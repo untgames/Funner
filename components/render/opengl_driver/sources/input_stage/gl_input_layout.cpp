@@ -30,6 +30,7 @@ struct InputLayout::GlVertexAttribute
   GLenum                  type;       //тип элементов
   size_t                  offset;     //смещение относительно начала вершинного буфера
   size_t                  stride;     //шаг между атрибутами
+  bool                    normalized; //нормирован ли атрибут
 };
 
 //группа вершинных атрибутов в интерпретации OpenGL
@@ -169,6 +170,8 @@ class VertexAttributeSemanticTraits
 
       Set (VertexAttributeSemantic_Position, InputDataType_Short);
       Set (VertexAttributeSemantic_Position, InputDataType_Int);
+      Set (VertexAttributeSemantic_Position, InputDataType_ShortNorm);
+      Set (VertexAttributeSemantic_Position, InputDataType_IntNorm);
       Set (VertexAttributeSemantic_Position, InputDataType_Float);
       Set (VertexAttributeSemantic_Position, InputDataFormat_Vector2);
       Set (VertexAttributeSemantic_Position, InputDataFormat_Vector3);
@@ -177,6 +180,9 @@ class VertexAttributeSemanticTraits
       Set (VertexAttributeSemantic_Normal, InputDataType_Byte);
       Set (VertexAttributeSemantic_Normal, InputDataType_Short);
       Set (VertexAttributeSemantic_Normal, InputDataType_Int);
+      Set (VertexAttributeSemantic_Normal, InputDataType_ByteNorm);
+      Set (VertexAttributeSemantic_Normal, InputDataType_ShortNorm);
+      Set (VertexAttributeSemantic_Normal, InputDataType_IntNorm);
       Set (VertexAttributeSemantic_Normal, InputDataType_Float);
       Set (VertexAttributeSemantic_Normal, InputDataFormat_Vector3);
       
@@ -186,6 +192,12 @@ class VertexAttributeSemanticTraits
       Set (VertexAttributeSemantic_Color, InputDataType_UShort);
       Set (VertexAttributeSemantic_Color, InputDataType_Int);
       Set (VertexAttributeSemantic_Color, InputDataType_UInt);
+      Set (VertexAttributeSemantic_Color, InputDataType_ByteNorm);
+      Set (VertexAttributeSemantic_Color, InputDataType_UByteNorm);
+      Set (VertexAttributeSemantic_Color, InputDataType_ShortNorm);
+      Set (VertexAttributeSemantic_Color, InputDataType_UShortNorm);
+      Set (VertexAttributeSemantic_Color, InputDataType_IntNorm);
+      Set (VertexAttributeSemantic_Color, InputDataType_UIntNorm);
       Set (VertexAttributeSemantic_Color, InputDataType_Float);
       Set (VertexAttributeSemantic_Color, InputDataFormat_Vector3);
       Set (VertexAttributeSemantic_Color, InputDataFormat_Vector4);
@@ -196,6 +208,8 @@ class VertexAttributeSemanticTraits
         
         Set (semantic, InputDataType_Short);
         Set (semantic, InputDataType_Int);
+        Set (semantic, InputDataType_ShortNorm);
+        Set (semantic, InputDataType_IntNorm);
         Set (semantic, InputDataType_Float);
         Set (semantic, InputDataFormat_Vector1);
         Set (semantic, InputDataFormat_Vector2);
@@ -305,14 +319,17 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
   switch (desc.index_type)
   {
     case InputDataType_UByte:
+    case InputDataType_UByteNorm:
       new_index_data_type = GL_UNSIGNED_BYTE;
       new_index_size      = sizeof (unsigned char);
       break;
     case InputDataType_UShort:
+    case InputDataType_UShortNorm:
       new_index_data_type = GL_UNSIGNED_SHORT;
       new_index_size      = sizeof (unsigned short);
       break;
     case InputDataType_UInt:
+    case InputDataType_UIntNorm:
 #ifndef OPENGL_ES_SUPPORT
       new_index_data_type = GL_UNSIGNED_INT;
       new_index_size      = sizeof (unsigned int);
@@ -321,6 +338,9 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     case InputDataType_Byte:
     case InputDataType_Short:
     case InputDataType_Int:
+    case InputDataType_ByteNorm:
+    case InputDataType_ShortNorm:
+    case InputDataType_IntNorm:
     case InputDataType_Float:
       throw xtl::format_not_supported_exception (METHOD_NAME, "desc.index_type=%s unsupported", get_name (desc.index_type));
     default:
@@ -398,6 +418,12 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           case InputDataType_UShort:
           case InputDataType_Int:
           case InputDataType_UInt:
+          case InputDataType_ByteNorm:
+          case InputDataType_UByteNorm:
+          case InputDataType_ShortNorm:
+          case InputDataType_UShortNorm:
+          case InputDataType_IntNorm:
+          case InputDataType_UIntNorm:
           case InputDataType_Float:
             if (!caps.glVertexAttribPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported (no GL_ARB_vertex_shader extension)", va.semantic);
@@ -477,6 +503,12 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           case InputDataType_UShort:
           case InputDataType_Int:
           case InputDataType_UInt:
+          case InputDataType_ByteNorm:
+          case InputDataType_UByteNorm:
+          case InputDataType_ShortNorm:
+          case InputDataType_UShortNorm:
+          case InputDataType_IntNorm:
+          case InputDataType_UIntNorm:
           case InputDataType_Float:
             if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.type))
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
@@ -576,30 +608,43 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       
       size_t type_size = 0;
 
+      gl_va.normalized = false;
+
       switch (va.type)
       {
+        case InputDataType_ByteNorm:
+          gl_va.normalized = true;
         case InputDataType_Byte:
           gl_va.type = GL_BYTE;
           type_size  = sizeof (char);
           break;
+        case InputDataType_UByteNorm:
+          gl_va.normalized = true;
         case InputDataType_UByte:
           gl_va.type = GL_UNSIGNED_BYTE;
           type_size  = sizeof (unsigned char);
           break;
+        case InputDataType_ShortNorm:
+          gl_va.normalized = true;         
         case InputDataType_Short:
           gl_va.type = GL_SHORT;
           type_size  = sizeof (short);
           break;
+        case InputDataType_UShortNorm:
+          gl_va.normalized = true;
         case InputDataType_UShort:
           gl_va.type = GL_UNSIGNED_SHORT;
           type_size  = sizeof (unsigned short);
           break;
 #ifndef OPENGL_ES_SUPPORT          
+        case InputDataType_IntNorm:
+          gl_va.normalized = true;
         case InputDataType_Int:
           gl_va.type = GL_INT;
           type_size  = sizeof (int);
           break;
         case InputDataType_UInt:
+        case InputDataType_UIntNorm:
           gl_va.type = GL_UNSIGNED_INT;
           type_size  = sizeof (unsigned int);
           break;
@@ -790,8 +835,8 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
           case GL_UNSIGNED_SHORT:
           case GL_INT:
           case GL_UNSIGNED_INT:
-            if (caps.glVertexAttribIPointer_fn) caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
-            else                                caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
+            if (caps.glVertexAttribIPointer_fn && !va.normalized) caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+            else                                                  caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, va.normalized, va.stride, offset);
 
             break;
           case GL_DOUBLE:
@@ -799,7 +844,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
             break;
 #endif
           default:
-            caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
+            caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, va.normalized, va.stride, offset);
             break;
         }
 

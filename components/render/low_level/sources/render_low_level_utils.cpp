@@ -267,13 +267,19 @@ const char* get_name (InputDataType param)
 {
   switch (param)
   {
-    case InputDataType_Byte:    return "InputDataType_Byte";
-    case InputDataType_UByte:   return "InputDataType_UByte";
-    case InputDataType_Short:   return "InputDataType_Short";
-    case InputDataType_UShort:  return "InputDataType_UShort";
-    case InputDataType_Int:     return "InputDataType_Int";
-    case InputDataType_UInt:    return "InputDataType_UInt";
-    case InputDataType_Float:   return "InputDataType_Float";
+    case InputDataType_Byte:        return "InputDataType_Byte";
+    case InputDataType_UByte:       return "InputDataType_UByte";
+    case InputDataType_Short:       return "InputDataType_Short";
+    case InputDataType_UShort:      return "InputDataType_UShort";
+    case InputDataType_Int:         return "InputDataType_Int";
+    case InputDataType_UInt:        return "InputDataType_UInt";
+    case InputDataType_ByteNorm:    return "InputDataType_ByteNorm";
+    case InputDataType_UByteNorm:   return "InputDataType_UByteNorm";
+    case InputDataType_ShortNorm:   return "InputDataType_ShortNorm";
+    case InputDataType_UShortNorm:  return "InputDataType_UShortNorm";
+    case InputDataType_IntNorm:     return "InputDataType_IntNorm";
+    case InputDataType_UIntNorm:    return "InputDataType_UIntNorm";
+    case InputDataType_Float:       return "InputDataType_Float";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(InputDataType)", "param", param);
   }

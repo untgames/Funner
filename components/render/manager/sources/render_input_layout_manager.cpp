@@ -163,13 +163,19 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
               
         switch (va.type)
         {
-          case render::low_level::InputDataType_Byte:   type = "byte"; break;
-          case render::low_level::InputDataType_UByte:  type = "ubyte"; break;
-          case render::low_level::InputDataType_Short:  type = "short"; break;
-          case render::low_level::InputDataType_UShort: type = "ushort"; break;
-          case render::low_level::InputDataType_Int:    type = "int"; break;
-          case render::low_level::InputDataType_UInt:   type = "uint"; break;
-          case render::low_level::InputDataType_Float:  type = "float"; break;
+          case render::low_level::InputDataType_Byte:       type = "byte"; break;
+          case render::low_level::InputDataType_UByte:      type = "ubyte"; break;
+          case render::low_level::InputDataType_Short:      type = "short"; break;
+          case render::low_level::InputDataType_UShort:     type = "ushort"; break;
+          case render::low_level::InputDataType_Int:        type = "int"; break;
+          case render::low_level::InputDataType_UInt:       type = "uint"; break;
+          case render::low_level::InputDataType_ByteNorm:   type = "byte_norm"; break;
+          case render::low_level::InputDataType_UByteNorm:  type = "ubyte_norm"; break;
+          case render::low_level::InputDataType_ShortNorm:  type = "short_norm"; break;
+          case render::low_level::InputDataType_UShortNorm: type = "ushort_norm"; break;
+          case render::low_level::InputDataType_IntNorm:    type = "int_norm"; break;
+          case render::low_level::InputDataType_UIntNorm:   type = "uint_norm"; break;
+          case render::low_level::InputDataType_Float:      type = "float"; break;
           default:
             break;
         }
@@ -206,7 +212,7 @@ void InputLayoutManager::InitDynamicPrimitivesLayout ()
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, position),  sizeof (DynamicPrimitiveVertex)},
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Normal),    render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, normal),    sizeof (DynamicPrimitiveVertex)},
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, tex_coord), sizeof (DynamicPrimitiveVertex)},
-      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_UByte, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_UByteNorm, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
     };
 
     static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);

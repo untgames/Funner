@@ -94,19 +94,19 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
             dst_va.format = InputDataFormat_Vector4;
             break;
           case media::geometry::VertexAttributeType_Short2:
-            dst_va.type   = InputDataType_Short;
+            dst_va.type   = InputDataType_ShortNorm;
             dst_va.format = InputDataFormat_Vector2;
             break;
           case media::geometry::VertexAttributeType_Short3:
-            dst_va.type   = InputDataType_Short;
+            dst_va.type   = InputDataType_ShortNorm;
             dst_va.format = InputDataFormat_Vector3;
             break;
           case media::geometry::VertexAttributeType_Short4:
-            dst_va.type   = InputDataType_Short;
+            dst_va.type   = InputDataType_ShortNorm;
             dst_va.format = InputDataFormat_Vector4;
             break;
           case media::geometry::VertexAttributeType_UByte4:
-            dst_va.type   = InputDataType_UByte;
+            dst_va.type   = InputDataType_UByteNorm;
             dst_va.format = InputDataFormat_Vector4;
             break;
           default:

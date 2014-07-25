@@ -73,14 +73,20 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
         {
           case InputDataType_Byte:
           case InputDataType_UByte:
+          case InputDataType_ByteNorm:
+          case InputDataType_UByteNorm:
             type_size = sizeof (char);
             break;
           case InputDataType_Short:
           case InputDataType_UShort:
+          case InputDataType_ShortNorm:
+          case InputDataType_UShortNorm:
             type_size = sizeof (short);
             break;
           case InputDataType_Int:
           case InputDataType_UInt:
+          case InputDataType_IntNorm:
+          case InputDataType_UIntNorm:
             type_size = sizeof (int);
             break;
           case InputDataType_Float:
@@ -97,13 +103,19 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
             switch (src_va.type)
             {
-              case InputDataType_Byte:   dst_va.Format = DXGI_FORMAT_R8_SINT;   break;
-              case InputDataType_UByte:  dst_va.Format = DXGI_FORMAT_R8_UINT;   break;
-              case InputDataType_Short:  dst_va.Format = DXGI_FORMAT_R16_SINT;  break;
-              case InputDataType_UShort: dst_va.Format = DXGI_FORMAT_R16_UINT;  break;
-              case InputDataType_Int:    dst_va.Format = DXGI_FORMAT_R32_SINT;  break;
-              case InputDataType_UInt:   dst_va.Format = DXGI_FORMAT_R32_UINT;  break;
-              case InputDataType_Float:  dst_va.Format = DXGI_FORMAT_R32_FLOAT; break;
+              case InputDataType_Byte:       dst_va.Format = DXGI_FORMAT_R8_SINT;   break;
+              case InputDataType_UByte:      dst_va.Format = DXGI_FORMAT_R8_UINT;   break;
+              case InputDataType_Short:      dst_va.Format = DXGI_FORMAT_R16_SINT;  break;
+              case InputDataType_UShort:     dst_va.Format = DXGI_FORMAT_R16_UINT;  break;
+              case InputDataType_Int:        dst_va.Format = DXGI_FORMAT_R32_SINT;  break;
+              case InputDataType_UInt:       dst_va.Format = DXGI_FORMAT_R32_UINT;  break;
+              case InputDataType_ByteNorm:   dst_va.Format = DXGI_FORMAT_R8_SNORM;  break;
+              case InputDataType_UByteNorm:  dst_va.Format = DXGI_FORMAT_R8_UNORM;  break;
+              case InputDataType_ShortNorm:  dst_va.Format = DXGI_FORMAT_R16_SNORM; break;
+              case InputDataType_UShortNorm: dst_va.Format = DXGI_FORMAT_R16_UNORM; break;
+              case InputDataType_IntNorm:    dst_va.Format = DXGI_FORMAT_R32_SNORM; break;
+              case InputDataType_UIntNorm:   dst_va.Format = DXGI_FORMAT_R32_UNORM; break;
+              case InputDataType_Float:      dst_va.Format = DXGI_FORMAT_R32_FLOAT; break;
             }
             break;
           case InputDataFormat_Vector2:
@@ -111,13 +123,19 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
             switch (src_va.type)
             {
-              case InputDataType_Byte:   dst_va.Format = DXGI_FORMAT_R8G8_SINT;    break;
-              case InputDataType_UByte:  dst_va.Format = DXGI_FORMAT_R8G8_UINT;    break;
-              case InputDataType_Short:  dst_va.Format = DXGI_FORMAT_R16G16_SINT;  break;
-              case InputDataType_UShort: dst_va.Format = DXGI_FORMAT_R16G16_UINT;  break;
-              case InputDataType_Int:    dst_va.Format = DXGI_FORMAT_R32G32_SINT;  break;
-              case InputDataType_UInt:   dst_va.Format = DXGI_FORMAT_R32G32_UINT;  break;
-              case InputDataType_Float:  dst_va.Format = DXGI_FORMAT_R32G32_FLOAT; break;
+              case InputDataType_Byte:       dst_va.Format = DXGI_FORMAT_R8G8_SINT;    break;
+              case InputDataType_UByte:      dst_va.Format = DXGI_FORMAT_R8G8_UINT;    break;
+              case InputDataType_Short:      dst_va.Format = DXGI_FORMAT_R16G16_SINT;  break;
+              case InputDataType_UShort:     dst_va.Format = DXGI_FORMAT_R16G16_UINT;  break;
+              case InputDataType_Int:        dst_va.Format = DXGI_FORMAT_R32G32_SINT;  break;
+              case InputDataType_UInt:       dst_va.Format = DXGI_FORMAT_R32G32_UINT;  break;
+              case InputDataType_ByteNorm:   dst_va.Format = DXGI_FORMAT_R8G8_SNORM;   break;
+              case InputDataType_UByteNorm:  dst_va.Format = DXGI_FORMAT_R8G8_UNORM;   break;
+              case InputDataType_ShortNorm:  dst_va.Format = DXGI_FORMAT_R16G16_SNORM; break;
+              case InputDataType_UShortNorm: dst_va.Format = DXGI_FORMAT_R16G16_UNORM; break;
+              case InputDataType_IntNorm:    dst_va.Format = DXGI_FORMAT_R32G32_SNORM; break;
+              case InputDataType_UIntNorm:   dst_va.Format = DXGI_FORMAT_R32G32_UNORM; break;
+              case InputDataType_Float:      dst_va.Format = DXGI_FORMAT_R32G32_FLOAT; break;
             }
             break;
           case InputDataFormat_Vector3:
@@ -125,9 +143,11 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
             switch (src_va.type)
             {
-              case InputDataType_Int:    dst_va.Format = DXGI_FORMAT_R32G32B32_SINT;  break;
-              case InputDataType_UInt:   dst_va.Format = DXGI_FORMAT_R32G32B32_UINT;  break;
-              case InputDataType_Float:  dst_va.Format = DXGI_FORMAT_R32G32B32_FLOAT; break;
+              case InputDataType_Int:      dst_va.Format = DXGI_FORMAT_R32G32B32_SINT;  break;
+              case InputDataType_UInt:     dst_va.Format = DXGI_FORMAT_R32G32B32_UINT;  break;
+              case InputDataType_IntNorm:  dst_va.Format = DXGI_FORMAT_R32G32B32_SNORM;  break;
+              case InputDataType_UIntNorm: dst_va.Format = DXGI_FORMAT_R32G32B32_UNORM;  break;
+              case InputDataType_Float:    dst_va.Format = DXGI_FORMAT_R32G32B32_FLOAT; break;
               case InputDataType_Byte:
               case InputDataType_UByte:
               case InputDataType_Short:
@@ -140,13 +160,19 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
             switch (src_va.type)
             {
-              case InputDataType_Byte:   dst_va.Format = DXGI_FORMAT_R8G8B8A8_SINT;      break;
-              case InputDataType_UByte:  dst_va.Format = DXGI_FORMAT_R8G8B8A8_UINT;      break;
-              case InputDataType_Short:  dst_va.Format = DXGI_FORMAT_R16G16B16A16_SINT;  break;
-              case InputDataType_UShort: dst_va.Format = DXGI_FORMAT_R16G16B16A16_UINT;  break;
-              case InputDataType_Int:    dst_va.Format = DXGI_FORMAT_R32G32B32A32_SINT;  break;
-              case InputDataType_UInt:   dst_va.Format = DXGI_FORMAT_R32G32B32A32_UINT;  break;
-              case InputDataType_Float:  dst_va.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+              case InputDataType_Byte:       dst_va.Format = DXGI_FORMAT_R8G8B8A8_SINT;      break;
+              case InputDataType_UByte:      dst_va.Format = DXGI_FORMAT_R8G8B8A8_UINT;      break;
+              case InputDataType_Short:      dst_va.Format = DXGI_FORMAT_R16G16B16A16_SINT;  break;
+              case InputDataType_UShort:     dst_va.Format = DXGI_FORMAT_R16G16B16A16_UINT;  break;
+              case InputDataType_Int:        dst_va.Format = DXGI_FORMAT_R32G32B32A32_SINT;  break;
+              case InputDataType_UInt:       dst_va.Format = DXGI_FORMAT_R32G32B32A32_UINT;  break;
+              case InputDataType_Byte:       dst_va.Format = DXGI_FORMAT_R8G8B8A8_SNORM;     break;
+              case InputDataType_UByteNorm:  dst_va.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     break;
+              case InputDataType_ShortNorm:  dst_va.Format = DXGI_FORMAT_R16G16B16A16_SNORM; break;
+              case InputDataType_UShortNorm: dst_va.Format = DXGI_FORMAT_R16G16B16A16_UNORM; break;
+              case InputDataType_IntNorm:    dst_va.Format = DXGI_FORMAT_R32G32B32A32_SNORM; break;
+              case InputDataType_UIntNorm:   dst_va.Format = DXGI_FORMAT_R32G32B32A32_UNORM; break;
+              case InputDataType_Float:      dst_va.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
             }
             break;
           default:
@@ -179,14 +205,20 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
     switch (desc.index_type)
     {
-      case InputDataType_Byte:    impl->index_format = DXGI_FORMAT_R8_SINT;   break;
-      case InputDataType_UByte:   impl->index_format = DXGI_FORMAT_R8_UINT;   break;
-      case InputDataType_Short:   impl->index_format = DXGI_FORMAT_R16_SINT;  break;
-      case InputDataType_UShort:  impl->index_format = DXGI_FORMAT_R16_UINT;  break;
-      case InputDataType_Int:     impl->index_format = DXGI_FORMAT_R32_SINT;  break;
-      case InputDataType_UInt:    impl->index_format = DXGI_FORMAT_R32_UINT;  break;
-      case InputDataType_Float:   impl->index_format = DXGI_FORMAT_R32_FLOAT; break;
-      default:                    throw xtl::make_argument_exception ("", "desc.index_type", desc.index_type);
+      case InputDataType_Byte:        impl->index_format = DXGI_FORMAT_R8_SINT;   break;
+      case InputDataType_UByte:       impl->index_format = DXGI_FORMAT_R8_UINT;   break;
+      case InputDataType_Short:       impl->index_format = DXGI_FORMAT_R16_SINT;  break;
+      case InputDataType_UShort:      impl->index_format = DXGI_FORMAT_R16_UINT;  break;
+      case InputDataType_Int:         impl->index_format = DXGI_FORMAT_R32_SINT;  break;
+      case InputDataType_UInt:        impl->index_format = DXGI_FORMAT_R32_UINT;  break;
+      case InputDataType_ByteNorm:    impl->index_format = DXGI_FORMAT_R8_SNORM;  break;
+      case InputDataType_UByteNorm:   impl->index_format = DXGI_FORMAT_R8_UNORM;  break;
+      case InputDataType_ShortNorm:   impl->index_format = DXGI_FORMAT_R16_SNORM; break;
+      case InputDataType_UShortNorm:  impl->index_format = DXGI_FORMAT_R16_UNORM; break;
+      case InputDataType_IntNorm:     impl->index_format = DXGI_FORMAT_R32_SNORM; break;
+      case InputDataType_UIntNorm:    impl->index_format = DXGI_FORMAT_R32_UNORM; break;
+      case InputDataType_Float:       impl->index_format = DXGI_FORMAT_R32_FLOAT; break;
+      default:                        throw xtl::make_argument_exception ("", "desc.index_type", desc.index_type);
     }
 
       //נאסק¸ע ץ‎רא

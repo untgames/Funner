@@ -41,13 +41,19 @@ enum VertexAttributeSemantic
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum InputDataType
 {
-  InputDataType_Byte,   //однобайтовое целое знаковое число
-  InputDataType_UByte,  //однобайтовое целое беззнаковое число
-  InputDataType_Short,  //двубайтовое целое знаковое число
-  InputDataType_UShort, //двубайтовое целое беззнаковое число
-  InputDataType_Int,    //четырёхбайтовое целое знаковое число
-  InputDataType_UInt,   //четырёхбайтовое целое беззнаковое число
-  InputDataType_Float,  //четырёхбайтовое вещественное число
+  InputDataType_Byte,       //однобайтовое целое знаковое число
+  InputDataType_UByte,      //однобайтовое целое беззнаковое число
+  InputDataType_Short,      //двубайтовое целое знаковое число
+  InputDataType_UShort,     //двубайтовое целое беззнаковое число
+  InputDataType_Int,        //четырёхбайтовое целое знаковое число
+  InputDataType_UInt,       //четырёхбайтовое целое беззнаковое число
+  InputDataType_ByteNorm,   //однобайтовое целое знаковое число (нормированное)
+  InputDataType_UByteNorm,  //однобайтовое целое беззнаковое число (нормированное)
+  InputDataType_ShortNorm,  //двубайтовое целое знаковое число (нормированное)
+  InputDataType_UShortNorm, //двубайтовое целое беззнаковое число (нормированное)
+  InputDataType_IntNorm,    //четырёхбайтовое целое знаковое число (нормированное)
+  InputDataType_UIntNorm,   //четырёхбайтовое целое беззнаковое число (нормированное)
+  InputDataType_Float,      //четырёхбайтовое вещественное число
 
   InputDataType_Num
 };
