@@ -41,10 +41,10 @@ void idle (Test& test)
 
         scene_graph::Scissor::Pointer scissor = scene_graph::Scissor::Create ();
 
-        scissor->SetScale (math::vec3f (5.0f));
-        scissor->SetPosition (math::vec3f (2.5f, 2.5f, 0));
+        scissor->SetScale (math::vec3f (1.f));
+        scissor->SetWorldPosition (math::vec3f (0.f, 2.f, 0.f));
 
-        scissor->BindToParent (test.sprite, scene_graph::NodeBindMode_AddRef);
+        scissor->BindToScene (*test.sprite.Scene (), scene_graph::NodeBindMode_AddRef);
 
         test.sprite.SetScissor (&*scissor);
       }
@@ -76,7 +76,7 @@ int main ()
   {
     common::LogFilter log_filter ("render.*", &log_print);
 
-    syslib::Window window (syslib::WindowStyle_Overlapped, 400, 300);
+    syslib::Window window (syslib::WindowStyle_Overlapped, 400, 400);
 
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&on_window_close));
 
