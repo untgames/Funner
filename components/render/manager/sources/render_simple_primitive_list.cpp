@@ -30,7 +30,7 @@ inline math::vec4ub convert_color (const math::vec4f& src_color)
 {
   math::vec4f color = 255.0f * src_color;
 
-  return math::vec4ub (unsigned char (color.x), unsigned char (color.y), unsigned char (color.z), unsigned char (color.w));
+  return math::vec4ub ((unsigned char)color.x, (unsigned char)color.y, (unsigned char)color.z, (unsigned char)color.w);
 }
 
 /*
