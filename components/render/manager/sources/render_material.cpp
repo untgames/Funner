@@ -292,6 +292,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
           if (texmap)
           {
+            texmap->UpdateCache ();
+
             if (!texmap->cached_device_texture)
               log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad texture '%s'", channel, cached_program->Name (), name.c_str (), texmap->texture.Name ());
 

@@ -38,6 +38,11 @@ bool find_font_less_comparator (const FontEntryPtr& font, const char* name)
   return font->font_name < name;
 }
 
+bool find_font_less_comparator_ptr (const FontEntryPtr& font1, const FontEntryPtr& font2)
+{
+  return font1->font_name < font2->font_name;
+}
+
 bool remove_by_file_name (const FontEntryPtr& font, const char* file_name)
 {
   return !xtl::xstrcmp (font->font_desc.Source (), file_name);
@@ -231,7 +236,7 @@ void FontLibrary::LoadFont (const char* file_name)
 
     impl->LoadFont (file_name, &loader);
 
-    stl::sort (impl->fonts.begin (), impl->fonts.end ());
+    stl::sort (impl->fonts.begin (), impl->fonts.end (), find_font_less_comparator_ptr);
   }
   catch (xtl::exception& e)
   {
@@ -273,7 +278,7 @@ void FontLibrary::LoadFonts (const char* wildcard)
       }
     }
 
-    stl::sort (impl->fonts.begin (), impl->fonts.end ());
+    stl::sort (impl->fonts.begin (), impl->fonts.end (), find_font_less_comparator_ptr);
   }
   catch (xtl::exception& e)
   {
