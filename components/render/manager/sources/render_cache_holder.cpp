@@ -8,19 +8,45 @@ using namespace render::manager;
 ===================================================================================================
 */
 
+typedef stl::list<CacheHolder*> HolderList;
+
+struct CacheHolder::Impl: public xtl::reference_counter
+{
+  HolderList dependencies;
+  HolderList sources;
+  CacheState state;
+  bool       need_update_this;
+
+  Impl ()
+    : state (CacheState_Reset)
+    , need_update_this (true)  
+  {
+  }  
+};
+
 /*
     Конструктор / деструктор
 */
 
 CacheHolder::CacheHolder ()
-  : state (CacheState_Reset)
-  , need_update_this (true)  
+  : impl (new Impl)
 {
 }
 
 CacheHolder::~CacheHolder ()
 {
   DetachAllCacheSources ();
+
+  release (impl);
+}
+
+/*
+    Состояние
+*/
+
+CacheState CacheHolder::State ()
+{
+  return impl->state;
 }
 
 /*
@@ -35,36 +61,36 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
   if (source.IsParentOf (*this))
     throw xtl::format_operation_exception ("render::manager::CacheHolder::AttachCacheSource", "Cache source is a parent of this cache holder");  
     
-  sources.push_back (&source);
+  impl->sources.push_back (&source);
   
   try
   {
-    source.dependencies.push_back (this);
+    source.impl->dependencies.push_back (this);
 
     InvalidateCache (false);
   }
   catch (...)
   {
-    sources.pop_back ();
+    impl->sources.pop_back ();
     throw;
   }
 }
 
 void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
-  sources.remove (&source);
-  source.dependencies.remove (this);
+  impl->sources.remove (&source);
+  source.impl->dependencies.remove (this);
 
   InvalidateCache (false);
 }
 
 void CacheHolder::DetachAllCacheSources ()
 {
-  while (!sources.empty ())
-    DetachCacheSource (*sources.back ());
+  while (!impl->sources.empty ())
+    DetachCacheSource (*impl->sources.back ());
 
-  while (!dependencies.empty ())
-    dependencies.back ()->DetachCacheSource (*this);
+  while (!impl->dependencies.empty ())
+    impl->dependencies.back ()->DetachCacheSource (*this);
     
   InvalidateCache (false);    
 }
@@ -75,7 +101,7 @@ void CacheHolder::DetachAllCacheSources ()
 
 bool CacheHolder::IsParentOf (CacheHolder& child)
 {
-  for (HolderList::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+  for (HolderList::iterator iter=impl->sources.begin (), end=impl->sources.end (); iter!=end; ++iter)
   {
     if (*iter == &child)
       return true;
@@ -93,10 +119,10 @@ bool CacheHolder::IsParentOf (CacheHolder& child)
 
 void CacheHolder::InvalidateFlags ()
 {
-  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+  for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
     (*iter)->InvalidateFlags ();
 
-  switch (state)
+  switch (impl->state)
   {
     case CacheState_Valid:
     case CacheState_Broken:    
@@ -106,20 +132,20 @@ void CacheHolder::InvalidateFlags ()
       return;
   }
 
-  state = CacheState_Invalid;
+  impl->state = CacheState_Invalid;
 }
 
 void CacheHolder::InvalidateCache (bool invalidate_dependencies)
 {
-  if (need_update_this && !invalidate_dependencies)
+  if (impl->need_update_this && !invalidate_dependencies)
     return;
 
-  need_update_this = true;
+  impl->need_update_this = true;
 
   if (invalidate_dependencies)
   {
-    for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
-      (*iter)->need_update_this = true;  
+    for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
+      (*iter)->impl->need_update_this = true;  
   }
 
   InvalidateFlags ();
@@ -131,7 +157,7 @@ void CacheHolder::InvalidateCache (bool invalidate_dependencies)
 
 void CacheHolder::ResetCache ()
 {
-  switch (state)
+  switch (impl->state)
   {
     case CacheState_Valid:
     case CacheState_Invalid:
@@ -141,9 +167,9 @@ void CacheHolder::ResetCache ()
       return;
   }    
   
-  if (state != CacheState_Reset)
+  if (impl->state != CacheState_Reset)
   {
-    need_update_this = true;
+    impl->need_update_this = true;
         
     try
     {
@@ -158,9 +184,9 @@ void CacheHolder::ResetCache ()
       Log ().Printf ("Unexpected exception at render::manager::CacheHolder::ResetCache");
     }
     
-    state = CacheState_Reset;
+    impl->state = CacheState_Reset;
     
-    for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+    for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
       (*iter)->UpdateCacheAfterReset ();    
   }
 }
@@ -180,7 +206,7 @@ void CacheHolder::UpdateCacheAfterReset ()
     Log ().Printf ("Unexpected exception at render::manager::CacheHolder::UpdateCacheAfterReset");
   }    
 
-  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+  for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
     (*iter)->UpdateCacheAfterReset ();
 }
 
@@ -190,7 +216,7 @@ void CacheHolder::UpdateCacheAfterReset ()
 
 void CacheHolder::UpdateCache ()
 {
-  switch (state)
+  switch (impl->state)
   {    
     case CacheState_Invalid:
     case CacheState_Reset:    
@@ -200,10 +226,10 @@ void CacheHolder::UpdateCache ()
       return;
   }    
 
-  for (HolderList::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+  for (HolderList::iterator iter=impl->sources.begin (), end=impl->sources.end (); iter!=end; ++iter)
     (*iter)->UpdateCache ();
     
-  if (need_update_this)
+  if (impl->need_update_this)
   {   
     try
     {
@@ -213,16 +239,16 @@ void CacheHolder::UpdateCache ()
     {
       InvalidateCacheDependencies ();
       
-      state            = CacheState_Broken;
-      need_update_this = false;
+      impl->state            = CacheState_Broken;
+      impl->need_update_this = false;
 
       throw;
     }
     
-    need_update_this = false;
+    impl->need_update_this = false;
   } 
     
-  state = CacheState_Valid;
+  impl->state = CacheState_Valid;
 }
 
 /*
