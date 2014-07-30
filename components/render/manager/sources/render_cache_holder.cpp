@@ -8,17 +8,44 @@ using namespace render::manager;
 ===================================================================================================
 */
 
+namespace
+{
+
 typedef stl::list<CacheHolder*> HolderList;
+
+struct IteratorNode
+{
+  HolderList::iterator& iter;  
+  IteratorNode*         next;
+  IteratorNode*&        first;
+
+  IteratorNode (HolderList::iterator& in_iter, IteratorNode*& in_first)
+    : iter (in_iter)
+    , next (first)
+    , first (in_first)
+  {
+    first = this;    
+  }
+
+  ~IteratorNode ()
+  {
+    first = next;
+  }
+};
+
+}
 
 struct CacheHolder::Impl: public xtl::reference_counter
 {
-  HolderList dependencies;
-  HolderList sources;
-  CacheState state;
-  bool       need_update_this;
+  HolderList    dependencies;
+  HolderList    sources;
+  CacheState    state;
+  IteratorNode* first_iter;
+  bool          need_update_this;  
 
   Impl ()
     : state (CacheState_Reset)
+    , first_iter ()
     , need_update_this (true)  
   {
   }  
@@ -79,7 +106,19 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
 void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
   impl->sources.remove (&source);
-  source.impl->dependencies.remove (this);
+
+  HolderList& src_dependencies = source.impl->dependencies;
+
+  HolderList::iterator iter = stl::find (src_dependencies.begin (), src_dependencies.end (), this);
+
+  if (iter != src_dependencies.end ())
+  {
+    for (IteratorNode* node=source.impl->first_iter; node; node=node->next)
+      if (node->iter == iter)
+        --node->iter;
+
+    src_dependencies.erase (iter);
+  }
 
   InvalidateCache (false);
 }
@@ -186,9 +225,19 @@ void CacheHolder::ResetCache ()
     
     impl->state = CacheState_Reset;
     
-    for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
-      (*iter)->UpdateCacheAfterReset ();    
+    UpdateChildrenCacheAfterReset ();
   }
+}
+
+void CacheHolder::UpdateChildrenCacheAfterReset ()
+{
+  xtl::intrusive_ptr<Impl> self_lock (impl);
+  HolderList&              dependencies = impl->dependencies;
+  HolderList::iterator     iter         = dependencies.begin ();
+  IteratorNode             iter_node (iter, impl->first_iter);
+
+  for (; iter!=dependencies.end (); ++iter)
+    (*iter)->UpdateCacheAfterReset ();    
 }
 
 void CacheHolder::UpdateCacheAfterReset ()
@@ -206,8 +255,7 @@ void CacheHolder::UpdateCacheAfterReset ()
     Log ().Printf ("Unexpected exception at render::manager::CacheHolder::UpdateCacheAfterReset");
   }    
 
-  for (HolderList::iterator iter=impl->dependencies.begin (), end=impl->dependencies.end (); iter!=end; ++iter)
-    (*iter)->UpdateCacheAfterReset ();
+  UpdateChildrenCacheAfterReset ();
 }
 
 /*

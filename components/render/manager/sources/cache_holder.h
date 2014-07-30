@@ -72,6 +72,7 @@ class CacheHolder: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void InvalidateFlags ();
     void UpdateCacheAfterReset ();
+    void UpdateChildrenCacheAfterReset ();
 
   private:
     struct Impl;
