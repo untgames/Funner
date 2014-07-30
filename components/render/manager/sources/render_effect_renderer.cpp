@@ -250,7 +250,8 @@ struct NormalizedScissor
       math::vec4f vmin = vp_matrix * math::vec4f (scissor->Box ().min_extent, 1.0f),
                   vmax = vp_matrix * math::vec4f (scissor->Box ().max_extent, 1.0f);
 
-      box += math::vec3f (vmin / vmin.w);
+      box.reset (math::vec3f (vmin / vmin.w));
+
       box += math::vec3f (vmax / vmax.w);
     }
 
