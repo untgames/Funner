@@ -21,7 +21,7 @@ struct IteratorNode
 
   IteratorNode (HolderList::iterator& in_iter, IteratorNode*& in_first)
     : iter (in_iter)
-    , next (first)
+    , next (in_first)
     , first (in_first)
   {
     first = this;    
