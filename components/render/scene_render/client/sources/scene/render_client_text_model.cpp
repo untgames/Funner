@@ -126,7 +126,7 @@ class TextModel: public VisualModel
 
           //обновление шрифтов
 
-        if (need_update_fonts)
+        if (chars_count && need_update_fonts)
         {
           UpdateFonts (context, model);
 
