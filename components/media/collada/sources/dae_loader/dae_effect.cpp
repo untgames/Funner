@@ -51,6 +51,12 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
   if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.bump.texture"))
     ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Bump);
 
+  if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.specularLevel.texture"))
+    ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Specular);
+
+  if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.gloss.texture"))
+    ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Specular);
+
     //чтение типа шейдера
 
   static String2Value<ShaderType> shader_types [] = {
