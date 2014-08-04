@@ -145,10 +145,10 @@ struct InputStage::Impl: public ContextObject
 
       MakeContextCurrent();
 
-      texture_units_count = GetCaps ().texture_units_count;
+      ffp_texture_units_count = GetCaps ().ffp_texture_units_count;
         
-      if (texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
-        texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
+      if (ffp_texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+        ffp_texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
         
         //инициализация состояния уровня
         
@@ -162,7 +162,7 @@ struct InputStage::Impl: public ContextObject
       default_layout_desc.index_type = InputDataType_UShort;
 #endif
 
-      default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, texture_units_count), false);
+      default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, ffp_texture_units_count), false);
       
       SetInputLayout (default_layout.get ());
         
@@ -216,7 +216,7 @@ struct InputStage::Impl: public ContextObject
     
     IInputLayout* CreateInputLayout (const InputLayoutDesc& desc)
     {
-      return new InputLayout (GetContextManager (), desc, texture_units_count);
+      return new InputLayout (GetContextManager (), desc, ffp_texture_units_count);
     }
 
     /*
@@ -306,9 +306,9 @@ struct InputStage::Impl: public ContextObject
     typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
 
   private:
-    InputStageState state;               //состояние уровня
-    InputLayoutPtr  default_layout;      //состояние расположения геометрии по умолчанию  
-    size_t          texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно
+    InputStageState state;                   //состояние уровня
+    InputLayoutPtr  default_layout;          //состояние расположения геометрии по умолчанию  
+    size_t          ffp_texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно для FFP
 };
 
 /*

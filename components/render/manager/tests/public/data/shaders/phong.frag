@@ -21,9 +21,9 @@ uniform sampler2D   DiffuseTexture;
 uniform sampler2D   BumpTexture;
 uniform sampler2D   SpecularTexture;
 
-varying vec4 DiffuseTexcoord;
-varying vec4 BumpTexcoord;
-varying vec4 SpecularTexcoord;
+varying vec3 DiffuseTexcoord;
+varying vec3 BumpTexcoord;
+varying vec3 SpecularTexcoord;
 varying vec3 GlobalAmbientTexcoord;
 varying vec3 EyeDirection;
 varying vec3 ReflectionDirection;

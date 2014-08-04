@@ -84,7 +84,7 @@ int main ()
 
     RenderManager render_manager = test.RenderManager ();
 
-    render_manager.LoadResource ("data/u1.binmesh");
+    render_manager.LoadResource ("data/u1.xmesh");
     render_manager.LoadResource ("data/u1.xmtl");
     render_manager.LoadResource ("data/u1.rfx");
     render_manager.LoadResource ("data/u1/texture0000.dds");

@@ -252,11 +252,11 @@ class VertexAttributeSemanticTraits
     Конструктор / деструктор
 */
 
-InputLayout::InputLayout (const ContextManager& context_manager, const InputLayoutDesc& desc, size_t in_tex_units_count)
+InputLayout::InputLayout (const ContextManager& context_manager, const InputLayoutDesc& desc, size_t in_ffp_tex_units_count)
   : ContextObject (context_manager)
   , shader_layouts (0)
   , shader_attribute_names (0, 0)
-  , tex_units_count (in_tex_units_count)
+  , ffp_tex_units_count (in_ffp_tex_units_count)
 {
   try
   {
@@ -460,9 +460,9 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
             size_t tex_unit = semantic - VertexAttributeSemantic_TexCoord0;
 
-            if (tex_unit >= tex_units_count)
+            if (tex_unit >= ffp_tex_units_count)
               throw xtl::format_not_supported_exception (METHOD_NAME, "Bad desc.vertex_attribute[%u].semantic=%s (only %u texture units supported)",
-                                 i, va.semantic, tex_units_count);
+                                 i, va.semantic, ffp_tex_units_count);
 
             break;
           }
@@ -745,7 +745,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     {
       size_t mask = 1 << VertexAttributeSemantic_TexCoord0;
 
-      for (size_t i=0; i<tex_units_count; i++, mask <<= 1)
+      for (size_t i=0; i<ffp_tex_units_count; i++, mask <<= 1)
       {
         if (current_enabled_semantics_mask & ~std_semantics_mask & mask)
         {

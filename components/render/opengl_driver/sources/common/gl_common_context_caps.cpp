@@ -369,8 +369,16 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   if (has_ffp)
   {
 #ifndef OPENGL_ES2_SUPPORT
-    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-    else                      texture_units_count = 1;
+    if (has_arb_multitexture)
+    {
+      glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&ffp_texture_units_count);
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&texture_units_count);
+    }
+    else
+    {
+      texture_units_count     = 1;
+      ffp_texture_units_count = 1;
+    }
 #endif
   }
 #ifndef OPENGL_ES_SUPPORT  
@@ -414,8 +422,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     if (max_texture_size > settings_max_texture_size)           max_texture_size           = settings_max_texture_size;
   }
 
-  if (settings_max_anisotropy && max_anisotropy > settings_max_anisotropy)                max_anisotropy      = settings_max_anisotropy;
-  if (settings_texture_units_count && texture_units_count > settings_texture_units_count) texture_units_count = settings_texture_units_count;
+  if (settings_max_anisotropy && max_anisotropy > settings_max_anisotropy)                    max_anisotropy          = settings_max_anisotropy;
+  if (settings_texture_units_count && texture_units_count > settings_texture_units_count)     texture_units_count     = settings_texture_units_count;
+  if (settings_texture_units_count && ffp_texture_units_count > settings_texture_units_count) ffp_texture_units_count = settings_texture_units_count;
 }
 
 /*

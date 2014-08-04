@@ -493,16 +493,16 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     
   if (need_update_texmaps)
   {    
-    size_t       texture_units_count      = caps.has_arb_multitexture ? caps.texture_units_count : 1;
+    size_t       ffp_texture_units_count  = caps.has_arb_multitexture ? caps.ffp_texture_units_count : 1;
     const size_t active_texture_slot      = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
                  current_enabled_textures = GetContextCacheValue (CacheEntry_EnabledTextures);
 
-    if (texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
-      texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
+    if (ffp_texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
+      ffp_texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
 
     glMatrixMode (GL_TEXTURE);
 
-    for (size_t i=0; i<texture_units_count; i++)
+    for (size_t i=0; i<ffp_texture_units_count; i++)
     {
         //установка активного слота текстурирования
 

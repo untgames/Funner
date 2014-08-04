@@ -224,7 +224,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InputLayout  (const ContextManager&, const InputLayoutDesc&, size_t tex_units_count);
+    InputLayout  (const ContextManager&, const InputLayoutDesc&, size_t ffp_tex_units_count);
     ~InputLayout ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
     GLenum                      index_data_type;         //тип индексов
     size_t                      index_size;              //размер индекса
     size_t                      index_buffer_offset;     //смещение в индексном буфере до первого индекса
-    size_t                      tex_units_count;         //количество текстурных юнитов поддерживаемое аппаратно
+    size_t                      ffp_tex_units_count;     //количество текстурных юнитов поддерживаемое аппаратно для FFP
     size_t                      used_semantics_mask;     //маска используемых семантик
     size_t                      attributes_hash;         //хеш атрибутов
 };
