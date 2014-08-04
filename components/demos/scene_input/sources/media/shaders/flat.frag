@@ -3,7 +3,7 @@ uniform vec4 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 
 varying vec4 VertexColor;
-varying vec4 DiffuseTexcoord;
+varying vec3 DiffuseTexcoord;
 
 void main (void)
 {
