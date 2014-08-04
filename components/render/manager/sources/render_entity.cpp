@@ -446,6 +446,9 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       if (!cached_primitive)
       {  
         dynamic_primitives.RemoveAllPrimitives ();
+        cached_operations.clear ();
+
+        memset (&cached_operation_list, 0, sizeof (cached_operation_list));
 
         throw xtl::format_operation_exception ("", "Primitive '%s' not found", primitive.Name ());
       }
