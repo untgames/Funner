@@ -68,6 +68,7 @@ struct Params
   stl::string   output_textures_dir_name;     //имя каталога с сохранёнными текстурами
   stl::string   output_textures_format;       //формат текстур
   stl::string   material_textures_format;     //формат текстур сохраняемых в материале
+  stl::string   material_textures_dir_name;   //имя каталога с сохранёнными текстурами сохраняемых в материале
   stl::string   output_materials_file_name;   //файл материалов
   stl::string   output_scene_file_name;       //файл сцены
   stl::string   output_animations_file_name;  //файл анимаций
@@ -176,6 +177,12 @@ void command_line_material_textures_format (const char* format, Params& params)
   params.material_textures_format = format;
 }
 
+//установка каталога сохранения текстур в материале
+void command_line_material_textures_dir_name (const char* dir, Params& params)
+{
+  params.material_textures_dir_name = dir;
+}
+
 //установка максимального размера текстуры
 void command_line_output_max_texture_size (const char* value, Params& params)
 {
@@ -276,27 +283,28 @@ void command_line_set_resources_namespace (const char* prefix, Params& params)
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_source_search_path,           "include",                'I', "dir",       "add path to resources search paths"},
-    {command_line_output_textures_dir_name,     "out-textures-dir",         0, "dir",       "set output textures directory"},
-    {command_line_output_textures_format,       "out-textures-format",      0, "string",    "set output textures format string"},
-    {command_line_material_textures_format,     "material-textures-format", 0, "string",    "set material textures format string"},
-    {command_line_output_max_texture_size,      "max-texture-size",         0, "value",     "set maximum output textures size"},
-    {command_line_fix_zero_tangents,            "fix-zero-tangents",        0, 0,           "generate tangents for zero-values"},
-    {command_line_pot,                          "pot",                      0, 0,           "rescale textures to power of two"},
-    {command_line_output_materials_file_name,   "out-materials",            0, "file",      "set output materials file"},
-    {command_line_output_meshes_file_name,      "out-meshes",               0, "file",      "set output meshes file name"},
-    {command_line_output_phys_meshes_file_name, "out-phys-meshes",          0, "file",      "set output physics meshes file name"},
-    {command_line_convex_phys_meshes,           "convex-meshes",            0, "wldcards",  "set selected physics meshes as convex"},
-    {command_line_output_scene_file_name,       "out-scene",                0, "file",      "set output scene file"},
-    {command_line_output_animations_file_name,  "out-animations",           0, "file",      "set output animations file"},
-    {command_line_set_remove_file_prefix,       "remove-file-prefix",       0, "string",    "remove file prefix from all file links"},
-    {command_line_set_resources_namespace,      "resources-namespace",      0, "string",    "set resources namespace"},
-    {command_line_exclude_nodes,                "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
-    {command_line_merge_animation,              "merge-animation",          0, "string",    "merge all animations in one with given name"},
-    {command_line_remove_unused_resources,      "remove-unused",            0, 0,           "remove unused resources from export"},
-    {command_line_dont_convert_to_meters,       "dont-convert-to-meters",   0, 0,           "dont scale scene to match units with meters"},
-    {command_line_silent,                       "silent",                 's', 0,           "quiet mode"},
-    {command_line_help,                         "help",                   '?', 0,           "print help message"},
+    {command_line_source_search_path,           "include",                  'I', "dir",       "add path to resources search paths"},
+    {command_line_output_textures_dir_name,     "out-textures-dir",           0, "dir",       "set output textures directory"},
+    {command_line_output_textures_format,       "out-textures-format",        0, "string",    "set output textures format string"},
+    {command_line_material_textures_format,     "material-textures-format",   0, "string",    "set material textures format string"},
+    {command_line_material_textures_dir_name,   "material-textures-dir",      0, "string",    "set textures dir for material textures"},
+    {command_line_output_max_texture_size,      "max-texture-size",           0, "value",     "set maximum output textures size"},
+    {command_line_fix_zero_tangents,            "fix-zero-tangents",          0, 0,           "generate tangents for zero-values"},
+    {command_line_pot,                          "pot",                        0, 0,           "rescale textures to power of two"},
+    {command_line_output_materials_file_name,   "out-materials",              0, "file",      "set output materials file"},
+    {command_line_output_meshes_file_name,      "out-meshes",                 0, "file",      "set output meshes file name"},
+    {command_line_output_phys_meshes_file_name, "out-phys-meshes",            0, "file",      "set output physics meshes file name"},
+    {command_line_convex_phys_meshes,           "convex-meshes",              0, "wldcards",  "set selected physics meshes as convex"},
+    {command_line_output_scene_file_name,       "out-scene",                  0, "file",      "set output scene file"},
+    {command_line_output_animations_file_name,  "out-animations",             0, "file",      "set output animations file"},
+    {command_line_set_remove_file_prefix,       "remove-file-prefix",         0, "string",    "remove file prefix from all file links"},
+    {command_line_set_resources_namespace,      "resources-namespace",        0, "string",    "set resources namespace"},
+    {command_line_exclude_nodes,                "exclude-nodes",              0, "wildcards", "exclude selected nodes from export"},
+    {command_line_merge_animation,              "merge-animation",            0, "string",    "merge all animations in one with given name"},
+    {command_line_remove_unused_resources,      "remove-unused",              0, 0,           "remove unused resources from export"},
+    {command_line_dont_convert_to_meters,       "dont-convert-to-meters",     0, 0,           "dont scale scene to match units with meters"},
+    {command_line_silent,                       "silent",                   's', 0,           "quiet mode"},
+    {command_line_help,                         "help",                     '?', 0,           "print help message"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -938,12 +946,7 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
     }
       
     stl::string output_texture_name   = get_texture_name (params.output_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id),
-                material_texture_name;
-
-    if (params.material_textures_format.empty ())
-      material_texture_name = output_texture_name;
-    else
-      material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id);
+                material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.material_textures_dir_name.c_str (), image_path.c_str (), texture_id);
 
     texture->Save (output_texture_name.c_str ());
 
@@ -1108,6 +1111,12 @@ void print (const char* message)
 //экспорт
 void export_data (Params& params)
 {
+  if (params.material_textures_format.empty ())
+    params.material_textures_format = params.output_textures_format;
+
+  if (params.material_textures_dir_name.empty ())
+    params.material_textures_dir_name = params.output_textures_dir_name;
+
   if (!params.silent)
     printf ("Load model '%s'...\n", params.source_name.c_str ());
 
