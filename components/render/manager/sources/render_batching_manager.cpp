@@ -385,7 +385,8 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
     return result;
   }
 
-  throw xtl::format_operation_exception ("render::manager::BatchingManager::AllocateDynamicVertices", "Can't allocate %u vertices in dynamic vertex buffer", count);
+  throw xtl::format_operation_exception ("render::manager::BatchingManager::AllocateDynamicVertices", "Can't allocate %u vertices in dynamic vertex buffer (%u from %u have been already allocated)",
+    count, impl->dynamic_vertex_pool.Size (), impl->dynamic_vb.Capacity ());
 }
 
 DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType pool_type, size_t count)
@@ -413,7 +414,8 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
       if (result)
         return result;
 
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't allocate %u indices in dynamic temporary index buffer", count);
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't allocate %u indices in dynamic temporary index buffer (%u from %u have been already allocated)",
+        count, impl->temp_index_pool.Size (), impl->dynamic_ib.Capacity ());
     }
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "pool_type", pool_type);
