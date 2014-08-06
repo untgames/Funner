@@ -842,6 +842,9 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       }
     }
 
+///Получение указателя на индексы (должен вызываться между OnPrerenderCore & OnRenderCore, обязательно после UpdatePrimitive)
+    DynamicPrimitiveIndex* TempIndices () { return const_cast<DynamicPrimitiveIndex*> (*cached_primitive.dynamic_indices) + cached_primitive.first; }
+
   private:
 /// Обновление кэша
     void UpdateCacheCore ()
@@ -1462,7 +1465,6 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 /// Конструктор
         InstanceBase (const PrototypePtr& prototype)
           : BatchingInstance (prototype, BillboardSpriteGenerator::PRIMITIVE_TYPE, DynamicPrimitiveFlag_FrameDependent) 
-          , indices ()
         { }
 
       private:
@@ -1477,6 +1479,8 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
                    verts_count = items_count * VERTICES_PER_PRIMITIVE,
                    inds_count  = items_count * INDICES_PER_PRIMITIVE;
 
+            DynamicPrimitiveIndex* indices = 0;
+
             UpdatePrimitive (verts_count, inds_count, 0, &indices, 0);
           }
           catch (xtl::exception& e)
@@ -1485,9 +1489,6 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
             throw;
           }
         }
-
-      protected:
-        DynamicPrimitiveIndex* indices;
     };
 
     template <class Generator>
@@ -1511,6 +1512,8 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
               //формирование вершин и индексов
 
             Generator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
+
+            DynamicPrimitiveIndex* indices = TempIndices ();
 
             generate (generator, items_count, prototype.Items (), base_vertex, vertices, indices);
           }

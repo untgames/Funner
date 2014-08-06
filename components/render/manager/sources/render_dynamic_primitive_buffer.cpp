@@ -36,7 +36,8 @@ void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, 
     if (!src_data_size)
       return;
 
-    dst_buffer->SetData (offset, src_data_size, src_data);
+    if (src_data)
+      dst_buffer->SetData (offset, src_data_size, src_data);
   }
   catch (xtl::exception& e)
   {
