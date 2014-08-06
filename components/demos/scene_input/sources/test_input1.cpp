@@ -70,8 +70,8 @@ struct Test
     camera [0]->BindToScene (scene);
     camera [0]->SetName     ("Camera1");
     camera [0]->SetPosition (0, 0, 0);
-    camera [0]->SetLeft     (10);
-    camera [0]->SetRight    (-10);
+    camera [0]->SetLeft     (-10);
+    camera [0]->SetRight    (10);
     camera [0]->SetTop      (10);
     camera [0]->SetBottom   (-10);
     camera [0]->SetZNear    (0);
@@ -82,8 +82,8 @@ struct Test
     camera [1]->BindToScene (scene);
     camera [1]->SetName     ("Camera2");
     camera [1]->SetPosition (0, 0, 0);
-    camera [1]->SetLeft     (10);
-    camera [1]->SetRight    (-10);
+    camera [1]->SetLeft     (-10);
+    camera [1]->SetRight    (10);
     camera [1]->SetTop      (10);
     camera [1]->SetBottom   (-10);
     camera [1]->SetZNear    (0.7f);

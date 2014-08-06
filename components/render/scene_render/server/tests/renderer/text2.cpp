@@ -102,8 +102,8 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (10.0f);
-    camera->SetRight  (-10.0f);
+    camera->SetLeft   (-10.0f);
+    camera->SetRight  (10.0f);
     camera->SetBottom (-10.0f);
     camera->SetTop    (10.0f);
     camera->SetZNear  (0.0f);
