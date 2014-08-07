@@ -37,7 +37,8 @@ struct Test
     sprite [2] = Sprite::Create ();    
 
     sprite [2]->SetMaterial ("sprite_material");
-    sprite [2]->SetScale (0.2f, 0.2f, 0.2f);
+    sprite [2]->SetScale (0.9f, 0.9f, 0.9f);
+    //sprite [2]->SetScale (0.7f, 0.7f, 0.7f); //With this touch zone is much less
     sprite [2]->SetPosition (0.0f, -0.5f, -15.f);
     sprite [2]->SetColor (0.0f, 1.0f, 1.0f);
     sprite [2]->SetMode (SpriteMode_Oriented);
@@ -63,8 +64,7 @@ struct Test
     input_zone [2] = InputZone::Create ();
     
     input_zone [2]->SetName     ("zone3");
-    input_zone [2]->SetPosition (sprite [2]->Position ());
-    input_zone [2]->BindToScene (scene);
+    input_zone [2]->BindToParent (*sprite [2]);
     
     input_zone [2]->RegisterNotificationHandler (&Test::InputNotify);
 
