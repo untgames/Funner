@@ -215,7 +215,7 @@ void PThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_p
 
 void PThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
 {
-#ifdef __APPLE__
+#if defined (__APPLE__) || defined (ANDROID)
   throw xtl::format_not_supported_exception ("syslib::PThreadManager::SetThreadAffinity");
 #else
   try
