@@ -7,46 +7,46 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
-//Класс для работы с сообщениями google cloud messaging
+//РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРѕРѕР±С‰РµРЅРёСЏРјРё google cloud messaging
 public class EngineGCMManager
 {
   private static final String TAG = "EngineGCMManager";
 
-  //Получение идентификатора отправителя
+  //РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РѕС‚РїСЂР°РІРёС‚РµР»СЏ
   public static String getSenderId(Context context) {
-  		String packageName = context.getPackageName();
+      String packageName = context.getPackageName();
       int    resId       = context.getResources().getIdentifier("GCMSenderID", "string", packageName);
 
       if (resId == 0)
-  		{
-  			Log.e (TAG, "'GCMSenderID' metadata not setted in application manifest");
-  			return null;
-  		}
+      {
+        Log.e (TAG, "'GCMSenderID' metadata not setted in application manifest");
+        return null;
+      }
 
-  		return context.getString(resId);
+      return context.getString(resId);
   }
-	
-	//Регистрация на получение сообщений
-	public static void registerForGCMMessages (Context context)
-	{
-		try
-		{
-  		GCMRegistrar.checkDevice(context);
-	  	GCMRegistrar.checkManifest(context);
-		}
-		catch (Exception exception)
-		{
-			onErrorCallback ("Can't register for gcm, exception " + exception);
-			return;
-		}
-		
-		final String regId = GCMRegistrar.getRegistrationId(context);
+  
+  //Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅР° РїРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№
+  public static void registerForGCMMessages (Context context)
+  {
+    try
+    {
+      GCMRegistrar.checkDevice(context);
+      GCMRegistrar.checkManifest(context);
+    }
+    catch (Exception exception)
+    {
+      onErrorCallback ("Can't register for gcm, exception " + exception);
+      return;
+    }
+    
+    final String regId = GCMRegistrar.getRegistrationId(context);
 
-		if (regId.equals("")) {
-		  GCMRegistrar.register(context, getSenderId (context));
-		} else {
-			onRegisteredCallback(regId);
-		}
+    if (regId.equals("")) {
+      GCMRegistrar.register(context, getSenderId (context));
+    } else {
+      onRegisteredCallback(regId);
+    }
   }
 
   public static void unregisterForGCMMessages (Context context)

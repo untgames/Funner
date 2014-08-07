@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.amazon.device.messaging.ADM;
 
-//Класс для работы с сообщениями Amazon device messaging
+//РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРѕРѕР±С‰РµРЅРёСЏРјРё Amazon device messaging
 public class EngineADMManager
 {
   private static final String TAG = "EngineADMManager";
@@ -23,32 +23,32 @@ public class EngineADMManager
     adm = new ADM (context);
   }
   
-	//Регистрация на получение сообщений
-	public static void registerForADMMessages (final Context context) throws Throwable
-	{
-	  try
-	  {
+  //Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅР° РїРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№
+  public static void registerForADMMessages (final Context context) throws Throwable
+  {
+    try
+    {
       initializeADM (context);
 
 //      com.amazon.device.messaging.development.ADMManifest.checkManifestAuthoredProperly (activity); //DO NOT USE IN PRODUCTION
     
-  		final String regId = adm.getRegistrationId ();
+      final String regId = adm.getRegistrationId ();
 
-  		if (regId == null || regId.equals ("")) 
-	  	{
-		    adm.startRegister ();
-  		} 
-	  	else 
-		  {
-			  onRegisteredCallback (regId);
-  		}
-	  }
-	  catch (Throwable e)
-	  {
-	    Log.e (TAG, "Can't register for adm, exception " + e);
-	    onErrorCallback ("Can't register for adm, exception " + e);
-	    throw e;
-	  }
+      if (regId == null || regId.equals ("")) 
+      {
+        adm.startRegister ();
+      } 
+      else 
+      {
+        onRegisteredCallback (regId);
+      }
+    }
+    catch (Throwable e)
+    {
+      Log.e (TAG, "Can't register for adm, exception " + e);
+      onErrorCallback ("Can't register for adm, exception " + e);
+      throw e;
+    }
   }
 
   public static void unregisterForADMMessages (final Context context)
