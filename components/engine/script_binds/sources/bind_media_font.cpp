@@ -186,8 +186,6 @@ class Component
     }
 };
 
-template class engine::decl_sg_cast<components::media_font_script_bind::FontCreationParams, media::FontCreationParams>;
-
 extern "C"
 {
 
@@ -196,5 +194,12 @@ common::ComponentRegistrator<Component> MediaFontScriptBind (COMPONENT_NAME);
 }
 
 }
+
+}
+
+namespace engine
+{
+
+template class decl_sg_cast<components::media_font_script_bind::FontCreationParams, media::FontCreationParams>;
 
 }
