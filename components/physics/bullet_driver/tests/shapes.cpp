@@ -1,8 +1,5 @@
 #include "shared.h"
 
-const size_t NUM_VERTS_X = 5;
-const size_t NUM_VERTS_Y = 5;
-
 int main ()
 {
   printf ("Results of shapes_test:\n");

@@ -20,15 +20,15 @@ struct ContactPointInfo
 };
 
 bool contact_added_callback (btManifoldPoint& contact_point,
-                             const btCollisionObject* object0,
+                             const btCollisionObjectWrapper* object0,
                              int part_id0,
                              int index0,
-                             const btCollisionObject* object1,
+                             const btCollisionObjectWrapper* object1,
                              int part_id1,
                              int index1)
 {
-  RigidBodyInfo *body0_info = (RigidBodyInfo*)object0->getUserPointer (),
-                *body1_info = (RigidBodyInfo*)object1->getUserPointer ();
+  RigidBodyInfo *body0_info = (RigidBodyInfo*)object0->m_collisionObject->getUserPointer (),
+                *body1_info = (RigidBodyInfo*)object1->m_collisionObject->getUserPointer ();
 
   ContactPointInfo *contact_point_info;
 
@@ -180,7 +180,7 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
 
       if (update_result)
       {
-        btCollisionObject* collision_object = ray_result.m_collisionObject;
+        const btCollisionObject* collision_object = ray_result.m_collisionObject;
 
         RigidBody *body = ((RigidBodyInfo*)collision_object->getUserPointer ())->body;
 

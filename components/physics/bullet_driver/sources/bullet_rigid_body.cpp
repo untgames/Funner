@@ -74,9 +74,9 @@ struct RigidBody::Impl : public btDefaultMotionState
   //Реализация btMotionState
   void setWorldTransform (const btTransform& worldTrans)
   {
-    transform_update_signal (rigid_body);
-
     btDefaultMotionState::setWorldTransform (worldTrans);
+
+    transform_update_signal (rigid_body);
   }
 };
 
@@ -347,7 +347,12 @@ void RigidBody::SetCollisionGroup (size_t group_number)
 
 const Transform& RigidBody::WorldTransform ()
 {
-  const btTransform& world_transform = impl->body->getWorldTransform ();
+  btTransform world_transform;
+
+  if (impl->flags & RigidBodyFlag_Kinematic)
+    impl->getWorldTransform (world_transform);
+  else
+    world_transform = impl->body->getWorldTransform ();
 
   vector_from_bullet_vector         (world_transform.getOrigin (),   impl->world_transform.position);
   quaternion_from_bullet_quaternion (world_transform.getRotation (), impl->world_transform.orientation);
@@ -366,6 +371,9 @@ void RigidBody::SetWorldTransform (const Transform& transform)
   bullet_quaternion_from_quaternion (transform.orientation, transform_rotation);
 
   new_world_transform.setRotation (transform_rotation);
+
+  if (impl->flags & RigidBodyFlag_Kinematic)
+    impl->setWorldTransform (new_world_transform);
 
   impl->body->setWorldTransform (new_world_transform);
 }

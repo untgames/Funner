@@ -8,8 +8,10 @@ SET(LinearMath_SRCS
 	btConvexHull.cpp
 	btConvexHullComputer.cpp
 	btGeometryUtil.cpp
+	btPolarDecomposition.cpp
 	btQuickprof.cpp
 	btSerializer.cpp
+	btVector3.cpp
 )
 
 SET(LinearMath_HDRS
@@ -27,6 +29,7 @@ SET(LinearMath_HDRS
 	btMatrix3x3.h
 	btMinMax.h
 	btMotionState.h
+	btPolarDecomposition.h
 	btPoolAllocator.h
 	btQuadWord.h
 	btQuaternion.h
@@ -51,7 +54,10 @@ IF (INSTALL_LIBS)
 			IF (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
 				INSTALL(TARGETS LinearMath DESTINATION .)
 			ELSE (APPLE AND BUILD_SHARED_LIBS AND FRAMEWORK)
-				INSTALL(TARGETS LinearMath DESTINATION lib${LIB_SUFFIX})
+				INSTALL(TARGETS LinearMath 
+					RUNTIME DESTINATION bin
+					LIBRARY DESTINATION lib${LIB_SUFFIX}
+					ARCHIVE DESTINATION lib${LIB_SUFFIX})
 				INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 DESTINATION ${INCLUDE_INSTALL_DIR} FILES_MATCHING PATTERN "*.h"  PATTERN
 ".svn" EXCLUDE PATTERN "CMakeFiles" EXCLUDE)
