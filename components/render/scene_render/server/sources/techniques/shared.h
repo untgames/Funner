@@ -12,6 +12,7 @@
 #include <shared/server.h>
 #include <shared/technique_manager.h>
 
+#include <shared/sg/light.h>
 #include <shared/sg/visual_model.h>
 
 #include <render/manager.h>
@@ -30,7 +31,7 @@ class BasicTechnique: public Technique
 {
   public:
 ///Конструктор / деструктор
-    BasicTechnique  (RenderManager& in_manager, const common::ParseNode& node);
+    BasicTechnique  (RenderManager& in_manager, const common::ParseNode& node, bool read_effect_name = true);
     ~BasicTechnique ();
 
   protected:
@@ -51,8 +52,8 @@ class BasicTechnique: public Technique
       size_t              proj_matrix_property_index;   //индекс свойства матрицы Projection (в свойства кадра)
       manager::Frame      frame;                        //фрейм
 
-      PrivateData (BasicTechnique& technique)
-        : frame (technique.CreateFrame (*this))
+      PrivateData (BasicTechnique& technique, const char* effect_name = 0)
+        : frame (technique.CreateFrame (*this, effect_name))
         , view_transaction_id ()
         , proj_transaction_id ()
         , view_proj_transaction_id ()
@@ -66,6 +67,9 @@ class BasicTechnique: public Technique
       {
       }
     };
+
+///Имя эффекта
+    const char* EffectName () { return effect_name.c_str (); }
 
 ///Настройка кадра перед рендерингом
     virtual void ConfigureFrame (RenderingContext& parent_context, PrivateData& private_data);
@@ -87,7 +91,7 @@ class BasicTechnique: public Technique
 
   private:
 /// Создание кадра
-    manager::Frame CreateFrame (PrivateData& private_data);
+    manager::Frame CreateFrame (PrivateData& private_data, const char* effect_name);
 
 ///Обработчик отрисовки объектов
     void EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, void* user_data, manager::EntityDrawParams& out_params);

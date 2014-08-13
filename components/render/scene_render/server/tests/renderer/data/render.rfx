@@ -315,6 +315,13 @@ effect "lighting"
   }
 }
 
+effect "forward_shading"
+{
+  tags "lighting"
+
+  effect_group "lighting"
+}
+
 effect "clearing"
 {
   tags "clearing"
@@ -331,9 +338,14 @@ effect "clearing"
 technique "default"
 {
   effect  "main"                    //name of the root effect for this technique
-  program "draw_without_lights"     //name of the builtin program for scene enumeration
+
+  program "forward_shading" //name of the builtin program for scene enumeration
   {
-    effect "lighting"
+    root_effect              "forward_shading"
+    lighting_effect          "lighting"
+    spot_light_shader_type   "Spot"
+    direct_light_shader_type "Direct"
+    point_light_shader_type  "Point"
   }
 }
 
