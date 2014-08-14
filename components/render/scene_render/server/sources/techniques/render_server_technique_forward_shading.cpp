@@ -50,9 +50,11 @@ class ForwardShading: public BasicTechnique
     struct PrivateData: public BasicTechnique::PrivateData, public xtl::reference_counter
     {
       common::PropertyMap shader_defines;
+      manager::Frame      shadow_frame;
 
       PrivateData (ForwardShading& technique)
         : BasicTechnique::PrivateData (technique, technique.lighting_effect.c_str ())
+        , shadow_frame (technique.manager.Manager ().CreateFrame ())
       {
         frame.SetShaderOptions (shader_defines);
       }
@@ -114,7 +116,7 @@ class ForwardShading: public BasicTechnique
     {
         //получение данных отрисовки
 
-     PrivateData& private_data = AllocateLightContext (root_private_data, light_index);
+      PrivateData& private_data = AllocateLightContext (root_private_data, light_index);
 
         //установка параметров вложенного фрейма
         
@@ -159,6 +161,12 @@ class ForwardShading: public BasicTechnique
         //обновление визуализируемых объектов
 
       BasicTechnique::DrawVisualModels (context, private_data);
+    }
+
+///Отрисовка теневой карты
+    void UpdateShadowMap (RenderingContext& context, Light& light, TraverseResult& result, PrivateData& private_data, RootPrivateData& root_private_data)
+    {
+    
     }
 
 ///Резервирование контекста источника
