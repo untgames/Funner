@@ -351,6 +351,11 @@ StaticMesh::Pointer create_static_mesh ()
    Регистрация библиотеки работы с моделями
 */
 
+void set_bound_box (StaticMesh& entity, const bound_volumes::aaboxf& box)
+{
+  entity.SetBoundBox (box);
+}
+
 void bind_static_mesh_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_STATIC_MESH_LIBRARY);
@@ -367,6 +372,7 @@ void bind_static_mesh_library (Environment& environment)
 
   lib.Register ("set_MeshName", make_invoker (&StaticMesh::SetMeshName));
   lib.Register ("get_MeshName", make_invoker (&StaticMesh::MeshName));
+  lib.Register ("set_BoundBox", make_invoker (&set_bound_box));
 
   environment.RegisterType<StaticMesh> (SCENE_STATIC_MESH_LIBRARY);
 }
