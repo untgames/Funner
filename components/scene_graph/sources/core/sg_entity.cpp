@@ -112,6 +112,7 @@ bool Entity::IsVisible () const
 void Entity::UpdateBoundsNotify ()
 {
   impl->need_local_bounds_update = true;
+  impl->need_world_bounds_update = true;
 
   UpdateNotify ();
 }
@@ -125,6 +126,9 @@ void Entity::UpdateWorldBoundsNotify ()
 //пересчёт мировых ограничивающих объёмов
 void Entity::UpdateWorldBounds () const
 {
+  if (impl->need_local_bounds_update)
+    BoundBox ();
+
   if (impl->infinite_bounds) impl->world_bound_box = impl->local_bound_box;
   else                       impl->world_bound_box = impl->local_bound_box * WorldTM ();
 
@@ -207,10 +211,7 @@ void Entity::UpdateBoundsCore ()
 bool Entity::IsInfiniteBounds () const
 {
   if (impl->need_local_bounds_update)
-  {
-    const_cast <Entity&> (*this).UpdateBoundsCore ();
-    impl->need_local_bounds_update = false;
-  }
+    BoundBox ();
 
   return impl->infinite_bounds;
 }

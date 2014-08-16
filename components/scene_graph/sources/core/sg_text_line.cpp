@@ -96,6 +96,7 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
   CharsColors                chars_colors;
   bool                       chars_colors_need_update;
   float                      spacing_multiplier;
+  TextDimensions             text_dimensions;
 
   Impl ()
    : length (0),
@@ -292,6 +293,7 @@ void TextLine::SetTextUtf8 (const char* text)
   impl->OnTextChanged ();
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
@@ -326,6 +328,7 @@ void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
   impl->OnTextChanged ();
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 const char* TextLine::TextUtf8 () const
@@ -478,6 +481,8 @@ void TextLine::SetFont (const char* font_name)
     UpdateFontsNotify ();
 
     UpdateCharsNotify ();
+
+    UpdateBoundsNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -504,6 +509,7 @@ void TextLine::SetFontCreationParams (const media::FontCreationParams& params)
   impl->font_creation_params.charset_name        = impl->font_creation_params.charset_name_string.c_str ();
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 const media::FontCreationParams& TextLine::FontCreationParams () const
@@ -520,6 +526,7 @@ void TextLine::SetSpacingMultiplier (float spacing_multiplier)
   impl->spacing_multiplier = spacing_multiplier;
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 float TextLine::SpacingMultiplier () const
@@ -545,6 +552,7 @@ void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment ver
   impl->vertical_alignment = vertical;
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
@@ -555,6 +563,7 @@ void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
   impl->horizontal_alignment = alignment;
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
@@ -565,6 +574,7 @@ void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
   impl->vertical_alignment = alignment;
 
   UpdateCharsNotify ();
+  UpdateBoundsNotify ();
 }
 
 TextLineAlignment TextLine::VerticalAlignment () const
@@ -614,13 +624,15 @@ void TextLine::RebuildCharsCore ()
                             font_size          = (float)font.FontSize (),
                             spacing_multiplier = SpacingMultiplier (),
                             advance_multiplier = spacing_multiplier / font_size;
-    TextDimensions          text_dimensions;
     const unsigned int*     src_char           = TextUtf32 ();
     const math::vec4f*      colors             = impl->chars_colors.empty () ? (const math::vec4f*)0 : &impl->chars_colors [0],
                             &default_color     = impl->color;
     CharDesc                *dst_first_char    = CharsForUpdate (),
                             *dst_char          = dst_first_char;
     size_t                  prev_glyph_index   = 0;
+
+    impl->text_dimensions.min = 0.f;
+    impl->text_dimensions.max = 0.f;
 
     for (size_t i=0; i<chars_count; i++, src_char++)
     {
@@ -681,10 +693,10 @@ void TextLine::RebuildCharsCore ()
       glyph_dimensions.max.x = glyph_dimensions.min.x + dst_char->size.x;
       glyph_dimensions.max.y = glyph_dimensions.min.y + dst_char->size.y;
 
-      if (glyph_dimensions.min.x < text_dimensions.min.x) text_dimensions.min.x = glyph_dimensions.min.x;
-      if (glyph_dimensions.min.y < text_dimensions.min.y) text_dimensions.min.y = glyph_dimensions.min.y;
-      if (glyph_dimensions.max.x > text_dimensions.max.x) text_dimensions.max.x = glyph_dimensions.max.x;
-      if (glyph_dimensions.max.y > text_dimensions.max.y) text_dimensions.max.y = glyph_dimensions.max.y;
+      if (glyph_dimensions.min.x < impl->text_dimensions.min.x) impl->text_dimensions.min.x = glyph_dimensions.min.x;
+      if (glyph_dimensions.min.y < impl->text_dimensions.min.y) impl->text_dimensions.min.y = glyph_dimensions.min.y;
+      if (glyph_dimensions.max.x > impl->text_dimensions.max.x) impl->text_dimensions.max.x = glyph_dimensions.max.x;
+      if (glyph_dimensions.max.y > impl->text_dimensions.max.y) impl->text_dimensions.max.y = glyph_dimensions.max.y;
 
         //переход к следующему символу
 
@@ -705,8 +717,8 @@ void TextLine::RebuildCharsCore ()
     {
         //расчёт вектора смещения надписи
 
-      math::vec2f size = text_dimensions.max - text_dimensions.min;
-      math::vec3f offset (-text_dimensions.min.x, -text_dimensions.min.y, 0);
+      math::vec2f size = impl->text_dimensions.max - impl->text_dimensions.min;
+      math::vec3f offset (-impl->text_dimensions.min.x, -impl->text_dimensions.min.y, 0);
 
       switch (impl->horizontal_alignment)
       {
@@ -752,6 +764,18 @@ void TextLine::RebuildCharsCore ()
     throw;
   }
 }
+
+/*
+   Рассчёт ограничивающего объёма
+*/
+
+void TextLine::UpdateBoundsCore ()
+{
+  RebuildChars ();
+
+  SetBoundBox (bound_volumes::axis_aligned_box <float> (impl->text_dimensions.min.x, impl->text_dimensions.min.y, 0, impl->text_dimensions.max.x, impl->text_dimensions.max.y, 0));
+}
+
 
 /*
     Метод, вызываемый при посещении объекта
