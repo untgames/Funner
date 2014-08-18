@@ -25,13 +25,12 @@ const size_t LIGHTS_RESERVE_SIZE = 64;   //резервируемое количество источников с
 }
 
 ///“ехника рендеринга: отрисовка изображени€ из каждого источника и сложение полученных изображений
-class ForwardShading: public BasicTechnique
+class ForwardShading: public Technique
 {
   public:
 /// онструктор / деструктор
     ForwardShading (RenderManager& in_manager, const common::ParseNode& node)
-      : BasicTechnique (in_manager, node, false)
-      , manager (in_manager)
+      : manager (in_manager)
     {
         //чтение конфигурации
 
@@ -46,29 +45,37 @@ class ForwardShading: public BasicTechnique
     static const char* ClassName     () { return "forward_shading"; }
     static const char* ComponentName () { return "render.scene.server.techniques.forward_shading"; }
 
+  protected:
+///ќбновление свойств
+    void UpdatePropertiesCore () {}
+
+///—в€зывание свойств техники с методами техники
+    void BindProperties (common::PropertyBindingMap&) {}
+
   private:
-    struct PrivateData: public BasicTechnique::PrivateData, public xtl::reference_counter
+    struct LightContext: public xtl::reference_counter
     {
+      BasicRendererPtr    renderer;
       common::PropertyMap shader_defines;
       manager::Frame      shadow_frame;
 
-      PrivateData (ForwardShading& technique)
-        : BasicTechnique::PrivateData (technique, technique.lighting_effect.c_str ())
+      LightContext (ForwardShading& technique)
+        : renderer (new BasicRenderer (technique.manager, technique.lighting_effect.c_str ()), false)
         , shadow_frame (technique.manager.Manager ().CreateFrame ())
       {
-        frame.SetShaderOptions (shader_defines);
+        renderer->Frame ().SetShaderOptions (shader_defines);
       }
     };
 
-    typedef xtl::intrusive_ptr<PrivateData> PrivateDataPtr;
-    typedef stl::vector<PrivateDataPtr>     PrivateDataArray;
+    typedef xtl::intrusive_ptr<LightContext> LightContextPtr;
+    typedef stl::vector<LightContextPtr>      LightContextArray;
 
-    struct RootPrivateData
+    struct PrivateData
     {
-      PrivateDataArray light_frames;
+      LightContextArray light_frames;
       manager::Frame   frame;
 
-      RootPrivateData (ForwardShading& technique)
+      PrivateData (ForwardShading& technique)
         : frame (technique.manager.Manager ().CreateFrame ())
       {
         frame.SetEffect (technique.root_effect.c_str ());
@@ -85,7 +92,7 @@ class ForwardShading: public BasicTechnique
       {
           //получение приватных данных техники
 
-        RootPrivateData& private_data = private_data_holder.Get<RootPrivateData> (*this);
+        PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
           //определение списка источников и визуализируемых объектов, попадающих в камеру
         
@@ -112,22 +119,18 @@ class ForwardShading: public BasicTechnique
     }
 
 ///ќбновление кадра из источника света
-    void UpdateFromLight (RenderingContext& context, Light& light, TraverseResult& result, size_t light_index, RootPrivateData& root_private_data)
+    void UpdateFromLight (RenderingContext& context, Light& light, TraverseResult& result, size_t light_index, PrivateData& private_data)
     {
         //получение данных отрисовки
 
-      PrivateData& private_data = AllocateLightContext (root_private_data, light_index);
-
-        //установка параметров вложенного фрейма
-        
-      BasicTechnique::ConfigureFrame (context, private_data);
+      LightContext& light_context = AllocateLightContext (private_data, light_index);
 
         //установка параметров источника
 
-      manager::Frame&                 frame  = private_data.frame;
+      manager::Frame&                 frame  = light_context.renderer->Frame ();
       const interchange::LightParams& params = light.Params ();
 
-      common::PropertyMap& frame_properties = private_data.frame_properties;
+      common::PropertyMap& frame_properties = light_context.renderer->FrameProperties ();
 
       frame_properties.SetProperty ("LightWorldPosition", light.WorldMatrix () * math::vec3f (0.0f));
       frame_properties.SetProperty ("LightWorldDirection", light.WorldMatrix() * math::vec4f (0.0f, 0.0f, 1.0f, 0.0f));
@@ -138,7 +141,7 @@ class ForwardShading: public BasicTechnique
       frame_properties.SetProperty ("LightAngle", math::radian (params.angle));
       frame_properties.SetProperty ("LightRadius", params.radius);
 
-      common::PropertyMap& frame_defines     = private_data.shader_defines;
+      common::PropertyMap& frame_defines     = light_context.shader_defines;
       const char*          shader_light_type = "";
 
       switch (light.Type ())
@@ -160,26 +163,26 @@ class ForwardShading: public BasicTechnique
      
         //обновление визуализируемых объектов
 
-      BasicTechnique::DrawVisualModels (context, private_data);
+      light_context.renderer->Draw (context);
     }
 
 ///ќтрисовка теневой карты
-    void UpdateShadowMap (RenderingContext& context, Light& light, TraverseResult& result, PrivateData& private_data, RootPrivateData& root_private_data)
+    void UpdateShadowMap (RenderingContext& context, Light& light, TraverseResult& result, LightContext& light_context, PrivateData& private_data)
     {
     
     }
 
 ///–езервирование контекста источника
-    PrivateData& AllocateLightContext (RootPrivateData& root_private_data, size_t light_index)
+    LightContext& AllocateLightContext (PrivateData& private_data, size_t light_index)
     {
-      if (light_index < root_private_data.light_frames.size ())
-        return *root_private_data.light_frames [light_index];
+      if (light_index < private_data.light_frames.size ())
+        return *private_data.light_frames [light_index];
       
-      PrivateDataPtr private_data (new PrivateData (*this), false);      
+      LightContextPtr light_context (new LightContext (*this), false);      
         
-      root_private_data.light_frames.push_back (private_data);
+      private_data.light_frames.push_back (light_context);
         
-      return *private_data;
+      return *light_context;
     }
 
   private:
