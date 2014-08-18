@@ -346,6 +346,14 @@ technique "default"
     spot_light_shader_type   "Spot"
     direct_light_shader_type "Direct"
     point_light_shader_type  "Point"
+
+    shadow_map
+    {
+      effect        "shadow"
+      texture       "shadow_map"
+      framemap      "shadow"
+      render_target "shadow_map"
+    }
   }
 }
 

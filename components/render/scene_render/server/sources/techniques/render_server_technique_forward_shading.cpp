@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//TODO: draw only visual models affected by light
+
 using namespace render;
 using namespace render::scene;
 using namespace render::scene::server;
@@ -31,6 +33,7 @@ class ForwardShading: public Technique
 ///Конструктор / деструктор
     ForwardShading (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
+      , shadow_map_renderer (in_manager, node.First ("shadow_map"))
     {
         //чтение конфигурации
 
@@ -68,7 +71,7 @@ class ForwardShading: public Technique
     };
 
     typedef xtl::intrusive_ptr<LightContext> LightContextPtr;
-    typedef stl::vector<LightContextPtr>      LightContextArray;
+    typedef stl::vector<LightContextPtr>     LightContextArray;
 
     struct PrivateData
     {
@@ -79,6 +82,7 @@ class ForwardShading: public Technique
         : frame (technique.manager.Manager ().CreateFrame ())
       {
         frame.SetEffect (technique.root_effect.c_str ());
+        frame.SetLocalTexture (technique.shadow_map_renderer.LocalTextureName (), technique.shadow_map_renderer.ShadowMap ());
 
         light_frames.reserve (LIGHTS_RESERVE_SIZE);
       }
@@ -125,6 +129,10 @@ class ForwardShading: public Technique
 
       LightContext& light_context = AllocateLightContext (private_data, light_index);
 
+        //обновление тени
+
+      UpdateShadowMap (context, light);
+
         //установка параметров источника
 
       manager::Frame&                 frame  = light_context.renderer->Frame ();
@@ -163,13 +171,23 @@ class ForwardShading: public Technique
      
         //обновление визуализируемых объектов
 
+//TODO: draw only visual models affected by light
+
       light_context.renderer->Draw (context);
     }
 
 ///Отрисовка теневой карты
-    void UpdateShadowMap (RenderingContext& context, Light& light, TraverseResult& result, LightContext& light_context, PrivateData& private_data)
+    void UpdateShadowMap (RenderingContext& context, Light& light)
     {
-    
+      try
+      {
+        shadow_map_renderer.UpdateShadowMap (context, light);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::scene::server::ForwardShading::UpdateShadowMap");
+        throw;
+      }
     }
 
 ///Резервирование контекста источника
@@ -186,12 +204,13 @@ class ForwardShading: public Technique
     }
 
   private:
-    RenderManager  manager;                        //менеджер рендеринга
-    stl::string    lighting_effect;                //эффект отрисовки с источником света
-    stl::string    root_effect;                    //корневой эффект отрисовки
-    stl::string    spot_light_shader_light_type;   //настройки шейдера для конического источника света
-    stl::string    direct_light_shader_light_type; //настройки шейдера для цилиндрического источника света
-    stl::string    point_light_shader_light_type;  //настройки шейдера для точечного источника света
+    RenderManager     manager;                        //менеджер рендеринга
+    stl::string       lighting_effect;                //эффект отрисовки с источником света
+    stl::string       root_effect;                    //корневой эффект отрисовки
+    stl::string       spot_light_shader_light_type;   //настройки шейдера для конического источника света
+    stl::string       direct_light_shader_light_type; //настройки шейдера для цилиндрического источника света
+    stl::string       point_light_shader_light_type;  //настройки шейдера для точечного источника света
+    ShadowMapRenderer shadow_map_renderer;            //рендер карты теней
 };
 
 }

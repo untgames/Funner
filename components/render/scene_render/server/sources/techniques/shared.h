@@ -9,9 +9,11 @@
 
 #include <shared/camera.h>
 #include <shared/render_manager.h>
+#include <shared/scene_manager.h>
 #include <shared/server.h>
 #include <shared/technique_manager.h>
 
+#include <shared/sg/collection_visitor.h>
 #include <shared/sg/light.h>
 #include <shared/sg/visual_model.h>
 

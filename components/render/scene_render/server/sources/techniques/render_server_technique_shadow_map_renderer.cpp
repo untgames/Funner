@@ -5,6 +5,12 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
+    Константы
+*/
+
+const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых моделей
+
+/*
     Конструктор / деструктор
 */
 
@@ -16,6 +22,7 @@ try
   try
   {
     render_target_name = common::get<const char*> (node, "render_target");
+    local_texture_name = common::get<const char*> (node, "framemap");
 
     size_t layers_count = shadow_map.Depth ();
 
@@ -27,6 +34,8 @@ try
 
       render_targets.push_back (target);
     }
+
+    traverse_result.visual_models.reserve (TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE);
   }
   catch (xtl::exception& e)
   {
@@ -48,23 +57,48 @@ ShadowMapRenderer::~ShadowMapRenderer ()
     Обновление карты
 */
 
-void ShadowMapRenderer::UpdateShadowMap (RenderingContext& parent_context, Light& light, ITraverseResultCache& traverse_result_cache)
+namespace
+{
+
+struct TraverseResultCache: public ITraverseResultCache
+{
+  TraverseResult& result;
+
+  TraverseResultCache (TraverseResult& in_result) : result (in_result) {}
+
+  TraverseResult& Result () { return result; }
+};
+
+}
+
+void ShadowMapRenderer::UpdateShadowMap (RenderingContext& parent_context, Light& light)
 {
   try
   {
+    if (!light.SceneOwner ())
+      return;
+
+    Scene& scene = *light.SceneOwner ();
+
     size_t pass_count = light.CamerasCount () < render_targets.size () ? light.CamerasCount () : render_targets.size ();
 
-    manager::Frame& frame = Frame ();;
+    manager::Frame& frame = Frame ();
 
+    TraverseResultCache cache (traverse_result);
+printf ("%s(%u) %u %u\n", __FUNCTION__, __LINE__, light.CamerasCount (), render_targets.size ());
     for (size_t i=0; i<pass_count; i++)
     {
       Camera& camera = const_cast<Camera&> (light.Camera (i));
 
       frame.SetRenderTarget (render_target_name.c_str (), render_targets [i]);
 
-      RenderingContext context (frame, RenderManager (), traverse_result_cache, camera, &parent_context);
+      traverse_result.Clear ();
 
-      Draw (context); 
+      scene.Traverse (camera.Frustum (), traverse_result, Collect_VisualModels);
+
+      RenderingContext context (frame, RenderManager (), cache, camera, &parent_context);
+printf ("%s(%u)\n", __FUNCTION__, __LINE__);
+      Draw (context);
     }
   }
   catch (xtl::exception& e)
