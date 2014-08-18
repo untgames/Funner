@@ -35,7 +35,7 @@ class RenderingContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderingContext (manager::Frame& frame, server::RenderManager& render_manager, ITraverseResultCache& traverse_result_cache, server::Camera& camera);
+    RenderingContext (manager::Frame& frame, server::RenderManager& render_manager, ITraverseResultCache& traverse_result_cache, server::Camera& camera, RenderingContext* parent = 0);
     RenderingContext (RenderingContext& context, manager::Frame& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

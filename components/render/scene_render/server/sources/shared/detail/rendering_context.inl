@@ -1,5 +1,5 @@
-inline RenderingContext::RenderingContext (manager::Frame& in_frame, server::RenderManager& in_render_manager, ITraverseResultCache& in_traverse_result_cache, server::Camera& in_camera)
-  : parent ()
+inline RenderingContext::RenderingContext (manager::Frame& in_frame, server::RenderManager& in_render_manager, ITraverseResultCache& in_traverse_result_cache, server::Camera& in_camera, RenderingContext* in_parent)
+  : parent (in_parent)
   , frame (in_frame)
   , render_manager (in_render_manager)
   , traverse_result ()

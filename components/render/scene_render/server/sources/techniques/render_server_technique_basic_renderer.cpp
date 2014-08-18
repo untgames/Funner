@@ -8,7 +8,7 @@ using namespace render::scene::server;
     Конструктор / деструктор
 */
 
-BasicRenderer::BasicRenderer (RenderManager& in_manager, const char* effect_name)
+BasicRenderer::BasicRenderer (server::RenderManager& in_manager, const char* effect_name)
   : manager (in_manager)
   , frame (manager.Manager ().CreateFrame ())
   , view_transaction_id ()

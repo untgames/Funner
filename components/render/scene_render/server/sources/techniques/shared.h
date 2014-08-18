@@ -32,7 +32,7 @@ class BasicRenderer;
 typedef xtl::intrusive_ptr<BasicRenderer> BasicRendererPtr;
 
 #include "basic_renderer.h"
-//#include "shadow_map_builder.h"
+#include "shadow_map_renderer.h"
 
 }
 
