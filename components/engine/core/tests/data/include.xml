@@ -5,4 +5,5 @@
     <Property Name="A" Value="3"/>
   </Properties>
   <Subsystem21 Value = "{A}"/>
+  <Include Source="{A}.xml"/>
 </Configuration>

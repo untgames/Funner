@@ -90,7 +90,9 @@ struct StartupManagerImpl::Impl
         {
           try
           {
-            IncludeSubsystems (iter, subsystems_name_mask, manager, properties);
+            common::ParseNode parse_node = resolve_references (iter, properties);
+
+            IncludeSubsystems (parse_node, subsystems_name_mask, manager, properties);
           }
           catch (std::exception& exception)
           {
