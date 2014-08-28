@@ -2,6 +2,8 @@
 
 #include <exception>
 
+#include <stl/vector>
+
 #include <xtl/bind.h>
 #include <xtl/function.h>
 #include <xtl/ref.h>
