@@ -41,7 +41,7 @@ SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_ROOT                  := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
-ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/18.1.1
+ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/20.0.0
 ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
 GCC_TOOLS_DIR              := $(ABI_DIR)/bin
 COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-gcc
@@ -57,7 +57,7 @@ JAVA_JAR                   := "$(JAVA_ROOT)/bin/jar"
 JAVA_CC                    := "$(JAVA_ROOT)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_BUILD_TOOLS_DIR)/aapt
 JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
-ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
+ZIP_ALIGNER                := $(ANDROID_BUILD_TOOLS_DIR)/zipalign
 BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
 
 COMMON_JAVA_FLAGS          += -g

@@ -43,39 +43,39 @@ import java.util.UUID;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-/// Данный класс используется для запуска внешних shared-library
+/// Р”Р°РЅРЅС‹Р№ РєР»Р°СЃСЃ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ Р·Р°РїСѓСЃРєР° РІРЅРµС€РЅРёС… shared-library
 public class EngineActivity extends Activity
 {
-	///Типы посылаемых событий
-	public enum EventType
-	{
-		ON_PAUSE, 
-		ON_RESUME, 
-		ON_STOP, 
-		ON_START, 
-		ON_DESTROY 
-	}
-	
-	///Интерфейс слушателя событий
-	public interface EngineActivityEventListener
-	{
-		void handleEngineActivityEvent (EventType eventType);
-	}
+  ///РўРёРїС‹ РїРѕСЃС‹Р»Р°РµРјС‹С… СЃРѕР±С‹С‚РёР№
+  public enum EventType
+  {
+    ON_PAUSE, 
+    ON_RESUME, 
+    ON_STOP, 
+    ON_START, 
+    ON_DESTROY 
+  }
+  
+  ///РРЅС‚РµСЂС„РµР№СЃ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
+  public interface EngineActivityEventListener
+  {
+    void handleEngineActivityEvent (EventType eventType);
+  }
 
-	///Интерфейс слушателя результатов запуска других activity
-	public interface EngineActivityResultListener
-	{
-		boolean handleEngineActivityResult (int requestCode, int resultCode, Intent data);
-	}
+  ///РРЅС‚РµСЂС„РµР№СЃ СЃР»СѓС€Р°С‚РµР»СЏ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ Р·Р°РїСѓСЃРєР° РґСЂСѓРіРёС… activity
+  public interface EngineActivityResultListener
+  {
+    boolean handleEngineActivityResult (int requestCode, int resultCode, Intent data);
+  }
 
-	private static final String TAG = "funner";
-			
+  private static final String TAG = "funner";
+      
   private static boolean isLoaded        = false;
   private ViewGroup      views           = null;
   private List           eventListeners  = new ArrayList ();
   private List           resultListeners = new ArrayList ();
 
-///Загрузчик
+///Р—Р°РіСЂСѓР·С‡РёРє
   @Override
   public void onCreate(Bundle savedInstanceState)
   {        
@@ -91,7 +91,7 @@ public class EngineActivity extends Activity
   
   void startApplication ()
   {
-      /// получение параметров запуска
+      /// РїРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСѓСЃРєР°
 
     Bundle extras = getIntent ().getExtras ();
     
@@ -197,7 +197,7 @@ public class EngineActivity extends Activity
     }                   
   }
 
-///Установка состояния скрин-сейвера
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
   public void setScreenSaverStateThreadSafe (final boolean state)
   {
     UiDispatch.run (this, new UiRunnable () {
@@ -219,7 +219,7 @@ public class EngineActivity extends Activity
     });
   }  
 
-///Установка параметров оборудования
+///РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ
   private void setupHardwareConfiguration ()
   {
     Display display = getWindowManager().getDefaultDisplay();
@@ -247,7 +247,7 @@ public class EngineActivity extends Activity
     setScreenMode (width, height, (int)display.getRefreshRate (), (int)metrics.xdpi, (int)metrics.ydpi);
   }
   
-///Приостановка приложения  
+///РџСЂРёРѕСЃС‚Р°РЅРѕРІРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ  
   @Override
   public void onPause ()
   {
@@ -257,7 +257,7 @@ public class EngineActivity extends Activity
     notify (EventType.ON_PAUSE);
   }  
   
-///Возобновление работы приложения
+///Р’РѕР·РѕР±РЅРѕРІР»РµРЅРёРµ СЂР°Р±РѕС‚С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
   @Override
   public void onResume ()
   {
@@ -267,7 +267,7 @@ public class EngineActivity extends Activity
     notify (EventType.ON_RESUME);
   }    
     
-///Остановка приложения  
+///РћСЃС‚Р°РЅРѕРІРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ  
   @Override
   public void onStop ()
   {
@@ -277,7 +277,7 @@ public class EngineActivity extends Activity
     notify (EventType.ON_STOP);
   }  
   
-///Восстановление приложения
+///Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
   @Override
   public void onStart ()
   {
@@ -287,7 +287,7 @@ public class EngineActivity extends Activity
     notify (EventType.ON_START);
   }    
     
-///Завершение приложения
+///Р—Р°РІРµСЂС€РµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
   @Override
   public void onDestroy ()
   {
@@ -298,7 +298,7 @@ public class EngineActivity extends Activity
     android.os.Process.killProcess (android.os.Process.myPid ()); //kill our process, so singletons will die with activity. Activity is destroyed on device lock on Galaxy S3
   }        
     
-///Нехватка памяти
+///РќРµС…РІР°С‚РєР° РїР°РјСЏС‚Рё
   @Override
   public void onLowMemory ()  
   {
@@ -306,18 +306,18 @@ public class EngineActivity extends Activity
     super.onLowMemory ();
   }
   
-///Игнорирование нажатия на кнопку back
+///РРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РЅР°Р¶Р°С‚РёСЏ РЅР° РєРЅРѕРїРєСѓ back
   @Override
   public void onBackPressed ()
   {    
   }
   
-///Обработка событий приложения
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
   protected void onApplicationNotification (String notification)
   {
   }
   
-///Добавление окна
+///Р”РѕР±Р°РІР»РµРЅРёРµ РѕРєРЅР°
   void addView (View view)
   {
     boolean needSetContentView = views == null;
@@ -336,7 +336,7 @@ public class EngineActivity extends Activity
       getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
   }
   
-/// Создание окна
+/// РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
   public EngineViewController createSurfaceViewController (String initString, final long windowRef)
   {
     final EngineActivity activity = this;            
@@ -371,7 +371,7 @@ public class EngineActivity extends Activity
     });
   }
   
-/// Получение UUID
+/// РџРѕР»СѓС‡РµРЅРёРµ UUID
   public String getUuid ()
   {
     SharedPreferences prefs = getSharedPreferences ("default.settings", 0);
@@ -438,35 +438,35 @@ public class EngineActivity extends Activity
 
     try
     {
-    	PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+      PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 
-    	result += " ApplicationVersion=" + packageInfo.versionName;
+      result += " ApplicationVersion=" + packageInfo.versionName;
     }
     catch (Exception e)
     {
-    	Log.e (TAG, "Exception while getting application version: " + e.getMessage ());
+      Log.e (TAG, "Exception while getting application version: " + e.getMessage ());
     }
     
     boolean hasWifi = false;
     
     try
     {
-    	WifiManager wifiManager = (WifiManager)getSystemService (Context.WIFI_SERVICE);
+      WifiManager wifiManager = (WifiManager)getSystemService (Context.WIFI_SERVICE);
 
-    	if (wifiManager != null && wifiManager.getWifiState () == WifiManager.WIFI_STATE_ENABLED)
-    	{
-    		WifiInfo wifiInfo = wifiManager.getConnectionInfo ();
-    		
-    		if (wifiInfo != null)
-    		{
-    			hasWifi = wifiInfo.getSupplicantState () == android.net.wifi.SupplicantState.COMPLETED;
-    		}
-    	}
+      if (wifiManager != null && wifiManager.getWifiState () == WifiManager.WIFI_STATE_ENABLED)
+      {
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo ();
+        
+        if (wifiInfo != null)
+        {
+          hasWifi = wifiInfo.getSupplicantState () == android.net.wifi.SupplicantState.COMPLETED;
+        }
+      }
     }
     catch (Exception e)
     {
-    	Log.e (TAG, "Exception while getting wifi state: " + e.getMessage ());
-    	hasWifi = true;
+      Log.e (TAG, "Exception while getting wifi state: " + e.getMessage ());
+      hasWifi = true;
     }
     
     if (!hasWifi)
@@ -487,7 +487,7 @@ public class EngineActivity extends Activity
     return formatter.toString ();
   }
   
-/// Работа с cookies
+/// Р Р°Р±РѕС‚Р° СЃ cookies
   private void initCookieManager ()
   {
     // Edge case: an illegal state exception is thrown if an instance of
@@ -524,7 +524,7 @@ public class EngineActivity extends Activity
     }
   }
 
-/// Открытие внешней ссылки
+/// РћС‚РєСЂС‹С‚РёРµ РІРЅРµС€РЅРµР№ СЃСЃС‹Р»РєРё
   public void openUrl (String url)
   {
     Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse (url));
@@ -532,7 +532,7 @@ public class EngineActivity extends Activity
     startActivity (intent);
   }
 
-/// Работа с событиями
+/// Р Р°Р±РѕС‚Р° СЃ СЃРѕР±С‹С‚РёСЏРјРё
   public void addEventListener (EngineActivityEventListener listener)  
   {
     eventListeners.add (listener);
@@ -553,7 +553,7 @@ public class EngineActivity extends Activity
     }
   }
   
-/// Работа с результатами запуска других активити
+/// Р Р°Р±РѕС‚Р° СЃ СЂРµР·СѓР»СЊС‚Р°С‚Р°РјРё Р·Р°РїСѓСЃРєР° РґСЂСѓРіРёС… Р°РєС‚РёРІРёС‚Рё
   public void addResultListener (EngineActivityResultListener listener)  
   {
     resultListeners.add (listener);
@@ -571,25 +571,25 @@ public class EngineActivity extends Activity
     while (i.hasNext())  
     {
       if (((EngineActivityResultListener) i.next()).handleEngineActivityResult(requestCode, resultCode, data))  //result handled
-      	return;
+        return;
     }
     
     super.onActivityResult(requestCode, resultCode, data);
   }
   
-/// Точка входа в native код
+/// РўРѕС‡РєР° РІС…РѕРґР° РІ native РєРѕРґ
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
 
-/// Регистрация параметров дисплея
+/// Р РµРіРёСЃС‚СЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РґРёСЃРїР»РµСЏ
   public native void setScreenMode (int width, int height, int refresh_rate, int xdpi, int ydpi);  
 
-/// Оповещение о возникновении событий
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёР№
   public native void onPauseCallback ();
   public native void onResumeCallback ();
   public native void onStartCallback ();
   public native void onStopCallback ();
   public native void onLowMemoryCallback ();
 
-/// Посылка сообщения в приложение
+/// РџРѕСЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёСЏ РІ РїСЂРёР»РѕР¶РµРЅРёРµ
   public native void postNotification (String notification);
 }
