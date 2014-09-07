@@ -54,11 +54,12 @@ class Store
 ///Покупка / восстановление покупок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const Transaction&)> PurchaseCallback;
+    typedef xtl::function<void (bool success, const char* status)> OnPurchasesRestoredCallback;
     
     xtl::connection RegisterTransactionUpdateHandler (const PurchaseCallback&);
     Transaction     BuyProduct                       (const char* product_id, size_t count, const PurchaseCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
     Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void            RestorePurchases                 () const;    
+    void            RestorePurchases                 (const OnPurchasesRestoredCallback& finish_callback) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -113,7 +114,7 @@ class IStore
 ///Покупка / восстановление покупок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&) = 0;
-    virtual void            RestorePurchases                 () = 0;
+    virtual void            RestorePurchases                 (const Store::OnPurchasesRestoredCallback& finish_callback) = 0;
     virtual Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties) = 0;
 };
 

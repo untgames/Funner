@@ -199,9 +199,9 @@ Transaction Store::BuyProduct (const char* product_id, size_t count, const commo
   return impl->BuyProduct (product_id, count, properties);
 }
 
-void Store::RestorePurchases () const
+void Store::RestorePurchases (const OnPurchasesRestoredCallback& finish_callback) const
 {
-  impl->store->RestorePurchases ();
+  impl->store->RestorePurchases (finish_callback);
 }
 
 /*

@@ -63,7 +63,7 @@ class StoreImpl : public IStore
 ///Покупка / восстановление покупок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&);
-    void            RestorePurchases                 ();
+    void            RestorePurchases                 (const Store::OnPurchasesRestoredCallback& finish_callback);
     Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

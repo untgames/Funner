@@ -256,6 +256,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 ///Конструктор / деструктор
     IOSStore  ()
       : log (LOG_NAME)
+      , restore_purchases_in_progress (false)
     {
       running_products_requests_delegats = [[NSMutableSet alloc] init];
 
@@ -351,9 +352,15 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       return store_signal.connect (callback);
     }
 
-    void RestorePurchases ()
+    void RestorePurchases (const Store::OnPurchasesRestoredCallback& finish_callback)
     {
+      if (restore_purchases_in_progress)
+        throw xtl::format_operation_exception ("store::ios_store::IOSStore::RestorePurchases", "Previous restore purchases in progress now");
+
       log.Printf ("Restoring transactions");
+
+      restore_purchases_finish_callback = finish_callback;
+      restore_purchases_in_progress = true;
 
       return [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
     }
@@ -524,11 +531,21 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
     void OnRestoreCompletedTransactionsFinished ()
     {
       log.Printf ("Restore completed transactions finished");
+
+      restore_purchases_finish_callback (true, "");
+
+      restore_purchases_finish_callback = Store::OnPurchasesRestoredCallback ();
+      restore_purchases_in_progress = false;
     }
 
     void OnRestoreCompletedTransactionsFailedWithError (NSError* error)
     {
       log.Printf ("Restore completed transactions failed, error '%s'", [[error description] UTF8String]);
+
+      restore_purchases_finish_callback (false, [[error description] UTF8String]);
+
+      restore_purchases_finish_callback = Store::OnPurchasesRestoredCallback ();
+      restore_purchases_in_progress = false;
     }
 
   private:
@@ -599,11 +616,13 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
     typedef stl::vector<TransactionDesc>           TransactionsArray;
 
   public:
-    common::Log          log;
-    TransactionObserver* transaction_observer;
-    StoreSignal          store_signal;
-    NSMutableSet*        running_products_requests_delegats;
-    TransactionsArray    pending_transactions;
+    common::Log                        log;                                 //log
+    TransactionObserver*               transaction_observer;                //transactions updates observer
+    StoreSignal                        store_signal;                        //signal for transactions updates
+    NSMutableSet*                      running_products_requests_delegats;  //delegats for running products requests
+    TransactionsArray                  pending_transactions;                //pending transactions
+    Store::OnPurchasesRestoredCallback restore_purchases_finish_callback;   //callback for restore purchases result
+    bool                               restore_purchases_in_progress;       //is purchases restore in progress now
 };
 
 typedef common::Singleton<IOSStore> StoreSingleton;
@@ -668,9 +687,9 @@ xtl::connection StoreImpl::RegisterTransactionUpdateHandler (const Store::Purcha
   return StoreSingleton::Instance ()->RegisterTransactionUpdateHandler (callback);
 }
 
-void StoreImpl::RestorePurchases ()
+void StoreImpl::RestorePurchases (const Store::OnPurchasesRestoredCallback& finish_callback)
 {
-  StoreSingleton::Instance ()->RestorePurchases ();
+  StoreSingleton::Instance ()->RestorePurchases (finish_callback);
 }
 
 Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)
