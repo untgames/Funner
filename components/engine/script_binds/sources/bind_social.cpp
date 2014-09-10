@@ -288,6 +288,11 @@ void bind_session_library (Environment& environment)
       make_invoker<void (Session&, const char*)> (xtl::bind (&show_window, _1, _2, LoadCallback (), common::PropertyMap ()))
   ));
   lib.Register ("CreateLoadCallback", make_callback_invoker<LoadCallback::signature_type> ());
+  lib.Register ("CreateRequestCallback", make_callback_invoker<RequestCallback::signature_type> ());
+  lib.Register ("PerformRequest",     make_invoker (
+      make_invoker (&Session::PerformRequest),
+      make_invoker<void (Session&, const char*, const RequestCallback&)> (xtl::bind (&Session::PerformRequest, _1, _2, _3, common::PropertyMap ()))
+  ));
   lib.Register ("LoadUser",           make_invoker (
       make_invoker (&load_user),
       make_invoker<void (Session&, const char*, const LoadCallback&)> (xtl::bind (&load_user, _1, _2, _3, common::PropertyMap ())),

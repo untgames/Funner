@@ -29,7 +29,7 @@ enum OperationStatus
 
 typedef xtl::function <void (const void*)> ReleaseHandleFunction;
 
-//typedef xtl::function<void (OperationStatus status, const char* error)> RequestCallback;                              //ADDED
+typedef xtl::function<void (const char* respone, OperationStatus status, const char* error)> RequestCallback;
 typedef xtl::function<void (OperationStatus status, const char* error)> LoginCallback;
 typedef xtl::function<void (OperationStatus status, const char* error)> WindowCallback;
 
@@ -55,14 +55,16 @@ class ISessionManager
     virtual void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Завершился ли процесс логина
+///Логин/логаут
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void LogIn          (const LoginCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LogOut         () = 0;
     virtual bool IsUserLoggedIn () = 0;
 
-//ADDED
-//    virtual void PerformRequest (const RequestCallback& callback, const common::PropertyMap& properties); //ADDED
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка произвольных запросов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void PerformRequest (const char* request, const RequestCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение залогиненного пользователя

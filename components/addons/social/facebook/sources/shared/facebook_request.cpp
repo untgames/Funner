@@ -10,9 +10,9 @@ size_t DEFAULT_RESPONSE_BUFFER_SIZE = 1024 * 16; //buffer size used for chunked 
 
 }
 
-void FacebookSessionImpl::PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response)
+void FacebookSessionImpl::PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const char* response)
 {
-  common::ActionQueue::PushAction (xtl::bind (callback, succeeded, stl::string (status), response), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (callback, succeeded, stl::string (status), stl::string (response)), common::ActionThread_Main);
 }
 
 void FacebookSessionImpl::RequestTryRelogin (const stl::string& method_name, const stl::string& params, const RequestCallback& callback)
@@ -28,7 +28,7 @@ void FacebookSessionImpl::RequestReloginCallback (OperationStatus status, const 
   }
   else
   {
-    PerformRequestNotify (callback, false, error, common::ParseNode ());
+    PerformRequestNotify (callback, false, error, "");
   }
 }
 
@@ -38,7 +38,7 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
 
   try
   {
-    stl::string url = common::format ("https://graph.facebook.com/%s?%s&access_token=%s", method_name.c_str (), params.c_str (), token.c_str ());
+    stl::string url = common::format ("https://graph.facebook.com/%s/%s?%s&access_token=%s", PLATFORM_VERSION, method_name.c_str (), params.c_str (), token.c_str ());
 
     url = percent_escape (url.c_str ());
 
@@ -54,7 +54,7 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
     log.Printf ("Request failed, error '%s'", e.what ());
 
     if (after_relogin)
-      PerformRequestNotify (callback, false, e.what (), common::ParseNode ());
+      PerformRequestNotify (callback, false, e.what (), "");
     else  //try relogin
       common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
 
@@ -68,7 +68,7 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
     log.Printf ("Request failed, unknown error");
 
     if (after_relogin)
-      PerformRequestNotify (callback, false, "Unknown error", common::ParseNode ());
+      PerformRequestNotify (callback, false, "Unknown error", "");
     else  //try relogin
       common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
 
@@ -111,31 +111,12 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
 
     log.Printf ("Response received: '%s'", buffer.data ());
 
-    common::Parser   parser ("json", bytes_copied, buffer.data (), "json");
-    common::ParseLog parse_log = parser.Log ();
-
-    for (size_t i = 0; i < parse_log.MessagesCount (); i++)
-      switch (parse_log.MessageType (i))
-      {
-        case common::ParseLogMessageType_Error:
-        case common::ParseLogMessageType_FatalError:
-          throw xtl::format_operation_exception ("", "Parser error: '%s'", parse_log.Message (i));
-          break;
-        default:
-          break;
-      }
-
-    common::ParseNode iter = parser.Root ().First ();
-
-    if (!iter)
-      throw xtl::format_operation_exception ("", "There is no root node in response");
-
     if (action.IsCanceled ())
       return;
 
     //TODO check for errors (http://developers.facebook.com/docs/reference/api/errors/)
 
-    PerformRequestNotify (callback, true, "Ok", iter);
+    PerformRequestNotify (callback, true, "Ok", buffer.data ());
   }
   catch (xtl::exception& e)
   {
@@ -143,7 +124,7 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
       return;
 
     log.Printf ("Request failed, error '%s'", e.what ());
-    PerformRequestNotify (callback, false, e.what (), common::ParseNode ());
+    PerformRequestNotify (callback, false, e.what (), "");
   }
   catch (...)
   {
@@ -151,8 +132,34 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
       return;
 
     log.Printf ("Request failed, unknown error");
-    PerformRequestNotify (callback, false, "Unknown error", common::ParseNode ());
+    PerformRequestNotify (callback, false, "Unknown error", "");
   }
+}
+
+common::ParseNode FacebookSessionImpl::ParseRequestResponse (const stl::string& response)
+{
+  static const char* METHOD_NAME = "social::facebook::FacebookSessionImpl::ParseRequestResponse";
+
+  common::Parser   parser ("json", response.size (), response.data (), "json");
+  common::ParseLog parse_log = parser.Log ();
+
+  for (size_t i = 0; i < parse_log.MessagesCount (); i++)
+    switch (parse_log.MessageType (i))
+    {
+      case common::ParseLogMessageType_Error:
+      case common::ParseLogMessageType_FatalError:
+        throw xtl::format_operation_exception (METHOD_NAME, "Parser error: '%s'", parse_log.Message (i));
+        break;
+      default:
+        break;
+    }
+
+  common::ParseNode iter = parser.Root ().First ();
+
+  if (!iter)
+    throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in response");
+
+  return iter;
 }
 
 /*

@@ -32,6 +32,8 @@ namespace social
 namespace facebook
 {
 
+const char* const PLATFORM_VERSION = "v2.1"; //API version
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Facebook сессия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +61,11 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///Показ стандартных окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка произвольных запросов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void PerformRequest (const char* request, const social::RequestCallback& callback, const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
@@ -124,15 +131,17 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение запроса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (bool succeeded, const stl::string& status, common::ParseNode response)> RequestCallback;
+    typedef xtl::function<void (bool succeeded, const stl::string& status, const stl::string& response)> RequestCallback;
 
     void PerformRequest         (const char* method_name, const char* params, const RequestCallback& callback);
+    void PerformRequestHandler  (bool succeeded, const stl::string& status, const stl::string& result, const social::RequestCallback& callback);
     void CleanupRequestsActions ();
 
-    static void PerformRequestNotify   (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response);
-    static void PerformRequestImpl     (common::Action& action, const stl::string& method_name, const stl::string& params, const stl::string& token, const RequestCallback& callback, FacebookSessionImpl* session, common::Log log, bool after_relogin);
-           void RequestTryRelogin      (const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
-           void RequestReloginCallback (OperationStatus status, const char* error, const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
+    static void              PerformRequestNotify   (const RequestCallback& callback, bool succeeded, const char* status, const char* response);
+    static void              PerformRequestImpl     (common::Action& action, const stl::string& method_name, const stl::string& params, const stl::string& token, const RequestCallback& callback, FacebookSessionImpl* session, common::Log log, bool after_relogin);
+           common::ParseNode ParseRequestResponse   (const stl::string& response);
+           void              RequestTryRelogin      (const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
+           void              RequestReloginCallback (OperationStatus status, const char* error, const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события активации приложения
@@ -147,7 +156,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка событий логина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
+    void OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, const stl::string& response, const LoginCallback& callback);
     bool ProcessLoginRequest     (const char* request, const LoginCallback& callback);
     void ProcessLoginFail        (const LoginCallback& callback);
     void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* token, const LoginCallback& callback);
@@ -157,8 +166,8 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка ответов запросов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback);
-    void OnUserInfoLoaded    (bool succeeded, const stl::string& status, common::ParseNode response, const LoadUserCallback& callback);
+    void OnFriendsInfoLoaded (bool succeeded, const stl::string& status, const stl::string& response, const LoadFriendsCallback& callback);
+    void OnUserInfoLoaded    (bool succeeded, const stl::string& status, const stl::string& response, const LoadUserCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка событий диалогов
