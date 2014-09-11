@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.amazon.device.messaging.ADM;
 
-//Класс для работы с сообщениями Amazon device messaging
+//Class for work with Amazon device messaging
 public class EngineADMManager
 {
   private static final String TAG = "EngineADMManager";
@@ -23,7 +23,7 @@ public class EngineADMManager
     adm = new ADM (context);
   }
   
-	//Регистрация на получение сообщений
+  //Registering for messages receiving
 	public static void registerForADMMessages (final Context context) throws Throwable
 	{
 	  try
