@@ -242,20 +242,20 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 
       if (samples_count > 1)
       {
-        glGenFramebuffers (1, &sample_frame_buffer);
-        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
+        glGenFramebuffersOES (1, &sample_frame_buffer);
+        glBindFramebufferOES (GL_FRAMEBUFFER_OES, sample_frame_buffer);
 
-        glGenRenderbuffers (1, &sample_render_buffer);
-        glBindRenderbuffer (GL_RENDERBUFFER, sample_render_buffer);
-        glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_RGBA8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
-        glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sample_render_buffer);
+        glGenRenderbuffersOES (1, &sample_render_buffer);
+        glBindRenderbufferOES (GL_RENDERBUFFER_OES, sample_render_buffer);
+        glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER_OES, samples_count, GL_RGBA8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
+        glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, sample_render_buffer);
 
         if (desc.frame_buffer.depth_bits)
         {
-          glGenRenderbuffers (1, &sample_depth_buffer);
-          glBindRenderbuffer (GL_RENDERBUFFER, sample_depth_buffer);
-          glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_DEPTH_COMPONENT16, desc.frame_buffer.width, desc.frame_buffer.height);
-          glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sample_depth_buffer);
+          glGenRenderbuffersOES (1, &sample_depth_buffer);
+          glBindRenderbufferOES (GL_RENDERBUFFER_OES, sample_depth_buffer);
+          glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER_OES, samples_count, GL_DEPTH_COMPONENT16_OES, desc.frame_buffer.width, desc.frame_buffer.height);
+          glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, sample_depth_buffer);
         }
       }
 
@@ -342,8 +342,8 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     {
       if (sample_frame_buffer)
       {
-        glBindFramebuffer (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
-        glBindFramebuffer (GL_READ_FRAMEBUFFER_APPLE, sample_frame_buffer);
+        glBindFramebufferOES (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
+        glBindFramebufferOES (GL_READ_FRAMEBUFFER_APPLE, sample_frame_buffer);
         glResolveMultisampleFramebufferAPPLE ();
 
         CheckErrors (METHOD_NAME);
@@ -354,7 +354,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 
       if (sample_frame_buffer)
       {
-        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
+        glBindFramebufferOES (GL_FRAMEBUFFER_OES, sample_frame_buffer);
 
         CheckErrors (METHOD_NAME);
       }
