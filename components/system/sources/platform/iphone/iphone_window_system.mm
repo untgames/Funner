@@ -308,6 +308,25 @@ struct WindowImpl
 
   allowed_orientations = UIInterfaceOrientationMaskAll;
 
+  NSArray *app_allowed_orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+  if ([app_allowed_orientations count])
+  {
+    allowed_orientations = 0;
+
+    for (NSString* orientation in app_allowed_orientations)
+    {
+      if ([orientation isEqualToString:@"UIInterfaceOrientationPortrait"])
+        allowed_orientations |= UIInterfaceOrientationMaskPortrait;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationPortraitUpsideDown"])
+        allowed_orientations |= UIInterfaceOrientationMaskPortraitUpsideDown;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationLandscapeLeft"])
+        allowed_orientations |= UIInterfaceOrientationMaskLandscapeLeft;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationLandscapeRight"])
+        allowed_orientations |= UIInterfaceOrientationMaskLandscapeRight;
+    }
+  }
+
   try
   {
     event_context = new WindowEventContext;
