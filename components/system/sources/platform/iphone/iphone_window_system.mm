@@ -17,6 +17,7 @@ namespace
 {
 
 const char* LOG_NAME = "syslib.iphone.window";
+const float EPS      = 0.001f;
 
 InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
 {
@@ -30,9 +31,19 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
   }
 }
 
+bool float_equal (float a, float b)
+{
+  return a - b < EPS;
+}
+
+bool is_portrait_upside_down_transform (const CGAffineTransform& transform)
+{
+  return float_equal (transform.a, -1.f) && float_equal (transform.b, 0.f) && float_equal (transform.c, 0.f) && float_equal (transform.d, -1.f);
+}
+
 CGRect get_transformed_view_rect_size (CGRect frame, UIView* view)
 {
-  if (!CGAffineTransformIsIdentity (view.transform))
+  if (!CGAffineTransformIsIdentity (view.transform) && !is_portrait_upside_down_transform (view.transform))
   {
     float temp = frame.size.width;
 
@@ -677,7 +688,7 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
   rect.top    = frame.origin.y * scale_factor;
   rect.left   = frame.origin.x * scale_factor;
 
-  if (!CGAffineTransformIsIdentity (view.transform))
+  if (!CGAffineTransformIsIdentity (view.transform) && !is_portrait_upside_down_transform (view.transform))
   {
       size_t temp = rect.bottom;
 
