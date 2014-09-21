@@ -18,7 +18,7 @@ uniform sampler2D   SpecularTexture;
 uniform sampler2D   BumpTexture;
 uniform sampler2D   ReflectionTexture;
 
-varying vec4 Texcoord;
+varying vec3 Texcoord;
 varying vec3 EyeDirection;
 varying vec3 ReflectionDirection;
 varying vec3 Normal;
