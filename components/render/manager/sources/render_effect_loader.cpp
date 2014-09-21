@@ -15,7 +15,7 @@ namespace
 class EffectLoader
 {
   public:
-///Конструктор  
+///Конструктор
     EffectLoader (const DeviceManagerPtr& in_device_manager, const char* name, const common::ParseNode& in_root, EffectLoaderLibrary& in_library)
       : root (in_root)
       , library (in_library)
@@ -582,7 +582,7 @@ class EffectLoader
 ///Разбор размера текстуры
     static math::vec3ui ParseTextureSize (const ParseNode& node)
     {
-      math::vec3ui result;
+      math::vec3ui result = 1;
       size_t       index = 0;
 
       for (Parser::AttributeIterator params_iter = make_attribute_iterator (node); params_iter && index < 3; ++params_iter, ++index)
