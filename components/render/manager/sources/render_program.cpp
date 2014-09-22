@@ -39,42 +39,74 @@ typedef stl::vector<media::rfx::Shader>                               ShaderArra
 typedef stl::vector<TexmapDesc>                                       TexmapDescArray;
 typedef CacheMap<OptionsCacheCombinationKey, ProgramPtr, RemovePred>  ProgramMap;
 
-struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
+struct DefaultSamplerHolder: public xtl::reference_counter, public CacheSource
 {
-  DeviceManagerPtr            device_manager;         //менеджер устройства отрисовки
-  stl::string                 name;                   //имя программы
-  ShaderArray                 shaders;                //шейдеры
-  TexmapDescArray             texmaps;                //текстурные карты
-  stl::string                 static_options;         //статические опции компиляции шейдеров
-  stl::string                 dynamic_options;        //имена динамических опций
-  ShaderOptionsLayout         dynamic_options_layout; //расположение динамических опций
-  Log                         log;                    //протокол
-  bool                        need_update;            //необходимо обновление внутрених данных
-  bool                        has_framemaps;          //программа ссылается на контекстные карты кадра
-  ProgramParametersLayoutPtr  parameters_layout;      //расположение параметров программы
-  PropertyBuffer              properties;             //свойства программы
-  LowLevelStateBlockPtr       state_block;            //блок данных параметров
-  ProgramMap                  derived_programs;       //производные программы
+  SamplerProxy            sampler;        //сэмплер текстуры
+  size_t                  channel;        //номер канала
+  LowLevelSamplerStatePtr cached_sampler; //закэшированный сэмплер
+
+/// Конструктор
+  DefaultSamplerHolder (CacheHolder& owner, const TextureManagerPtr& texture_manager, const char* name, size_t in_channel)
+    : sampler (texture_manager->GetSamplerProxy (name))
+    , channel (in_channel)
+  {
+    owner.AttachCacheSource   (*this);
+    sampler.AttachCacheHolder (*this);    
+  }
+
+  using CacheSource::UpdateCache;
+  using CacheSource::ResetCache;
+
+/// Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_sampler = LowLevelSamplerStatePtr ();
+  }
+
+  void UpdateCacheCore ()
+  {
+    cached_sampler = sampler.Resource ();
+
+    InvalidateCache ();
+  }
+};
+
+typedef xtl::intrusive_ptr<DefaultSamplerHolder> DefaultSamplerHolderPtr;
+typedef stl::vector<DefaultSamplerHolderPtr>     DefaultSamplerHolderArray;
+
+struct ProgramCommonData: public xtl::reference_counter, public CacheSource, public DebugIdHolder
+{
+  DeviceManagerPtr            device_manager;               //менеджер устройства отрисовки
+  TextureManagerPtr           texture_manager;              //менеджер текстур
+  stl::string                 name;                         //имя программы
+  ShaderArray                 shaders;                      //шейдеры
+  TexmapDescArray             texmaps;                      //текстурные карты
+  DefaultSamplerHolderArray   default_samplers;             //сэмплеры по умолчанию
+  stl::string                 static_options;               //статические опции компиляции шейдеров
+  stl::string                 dynamic_options;              //имена динамических опций
+  ShaderOptionsLayout         dynamic_options_layout;       //расположение динамических опций
+  Log                         log;                          //протокол
+  bool                        has_framemaps;                //программа ссылается на контекстные карты кадра
+  ProgramParametersLayoutPtr  parameters_layout;            //расположение параметров программы
+  PropertyBuffer              properties;                   //свойства программы
+  LowLevelStateBlockPtr       cached_state_block;           //блок данных параметров
+  size_t                      cached_state_block_mask_hash; //хэш закэшированной маски блока состояний программы
+  ProgramMap                  derived_programs;             //производные программы
   
 ///Конструктор
-  ProgramCommonData (const DeviceManagerPtr& in_device_manager, const char* in_name)
+  ProgramCommonData (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const char* in_name)
     : device_manager (in_device_manager)
+    , texture_manager (in_texture_manager)
     , dynamic_options_layout (&in_device_manager->CacheManager ())
-    , need_update (true)
     , has_framemaps (false)
     , properties (in_device_manager)
+    , cached_state_block_mask_hash (0)
     , derived_programs (&device_manager->CacheManager ())
   {
     try
     {        
       name = in_name;        
 
-      render::low_level::StateBlockMask mask;
-
-      mask.ss_constant_buffers [ProgramParametersSlot_Program] = true;
-
-      state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
-      
       if (device_manager->Settings ().HasDebugLog ())
         log.Printf ("Program '%s' common data created (id=%u)", name.c_str (), Id ());
     }
@@ -88,18 +120,35 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 ///Деструктор
   ~ProgramCommonData ()
   {
+    cached_state_block = LowLevelStateBlockPtr ();
+
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Program '%s' common data destroyed (id=%u)", name.c_str (), Id ());    
   }
   
-///Обновление текстурных карт
-  void Update ()
+  using CacheSource::InvalidateCache;
+  using CacheSource::ResetCache;
+  using CacheSource::UpdateCache;
+
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_state_block_mask_hash = 0;
+    cached_state_block           = LowLevelStateBlockPtr ();
+
+    for (DefaultSamplerHolderArray::iterator iter=default_samplers.begin (), end=default_samplers.end (); iter!=end; ++iter)
+      (*iter)->ResetCache ();
+  }
+
+  void UpdateCacheCore ()
   {
     try
     {
-      if (!need_update)
-        return;
-        
+      bool has_debug_log = device_manager->Settings ().HasDebugLog ();
+      
+      if (has_debug_log)
+        log.Printf ("Update program '%s' common data cache (id=%u)", name.c_str (), Id ());
+
       has_framemaps = false;
         
       for (TexmapDescArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
@@ -118,23 +167,48 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
         new_properties.SetProperty (desc.param_name.c_str (), (int)desc.channel);
       }
 
+      render::low_level::StateBlockMask mask;
+
+      low_level::IDeviceContext& context = device_manager->ImmediateContext ();
+
+      for (DefaultSamplerHolderArray::iterator iter=default_samplers.begin (), end=default_samplers.end (); iter!=end; ++iter)
+      {
+        DefaultSamplerHolder& sampler_holder = **iter;
+
+        sampler_holder.UpdateCache ();
+
+        mask.ss_samplers [sampler_holder.channel] = true;
+
+        context.SSSetSampler (sampler_holder.channel, sampler_holder.cached_sampler.get ());
+      }
+
+      mask.ss_constant_buffers [ProgramParametersSlot_Program] = true;
+
+      size_t state_block_mask_hash = mask.Hash ();
+
+      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash)
+      {
+        cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+
+        if (has_debug_log)
+          log.Printf ("...create state block for program common data");
+      }
+
       ProgramParametersLayoutPtr new_layout = device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Program, new_properties.Layout ());
       
       properties.SetProperties (new_properties);
-
-      low_level::IDeviceContext& context = device_manager->ImmediateContext ();
       
       context.SSSetConstantBuffer (ProgramParametersSlot_Program, properties.Buffer ().get ());
       
-      state_block->Capture (&context);
+      cached_state_block->Capture (&context);
       
       parameters_layout = new_layout;
-        
-      need_update = false;
+
+      InvalidateCache ();
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::manager::ProgramCommonData::Update");
+      e.touch ("render::manager::ProgramCommonData::UpdateCacheCore");
       throw;
     }
   }
@@ -155,11 +229,11 @@ struct Program::Impl: public DebugIdHolder
   LowLevelProgramPtr   low_level_program; //низкоуровневая программа
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
+  Impl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const char* name, const char* static_options, const char* dynamic_options)
   {
     try
     {
-      common_data = ProgramCommonDataPtr (new ProgramCommonData (device_manager, name), false);      
+      common_data = ProgramCommonDataPtr (new ProgramCommonData (device_manager, texture_manager, name), false);      
               
       common_data->static_options  = static_options;      
       common_data->dynamic_options = dynamic_options;
@@ -205,7 +279,7 @@ struct Program::Impl: public DebugIdHolder
     Конструкторы / деструктор
 */
 
-Program::Program (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
+Program::Program (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const char* name, const char* static_options, const char* dynamic_options)
 {
   try
   {
@@ -216,12 +290,17 @@ Program::Program (const DeviceManagerPtr& device_manager, const char* name, cons
       throw xtl::make_null_argument_exception ("", "dynamic_options");
 
     if (!device_manager)
-      throw xtl::make_null_argument_exception ("", "device_manager");    
+      throw xtl::make_null_argument_exception ("", "device_manager");
+
+    if (!texture_manager)
+      throw xtl::make_null_argument_exception ("", "texture_manager");
       
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
     
-    impl = new Impl (device_manager, name, static_options, dynamic_options); 
+    impl = new Impl (device_manager, texture_manager, name, static_options, dynamic_options);
+
+    AttachCacheSource (*impl->common_data);
   }
   catch (xtl::exception& e)
   {
@@ -233,6 +312,7 @@ Program::Program (const DeviceManagerPtr& device_manager, const char* name, cons
 Program::Program (Program& parent, const ShaderOptions& options)
   : impl (new Impl (*parent.impl, options))
 {
+  AttachCacheSource (*impl->common_data);
 }
 
 Program::~Program ()
@@ -311,11 +391,8 @@ bool Program::HasFramemaps ()
 {
   try
   { 
-    if (!impl->common_data->need_update)
-      return impl->common_data->has_framemaps;
-    
-    impl->common_data->Update ();
-  
+    UpdateCache ();
+
     return impl->common_data->has_framemaps;
   }
   catch (xtl::exception& e)
@@ -360,7 +437,7 @@ const TexmapDesc* Program::FindTexmapBySemantic (const char* semantic)
   return FindTexmapBySemantic (common::strhash (semantic));
 }
 
-void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap)
+void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
 {
   static const char* METHOD_NAME = "render::manager::Program::SetTexmap";
 
@@ -368,32 +445,61 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
     throw xtl::make_null_argument_exception (METHOD_NAME, "semantic");
     
   if (!param_name)
-      throw xtl::make_null_argument_exception (METHOD_NAME, "param_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "param_name");
+
+  if (!default_sampler)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "default_sampler");
 
   if (index >= impl->common_data->texmaps.size ())
     throw xtl::make_range_exception (METHOD_NAME, "index", index, impl->common_data->texmaps.size ());
-    
+
+  if (channel >= render::low_level::DEVICE_SAMPLER_SLOTS_COUNT)
+    throw xtl::make_range_exception (METHOD_NAME, "channel", channel, render::low_level::DEVICE_SAMPLER_SLOTS_COUNT);
+
   TexmapDesc& desc = impl->common_data->texmaps [index];
-  
+
   desc.channel       = channel;
   desc.semantic      = semantic;
   desc.param_name    = param_name;
   desc.is_framemap   = is_framemap;
   desc.semantic_hash = common::strhash (semantic);
-  
-  impl->common_data->need_update = true;
+
+  if (default_sampler != desc.default_sampler)
+  {
+      //обновление дефолтного сэмплера
+
+    DefaultSamplerHolderPtr default_sampler_holder = DefaultSamplerHolderPtr (new DefaultSamplerHolder (*impl->common_data, impl->common_data->texture_manager, default_sampler, channel), false);
+
+    bool found = false;
+
+    for (DefaultSamplerHolderArray::iterator iter=impl->common_data->default_samplers.begin (), end=impl->common_data->default_samplers.end (); iter!=end; ++iter)
+      if ((*iter)->channel == channel)
+      {
+        found = true;
+        *iter = default_sampler_holder;
+
+        break;
+      }
+
+    if (!found)
+      impl->common_data->default_samplers.push_back (default_sampler_holder);
+
+    desc.default_sampler = default_sampler;
+  }
+
+  impl->common_data->InvalidateCache ();
 }
 
-size_t Program::AddTexmap (size_t channel, const char* semantic, const char* param_name, bool is_framemap)
+size_t Program::AddTexmap (size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
 {
   impl->common_data->texmaps.push_back ();
-  
+
   size_t index = impl->common_data->texmaps.size () - 1;
   
   try
   {
-    SetTexmap (index, channel, semantic, param_name, is_framemap);
-    
+    SetTexmap (index, channel, semantic, param_name, default_sampler, is_framemap);
+
     return index;
   }
   catch (...)
@@ -408,16 +514,26 @@ void Program::RemoveTexmap (size_t index)
   if (index >= impl->common_data->texmaps.size ())
     return;
 
+  size_t channel = impl->common_data->texmaps [index].channel;
+
+  for (DefaultSamplerHolderArray::iterator iter=impl->common_data->default_samplers.begin (), end=impl->common_data->default_samplers.end (); iter!=end; ++iter)
+    if (channel == (*iter)->channel)
+    {
+      impl->common_data->default_samplers.erase (iter);
+      break;
+    }
+
   impl->common_data->texmaps.erase (impl->common_data->texmaps.begin () + index);
   
-  impl->common_data->need_update = true;  
+  impl->common_data->InvalidateCache ();
 }
 
 void Program::RemoveAllTexmaps ()
 {
   impl->common_data->texmaps.clear ();
+  impl->common_data->default_samplers.clear ();
   
-  impl->common_data->need_update = true;  
+  impl->common_data->InvalidateCache ();
 }
 
 /*
@@ -578,12 +694,9 @@ LowLevelStateBlockPtr Program::StateBlock ()
 {
   try
   { 
-    if (!impl->common_data->need_update)
-      return impl->common_data->state_block;
-    
-    impl->common_data->Update ();
+    UpdateCache ();
   
-    return impl->common_data->state_block;    
+    return impl->common_data->cached_state_block;    
   }
   catch (xtl::exception& e)
   {
@@ -600,11 +713,8 @@ ProgramParametersLayoutPtr Program::ParametersLayout ()
 {
   try
   { 
-    if (!impl->common_data->need_update)
-      return impl->common_data->parameters_layout;
-    
-    impl->common_data->Update ();
-    
+    UpdateCache ();
+
     return impl->common_data->parameters_layout;
   }
   catch (xtl::exception& e)
@@ -612,4 +722,22 @@ ProgramParametersLayoutPtr Program::ParametersLayout ()
     e.touch ("render::manager::Program::ParametersLayout");
     throw;
   }
+}
+
+/*
+    Управление кэшированием
+*/
+
+void Program::UpdateCacheCore ()
+{
+  impl->common_data->UpdateCache ();
+
+    //обновление зависимых кэшей (реакция на Impl::InvalidateCacheDependencies)
+
+  InvalidateCacheDependencies ();
+}
+
+void Program::ResetCacheCore ()
+{
+  impl->common_data->ResetCache ();
 }

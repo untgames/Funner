@@ -146,10 +146,10 @@ program "phong"
   texmap   "diffuse"  "DiffuseTexture"
   texmap   "specular" "SpecularTexture"
   texmap   "bump"     "BumpTexture"
+  framemap "shadow"   "ShadowTexture" "default"
   texmap   "reflection"  "ReflectionTexture"
   texmap   "ambient"  "AmbientTexture"
   texmap   "emission" "EmissionTexture"
-  framemap "shadow"   "ShadowTexture"
 }
 
 //program instance for flat program, specified by (material, entity, frame)
@@ -301,7 +301,6 @@ effect "lighting"
     blend_state           "solid"                   //use blend stage settings for solid geometry
     depth_stencil_state   "solid"                   //use depth stencil stage settings for solid geometry
     rasterizer_state      "default"                 //use default rasterizer
-    texmap                "shadow" "default"        //define texture for framemap "shadow" with "default" sampler
   }
   
   //render transparent geometry
@@ -314,7 +313,6 @@ effect "lighting"
     blend_state           "transparent"             //use blend stage settings for transaparent geometry
     depth_stencil_state   "ztest_without_write"     //use depth stencil stage settings for transaparent geometry
     rasterizer_state      "default"                 //use default rasterizer
-    texmap                "shadow" "default"        //define texture for framemap "shadow" with "default" sampler
   }
 }
 

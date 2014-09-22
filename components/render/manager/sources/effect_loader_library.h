@@ -84,4 +84,4 @@ class EffectLoaderLibrary: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузчик эффектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void parse_effect_library (const DeviceManagerPtr&, const common::ParseNode& node, const char* file_name, EffectLoaderLibrary& library);
+void parse_effect_library (const DeviceManagerPtr&, const TextureManagerPtr&, const common::ParseNode& node, const char* file_name, EffectLoaderLibrary& library);

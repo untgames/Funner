@@ -16,10 +16,11 @@ class EffectLoader
 {
   public:
 ///Конструктор
-    EffectLoader (const DeviceManagerPtr& in_device_manager, const char* name, const common::ParseNode& in_root, EffectLoaderLibrary& in_library)
+    EffectLoader (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const char* name, const common::ParseNode& in_root, EffectLoaderLibrary& in_library)
       : root (in_root)
       , library (in_library)
       , device_manager (in_device_manager)
+      , texture_manager (in_texture_manager)
     {
       try
       {
@@ -703,9 +704,9 @@ class EffectLoader
       const char* id      = get<const char*> (*iter, "");
       const char* defines = get<const char*> (*iter, "defines", "");      
       const char* options = get<const char*> (*iter, "options", "");
-      
-      ProgramPtr program (new Program (device_manager, id, defines, options), false);
-      
+
+      ProgramPtr program (new Program (device_manager, texture_manager, id, defines, options), false);
+
       for (Parser::NamesakeIterator shader_iter=iter->First ("shader"); shader_iter; ++shader_iter)
       {
         Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
@@ -727,7 +728,7 @@ class EffectLoader
 
       if (!program->ShadersCount ())
         raise_parser_exception (*iter, "No shaders found for shading");
-        
+
       size_t channel = 0;
         
       for (Parser::Iterator texmap_iter=iter->First (); texmap_iter; ++texmap_iter)
@@ -737,12 +738,13 @@ class EffectLoader
           
         Parser::AttributeIterator params_iter = make_attribute_iterator (*texmap_iter);
         
-        const char* semantic    = *params_iter; ++params_iter;
-        const char* param_name  = *params_iter; ++params_iter;
-        bool        is_framemap = strcmp (texmap_iter->Name (), "framemap") == 0;
-        
-        program->AddTexmap (channel, semantic, param_name, is_framemap);
-        
+        const char* semantic        = get<const char*> (params_iter);
+        const char* param_name      = get<const char*> (params_iter);
+        const char* default_sampler = get<const char*> (params_iter, "");
+        bool        is_framemap     = strcmp (texmap_iter->Name (), "framemap") == 0;
+
+        program->AddTexmap (channel, semantic, param_name, default_sampler, is_framemap);
+
         ++channel;
       }        
 
@@ -948,10 +950,11 @@ class EffectLoader
     }    
   
   private:
-    common::ParseNode    root;           //корневой узел
-    EffectLoaderLibrary& library;        //библиотека загрузки эффектов
-    render::manager::Log log;            //протокол рендера
-    DeviceManagerPtr     device_manager; //менеджер устройства отрисовки
+    common::ParseNode    root;            //корневой узел
+    EffectLoaderLibrary& library;         //библиотека загрузки эффектов
+    render::manager::Log log;             //протокол рендера
+    DeviceManagerPtr     device_manager;  //менеджер устройства отрисовки
+    TextureManagerPtr    texture_manager; //менеджер текстур
 };
 
 }
@@ -962,9 +965,9 @@ namespace render
 namespace manager
 {
 
-void parse_effect_library (const DeviceManagerPtr& device_manager, const common::ParseNode& node, const char* name, EffectLoaderLibrary& library)
+void parse_effect_library (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const common::ParseNode& node, const char* name, EffectLoaderLibrary& library)
 {
-  EffectLoader loader (device_manager, name, node, library);
+  EffectLoader loader (device_manager, texture_manager, name, node, library);
 }
 
 }
