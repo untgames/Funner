@@ -842,15 +842,20 @@ class EffectLoader
         const char*                  depth_stencil_state_name = get<const char*> (*iter, "depth_stencil_state", "");
         const char*                  blend_state_name         = get<const char*> (*iter, "blend_state", "");
         const char*                  rasterizer_state_name    = get<const char*> (*iter, "rasterizer_state", "");
+        const char*                  program_name             = get<const char*> (*iter, "program", "");
         LowLevelBlendStatePtr        blend_state              = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
         LowLevelDepthStencilStatePtr depth_stencil_state      = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
         LowLevelRasterizerStatePtr   rasterizer_state         = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
         LowLevelRasterizerStatePtr   rasterizer_scissor_state = *rasterizer_state_name ? library.RasterizerScissorStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
+        ProgramPtr                   program                  = *program_name ? library.Programs ().Find (program_name) : ProgramPtr ();
+
+        //TODO проверять корректность заполнения полей
         
         EffectPassPtr pass (new EffectPass (device_manager), false);
 
         pass->SetColorTargets           (color_targets);
         pass->SetDepthStencilTarget     (depth_stencil_target);
+        pass->SetProgram                (program);
         pass->SetTags                   (tags);
         pass->SetSortMode               (sort_mode);
         pass->SetBlendState             (blend_state);

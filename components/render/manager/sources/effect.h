@@ -44,10 +44,12 @@ class EffectPass: public Object
     void                                SetDepthStencilState      (const LowLevelDepthStencilStatePtr&);
     void                                SetRasterizerState        (const LowLevelRasterizerStatePtr&);
     void                                SetRasterizerScissorState (const LowLevelRasterizerStatePtr&);    
+    void                                SetProgram                (const ProgramPtr&);
     const LowLevelBlendStatePtr&        BlendState                ();
     const LowLevelDepthStencilStatePtr& DepthStencilState         ();
     const LowLevelRasterizerStatePtr&   RasterizerState           ();
     const LowLevelRasterizerStatePtr&   RasterizerScissorState    ();
+    const ProgramPtr&                   Program    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блок состояний эффекта
