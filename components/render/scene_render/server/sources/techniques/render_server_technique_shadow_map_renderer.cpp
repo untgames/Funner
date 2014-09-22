@@ -84,22 +84,24 @@ void ShadowMapRenderer::UpdateShadowMap (RenderingContext& parent_context, Light
 
     manager::Frame& frame = Frame ();
 
+    frame.SetClearDepthValue (1.f);  //TODO is it needed here?
+
     TraverseResultCache cache (traverse_result);
-printf ("%s(%u) %u %u\n", __FUNCTION__, __LINE__, light.CamerasCount (), render_targets.size ());
+
     for (size_t i=0; i<pass_count; i++)
     {
       Camera& camera = const_cast<Camera&> (light.Camera (i));
-
-      frame.SetRenderTarget (render_target_name.c_str (), render_targets [i]);
 
       traverse_result.Clear ();
 
       scene.Traverse (camera.Frustum (), traverse_result, Collect_VisualModels);
 
       RenderingContext context (frame, RenderManager (), cache, camera, &parent_context);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__);
+
       Draw (context);
     }
+
+    parent_context.Frame ().AddFrame (frame);
   }
   catch (xtl::exception& e)
   {

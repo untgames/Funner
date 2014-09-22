@@ -95,7 +95,7 @@ struct Light::Impl
         {
           SetupCameras (1);
 
-          cameras [0]->SetProjectionMatrix (ComputePerspectiveMatrix (math::radian (params.angle), ZNEAR_FACTOR * params.range, params.range));
+          cameras [0]->SetProjectionMatrix (ComputePerspectiveMatrix (math::radian (params.angle), 1.f, params.range));  //TODO 1.f is for debug
           cameras [0]->SetWorldMatrix      (world_tm);
 
           break;

@@ -17,6 +17,7 @@ uniform sampler2D   DiffuseTexture;
 uniform sampler2D   SpecularTexture;
 uniform sampler2D   BumpTexture;
 uniform sampler2D   ReflectionTexture;
+uniform sampler2D   ShadowTexture;
 
 varying vec3 Texcoord;
 varying vec3 EyeDirection;
@@ -103,6 +104,11 @@ void main (void)
   lighted_color *= LightColor.xyz;
 
   color += lighted_color;
-    
-  gl_FragColor = vec4 (color, diffuse_transparency);
+ 
+  if (texture2D (ShadowTexture, Texcoord.xy).x == 0.0)  
+    gl_FragColor = vec4 (1.0, 1.0, 1.0, diffuse_transparency);
+  else
+    gl_FragColor = vec4 (0.0, 0.0, 0.0, diffuse_transparency);
+
+//  gl_FragColor = vec4 (texture2D (ShadowTexture, Texcoord.xy).xyz, diffuse_transparency);
 }

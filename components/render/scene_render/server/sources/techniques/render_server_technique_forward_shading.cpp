@@ -102,7 +102,7 @@ class ForwardShading: public Technique
         
         TraverseResult& result = parent_context.TraverseResult ();
 
-          //обход источников        
+          //обход источников
 
         RenderingContext context (parent_context, private_data.frame);
 
@@ -131,7 +131,10 @@ class ForwardShading: public Technique
 
         //обновление тени
 
-      UpdateShadowMap (context, light);
+      RenderingContext shadow_context (context, light_context.renderer->Frame ());   //TODO this for debug
+
+      shadow_map_renderer.UpdateShadowMap (shadow_context, light);   //TODO this for debug too 
+//      UpdateShadowMap (context, light);   //TODO this commented for debug
 
         //установка параметров источника
 
@@ -148,6 +151,7 @@ class ForwardShading: public Technique
       frame_properties.SetProperty ("LightExponent", params.exponent);
       frame_properties.SetProperty ("LightAngle", math::radian (params.angle));
       frame_properties.SetProperty ("LightRadius", params.radius);
+//      frame_properties.SetProperty ("LightProjectionMatrix", light.Camera (0).ViewProjectionMatrix ());
 
       common::PropertyMap& frame_defines     = light_context.shader_defines;
       const char*          shader_light_type = "";

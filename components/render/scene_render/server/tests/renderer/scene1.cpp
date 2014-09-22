@@ -68,7 +68,7 @@ int main ()
 
     const char* SERVER_NAME = "MyServer";
 
-    Server server (SERVER_NAME/*, render::scene::server::ServerThreadingModel_SingleThreaded*/);
+    Server server (SERVER_NAME, render::scene::server::ServerThreadingModel_SingleThreaded);
     Client client (SERVER_NAME);
 
     common::PropertyMap window_properties;
@@ -120,9 +120,10 @@ int main ()
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
     light->SetPosition  (0, 400.0f, 0.0f);
+    light->SetRange     (1000.0f);
     light->LookTo       (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     light->SetIntensity (0.3f);
-    light->SetAngle     (math::degree (90.0f));
+    light->SetAngle     (math::degree (5.0f));
 
     light->BindToScene (scene);
     
