@@ -18,7 +18,7 @@ class Light: public Entity
     }
 
     Light (scene_graph::SpotLight& light, SceneManager& manager)
-      : Entity (light, manager, interchange::NodeType_PointLight)
+      : Entity (light, manager, interchange::NodeType_SpotLight)
       , type (Type ())
     {
     }

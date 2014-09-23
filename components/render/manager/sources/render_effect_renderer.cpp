@@ -144,6 +144,7 @@ struct RenderPass: public xtl::reference_counter
   SortMode                 sort_mode;               //режим сортировки
   LowLevelStateBlockPtr    scissor_off_state_block; //блок состояний прохода
   LowLevelStateBlockPtr    scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
+  ProgramPtr               program;                 //программа
   ProgramParametersLayout  parameters_layout;       //расположение параметров
   size_t                   clear_flags;             //флаги очистки экрана
   OperationArray           operations;              //операции рендеринга
@@ -318,7 +319,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");                  
       
-      //получение свойств устройства      
+      //получение свойств устройства
     
     impl->right_hand_viewport = device_manager->DeviceCaps ().has_right_hand_viewport;
       
@@ -361,6 +362,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         pass->sort_mode               = src_pass->SortMode ();
         pass->scissor_off_state_block = src_pass->StateBlock (false);
         pass->scissor_on_state_block  = src_pass->StateBlock (true);
+        pass->program                 = src_pass->Program ();
         pass->clear_flags             = src_pass->ClearFlags ();
         
           //связывание объекта размещения параметров прохода с родительским объектом размещения параметров
@@ -387,7 +389,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
           impl->effects.insert_pair (hash, &*instantiated_effect);
         }
         
-          //создание операции рендеринга        
+          //создание операции рендеринга
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (instantiated_effect), false);
       }            
@@ -1116,7 +1118,7 @@ struct RenderOperationsExecutor
 
     device_context.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
 
-      //выполнение операций                    
+      //выполнение операций
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end;)
     {
@@ -1139,7 +1141,7 @@ struct RenderOperationsExecutor
 
       //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
       
-    Program* program = operation.program;
+    Program* program = pass.program ? pass.program.get () : operation.program;
 
     if (!program)
       return;
@@ -1185,7 +1187,7 @@ struct RenderOperationsExecutor
           //TODO: use FIFO cache
 
         TexturePtr texture = context.FindLocalTexture (texmap.semantic.c_str ());
-                       
+
         device_context.SSSetTexture (texmap.channel, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
       }
     }

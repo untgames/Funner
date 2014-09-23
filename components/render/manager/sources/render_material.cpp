@@ -193,6 +193,9 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Reset material cache (id=%u)", Id ());
 
+    if (cached_program)
+      DetachCacheSource (*cached_program);
+
     cached_properties_layout     = ProgramParametersLayoutPtr ();
     cached_program               = ProgramPtr ();
     cached_state_block           = LowLevelStateBlockPtr ();
@@ -290,6 +293,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
           mask.ss_textures [channel] = !texmap || !texmap->is_dynamic;
           mask.ss_samplers [channel] = true;
 
+          bool has_default_sampler = !program_texmap->default_sampler.empty ();
+
           if (texmap)
           {
             texmap->UpdateCache ();
@@ -301,12 +306,16 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
               log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad sampler '%s'", channel, cached_program->Name (), name.c_str (), texmap->sampler.Name ());
 
             context.SSSetTexture (channel, texmap->cached_device_texture.get ());
-            context.SSSetSampler (channel, texmap->cached_sampler.get ());
+
+            if (!has_default_sampler || texmap->cached_sampler)
+              context.SSSetSampler (channel, texmap->cached_sampler.get ());
           }
           else
           {
             context.SSSetTexture (channel, 0);
-            context.SSSetSampler (channel, 0);
+
+            if (!has_default_sampler)
+              context.SSSetSampler (channel, 0);
           }
         }
       }

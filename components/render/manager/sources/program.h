@@ -3,23 +3,24 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TexmapDesc
 {
-  size_t      channel;       //номер текстурного канала
-  stl::string semantic;      //имя семантики в media::rfx::Texmap
-  stl::string param_name;    //имя параметра в шейдере
-  bool        is_framemap;   //является ли текстурная карта контекстной картой кадра
-  size_t      semantic_hash; //хеш имени семантики
+  size_t      channel;         //номер текстурного канала
+  stl::string semantic;        //имя семантики в media::rfx::Texmap
+  stl::string param_name;      //имя параметра в шейдере
+  bool        is_framemap;     //является ли текстурная карта контекстной картой кадра
+  size_t      semantic_hash;   //хеш имени семантики
+  stl::string default_sampler; //сэмплер по умолчанию
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Программа шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Program: public Object
+class Program: public Object, public CacheSource
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Program  (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options);
+    Program  (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const char* name, const char* static_options, const char* dynamic_options);
     ~Program ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,8 +51,8 @@ class Program: public Object
     const TexmapDesc& Texmap               (size_t index);
     const TexmapDesc* FindTexmapBySemantic (size_t semantic_hash);
     const TexmapDesc* FindTexmapBySemantic (const char* semantic);
-    void              SetTexmap            (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
-    size_t            AddTexmap            (size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
+    void              SetTexmap            (size_t index, size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap = false);
+    size_t            AddTexmap            (size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap = false);
     void              RemoveTexmap         (size_t index);
     void              RemoveAllTexmaps     ();
     
@@ -76,7 +77,16 @@ class Program: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ProgramParametersLayoutPtr ParametersLayout ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление кэшированием
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    using CacheSource::UpdateCache;
+    using CacheSource::ResetCache;
+    
   private:
+    void UpdateCacheCore ();
+    void ResetCacheCore ();
+
     Program (Program& parent, const ShaderOptions&);
 
   private:

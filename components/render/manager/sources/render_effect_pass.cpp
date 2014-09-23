@@ -16,14 +16,15 @@ struct EffectPass::Impl
   render::manager::SortMode    sort_mode;                //режим сортировки
   LowLevelDepthStencilStatePtr depth_stencil_state;      //состояние уровня отсечения
   LowLevelBlendStatePtr        blend_state;              //состояние уровня смешивания цветов
-  LowLevelRasterizerStatePtr   rasterizer_state;         //состояние уровня растеризации  
+  LowLevelRasterizerStatePtr   rasterizer_state;         //состояние уровня растеризации
   LowLevelRasterizerStatePtr   rasterizer_scissor_state; //состояние уровня растеризации с включенным тестом отсечения
   LowLevelStateBlockPtr        scissor_off_state_block;  //блок состояний
   LowLevelStateBlockPtr        scissor_on_state_block;   //блок состояний с включенным тестом отсечения
+  ProgramPtr                   program;                  //программа
   bool                         state_block_need_update;  //блок состояний требует обновления
   size_t                       clear_flags;              //флаги очистки
   common::StringArray          tags;                     //тэги прохода
-  TagHashArray                 tag_hashes;               //хэши тэгов  
+  TagHashArray                 tag_hashes;               //хэши тэгов
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -122,6 +123,11 @@ void EffectPass::SetRasterizerScissorState (const LowLevelRasterizerStatePtr& st
   impl->state_block_need_update  = true;
 }
 
+void EffectPass::SetProgram (const ProgramPtr& program)
+{
+  impl->program = program;
+}
+
 const LowLevelBlendStatePtr& EffectPass::BlendState ()
 {
   return impl->blend_state;
@@ -140,6 +146,11 @@ const LowLevelRasterizerStatePtr& EffectPass::RasterizerState ()
 const LowLevelRasterizerStatePtr& EffectPass::RasterizerScissorState ()
 {
   return impl->rasterizer_scissor_state;
+}
+
+const ProgramPtr& EffectPass::Program ()
+{
+  return impl->program;
 }
 
 /*

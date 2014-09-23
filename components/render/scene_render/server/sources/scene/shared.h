@@ -6,7 +6,10 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/trackable.h>
+
+#include <math/utility.h>
 
 #include <render/manager.h>
 

@@ -23,7 +23,7 @@ void on_window_close ()
   syslib::Application::Exit (0);
 }
 
-void idle (Test& test)
+void idle (Test& test, scene_graph::Light& light)
 {
   try
   {
@@ -46,6 +46,15 @@ void idle (Test& test)
     
     test.mesh.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
+    static float LIGHT_R = 100.0f;
+
+    float light_x = cos (math::radian (math::degree (-angle))) * LIGHT_R,
+          light_z = sin (math::radian (math::degree (-angle))) * LIGHT_R;
+
+//    light.SetPosition  (light_x, 400.0f, light_z);
+//    light.SetPosition  (10, 0.0f, 0);
+//    light.LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
+
     test.target.Update ();      
   }
   catch (std::exception& e)
@@ -62,13 +71,13 @@ int main ()
   {
     common::LogFilter log_filter ("render.*", &log_print);
 
-    syslib::Window window (syslib::WindowStyle_Overlapped, 400, 300);
+    syslib::Window window (syslib::WindowStyle_Overlapped, 512, 512);
 
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&on_window_close));
 
     const char* SERVER_NAME = "MyServer";
 
-    Server server (SERVER_NAME/*, render::scene::server::ServerThreadingModel_SingleThreaded*/);
+    Server server (SERVER_NAME, render::scene::server::ServerThreadingModel_SingleThreaded);
     Client client (SERVER_NAME);
 
     common::PropertyMap window_properties;
@@ -85,6 +94,7 @@ int main ()
     client.LoadResource ("data/u1/EnvGala_020_D.dds");
     client.LoadResource ("data/u1.xmtl");
     client.LoadResource ("data/u1.xmesh");
+    client.LoadResource ("data/quad.xmesh");
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
 
@@ -104,8 +114,9 @@ int main ()
     camera->SetZNear  (-1000.0f);
     camera->SetZFar   (1000.0f);    
 
-    camera->SetPosition (0, 400.0f, 0.0f);
-    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    camera->SetPosition (0, 10.0f, 0.0f);
+    camera->LookTo      (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_X, scene_graph::NodeTransformSpace_World);
+//    camera->LookTo      (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     
     scene_graph::Scene scene;
     
@@ -115,7 +126,26 @@ int main ()
     
     model->SetMeshName ("u1.polySurface2.mesh#0");
 
-    model->BindToScene (scene);    
+    model->BindToScene (scene);
+
+    scene_graph::StaticMesh::Pointer model2 = scene_graph::StaticMesh::Create ();
+
+    model2->SetMeshName ("quad");
+    model2->Rotate (math::degree (-90.f), math::degree (0.f), math::degree (0.f));
+    model2->SetPosition (0, -8.0f, 0);
+    model2->Scale (10.0f, 10.0f, 10.0f);
+
+    model2->BindToScene (scene);
+
+    scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
+
+    light->SetPosition  (0.0f, 10.0f, 0);
+    light->SetRange     (20.0f);
+    light->LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_X, scene_graph::NodeTransformSpace_World);
+    light->SetIntensity (1.0f);
+    light->SetAngle     (math::degree (100.0f));
+
+    light->BindToScene (scene);
     
       //настройка области вывода
     
@@ -131,7 +161,7 @@ int main ()
 
     Test test (target, *model);
 
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test), xtl::ref (*light)));
     
     syslib::Application::Run ();
   }

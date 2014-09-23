@@ -151,7 +151,7 @@ struct EffectManager::Impl
   {
     EffectLoaderLibrary library;
     
-    parse_effect_library (device_manager, entry->resolved_root_node, entry->resource_name.c_str (), library);
+    parse_effect_library (device_manager, texture_manager, entry->resolved_root_node, entry->resource_name.c_str (), library);
 
     library.Effects ().ForEach       (xtl::bind (&EffectLibraryEntry::AddEffect, &*entry, _1, _2, xtl::ref (proxy_manager)));
     library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, &*entry, _1, _2, xtl::ref (program_manager)));

@@ -22,6 +22,7 @@
 #include <syslib/window.h>
 
 #include <sg/camera.h>
+#include <sg/light.h>
 #include <sg/line.h>
 #include <sg/mesh.h>
 #include <sg/page_curl.h>
