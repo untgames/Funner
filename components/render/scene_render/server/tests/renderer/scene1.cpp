@@ -46,12 +46,13 @@ void idle (Test& test, scene_graph::Light& light)
     
     test.mesh.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
-    static float LIGHT_R = 200.0f;
+    static float LIGHT_R = 100.0f;
 
-    float light_x = cos (math::radian (math::degree (-2.0 * angle))) * LIGHT_R,
-          light_z = sin (math::radian (math::degree (-2.0f * angle))) * LIGHT_R;
+    float light_x = cos (math::radian (math::degree (-angle))) * LIGHT_R,
+          light_z = sin (math::radian (math::degree (-angle))) * LIGHT_R;
 
-    light.SetPosition  (light_x, 400.0f, light_z);
+//    light.SetPosition  (light_x, 400.0f, light_z);
+    light.SetPosition  (10, 0.0f, 0);
     light.LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
 
     test.target.Update ();      
@@ -114,7 +115,7 @@ int main ()
     camera->SetZFar   (1000.0f);    
 
     camera->SetPosition (0, 400.0f, 0.0f);
-    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    camera->LookTo      (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     
     scene_graph::Scene scene;
     
@@ -128,11 +129,11 @@ int main ()
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
-    light->SetPosition  (200.f, 200.0f, 200.0f);
+    light->SetPosition  (0.f, 400.0f, 0);
     light->SetRange     (1000.0f);
-    light->LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
+    light->LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_X, scene_graph::NodeTransformSpace_World);
     light->SetIntensity (0.3f);
-    light->SetAngle     (math::degree (5.0f));
+    light->SetAngle     (math::degree (90.0f));
 
     light->BindToScene (scene);
     
