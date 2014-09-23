@@ -127,6 +127,15 @@ int main ()
 
     model->BindToScene (scene);
 
+    scene_graph::StaticMesh::Pointer model2 = scene_graph::StaticMesh::Create ();
+
+    model2->SetMeshName ("quad");
+    model2->Rotate (math::degree (0.f), math::degree (0.f), math::degree (0.f));
+    model2->SetWorldPosition (5, 5, 0);
+    model2->Scale (2.5, 2.5, 2.5);
+
+    model2->BindToScene (scene);
+
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
     light->SetPosition  (0.f, 400.0f, 0);
