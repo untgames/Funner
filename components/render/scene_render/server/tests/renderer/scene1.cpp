@@ -52,8 +52,8 @@ void idle (Test& test, scene_graph::Light& light)
           light_z = sin (math::radian (math::degree (-angle))) * LIGHT_R;
 
 //    light.SetPosition  (light_x, 400.0f, light_z);
-    light.SetPosition  (10, 0.0f, 0);
-    light.LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
+//    light.SetPosition  (10, 0.0f, 0);
+//    light.LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
 
     test.target.Update ();      
   }
@@ -114,8 +114,9 @@ int main ()
     camera->SetZNear  (-1000.0f);
     camera->SetZFar   (1000.0f);    
 
-    camera->SetPosition (0, 400.0f, 0.0f);
-    camera->LookTo      (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    camera->SetPosition (0, 10.0f, 0.0f);
+    camera->LookTo      (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_X, scene_graph::NodeTransformSpace_World);
+//    camera->LookTo      (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     
     scene_graph::Scene scene;
     
@@ -130,19 +131,19 @@ int main ()
     scene_graph::StaticMesh::Pointer model2 = scene_graph::StaticMesh::Create ();
 
     model2->SetMeshName ("quad");
-    model2->Rotate (math::degree (0.f), math::degree (0.f), math::degree (0.f));
-    model2->SetWorldPosition (5, 5, 0);
-    model2->Scale (2.5, 2.5, 2.5);
+    model2->Rotate (math::degree (-90.f), math::degree (0.f), math::degree (0.f));
+    model2->SetPosition (0, -8.0f, 0);
+    model2->Scale (10.0f, 10.0f, 10.0f);
 
     model2->BindToScene (scene);
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
-    light->SetPosition  (0.f, 400.0f, 0);
-    light->SetRange     (1000.0f);
+    light->SetPosition  (0.0f, 10.0f, 0);
+    light->SetRange     (100.0f);
     light->LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_X, scene_graph::NodeTransformSpace_World);
-    light->SetIntensity (0.3f);
-    light->SetAngle     (math::degree (90.0f));
+    light->SetIntensity (1.0f);
+    light->SetAngle     (math::degree (140.0f));
 
     light->BindToScene (scene);
     
