@@ -1189,8 +1189,6 @@ struct RenderOperationsExecutor
         TexturePtr texture = context.FindLocalTexture (texmap.semantic.c_str ());
 
         device_context.SSSetTexture (texmap.channel, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
-//        device_context.SSSetSampler (texmap.channel, device_context.SSGetSampler (0));
-//        device_context.SSSetTexture (0, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
       }
     }
 

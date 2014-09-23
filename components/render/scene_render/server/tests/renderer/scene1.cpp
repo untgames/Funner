@@ -23,7 +23,7 @@ void on_window_close ()
   syslib::Application::Exit (0);
 }
 
-void idle (Test& test)
+void idle (Test& test, scene_graph::Light& light)
 {
   try
   {
@@ -45,6 +45,14 @@ void idle (Test& test)
     float angle = common::milliseconds () / 100.0f;
     
     test.mesh.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
+
+    static float LIGHT_R = 200.0f;
+
+    float light_x = cos (math::radian (math::degree (-2.0 * angle))) * LIGHT_R,
+          light_z = sin (math::radian (math::degree (-2.0f * angle))) * LIGHT_R;
+
+    light.SetPosition  (light_x, 400.0f, light_z);
+    light.LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
 
     test.target.Update ();      
   }
@@ -120,9 +128,9 @@ int main ()
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
-    light->SetPosition  (200.f, 200.0f, 0.0f);
+    light->SetPosition  (200.f, 200.0f, 200.0f);
     light->SetRange     (1000.0f);
-    light->LookTo       (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    light->LookTo       (math::vec3f (0.0f), scene_graph::NodeOrt_Z, scene_graph::NodeOrt_Y, scene_graph::NodeTransformSpace_World);
     light->SetIntensity (0.3f);
     light->SetAngle     (math::degree (5.0f));
 
@@ -142,7 +150,7 @@ int main ()
 
     Test test (target, *model);
 
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test), xtl::ref (*light)));
     
     syslib::Application::Run ();
   }

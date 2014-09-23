@@ -66,7 +66,7 @@ vec3 ComputeReflectionColor (const in vec3 normal, const in vec3 eye_dir, const 
 
 float OffsetLookup(in sampler2D map, vec4 shadow_texcoord, vec2 offset)
 {
-  float shadow_depth = texture2D(map, shadow_texcoord.xy + offset * SHADOW_MAP_PIXEL_SIZE * shadow_texcoord.w).x + 0.005;
+  float shadow_depth = texture2D(map, shadow_texcoord.xy + offset * SHADOW_MAP_PIXEL_SIZE * shadow_texcoord.w).x - 0.005;
 
   if (shadow_depth < shadow_texcoord.z)
     return shadow_texcoord.z - shadow_depth;
@@ -148,10 +148,8 @@ void main (void)
     }
     else
     {
-      shade = 1.0 - PCF (ShadowTexture, shadow_texcoord);
-
-      shade = (texture2D(ShadowTexture, shadow_texcoord.xy).x - 0.99) * 100.0;
-  }
+      shade = PCF (ShadowTexture, shadow_texcoord);
+    }
   }
 
   gl_FragColor = vec4 (vec3 (shade), diffuse_transparency);
