@@ -17,29 +17,35 @@ const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //резервируемое 
 ShadowMapRenderer::ShadowMapRenderer (server::RenderManager& manager, const common::ParseNode& node)
 try
   : BasicRenderer (manager, common::get<const char*> (node, "effect"))
-  , shadow_map (manager.Manager ().CreateTexture (common::get<const char*> (node, "texture")))
+  , color_map (manager.Manager ().CreateTexture (common::get<const char*> (node, "color_texture")))
+  , depth_map (manager.Manager ().CreateTexture (common::get<const char*> (node, "depth_texture")))
 {
   try
   {
-    render_target_name = common::get<const char*> (node, "render_target");
-    local_texture_name = common::get<const char*> (node, "framemap");
+    color_render_target_name = common::get<const char*> (node, "color_render_target");
+    depth_render_target_name = common::get<const char*> (node, "depth_render_target");
+    local_texture_name       = common::get<const char*> (node, "framemap");
 
-    size_t layers_count = shadow_map.Depth ();
+    size_t layers_count = depth_map.Depth ();
 
     if (layers_count > 1)
       throw xtl::format_operation_exception ("", "More than one depth render target not implemented");
 
-    render_targets.reserve (layers_count);
+    color_render_targets.reserve (layers_count);
+    depth_render_targets.reserve (layers_count);
 
     manager::Frame& frame = Frame ();
 
     for (size_t i=0; i<layers_count; i++)
     {
-      manager::RenderTarget target = shadow_map.RenderTarget (i, 0);
+      manager::RenderTarget color_target = color_map.RenderTarget (i, 0),
+                            depth_target = depth_map.RenderTarget (i, 0);
 
-      render_targets.push_back (target);
+      color_render_targets.push_back (color_target);
+      depth_render_targets.push_back (depth_target);
 
-      frame.SetRenderTarget (render_target_name.c_str (), render_targets [i]);
+      frame.SetRenderTarget (color_render_target_name.c_str (), color_render_targets [i]);
+      frame.SetRenderTarget (depth_render_target_name.c_str (), depth_render_targets [i]);
     }
 
     traverse_result.visual_models.reserve (TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE);
@@ -87,7 +93,7 @@ void ShadowMapRenderer::UpdateShadowMap (RenderingContext& parent_context, Light
 
     Scene& scene = *light.SceneOwner ();
 
-    size_t pass_count = light.CamerasCount () < render_targets.size () ? light.CamerasCount () : render_targets.size ();
+    size_t pass_count = light.CamerasCount () < depth_render_targets.size () ? light.CamerasCount () : depth_render_targets.size ();
 
     manager::Frame& frame = Frame ();
 

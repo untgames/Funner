@@ -62,7 +62,7 @@ int main ()
   {
     common::LogFilter log_filter ("render.*", &log_print);
 
-    syslib::Window window (syslib::WindowStyle_PopUp, 512, 512);
+    syslib::Window window (syslib::WindowStyle_Overlapped, 512, 512);
 
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&on_window_close));
 

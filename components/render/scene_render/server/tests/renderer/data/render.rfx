@@ -198,6 +198,14 @@ texture "shadow_map"
   bind_flags texture depth_stencil
 }
 
+//auxilary texture description for shadow texture
+texture "shadow_color"
+{
+  size       512 512
+  format     rgb8
+  bind_flags texture render_target
+}
+
 //auxilary texture description for depth-stencil buffer
 texture "depth_stencil_render_buffer"
 {
@@ -274,7 +282,7 @@ effect "shadow"
   {
     tags                  "solid"       //tags for material of each primitive
     clear                 all
-    color_targets         "default_color"          //render target for color buffer - not needed for rendering of shadow maps
+    color_targets         "shadow_color"          //render target for color buffer - not needed for rendering of shadow maps
     depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
     depth_stencil_state   "solid"       //depth stencil stage settings
     blend_state           "solid"                   //use blend stage settings for solid geometry
@@ -350,10 +358,12 @@ technique "default"
 
     shadow_map
     {
-      effect        "shadow"
-      texture       "shadow_map"
-      framemap      "shadow"
-      render_target "shadow_map"
+      effect              "shadow"
+      color_texture       "shadow_color"
+      depth_texture       "shadow_map"
+      framemap            "shadow"
+      color_render_target "shadow_color"
+      depth_render_target "shadow_map"
     }
   }
 }

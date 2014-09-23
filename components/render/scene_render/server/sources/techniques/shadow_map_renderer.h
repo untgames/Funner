@@ -7,7 +7,7 @@ class ShadowMapRenderer: public BasicRenderer
     ~ShadowMapRenderer ();
 
 ///Получение теневой карты
-    manager::Texture& ShadowMap () { return shadow_map; }
+    manager::Texture& ShadowMap () { return depth_map; }
 
 ///Получение имени локальной текстуры
     const char* LocalTextureName () { return local_texture_name.c_str (); }
@@ -19,11 +19,14 @@ class ShadowMapRenderer: public BasicRenderer
     typedef stl::vector<manager::RenderTarget> RenderTargetArray;
 
   private:
-    manager::Texture  shadow_map;         //карта теней
-    RenderTargetArray render_targets;     //цели рендеринга
-    TraverseResult    traverse_result;    //результат обхода
-    stl::string       render_target_name; //имя цели рендеринга
-    stl::string       local_texture_name; //имя локальной текстуры
+    manager::Texture  color_map;                //карта теней
+    manager::Texture  depth_map;                //карта теней
+    RenderTargetArray color_render_targets;     //цели рендеринга
+    RenderTargetArray depth_render_targets;     //цели рендеринга
+    TraverseResult    traverse_result;          //результат обхода
+    stl::string       color_render_target_name; //имя цели рендеринга
+    stl::string       depth_render_target_name; //имя цели рендеринга
+    stl::string       local_texture_name;       //имя локальной текстуры
 };
 
 
