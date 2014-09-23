@@ -1,5 +1,5 @@
-DIST_DIR_SHORT_NAME := dist/scene_render2d
-TMP_DIR_SHORT_NAME  := tmp/scene_render2d
+DIST_DIR_SHORT_NAME := dist/master
+TMP_DIR_SHORT_NAME  := tmp/master
 
 MINGW_DIR         := D:/studio/dev/mingw/4.3.0
 DOXYGEN_DIR       := D:/studio/dev/doxygen
