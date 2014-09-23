@@ -85,6 +85,7 @@ int main ()
     client.LoadResource ("data/u1/EnvGala_020_D.dds");
     client.LoadResource ("data/u1.xmtl");
     client.LoadResource ("data/u1.xmesh");
+    client.LoadResource ("data/quad.xmesh");
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
 
@@ -116,6 +117,14 @@ int main ()
     model->SetMeshName ("u1.polySurface2.mesh#0");
 
     model->BindToScene (scene);
+
+    scene_graph::StaticMesh::Pointer model2 = scene_graph::StaticMesh::Create ();
+
+    model2->SetMeshName ("quad");
+    model2->Rotate (math::degree (-90.f), math::degree (0.f), math::degree (0.f));
+    model2->Scale (5, 5, 5);
+
+    model2->BindToScene (scene);
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
