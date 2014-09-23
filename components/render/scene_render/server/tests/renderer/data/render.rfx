@@ -193,7 +193,7 @@ texture "mirror"
 //auxilary texture description for shadow texture
 texture "shadow_map"
 {
-  size       512 512
+  size       1024 1024
   format     d32
   bind_flags texture depth_stencil
 }
@@ -201,7 +201,7 @@ texture "shadow_map"
 //auxilary texture description for shadow texture
 texture "shadow_color"
 {
-  size       512 512
+  size       1024 1024
   format     rgb8
   bind_flags texture render_target
 }

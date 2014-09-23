@@ -151,7 +151,6 @@ class ForwardShading: public Technique
       frame_properties.SetProperty ("LightExponent", params.exponent);
       frame_properties.SetProperty ("LightAngle", math::radian (params.angle));
       frame_properties.SetProperty ("LightRadius", params.radius);
-//      frame_properties.SetProperty ("LightShadowMatrix", light.Camera (0).ViewProjectionMatrix ());
 
       math::mat4f light_shadow_tm    = math::translate (math::vec3f (0.5f)) * math::scale (math::vec3f (0.5f)) * light.Camera (0).ViewProjectionMatrix ();
 
