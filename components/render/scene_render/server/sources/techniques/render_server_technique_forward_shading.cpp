@@ -151,7 +151,19 @@ class ForwardShading: public Technique
       frame_properties.SetProperty ("LightExponent", params.exponent);
       frame_properties.SetProperty ("LightAngle", math::radian (params.angle));
       frame_properties.SetProperty ("LightRadius", params.radius);
-//      frame_properties.SetProperty ("LightProjectionMatrix", light.Camera (0).ViewProjectionMatrix ());
+//      frame_properties.SetProperty ("LightShadowMatrix", light.Camera (0).ViewProjectionMatrix ());
+
+      math::mat4f inv_z_tm;
+
+      inv_z_tm [2][2] = -1.0f;
+
+      math::mat4f view_tm            = inverse (light.Camera (0).WorldMatrix () * inv_z_tm);
+      math::mat4f view_projection_tm = light.Camera (0).ProjectionMatrix () * view_tm;
+      math::mat4f light_shadow_tm    = math::translate (math::vec3f (0.5f)) * math::scale (math::vec3f (0.5f)) * view_projection_tm;
+
+      light_shadow_tm    = math::translate (math::vec3f (0.5f)) * math::scale (math::vec3f (0.5f)) * light.Camera (0).ViewProjectionMatrix ();
+
+      frame_properties.SetProperty ("LightShadowMatrix", light_shadow_tm);
 
       common::PropertyMap& frame_defines     = light_context.shader_defines;
       const char*          shader_light_type = "";

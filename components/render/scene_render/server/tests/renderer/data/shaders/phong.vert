@@ -4,12 +4,14 @@ uniform mat4 ModelViewMatrix;
 uniform mat4 ModelViewProjectionMatrix;
 uniform vec4 LightWorldPosition;
 uniform vec4 LightWorldDirection;
+uniform mat4 LightShadowMatrix;
 
 varying vec3 Texcoord;
 varying vec3 EyeDirection;
 varying vec3 ReflectionDirection;
 varying vec3 Normal;
 varying vec3 PointToLightDirection;
+varying vec4 LightShadowTexcoord;
 
 attribute vec4 aVertex;
 attribute vec3 aNormal;
@@ -34,6 +36,8 @@ void main(void)
   vec3 light_dir = normalize ((ViewMatrix * vec4 (LightWorldPosition.xyz, 1.0)).xyz - view_pos.xyz);
 
   PointToLightDirection = vec3 (dot (light_dir, tangent), dot (light_dir, binormal), dot (light_dir, normal));
+
+  LightShadowTexcoord = LightShadowMatrix * aVertex;
 
   gl_FrontColor  = aColor;
   gl_Position    = ModelViewProjectionMatrix * aVertex;

@@ -120,7 +120,7 @@ int main ()
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
-    light->SetPosition  (0, 400.0f, 0.0f);
+    light->SetPosition  (200.f, 200.0f, 0.0f);
     light->SetRange     (1000.0f);
     light->LookTo       (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     light->SetIntensity (0.3f);

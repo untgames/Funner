@@ -1,3 +1,5 @@
+#define SHADOW_MAP_PIXEL_SIZE 1.0 / 512.0
+
 uniform float Reflectivity;
 uniform float Shininess;
 uniform float BumpAmount;
@@ -24,6 +26,7 @@ varying vec3 EyeDirection;
 varying vec3 ReflectionDirection;
 varying vec3 Normal;
 varying vec3 PointToLightDirection;
+varying vec4 LightShadowTexcoord;
 
 vec2 SphereMap (const in vec3 r)
 {
@@ -59,6 +62,34 @@ vec3 ComputeReflectionColor (const in vec3 reflection)
 vec3 ComputeReflectionColor (const in vec3 normal, const in vec3 eye_dir, const in vec3 tex_specular_color)
 {
   return ComputeReflectionColor (normalize (reflect (eye_dir, normal))) * Reflectivity * tex_specular_color;
+}
+
+float OffsetLookup(in sampler2D map, vec4 shadow_texcoord, vec2 offset)
+{
+  float shadow_depth = texture2D(map, shadow_texcoord.xy + offset * SHADOW_MAP_PIXEL_SIZE * shadow_texcoord.w).x + 0.005;
+
+  if (shadow_depth < shadow_texcoord.z)
+    return shadow_texcoord.z - shadow_depth;
+ 
+  return 1.0;
+}
+
+float PCF(in sampler2D shadow_texture, in vec4 shadow_texcoord)
+{
+  float sum = 0.0;
+  float y = -1.5;
+
+  const int STEPS_COUNT = 3;
+
+  for (int i=0; i<STEPS_COUNT; i++, y += 1.5)
+  { 
+    float x = -1.5;
+
+    for (int j=0; j<STEPS_COUNT; j++, x+= 1.5)
+      sum += OffsetLookup(shadow_texture, shadow_texcoord, vec2(x, y));
+  }
+
+  return sum / float (STEPS_COUNT * STEPS_COUNT);
 }
 
 void main (void)
@@ -105,5 +136,28 @@ void main (void)
 
   color += lighted_color;
  
-  gl_FragColor = vec4 (color, diffuse_transparency);
+  vec4 shadow_texcoord = LightShadowTexcoord.xyzw / LightShadowTexcoord.w;
+
+  float shade = 0.0;
+
+  if (LightShadowTexcoord.w > 0.0)
+  {
+    if (shadow_texcoord.x < 0.0 || shadow_texcoord.x > 1.0 || shadow_texcoord.y < 0.0 || shadow_texcoord.y > 1.0)
+    {
+      shade = 1.0;
+    }
+    else
+    {
+      shade = 1.0 - PCF (ShadowTexture, shadow_texcoord);
+
+      shade = (texture2D(ShadowTexture, shadow_texcoord.xy).x - 0.99) * 100.0;
+  }
+  }
+
+  gl_FragColor = vec4 (vec3 (shade), diffuse_transparency);
+
+//  if (shade > 0.0)
+//    gl_FragColor = vec4 (vec3 (1.0), diffuse_transparency);
+
+//  gl_FragColor = vec4 (shadow_texcoord.xyz, diffuse_transparency);
 }
