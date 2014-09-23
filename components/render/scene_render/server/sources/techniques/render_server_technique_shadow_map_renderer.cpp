@@ -26,13 +26,20 @@ try
 
     size_t layers_count = shadow_map.Depth ();
 
+    if (layers_count > 1)
+      throw xtl::format_operation_exception ("", "More than one depth render target not implemented");
+
     render_targets.reserve (layers_count);
+
+    manager::Frame& frame = Frame ();
 
     for (size_t i=0; i<layers_count; i++)
     {
       manager::RenderTarget target = shadow_map.RenderTarget (i, 0);
 
       render_targets.push_back (target);
+
+      frame.SetRenderTarget (render_target_name.c_str (), render_targets [i]);
     }
 
     traverse_result.visual_models.reserve (TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE);

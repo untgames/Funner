@@ -105,6 +105,5 @@ void main (void)
 
   color += lighted_color;
  
-  gl_FragColor = vec4 (vec3 (texture2D (ShadowTexture, Texcoord.xy).x), diffuse_transparency);
-//  gl_FragColor = vec4 (color, diffuse_transparency);
+  gl_FragColor = vec4 (color, diffuse_transparency);
 }

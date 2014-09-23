@@ -62,7 +62,7 @@ int main ()
   {
     common::LogFilter log_filter ("render.*", &log_print);
 
-    syslib::Window window (syslib::WindowStyle_Overlapped, 400, 300);
+    syslib::Window window (syslib::WindowStyle_PopUp, 512, 512);
 
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&on_window_close));
 
@@ -117,14 +117,6 @@ int main ()
     model->SetMeshName ("u1.polySurface2.mesh#0");
 
     model->BindToScene (scene);
-
-    scene_graph::StaticMesh::Pointer model2 = scene_graph::StaticMesh::Create ();
-
-    model2->SetMeshName ("quad");
-    model2->Rotate (math::degree (-90.f), math::degree (0.f), math::degree (0.f));
-    model2->Scale (5, 5, 5);
-
-    model2->BindToScene (scene);
 
     scene_graph::SpotLight::Pointer light = scene_graph::SpotLight::Create ();
 
