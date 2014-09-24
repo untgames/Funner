@@ -175,10 +175,10 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_ATC_RGB_AMD:                     return GL_ATC_RGB_AMD;
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:     return GL_ATC_RGBA_EXPLICIT_ALPHA_AMD;
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD: return GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
-    case PixelFormat_D16:                             return GL_DEPTH_COMPONENT16_OES;
-    case PixelFormat_D24X8:                           return GL_DEPTH_COMPONENT24_OES;
+    case PixelFormat_D16:
+    case PixelFormat_D24X8:
+    case PixelFormat_D32:                             return GL_DEPTH_COMPONENT;
     case PixelFormat_D24S8:                           return GL_DEPTH_STENCIL_OES;
-    case PixelFormat_D32:                             return GL_DEPTH_COMPONENT32_OES;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported.");
     default:
@@ -199,8 +199,8 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_RGB8:        return GL_RGB;
     case PixelFormat_RGBA8:       return GL_RGBA;
     case PixelFormat_D16:
-    case PixelFormat_D24X8:       return GL_DEPTH_COMPONENT24_OES;
-    case PixelFormat_D32:         return GL_DEPTH_COMPONENT32_OES;
+    case PixelFormat_D24X8:
+    case PixelFormat_D32:         return GL_DEPTH_COMPONENT;
     case PixelFormat_D24S8:       return GL_DEPTH_STENCIL_OES;
     case PixelFormat_DXT1:        return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     case PixelFormat_DXT3:        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
@@ -259,6 +259,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:     return PixelFormat_DXT1;
     case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:    return PixelFormat_DXT3;
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:    return PixelFormat_DXT5;
+    case GL_DEPTH_COMPONENT:                  return PixelFormat_D16;
     case GL_DEPTH_COMPONENT16_OES:            return PixelFormat_D16;
     case GL_DEPTH_COMPONENT24_OES:            return PixelFormat_D24X8;
     case GL_DEPTH_COMPONENT32_OES:            return PixelFormat_D32;

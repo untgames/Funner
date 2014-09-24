@@ -288,6 +288,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_generate_mipmap           = true;
   has_arb_multisample                = true;
 #elif defined(OPENGL_ES2_SUPPORT)
+  static Extension OES_depth_texture = "GL_OES_depth_texture";
+
+  has_arb_depth_texture              = ext.Get (OES_depth_texture);
   has_arb_shading_language_100       = true;
   has_arb_fragment_shader            = true;
   has_arb_vertex_shader              = true;
