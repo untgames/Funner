@@ -65,9 +65,9 @@ void SceneObject::Update (Context& context)
 {
   try
   {
-    need_update = false;
+    UpdateCore (context);
 
-    UpdateCore (context);  
+    need_update = false;
   }
   catch (xtl::exception& e)
   {
