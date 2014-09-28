@@ -12,6 +12,7 @@ SOCIAL.FACEBOOK.SOURCES.SOURCE_DIRS         := sources/shared sources/platform/d
 SOCIAL.FACEBOOK.SOURCES.android.SOURCE_DIRS += sources/platform/android
 SOCIAL.FACEBOOK.SOURCES.iphone.SOURCE_DIRS  += sources/platform/ios
 SOCIAL.FACEBOOK.SOURCES.IMPORTS             := compile.social.core compile.system
+SOCIAL.FACEBOOK.SOURCES.iphone.IMPORTS      := compile.extern.facebook_sdk
 
 #Цель - java
 SOCIAL.ANDROID_SESSION.JAVA.TYPE        := android-jar

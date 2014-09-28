@@ -26,7 +26,7 @@ ifneq (,$(filter android,$(PROFILES)))
 endif
 
 ifneq (,$(filter iphone,$(PROFILES)))
-  COMPONENT_DIRS += flurry
+  COMPONENT_DIRS += flurry facebook_ios_sdk
 endif
 
 ifeq (,$(filter android,$(PROFILES)))

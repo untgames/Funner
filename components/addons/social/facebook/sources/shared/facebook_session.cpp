@@ -222,21 +222,6 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
     {
     }
 
-    if (has_previous_token)
-    {
-      if (properties.IsPresent ("UserId"))
-        current_user.SetId (properties.GetString ("UserId"));
-
-      token = properties.GetString ("Token");
-
-      login_properties.RemoveProperty ("UserId");
-      login_properties.RemoveProperty ("Token");
-
-      OnLoginTokenUpdated (callback);
-
-      return;
-    }
-
     Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, callback), properties);
   }
   catch (xtl::exception& e)
@@ -260,6 +245,21 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
         callback (status, error);
       else
         OnLoginTokenUpdated (callback);
+
+      return;
+    }
+
+    if (login_properties.IsPresent ("Token"))
+    {
+      if (login_properties.IsPresent ("UserId"))
+        current_user.SetId (login_properties.GetString ("UserId"));
+
+      token = login_properties.GetString ("Token");
+
+      login_properties.RemoveProperty ("UserId");
+      login_properties.RemoveProperty ("Token");
+
+      OnLoginTokenUpdated (callback);
 
       return;
     }
