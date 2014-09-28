@@ -491,6 +491,10 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
   syslib::Application::PostNotification (notification.c_str ());
 
+  [[NSNotificationCenter defaultCenter] postNotificationName:@"ApplicationOpenURL"
+                                                      object:self
+                                                    userInfo:@{ @"URL":url, @"sourceApplication":sourceApplication }];
+
   return YES;
 }
 
