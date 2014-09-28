@@ -397,7 +397,7 @@ define batch-compile
 
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$(filter-out force,$$?)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
+			@$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$(filter-out force,$$?)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS),$$($1.FRAMEWORK_DIRS))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -406,7 +406,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(if $$($2.UPDATED_SOURCE_FILES),$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$($2.UPDATED_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS)))
+			@$$(if $$($2.UPDATED_SOURCE_FILES),$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$($2.UPDATED_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS),$$($1.FRAMEWORK_DIRS)))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -513,6 +513,7 @@ define process_target_with_sources
   $1.OBJECT_FILES        := $$(call specialize_paths,$$($1.OBJECT_FILES))
   $1.DOCUMENTATION_DIRS  := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
   $1.LIB_DIRS            := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
+  $1.FRAMEWORK_DIRS      := $$(call specialize_paths,$$($1.FRAMEWORK_DIRS))
   $1.DLL_DIRS            := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.EXECUTION_DIR       := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR       := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
@@ -598,7 +599,7 @@ define process_target.dynamic-lib
 
   $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES) $$($1.DEF_FILE)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
-		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE),,$$($1.FRAMEWORK_DIRS))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
@@ -638,7 +639,7 @@ endif
   
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Linking $$(notdir $$@)...
-		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),,,$$($1.FRAMEWORK_DIRS))
 
   RUN.$1: $$($1.EXE_FILE) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
@@ -684,7 +685,7 @@ define process_tests_source_dir
 #Правило сборки теста
   $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),,,$$($1.FRAMEWORK_DIRS))
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX) $$($1.DEVELOPER_LICENSE)
@@ -954,6 +955,7 @@ define import_variables
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
   $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
   $2.LIB_DIRS             := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
+  $2.FRAMEWORK_DIRS       := $$($2.FRAMEWORK_DIRS) $$($1.FRAMEWORK_DIRS:%=$3%)
   $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
   $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
   $2.LIBS                 := $$($2.LIBS) $$($1.LIBS)
