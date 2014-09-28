@@ -1,6 +1,7 @@
 #include "shared.h"
 
 #import <UIKit/UIApplication.h>
+#import <UIKit/UIUserNotificationSettings.h>
 
 using namespace push_notifications;
 using namespace push_notifications::ios_push_notifications;
@@ -47,37 +48,74 @@ class IOSCenter
         if (is_registering_for_notifications)
           throw xtl::format_operation_exception ("", "Previous registration attempt is not finished yet");
 
-        UIRemoteNotificationType types = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert;
-
-        if (properties.IsPresent ("Types"))
-        {
-          common::StringArray params_types = common::split (properties.GetString ("Types"));
-
-          types = 0;
-
-          for (size_t i = 0, count = params_types.Size (); i < count; i++)
-          {
-            const char* type = params_types [i];
-
-            if (!xtl::xstrcmp (type, "Badge"))
-              types |= UIRemoteNotificationTypeBadge;
-            else if (!xtl::xstrcmp (type, "Sound"))
-              types |= UIRemoteNotificationTypeSound;
-            else if (!xtl::xstrcmp (type, "Alert"))
-              types |= UIRemoteNotificationTypeAlert;
-            else
-              log.Printf ("Ignored unknown push notification type '%s'", type);
-          }
-        }
-
         is_registering_for_notifications    = true;
         register_for_notifications_callback = callback;
 
-        NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+        if ([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending)
+        {
+          UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
 
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
+          if (properties.IsPresent ("Types"))
+          {
+            common::StringArray params_types = common::split (properties.GetString ("Types"));
 
-        [pool release];
+            types = 0;
+
+            for (size_t i = 0, count = params_types.Size (); i < count; i++)
+            {
+              const char* type = params_types [i];
+
+              if (!xtl::xstrcmp (type, "Badge"))
+                types |= UIUserNotificationTypeBadge;
+              else if (!xtl::xstrcmp (type, "Sound"))
+                types |= UIUserNotificationTypeSound;
+              else if (!xtl::xstrcmp (type, "Alert"))
+                types |= UIUserNotificationTypeAlert;
+              else
+                log.Printf ("Ignored unknown push notification type '%s'", type);
+            }
+          }
+
+          NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+          UIUserNotificationSettings* notification_settings = [UIUserNotificationSettings settingsForTypes:types categories:[NSSet set]];
+
+          [[UIApplication sharedApplication] registerUserNotificationSettings:notification_settings];
+          [[UIApplication sharedApplication] registerForRemoteNotifications];
+
+          [pool release];
+        }
+        else
+        {
+          UIRemoteNotificationType types = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert;
+
+          if (properties.IsPresent ("Types"))
+          {
+            common::StringArray params_types = common::split (properties.GetString ("Types"));
+
+            types = 0;
+
+            for (size_t i = 0, count = params_types.Size (); i < count; i++)
+            {
+              const char* type = params_types [i];
+
+              if (!xtl::xstrcmp (type, "Badge"))
+                types |= UIRemoteNotificationTypeBadge;
+              else if (!xtl::xstrcmp (type, "Sound"))
+                types |= UIRemoteNotificationTypeSound;
+              else if (!xtl::xstrcmp (type, "Alert"))
+                types |= UIRemoteNotificationTypeAlert;
+              else
+                log.Printf ("Ignored unknown push notification type '%s'", type);
+            }
+          }
+
+          NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+          [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
+
+          [pool release];
+        }
       }
       catch (xtl::exception& e)
       {
