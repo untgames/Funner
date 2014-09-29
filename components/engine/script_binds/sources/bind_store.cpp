@@ -103,7 +103,8 @@ void bind_store_library (Environment& environment)
       make_invoker (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const common::PropertyMap&) const> (&Store::BuyProduct)),
       make_invoker<Transaction (Store&, const char*, size_t)> (xtl::bind (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const common::PropertyMap&) const> (&Store::BuyProduct), _1, _2, _3, common::PropertyMap ()))
   ));
-  lib.Register ("RestorePurchases",                 make_invoker (&Store::RestorePurchases));
+  lib.Register ("CreateOnPurchasesRestoredCallback", make_callback_invoker<Store::OnPurchasesRestoredCallback::signature_type> ());
+  lib.Register ("RestorePurchases",                  make_invoker (&Store::RestorePurchases));
 
   environment.RegisterType<Store> (STORE_LIBRARY);
 }

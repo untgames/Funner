@@ -165,7 +165,7 @@ User parse_user (common::ParseNode node)
   User return_value;
 
   return_value.SetId       (node.First ("id").Attribute (0));
-  return_value.SetNickname (get_named_attribute (node, "username", ""));
+  return_value.SetNickname (get_named_attribute (node, "name", ""));
 
   const char *first_name = get_named_attribute (node, "first_name", 0),
              *last_name  = get_named_attribute (node, "last_name", 0),

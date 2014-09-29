@@ -7,12 +7,12 @@ import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
 
-//Класс для работы с сообщениями google cloud messaging
+//Class for work with google cloud messaging
 public class EngineGCMManager
 {
   private static final String TAG = "EngineGCMManager";
 
-  //Получение идентификатора отправителя
+  //Get sender identifier
   public static String getSenderId(Context context) {
       String packageName = context.getPackageName();
       int    resId       = context.getResources().getIdentifier("GCMSenderID", "string", packageName);
@@ -26,21 +26,21 @@ public class EngineGCMManager
       return context.getString(resId);
   }
   
-  //Регистрация на получение сообщений
-  public static void registerForGCMMessages (Context context)
-  {
-    try
-    {
-      GCMRegistrar.checkDevice(context);
-      GCMRegistrar.checkManifest(context);
-    }
-    catch (Exception exception)
-    {
-      onErrorCallback ("Can't register for gcm, exception " + exception);
-      return;
-    }
-    
-    final String regId = GCMRegistrar.getRegistrationId(context);
+	//Registering for messages receiving
+	public static void registerForGCMMessages (Context context)
+	{
+		try
+		{
+  		GCMRegistrar.checkDevice(context);
+	  	GCMRegistrar.checkManifest(context);
+		}
+		catch (Exception exception)
+		{
+			onErrorCallback ("Can't register for gcm, exception " + exception);
+			return;
+		}
+		
+		final String regId = GCMRegistrar.getRegistrationId(context);
 
     if (regId.equals("")) {
       GCMRegistrar.register(context, getSenderId (context));

@@ -491,6 +491,10 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
   syslib::Application::PostNotification (notification.c_str ());
 
+  [[NSNotificationCenter defaultCenter] postNotificationName:@"ApplicationOpenURL"
+                                                      object:self
+                                                    userInfo:@{ @"URL":url, @"sourceApplication":sourceApplication }];
+
   return YES;
 }
 
@@ -654,9 +658,8 @@ IApplicationDelegate* IPhoneApplicationManager::CreateDefaultApplicationDelegate
 
 void IPhoneApplicationManager::OpenUrl (const char* url)
 {
-  NSAutoreleasePool *pool          = [[NSAutoreleasePool alloc] init];
-  NSString          *ns_url_string = [NSString stringWithUTF8String:url];
-  NSURL             *ns_url        = [NSURL URLWithString:[ns_url_string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  NSAutoreleasePool *pool   = [[NSAutoreleasePool alloc] init];
+  NSURL             *ns_url = [NSURL URLWithString:[NSString stringWithUTF8String:url]];
 
   BOOL result = [[UIApplication sharedApplication] openURL:ns_url];
 
