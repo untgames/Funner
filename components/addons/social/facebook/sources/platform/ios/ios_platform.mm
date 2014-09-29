@@ -78,7 +78,6 @@ bool is_publish_permission (NSString *permission)
 
 -(void)loginWithAppId:(const char*)app_id properties:(const common::PropertyMap&)properties
 {
-  printf ("%s %d\n", __FUNCTION__, __LINE__);
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector (onOpenURL:)
                                                name:@"ApplicationOpenURL"
@@ -112,42 +111,33 @@ bool is_publish_permission (NSString *permission)
   if ([publish_permissions count])
     throw xtl::format_operation_exception ("social::facebook::ios_platform::loginWithAppId:properties:", "Publish permissions requesting is not implemented");
 
-  printf ("%s %d\n", __FUNCTION__, __LINE__);
   // Open session with public_profile (required) and user_birthday read permissions
   [FBSession openActiveSessionWithReadPermissions:read_permissions
                                      allowLoginUI:YES
                                 completionHandler:
        ^(FBSession *session, FBSessionState state, NSError *error)
        {
-         printf ("%s %d\n", __FUNCTION__, __LINE__);
          if (error)
          {
-           printf ("%s %d\n", __FUNCTION__, __LINE__);
            // If the user cancelled login
            if ([FBErrorUtility errorCategoryForError:error] == FBErrorCategoryUserCancelled)
            {
-             printf ("%s %d\n", __FUNCTION__, __LINE__);
              [self onLoginCanceled];
              return;
            }
 
-           printf ("%s %d\n", __FUNCTION__, __LINE__);
            [self onLoginFailedWithError:[error description]];
            return;
          }
 
-         printf ("%s %d\n", __FUNCTION__, __LINE__);
          if (state != FBSessionStateOpen)
            return;
-         printf ("%s %d ******   %d\n", __FUNCTION__, __LINE__, FBSession.activeSession.isOpen);
 
          if (![publish_permissions count])
          {
-           printf ("%s %d\n", __FUNCTION__, __LINE__);
            [self onLoginSucceeded];
            return;
          }
-         printf ("%s %d\n", __FUNCTION__, __LINE__);
 
          //TODO request publish permissions
        }];
@@ -155,7 +145,6 @@ bool is_publish_permission (NSString *permission)
 
 -(void)onLoginSucceeded
 {
-  printf ("%s %d\n", __FUNCTION__, __LINE__);
   if (!listener)
     return;
 
@@ -164,7 +153,6 @@ bool is_publish_permission (NSString *permission)
 
 -(void)onLoginCanceled
 {
-  printf ("%s %d\n", __FUNCTION__, __LINE__);
   if (!listener)
     return;
 
@@ -173,7 +161,6 @@ bool is_publish_permission (NSString *permission)
 
 -(void)onLoginFailedWithError:(NSString*)error
 {
-  printf ("%s %d\n", __FUNCTION__, __LINE__);
   if (!listener)
     return;
 
@@ -200,6 +187,7 @@ class IOsPlatformImpl : public ILoginResultListener
     IOsPlatformImpl ()
       : log (LOG_NAME)
       , on_activate_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&IOsPlatformImpl::OnApplicationActivated, this)))
+      , facebook_loginer (0)
       {}
 
     //Destructor
@@ -211,8 +199,6 @@ class IOsPlatformImpl : public ILoginResultListener
     //Login/cancel login
     void Login (const char* app_id, const social::facebook::DefaultPlatform::PlatformLoginCallback& callback, const common::PropertyMap& properties)
     {
-      printf ("%s %d\n", __FUNCTION__, __LINE__);
-
       try
       {
         if (!CanLogin ())
