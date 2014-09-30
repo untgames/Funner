@@ -19,9 +19,13 @@ class ProgramParametersLayout: public Object, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Порождающая функция
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ProgramParametersLayout  (const LowLevelDevicePtr& device, const SettingsPtr& settings);
+    static ProgramParametersLayoutPtr Create (const LowLevelDevicePtr& device, const SettingsPtr& settings);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
     ~ProgramParametersLayout ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +58,9 @@ class ProgramParametersLayout: public Object, public xtl::trackable
     void Attach    (const ProgramParametersLayout&);
     void Detach    (const ProgramParametersLayout&);
     void DetachAll ();
+
+  private:
+    ProgramParametersLayout (const LowLevelDevicePtr& device, const SettingsPtr& settings);
 
   private:
     struct Impl;

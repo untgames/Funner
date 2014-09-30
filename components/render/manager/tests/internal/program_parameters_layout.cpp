@@ -10,11 +10,11 @@ int main ()
     
     RenderManagerPtr manager = Wrappers::Unwrap<RenderManagerImpl> (test.RenderManager ());
     
-    ProgramParametersLayout layout1 (&manager->DeviceManager ().Device (), &manager->Settings ());
+    ProgramParametersLayoutPtr layout1 = ProgramParametersLayout::Create (&manager->DeviceManager ().Device (), &manager->Settings ());
         
-    LowLevelProgramParametersLayoutPtr low_level_layout = layout1.DeviceLayout ();
+    LowLevelProgramParametersLayoutPtr low_level_layout = layout1->DeviceLayout ();
     
-    ProgramParametersLayout layout2 (&manager->DeviceManager ().Device (), &manager->Settings ());
+    ProgramParametersLayoutPtr layout2 = ProgramParametersLayout::Create (&manager->DeviceManager ().Device (), &manager->Settings ());
     
     common::PropertyLayout properties_layout;
     
@@ -24,9 +24,9 @@ int main ()
     properties_layout.AddProperty ("D", PropertyType_Float);    
     properties_layout.AddProperty ("E", PropertyType_String);    
     
-    layout2.SetSlot (ProgramParametersSlot_Material, properties_layout);
+    layout2->SetSlot (ProgramParametersSlot_Material, properties_layout);
     
-    low_level_layout = layout2.DeviceLayout ();
+    low_level_layout = layout2->DeviceLayout ();
   }
   catch (std::exception& e)
   {

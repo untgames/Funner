@@ -122,7 +122,6 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
                         
             if (parameter.count != 1) log.Printf ("......name='%s', slot=%u, type=%sx%u, offset=%u", parameter.name, parameter.slot, get_name (parameter.type), parameter.count, parameter.offset);
             else                      log.Printf ("......name='%s', slot=%u, type=%s, offset=%u", parameter.name, parameter.slot, get_name (parameter.type), parameter.offset);
-            
           }
         }
 
@@ -252,6 +251,15 @@ ProgramParametersLayout::ProgramParametersLayout (const LowLevelDevicePtr& devic
 
 ProgramParametersLayout::~ProgramParametersLayout ()
 {
+}
+
+/*
+    Порождающая функция
+*/
+
+ProgramParametersLayoutPtr ProgramParametersLayout::Create (const LowLevelDevicePtr& device, const SettingsPtr& settings)
+{
+  return ProgramParametersLayoutPtr (new ProgramParametersLayout (device, settings), false);
 }
 
 /*

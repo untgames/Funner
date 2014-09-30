@@ -31,7 +31,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       , device_manager (in_device_manager)
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
-      , entity_parameters_layout (&in_device_manager->Device (), &in_device_manager->Settings ())
+      , entity_parameters_layout (ProgramParametersLayout::Create (&in_device_manager->Device (), &in_device_manager->Settings ()))
       , shader_options_cache (&in_device_manager->CacheManager ())
       , scissor_state (false)
       , world_tm (1.0f)
@@ -47,7 +47,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       
       default_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);            
       
-      entity_parameters_layout.AttachSlot (ProgramParametersSlot_Entity, properties.Properties ());
+      entity_parameters_layout->AttachSlot (ProgramParametersSlot_Entity, properties.Properties ());
       
       if (device_manager->Settings ().HasDebugLog ())
         Log ().Printf ("Entity created (id=%u)", Id ());
@@ -73,7 +73,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     PropertyBuffer& Properties () { return properties; }
     
 ///Расположение свойств
-    ProgramParametersLayout& ParametersLayout () { return entity_parameters_layout; }
+    ProgramParametersLayout& ParametersLayout () { return *entity_parameters_layout; }
 
 ///Динамические текстуры
     DynamicTextureEntityStorage& DynamicTextures () { return dynamic_textures; }
@@ -262,7 +262,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         if (!material)
           throw xtl::make_null_argument_exception ("render::manager::EntityLodCommonData::MaterialState::MaterialState", "material");
 
-        parameters_layout = ProgramParametersLayoutPtr (new ProgramParametersLayout (&common_data.DeviceManager ()->Device (), &common_data.DeviceManager ()->Settings ()), false);
+        parameters_layout = ProgramParametersLayout::Create (&common_data.DeviceManager ()->Device (), &common_data.DeviceManager ()->Settings ());
           
         common_data.AttachCacheSource (*this);
         
@@ -324,7 +324,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
           
           parameters_layout->DetachAll ();
           parameters_layout->Attach (*material->ParametersLayout ());
-          parameters_layout->Attach (common_data.entity_parameters_layout);
+          parameters_layout->Attach (*common_data.entity_parameters_layout);
 
           program = material->Program ();
 
@@ -353,7 +353,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     DeviceManagerPtr                     device_manager;           //менеджер устройства отрисовки
     TextureManagerPtr                    texture_manager;          //менеджер текстур
     PropertyBuffer                       properties;               //свойства рендеринга
-    ProgramParametersLayout              entity_parameters_layout; //объект расположения свойств
+    ProgramParametersLayoutPtr           entity_parameters_layout; //объект расположения свойств
     StateMap                             states;                   //карта состояний
     DynamicTextureEntityStorage          dynamic_textures;         //хранилище динамических текстур объекта рендеринга
     render::manager::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера

@@ -139,23 +139,23 @@ struct BackToFrontComparator
 ///Проход рендеринга
 struct RenderPass: public xtl::reference_counter
 {  
-  common::StringArray      color_targets;           //имя целевых буферов цвета
-  stl::string              depth_stencil_target;    //имя целевого буфера отсечения
-  SortMode                 sort_mode;               //режим сортировки
-  LowLevelStateBlockPtr    scissor_off_state_block; //блок состояний прохода
-  LowLevelStateBlockPtr    scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
-  ProgramPtr               program;                 //программа
-  ProgramParametersLayout  parameters_layout;       //расположение параметров
-  size_t                   clear_flags;             //флаги очистки экрана
-  OperationArray           operations;              //операции рендеринга
-  OperationPtrArray        operation_ptrs;          //указатели на операции
-  const RendererOperation* last_operation;          //последняя добавленная операция
-  FrameImpl&               frame;                   //ссылка на родительский кадр
+  common::StringArray         color_targets;           //имя целевых буферов цвета
+  stl::string                 depth_stencil_target;    //имя целевого буфера отсечения
+  SortMode                    sort_mode;               //режим сортировки
+  LowLevelStateBlockPtr       scissor_off_state_block; //блок состояний прохода
+  LowLevelStateBlockPtr       scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
+  ProgramPtr                  program;                 //программа
+  ProgramParametersLayoutPtr  parameters_layout;       //расположение параметров
+  size_t                      clear_flags;             //флаги очистки экрана
+  OperationArray              operations;              //операции рендеринга
+  OperationPtrArray           operation_ptrs;          //указатели на операции
+  const RendererOperation*    last_operation;          //последняя добавленная операция
+  FrameImpl&                  frame;                   //ссылка на родительский кадр
 
 ///Конструктор
   RenderPass (const DeviceManagerPtr& device_manager, FrameImpl& in_frame)
     : sort_mode (SortMode_Default)
-    , parameters_layout (&device_manager->Device (), &device_manager->Settings ())
+    , parameters_layout (ProgramParametersLayout::Create (&device_manager->Device (), &device_manager->Settings ()))
     , clear_flags (ClearFlag_All)
     , last_operation ()
     , frame (in_frame)
@@ -368,7 +368,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
           //связывание объекта размещения параметров прохода с родительским объектом размещения параметров
 
         if (parent_layout)
-          pass->parameters_layout.Attach (*parent_layout);
+          pass->parameters_layout->Attach (*parent_layout);
           
           //создание операции рендеринга
 
@@ -1195,7 +1195,7 @@ struct RenderOperationsExecutor
       //установка расположения параметров
       //TODO: кэшировать по entity (FIFO)
 
-    ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
+    ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (pass.parameters_layout.get (), operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
     device_context.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
     device_context.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);

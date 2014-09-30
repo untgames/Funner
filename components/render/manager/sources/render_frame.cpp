@@ -25,13 +25,13 @@ typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr> TextureMap;
 
 struct EffectHolder: public CacheSource
 {
-  FrameImpl&               frame;                  //ссылка на кадр
-  DeviceManagerPtr         device_manager;         //менеджер устройства отрисовки
-  EffectManagerPtr         effect_manager;         //ссылка на менеджер эффектов
-  EffectProxy              effect;                 //эффект кадра
-  EffectRendererPtr        effect_renderer;        //рендер эффекта
-  EffectPtr                cached_effect;          //закэшированный эффект
-  ProgramParametersLayout  properties_layout;      //расположение свойств
+  FrameImpl&                 frame;                  //ссылка на кадр
+  DeviceManagerPtr           device_manager;         //менеджер устройства отрисовки
+  EffectManagerPtr           effect_manager;         //ссылка на менеджер эффектов
+  EffectProxy                effect;                 //эффект кадра
+  EffectRendererPtr          effect_renderer;        //рендер эффекта
+  EffectPtr                  cached_effect;          //закэшированный эффект
+  ProgramParametersLayoutPtr properties_layout;      //расположение свойств
   
 ///Конструктор
   EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager, FrameImpl& in_frame)
@@ -39,7 +39,7 @@ struct EffectHolder: public CacheSource
     , device_manager (in_device_manager)
     , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
-    , properties_layout (&device_manager->Device (), &device_manager->Settings ())
+    , properties_layout (ProgramParametersLayout::Create (&device_manager->Device (), &device_manager->Settings ()))
   {
     effect.AttachCacheHolder (*this);
   }
@@ -72,7 +72,7 @@ struct EffectHolder: public CacheSource
       if (!cached_effect)
         return;
 
-      effect_renderer = EffectRendererPtr (new render::manager::EffectRenderer (cached_effect, device_manager, frame, &properties_layout), false);
+      effect_renderer = EffectRendererPtr (new render::manager::EffectRenderer (cached_effect, device_manager, frame, properties_layout.get ()), false);
     }
     catch (xtl::exception& e)
     {
@@ -153,7 +153,7 @@ struct FrameImpl::Impl: public CacheHolder
     AttachCacheSource (*effect_holder);
     AttachCacheSource (properties);
 
-    effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties.Properties ());
+    effect_holder->properties_layout->AttachSlot (ProgramParametersSlot_Frame, properties.Properties ());
     
     entities.reserve (RESERVED_ENTITIES_COUNT);
     frames.reserve (RESERVED_FRAMES_COUNT);
@@ -431,7 +431,7 @@ void FrameImpl::SetProperties (const common::PropertyMap& properties)
   {
     impl->properties.SetProperties (properties);
 
-    impl->effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties);
+    impl->effect_holder->properties_layout->AttachSlot (ProgramParametersSlot_Frame, properties);
   }
   catch (xtl::exception& e)
   {

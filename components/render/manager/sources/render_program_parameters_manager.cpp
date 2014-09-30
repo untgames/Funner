@@ -128,7 +128,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
       if (range.first->second->Parameters ().parameters_count == parameters_count)
         return range.first->second;
 
-    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
+    ProgramParametersLayoutPtr result_layout = ProgramParametersLayout::Create (impl->device, impl->settings);
 
     result_layout->SetSlot (slot, layout);
 
@@ -167,7 +167,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
     if (impl->settings->HasDebugLog ())
       impl->log.Printf ("Create composite program parameters layout for <%d,%d,%d>", layout1 ? layout1->Id () : 0, layout2 ? layout2->Id () : 0, layout3 ? layout3->Id () : 0);
 
-    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
+    ProgramParametersLayoutPtr result_layout = ProgramParametersLayout::Create (impl->device, impl->settings);
 
     if (layout1) result_layout->Attach (*layout1);
     if (layout2) result_layout->Attach (*layout2);
