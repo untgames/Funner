@@ -1,6 +1,7 @@
 #ifndef ANALYTICS_FLURRY_SHARED_HEADER
 #define ANALYTICS_FLURRY_SHARED_HEADER
 
+#include <common/log.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 

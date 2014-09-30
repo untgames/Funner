@@ -27,14 +27,14 @@ SOURCE_FILES_SUFFIXES       += s
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.gcc.compile
-echo $1 && $(COMPILER_GCC) -c -o "$4/$$(basename $$src $${src##*.})$(OBJ_SUFFIX:.%=%)" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(foreach def,$5,-D $(subst %,$(SPACE),$(def))) $1
+echo $1 && $(COMPILER_GCC) -c -o "$4/$$(basename $$src $${src##*.})$(OBJ_SUFFIX:.%=%)" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(foreach def,$5,-D $(subst %,$(SPACE),$(def))) $(patsubst %,-F%,$9) $1
 endef
 
 define tools.g++.c++compile
-$(call for_each_file,src,$(if $(filter -x c++,$6),,$(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) && \
-$(call for_each_file,src,$(filter %.cpp,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
-$(call for_each_file,src,$(filter %.mm,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(COMMON_MMFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
-$(call for_each_file,src,$(filter %.s,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) 
+$(call for_each_file,src,$(if $(filter -x c++,$6),,$(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8,$9)) && \
+$(call for_each_file,src,$(filter %.cpp,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8,$9)) && \
+$(call for_each_file,src,$(filter %.mm,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(COMMON_MMFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8,$9)) && \
+$(call for_each_file,src,$(filter %.s,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8,$9)) 
 endef
 
 ###################################################################################################
@@ -53,7 +53,7 @@ endef
 #список подключаемых символов линковки, флаги линковки, def-файл, файл ошибок)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6,$(call tools.link.deffile,$6)) $(MAP_FILE_LINK_OPTION_PREFIX)$(basename $1).map $(if $7, 2> $7) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(patsubst %,-F%,$8) $(if $6,$(call tools.link.deffile,$6)) $(MAP_FILE_LINK_OPTION_PREFIX)$(basename $1).map $(if $7, 2> $7) && chmod u+x "$1"
 endef
 
 ###################################################################################################

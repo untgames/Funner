@@ -5,6 +5,8 @@ using namespace analytics::flurry;
 namespace
 {
 
+const char* LOG_NAME = "analytics.flurry.FlurrySessionImpl";
+
 /*
    Flurry
 */
@@ -56,7 +58,7 @@ class FlurrySessionImpl
           throw xtl::make_null_argument_exception ("", "user_id");
 
         if (started)
-          throw xtl::format_operation_exception ("", "UserId can be set only before StartSession");
+          common::Log (LOG_NAME).Printf ("UserId can be set only before StartSession");
 
         Platform::SetUserId (user_id);
       }
@@ -72,7 +74,7 @@ class FlurrySessionImpl
       try
       {
         if (started)
-          throw xtl::format_operation_exception ("", "Age can be set only before StartSession");
+          common::Log (LOG_NAME).Printf ("Age can be set only before StartSession");
 
         Platform::SetAge (age);
       }
@@ -88,7 +90,7 @@ class FlurrySessionImpl
       try
       {
         if (started)
-          throw xtl::format_operation_exception ("", "Gender can be set only before StartSession");
+          common::Log (LOG_NAME).Printf ("Gender can be set only before StartSession");
 
         Platform::SetGender (gender);
       }

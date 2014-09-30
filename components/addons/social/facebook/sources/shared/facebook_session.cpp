@@ -9,8 +9,9 @@ namespace
 const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY     = 5;  //Задержка удаления web-view после скрытия
 const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Задержка показа web-view логина (для логина без показа окна в случае автопродления токена)
 
-const char* LOG_NAME            = "social.facebook.FacebookSession";
-const char* SESSION_DESCRIPTION = "Facebook";
+const char*  LOG_NAME              = "social.facebook.FacebookSession";
+const char*  SESSION_DESCRIPTION   = "Facebook";
+const size_t RESERVE_PROPERTY_SIZE = 32;
 
 bool session_created = false;  //Существует ли созданная сессия
 
@@ -72,7 +73,7 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
     if (!window_name)
       throw xtl::make_null_argument_exception ("", "window_name");
 
-    stl::string url = common::format ("https://m.facebook.com/dialog/%s?app_id=%s&display=touch&redirect_uri=fbconnect://success&access_token=%s", window_name, app_id.c_str (), token.c_str ());
+    stl::string url = common::format ("https://m.facebook.com/%s/dialog/%s?app_id=%s&display=touch&redirect_uri=fbconnect://success&access_token=%s", PLATFORM_VERSION, window_name, app_id.c_str (), token.c_str ());
 
     if (properties.Size ())
     {
@@ -90,7 +91,7 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
 
     dialog_web_view.reset (new syslib::WebView);
 
-    last_dialog_base_request = common::format ("https://m.facebook.com/dialog/%s", window_name);
+    last_dialog_base_request = common::format ("https://m.facebook.com/%s/dialog/%s", PLATFORM_VERSION, window_name);
 
     dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2, callback));
     dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0, callback));
@@ -105,6 +106,32 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
     e.touch (METHOD_NAME);
     throw;
   }
+}
+
+/*
+   Загрузка произвольных запросов
+*/
+
+void FacebookSessionImpl::PerformRequest (const char* request, const social::RequestCallback& callback, const common::PropertyMap& properties)
+{
+  stl::string params;
+
+  params.reserve (properties.Size () * RESERVE_PROPERTY_SIZE);
+
+  for (size_t i = 0, count = properties.Size (); i < count; i++)
+  {
+    if (!params.empty ())
+      params.append ("&");
+
+    params += common::format ("%s=%s", properties.PropertyName (i), properties.GetString (i));
+  }
+
+  PerformRequest (request, params.c_str (), xtl::bind (&FacebookSessionImpl::PerformRequestHandler, this, _1, _2, _3, callback));
+}
+
+void FacebookSessionImpl::PerformRequestHandler (bool succeeded, const stl::string& status, const stl::string& result, const social::RequestCallback& callback)
+{
+  callback (result.c_str (), succeeded ? OperationStatus_Success : OperationStatus_Failure, status.c_str ());
 }
 
 /*
@@ -195,21 +222,6 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
     {
     }
 
-    if (has_previous_token)
-    {
-      if (properties.IsPresent ("UserId"))
-        current_user.SetId (properties.GetString ("UserId"));
-
-      token = properties.GetString ("Token");
-
-      login_properties.RemoveProperty ("UserId");
-      login_properties.RemoveProperty ("Token");
-
-      OnLoginTokenUpdated (callback);
-
-      return;
-    }
-
     Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, callback), properties);
   }
   catch (xtl::exception& e)
@@ -237,7 +249,22 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
       return;
     }
 
-    stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id.c_str ());
+    if (login_properties.IsPresent ("Token"))
+    {
+      if (login_properties.IsPresent ("UserId"))
+        current_user.SetId (login_properties.GetString ("UserId"));
+
+      token = login_properties.GetString ("Token");
+
+      login_properties.RemoveProperty ("UserId");
+      login_properties.RemoveProperty ("Token");
+
+      OnLoginTokenUpdated (callback);
+
+      return;
+    }
+
+    stl::string url = common::format ("https://m.facebook.com/%s/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", PLATFORM_VERSION, app_id.c_str ());
 
     if (login_properties.IsPresent ("Permissions"))
       url.append (common::format ("&scope=%s", login_properties.GetString ("Permissions")));
@@ -267,7 +294,7 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
 void FacebookSessionImpl::OnLoginTokenUpdated (const LoginCallback& callback)
 {
-  PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
+  PerformRequest ("me/", "fields=id,name", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
 }
 
 void FacebookSessionImpl::HandleLoginResultUrl (const char* url, const LoginCallback& callback)
@@ -337,7 +364,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
         strstr (request, "://m.facebook.com/login/identify?ctx=recover"))
       return false;
 
-    if (strstr (request, "://m.facebook.com/dialog/oauth"))
+    if (strstr (request, common::format ("://m.facebook.com/%s/dialog/oauth", PLATFORM_VERSION).c_str ()))
       OnActivate ();
   }
   else
@@ -346,7 +373,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
   return true;
 }
 
-void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback)
+void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, const stl::string& response, const LoginCallback& callback)
 {
   log.Printf ("User info load status '%s'", status.c_str ());
 
@@ -356,7 +383,9 @@ void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::st
     return;
   }
 
-  User logged_in_user = parse_user (response);
+  common::ParseNode response_node = ParseRequestResponse (response);
+
+  User logged_in_user = parse_user (response_node);
 
   if (xtl::xstrlen (current_user.Id ()) && xtl::xstrcmp (current_user.Id (), logged_in_user.Id ()))
   {

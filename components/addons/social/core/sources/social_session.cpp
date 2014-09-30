@@ -59,6 +59,26 @@ struct Session::Impl : public xtl::reference_counter
     manager->LogOut ();
   }
 
+  ///Загрузка произвольных запросов
+  void PerformRequest (const char* request, const RequestCallback& callback, const common::PropertyMap& properties)
+  {
+    try
+    {
+      if (!request)
+        throw xtl::make_null_argument_exception ("", "request");
+
+      if (!manager->IsUserLoggedIn ())
+        throw xtl::format_operation_exception ("", "Not logged in");
+
+      manager->PerformRequest (request, callback, properties);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("social::Session::PerformRequest");
+      throw;
+    }
+  }
+
   ///Показ стандартных окон
   void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties)
   {
@@ -339,6 +359,15 @@ void Session::LogOut ()
 bool Session::IsUserLoggedIn () const
 {
   return impl->manager->IsUserLoggedIn ();
+}
+
+/*
+   Загрузка произвольных запросов
+*/
+
+void Session::PerformRequest (const char* request, const RequestCallback& callback, const common::PropertyMap& properties) const
+{
+  impl->PerformRequest (request, callback, properties);
 }
 
 /*

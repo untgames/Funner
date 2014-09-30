@@ -20,6 +20,7 @@ class IOsPlatform: public DefaultPlatform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void Login       (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties);
     static void CancelLogin ();
+    static void LogOut      ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕроверка, установлено ли приложение facebook

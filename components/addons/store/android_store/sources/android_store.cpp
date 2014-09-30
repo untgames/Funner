@@ -141,7 +141,7 @@ class AndroidStore
       return store_signal.connect (callback);
     }
 
-    void RestorePurchases ()
+    void RestorePurchases (const Store::OnPurchasesRestoredCallback& finish_callback)
     {
       log.Printf ("Restoring transactions");
 
@@ -616,9 +616,9 @@ xtl::connection StoreImpl::RegisterTransactionUpdateHandler (const Store::Purcha
   return StoreSingleton::Instance ()->RegisterTransactionUpdateHandler (callback);
 }
 
-void StoreImpl::RestorePurchases ()
+void StoreImpl::RestorePurchases (const Store::OnPurchasesRestoredCallback& finish_callback)
 {
-  StoreSingleton::Instance ()->RestorePurchases ();
+  StoreSingleton::Instance ()->RestorePurchases (finish_callback);
 }
 
 Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)

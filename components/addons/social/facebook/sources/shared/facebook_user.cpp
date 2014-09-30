@@ -33,7 +33,7 @@ void FacebookSessionImpl::LoadUser (const char* user_id, const LoadUserCallback&
 
   CheckUnknownProperties (METHOD_NAME, properties, sizeof (SUPPORTED_PROPERTIES) / sizeof (*SUPPORTED_PROPERTIES), SUPPORTED_PROPERTIES);
 
-  stl::string fields = "id,username";
+  stl::string fields = "id,name";
 
   if (properties.IsPresent ("Fields"))
   {
@@ -49,7 +49,7 @@ void FacebookSessionImpl::LoadUser (const char* user_id, const LoadUserCallback&
   PerformRequest (user_id, common::format ("fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3, callback));
 }
 
-void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadUserCallback& callback)
+void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, const stl::string& response, const LoadUserCallback& callback)
 {
   try
   {
@@ -63,7 +63,9 @@ void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& s
       return;
     }
 
-    return_value = parse_user (response);
+    common::ParseNode response_node = ParseRequestResponse (response);
+
+    return_value = parse_user (response_node);
 
     callback (return_value, OperationStatus_Success, status.c_str ());
   }
@@ -122,7 +124,7 @@ void FacebookSessionImpl::LoadFriends (const User& user, const LoadFriendsCallba
 
   CheckUnknownProperties (METHOD_NAME, properties, sizeof (SUPPORTED_PROPERTIES) / sizeof (*SUPPORTED_PROPERTIES), SUPPORTED_PROPERTIES);
 
-  stl::string fields = "id,username";
+  stl::string fields = "id,name";
 
   if (properties.IsPresent ("Fields"))
   {
@@ -138,7 +140,7 @@ void FacebookSessionImpl::LoadFriends (const User& user, const LoadFriendsCallba
   PerformRequest ("me/friends", common::format ("limit=9999&fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnFriendsInfoLoaded, this, _1, _2, _3, callback));
 }
 
-void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback)
+void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string& status, const stl::string& response, const LoadFriendsCallback& callback)
 {
   try
   {
@@ -152,7 +154,9 @@ void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string
       return;
     }
 
-    common::ParseNode data = response.First ("data").First ();
+    common::ParseNode response_node = ParseRequestResponse (response);
+
+    common::ParseNode data = response_node.First ("data").First ();
 
     for (common::ParseNode iter = data.First (); iter; iter = iter.Next ())
       return_value.Add (parse_user (iter));

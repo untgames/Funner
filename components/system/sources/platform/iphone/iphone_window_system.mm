@@ -222,8 +222,7 @@ struct WindowImpl
   self.view = [[UIViewWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
   [self.view release];
 
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
-    self.view.contentScaleFactor = [UIScreen mainScreen].scale;
+  self.view.contentScaleFactor = [UIScreen mainScreen].scale;
 }
 
 -(void)viewDidUnload
@@ -533,8 +532,7 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
-    new_window.contentScaleFactor = [UIScreen mainScreen].scale;
+  new_window.contentScaleFactor = [UIScreen mainScreen].scale;
 
   new_window.rootViewController.view.clearsContextBeforeDrawing = NO;
   new_window.rootViewController.view.multipleTouchEnabled       = YES;
