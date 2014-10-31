@@ -3,6 +3,8 @@
 
 #include "shared.h"
 
+#include <sys/sysctl.h>
+
 namespace
 {
 
@@ -34,6 +36,18 @@ class PlatformConfigurationComponent
         SaveProperty (writer, "Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "ipad" : "iphone");
         SaveProperty (writer, "Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
         SaveProperty (writer, "OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
+
+        size_t model_name_size = 0;
+
+        sysctlbyname ("hw.machine", 0, &model_name_size, 0, 0);
+
+        xtl::uninitialized_storage<char> model_name (model_name_size + 1);
+
+        if (!sysctlbyname ("hw.machine", model_name.data (), &model_name_size, 0, 0))
+        {
+          model_name.data () [model_name_size] = 0;
+          SaveProperty (writer, "DeviceModel", model_name.data ());
+        }
 
         [pool release];
       }

@@ -9,10 +9,7 @@ const float DEFAULT_DPI = 160.f;
 
 void fill_screen_mode_desc (UIScreen* screen, UIScreenMode* mode, ScreenModeDesc& mode_desc)
 {
-  float scale = 1;
-
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
-    scale = screen.scale;
+  float scale = screen.scale;
 
   memset (&mode_desc, 0, sizeof (mode_desc));
 
@@ -135,10 +132,7 @@ void IPhoneScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc&
 
   UIScreen *ui_screen = (UIScreen*)screen;
 
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.3" options:NSNumericSearch] != NSOrderedAscending)
-    fill_screen_mode_desc (ui_screen, ui_screen.preferredMode, mode_desc);
-  else
-    fill_screen_mode_desc (ui_screen, [[ui_screen availableModes] objectAtIndex:0], mode_desc);
+  fill_screen_mode_desc (ui_screen, ui_screen.preferredMode, mode_desc);
 }
 
 /*

@@ -17,6 +17,7 @@ namespace
 {
 
 const char* LOG_NAME = "syslib.iphone.window";
+const float EPS      = 0.001f;
 
 InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
 {
@@ -30,9 +31,19 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
   }
 }
 
+bool float_equal (float a, float b)
+{
+  return a - b < EPS;
+}
+
+bool is_portrait_upside_down_transform (const CGAffineTransform& transform)
+{
+  return float_equal (transform.a, -1.f) && float_equal (transform.b, 0.f) && float_equal (transform.c, 0.f) && float_equal (transform.d, -1.f);
+}
+
 CGRect get_transformed_view_rect_size (CGRect frame, UIView* view)
 {
-  if (!CGAffineTransformIsIdentity (view.transform))
+  if (!CGAffineTransformIsIdentity (view.transform) && !is_portrait_upside_down_transform (view.transform))
   {
     float temp = frame.size.width;
 
@@ -211,8 +222,7 @@ struct WindowImpl
   self.view = [[UIViewWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
   [self.view release];
 
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
-    self.view.contentScaleFactor = [UIScreen mainScreen].scale;
+  self.view.contentScaleFactor = [UIScreen mainScreen].scale;
 }
 
 -(void)viewDidUnload
@@ -307,6 +317,25 @@ struct WindowImpl
     return nil;
 
   allowed_orientations = UIInterfaceOrientationMaskAll;
+
+  NSArray *app_allowed_orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+  if ([app_allowed_orientations count])
+  {
+    allowed_orientations = 0;
+
+    for (NSString* orientation in app_allowed_orientations)
+    {
+      if ([orientation isEqualToString:@"UIInterfaceOrientationPortrait"])
+        allowed_orientations |= UIInterfaceOrientationMaskPortrait;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationPortraitUpsideDown"])
+        allowed_orientations |= UIInterfaceOrientationMaskPortraitUpsideDown;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationLandscapeLeft"])
+        allowed_orientations |= UIInterfaceOrientationMaskLandscapeLeft;
+      if ([orientation isEqualToString:@"UIInterfaceOrientationLandscapeRight"])
+        allowed_orientations |= UIInterfaceOrientationMaskLandscapeRight;
+    }
+  }
 
   try
   {
@@ -503,8 +532,7 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
-    new_window.contentScaleFactor = [UIScreen mainScreen].scale;
+  new_window.contentScaleFactor = [UIScreen mainScreen].scale;
 
   new_window.rootViewController.view.clearsContextBeforeDrawing = NO;
   new_window.rootViewController.view.multipleTouchEnabled       = YES;
@@ -658,7 +686,7 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
   rect.top    = frame.origin.y * scale_factor;
   rect.left   = frame.origin.x * scale_factor;
 
-  if (!CGAffineTransformIsIdentity (view.transform))
+  if (!CGAffineTransformIsIdentity (view.transform) && !is_portrait_upside_down_transform (view.transform))
   {
       size_t temp = rect.bottom;
 
