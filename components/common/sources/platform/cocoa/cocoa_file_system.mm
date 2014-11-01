@@ -218,9 +218,9 @@ class CocoaFileSystem: public StdioFileSystem
 
     bool HasFileAttribute (const char* file_name, const char* attribute)
     {
-      size_t attributes_length = listxattr (file_name, 0, 0, 0);
+      ssize_t attributes_length = listxattr (file_name, 0, 0, 0);
 
-      if (!attributes_length)
+      if (attributes_length < 0)
         return false;
 
       xtl::uninitialized_storage<char> names (attributes_length);
