@@ -94,6 +94,29 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
     }
 
+    void Remove (const char* file_name)
+    {
+      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+      NSString* path = [file_manager stringWithFileSystemRepresentation:file_name length:xtl::xstrlen (file_name)];
+
+      stl::string error_string ("Unknown error");
+
+      NSError* error = nil;
+
+      if ([file_manager fileExistsAtPath:path] && ![file_manager removeItemAtPath:path error:&error])
+      {
+        if (error)
+          error_string = [[error localizedDescription] UTF8String];
+
+        [pool release];
+
+        throw xtl::format_operation_exception ("common::CocoaFileSystem::Remove", "Can't remove item at path '%s': error '%s'", file_name, error_string.c_str ());
+      }
+
+      [pool release];
+    }
+
 ///Получение информации о файле
     bool IsFileExist (const char* file_name)
     {
