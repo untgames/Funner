@@ -597,15 +597,13 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
         if (sk_transaction.transactionState == SKPaymentTransactionStatePurchased || sk_transaction.transactionState == SKPaymentTransactionStateRestored)
         {
-          SKPaymentTransaction *paid_transaction = sk_transaction.transactionState == SKPaymentTransactionStatePurchased ? sk_transaction : sk_transaction.originalTransaction;
-
-          NSData* receipt = paid_transaction.transactionReceipt;
+          NSData* receipt = sk_transaction.transactionReceipt;
 
           transaction.SetReceipt ([receipt length], [receipt bytes]);
 
           common::PropertyMap properties;
 
-          properties.SetProperty ("Id", [paid_transaction.transactionIdentifier UTF8String]);
+          properties.SetProperty ("Id", [sk_transaction.transactionIdentifier UTF8String]);
 
           transaction.SetProperties (properties);
         }
