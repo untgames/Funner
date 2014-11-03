@@ -1,4 +1,5 @@
 #include <common/file.h>
+#include <common/strlib.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +26,10 @@ int main ()
 
       FileSystem::Mkdir (RESULTS_DIR_NAMES [i]);
       FileSystem::Mkdir (NESTED_DIR_NAMES [i]);
+
+      common::StdFile output_file (common::format ("%s/.hidden_file", NESTED_DIR_NAMES [i]).c_str (), common::FileMode_ReadWrite);
+
+      output_file.Close ();
 
       printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAMES [i]) ? 'y' : 'n');
 

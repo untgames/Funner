@@ -17,6 +17,8 @@ int main ()
   
   try
   {
+    FileSystem::Mkdir (FILE_PATH);
+
     printf ("Has attribute = '%c'\n", FileSystem::HasFileAttribute (FILE_PATH, ATTRIBUTE_NAME) ? 'y' : 'n');
 
     FileSystem::SetFileAttribute (FILE_PATH, ATTRIBUTE_NAME, 0, 0);
@@ -42,6 +44,8 @@ int main ()
     {
       printf ("Has attribute = '%c'\n", FileSystem::HasFileAttribute (FILE_PATH, common::format ("%s_%d", ATTRIBUTE_NAME, i).c_str ()) ? 'y' : 'n');
     }
+
+    FileSystem::Remove (FILE_PATH);
   }
   catch (std::exception& exception)
   {
