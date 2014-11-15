@@ -24,7 +24,7 @@ int main()
 
     using namespace std; // printf, clock_t, clock
 
-    printf("%s: %d threads, %d iterations: ", title, m, n);
+    printf("%d threads, %d iterations: ", m, n);
 
     int value = 0;
 
@@ -44,7 +44,7 @@ int main()
 
     t = clock() - t;
 
-    printf("\n\n%.3f seconds.\n", static_cast<double>(t) / CLOCKS_PER_SEC);
+//    printf("\n\n%.3f seconds.\n", static_cast<double>(t) / CLOCKS_PER_SEC);
 
     printf ("value is %u required is %u\n", value, n * m);
 
