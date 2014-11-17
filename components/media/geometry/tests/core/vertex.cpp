@@ -1,8 +1,8 @@
-#include "shared.h"
-
 #if defined (_MSC_VER) || defined (__GNUC__)
 #pragma pack(1)
 #endif
+
+#include "shared.h"
 
 template <class Vertex> void dump_format ()
 {
