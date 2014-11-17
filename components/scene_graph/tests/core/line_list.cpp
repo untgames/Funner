@@ -12,8 +12,9 @@ class MyVisitor: public visitor<void, LineList>
         const LineDesc& s = line_list.Lines ()[i];
 
         printf ("  #%u: position=[%.0f %.0f %.0f]-[%.0f %.0f %.0f] color=[%.2f %.2f %.2f %.2f]-[%.2f %.2f %.2f %.2f] tex_offset=[%.0f %.0f]-[%.0f %.0f]\n",
-          i, s.point [0].position.x, s.point [0].position.y, s.point [0].position.z, s.point [0].color.x, s.point [0].color.y, s.point [0].color.z, s.point [0].color.w, s.point [0].tex_offset.x, s.point [0].tex_offset.y,
-             s.point [1].position.x, s.point [1].position.y, s.point [1].position.z, s.point [1].color.x, s.point [1].color.y, s.point [1].color.z, s.point [1].color.w, s.point [1].tex_offset.x, s.point [1].tex_offset.y);
+          i, s.point [0].position.x, s.point [0].position.y, s.point [0].position.z, s.point [1].position.x, s.point [1].position.y, s.point [1].position.z,
+             s.point [0].color.x, s.point [0].color.y, s.point [0].color.z, s.point [0].color.w, s.point [1].color.x, s.point [1].color.y, s.point [1].color.z, s.point [1].color.w,
+             s.point [0].tex_offset.x, s.point [0].tex_offset.y, s.point [1].tex_offset.x, s.point [1].tex_offset.y);
       }
     }
 };
