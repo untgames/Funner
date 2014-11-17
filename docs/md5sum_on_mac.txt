@@ -1,0 +1,6 @@
+sudo port install coreutils
+
+create script
+
+#!/bin/sh
+/opt/local/libexec/gnubin/md5sum $1 $2 $3 $4
