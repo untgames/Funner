@@ -715,10 +715,17 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
   properties.SetProperty ("OSVersion", [system_version UTF8String]);
 
-  NSString* application_version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+  NSBundle*     main_bundle         = [NSBundle mainBundle];
+  NSDictionary* bundle_info         = [main_bundle infoDictionary];
+  NSString*     application_version = [bundle_info objectForKey:@"CFBundleVersion"];
 
   if ([application_version isKindOfClass:[NSString class]])
     properties.SetProperty ("ApplicationVersion", [application_version UTF8String]);
+
+  NSString* application_user_visible_version = [bundle_info objectForKey:@"CFBundleShortVersionString"];
+
+  if ([application_user_visible_version isKindOfClass:[NSString class]])
+    properties.SetProperty ("ApplicationUserVisibleVersion", [application_user_visible_version UTF8String]);
 
   size_t model_name_size = 0;
 
