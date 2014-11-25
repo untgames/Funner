@@ -100,8 +100,8 @@ class ApplicationThread: private ApplicationStartArgs
             const char* name  = env_vars.PropertyName (i);
             const char* value = env_vars.GetString (i);
             
-            if (putenv (common::format ("%s=%s", name, value).c_str ()))
-              throw xtl::format_operation_exception ("", "::putenv failed for '%s=%s'", name, value);
+            if (setenv (name, value, 1))
+              throw xtl::format_operation_exception ("", "::setenv failed for '%s=%s'", name, value);
           }
 
             //предварительные действия
@@ -152,7 +152,7 @@ class ApplicationThread: private ApplicationStartArgs
         
         if (apk_path)
           common::FileSystem::AddSearchPath (common::format ("/std/%s", apk_path).c_str ());
-         
+
         const char* search_paths = getenv (SEARCH_PATHS);
         
         if (search_paths)
