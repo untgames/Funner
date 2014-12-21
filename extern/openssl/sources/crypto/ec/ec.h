@@ -151,11 +151,21 @@ const EC_METHOD *EC_GFp_mont_method(void);
  */
 const EC_METHOD *EC_GFp_nist_method(void);
 
-#ifndef OPENSSL_NO_EC_NISTP224_64_GCC_128
+#ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
 /** Returns 64-bit optimized methods for nistp224
  *  \return  EC_METHOD object
  */
 const EC_METHOD *EC_GFp_nistp224_method(void);
+
+/** Returns 64-bit optimized methods for nistp256
+ *  \return  EC_METHOD object
+ */
+const EC_METHOD *EC_GFp_nistp256_method(void);
+
+/** Returns 64-bit optimized methods for nistp521
+ *  \return  EC_METHOD object
+ */
+const EC_METHOD *EC_GFp_nistp521_method(void);
 #endif
 
 #ifndef OPENSSL_NO_EC2M
@@ -264,10 +274,10 @@ int EC_GROUP_get_curve_name(const EC_GROUP *group);
 void EC_GROUP_set_asn1_flag(EC_GROUP *group, int flag);
 int EC_GROUP_get_asn1_flag(const EC_GROUP *group);
 
-void EC_GROUP_set_point_conversion_form(EC_GROUP *, point_conversion_form_t);
+void EC_GROUP_set_point_conversion_form(EC_GROUP *group, point_conversion_form_t form);
 point_conversion_form_t EC_GROUP_get_point_conversion_form(const EC_GROUP *);
 
-unsigned char *EC_GROUP_get0_seed(const EC_GROUP *);
+unsigned char *EC_GROUP_get0_seed(const EC_GROUP *x);
 size_t EC_GROUP_get_seed_len(const EC_GROUP *);
 size_t EC_GROUP_set_seed(EC_GROUP *, const unsigned char *, size_t len);
 
@@ -616,10 +626,10 @@ int EC_POINT_is_on_curve(const EC_GROUP *group, const EC_POINT *point, BN_CTX *c
  */
 int EC_POINT_cmp(const EC_GROUP *group, const EC_POINT *a, const EC_POINT *b, BN_CTX *ctx);
 
-int EC_POINT_make_affine(const EC_GROUP *, EC_POINT *, BN_CTX *);
-int EC_POINTs_make_affine(const EC_GROUP *, size_t num, EC_POINT *[], BN_CTX *);
+int EC_POINT_make_affine(const EC_GROUP *group, EC_POINT *point, BN_CTX *ctx);
+int EC_POINTs_make_affine(const EC_GROUP *group, size_t num, EC_POINT *points[], BN_CTX *ctx);
 
-/** Computes r = generator * n sum_{i=0}^num p[i] * m[i]
+/** Computes r = generator * n sum_{i=0}^{num-1} p[i] * m[i]
  *  \param  group  underlying EC_GROUP object
  *  \param  r      EC_POINT object for the result
  *  \param  n      BIGNUM with the multiplier for the group generator (optional)
@@ -790,16 +800,24 @@ const EC_POINT *EC_KEY_get0_public_key(const EC_KEY *key);
 int EC_KEY_set_public_key(EC_KEY *key, const EC_POINT *pub);
 
 unsigned EC_KEY_get_enc_flags(const EC_KEY *key);
-void EC_KEY_set_enc_flags(EC_KEY *, unsigned int);
-point_conversion_form_t EC_KEY_get_conv_form(const EC_KEY *);
-void EC_KEY_set_conv_form(EC_KEY *, point_conversion_form_t);
+void EC_KEY_set_enc_flags(EC_KEY *eckey, unsigned int flags);
+point_conversion_form_t EC_KEY_get_conv_form(const EC_KEY *key);
+void EC_KEY_set_conv_form(EC_KEY *eckey, point_conversion_form_t cform);
 /* functions to set/get method specific data  */
-void *EC_KEY_get_key_method_data(EC_KEY *, 
+void *EC_KEY_get_key_method_data(EC_KEY *key, 
 	void *(*dup_func)(void *), void (*free_func)(void *), void (*clear_free_func)(void *));
-void EC_KEY_insert_key_method_data(EC_KEY *, void *data,
+/** Sets the key method data of an EC_KEY object, if none has yet been set.
+ *  \param  key              EC_KEY object
+ *  \param  data             opaque data to install.
+ *  \param  dup_func         a function that duplicates |data|.
+ *  \param  free_func        a function that frees |data|.
+ *  \param  clear_free_func  a function that wipes and frees |data|.
+ *  \return the previously set data pointer, or NULL if |data| was inserted.
+ */
+void *EC_KEY_insert_key_method_data(EC_KEY *key, void *data,
 	void *(*dup_func)(void *), void (*free_func)(void *), void (*clear_free_func)(void *));
 /* wrapper functions for the underlying EC_GROUP object */
-void EC_KEY_set_asn1_flag(EC_KEY *, int);
+void EC_KEY_set_asn1_flag(EC_KEY *eckey, int asn1_flag);
 
 /** Creates a table of pre-computed multiples of the generator to 
  *  accelerate further EC_KEY operations.
@@ -1003,6 +1021,12 @@ void ERR_load_EC_strings(void);
 #define EC_F_EC_GFP_NISTP224_GROUP_SET_CURVE		 225
 #define EC_F_EC_GFP_NISTP224_POINTS_MUL			 228
 #define EC_F_EC_GFP_NISTP224_POINT_GET_AFFINE_COORDINATES 226
+#define EC_F_EC_GFP_NISTP256_GROUP_SET_CURVE		 230
+#define EC_F_EC_GFP_NISTP256_POINTS_MUL			 231
+#define EC_F_EC_GFP_NISTP256_POINT_GET_AFFINE_COORDINATES 232
+#define EC_F_EC_GFP_NISTP521_GROUP_SET_CURVE		 233
+#define EC_F_EC_GFP_NISTP521_POINTS_MUL			 234
+#define EC_F_EC_GFP_NISTP521_POINT_GET_AFFINE_COORDINATES 235
 #define EC_F_EC_GFP_NIST_FIELD_MUL			 200
 #define EC_F_EC_GFP_NIST_FIELD_SQR			 201
 #define EC_F_EC_GFP_NIST_GROUP_SET_CURVE		 202
@@ -1077,6 +1101,8 @@ void ERR_load_EC_strings(void);
 #define EC_F_I2D_ECPRIVATEKEY				 192
 #define EC_F_I2O_ECPUBLICKEY				 151
 #define EC_F_NISTP224_PRE_COMP_NEW			 227
+#define EC_F_NISTP256_PRE_COMP_NEW			 236
+#define EC_F_NISTP521_PRE_COMP_NEW			 237
 #define EC_F_O2I_ECPUBLICKEY				 152
 #define EC_F_OLD_EC_PRIV_DECODE				 222
 #define EC_F_PKEY_EC_CTRL				 197

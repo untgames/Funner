@@ -79,8 +79,7 @@
 #undef COMPILE_RSAX
 
 #if (defined(__x86_64) || defined(__x86_64__) || \
-     defined(_M_AMD64) || defined (_M_X64)) && !defined(OPENSSL_NO_ASM) && \
-     !defined(OPENSSL_SYS_WIN32)
+     defined(_M_AMD64) || defined (_M_X64)) && !defined(OPENSSL_NO_ASM)
 #define COMPILE_RSAX
 static ENGINE *ENGINE_rsax (void);
 #endif
@@ -227,10 +226,13 @@ static int e_rsax_ctrl(ENGINE *e, int cmd, long i, void *p, void (*f)(void))
 
 
 #ifndef OPENSSL_NO_RSA
-#include <stdint.h>
 
-typedef uint64_t UINT64;
-typedef uint16_t UINT16;
+#ifdef _WIN32
+typedef unsigned __int64 UINT64;
+#else
+typedef unsigned long long UINT64;
+#endif
+typedef unsigned short UINT16;
 
 /* Table t is interleaved in the following manner:
  * The order in memory is t[0][0], t[0][1], ..., t[0][7], t[1][0], ...
@@ -303,10 +305,17 @@ static E_RSAX_MOD_CTX *e_rsax_get_ctx(RSA *rsa, int idx, BIGNUM* m)
 static int e_rsax_rsa_finish(RSA *rsa)
 	{
 	E_RSAX_MOD_CTX *hptr = RSA_get_ex_data(rsa, rsax_ex_data_idx);
-	if(!hptr) return 0;
-
-	OPENSSL_free(hptr);
-	RSA_set_ex_data(rsa, rsax_ex_data_idx, NULL);
+	if(hptr)
+		{
+		OPENSSL_free(hptr);
+		RSA_set_ex_data(rsa, rsax_ex_data_idx, NULL);
+		}
+	if (rsa->_method_mod_n)
+		BN_MONT_CTX_free(rsa->_method_mod_n);
+	if (rsa->_method_mod_p)
+		BN_MONT_CTX_free(rsa->_method_mod_p);
+	if (rsa->_method_mod_q)
+		BN_MONT_CTX_free(rsa->_method_mod_q);
 	return 1;
 	}
 
@@ -465,7 +474,7 @@ static int mod_exp_pre_compute_data_512(UINT64 *m, struct mod_ctx_512 *data)
 err:
     /* Cleanup */
 	if (ctx != NULL) {
-		BN_CTX_end(ctx); }
+		BN_CTX_end(ctx); BN_CTX_free(ctx); }
     BN_free(&two_768);
     BN_free(&two_640);
     BN_free(&two_128);

@@ -694,13 +694,16 @@ static int check_cert(X509_STORE_CTX *ctx)
 	X509_CRL *crl = NULL, *dcrl = NULL;
 	X509 *x;
 	int ok, cnum;
+	unsigned int last_reasons;
 	cnum = ctx->error_depth;
 	x = sk_X509_value(ctx->chain, cnum);
 	ctx->current_cert = x;
 	ctx->current_issuer = NULL;
+	ctx->current_crl_score = 0;
 	ctx->current_reasons = 0;
 	while (ctx->current_reasons != CRLDP_ALL_REASONS)
 		{
+		last_reasons = ctx->current_reasons;
 		/* Try to retrieve relevant CRL */
 		if (ctx->get_crl)
 			ok = ctx->get_crl(ctx, &crl, x);
@@ -744,6 +747,15 @@ static int check_cert(X509_STORE_CTX *ctx)
 		X509_CRL_free(dcrl);
 		crl = NULL;
 		dcrl = NULL;
+		/* If reasons not updated we wont get anywhere by
+		 * another iteration, so exit loop.
+		 */
+		if (last_reasons == ctx->current_reasons)
+			{
+			ctx->error = X509_V_ERR_UNABLE_TO_GET_CRL;
+			ok = ctx->verify_cb(0, ctx);
+			goto err;
+			}
 		}
 	err:
 	X509_CRL_free(crl);
@@ -871,7 +883,7 @@ static int crl_extension_match(X509_CRL *a, X509_CRL *b, int nid)
 	{
 	ASN1_OCTET_STRING *exta, *extb;
 	int i;
-	i = X509_CRL_get_ext_by_NID(a, nid, 0);
+	i = X509_CRL_get_ext_by_NID(a, nid, -1);
 	if (i >= 0)
 		{
 		/* Can't have multiple occurrences */
@@ -882,7 +894,7 @@ static int crl_extension_match(X509_CRL *a, X509_CRL *b, int nid)
 	else
 		exta = NULL;
 
-	i = X509_CRL_get_ext_by_NID(b, nid, 0);
+	i = X509_CRL_get_ext_by_NID(b, nid, -1);
 
 	if (i >= 0)
 		{
@@ -1450,10 +1462,9 @@ static int cert_crl(X509_STORE_CTX *ctx, X509_CRL *crl, X509 *x)
 	 * a certificate was revoked. This has since been changed since 
 	 * critical extension can change the meaning of CRL entries.
 	 */
-	if (crl->flags & EXFLAG_CRITICAL)
+	if (!(ctx->param->flags & X509_V_FLAG_IGNORE_CRITICAL)
+		&& (crl->flags & EXFLAG_CRITICAL))
 		{
-		if (ctx->param->flags & X509_V_FLAG_IGNORE_CRITICAL)
-			return 1;
 		ctx->error = X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION;
 		ok = ctx->verify_cb(0, ctx);
 		if(!ok)
@@ -1726,7 +1737,7 @@ int X509_cmp_time(const ASN1_TIME *ctm, time_t *cmp_time)
 	atm.length=sizeof(buff2);
 	atm.data=(unsigned char *)buff2;
 
-	if (X509_time_adj(&atm,-offset*60, cmp_time) == NULL)
+	if (X509_time_adj(&atm, offset*60, cmp_time) == NULL)
 		return 0;
 
 	if (ctm->type == V_ASN1_UTCTIME)
@@ -2010,6 +2021,9 @@ int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *store, X509 *x509,
 	ctx->error_depth=0;
 	ctx->current_cert=NULL;
 	ctx->current_issuer=NULL;
+	ctx->current_crl=NULL;
+	ctx->current_crl_score=0;
+	ctx->current_reasons=0;
 	ctx->tree = NULL;
 	ctx->parent = NULL;
 

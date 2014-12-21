@@ -60,125 +60,125 @@ static const unsigned char default_iv[] = {
 };
 
 int AES_wrap_key(AES_KEY *key, const unsigned char *iv,
-    unsigned char *out,
-    const unsigned char *in, unsigned int inlen)
-  {
-  unsigned char *A, B[16], *R;
-  unsigned int i, j, t;
-  if ((inlen & 0x7) || (inlen < 8))
-    return -1;
-  A = B;
-  t = 1;
-  memcpy(out + 8, in, inlen);
-  if (!iv)
-    iv = default_iv;
+		unsigned char *out,
+		const unsigned char *in, unsigned int inlen)
+	{
+	unsigned char *A, B[16], *R;
+	unsigned int i, j, t;
+	if ((inlen & 0x7) || (inlen < 8))
+		return -1;
+	A = B;
+	t = 1;
+	memcpy(out + 8, in, inlen);
+	if (!iv)
+		iv = default_iv;
 
-  memcpy(A, iv, 8);
+	memcpy(A, iv, 8);
 
-  for (j = 0; j < 6; j++)
-    {
-    R = out + 8;
-    for (i = 0; i < inlen; i += 8, t++, R += 8)
-      {
-      memcpy(B + 8, R, 8);
-      AES_encrypt(B, B, key);
-      A[7] ^= (unsigned char)(t & 0xff);
-      if (t > 0xff) 
-        {
-        A[6] ^= (unsigned char)((t >> 8) & 0xff);
-        A[5] ^= (unsigned char)((t >> 16) & 0xff);
-        A[4] ^= (unsigned char)((t >> 24) & 0xff);
-        }
-      memcpy(R, B + 8, 8);
-      }
-    }
-  memcpy(out, A, 8);
-  return inlen + 8;
-  }
+	for (j = 0; j < 6; j++)
+		{
+		R = out + 8;
+		for (i = 0; i < inlen; i += 8, t++, R += 8)
+			{
+			memcpy(B + 8, R, 8);
+			AES_encrypt(B, B, key);
+			A[7] ^= (unsigned char)(t & 0xff);
+			if (t > 0xff)	
+				{
+				A[6] ^= (unsigned char)((t >> 8) & 0xff);
+				A[5] ^= (unsigned char)((t >> 16) & 0xff);
+				A[4] ^= (unsigned char)((t >> 24) & 0xff);
+				}
+			memcpy(R, B + 8, 8);
+			}
+		}
+	memcpy(out, A, 8);
+	return inlen + 8;
+	}
 
 int AES_unwrap_key(AES_KEY *key, const unsigned char *iv,
-    unsigned char *out,
-    const unsigned char *in, unsigned int inlen)
-  {
-  unsigned char *A, B[16], *R;
-  unsigned int i, j, t;
-  inlen -= 8;
-  if (inlen & 0x7)
-    return -1;
-  if (inlen < 8)
-    return -1;
-  A = B;
-  t =  6 * (inlen >> 3);
-  memcpy(A, in, 8);
-  memcpy(out, in + 8, inlen);
-  for (j = 0; j < 6; j++)
-    {
-    R = out + inlen - 8;
-    for (i = 0; i < inlen; i += 8, t--, R -= 8)
-      {
-      A[7] ^= (unsigned char)(t & 0xff);
-      if (t > 0xff) 
-        {
-        A[6] ^= (unsigned char)((t >> 8) & 0xff);
-        A[5] ^= (unsigned char)((t >> 16) & 0xff);
-        A[4] ^= (unsigned char)((t >> 24) & 0xff);
-        }
-      memcpy(B + 8, R, 8);
-      AES_decrypt(B, B, key);
-      memcpy(R, B + 8, 8);
-      }
-    }
-  if (!iv)
-    iv = default_iv;
-  if (memcmp(A, iv, 8))
-    {
-    OPENSSL_cleanse(out, inlen);
-    return 0;
-    }
-  return inlen;
-  }
+		unsigned char *out,
+		const unsigned char *in, unsigned int inlen)
+	{
+	unsigned char *A, B[16], *R;
+	unsigned int i, j, t;
+	inlen -= 8;
+	if (inlen & 0x7)
+		return -1;
+	if (inlen < 8)
+		return -1;
+	A = B;
+	t =  6 * (inlen >> 3);
+	memcpy(A, in, 8);
+	memcpy(out, in + 8, inlen);
+	for (j = 0; j < 6; j++)
+		{
+		R = out + inlen - 8;
+		for (i = 0; i < inlen; i += 8, t--, R -= 8)
+			{
+			A[7] ^= (unsigned char)(t & 0xff);
+			if (t > 0xff)	
+				{
+				A[6] ^= (unsigned char)((t >> 8) & 0xff);
+				A[5] ^= (unsigned char)((t >> 16) & 0xff);
+				A[4] ^= (unsigned char)((t >> 24) & 0xff);
+				}
+			memcpy(B + 8, R, 8);
+			AES_decrypt(B, B, key);
+			memcpy(R, B + 8, 8);
+			}
+		}
+	if (!iv)
+		iv = default_iv;
+	if (memcmp(A, iv, 8))
+		{
+		OPENSSL_cleanse(out, inlen);
+		return 0;
+		}
+	return inlen;
+	}
 
 #ifdef AES_WRAP_TEST
 
 int AES_wrap_unwrap_test(const unsigned char *kek, int keybits,
-       const unsigned char *iv,
-       const unsigned char *eout,
-       const unsigned char *key, int keylen)
-  {
-  unsigned char *otmp = NULL, *ptmp = NULL;
-  int r, ret = 0;
-  AES_KEY wctx;
-  otmp = OPENSSL_malloc(keylen + 8);
-  ptmp = OPENSSL_malloc(keylen);
-  if (!otmp || !ptmp)
-    return 0;
-  if (AES_set_encrypt_key(kek, keybits, &wctx))
-    goto err;
-  r = AES_wrap_key(&wctx, iv, otmp, key, keylen);
-  if (r <= 0)
-    goto err;
+			 const unsigned char *iv,
+			 const unsigned char *eout,
+			 const unsigned char *key, int keylen)
+	{
+	unsigned char *otmp = NULL, *ptmp = NULL;
+	int r, ret = 0;
+	AES_KEY wctx;
+	otmp = OPENSSL_malloc(keylen + 8);
+	ptmp = OPENSSL_malloc(keylen);
+	if (!otmp || !ptmp)
+		return 0;
+	if (AES_set_encrypt_key(kek, keybits, &wctx))
+		goto err;
+	r = AES_wrap_key(&wctx, iv, otmp, key, keylen);
+	if (r <= 0)
+		goto err;
 
-  if (eout && memcmp(eout, otmp, keylen))
-    goto err;
-    
-  if (AES_set_decrypt_key(kek, keybits, &wctx))
-    goto err;
-  r = AES_unwrap_key(&wctx, iv, ptmp, otmp, r);
+	if (eout && memcmp(eout, otmp, keylen))
+		goto err;
+		
+	if (AES_set_decrypt_key(kek, keybits, &wctx))
+		goto err;
+	r = AES_unwrap_key(&wctx, iv, ptmp, otmp, r);
 
-  if (memcmp(key, ptmp, keylen))
-    goto err;
+	if (memcmp(key, ptmp, keylen))
+		goto err;
 
-  ret = 1;
+	ret = 1;
 
-  err:
-  if (otmp)
-    OPENSSL_free(otmp);
-  if (ptmp)
-    OPENSSL_free(ptmp);
+	err:
+	if (otmp)
+		OPENSSL_free(otmp);
+	if (ptmp)
+		OPENSSL_free(ptmp);
 
-  return ret;
+	return ret;
 
-  }
+	}
 
 
 
@@ -239,21 +239,21 @@ static const unsigned char e6[] = {
   0xfb, 0x98, 0x8b, 0x9b, 0x7a, 0x02, 0xdd, 0x21
 };
 
-  AES_KEY wctx, xctx;
-  int ret;
-  ret = AES_wrap_unwrap_test(kek, 128, NULL, e1, key, 16);
-  fprintf(stderr, "Key test result %d\n", ret);
-  ret = AES_wrap_unwrap_test(kek, 192, NULL, e2, key, 16);
-  fprintf(stderr, "Key test result %d\n", ret);
-  ret = AES_wrap_unwrap_test(kek, 256, NULL, e3, key, 16);
-  fprintf(stderr, "Key test result %d\n", ret);
-  ret = AES_wrap_unwrap_test(kek, 192, NULL, e4, key, 24);
-  fprintf(stderr, "Key test result %d\n", ret);
-  ret = AES_wrap_unwrap_test(kek, 256, NULL, e5, key, 24);
-  fprintf(stderr, "Key test result %d\n", ret);
-  ret = AES_wrap_unwrap_test(kek, 256, NULL, e6, key, 32);
-  fprintf(stderr, "Key test result %d\n", ret);
+	AES_KEY wctx, xctx;
+	int ret;
+	ret = AES_wrap_unwrap_test(kek, 128, NULL, e1, key, 16);
+	fprintf(stderr, "Key test result %d\n", ret);
+	ret = AES_wrap_unwrap_test(kek, 192, NULL, e2, key, 16);
+	fprintf(stderr, "Key test result %d\n", ret);
+	ret = AES_wrap_unwrap_test(kek, 256, NULL, e3, key, 16);
+	fprintf(stderr, "Key test result %d\n", ret);
+	ret = AES_wrap_unwrap_test(kek, 192, NULL, e4, key, 24);
+	fprintf(stderr, "Key test result %d\n", ret);
+	ret = AES_wrap_unwrap_test(kek, 256, NULL, e5, key, 24);
+	fprintf(stderr, "Key test result %d\n", ret);
+	ret = AES_wrap_unwrap_test(kek, 256, NULL, e6, key, 32);
+	fprintf(stderr, "Key test result %d\n", ret);
 }
-  
-  
+	
+	
 #endif

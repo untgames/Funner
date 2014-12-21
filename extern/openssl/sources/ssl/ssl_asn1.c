@@ -408,6 +408,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 		if (os.length != 3)
 			{
 			c.error=SSL_R_CIPHER_CODE_WRONG_LENGTH;
+			c.line=__LINE__;
 			goto err;
 			}
 		id=0x02000000L|
@@ -420,6 +421,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 		if (os.length != 2)
 			{
 			c.error=SSL_R_CIPHER_CODE_WRONG_LENGTH;
+			c.line=__LINE__;
 			goto err;
 			}
 		id=0x03000000L|
@@ -429,6 +431,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 	else
 		{
 		c.error=SSL_R_UNKNOWN_SSL_VERSION;
+		c.line=__LINE__;
 		goto err;
 		}
 	
@@ -521,6 +524,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 	    if (os.length > SSL_MAX_SID_CTX_LENGTH)
 		{
 		c.error=SSL_R_BAD_LENGTH;
+		c.line=__LINE__;
 		goto err;
 		}
 	    else
@@ -571,6 +575,19 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 		}
 	else
 		ret->psk_identity_hint=NULL;
+
+	os.length=0;
+	os.data=NULL;
+	M_ASN1_D2I_get_EXP_opt(osp,d2i_ASN1_OCTET_STRING,8);
+	if (os.data)
+		{
+		ret->psk_identity = BUF_strndup((char *)os.data, os.length);
+		OPENSSL_free(os.data);
+		os.data = NULL;
+		os.length = 0;
+		}
+	else
+		ret->psk_identity=NULL;
 #endif /* OPENSSL_NO_PSK */
 
 #ifndef OPENSSL_NO_TLSEXT
@@ -613,7 +630,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
 #ifndef OPENSSL_NO_SRP
 	os.length=0;
 	os.data=NULL;
-	M_ASN1_D2I_get_EXP_opt(osp,d2i_ASN1_OCTET_STRING,11);
+	M_ASN1_D2I_get_EXP_opt(osp,d2i_ASN1_OCTET_STRING,12);
 	if (os.data)
 		{
 		ret->srp_username = BUF_strndup((char *)os.data, os.length);

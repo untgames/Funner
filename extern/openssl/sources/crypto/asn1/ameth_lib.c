@@ -258,7 +258,12 @@ int EVP_PKEY_asn1_add_alias(int to, int from)
 	if (!ameth)
 		return 0;
 	ameth->pkey_base_id = to;
-	return EVP_PKEY_asn1_add0(ameth);
+	if (!EVP_PKEY_asn1_add0(ameth))
+		{
+		EVP_PKEY_asn1_free(ameth);
+		return 0;
+		}
+	return 1;
 	}
 
 int EVP_PKEY_asn1_get0_info(int *ppkey_id, int *ppkey_base_id, int *ppkey_flags,
@@ -293,6 +298,8 @@ EVP_PKEY_ASN1_METHOD* EVP_PKEY_asn1_new(int id, int flags,
 	if (!ameth)
 		return NULL;
 
+	memset(ameth, 0, sizeof(EVP_PKEY_ASN1_METHOD));
+
 	ameth->pkey_id = id;
 	ameth->pkey_base_id = id;
 	ameth->pkey_flags = flags | ASN1_PKEY_DYNAMIC;
@@ -326,6 +333,9 @@ EVP_PKEY_ASN1_METHOD* EVP_PKEY_asn1_new(int id, int flags,
 
 	ameth->old_priv_encode = 0;
 	ameth->old_priv_decode = 0;
+
+	ameth->item_verify = 0;
+	ameth->item_sign = 0;
 
 	ameth->pkey_size = 0;
 	ameth->pkey_bits = 0;
@@ -377,6 +387,9 @@ void EVP_PKEY_asn1_copy(EVP_PKEY_ASN1_METHOD *dst,
 
 	dst->pkey_free = src->pkey_free;
 	dst->pkey_ctrl = src->pkey_ctrl;
+
+	dst->item_sign = src->item_sign;
+	dst->item_verify = src->item_verify;
 
 	}
 
