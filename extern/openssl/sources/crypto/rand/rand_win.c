@@ -113,7 +113,7 @@
 #include <openssl/rand.h>
 #include "rand_lcl.h"
 
-#if !defined (WP8) && (defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32))
+#if defined(OPENSSL_SYS_WINDOWS) || defined(OPENSSL_SYS_WIN32)
 #include <windows.h>
 #ifndef _WIN32_WINNT
 # define _WIN32_WINNT 0x0400
@@ -750,7 +750,7 @@ static void readscreen(void)
   int		y;		/* y-coordinate of screen lines to grab */
   int		n = 16;		/* number of screen lines to grab at a time */
 
-  if (GetVersion() < 0x80000000 && OPENSSL_isservice()>0)
+  if (check_winnt() && OPENSSL_isservice()>0)
     return;
 
   /* Create a screen DC and a memory DC compatible to screen DC */

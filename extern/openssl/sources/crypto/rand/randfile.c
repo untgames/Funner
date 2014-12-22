@@ -57,7 +57,9 @@
  */
 
 /* We need to define this to get macros like S_IFBLK and S_IFCHR */
+#if !defined(OPENSSL_SYS_VXWORKS)
 #define _XOPEN_SOURCE 500
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -77,6 +79,7 @@
 #endif
 #ifndef OPENSSL_NO_POSIX_IO
 # include <sys/stat.h>
+# include <fcntl.h>
 #endif
 
 #ifdef _WIN32
@@ -137,7 +140,7 @@ int RAND_load_file(const char *file, long bytes)
 	in=fopen(file,"rb");
 #endif
 	if (in == NULL) goto err;
-#if defined(S_IFBLK) && defined(S_IFCHR) && !defined(OPNESSL_NO_POSIX_IO)
+#if defined(S_IFBLK) && defined(S_IFCHR) && !defined(OPENSSL_NO_POSIX_IO)
 	if (sb.st_mode & (S_IFBLK | S_IFCHR)) {
 	  /* this file is a device. we don't want read an infinite number
 	   * of bytes from a random device, nor do we want to use buffered

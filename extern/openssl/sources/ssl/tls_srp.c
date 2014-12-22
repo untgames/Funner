@@ -4,7 +4,7 @@
  * for the EdelKey project and contributed to the OpenSSL project 2004.
  */
 /* ====================================================================
- * Copyright (c) 2004 The OpenSSL Project.  All rights reserved.
+ * Copyright (c) 2004-2011 The OpenSSL Project.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -80,7 +80,6 @@ int SSL_CTX_SRP_CTX_free(struct ssl_ctx_st *ctx)
 	ctx->srp_ctx.SRP_cb_arg = NULL;
 	ctx->srp_ctx.SRP_verify_param_callback = NULL;
 	ctx->srp_ctx.SRP_give_srp_client_pwd_callback = NULL;
-	ctx->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback = NULL;
 	ctx->srp_ctx.N = NULL;
 	ctx->srp_ctx.g = NULL;
 	ctx->srp_ctx.s = NULL;
@@ -113,7 +112,6 @@ int SSL_SRP_CTX_free(struct ssl_st *s)
 	s->srp_ctx.SRP_cb_arg = NULL;
 	s->srp_ctx.SRP_verify_param_callback = NULL;
 	s->srp_ctx.SRP_give_srp_client_pwd_callback = NULL;
-	s->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback = NULL;
 	s->srp_ctx.N = NULL;
 	s->srp_ctx.g = NULL;
 	s->srp_ctx.s = NULL;
@@ -142,7 +140,6 @@ int SSL_SRP_CTX_init(struct ssl_st *s)
 	s->srp_ctx.SRP_verify_param_callback = ctx->srp_ctx.SRP_verify_param_callback;
 	/* set SRP client passwd callback */
 	s->srp_ctx.SRP_give_srp_client_pwd_callback = ctx->srp_ctx.SRP_give_srp_client_pwd_callback;
-	s->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback = ctx->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback;
 
 	s->srp_ctx.N = NULL;
 	s->srp_ctx.g = NULL;
@@ -210,7 +207,6 @@ int SSL_CTX_SRP_CTX_init(struct ssl_ctx_st *ctx)
 	ctx->srp_ctx.SRP_verify_param_callback = NULL;
 	/* set SRP client passwd callback */
 	ctx->srp_ctx.SRP_give_srp_client_pwd_callback = NULL;
-	ctx->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback = NULL;
 
 	ctx->srp_ctx.N = NULL;
 	ctx->srp_ctx.g = NULL;
@@ -234,7 +230,7 @@ int SSL_srp_server_param_with_username(SSL *s, int *ad)
 	unsigned char b[SSL_MAX_MASTER_KEY_LENGTH];
 	int al;
 
-	*ad = SSL_AD_UNKNOWN_SRP_USERNAME;
+	*ad = SSL_AD_UNKNOWN_PSK_IDENTITY;
 	if ((s->srp_ctx.TLS_ext_srp_username_callback !=NULL) &&
 		((al = s->srp_ctx.TLS_ext_srp_username_callback(s, ad, s->srp_ctx.SRP_cb_arg))!=SSL_ERROR_NONE))
 			return al;
@@ -246,7 +242,8 @@ int SSL_srp_server_param_with_username(SSL *s, int *ad)
 		(s->srp_ctx.v == NULL))
 		return SSL3_AL_FATAL;
 
-	RAND_bytes(b, sizeof(b));
+	if (RAND_bytes(b, sizeof(b)) <= 0)
+		return SSL3_AL_FATAL;
 	s->srp_ctx.b = BN_bin2bn(b,sizeof(b),NULL);
 	OPENSSL_cleanse(b,sizeof(b));
 
@@ -411,16 +408,46 @@ err:
 	return ret;
 	}
 
+int srp_verify_server_param(SSL *s, int *al)
+	{
+	SRP_CTX *srp = &s->srp_ctx;
+	/* Sanity check parameters: we can quickly check B % N == 0
+	 * by checking B != 0 since B < N
+	 */
+	if (BN_ucmp(srp->g, srp->N) >=0 || BN_ucmp(srp->B, srp->N) >= 0
+		|| BN_is_zero(srp->B))
+		{
+		*al = SSL3_AD_ILLEGAL_PARAMETER;
+		return 0;
+		}
+
+	if (BN_num_bits(srp->N) < srp->strength)
+		{
+		*al = TLS1_AD_INSUFFICIENT_SECURITY;
+		return 0;
+		}
+
+	if (srp->SRP_verify_param_callback)
+		{
+		if (srp->SRP_verify_param_callback(s, srp->SRP_cb_arg) <= 0)
+			{
+			*al = TLS1_AD_INSUFFICIENT_SECURITY;
+			return 0;
+			}
+		}
+	else if(!SRP_check_known_gN_param(srp->g, srp->N))
+		{
+		*al = TLS1_AD_INSUFFICIENT_SECURITY;
+		return 0;
+		}
+
+	return 1;
+	}
+	
+
 int SRP_Calc_A_param(SSL *s)
 	{
 	unsigned char rnd[SSL_MAX_MASTER_KEY_LENGTH];
-
-	if (BN_num_bits(s->srp_ctx.N) < s->srp_ctx.strength)
-		return -1;
-
-	if (s->srp_ctx.SRP_verify_param_callback ==NULL && 
-		!SRP_check_known_gN_param(s->srp_ctx.g,s->srp_ctx.N))
-		return -1 ;
 
 	RAND_bytes(rnd, sizeof(rnd));
 	s->srp_ctx.a = BN_bin2bn(rnd, sizeof(rnd), s->srp_ctx.a);
@@ -429,20 +456,6 @@ int SRP_Calc_A_param(SSL *s)
 	if (!(s->srp_ctx.A = SRP_Calc_A(s->srp_ctx.a,s->srp_ctx.N,s->srp_ctx.g)))
 		return -1;
 
-	/* We can have a callback to verify SRP param!! */
-	if (s->srp_ctx.SRP_verify_param_callback !=NULL) 
-		return s->srp_ctx.SRP_verify_param_callback(s,s->srp_ctx.SRP_cb_arg);
-
-	return 1;
-	}
-
-int SRP_have_to_put_srp_username(SSL *s)
-	{
-	if (s->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback == NULL)
-		return 0;
-	if ((s->srp_ctx.login = s->srp_ctx.SRP_TLS_ext_missing_srp_client_username_callback(s,s->srp_ctx.SRP_cb_arg)) == NULL)
-		return 0;
-	s->srp_ctx.srp_Mask|=SSL_kSRP;
 	return 1;
 	}
 
@@ -517,11 +530,4 @@ int SSL_CTX_set_srp_client_pwd_callback(SSL_CTX *ctx, char *(*cb)(SSL *,void *))
 				      (void (*)(void))cb);
 	}
 
-int SSL_CTX_set_srp_missing_srp_username_callback(SSL_CTX *ctx,
-						  char *(*cb)(SSL *,void *))
-	{
-	return tls1_ctx_callback_ctrl(ctx,
-			    SSL_CTRL_SET_TLS_EXT_SRP_MISSING_CLIENT_USERNAME_CB,
-				      (void (*)(void))cb);
-	}
 #endif

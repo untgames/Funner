@@ -54,12 +54,12 @@
 #include <stdio.h>          /* for FILE */
 #include <stdlib.h>         /* for getenv */
 #include <sys/time.h>       /* for setitimer, etc */
+#include <sys/ucontext.h>   /* for mcontext_t, etc */
 
 #include "gmon.h"
 #include "gmon_out.h"
 #include "prof.h"
 #include "read_smaps.h"
-#include "ucontext.h"       /* for mcontext_t, etc */
 
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, "PROFILING", __VA_ARGS__)
 #define FREQ_HZ 100

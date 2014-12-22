@@ -154,6 +154,7 @@
 #include <stdio.h>
 #include "ssl_locl.h"
 #include "kssl_lcl.h"
+#include "../crypto/constant_time_locl.h"
 #include <openssl/buffer.h>
 #include <openssl/rand.h>
 #include <openssl/objects.h>
@@ -180,24 +181,25 @@ static const SSL_METHOD *ssl3_get_server_method(int ver)
 	}
 
 #ifndef OPENSSL_NO_SRP
-static int SSL_check_srp_ext_ClientHello(SSL *s, int *ad)
+static int ssl_check_srp_ext_ClientHello(SSL *s, int *al)
 	{
 	int ret = SSL_ERROR_NONE;
 
-	*ad = SSL_AD_UNRECOGNIZED_NAME;
+	*al = SSL_AD_UNRECOGNIZED_NAME;
 
 	if ((s->s3->tmp.new_cipher->algorithm_mkey & SSL_kSRP) &&
 	    (s->srp_ctx.TLS_ext_srp_username_callback != NULL))
 		{
 		if(s->srp_ctx.login == NULL)
 			{
-			/* There isn't any srp login extension !!! */
-			ret = SSL3_AL_WARNING;
-			*ad = SSL_AD_MISSING_SRP_USERNAME;
+			/* RFC 5054 says SHOULD reject, 
+			   we do so if There is no srp login name */
+			ret = SSL3_AL_FATAL;
+			*al = SSL_AD_UNKNOWN_PSK_IDENTITY;
 			}
 		else
 			{
-			ret = SSL_srp_server_param_with_username(s,ad);
+			ret = SSL_srp_server_param_with_username(s,al);
 			}
 		}
 	return ret;
@@ -216,10 +218,6 @@ int ssl3_accept(SSL *s)
 	void (*cb)(const SSL *ssl,int type,int val)=NULL;
 	int ret= -1;
 	int new_state,state,skip=0;
-#ifndef OPENSSL_NO_SRP
-	int srp_no_username=0;
-	int extension_error,al;
-#endif
 
 	RAND_add(&Time,sizeof(Time),0);
 	ERR_clear_error();
@@ -239,6 +237,18 @@ int ssl3_accept(SSL *s)
 		SSLerr(SSL_F_SSL3_ACCEPT,SSL_R_NO_CERTIFICATE_SET);
 		return(-1);
 		}
+
+#ifndef OPENSSL_NO_HEARTBEATS
+	/* If we're awaiting a HeartbeatResponse, pretend we
+	 * already got and don't await it anymore, because
+	 * Heartbeats don't make sense during handshakes anyway.
+	 */
+	if (s->tlsext_hb_pending)
+		{
+		s->tlsext_hb_pending = 0;
+		s->tlsext_hb_seq++;
+		}
+#endif
 
 	for (;;)
 		{
@@ -287,6 +297,7 @@ int ssl3_accept(SSL *s)
 				}
 
 			s->init_num=0;
+			s->s3->flags &= ~SSL3_FLAGS_SGC_RESTART_DONE;
 
 			if (s->state != SSL_ST_RENEGOTIATE)
 				{
@@ -340,34 +351,35 @@ int ssl3_accept(SSL *s)
 		case SSL3_ST_SR_CLNT_HELLO_A:
 		case SSL3_ST_SR_CLNT_HELLO_B:
 		case SSL3_ST_SR_CLNT_HELLO_C:
-#ifndef OPENSSL_NO_SRP
-		case SSL3_ST_SR_CLNT_HELLO_SRP_USERNAME:
-#endif
 
 			s->shutdown=0;
-			ret=ssl3_get_client_hello(s);
-			if (ret <= 0) goto end;
+			if (s->rwstate != SSL_X509_LOOKUP)
+			{
+				ret=ssl3_get_client_hello(s);
+				if (ret <= 0) goto end;
+			}
 #ifndef OPENSSL_NO_SRP
-			extension_error = 0;
-			if ((al = SSL_check_srp_ext_ClientHello(s,&extension_error)) != SSL_ERROR_NONE)
-				{
-				ssl3_send_alert(s,al,extension_error);
-				if (extension_error == SSL_AD_MISSING_SRP_USERNAME)
+			{
+			int al;
+			if ((ret = ssl_check_srp_ext_ClientHello(s,&al))  < 0)
 					{
-					if (srp_no_username) goto end;
-					ERR_clear_error();
-					srp_no_username = 1;
-					s->state=SSL3_ST_SR_CLNT_HELLO_SRP_USERNAME;
-					if (cb != NULL) cb(s,SSL_CB_HANDSHAKE_START,1);
-					if ((ret=BIO_flush(s->wbio)) <= 0) goto end;
-					s->init_num=0;
-					break;
+					/* callback indicates firther work to be done */
+					s->rwstate=SSL_X509_LOOKUP;
+					goto end;
 					}
-				ret = -1;
-				SSLerr(SSL_F_SSL3_ACCEPT,SSL_R_CLIENTHELLO_TLSEXT);
-				goto end;
+			if (ret != SSL_ERROR_NONE)
+				{
+				ssl3_send_alert(s,SSL3_AL_FATAL,al);	
+				/* This is not really an error but the only means to
+                                   for a client to detect whether srp is supported. */
+ 				   if (al != TLS1_AD_UNKNOWN_PSK_IDENTITY) 	
+					SSLerr(SSL_F_SSL3_ACCEPT,SSL_R_CLIENTHELLO_TLSEXT);			
+				ret = SSL_TLSEXT_ERR_ALERT_FATAL;			
+				ret= -1;
+				goto end;	
 				}
-#endif
+			}
+#endif		
 			
 			s->renegotiate = 2;
 			s->state=SSL3_ST_SW_SRVR_HELLO_A;
@@ -399,9 +411,8 @@ int ssl3_accept(SSL *s)
 		case SSL3_ST_SW_CERT_B:
 			/* Check if it is anon DH or anon ECDH, */
 			/* normal PSK or KRB5 or SRP */
-			if (!(s->s3->tmp.new_cipher->algorithm_auth & SSL_aNULL)
-				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK)
-				&& !(s->s3->tmp.new_cipher->algorithm_auth & SSL_aKRB5))
+			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aKRB5|SSL_aSRP))
+				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
 				ret=ssl3_send_server_certificate(s);
 				if (ret <= 0) goto end;
@@ -504,7 +515,9 @@ int ssl3_accept(SSL *s)
 				  * (against the specs, but s3_clnt.c accepts this for SSL 3) */
 				 !(s->verify_mode & SSL_VERIFY_FAIL_IF_NO_PEER_CERT)) ||
 				 /* never request cert in Kerberos ciphersuites */
-				(s->s3->tmp.new_cipher->algorithm_auth & SSL_aKRB5)
+				(s->s3->tmp.new_cipher->algorithm_auth & SSL_aKRB5) ||
+				/* don't request certificate for SRP auth */
+				(s->s3->tmp.new_cipher->algorithm_auth & SSL_aSRP)
 				/* With normal PSK Certificates and
 				 * Certificate Requests are omitted */
 				|| (s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
@@ -598,7 +611,14 @@ int ssl3_accept(SSL *s)
 				 * the client uses its key from the certificate
 				 * for key exchange.
 				 */
+#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
 				s->state=SSL3_ST_SR_FINISHED_A;
+#else
+				if (s->s3->next_proto_neg_seen)
+					s->state=SSL3_ST_SR_NEXT_PROTO_A;
+				else
+					s->state=SSL3_ST_SR_FINISHED_A;
+#endif
 				s->init_num = 0;
 				}
 			else if (TLS1_get_version(s) >= TLS1_2_VERSION)
@@ -655,27 +675,43 @@ int ssl3_accept(SSL *s)
 		case SSL3_ST_SR_CERT_VRFY_A:
 		case SSL3_ST_SR_CERT_VRFY_B:
 
+			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			/* we should decide if we expected this one */
 			ret=ssl3_get_cert_verify(s);
 			if (ret <= 0) goto end;
 
+#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
 			s->state=SSL3_ST_SR_FINISHED_A;
+#else
+			if (s->s3->next_proto_neg_seen)
+				s->state=SSL3_ST_SR_NEXT_PROTO_A;
+			else
+				s->state=SSL3_ST_SR_FINISHED_A;
+#endif
 			s->init_num=0;
 			break;
 
+#if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
+		case SSL3_ST_SR_NEXT_PROTO_A:
+		case SSL3_ST_SR_NEXT_PROTO_B:
+			ret=ssl3_get_next_proto(s);
+			if (ret <= 0) goto end;
+			s->init_num = 0;
+			s->state=SSL3_ST_SR_FINISHED_A;
+			break;
+#endif
+
 		case SSL3_ST_SR_FINISHED_A:
 		case SSL3_ST_SR_FINISHED_B:
+			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			ret=ssl3_get_finished(s,SSL3_ST_SR_FINISHED_A,
 				SSL3_ST_SR_FINISHED_B);
 			if (ret <= 0) goto end;
-#ifndef OPENSSL_NO_TLSEXT
-			if (s->tlsext_ticket_expected)
-				s->state=SSL3_ST_SW_SESSION_TICKET_A;
-			else if (s->hit)
-				s->state=SSL_ST_OK;
-#else
 			if (s->hit)
 				s->state=SSL_ST_OK;
+#ifndef OPENSSL_NO_TLSEXT
+			else if (s->tlsext_ticket_expected)
+				s->state=SSL3_ST_SW_SESSION_TICKET_A;
 #endif
 			else
 				s->state=SSL3_ST_SW_CHANGE_A;
@@ -733,7 +769,19 @@ int ssl3_accept(SSL *s)
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_SW_FLUSH;
 			if (s->hit)
+				{
+#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
 				s->s3->tmp.next_state=SSL3_ST_SR_FINISHED_A;
+#else
+				if (s->s3->next_proto_neg_seen)
+					{
+					s->s3->flags |= SSL3_FLAGS_CCS_OK;
+					s->s3->tmp.next_state=SSL3_ST_SR_NEXT_PROTO_A;
+					}
+				else
+					s->s3->tmp.next_state=SSL3_ST_SR_FINISHED_A;
+#endif
+				}
 			else
 				s->s3->tmp.next_state=SSL_ST_OK;
 			s->init_num=0;
@@ -753,9 +801,6 @@ int ssl3_accept(SSL *s)
 
 			if (s->renegotiate == 2) /* skipped if we just sent a HelloRequest */
 				{
-				/* actually not necessarily a 'new' session unless
-				 * SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION is set */
-				
 				s->renegotiate=0;
 				s->new_session=0;
 				
@@ -846,10 +891,15 @@ int ssl3_check_client_hello(SSL *s)
 	s->s3->tmp.reuse_message = 1;
 	if (s->s3->tmp.message_type == SSL3_MT_CLIENT_HELLO)
 		{
+		/* We only allow the client to restart the handshake once per
+		 * negotiation. */
+		if (s->s3->flags & SSL3_FLAGS_SGC_RESTART_DONE)
+			{
+			SSLerr(SSL_F_SSL3_CHECK_CLIENT_HELLO, SSL_R_MULTIPLE_SGC_RESTARTS);
+			return -1;
+			}
 		/* Throw away what we have done so far in the current handshake,
-		 * which will now be aborted. (A full SSL_clear would be too much.)
-		 * I hope that tmp.dh is the only thing that may need to be cleared
-		 * when a handshake is not completed ... */
+		 * which will now be aborted. (A full SSL_clear would be too much.) */
 #ifndef OPENSSL_NO_DH
 		if (s->s3->tmp.dh != NULL)
 			{
@@ -857,6 +907,14 @@ int ssl3_check_client_hello(SSL *s)
 			s->s3->tmp.dh = NULL;
 			}
 #endif
+#ifndef OPENSSL_NO_ECDH
+		if (s->s3->tmp.ecdh != NULL)
+			{
+			EC_KEY_free(s->s3->tmp.ecdh);
+			s->s3->tmp.ecdh = NULL;
+			}
+#endif
+		s->s3->flags |= SSL3_FLAGS_SGC_RESTART_DONE;
 		return 2;
 		}
 	return 1;
@@ -882,9 +940,6 @@ int ssl3_get_client_hello(SSL *s)
 	 * TLSv1.
 	 */
 	if (s->state == SSL3_ST_SR_CLNT_HELLO_A
-#ifndef OPENSSL_NO_SRP
-		|| (s->state == SSL3_ST_SR_CLNT_HELLO_SRP_USERNAME)
-#endif
 		)
 		{
 		s->state=SSL3_ST_SR_CLNT_HELLO_B;
@@ -910,7 +965,8 @@ int ssl3_get_client_hello(SSL *s)
 	    (s->version != DTLS1_VERSION && s->client_version < s->version))
 		{
 		SSLerr(SSL_F_SSL3_GET_CLIENT_HELLO, SSL_R_WRONG_VERSION_NUMBER);
-		if ((s->client_version>>8) == SSL3_VERSION_MAJOR)
+		if ((s->client_version>>8) == SSL3_VERSION_MAJOR && 
+			!s->enc_write_ctx && !s->write_hash)
 			{
 			/* similar to ssl3_get_record, send alert using remote version number */
 			s->version = s->client_version;
@@ -942,13 +998,16 @@ int ssl3_get_client_hello(SSL *s)
 	j= *(p++);
 
 	s->hit=0;
-	/* Versions before 0.9.7 always allow session reuse during renegotiation
-	 * (i.e. when s->new_session is true), option
-	 * SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION is new with 0.9.7.
-	 * Maybe this optional behaviour should always have been the default,
-	 * but we cannot safely change the default behaviour (or new applications
-	 * might be written that become totally unsecure when compiled with
-	 * an earlier library version)
+	/* Versions before 0.9.7 always allow clients to resume sessions in renegotiation.
+	 * 0.9.7 and later allow this by default, but optionally ignore resumption requests
+	 * with flag SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION (it's a new flag rather
+	 * than a change to default behavior so that applications relying on this for security
+	 * won't even compile against older library versions).
+	 *
+	 * 1.0.1 and later also have a function SSL_renegotiate_abbreviated() to request
+	 * renegotiation but not a new session (s->new_session remains unset): for servers,
+	 * this essentially just means that the SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION
+	 * setting will be ignored.
 	 */
 	if ((s->new_session && (s->options & SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION)))
 		{
@@ -1132,7 +1191,7 @@ int ssl3_get_client_hello(SSL *s)
 			goto f_err;
 			}
 		}
-		if (ssl_check_clienthello_tlsext(s) <= 0) {
+		if (ssl_check_clienthello_tlsext_early(s) <= 0) {
 			SSLerr(SSL_F_SSL3_GET_CLIENT_HELLO,SSL_R_CLIENTHELLO_TLSEXT);
 			goto err;
 		}
@@ -1142,12 +1201,9 @@ int ssl3_get_client_hello(SSL *s)
 	 * server_random before calling tls_session_secret_cb in order to allow
 	 * SessionTicket processing to use it in key derivation. */
 	{
-		unsigned long Time;
 		unsigned char *pos;
-		Time=(unsigned long)time(NULL);			/* Time */
 		pos=s->s3->server_random;
-		l2n(Time,pos);
-		if (RAND_pseudo_bytes(pos,SSL3_RANDOM_SIZE-4) <= 0)
+		if (ssl_fill_hello_random(s, 1, pos, SSL3_RANDOM_SIZE) <= 0)
 			{
 			al=SSL_AD_INTERNAL_ERROR;
 			goto f_err;
@@ -1340,7 +1396,10 @@ int ssl3_get_client_hello(SSL *s)
 	if (TLS1_get_version(s) < TLS1_2_VERSION || !(s->verify_mode & SSL_VERIFY_PEER))
 		{
 		if (!ssl3_digest_cached_records(s))
+			{
+			al = SSL_AD_INTERNAL_ERROR;
 			goto f_err;
+			}
 		}
 	
 	/* we now have the following setup. 
@@ -1353,6 +1412,16 @@ int ssl3_get_client_hello(SSL *s)
 	 * s->hit		- session reuse flag
 	 * s->tmp.new_cipher	- the new cipher to use.
 	 */
+
+	/* Handles TLS extensions that we couldn't check earlier */
+	if (s->version >= SSL3_VERSION)
+		{
+		if (ssl_check_clienthello_tlsext_late(s) <= 0)
+			{
+			SSLerr(SSL_F_SSL3_GET_CLIENT_HELLO, SSL_R_CLIENTHELLO_TLSEXT);
+			goto err;
+			}
+		}
 
 	if (ret < 0) ret=1;
 	if (0)
@@ -1371,19 +1440,13 @@ int ssl3_send_server_hello(SSL *s)
 	unsigned char *p,*d;
 	int i,sl;
 	unsigned long l;
-#ifdef OPENSSL_NO_TLSEXT
-	unsigned long Time;
-#endif
 
 	if (s->state == SSL3_ST_SW_SRVR_HELLO_A)
 		{
 		buf=(unsigned char *)s->init_buf->data;
 #ifdef OPENSSL_NO_TLSEXT
 		p=s->s3->server_random;
-		/* Generate server_random if it was not needed previously */
-		Time=(unsigned long)time(NULL);			/* Time */
-		l2n(Time,p);
-		if (RAND_pseudo_bytes(p,SSL3_RANDOM_SIZE-4) <= 0)
+		if (ssl_fill_hello_random(s, 1, p, SSL3_RANDOM_SIZE) <= 0)
 			return -1;
 #endif
 		/* Do the message type and length last */
@@ -1396,20 +1459,20 @@ int ssl3_send_server_hello(SSL *s)
 		memcpy(p,s->s3->server_random,SSL3_RANDOM_SIZE);
 		p+=SSL3_RANDOM_SIZE;
 
-		/* now in theory we have 3 options to sending back the
-		 * session id.  If it is a re-use, we send back the
-		 * old session-id, if it is a new session, we send
-		 * back the new session-id or we send back a 0 length
-		 * session-id if we want it to be single use.
-		 * Currently I will not implement the '0' length session-id
-		 * 12-Jan-98 - I'll now support the '0' length stuff.
-		 *
-		 * We also have an additional case where stateless session
-		 * resumption is successful: we always send back the old
-		 * session id. In this case s->hit is non zero: this can
-		 * only happen if stateless session resumption is succesful
-		 * if session caching is disabled so existing functionality
-		 * is unaffected.
+		/* There are several cases for the session ID to send
+		 * back in the server hello:
+		 * - For session reuse from the session cache,
+		 *   we send back the old session ID.
+		 * - If stateless session reuse (using a session ticket)
+		 *   is successful, we send back the client's "session ID"
+		 *   (which doesn't actually identify the session).
+		 * - If it is a new session, we send back the new
+		 *   session ID.
+		 * - However, if we want the new session to be single-use,
+		 *   we send back a 0-length session ID.
+		 * s->hit is non-zero in either case of session reuse,
+		 * so the following won't overwrite an ID that we're supposed
+		 * to send back.
 		 */
 		if (!(s->ctx->session_cache_mode & SSL_SESS_CACHE_SERVER)
 			&& !s->hit)
@@ -1578,7 +1641,6 @@ int ssl3_send_server_key_exchange(SSL *s)
 
 			if (s->s3->tmp.dh != NULL)
 				{
-				DH_free(dh);
 				SSLerr(SSL_F_SSL3_SEND_SERVER_KEY_EXCHANGE, ERR_R_INTERNAL_ERROR);
 				goto err;
 				}
@@ -1639,7 +1701,6 @@ int ssl3_send_server_key_exchange(SSL *s)
 
 			if (s->s3->tmp.ecdh != NULL)
 				{
-				EC_KEY_free(s->s3->tmp.ecdh); 
 				SSLerr(SSL_F_SSL3_SEND_SERVER_KEY_EXCHANGE, ERR_R_INTERNAL_ERROR);
 				goto err;
 				}
@@ -1650,12 +1711,11 @@ int ssl3_send_server_key_exchange(SSL *s)
 				SSLerr(SSL_F_SSL3_SEND_SERVER_KEY_EXCHANGE,ERR_R_ECDH_LIB);
 				goto err;
 				}
-			if (!EC_KEY_up_ref(ecdhp))
+			if ((ecdh = EC_KEY_dup(ecdhp)) == NULL)
 				{
 				SSLerr(SSL_F_SSL3_SEND_SERVER_KEY_EXCHANGE,ERR_R_ECDH_LIB);
 				goto err;
 				}
-			ecdh = ecdhp;
 
 			s->s3->tmp.ecdh=ecdh;
 			if ((EC_KEY_get0_public_key(ecdh) == NULL) ||
@@ -1777,7 +1837,7 @@ int ssl3_send_server_key_exchange(SSL *s)
 			SSLerr(SSL_F_SSL3_SEND_SERVER_KEY_EXCHANGE,SSL_R_UNKNOWN_KEY_EXCHANGE_TYPE);
 			goto f_err;
 			}
-		for (i=0; r[i] != NULL && i<4; i++)
+		for (i=0; i < 4 && r[i] != NULL; i++)
 			{
 			nr[i]=BN_num_bytes(r[i]);
 #ifndef OPENSSL_NO_SRP
@@ -1788,7 +1848,7 @@ int ssl3_send_server_key_exchange(SSL *s)
 			n+=2+nr[i];
 			}
 
-		if (!(s->s3->tmp.new_cipher->algorithm_auth & SSL_aNULL)
+		if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aSRP))
 			&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 			{
 			if ((pkey=ssl_get_sign_pkey(s,s->s3->tmp.new_cipher,&md))
@@ -1813,7 +1873,7 @@ int ssl3_send_server_key_exchange(SSL *s)
 		d=(unsigned char *)s->init_buf->data;
 		p= &(d[4]);
 
-		for (i=0; r[i] != NULL && i<4; i++)
+		for (i=0; i < 4 && r[i] != NULL; i++)
 			{
 #ifndef OPENSSL_NO_SRP
 			if ((i == 2) && (type & SSL_kSRP))
@@ -2044,6 +2104,11 @@ int ssl3_send_certificate_request(SSL *s)
 		s->init_num=n+4;
 		s->init_off=0;
 #ifdef NETSCAPE_HANG_BUG
+		if (!BUF_MEM_grow_clean(buf, s->init_num + 4))
+			{
+			SSLerr(SSL_F_SSL3_SEND_CERTIFICATE_REQUEST,ERR_R_BUF_LIB);
+			goto err;
+			}
 		p=(unsigned char *)s->init_buf->data + s->init_num;
 
 		/* do the header */
@@ -2103,6 +2168,10 @@ int ssl3_get_client_key_exchange(SSL *s)
 #ifndef OPENSSL_NO_RSA
 	if (alg_k & SSL_kRSA)
 		{
+		unsigned char rand_premaster_secret[SSL_MAX_MASTER_KEY_LENGTH];
+		int decrypt_len;
+		unsigned char decrypt_good, version_good;
+
 		/* FIX THIS UP EAY EAY EAY EAY */
 		if (s->s3->tmp.use_rsa_tmp)
 			{
@@ -2150,54 +2219,61 @@ int ssl3_get_client_key_exchange(SSL *s)
 				n=i;
 			}
 
-		i=RSA_private_decrypt((int)n,p,p,rsa,RSA_PKCS1_PADDING);
+		/* We must not leak whether a decryption failure occurs because
+		 * of Bleichenbacher's attack on PKCS #1 v1.5 RSA padding (see
+		 * RFC 2246, section 7.4.7.1). The code follows that advice of
+		 * the TLS RFC and generates a random premaster secret for the
+		 * case that the decrypt fails. See
+		 * https://tools.ietf.org/html/rfc5246#section-7.4.7.1 */
 
-		al = -1;
-		
-		if (i != SSL_MAX_MASTER_KEY_LENGTH)
+		/* should be RAND_bytes, but we cannot work around a failure. */
+		if (RAND_pseudo_bytes(rand_premaster_secret,
+				      sizeof(rand_premaster_secret)) <= 0)
+			goto err;
+		decrypt_len = RSA_private_decrypt((int)n,p,p,rsa,RSA_PKCS1_PADDING);
+		ERR_clear_error();
+
+		/* decrypt_len should be SSL_MAX_MASTER_KEY_LENGTH.
+		 * decrypt_good will be 0xff if so and zero otherwise. */
+		decrypt_good = constant_time_eq_int_8(decrypt_len, SSL_MAX_MASTER_KEY_LENGTH);
+
+		/* If the version in the decrypted pre-master secret is correct
+		 * then version_good will be 0xff, otherwise it'll be zero.
+		 * The Klima-Pokorny-Rosa extension of Bleichenbacher's attack
+		 * (http://eprint.iacr.org/2003/052/) exploits the version
+		 * number check as a "bad version oracle". Thus version checks
+		 * are done in constant time and are treated like any other
+		 * decryption error. */
+		version_good = constant_time_eq_8(p[0], (unsigned)(s->client_version>>8));
+		version_good &= constant_time_eq_8(p[1], (unsigned)(s->client_version&0xff));
+
+		/* The premaster secret must contain the same version number as
+		 * the ClientHello to detect version rollback attacks
+		 * (strangely, the protocol does not offer such protection for
+		 * DH ciphersuites). However, buggy clients exist that send the
+		 * negotiated protocol version instead if the server does not
+		 * support the requested protocol version. If
+		 * SSL_OP_TLS_ROLLBACK_BUG is set, tolerate such clients. */
+		if (s->options & SSL_OP_TLS_ROLLBACK_BUG)
 			{
-			al=SSL_AD_DECODE_ERROR;
-			/* SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,SSL_R_BAD_RSA_DECRYPT); */
+			unsigned char workaround_good;
+			workaround_good = constant_time_eq_8(p[0], (unsigned)(s->version>>8));
+			workaround_good &= constant_time_eq_8(p[1], (unsigned)(s->version&0xff));
+			version_good |= workaround_good;
 			}
 
-		if ((al == -1) && !((p[0] == (s->client_version>>8)) && (p[1] == (s->client_version & 0xff))))
-			{
-			/* The premaster secret must contain the same version number as the
-			 * ClientHello to detect version rollback attacks (strangely, the
-			 * protocol does not offer such protection for DH ciphersuites).
-			 * However, buggy clients exist that send the negotiated protocol
-			 * version instead if the server does not support the requested
-			 * protocol version.
-			 * If SSL_OP_TLS_ROLLBACK_BUG is set, tolerate such clients. */
-			if (!((s->options & SSL_OP_TLS_ROLLBACK_BUG) &&
-				(p[0] == (s->version>>8)) && (p[1] == (s->version & 0xff))))
-				{
-				al=SSL_AD_DECODE_ERROR;
-				/* SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,SSL_R_BAD_PROTOCOL_VERSION_NUMBER); */
+		/* Both decryption and version must be good for decrypt_good
+		 * to remain non-zero (0xff). */
+		decrypt_good &= version_good;
 
-				/* The Klima-Pokorny-Rosa extension of Bleichenbacher's attack
-				 * (http://eprint.iacr.org/2003/052/) exploits the version
-				 * number check as a "bad version oracle" -- an alert would
-				 * reveal that the plaintext corresponding to some ciphertext
-				 * made up by the adversary is properly formatted except
-				 * that the version number is wrong.  To avoid such attacks,
-				 * we should treat this just like any other decryption error. */
-				}
+		/* Now copy rand_premaster_secret over p using
+		 * decrypt_good_mask. */
+		for (i = 0; i < (int) sizeof(rand_premaster_secret); i++)
+			{
+			p[i] = constant_time_select_8(decrypt_good, p[i],
+						      rand_premaster_secret[i]);
 			}
 
-		if (al != -1)
-			{
-			/* Some decryption failure -- use random value instead as countermeasure
-			 * against Bleichenbacher's attack on PKCS #1 v1.5 RSA padding
-			 * (see RFC 2246, section 7.4.7.1). */
-			ERR_clear_error();
-			i = SSL_MAX_MASTER_KEY_LENGTH;
-			p[0] = s->client_version >> 8;
-			p[1] = s->client_version & 0xff;
-			if (RAND_pseudo_bytes(p+2, i-2) <= 0) /* should be RAND_bytes, but we cannot work around a failure */
-				goto err;
-			}
-	
 		s->session->master_key_length=
 			s->method->ssl3_enc->generate_master_secret(s,
 				s->session->master_key,
@@ -2254,6 +2330,7 @@ int ssl3_get_client_key_exchange(SSL *s)
 		if (i <= 0)
 			{
 			SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,ERR_R_DH_LIB);
+			BN_clear_free(pub);
 			goto err;
 			}
 
@@ -2567,6 +2644,12 @@ int ssl3_get_client_key_exchange(SSL *s)
 			/* Get encoded point length */
 			i = *p; 
 			p += 1;
+			if (n != 1 + i)
+				{
+				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
+				    ERR_R_EC_LIB);
+				goto err;
+				}
 			if (EC_POINT_oct2point(group, 
 			    clnt_ecpoint, p, i, bn_ctx) == 0)
 				{
@@ -2725,6 +2808,13 @@ int ssl3_get_client_key_exchange(SSL *s)
 				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,ERR_R_BN_LIB);
 				goto err;
 				}
+			if (BN_ucmp(s->srp_ctx.A, s->srp_ctx.N) >= 0
+				|| BN_is_zero(s->srp_ctx.A))
+				{
+				al=SSL_AD_ILLEGAL_PARAMETER;
+				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,SSL_R_BAD_SRP_PARAMETERS);
+				goto f_err;
+				}
 			if (s->session->srp_username != NULL)
 				OPENSSL_free(s->session->srp_username);
 			s->session->srp_username = BUF_strdup(s->srp_ctx.login);
@@ -2753,6 +2843,8 @@ int ssl3_get_client_key_exchange(SSL *s)
 			unsigned char premaster_secret[32], *start;
 			size_t outlen=32, inlen;
 			unsigned long alg_a;
+			int Ttag, Tclass;
+			long Tlen;
 
 			/* Get our certificate private key*/
 			alg_a = s->s3->tmp.new_cipher->algorithm_auth;
@@ -2774,26 +2866,15 @@ int ssl3_get_client_key_exchange(SSL *s)
 					ERR_clear_error();
 				}
 			/* Decrypt session key */
-			if ((*p!=( V_ASN1_SEQUENCE| V_ASN1_CONSTRUCTED))) 
+			if (ASN1_get_object((const unsigned char **)&p, &Tlen, &Ttag, &Tclass, n) != V_ASN1_CONSTRUCTED || 
+				Ttag != V_ASN1_SEQUENCE ||
+			 	Tclass != V_ASN1_UNIVERSAL) 
 				{
 				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,SSL_R_DECRYPTION_FAILED);
 				goto gerr;
 				}
-			if (p[1] == 0x81)
-				{
-				start = p+3;
-				inlen = p[2];
-				}
-			else if (p[1] < 0x80)
-				{
-				start = p+2;
-				inlen = p[1];
-				}
-			else
-				{
-				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,SSL_R_DECRYPTION_FAILED);
-				goto gerr;
-				}
+			start = p;
+			inlen = Tlen;
 			if (EVP_PKEY_decrypt(pkey_ctx,premaster_secret,&outlen,start,inlen) <=0) 
 
 				{
@@ -2857,7 +2938,7 @@ int ssl3_get_cert_verify(SSL *s)
 		SSL3_ST_SR_CERT_VRFY_A,
 		SSL3_ST_SR_CERT_VRFY_B,
 		-1,
-		514, /* 514? */
+		SSL3_RT_MAX_PLAIN_LENGTH,
 		&ok);
 
 	if (!ok) return((int)n);
@@ -2877,7 +2958,7 @@ int ssl3_get_cert_verify(SSL *s)
 	if (s->s3->tmp.message_type != SSL3_MT_CERTIFICATE_VERIFY)
 		{
 		s->s3->tmp.reuse_message=1;
-		if ((peer != NULL) && (type | EVP_PKT_SIGN))
+		if ((peer != NULL) && (type & EVP_PKT_SIGN))
 			{
 			al=SSL_AD_UNEXPECTED_MESSAGE;
 			SSLerr(SSL_F_SSL3_GET_CERT_VERIFY,SSL_R_MISSING_VERIFY_MESSAGE);
@@ -3289,13 +3370,17 @@ int ssl3_send_server_certificate(SSL *s)
 	/* SSL3_ST_SW_CERT_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 	}
+
 #ifndef OPENSSL_NO_TLSEXT
+/* send a new session ticket (not necessarily for a new session) */
 int ssl3_send_newsession_ticket(SSL *s)
 	{
 	if (s->state == SSL3_ST_SW_SESSION_TICKET_A)
 		{
 		unsigned char *p, *senc, *macstart;
-		int len, slen;
+		const unsigned char *const_p;
+		int len, slen_full, slen;
+		SSL_SESSION *sess;
 		unsigned int hlen;
 		EVP_CIPHER_CTX ctx;
 		HMAC_CTX hctx;
@@ -3304,12 +3389,38 @@ int ssl3_send_newsession_ticket(SSL *s)
 		unsigned char key_name[16];
 
 		/* get session encoding length */
-		slen = i2d_SSL_SESSION(s->session, NULL);
+		slen_full = i2d_SSL_SESSION(s->session, NULL);
 		/* Some length values are 16 bits, so forget it if session is
  		 * too long
  		 */
-		if (slen > 0xFF00)
+		if (slen_full > 0xFF00)
 			return -1;
+		senc = OPENSSL_malloc(slen_full);
+		if (!senc)
+			return -1;
+		p = senc;
+		i2d_SSL_SESSION(s->session, &p);
+
+		/* create a fresh copy (not shared with other threads) to clean up */
+		const_p = senc;
+		sess = d2i_SSL_SESSION(NULL, &const_p, slen_full);
+		if (sess == NULL)
+			{
+			OPENSSL_free(senc);
+			return -1;
+			}
+		sess->session_id_length = 0; /* ID is irrelevant for the ticket */
+
+		slen = i2d_SSL_SESSION(sess, NULL);
+		if (slen > slen_full) /* shouldn't ever happen */
+			{
+			OPENSSL_free(senc);
+			return -1;
+			}
+		p = senc;
+		i2d_SSL_SESSION(sess, &p);
+		SSL_SESSION_free(sess);
+
 		/* Grow buffer if need be: the length calculation is as
  		 * follows 1 (size of message name) + 3 (message length
  		 * bytes) + 4 (ticket lifetime hint) + 2 (ticket length) +
@@ -3321,11 +3432,6 @@ int ssl3_send_newsession_ticket(SSL *s)
 			26 + EVP_MAX_IV_LENGTH + EVP_MAX_BLOCK_LENGTH +
 			EVP_MAX_MD_SIZE + slen))
 			return -1;
-		senc = OPENSSL_malloc(slen);
-		if (!senc)
-			return -1;
-		p = senc;
-		i2d_SSL_SESSION(s->session, &p);
 
 		p=(unsigned char *)s->init_buf->data;
 		/* do the header */
@@ -3356,7 +3462,13 @@ int ssl3_send_newsession_ticket(SSL *s)
 					tlsext_tick_md(), NULL);
 			memcpy(key_name, tctx->tlsext_tick_key_name, 16);
 			}
-		l2n(s->session->tlsext_tick_lifetime_hint, p);
+
+		/* Ticket lifetime hint (advisory only):
+		 * We leave this unspecified for resumed session (for simplicity),
+		 * and guess that tickets for new sessions will live as long
+		 * as their sessions. */
+		l2n(s->hit ? 0 : s->session->timeout, p);
+
 		/* Skip ticket length for now */
 		p += 2;
 		/* Output key name */
@@ -3431,4 +3543,72 @@ int ssl3_send_cert_status(SSL *s)
 	/* SSL3_ST_SW_CERT_STATUS_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 	}
+
+# ifndef OPENSSL_NO_NEXTPROTONEG
+/* ssl3_get_next_proto reads a Next Protocol Negotiation handshake message. It
+ * sets the next_proto member in s if found */
+int ssl3_get_next_proto(SSL *s)
+	{
+	int ok;
+	int proto_len, padding_len;
+	long n;
+	const unsigned char *p;
+
+	/* Clients cannot send a NextProtocol message if we didn't see the
+	 * extension in their ClientHello */
+	if (!s->s3->next_proto_neg_seen)
+		{
+		SSLerr(SSL_F_SSL3_GET_NEXT_PROTO,SSL_R_GOT_NEXT_PROTO_WITHOUT_EXTENSION);
+		return -1;
+		}
+
+	n=s->method->ssl_get_message(s,
+		SSL3_ST_SR_NEXT_PROTO_A,
+		SSL3_ST_SR_NEXT_PROTO_B,
+		SSL3_MT_NEXT_PROTO,
+		514,  /* See the payload format below */
+		&ok);
+
+	if (!ok)
+		return((int)n);
+
+	/* s->state doesn't reflect whether ChangeCipherSpec has been received
+	 * in this handshake, but s->s3->change_cipher_spec does (will be reset
+	 * by ssl3_get_finished). */
+	if (!s->s3->change_cipher_spec)
+		{
+		SSLerr(SSL_F_SSL3_GET_NEXT_PROTO,SSL_R_GOT_NEXT_PROTO_BEFORE_A_CCS);
+		return -1;
+		}
+
+	if (n < 2)
+		return 0;  /* The body must be > 1 bytes long */
+
+	p=(unsigned char *)s->init_msg;
+
+	/* The payload looks like:
+	 *   uint8 proto_len;
+	 *   uint8 proto[proto_len];
+	 *   uint8 padding_len;
+	 *   uint8 padding[padding_len];
+	 */
+	proto_len = p[0];
+	if (proto_len + 2 > s->init_num)
+		return 0;
+	padding_len = p[proto_len + 1];
+	if (proto_len + padding_len + 2 != s->init_num)
+		return 0;
+
+	s->next_proto_negotiated = OPENSSL_malloc(proto_len);
+	if (!s->next_proto_negotiated)
+		{
+		SSLerr(SSL_F_SSL3_GET_NEXT_PROTO,ERR_R_MALLOC_FAILURE);
+		return 0;
+		}
+	memcpy(s->next_proto_negotiated, p + 1, proto_len);
+	s->next_proto_negotiated_len = proto_len;
+
+	return 1;
+	}
+# endif
 #endif

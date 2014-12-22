@@ -209,6 +209,9 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
     math::vec4f normalized_position = normalized_position_tm * source_position, normalized_direction (0.0f, 0.0f, 2.0f, 0.0f);
 
     normalized_position /= normalized_position.w;
+
+    if (fabs (normalized_position.x) > 1.0f || fabs (normalized_position.y) > 1.0f)
+      return;
     
     math::vec4f world_direction = inv_view_proj_tm * normalized_direction;
     
