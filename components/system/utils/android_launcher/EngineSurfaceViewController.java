@@ -101,6 +101,11 @@ public class EngineSurfaceViewController extends EngineViewController
       
       controller.onSurfaceDestroyedCallback ();
     }    
+    
+    public Surface getSurface ()
+    {
+      return getHolder ().getSurface ();
+    }
   }    
  
   public EngineSurfaceViewController (Context context, long window_ref)
