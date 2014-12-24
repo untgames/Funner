@@ -184,6 +184,11 @@ public class EngineActivity extends Activity
         System.load (programName);        
 
       setupHardwareConfiguration ();
+
+	  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //on Android 5 application crashes when accessing webkit after native thread is started
+	  {
+        android.webkit.WebView dummyWebView = new android.webkit.WebView (this);
+	  }
       
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
         System.exit (0);
@@ -496,7 +501,7 @@ public class EngineActivity extends Activity
     // app, restore saved state, and click logout before running a UI
     // dialog in a WebView -- in which case the app crashes
     @SuppressWarnings("unused")
-    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);    
+    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
   }
   
   public void setAcceptCookie (boolean accept)
@@ -516,9 +521,9 @@ public class EngineActivity extends Activity
   public void deleteAllCookies ()
   {
     initCookieManager ();
-    
+	    	    
     CookieManager manager = CookieManager.getInstance ();
-    
+	    	    
     synchronized (manager) {
       manager.removeAllCookie ();
     }
