@@ -88,7 +88,8 @@ class TestStreamPlayer: public IStreamPlayer
         {
           position = Duration ();
           
-          Stop ();
+          printf ("TestStreamPlayer::Stop(%s)\n", stream.c_str ());
+          instance = 0;
 
           handler (this, StreamEvent_OnAutoStop);
         }
@@ -133,7 +134,7 @@ void media_player_event_handler (MediaPlayer& player, MediaPlayerEvent event)
       dump ("", player.Playlist ());
       break;
     case MediaPlayerEvent_OnChangeTrack:
-      printf ("media player '%s' change track to %u\n", player.Name (), player.Track ());
+      printf ("media player '%s' change track to %d\n", player.Name (), player.Track ());
       break;
     case MediaPlayerEvent_OnChangePlayback:
     {

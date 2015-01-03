@@ -10,7 +10,9 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
+#include <common/log.h>
 #include <common/singleton.h>
 #include <common/string.h>
 

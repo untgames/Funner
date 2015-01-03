@@ -210,4 +210,4 @@ before exit
 TestStreamPlayer::Stop(source2)
 media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.00
 media player 'player' change play list={}
-media player 'player' change track to 0
+media player 'player' change track to -1
