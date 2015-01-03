@@ -7,6 +7,8 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
+#include <common/action_queue.h>
+
 #include <media/players.h>
 
 using namespace media::players;

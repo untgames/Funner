@@ -179,10 +179,27 @@ void media_player_event_handler (MediaPlayer& player, MediaPlayerEvent event)
   }
 }
 
+void process_action_queue ()
+{
+  for (;common::ActionQueue::ActionsCount (common::ActionThread_Main);)
+  {
+    common::Action action = common::ActionQueue::PopAction (common::ActionThread_Main);
+
+    if (action.IsEmpty ())
+      continue;
+
+    action.Perform ();
+  }
+}
+
 void simulate (MediaPlayer& player, float time = SIMULATE_MAX)
 {  
+  process_action_queue ();
+
   player.Play ();
        
+  process_action_queue ();
+
   while (player.State () != MediaPlayerState_Stopped && time > 0)
   {
     printf ("  track #%u stream '%s': %.2f of %.2f\n", player.Track (), player.Source (), player.Position (), player.Duration ());  
@@ -190,9 +207,13 @@ void simulate (MediaPlayer& player, float time = SIMULATE_MAX)
     TestStreamPlayer::Instance ().Simulate (SIMULATE_DT);            
     
     time -= SIMULATE_DT;    
+
+    process_action_queue ();
   }
-  
+
   player.Stop ();
+
+  process_action_queue ();
 }
 
 int main ()
@@ -212,7 +233,9 @@ int main ()
 
     player.SetName ("player");
     player.SetTarget ("test");
-    
+
+    process_action_queue ();
+
     printf ("Open play list:\n");    
     
     Playlist list;
@@ -222,6 +245,8 @@ int main ()
     
     player.Open (list);
     
+    process_action_queue ();
+
     printf ("Tracks count: %u\n", player.TracksCount ());
     
     printf ("Playing...\n");
@@ -236,6 +261,8 @@ int main ()
     
     player.NextTrack ();
 
+    process_action_queue ();
+
     player.SetRepeatMode (MediaPlayerRepeatMode_Last);
     
     simulate (player, 4.0f);
@@ -244,6 +271,8 @@ int main ()
     
     player.PrevTrack ();
     
+    process_action_queue ();
+
     player.SetRepeatMode (MediaPlayerRepeatMode_All);
     
     simulate (player, 8.0f);
@@ -251,10 +280,14 @@ int main ()
     printf ("Change mute\n");
     
     player.SetMute (true);
+
+    process_action_queue ();
     
     printf ("volume=%.2f mute=%s\n", player.Volume (), player.IsMuted () ? "true" : "false");
     
     player.SetMute (false);
+
+    process_action_queue ();
     
     printf ("volume=%.2f mute=%s\n", player.Volume (), player.IsMuted () ? "true" : "false");
     
@@ -262,10 +295,17 @@ int main ()
     
     player.NextTrack ();
     
+    process_action_queue ();
+
     player.Play ();
     
+    process_action_queue ();
+
     for (int i=0; i<5; i++)
+    {
       player.SetVolume (1.0f / 5 * i);
+      process_action_queue ();
+    }
 
     printf ("before exit\n");
   }
@@ -273,6 +313,8 @@ int main ()
   {
     printf ("exception: %s\n", e.what ());
   }
+
+  process_action_queue ();
 
   return 0;
 }

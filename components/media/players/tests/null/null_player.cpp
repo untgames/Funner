@@ -3,6 +3,8 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
+#include <common/action_queue.h>
+
 #include <media/players.h>
 
 using namespace media::players;
@@ -66,6 +68,19 @@ void media_player_event_handler (MediaPlayer& player, MediaPlayerEvent event)
   }
 }
 
+void process_action_queue ()
+{
+  for (;common::ActionQueue::ActionsCount (common::ActionThread_Main);)
+  {
+    common::Action action = common::ActionQueue::PopAction (common::ActionThread_Main);
+
+    if (action.IsEmpty ())
+      continue;
+
+    action.Perform ();
+  }
+}
+
 int main ()
 {
   printf ("Results of null_player_test:\n");
@@ -81,9 +96,15 @@ int main ()
 
     player.SetName ("null player");
     
+    process_action_queue ();
+
     printf ("Playing...\n");
     
+    process_action_queue ();
+
     player.Play ();
+
+    process_action_queue ();
   }
   catch (std::exception& e)
   {
