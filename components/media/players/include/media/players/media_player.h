@@ -115,14 +115,14 @@ class MediaPlayer : public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Номер проигрываемого трека / имя потока / его длительность
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetTrack     (size_t track);       //установка текущего трека
-    void        SetNextTrack (size_t track);       //установка следующего трека
-    int         Track        () const;             //текущий трек
-    size_t      NextTrack    () const;             //следующий трек
-    const char* Source       (size_t track) const; //имя трека
-    const char* Source       () const;             //имя прогрываемого трека
-    float       Duration     (size_t tack) const;  //длительность трека
-    float       Duration     () const;             //длительность проигрываемого трека
+    void        SetTrack         (size_t track);       //установка текущего трека
+    void        SetNextPlayTrack (size_t track);       //установка следующего трека
+    int         Track            () const;             //текущий трек
+    size_t      NextPlayTrack    () const;             //следующий трек
+    const char* Source           (size_t track) const; //имя трека
+    const char* Source           () const;             //имя прогрываемого трека
+    float       Duration         (size_t tack) const;  //длительность трека
+    float       Duration         () const;             //длительность проигрываемого трека
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переключение треков

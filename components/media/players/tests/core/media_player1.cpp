@@ -320,7 +320,7 @@ int main ()
     process_action_queue ();
 
     player.SetTrack (1);
-    player.SetNextTrack (0);
+    player.SetNextPlayTrack (0);
     player.SetRepeatMode (MediaPlayerRepeatMode_Off);
 
     process_action_queue ();

@@ -617,7 +617,7 @@ void MediaPlayer::SetTrack (size_t track)
   }
 }
 
-void MediaPlayer::SetNextTrack (size_t track)
+void MediaPlayer::SetNextPlayTrack (size_t track)
 {
   common::Lock lock (*impl);
 
@@ -643,7 +643,7 @@ int MediaPlayer::Track () const
   return impl->current_track;
 }
 
-size_t MediaPlayer::NextTrack () const
+size_t MediaPlayer::NextPlayTrack () const
 {
   common::Lock lock (*impl);
 
