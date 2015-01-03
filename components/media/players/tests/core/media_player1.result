@@ -206,5 +206,40 @@ TestStreamPlayer::SetVolume(source2, 0.60)
 media player 'player' change volume: mute=false, volume=0.60
 TestStreamPlayer::SetVolume(source2, 0.80)
 media player 'player' change volume: mute=false, volume=0.80
-before exit
 TestStreamPlayer::Stop(source2)
+media player 'player' change playback: state=stopped, track=0, source=source1, duration=2.00, position=0.00
+media player 'player' change play list={'source1', 'source2', 'source3'}
+media player 'player' change track to 0
+media player 'player' change play list={'source1', 'source2', 'source3'}
+media player 'player' change track to 1
+media player 'player' change repeat mode to 'off'
+TestStreamPlayer::SetVolume(source2, 0.80)
+TestStreamPlayer::SetLooping(source2, false)
+TestStreamPlayer::Play(source2)
+media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
+TestStreamPlayer::Stop(source2)
+TestStreamPlayer::SetPosition(source2, 0.00)
+TestStreamPlayer::SetVolume(source1, 0.80)
+TestStreamPlayer::SetLooping(source1, false)
+TestStreamPlayer::Play(source1)
+media player 'player' change track to 0
+media player 'player' change playback: state=playing, track=0, source=source1, duration=2.00, position=0.00
+TestStreamPlayer::Stop(source1)
+TestStreamPlayer::SetPosition(source1, 0.00)
+TestStreamPlayer::SetVolume(source2, 0.80)
+TestStreamPlayer::SetLooping(source2, false)
+TestStreamPlayer::Play(source2)
+media player 'player' change track to 1
+media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
+TestStreamPlayer::Stop(source2)
+TestStreamPlayer::SetPosition(source2, 0.00)
+TestStreamPlayer::SetVolume(source3, 0.80)
+TestStreamPlayer::SetLooping(source3, false)
+TestStreamPlayer::Play(source3)
+media player 'player' change track to 2
+media player 'player' change playback: state=playing, track=2, source=source3, duration=2.00, position=0.00
+TestStreamPlayer::Stop(source3)
+TestStreamPlayer::SetPosition(source3, 0.00)
+media player 'player' change playback: state=stopped, track=0, source=source1, duration=2.00, position=0.00
+media player 'player' change track to 0
+before exit

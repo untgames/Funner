@@ -307,6 +307,36 @@ int main ()
       process_action_queue ();
     }
 
+    //next track test
+
+    Playlist list2;
+
+    list2.AddSource ("source1");
+    list2.AddSource ("source2");
+    list2.AddSource ("source3");
+
+    player.Open (list2);
+
+    process_action_queue ();
+
+    player.SetTrack (1);
+    player.SetNextTrack (0);
+    player.SetRepeatMode (MediaPlayerRepeatMode_Off);
+
+    process_action_queue ();
+
+    player.Play ();
+
+    process_action_queue ();
+
+    for (size_t i = 0; i < 4; i++)
+    {
+      process_action_queue ();
+      TestStreamPlayer::Instance ().Simulate (2.f);
+    }
+
+    process_action_queue ();
+
     printf ("before exit\n");
   }
   catch (std::exception& e)
