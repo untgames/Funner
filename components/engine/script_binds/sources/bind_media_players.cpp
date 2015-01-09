@@ -151,16 +151,17 @@ void bind_media_player_library (Environment& environment)
   lib.Register ("set_Track",         make_invoker (&MediaPlayer::SetTrack));
   lib.Register ("set_Volume",        make_invoker (&MediaPlayer::SetVolume));
 
-  lib.Register ("Close",     make_invoker (&MediaPlayer::Close));
-  lib.Register ("Duration",  make_invoker (implicit_cast<float (MediaPlayer::*) (size_t) const> (&MediaPlayer::Duration)));
-  lib.Register ("NextTrack", make_invoker (&MediaPlayer::NextTrack));
-  lib.Register ("Open",      make_invoker (make_invoker (implicit_cast<void (MediaPlayer::*) (const char*)> (&MediaPlayer::Open)),
-                                           make_invoker (implicit_cast<void (MediaPlayer::*) (const Playlist&)> (&MediaPlayer::Open))));
-  lib.Register ("Pause",     make_invoker (&MediaPlayer::Pause));
-  lib.Register ("Play",      make_invoker (&MediaPlayer::Play));
-  lib.Register ("PrevTrack", make_invoker (&MediaPlayer::PrevTrack));
-  lib.Register ("Source",    make_invoker (implicit_cast<const char* (MediaPlayer::*) (size_t) const> (&MediaPlayer::Source)));
-  lib.Register ("Stop",      make_invoker (&MediaPlayer::Stop));
+  lib.Register ("Close",          make_invoker (&MediaPlayer::Close));
+  lib.Register ("Duration",       make_invoker (implicit_cast<float (MediaPlayer::*) (size_t) const> (&MediaPlayer::Duration)));
+  lib.Register ("NextTrack",      make_invoker (&MediaPlayer::NextTrack));
+  lib.Register ("Open",           make_invoker (make_invoker (implicit_cast<void (MediaPlayer::*) (const char*)> (&MediaPlayer::Open)),
+                                                make_invoker (implicit_cast<void (MediaPlayer::*) (const Playlist&)> (&MediaPlayer::Open))));
+  lib.Register ("UpdatePlaylist", make_invoker (&MediaPlayer::UpdatePlaylist));
+  lib.Register ("Pause",          make_invoker (&MediaPlayer::Pause));
+  lib.Register ("Play",           make_invoker (&MediaPlayer::Play));
+  lib.Register ("PrevTrack",      make_invoker (&MediaPlayer::PrevTrack));
+  lib.Register ("Source",         make_invoker (implicit_cast<const char* (MediaPlayer::*) (size_t) const> (&MediaPlayer::Source)));
+  lib.Register ("Stop",           make_invoker (&MediaPlayer::Stop));
 
   lib.Register ("CreateEventHandler",   make_callback_invoker<MediaPlayerEventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (&player_register_event_handler));
