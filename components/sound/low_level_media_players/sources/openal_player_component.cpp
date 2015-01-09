@@ -10,7 +10,6 @@ namespace openal_media_player
 
 const char* TARGET_NAME = "low_level_openal";
 
-
 /*
    Компонент проигрывания медиа
 */
@@ -21,7 +20,7 @@ class PlayerComponent
     //загрузка компонента
     PlayerComponent ()
     {
-//      StreamPlayerManager::RegisterPlayer (TARGET_NAME, &PlayerComponent::CreatePlayer);
+      StreamPlayerManager::RegisterPlayer (TARGET_NAME, &PlayerComponent::CreatePlayer);
     }
 
     static IStreamPlayer* CreatePlayer (const char* target_name, const char* source_name, const StreamPlayerManager::StreamEventHandler& handler)
@@ -34,8 +33,8 @@ class PlayerComponent
       if (!source_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "source_name");
 
-//      if (!xtl::xstrcmp (target_name, TARGET_NAME))
-//        return new NullPlayer (handler);
+      if (!xtl::xstrcmp (target_name, TARGET_NAME))
+        return new sound::low_level_media_players::LowLevelPlayer<sound::low_level_media_players::DriverType_OpenAL> (source_name, handler);
 
       throw xtl::make_argument_exception (METHOD_NAME, "target_name", target_name);
     }

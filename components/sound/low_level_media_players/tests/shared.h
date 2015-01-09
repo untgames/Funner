@@ -4,6 +4,7 @@
 #include <xtl/function.h>
 #include <xtl/ref.h>
 
+#include <common/log.h>
 #include <common/strlib.h>
 
 #include <media/players.h>
