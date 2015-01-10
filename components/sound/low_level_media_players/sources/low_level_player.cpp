@@ -95,8 +95,12 @@ class LowLevelPlayerDevice : public common::Lockable
 
     void Pause (void* player)
     {
-      if (player != active_player)
-        return;
+      {
+        common::Lock lock (*this);
+
+        if (player != active_player)
+          return;
+      }
 
       device->Pause (0);
 
@@ -108,20 +112,14 @@ class LowLevelPlayerDevice : public common::Lockable
 
     void Stop (void* player)
     {
-      if (player != active_player || !active_player)
-        return;
+      {
+        common::Lock lock (*this);
 
-      device->Stop (0);
+        if (player != active_player || !active_player)
+          return;
+      }
 
-      event_handler (active_player, media::players::StreamEvent_OnManualStop);
-
-      low_level_sample   = 0;
-      sample_read_offset = 0;
-      last_read_sample   = 0;
-      active_player      = 0;
-      event_handler      = media::players::StreamPlayerManager::StreamEventHandler ();
-
-      media::SoundSample ().Swap (media_sample);
+      StopPlayback ();
     }
 
     ///Seeking
@@ -153,13 +151,31 @@ class LowLevelPlayerDevice : public common::Lockable
 
     void SetVolume (void* player, float volume)
     {
-      if (player != active_player)
-        return;
+      {
+        common::Lock lock (*this);
+
+        if (player != active_player)
+          return;
+      }
 
       device->SetVolume (volume);
     }
 
   private:
+    //Stop and cleanup
+    void StopPlayback ()
+    {
+      device->Stop (0);
+
+      low_level_sample   = 0;
+      sample_read_offset = 0;
+      last_read_sample   = 0;
+      active_player      = 0;
+      event_handler      = media::players::StreamPlayerManager::StreamEventHandler ();
+
+      media::SoundSample ().Swap (media_sample);
+    }
+
     //Read data for device
     size_t ReadSampleData (size_t first_sample, size_t samples_count, void* data)
     {
@@ -196,6 +212,8 @@ class LowLevelPlayerDevice : public common::Lockable
             if (samples_count > return_value)
               return_value += ReadSampleData (sample_read_offset, samples_count - return_value, (char*)data + media_sample.SamplesToBytes (return_value));
           }
+          else
+            StopPlayback ();
         }
       }
 
@@ -211,9 +229,9 @@ class LowLevelPlayerDevice : public common::Lockable
     typedef xtl::com_ptr<sound::low_level::ISample> SamplePtr;
 
   private:
+    media::SoundSample                                      media_sample;       //media sample
     DevicePtr                                               device;             //low level device
     SamplePtr                                               low_level_sample;   //low level sample
-    media::SoundSample                                      media_sample;       //media sample
     size_t                                                  sample_read_offset; //offset to use for calculation in read function
     size_t                                                  last_read_sample;   //index of last readed sample from media sample
     media::players::IStreamPlayer*                          active_player;      //current playing player
@@ -261,15 +279,11 @@ struct LowLevelPlayer<driver_type>::Impl : public common::Lockable
 
   void Pause ()
   {
-    common::Lock lock (*device);
-
     device->Pause (owner);
   }
 
   void Stop ()
   {
-    common::Lock lock (*device);
-
     device->Stop (owner);
   }
 
@@ -301,8 +315,6 @@ struct LowLevelPlayer<driver_type>::Impl : public common::Lockable
 
   void SetVolume (float in_volume)
   {
-    common::Lock lock (*device);
-
     volume = in_volume;
 
     device->SetVolume (owner, volume);

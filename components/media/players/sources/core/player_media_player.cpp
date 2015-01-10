@@ -81,7 +81,16 @@ struct MediaPlayer::Impl : public common::Lockable
       iter->Cancel ();
   }
 
-///Создание проигрывателей потоков
+  ///Update looping state for current playing track
+  void UpdateCurrentTrackLooping ()
+  {
+    if (!current_stream || current_track >= streams.size ())
+      return;
+
+    current_stream->SetLooping (current_track == streams.size () - 1 && repeat_mode == MediaPlayerRepeatMode_Last && current_stream == streams [current_track]);
+  }
+
+  ///Создание проигрывателей потоков
   void UpdatePlaylist (const media::players::Playlist& in_play_list)
   {
     try
@@ -124,6 +133,9 @@ struct MediaPlayer::Impl : public common::Lockable
 
         streams.swap (new_streams);
 
+        if (current_stream)
+          current_stream->SetLooping (false);
+
         bool is_closed = list.IsEmpty ();
 
         list = new_play_list;
@@ -157,17 +169,17 @@ struct MediaPlayer::Impl : public common::Lockable
   }
   
 ///Корректен ли текущий поток
-  bool IsCurrentStreamValid ()
+  bool IsCurrentTrackValid ()
   {
     return current_track >= 0 && current_track < streams.size ();
   }
-  
+
 ///Текущий медиа-поток
-  IStreamPlayer* CurrentStream ()
+  IStreamPlayer* CurrentTrackStream ()
   {
-    return IsCurrentStreamValid () ? streams [current_track].get () : 0;
+    return IsCurrentTrackValid () ? streams [current_track].get () : 0;
   }
-  
+
 ///Обработчик событий медиа-потока
   void OnStreamEvent (IStreamPlayer* stream_player, StreamEvent event)
   {
@@ -177,9 +189,6 @@ struct MediaPlayer::Impl : public common::Lockable
     {
         //обрабатываются только события текущего трека
     
-      if (current_track >= streams.size ())
-        return;
-        
       if (stream_player != current_stream.get () || !stream_player)
         return;
         
@@ -568,6 +577,8 @@ void MediaPlayer::SetRepeatMode (MediaPlayerRepeatMode mode)
 
   impl->repeat_mode = mode;
 
+  impl->UpdateCurrentTrackLooping ();
+
   impl->Notify (MediaPlayerEvent_OnChangeRepeatMode);
 }
 
@@ -690,7 +701,12 @@ float MediaPlayer::Duration (size_t track) const
 //длительность проигрываемого трека
 float MediaPlayer::Duration () const
 {
-  return Duration (Track ());
+  common::Lock lock (*impl);
+
+  if (impl->current_stream)
+    return impl->current_stream->Duration ();
+
+  return 0.f;
 }
 
 /*
@@ -761,7 +777,7 @@ void MediaPlayer::Play ()
 
   try
   {
-    if (!impl->IsCurrentStreamValid ())
+    if (!impl->IsCurrentTrackValid ())
       return;
     
     switch (impl->current_track_state)
@@ -770,7 +786,7 @@ void MediaPlayer::Play ()
         SetPosition (0.0f);
         break;
       case MediaPlayerState_Paused:
-        impl->CurrentStream ()->Play ();
+        impl->CurrentTrackStream ()->Play ();
         impl->Notify (MediaPlayerEvent_OnChangePlayback);
         break;
       case MediaPlayerState_Stopped:
@@ -781,7 +797,7 @@ void MediaPlayer::Play ()
         impl->current_stream = impl->streams [impl->current_track];
 
         impl->current_stream->SetVolume (impl->volume);
-        impl->current_stream->SetLooping (impl->current_track == impl->streams.size () - 1 && impl->repeat_mode == MediaPlayerRepeatMode_Last);
+        impl->UpdateCurrentTrackLooping ();
         
         impl->current_stream->Play ();
 
@@ -812,13 +828,13 @@ void MediaPlayer::Pause ()
 
   try
   {
-    if (!impl->IsCurrentStreamValid ())
+    if (!impl->current_stream)
       return;
     
     switch (impl->current_track_state)
     {
       case MediaPlayerState_Playing:
-        impl->CurrentStream ()->Pause ();
+        impl->current_stream->Pause ();
         impl->Notify (MediaPlayerEvent_OnChangePlayback);       
         break;
       case MediaPlayerState_Paused:
@@ -849,14 +865,14 @@ void MediaPlayer::Stop ()
 
   try
   {
-    if (!impl->IsCurrentStreamValid ())
+    if (!impl->current_stream)
       return;
     
     switch (impl->current_track_state)
     {
       case MediaPlayerState_Playing:
       case MediaPlayerState_Paused:
-        impl->CurrentStream ()->Stop ();
+        impl->current_stream->Stop ();
         impl->Notify (MediaPlayerEvent_OnChangePlayback);
         break;
       case MediaPlayerState_Stopped:
@@ -882,16 +898,15 @@ void MediaPlayer::SetPosition (float position)
 
   try
   {
-    if (!impl->IsCurrentStreamValid ())
+    if (!impl->current_stream)
       return;
       
-    IStreamPlayer *stream  = impl->CurrentStream ();
-    float         duration = stream->Duration ();
+    float duration = impl->current_stream->Duration ();
     
     if (position > duration)
       throw xtl::make_range_exception ("", "position", position, 0.f, duration);
 
-    stream->SetPosition (position);
+    impl->current_stream->SetPosition (position);
 
     impl->Notify (MediaPlayerEvent_OnChangePlayback);
   }
@@ -906,18 +921,10 @@ float MediaPlayer::Position () const
 {
   common::Lock lock (*impl);
 
-  try
-  {
-    if (!impl->IsCurrentStreamValid ())
-      return 0.0f;
-      
-    return impl->CurrentStream ()->Position ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("media::players::MediaPlayer::Position");
-    throw;
-  }
+  if (impl->current_stream)
+    return impl->current_stream->Position ();
+
+  return 0.f;
 }
 
 /*
@@ -937,8 +944,8 @@ void MediaPlayer::SetVolume (float volume)
     if (volume < 0.0f) volume = 0.0f;
     if (volume > 1.0f) volume = 1.0f;
       
-    if (impl->IsCurrentStreamValid ())
-      impl->CurrentStream ()->SetVolume (volume);
+    if (impl->current_stream)
+      impl->current_stream->SetVolume (volume);
       
     impl->volume   = volume;
     impl->is_muted = false;
@@ -967,10 +974,10 @@ void MediaPlayer::SetMute (bool state)
     if (impl->is_muted == state)
       return;
       
-    if (impl->IsCurrentStreamValid ())
+    if (impl->current_stream)
     {
-      if (state) impl->CurrentStream ()->SetVolume (0.0f);
-      else       impl->CurrentStream ()->SetVolume (impl->volume);
+      if (state) impl->current_stream->SetVolume (0.0f);
+      else       impl->current_stream->SetVolume (impl->volume);
     }
 
     impl->is_muted = state;

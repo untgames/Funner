@@ -126,30 +126,30 @@ void bind_media_player_library (Environment& environment)
 
   //регистрация операций
 
-  lib.Register ("get_Duration",      make_invoker (implicit_cast<float (MediaPlayer::*) () const> (&MediaPlayer::Duration)));
-  lib.Register ("get_IsPaused",      make_invoker (&MediaPlayer::IsPaused));
-  lib.Register ("get_IsPlaying",     make_invoker (&MediaPlayer::IsPlaying));
-  lib.Register ("get_IsStopped",     make_invoker (&MediaPlayer::IsStopped));
-  lib.Register ("get_Mute",          make_invoker (&MediaPlayer::IsMuted));
-  lib.Register ("get_Name",          make_invoker (&MediaPlayer::Name));
-  lib.Register ("get_NextPlayTrack", make_invoker (&MediaPlayer::NextPlayTrack));
-  lib.Register ("get_Playlist",      make_invoker (&MediaPlayer::Playlist));
-  lib.Register ("get_Position",      make_invoker (&MediaPlayer::Position));
-  lib.Register ("get_RepeatMode",    make_invoker (&MediaPlayer::RepeatMode));
-  lib.Register ("get_Source",        make_invoker (implicit_cast<const char* (MediaPlayer::*) () const> (&MediaPlayer::Source)));
-  lib.Register ("get_State",         make_invoker (&MediaPlayer::State));
-  lib.Register ("get_Target",        make_invoker (&MediaPlayer::Target));
-  lib.Register ("get_Track",         make_invoker (&MediaPlayer::Track));
-  lib.Register ("get_TracksCount",   make_invoker (&MediaPlayer::TracksCount));
-  lib.Register ("get_Volume",        make_invoker (&MediaPlayer::Volume));
-  lib.Register ("set_Mute",          make_invoker (&MediaPlayer::SetMute));
-  lib.Register ("set_Name",          make_invoker (&MediaPlayer::SetName));
-  lib.Register ("set_NextPlayTrack", make_invoker (&MediaPlayer::SetNextPlayTrack));
-  lib.Register ("set_Position",      make_invoker (&MediaPlayer::SetPosition));
-  lib.Register ("set_RepeatMode",    make_invoker (&MediaPlayer::SetRepeatMode));
-  lib.Register ("set_Target",        make_invoker (&MediaPlayer::SetTarget));
-  lib.Register ("set_Track",         make_invoker (&MediaPlayer::SetTrack));
-  lib.Register ("set_Volume",        make_invoker (&MediaPlayer::SetVolume));
+  lib.Register ("get_CurrentPlaybackDuration", make_invoker (implicit_cast<float (MediaPlayer::*) () const> (&MediaPlayer::Duration)));
+  lib.Register ("get_IsPaused",                make_invoker (&MediaPlayer::IsPaused));
+  lib.Register ("get_IsPlaying",               make_invoker (&MediaPlayer::IsPlaying));
+  lib.Register ("get_IsStopped",               make_invoker (&MediaPlayer::IsStopped));
+  lib.Register ("get_Mute",                    make_invoker (&MediaPlayer::IsMuted));
+  lib.Register ("get_Name",                    make_invoker (&MediaPlayer::Name));
+  lib.Register ("get_NextPlayTrack",           make_invoker (&MediaPlayer::NextPlayTrack));
+  lib.Register ("get_Playlist",                make_invoker (&MediaPlayer::Playlist));
+  lib.Register ("get_Position",                make_invoker (&MediaPlayer::Position));
+  lib.Register ("get_RepeatMode",              make_invoker (&MediaPlayer::RepeatMode));
+  lib.Register ("get_Source",                  make_invoker (implicit_cast<const char* (MediaPlayer::*) () const> (&MediaPlayer::Source)));
+  lib.Register ("get_State",                   make_invoker (&MediaPlayer::State));
+  lib.Register ("get_Target",                  make_invoker (&MediaPlayer::Target));
+  lib.Register ("get_Track",                   make_invoker (&MediaPlayer::Track));
+  lib.Register ("get_TracksCount",             make_invoker (&MediaPlayer::TracksCount));
+  lib.Register ("get_Volume",                  make_invoker (&MediaPlayer::Volume));
+  lib.Register ("set_Mute",                    make_invoker (&MediaPlayer::SetMute));
+  lib.Register ("set_Name",                    make_invoker (&MediaPlayer::SetName));
+  lib.Register ("set_NextPlayTrack",           make_invoker (&MediaPlayer::SetNextPlayTrack));
+  lib.Register ("set_Position",                make_invoker (&MediaPlayer::SetPosition));
+  lib.Register ("set_RepeatMode",              make_invoker (&MediaPlayer::SetRepeatMode));
+  lib.Register ("set_Target",                  make_invoker (&MediaPlayer::SetTarget));
+  lib.Register ("set_Track",                   make_invoker (&MediaPlayer::SetTrack));
+  lib.Register ("set_Volume",                  make_invoker (&MediaPlayer::SetVolume));
 
   lib.Register ("Close",          make_invoker (&MediaPlayer::Close));
   lib.Register ("Duration",       make_invoker (implicit_cast<float (MediaPlayer::*) (size_t) const> (&MediaPlayer::Duration)));
