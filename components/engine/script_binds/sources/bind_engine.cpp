@@ -168,6 +168,7 @@ void bind_subsystem_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
 
+  lib.Register ("Execute",             make_invoker (&SubsystemManager::Execute));
   lib.Register ("Start",               make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
   lib.Register ("Restart",             make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
   lib.Register ("Remove",              make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
