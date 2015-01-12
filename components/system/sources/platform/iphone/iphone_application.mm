@@ -12,8 +12,6 @@
 
 #import <SystemConfiguration/SCNetworkReachability.h>
 
-#import <AudioToolbox/AudioServices.h>
-
 using namespace syslib;
 using namespace syslib::iphone;
 
@@ -84,35 +82,6 @@ void ns_object_to_json (id obj, stl::string& output)
     ns_array_to_json (obj, output);
   else
     output += "\"\"";
-}
-
-//получение имени ошибки Audio Services
-const char* get_audio_session_error_name (OSStatus error)
-{
-  switch (error)
-  {
-    case kAudioSessionNoError:                  return "No error has occurred.";
-    case kAudioSessionNotInitialized:           return "An Audio Session Services function was called without first initializing the session.";
-    case kAudioSessionAlreadyInitialized:       return "The AudioSessionInitialize function was called more than once during the lifetime of your application.";
-    case kAudioSessionInitializationError:      return "There was an error during audio session initialization.";
-    case kAudioSessionUnsupportedPropertyError: return "The audio session property is not supported.";
-    case kAudioSessionBadPropertySizeError:     return "The size of the audio session property data was not correct.";
-    case kAudioSessionNotActiveError:           return "The operation failed because your application's audio session was not active.";
-    case kAudioServicesNoHardwareError:         return "The audio operation failed because the device has no audio input available.";
-    case kAudioSessionNoCategorySet:            return "The audio operation failed because it requires the audio session to have an explicitly-set category, but none was set. To use a hardware codec you must explicitly initialize the audio session and explicitly set an audio session category.";
-    case kAudioSessionIncompatibleCategory:     return "The specified audio session category cannot be used for the attempted audio operation. For example, you attempted to play or record audio with the audio session category set to kAudioSessionCategory_AudioProcessing.";
-    case kAudioSessionUnspecifiedError:         return "An unspecified audio session error has occurred. This typically results from the audio system being in an inconsistent state.";
-    default:                                    return "Unknown error";
-  }
-}
-
-//проверка ошибок Audio Services
-void check_audio_session_error (OSStatus error_code, const char* source)
-{
-  if (error_code == kAudioSessionNoError)
-    return;
-
-  throw xtl::format_operation_exception (source, "Audio session error. %s. Code %d.", get_audio_session_error_name (error_code), error_code);
 }
 
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
@@ -264,7 +233,6 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
     NSDictionary              *launch_options;                //параметры запуска приложения
     bool                      main_view_visible;              //виден ли главный view приложения
     ApplicationBackgroundMode background_mode;                //режим фоновой работы приложения
-    int                       suspend_audio_session_category; //аудио-категория, бывшая активной до установки режима ApplicationBackgroundMode_Active
 }
 
 @property (nonatomic, readonly) ListenerArray*            listeners;
@@ -272,13 +240,12 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 @property (nonatomic, retain)   NSDictionary*             launch_options;
 @property (nonatomic)           bool                      main_view_visible;
 @property (nonatomic)           ApplicationBackgroundMode background_mode;
-@property (nonatomic)           int                       suspend_audio_session_category;
 
 @end
 
 @implementation ApplicationDelegateInternal
 
-@synthesize listeners, idle_timer, launch_options, main_view_visible, background_mode, suspend_audio_session_category;
+@synthesize listeners, idle_timer, launch_options, main_view_visible, background_mode;
 
 -(void)initIdleTimer
 {
@@ -386,50 +353,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) setBackgroundMode:(ApplicationBackgroundMode)new_background_mode
 {
-  if (impl.background_mode == new_background_mode)
-    return;
-
-  try
-  {
-    switch (new_background_mode)
-    {
-      case ApplicationBackgroundMode_Active:
-      {
-        int suspend_audio_session_category = impl.suspend_audio_session_category;
-
-        UInt32 buffer_size = sizeof (suspend_audio_session_category);
-
-        check_audio_session_error (AudioSessionGetProperty (kAudioSessionProperty_AudioCategory, &buffer_size, &suspend_audio_session_category), "::AudioSessionGetProperty");
-
-        impl.suspend_audio_session_category = suspend_audio_session_category;
-
-        int background_execution_category = kAudioSessionCategory_MediaPlayback;
-
-        check_audio_session_error (AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
-                                   sizeof (background_execution_category), &background_execution_category), "::AudioSessionSetProperty");
-
-        break;
-      }
-      case ApplicationBackgroundMode_Suspend:
-      {
-        int suspend_audio_session_category = impl.suspend_audio_session_category;
-
-        check_audio_session_error (AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
-                                   sizeof (suspend_audio_session_category), &suspend_audio_session_category), "::AudioSessionSetProperty");
-        
-        break;
-      }
-      default:
-        throw xtl::make_argument_exception ("", "mode", new_background_mode);
-    }
-
-    impl.background_mode = new_background_mode;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("syslib::iphone::ApplicationDelegate::setBackgroundMode");
-    throw;
-  }
+  impl.background_mode = new_background_mode;
 }
 
 -(NSDictionary*)launchOptions
