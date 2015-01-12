@@ -58,6 +58,9 @@ class IPhoneAudioSessionSubsystem : public ISubsystem, public xtl::reference_cou
     void StopAffectedSubsystems ();
     void StartAffectedSubsystems ();
 
+    ///Выполнение команды
+    void Execute (const char* command);
+
     ///Подсчёт ссылок
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
@@ -278,6 +281,33 @@ void IPhoneAudioSessionSubsystem::StartAffectedSubsystems ()
 
   for (AffectedSubsystemsDescsArray::reverse_iterator iter = affected_subsystems.rbegin (), end = affected_subsystems.rend (); iter != end; ++iter)
     subsystem_manager.Start ((*iter)->config_file.c_str (), (*iter)->name_wildcard.c_str ());
+}
+
+///Выполнение команды
+void IPhoneAudioSessionSubsystem::Execute (const char* command)
+{
+  if (!common::wcimatch (command, "iPhoneAudioSession:*"))
+    return;
+
+  try
+  {
+    static const char* PREFIX_STRING = "iPhoneAudioSession:";
+    static size_t      PREFIX_LENGTH = strlen (PREFIX_STRING);
+
+    command += PREFIX_LENGTH;
+
+    common::StringArray components = common::split (command);
+
+    if (components.Size () != 2 || xtl::xstrcmp (components [0], "SetCategory"))
+      throw xtl::format_operation_exception ("", "Invalid iPhoneAudioSession command format for command '%s'", command);
+
+    AudioSessionManagerSingleton::Instance ()->SetAudioCategory (components [1]);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("engine::IPhoneAudioSessionSubsystem::Execute");
+    throw;
+  }
 }
 
 //обработчик событий прерывания/восстановления аудиосессии
