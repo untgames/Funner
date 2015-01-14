@@ -9,6 +9,5 @@ ANDROID_ARCH              := arm
 ANDROID_ABI               := armeabi
 BUSYBOX_FILE              := $(BUILD_DIR)platforms/android/arm/busybox
 COMMON_CFLAGS             += -mthumb
-COMMON_CFLAGS             += -DARM
 
 include $(TOOLSETS_DIR)/common/android.mak

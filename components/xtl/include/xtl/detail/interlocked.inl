@@ -82,7 +82,7 @@
     return atomic_increment (rc, -1);
   }
   
-#elif defined (ARM)
+#elif defined (__ARM_ARCH)
 
 #if defined (BEAGLEBOARD) || defined (TABLETOS)
 

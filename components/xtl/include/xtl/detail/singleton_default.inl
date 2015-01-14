@@ -47,7 +47,7 @@ template <class T> struct singleton_default_instance<T, false>
       char        value_buffer [sizeof (T)];
     };
 
-#ifdef ARM
+#ifdef __ARM_ARCH
 #ifdef __GNUC__
     #define XTL_SINGLETON_DEEFAULT_ALIGN __attribute__ ((aligned))
 #elif defined (_MSC_VER)
