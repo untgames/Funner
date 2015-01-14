@@ -526,7 +526,7 @@
 /*    ARM                                */
 /* ===================================== */
 
-#elif defined(ARM)
+#elif defined(__ARM_ARCH)
 #  define CURL_SIZEOF_LONG           4
 #  define CURL_TYPEOF_CURL_OFF_T     long long
 #  define CURL_FORMAT_CURL_OFF_T     "lld"
