@@ -1,9 +1,9 @@
 ###################################################################################################
-#—борка под iPhone Device g++ armv7 (iPhone 3GS/4/4S, iPod Touch 3G/4G/5G, iPad 1/2/3/Mini)
+#—борка под iPhone Device g++ armv64 (iPhone 5S/6/6+, iPad Air/Air2/Mini2/Mini3)
 ###################################################################################################
 
-COMMON_CFLAGS     += -arch armv7
-COMMON_LINK_FLAGS += -arch armv7
-FAT_LIB_ARCH_TYPE := armv7
+COMMON_CFLAGS     += -arch arm64
+COMMON_LINK_FLAGS += -arch arm64
+FAT_LIB_ARCH_TYPE := arm64
 
 include $(TOOLSETS_DIR)/iphone-device.mak
