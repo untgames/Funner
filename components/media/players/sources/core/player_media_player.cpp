@@ -84,7 +84,7 @@ struct MediaPlayer::Impl : public common::Lockable
   ///Update looping state for current playing track
   void UpdateCurrentTrackLooping ()
   {
-    if (!current_stream || current_track >= streams.size ())
+    if (!current_stream || (size_t)current_track >= streams.size ())
       return;
 
     current_stream->SetLooping (current_track == streams.size () - 1 && repeat_mode == MediaPlayerRepeatMode_Last && current_stream == streams [current_track]);
@@ -117,7 +117,7 @@ struct MediaPlayer::Impl : public common::Lockable
           new_streams.push_back (stream);
         }
 
-        if (current_track < 0 || current_track >= list.Size () || current_track >= new_play_list.Size () || xtl::xstrcmp (list.Item (current_track), new_play_list.Item (current_track)))
+        if ((size_t)current_track >= list.Size () || (size_t)current_track >= new_play_list.Size () || xtl::xstrcmp (list.Item (current_track), new_play_list.Item (current_track)))
         {
           if (new_play_list.IsEmpty ())
           {
@@ -171,7 +171,7 @@ struct MediaPlayer::Impl : public common::Lockable
 ///Корректен ли текущий поток
   bool IsCurrentTrackValid ()
   {
-    return current_track >= 0 && current_track < streams.size ();
+    return (size_t)current_track < streams.size ();
   }
 
 ///Текущий медиа-поток
@@ -539,7 +539,7 @@ void MediaPlayer::Close ()
    следующего трека сбрасывается в 0, номер текущего трека в -1)
 */
 
-void MediaPlayer::UpdatePlaylist (const players::Playlist& new_playlist)
+void MediaPlayer::UpdatePlaylist (const media::players::Playlist& new_playlist)
 {
   impl->UpdatePlaylist (new_playlist);
 }
