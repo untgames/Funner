@@ -22,9 +22,11 @@
 #include <common/utf_converter.h>
 
 #include <media/charset_manager.h>
+#include <media/font_creation_params_library.h>
 #include <media/font_library.h>
 #include <media/font.h>
 #include <media/rasterized_font.h>
+#include <media/resource_library.h>
 
 namespace media
 {
