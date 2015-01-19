@@ -89,6 +89,8 @@ int main ()
     image1.Save("results/image1with5 (PutImage test).bmp", PixelFormat_RGB8);
 
     dump_hash ("results/image1with5 (PutImage test).bmp");
+
+    FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)
   {

@@ -43,6 +43,8 @@ int main ()
     image.Save (file_name);
 
     dump_hash (file_name);
+
+    FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)
   {

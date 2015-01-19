@@ -38,6 +38,8 @@ int main ()
     print_hash ("results/pic1_right.png");
     print_hash ("results/pic1_front.png");
     print_hash ("results/pic1_back.png");
+
+    FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)
   {                                               

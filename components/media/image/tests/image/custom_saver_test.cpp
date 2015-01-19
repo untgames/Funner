@@ -43,6 +43,8 @@ int main ()
       printf ("%02x,",file_hash.md5 [i]);
 
     printf ("%02x}\n",file_hash.md5 [15]);
+
+    FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)
   {                                               

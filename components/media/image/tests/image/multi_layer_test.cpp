@@ -57,6 +57,8 @@ int main ()
     img.Save("results/multilayer_image.bmp.skybox");
 
     printf ("File 'results/multilayer_image_up.bmp' size: %u\n", FileSystem::GetFileSize ("results/multilayer_image_down.bmp"));
+
+    FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)               
   {                                               

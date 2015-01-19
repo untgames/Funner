@@ -105,6 +105,8 @@ int main ()
 
     dump_hash (RESULT_POWER_OF_TWO_IMAGE_NAME);
     dump_hash (RESULT_NON_POWER_OF_TWO_IMAGE_NAME);
+
+    common::FileSystem::Remove (RESULTS_DIR);
   }
   catch (std::exception& exception)
   {

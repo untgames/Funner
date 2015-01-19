@@ -31,6 +31,8 @@ int main ()
 
       printf ("%02x}\n", hash [15]);      
     }
+
+    common::FileSystem::Remove (results_dir);
   }
   catch (std::exception& exception)
   {

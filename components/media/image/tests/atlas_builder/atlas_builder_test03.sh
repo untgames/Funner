@@ -10,3 +10,4 @@ echo 'results/atlas2-custom.xatlas'
 cat 'results/atlas2-custom.xatlas'
 echo 'results/my.xatlas'
 cat 'results/my.xatlas'
+rm -rf results/* results

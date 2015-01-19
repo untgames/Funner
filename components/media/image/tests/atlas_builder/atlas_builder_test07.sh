@@ -10,3 +10,4 @@ echo 'results/invert-y.xatlas'
 cat 'results/invert-y.xatlas'
 echo 'results/invert-xy.xatlas'
 cat 'results/invert-xy.xatlas'
+rm -rf results/* results
