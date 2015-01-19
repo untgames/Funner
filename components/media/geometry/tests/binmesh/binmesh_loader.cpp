@@ -31,6 +31,8 @@ int main ()
 
     dump_hash (SRC_MODEL_FILE_NAME);
     dump_hash (DST_MODEL_FILE_NAME);
+
+    common::FileSystem::Remove (RESULTS_DIR);
   }
   catch (std::exception& exception)
   {
