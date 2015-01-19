@@ -41,6 +41,8 @@ int main ()
 
     dump_hash (SRC_ANIM_FILE_NAME);
     dump_hash (DST_ANIM_FILE_NAME);
+
+    common::FileSystem::Remove (RESULTS_DIR);
   }
   catch (std::exception& exception)
   {

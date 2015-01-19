@@ -70,6 +70,8 @@ int main ()
     animation_library.Save (DST_FILE_NAME);
 
     dump_hash (DST_FILE_NAME);
+
+    common::FileSystem::Remove (RESULTS_DIR);
   }
   catch (std::exception& exception)
   {
