@@ -14,7 +14,11 @@ typedef xtl::com_ptr<ISoundInputStream> SoundInputStreamPtr;
 struct SoundSample::Impl : public xtl::reference_counter
 {
   public:
-    Impl () {}
+    Impl ()
+    {
+      memset (&info, 0, sizeof (info));
+    }
+
     Impl (const Impl& source) : str_name (source.str_name), info (source.info), input_stream (source.input_stream) {}
 
     Impl* Clone ()

@@ -12,13 +12,20 @@ const char* file_name = "data/sound1.ogg";
 
 int main ()
 {
+  printf ("Results of sound_common_test:\n");
+
   try
   {
     SoundSample sample, sample2;
 
-    sample = sample2;
+    printf ("Empty sample properties:\n");
+    printf ("  Samples   - %u\n", sample.SamplesCount ());
+    printf ("  Size      - %u\n", sample.SizeInBytes ());
+    printf ("  Frequency - %u\n", sample.Frequency ());
+    printf ("  Channels  - %u\n", sample.Channels ());
+    printf ("  Bits per sample - %u\n", sample.BitsPerSample ());
 
-    printf ("Results of sound_common_test:\n");
+    sample = sample2;
 
     sample.Load (file_name);
 

@@ -1,4 +1,10 @@
 Results of sound_common_test:
+Empty sample properties:
+  Samples   - 0
+  Size      - 0
+  Frequency - 0
+  Channels  - 0
+  Bits per sample - 0
 Sample name - 'data/sound1.ogg'
 New sample name - 'new_name'
 Sample properties:
