@@ -14,7 +14,7 @@ endif
 ###################################################################################################
 PROFILES          += unistd emscripten has_windows no_dll no_threads
 EXE_SUFFIX        := .js
-DLL_SUFFIX        :=
+DLL_SUFFIX        := .so
 DLL_PREFIX        :=
 NCLIENT_GCC       := $(subst \,/,$(EMSCRIPTEN_SDK))/emscripten/1.12.0
 EMCC              := $(NCLIENT_GCC)/emcc
@@ -30,7 +30,7 @@ LINKER_GCC        := $(COMPILER_GCC)
 NODE_TOOL         := $(subst \,/,$(EMSCRIPTEN_SDK))/node/0.10.17_32bit/node
 COMMON_CPPFLAGS   += -s DISABLE_EXCEPTION_CATCHING=0
 COMMON_CFLAGS     +=
-COMMON_LINK_FLAGS +=
+COMMON_LINK_FLAGS += -v
 BUILD_PATHS       += /$(subst :,,$(call convert_path,$(EMSCRIPTEN_SDK)/emscripten/1.12.0)):/$(subst :,,$(call convert_path,$(PYTHON2_SDK)))
 ADDITIONAL_PATHS  += $(BUILD_PATHS)
 
