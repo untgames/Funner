@@ -57,6 +57,10 @@
 #  include "config-android.h"
 #endif
 
+#ifdef EMSCRIPTEN
+#  include "config-emscripten.h"
+#endif
+
 #if defined(macintosh) && defined(__MRC__)
 #  include "config-mac.h"
 #elif defined (__IPHONE__)
