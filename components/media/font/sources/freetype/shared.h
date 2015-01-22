@@ -20,7 +20,6 @@
 
 #include <media/atlas_builder.h>
 #include <media/charset_manager.h>
-#include <media/font_creation_params_library.h>
 #include <media/font_library.h>
 #include <media/rasterized_font.h>
 

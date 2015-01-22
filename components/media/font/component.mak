@@ -8,7 +8,7 @@ TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.FREETYPE MEDIA.FONT.XFONT MEDIA.FONT.TE
 MEDIA.FONT.SOURCES.TYPE        := static-lib
 MEDIA.FONT.SOURCES.NAME        := funner.media.font
 MEDIA.FONT.SOURCES.SOURCE_DIRS := sources/core
-MEDIA.FONT.SOURCES.IMPORTS     := compile.media.font compile.media.shared
+MEDIA.FONT.SOURCES.IMPORTS     := compile.media.font
 
 #Цель - freetype
 MEDIA.FONT.FREETYPE.TYPE        := static-lib
@@ -25,6 +25,7 @@ MEDIA.FONT.XFONT.IMPORTS     := compile.media.font
 #Цель - xfont
 MEDIA.FONT.FONT_CONVERTER.TYPE         := static-lib
 MEDIA.FONT.FONT_CONVERTER.NAME         := funner.media.font.font_converter
+MEDIA.FONT.FONT_CONVERTER.INCLUDE_DIRS := 
 MEDIA.FONT.FONT_CONVERTER.SOURCE_DIRS  := sources/font_converter
 MEDIA.FONT.FONT_CONVERTER.IMPORTS      := compile.media.font compile.media.image link.media.image compile.extern.freetype
 
