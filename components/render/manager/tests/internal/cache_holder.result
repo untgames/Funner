@@ -12,7 +12,7 @@ Invalidate cache with dependencies
 ...update cache self
 Update error cache
 ...update cache error
-bad allocation
+std::bad_alloc
 Update cache after error
 ...update cache dependency
 Invalidate error cache and update
