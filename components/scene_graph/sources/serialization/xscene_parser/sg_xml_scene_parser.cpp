@@ -136,7 +136,7 @@ struct NodeDecl: public xtl::reference_counter
   {
     math::vec3f position;              //точка поворота
     bool        has_orientation_pivot; //центр поворота не совпадает с геометрическим центром
-    bool        has_scale_pivot;       //центр масштабирования не совпадает с геометрическим центром    
+    bool        has_scale_pivot;       //центр масштабирования не совпадает с геометрическим центром
     
     Pivot ()
       : has_orientation_pivot (true)
@@ -145,7 +145,7 @@ struct NodeDecl: public xtl::reference_counter
     }
   };
 
-  stl::string                name;                //имя узла    
+  stl::string                name;                //имя узла
   math::vec3f                position;            //положение
   math::vec3f                scale;               //масштаб
   math::quatf                orientation;         //ориентация
@@ -287,6 +287,13 @@ struct SoundEmitterDecl: public xtl::reference_counter
   Param<float> gain;
 };
 
+//Описание параметров шрифта
+struct FontDecl : public xtl::reference_counter
+{
+  stl::string               face_name;
+  media::FontCreationParams creation_params;
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
@@ -295,6 +302,7 @@ typedef xtl::intrusive_ptr<StaticMeshDecl>        StaticMeshDeclPtr;
 typedef xtl::intrusive_ptr<SpriteDecl>            SpriteDeclPtr;
 typedef xtl::intrusive_ptr<TextLineDecl>          TextLineDeclPtr;
 typedef xtl::intrusive_ptr<SoundEmitterDecl>      SoundEmitterDeclPtr;
+typedef xtl::intrusive_ptr<FontDecl>              FontDeclPtr;
 
 PropertyType get_property_type (const common::ParseNode& node)
 {
@@ -334,12 +342,14 @@ struct XmlSceneParser::Impl
 
   typedef stl::hash_map<stl::hash_key<const char*>, common::ParseNode>  IncludeMap;
   typedef stl::hash_map<stl::hash_key<const char*>, ParserDesc>         ParserMap;
+  typedef stl::hash_map<stl::hash_key<const char*>, FontDeclPtr>        FontDeclMap;
 
   common::ParseNode root;        //корневой узел
   SceneParserCache  cache;       //кэш парсера
   ResourceGroup     resources;   //ресурсы сцены
   IncludeMap        includes;    //карта подключаемых файлов
   ParserMap         parsers;     //парсеры
+  FontDeclMap       fonts_decls; //загруженные шрифты
   bool              prepared;    //был проведен предварительный разбор
   
 ///Конструктор
@@ -363,7 +373,7 @@ struct XmlSceneParser::Impl
         ParserMap::iterator iter = parsers.find (type);
 
         if (iter == parsers.end () || !iter->second.prepare_handler)
-          continue; //игнорирование неизвестных узлов                    
+          continue; //игнорирование неизвестных узлов
 
         iter->second.prepare_handler (decl);
       }
@@ -395,6 +405,31 @@ struct XmlSceneParser::Impl
     resources.Add (name);
   }
   
+///Разбор узла описания шрифта
+  void PrepareFontNode (const ParseNode& decl)
+  {
+    FontDeclPtr font_decl = FontDeclPtr (new FontDecl, false);
+
+    memset (&font_decl->creation_params, 0, sizeof (font_decl->creation_params));
+
+    font_decl->face_name = get<const char*> (decl, "face");
+
+    font_decl->creation_params.font_size      = get<size_t> (decl, "size");
+    font_decl->creation_params.font_size_eps  = get<size_t> (decl, "size_eps", 0);
+    font_decl->creation_params.weight         = get<size_t> (decl, "weight", 0);
+    font_decl->creation_params.escapement     = get<int> (decl, "escapement", 0);
+    font_decl->creation_params.bold           = xtl::xstrcmp (get<const char*> (decl, "bold", "false"), "true") == 0;
+    font_decl->creation_params.italic         = xtl::xstrcmp (get<const char*> (decl, "italic", "false"), "true") == 0;
+    font_decl->creation_params.underlined     = xtl::xstrcmp (get<const char*> (decl, "underlined", "false"), "true") == 0;
+    font_decl->creation_params.striked        = xtl::xstrcmp (get<const char*> (decl, "striked", "false"), "true") == 0;
+    font_decl->creation_params.stroke_size    = get<size_t> (decl, "stroke_size", 0);
+    font_decl->creation_params.vertical_dpi   = get<size_t> (decl, "vertical_dpi", 0);
+    font_decl->creation_params.horizontal_dpi = get<size_t> (decl, "horizontal_dpi", 0);
+    font_decl->creation_params.charset_name   = get<const char*> (decl, "charset_name");
+
+    fonts_decls [get<const char*> (decl, "id")] = font_decl;
+  }
+
 ///Разбор подключаемого узла
   void PrepareIncludeNode (const ParseNode& decl)
   {
@@ -459,7 +494,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
 {
   try
   { 
-      //создание реализации            
+      //создание реализации
 
     impl = new Impl (root);
     
@@ -477,6 +512,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
     RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSoundEmitter, &*impl, _1));
     RegisterParser ("include", xtl::bind (&XmlSceneParser::IncludeSubscene, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareIncludeNode, &*impl, _1));
+    RegisterParser ("font", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareFontNode, &*impl, _1));
     RegisterParser ("resource", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareResourceNode, &*impl, _1));  
   }
   catch (xtl::exception& e)
@@ -872,7 +908,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
     node_decl->orientation_inherit = strcmp (get<const char*> (decl, "orientation_inherit", "true"), "true") == 0;
     node_decl->scale_inherit       = strcmp (get<const char*> (decl, "scale_inherit", "true"), "true") == 0;
 
-      //парсинг пользовательских свойств              
+      //парсинг пользовательских свойств
 
     PropertyMap* properties = 0;
     
@@ -1031,7 +1067,7 @@ OrthoCameraDeclPtr XmlSceneParser::Impl::PrepareOrthoCamera (const ParseNode& de
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (OrthoCameraDeclPtr* node_decl_ptr = cache.FindValue<OrthoCameraDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1090,7 +1126,7 @@ PerspectiveCameraDeclPtr XmlSceneParser::Impl::PreparePerspectiveCamera (const P
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (PerspectiveCameraDeclPtr* node_decl_ptr = cache.FindValue<PerspectiveCameraDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1145,7 +1181,7 @@ LightDeclPtr XmlSceneParser::Impl::PrepareLight (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (LightDeclPtr* node_decl_ptr = cache.FindValue<LightDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1211,7 +1247,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, DirectLight& node, Node& pare
       
     if (node_decl->radius.state) node.SetRadius (node_decl->radius.value);
     
-      //разбор родительских параметров    
+      //разбор родительских параметров
     
     Parse (decl, static_cast<Light&> (node), parent, context);        
   }
@@ -1235,7 +1271,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, SpotLight& node, Node& parent
     if (node_decl->exponent.state) node.SetExponent (node_decl->exponent.value);
     if (node_decl->angle.state)    node.SetAngle (degree (node_decl->angle.value));
     
-      //разбор родительских параметров    
+      //разбор родительских параметров
     
     Parse (decl, static_cast<Light&> (node), parent, context);    
   }
@@ -1263,7 +1299,7 @@ StaticMeshDeclPtr XmlSceneParser::Impl::PrepareStaticMesh (const ParseNode& decl
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (StaticMeshDeclPtr* node_decl_ptr = cache.FindValue<StaticMeshDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1322,7 +1358,7 @@ SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (SpriteDeclPtr* node_decl_ptr = cache.FindValue<SpriteDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1400,7 +1436,7 @@ TextLineDeclPtr XmlSceneParser::Impl::PrepareTextLine (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (TextLineDeclPtr* node_decl_ptr = cache.FindValue<TextLineDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1439,8 +1475,45 @@ void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent,
       //настройка узла
       
     node.SetTextUtf8 (node_decl->text.c_str ());
-    node.SetFont (node_decl->font.c_str ());
-    
+
+    Impl::FontDeclMap::iterator font_decl_iter = impl->fonts_decls.find (node_decl->font.c_str ());
+
+    if (font_decl_iter == impl->fonts_decls.end ())
+      raise_parser_exception (decl, "Font '%s' is not defined", node_decl->font.c_str ());
+
+    FontDecl& font_decl = *font_decl_iter->second;
+
+    node.SetFont (get<const char*> (decl, "font_face", font_decl.face_name.c_str ()));
+
+    FontDpi* font_dpi = context.FindAttachment<FontDpi> ();
+
+    media::FontCreationParams font_creation_params = font_decl.creation_params;
+
+    if (font_dpi)
+    {
+      if (!font_creation_params.vertical_dpi)
+        font_creation_params.vertical_dpi = font_dpi->vertical_dpi;
+
+      if (!font_creation_params.horizontal_dpi)
+        font_creation_params.horizontal_dpi = font_dpi->horizontal_dpi;
+    }
+
+      //load font params overrides
+    font_creation_params.font_size      = get<size_t> (decl, "font_size", font_creation_params.font_size);
+    font_creation_params.font_size_eps  = get<size_t> (decl, "font_size_eps", font_creation_params.font_size_eps);
+    font_creation_params.weight         = get<size_t> (decl, "font_weight", font_creation_params.weight);
+    font_creation_params.escapement     = get<int> (decl, "font_escapement", font_creation_params.escapement);
+    font_creation_params.bold           = xtl::xstrcmp (get<const char*> (decl, "font_bold", font_creation_params.bold ? "true" : "false"), "true") == 0;
+    font_creation_params.italic         = xtl::xstrcmp (get<const char*> (decl, "font_italic", font_creation_params.italic ? "true" : "false"), "true") == 0;
+    font_creation_params.underlined     = xtl::xstrcmp (get<const char*> (decl, "font_underlined", font_creation_params.underlined ? "true" : "false"), "true") == 0;
+    font_creation_params.striked        = xtl::xstrcmp (get<const char*> (decl, "font_striked", font_creation_params.striked ? "true" : "false"), "true") == 0;
+    font_creation_params.stroke_size    = get<size_t> (decl, "font_stroke_size", font_creation_params.stroke_size);
+    font_creation_params.vertical_dpi   = get<size_t> (decl, "font_vertical_dpi", font_creation_params.vertical_dpi);
+    font_creation_params.horizontal_dpi = get<size_t> (decl, "font_horizontal_dpi", font_creation_params.horizontal_dpi);
+    font_creation_params.charset_name   = get<const char*> (decl, "font_charset_name", font_creation_params.charset_name);
+
+    node.SetFontCreationParams (font_creation_params);
+
     if (node_decl->horizontal_alignment.state) node.SetHorizontalAlignment (node_decl->horizontal_alignment.value);
     if (node_decl->vertical_alignment.state)   node.SetVerticalAlignment (node_decl->vertical_alignment.value);
     
@@ -1485,7 +1558,7 @@ SoundEmitterDeclPtr XmlSceneParser::Impl::PrepareSoundEmitter (const ParseNode& 
 {
   try
   {
-      //попытка найти параметры в кеше      
+      //попытка найти параметры в кеше
 
     if (SoundEmitterDeclPtr* node_decl_ptr = cache.FindValue<SoundEmitterDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1541,7 +1614,7 @@ template <> void XmlSceneParser::CreateNode<TextLine> (const common::ParseNode& 
       //получение библиотеки шрифтов
       
     media::FontLibrary& font_library = context.Attachment<media::FontLibrary> ();
-    
+
       //настройка узла
 
     TextLine::Pointer node = TextLine::Create (font_library);

@@ -12,6 +12,7 @@
 #include <media/font_library.h>
 
 #include <sg/scene_manager.h>
+#include <sg/text.h>
 
 using namespace scene_graph;
 

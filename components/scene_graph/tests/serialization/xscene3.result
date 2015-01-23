@@ -280,11 +280,11 @@ node 'text_line':
     vector ParentOrtX='1 0 0 0'
     vector ParentOrtY='0 1 0 0'
     vector ParentOrtZ='0 0 1 0'
-    integer InfiniteBounds='1'
+    integer InfiniteBounds='0'
     vector WireColor='0 0 0 0'
     integer Visible='1'
     string Scissor=''
-    string Font='my_font'
+    string Font='Times'
     vector Color='1 1 1 0.5'
     string TextUtf8='Hello world'
 node 'sound':

@@ -24,8 +24,17 @@ int main ()
 
     media::FontLibrary font_library;
 
+    font_library.LoadFont ("data/times.xfont");
+
     context.Attach (font_library);
-    
+
+    FontDpi font_dpi;
+
+    font_dpi.horizontal_dpi = 100;
+    font_dpi.vertical_dpi   = 100;
+
+    context.Attach (font_dpi);
+
     context.SetLogHandler (&print_log);
     
     Node::Pointer node = manager.CreateScene ("scene3", context);
