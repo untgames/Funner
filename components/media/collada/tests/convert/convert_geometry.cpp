@@ -14,6 +14,10 @@ int main ()
 {
   printf ("Results of collada_import_test:\n");
 
+#ifdef _MSC_VER
+  _set_output_format (_TWO_DIGIT_EXPONENT);
+#endif
+
   try
   {
     printf ("Load collada model '%s'\n", COLLADA_FILE_NAME);
