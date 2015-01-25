@@ -4,7 +4,7 @@
     <include source="data/include1.xscene"/>
     <node id="node1"/>
     <node id="node2" scale="1; -2; 3">
-      <node id="node3" position="1;2;3" scale="1; 2; 3" rotation="10;20;30">
+      <node id="node3" position="1;2;3" scale="1; 2; 3" rotation="10;20;45">
         <property name="A" type="int" value="4"/>
       </node>
       <node id="node2" position="1;2;3" parent="node1">
