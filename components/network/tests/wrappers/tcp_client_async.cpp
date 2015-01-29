@@ -59,6 +59,8 @@ int server ()
   {
     Socket socket (SocketDomain_IpV4, SocketProtocol_Tcp);
 
+    socket.SetReuseAddress (true);
+
     unsigned char address [] = { 0, 0, 0, 0 };
 
     socket.Bind (SocketAddress (InetAddress (address), CONNECTION_PORT));

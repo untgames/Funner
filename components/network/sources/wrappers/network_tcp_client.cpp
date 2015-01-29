@@ -155,9 +155,9 @@ class AsyncProcessor
   public:
 /// онструктор
     AsyncProcessor (const char* name)
-      : thread (name, xtl::bind (&AsyncProcessor::Run, this))
-      , log (name)
+      : log (name)
       , stop_requested (false)
+      , thread (name, xtl::bind (&AsyncProcessor::Run, this))
     {
     }
 
@@ -213,9 +213,9 @@ class AsyncProcessor
     virtual void DoStep () = 0;
 
   private:    
-    syslib::Thread thread;         //нить отсылки данных
     common::Log    log;            //поток отладочного протоколировани€
     volatile bool  stop_requested; //запрошена остановка
+    syslib::Thread thread;         //нить отсылки данных
 };
 
 ///јсинхронна€ отсылка данных
