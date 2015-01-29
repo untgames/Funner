@@ -33,7 +33,7 @@ Body world transform:
 light falling body state:
   mass = 1.00
 Body world transform:
-  position = -23; -4; 0
+  position = -6; -4; 0
   orientation = 0.0; 0.0; 0.0; 0.9
 heavy falling body state:
   mass = 5.00
@@ -52,12 +52,12 @@ Body world transform:
   orientation = 0.0; 0.0; 0.0; 1.0
 light falling body state:
 Body world transform:
-  position = -42; -14; 0
-  orientation = 0.0; 0.0; 0.6; 0.7
+  position = -6; -14; 0
+  orientation = 0.0; 0.0; 0.0; 0.9
 scaled falling body state:
 Body world transform:
-  position = -31; -13; 0
-  orientation = 0.0; 0.0; 0.9; 0.4
+  position = -3; -13; 0
+  orientation = 0.0; 0.0; 0.2; 0.9
 heavy falling body state:
 Body world transform:
   position = 5; -14; 0
@@ -65,12 +65,12 @@ Body world transform:
 Simulating one second after deleting ground
 light falling body state:
 Body world transform:
-  position = -58; -18; 0
+  position = -7; -18; 0
   orientation = 0.0; 0.0; 0.0; 0.9
 scaled falling body state:
 Body world transform:
-  position = -43; -17; 0
-  orientation = 0.0; 0.0; 0.8; 0.4
+  position = -3; -17; 0
+  orientation = 0.0; 0.0; 0.3; 0.9
 heavy falling body state:
 Body world transform:
   position = 5; -18; 0
