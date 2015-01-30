@@ -82,10 +82,17 @@ function xml_test ()
   print_node (node, 0)
   
   node:SaveXml ("/io/stdout")
+  
+  if not Common.File.IsFileExist ("results") then
+    Common.File.Mkdir ("results")
+  end
+  
   node:SafeSaveXml ("results/string_tree.xml")
   
   local node1 = Common.StringNode.LoadXml ("results/string_tree.xml")
   
+  Common.File.Remove ("results")
+
   print_node (node1, 0)  
   
   local node2 = Common.StringNode.LoadXml ("data/empty_string_tree.xml")

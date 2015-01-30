@@ -121,33 +121,31 @@ Body collision callback called for event Begin at point 1 1 1
 Collision callback called for event Begin at point 1 1 1
 body transform updated
 Collision filter called
-Body collision callback called for event Begin at point 5.03049 0.773372 4.15085
-Collision callback called for event Begin at point 5.03049 0.773372 4.15085
+Body collision callback called for event Begin at point 4.52097 0.563089 5.30535
+Collision callback called for event Begin at point 4.52097 0.563089 5.30535
+body transform updated
+Body collision callback called for event Begin at point 1.92168 1.18745 0.569357
+Collision callback called for event Begin at point 1.92168 1.18745 0.569357
+body transform updated
+Body collision callback called for event Begin at point 3.85729 0.553512 6.22816
+Collision callback called for event Begin at point 3.85729 0.553512 6.22816
+body transform updated
+Body collision callback called for event Begin at point 3.31628 1.51538 0.623734
+Collision callback called for event Begin at point 3.31628 1.51538 0.623734
+body transform updated
+Body collision callback called for event Begin at point -0.18055 1.67989 6.68393
+Collision callback called for event Begin at point -0.18055 1.67989 6.68393
+body transform updated
+Body collision callback called for event Begin at point 4.0508 1.66869 0.869632
+Collision callback called for event Begin at point 4.0508 1.66869 0.869632
+body transform updated
+Body collision callback called for event Begin at point -0.324191 1.27769 6.40552
+Collision callback called for event Begin at point -0.324191 1.27769 6.40552
 body transform updated
 Collision filter called
 body transform updated
-Collision filter called
-Body collision callback called for event Begin at point 2.21565 1.06546 7.18535
-Collision callback called for event Begin at point 2.21565 1.06546 7.18535
-body transform updated
-Body collision callback called for event Begin at point 3.08196 1.55121 0.627735
-Collision callback called for event Begin at point 3.08196 1.55121 0.627735
-body transform updated
-Collision filter called
-Body collision callback called for event Begin at point 0.83667 0.982244 6.8548
-Collision callback called for event Begin at point 0.83667 0.982244 6.8548
-body transform updated
-body transform updated
-Collision filter called
-Body collision callback called for event Begin at point 0.896958 1.35522 0.839029
-Collision callback called for event Begin at point 0.896958 1.35522 0.839029
-body transform updated
-Body collision callback called for event Begin at point 3.54048 1.41769 7.02281
-Collision callback called for event Begin at point 3.54048 1.41769 7.02281
-body transform updated
-Collision filter called
-Body collision callback called for event Begin at point -0.402415 1.58518 6.26219
-Collision callback called for event Begin at point -0.402415 1.58518 6.26219
+Body collision callback called for event Begin at point 4.29711 1.52449 1.01577
+Collision callback called for event Begin at point 4.29711 1.52449 1.01577
 body transform updated
 Node position = [0.00 0.00 0.00]
-Node position = [2.14 2.95 3.91]
+Node position = [2.25 2.31 4.03]

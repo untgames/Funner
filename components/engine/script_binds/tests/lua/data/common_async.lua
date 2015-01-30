@@ -2,7 +2,6 @@ function test_async_post()
   print "Async post test"
   
   local function OnLoad (data)
---    print ("File data: '" .. data .. "'")
     if data ~= "" then print ("Data received") end
     
     System.Application.Exit (0)
@@ -10,7 +9,7 @@ function test_async_post()
   
   local callback = Common.File.CreateAsyncLoadHandler (OnLoad)
 
-  local FILE_NAME = "http://www.untgames.com"       
+  local FILE_NAME = "http://svn.untgames.com"       
   local result    = Common.File.AsyncPostString (FILE_NAME, "post_string", callback)
 
   print ("Test completed")
