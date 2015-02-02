@@ -19,7 +19,7 @@ int main ()
   m1.insert_pair (4,40);
 
   print ("m1 =", m1.begin (), m1.end ());
-  printf ("max_size: %lu\n", m1.max_size ());
+  printf ("max_size correct: %d\n", m1.max_size () == myMap::size_type (-1) / sizeof (myMap::allocator_type::value_type));
   printf ("size: %lu\n", m1.size ());
   printf ("empty: %s\n", m1.empty ()?"true":"false");
 

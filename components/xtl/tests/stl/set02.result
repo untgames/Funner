@@ -1,7 +1,7 @@
 Results of set2_test:
 s1 = 10 20 30 40
 s2 = 40 30 20 10
-max_size: 214748364
+max_size correct: 1
 size: 4
 empty: false
 lkc (2, 3) return 'true'

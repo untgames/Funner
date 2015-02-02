@@ -20,7 +20,7 @@ int main ()
 
   print ("hm1 =", hm1.begin (), hm1.end ());
   printf ("size: %lu\n", hm1.size ());
-  printf ("max_size: %lu\n", hm1.max_size ());
+  printf ("max_size correct: %d\n", hm1.max_size () == MyHash::size_type (-1) / sizeof (MyHash::allocator_type::value_type));
   printf ("empty: %s\n", hm1.empty ()?"true":"false");
 
   MyHash::key_equal ke = hm1.key_eq ();

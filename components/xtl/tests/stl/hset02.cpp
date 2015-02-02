@@ -18,7 +18,7 @@ int main ()
 
   print ("hs1 =", hs1.begin (), hs1.end ());
 
-  printf ("max_size: %lu\n", hs1.max_size ());
+  printf ("max_size correct: %d\n", hs1.max_size () == hash_set<int>::size_type (-1) / sizeof (hash_set<int>::allocator_type::value_type));
   printf ("size: %lu\n", hs1.size ());
   printf ("empty: %s\n", hs1.empty ()?"true":"false");
 

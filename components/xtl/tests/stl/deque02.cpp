@@ -25,7 +25,8 @@ int main ()
 
   printf ("c1.size () = %lu\n", c1.size ());
   printf ("c2.size () = %lu\n", c2.size ());
-  printf ("c1.max_size () = %lu\n", c1.max_size ());
+
+  printf ("c1.max_size correct = %d\n", c1.max_size () == deque<int>::size_type (-1) / sizeof (int));
 
   return 0;
 }

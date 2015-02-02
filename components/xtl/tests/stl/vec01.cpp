@@ -10,7 +10,7 @@ int main ()
   printf ("Results of vec01_test:\n");
   printf ("empty = %d\n",v.empty ());
   printf ("size = %lu\n",v.size ());
-  printf ("max_size = %lu\n",v.max_size ());
+  printf ("max_size correct: %d\n", v.max_size () == vector<int>::size_type (-1) / sizeof (vector<int>::allocator_type::value_type));
 
   v.push_back (42);
 

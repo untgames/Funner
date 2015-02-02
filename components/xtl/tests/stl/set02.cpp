@@ -19,7 +19,7 @@ int main ()
 
   print ("s1 =", s1.begin (), s1.end ());
   print ("s2 =", s2.begin (), s2.end ());
-  printf ("max_size: %lu\n", s1.max_size ());
+  printf ("max_size correct: %d\n", s1.max_size () == set <int, less <int> >::size_type (-1) / sizeof (set <int, less <int> >::allocator_type::value_type));
   printf ("size: %lu\n", s1.size ());
   printf ("empty: %s\n", s1.empty ()?"true":"false");
 
