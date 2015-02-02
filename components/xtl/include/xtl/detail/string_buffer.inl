@@ -163,7 +163,13 @@ typename basic_string_buffer<T, Allocator>::size_type basic_string_buffer<T, All
   if (!format)
     return 0;
 
-  int append_size = xvsnprintf (0, 0, format, args);
+  va_list args_copy;
+
+  va_copy (args_copy, args);
+
+  int append_size = xvsnprintf (0, 0, format, args_copy);
+
+  va_end (args_copy);
 
   if (append_size <= 0)
     return 0;

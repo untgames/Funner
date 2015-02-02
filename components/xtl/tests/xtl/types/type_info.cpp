@@ -50,7 +50,7 @@ void dump1 (const xtl::type_info& t)
   DUMP_FIELD (is_signed);
   DUMP_FIELD (is_unsigned);  
   
-  printf ("  alignment_of: %u\n", t.alignment_of ());
+//  printf ("  alignment_of: %u\n", t.alignment_of ());
   printf ("  rank: %u\n", t.rank ());
 
   #undef DUMP_FIELD

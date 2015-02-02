@@ -26,7 +26,7 @@ int main ()
   last = ++s1.begin ();
   set <int> s3 (first, ++last);
 
-  set <int>::allocator_type s2_Alloc = s2_Alloc = s2.get_allocator ();
+  set <int>::allocator_type s2_Alloc = s2.get_allocator ();
   set <int> s4 (s3.begin (), ++s3.begin (), less<int>( ), s2_Alloc);
 
   print ("s0 =", s0.begin (), s0.end ());
