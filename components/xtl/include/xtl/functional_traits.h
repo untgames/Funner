@@ -602,7 +602,7 @@ struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8,
     Специализации для указателей на функцию с модификатором __fastcall
 */
 
-#if !defined (__cplusplus_cli) && !defined (WP8)
+#if !defined (__cplusplus_cli) && !defined (WP8) && !defined (_M_X64)
 
 //специализация для указателя на функцию без аргументов
 template <class Ret>
@@ -814,6 +814,8 @@ struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg
     Специализации для указателей на функцию с модификатором __stdcall
 */
 
+#ifndef _M_X64
+
 //специализация для указателя на функцию без аргументов
 template <class Ret>
 struct functional_traits<Ret (__stdcall*)()>: public ptrfun_arguments_traits<0, Ret>  { };
@@ -1018,6 +1020,8 @@ struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
+#endif
+
 /*
     Специализации для указателей на функцию с модификатором __cdecl
 */
@@ -1065,6 +1069,8 @@ struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7
 /*
     Специализации для указателей на функцию-член класса с модификатором __cdecl
 */
+
+#ifndef _M_X64
 
 //специализация для указателя на функцию-член класса T без аргументов
 template <class T,class Ret>
@@ -1225,6 +1231,8 @@ struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, 
 //специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
+
+#endif //_M_X64
 
 #endif //_MSC_VER
 
