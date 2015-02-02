@@ -42,7 +42,7 @@ void dump1 (const xtl::type_info& t)
   DUMP_FIELD (has_trivial_constructor);
   DUMP_FIELD (has_trivial_copy);
   DUMP_FIELD (has_trivial_assign);
-  DUMP_FIELD (has_trivial_destructor);
+//  DUMP_FIELD (has_trivial_destructor);
 //  DUMP_FIELD (has_nothrow_constructor);
 //  DUMP_FIELD (has_nothrow_copy);
 //  DUMP_FIELD (has_nothrow_assign);
