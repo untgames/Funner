@@ -10,8 +10,6 @@ struct Test
   const char* spaces;
 };
 
-const size_t MAX_WORDS = 4;
-
 int main ()
 {
   printf ("Results of trim_test:\n");

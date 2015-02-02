@@ -526,7 +526,7 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
   const char* p_buf = (const char*) data;
 
   // Handle leading misaligned bytes
-  size_t initial_bytes = (4 - (int)p_buf) & 3;
+  size_t initial_bytes = (4 - (size_t)p_buf) & 3;
 
   if (data_size < initial_bytes)
     initial_bytes = data_size;

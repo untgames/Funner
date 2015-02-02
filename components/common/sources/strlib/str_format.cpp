@@ -9,7 +9,13 @@ stl::string vformat (const char* format,va_list list)
   if (!format)
     return "";
 
-  int size = xtl::xvsnprintf (0,0,format,list);
+  va_list list_copy;
+
+  va_copy (list_copy, list);
+
+  int size = xtl::xvsnprintf (0,0,format,list_copy);
+
+  va_end (list_copy);
 
   if (size == -1)
     return "";

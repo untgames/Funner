@@ -72,6 +72,58 @@ void log_exception (const char* source)
   }
 }
 
+//Class for mapping StdFile to int descriptor
+class ZipFilesTable
+{
+  public:
+    //Constructor
+    ZipFilesTable ()
+      : current_file (1)
+    {}
+
+    //Open file
+    int CreateNewFile (const char* name)
+    {
+      static const char* METHOD_NAME = "common::ZipFilesTable::CreateNewFile";
+
+      if (current_file < 0)
+        throw xtl::format_operation_exception (METHOD_NAME, "Create files limit exceeded");
+
+      StdFile new_file (name, FileMode_ReadOnly);
+
+      if (!files.insert_pair (current_file, new_file).second)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't add new file to files map");
+
+      return current_file++;
+    }
+
+    //Close file
+    void CloseFile (int fd)
+    {
+      files.erase (fd);
+    }
+
+    //Get file
+    StdFile& GetFile (int fd)
+    {
+      FileMap::iterator iter = files.find (fd);
+
+      if (iter == files.end ())
+        throw xtl::make_argument_exception ("common::ZipFilesTable::GetFile", "fd", fd);
+
+      return iter->second;
+    }
+
+  private:
+    typedef stl::hash_map<int, StdFile> FileMap;
+
+  private:
+    int     current_file; //current file index
+    FileMap files;        //map of opened files
+};
+
+typedef common::Singleton<ZipFilesTable> ZipFilesTableSingleton;
+
 int zip_open_func (zzip_char_t* name, int flags, ...)
 {
   try
@@ -81,7 +133,7 @@ int zip_open_func (zzip_char_t* name, int flags, ...)
     if (flags & INVALID_MODE)
       throw xtl::make_argument_exception ("", "flags", flags);
 
-    return (int)new StdFile (name, FileMode_ReadOnly);
+    return ZipFilesTableSingleton::Instance ()->CreateNewFile (name);
   }
   catch (std::exception& exception)
   {
@@ -99,7 +151,7 @@ int zip_close_func (int fd)
 {
   try
   {
-    delete (StdFile*)fd;
+    ZipFilesTableSingleton::Instance ()->CloseFile (fd);
 
     return 0;
   }
@@ -122,7 +174,7 @@ zzip_ssize_t zip_read_func (int fd, void* buf, zzip_size_t len)
 
   try
   {
-    return ((StdFile*)fd)->Read (buf, len);
+    return ZipFilesTableSingleton::Instance ()->GetFile (fd).Read (buf, len);
   }
   catch (std::exception& exception)
   {
@@ -151,7 +203,7 @@ zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
         throw xtl::make_argument_exception ("common::zip_seek_func", "whence", whence);
     }
 
-    return (zzip_off_t)((StdFile*)fd)->Seek (offset, seek_mode);
+    return (zzip_off_t)ZipFilesTableSingleton::Instance ()->GetFile (fd).Seek (offset, seek_mode);
   }
   catch (std::exception& exception)
   {
@@ -169,7 +221,7 @@ zzip_off_t zip_size_func (int fd)
 {
   try
   {
-    return (zzip_off_t)((StdFile*)fd)->Size ();
+    return (zzip_off_t)ZipFilesTableSingleton::Instance ()->GetFile (fd).Size ();
   }
   catch (std::exception& exception)
   {
@@ -190,7 +242,7 @@ zzip_ssize_t zip_write_func (int fd, _zzip_const void* buf, zzip_size_t len)
     if (!len)
       return 0;
 
-    return ((StdFile*)fd)->Write (buf, len);
+    return ZipFilesTableSingleton::Instance ()->GetFile (fd).Write (buf, len);
   }
   catch (std::exception& exception)
   {

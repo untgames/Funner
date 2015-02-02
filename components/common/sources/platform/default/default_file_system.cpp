@@ -231,7 +231,7 @@ void StdioFileSystem::FileFlush (file_t file)
   {
     switch (errno)
     {
-      case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileFlush","file",(int)file,"Invalid file descriptor"); break;
+      case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileFlush","file",(size_t)file,"Invalid file descriptor"); break;
       case ENOSPC: throw xtl::format_operation_exception ("common::StdioFileSystem::FileFlush","Unable to flush file buffers due to write failure"); break;
       default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileFlush","Unknown error"); break;
     }
