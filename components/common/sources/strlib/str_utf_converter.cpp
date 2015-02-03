@@ -176,7 +176,7 @@ template<>
 bool decoder<Encoding_ASCII7> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
   const unsigned char* src_ptr = (const unsigned char*)src_char;
-  size_t* dst_ptr = (size_t*)dst_char;
+  uint32_t* dst_ptr = (uint32_t*)dst_char;
 
   if (src_size < sizeof(char))
     return false;
@@ -194,7 +194,7 @@ template<>
 bool decoder<Encoding_UTF8> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
   const unsigned char* src_ptr = (const unsigned char*)src_char;
-  size_t* dst_ptr = (size_t*)dst_char;
+  uint32_t* dst_ptr = (uint32_t*)dst_char;
 
   if (src_size < sizeof(char))
     return false;
@@ -244,6 +244,7 @@ bool decoder<Encoding_UTF8> (const void*& src_char, size_t& src_size, void*& dst
   }
 
   src_char = src_ptr;
+
   return true;
 }
 
@@ -253,7 +254,7 @@ bool decoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& 
   xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
 
   const unsigned short* src_ptr = (const unsigned short*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  uint32_t* dst_ptr = (uint32_t*) dst_char;
 
   if (src_size < 2)
     return false;
@@ -279,6 +280,7 @@ bool decoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& 
   }
 
   src_char = src_ptr;
+
   return true;
 }
 
@@ -288,7 +290,7 @@ bool decoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& 
   xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
 
   const unsigned short* src_ptr = (const unsigned short*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  uint32_t* dst_ptr = (uint32_t*) dst_char;
   unsigned short tmp0, tmp1;
 
   if (src_size < 2)
@@ -325,15 +327,15 @@ bool decoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool decoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+  uint32_t* dst_ptr = (uint32_t*) dst_char;
 
-  if (src_size < sizeof(unsigned int))
+  if (src_size < sizeof(uint32_t))
     return false;
 
   *dst_ptr = *src_ptr;
   src_ptr++;
-  src_size -= sizeof(unsigned int);
+  src_size -= sizeof(uint32_t);
 
   src_char = src_ptr;
   return true;
@@ -342,10 +344,10 @@ bool decoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+  uint32_t* dst_ptr = (uint32_t*) dst_char;
 
-  if (src_size < sizeof(unsigned int))
+  if (src_size < sizeof(uint32_t))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -354,7 +356,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   src_ptr++;
-  src_size -= sizeof(unsigned int);
+  src_size -= sizeof(uint32_t);
 
   src_char = src_ptr;
   return true;
@@ -365,8 +367,8 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool encoder<Encoding_ASCII7> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  unsigned char* dst_ptr = (unsigned char*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+  unsigned char*  dst_ptr = (unsigned char*) dst_char;
 
   if (dst_size < sizeof(char))
     return false;
@@ -383,8 +385,8 @@ bool encoder<Encoding_ASCII7> (const void*& src_char, size_t& src_size, void*& d
 template<>
 bool encoder<Encoding_UTF8> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  unsigned char* dst_ptr = (unsigned char*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+  unsigned char*  dst_ptr = (unsigned char*) dst_char;
 
   if (*src_ptr > 0xFFFF)
   {
@@ -442,7 +444,7 @@ bool encoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& 
 {
   xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
 
-  const size_t* src_ptr = (const size_t*) src_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
   unsigned short* dst_ptr = (unsigned short*) dst_char;
   size_t tmp;
 
@@ -481,7 +483,7 @@ bool encoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& 
 {
   xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
 
-  const size_t* src_ptr = (const size_t*) src_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
   unsigned short* dst_ptr = (unsigned short*) dst_char;
   unsigned short tmp0, tmp1;
 
@@ -521,16 +523,16 @@ bool encoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool encoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+        uint32_t* dst_ptr = (uint32_t*) dst_char;
 
-  if (dst_size < sizeof(unsigned int))
+  if (dst_size < sizeof(uint32_t))
     return false;
 
   *dst_ptr = *src_ptr;
 
   dst_ptr++;
-  dst_size -= sizeof(unsigned int);
+  dst_size -= sizeof(uint32_t);
 
   dst_char = dst_ptr;
   return true;
@@ -539,10 +541,10 @@ bool encoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const size_t* src_ptr = (const size_t*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
+  const uint32_t* src_ptr = (const uint32_t*) src_char;
+        uint32_t* dst_ptr = (uint32_t*) dst_char;
 
-  if (dst_size < sizeof(unsigned int))
+  if (dst_size < sizeof(uint32_t))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -551,7 +553,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   dst_ptr++;
-  dst_size -= sizeof(unsigned int);
+  dst_size -= sizeof(uint32_t);
 
   dst_char = dst_ptr;
   return true;

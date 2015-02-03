@@ -1,6 +1,8 @@
-#include <common/hash.h>
-#include <string.h>
+#include <stdint.h>
+#include <cstring>
 #include <new>
+
+#include <common/hash.h>
 
 using namespace common;
 
@@ -11,16 +13,16 @@ namespace
 typedef unsigned char *POINTER;
 
 /* UINT2 defines a two byte word */
-typedef unsigned short int UINT2;
+typedef uint16_t UINT2;
 
 /* UINT4 defines a four byte word */
-typedef unsigned long int UINT4;
+typedef uint32_t UINT4;
 
 /* MD5 context. */
 struct MD5_CTX
 {
-  unsigned long state[4];             /* state (ABCD) */
-  unsigned long count[2];             /* number of bits, modulo 2^64 (lsb first) */
+  uint32_t      state[4];             /* state (ABCD) */
+  uint32_t      count[2];             /* number of bits, modulo 2^64 (lsb first) */
   unsigned char buffer[64];           /* input buffer */
 };
 

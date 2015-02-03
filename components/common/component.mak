@@ -64,7 +64,7 @@ COMMON.ZIP_FILE_SYSTEM.IMPORTS      := compile.extern.zzip
 COMMON.AES.TYPE             := static-lib
 COMMON.AES.NAME             := funner.common.aes
 COMMON.AES.SOURCE_DIRS      := sources/crypto/aes
-COMMON.AES.IMPORTS          := compile.common
+COMMON.AES.IMPORTS          := compile.common compile.extern.openssl
 
 #Цель - CommonLib iconv sources
 COMMON.ICONV.TYPE             := static-lib
