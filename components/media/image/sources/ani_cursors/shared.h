@@ -26,21 +26,21 @@ namespace ani_cursors
 ///Riff data header 
 struct RiffHeader
 {
-  char   tag [4]; //RIFF tag
-  size_t length;  //length of file
+  char     tag [4]; //RIFF tag
+  uint32_t length;  //length of file
 };
 
 ///Animation cursor header
 struct AniHeader
 {
-  size_t header_size;    // размер AniHeader (36 bytes)
-  size_t images_count;   // количество изображений в файле
-  size_t frames_count;   // количество кадров в файле
-  size_t cx, cy;         // зарезервированы
-  size_t bits_per_pixel; // зарезервировано, должны быть равны нулю
-  size_t planes_count;   // зарезервировано, должно быть равно нулю
-  size_t fps;            // количество кадров в секунду
-  size_t flags;          // флаги
+  uint32_t header_size;    // размер AniHeader (36 bytes)
+  uint32_t images_count;   // количество изображений в файле
+  uint32_t frames_count;   // количество кадров в файле
+  uint32_t cx, cy;         // зарезервированы
+  uint32_t bits_per_pixel; // зарезервировано, должны быть равны нулю
+  uint32_t planes_count;   // зарезервировано, должно быть равно нулю
+  uint32_t fps;            // количество кадров в секунду
+  uint32_t flags;          // флаги
 };
 
 #ifdef _MSC_VER

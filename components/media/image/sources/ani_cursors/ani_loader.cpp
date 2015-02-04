@@ -49,7 +49,7 @@ class AniLoader
           
           Read (tag);
           
-          size_t chunk_size = 0;
+          uint32_t chunk_size = 0;
           
           Read (chunk_size);
           
@@ -106,7 +106,7 @@ class AniLoader
         
         if (!memcmp ("INAM", tag, sizeof tag) || !memcmp ("IART", tag, sizeof tag))
         {
-          size_t chunk_size = 0;
+          uint32_t chunk_size = 0;
           
           Read (chunk_size);
           
@@ -140,7 +140,7 @@ class AniLoader
         if (memcmp ("icon", tag, sizeof tag))
           throw xtl::format_operation_exception ("", "Can't read frame. No tag 'icon' found");
           
-        size_t length = 0;
+        uint32_t length = 0;
         
         Read (length);
         
@@ -171,9 +171,9 @@ class AniLoader
     {
       try
       {
-        stl::vector<size_t> frame_indexes (ani_header.frames_count);
+        stl::vector<uint32_t> frame_indexes (ani_header.frames_count);
         
-        size_t required_size = frame_indexes.size () * sizeof (size_t),
+        size_t required_size = frame_indexes.size () * sizeof (uint32_t),
                read_size     = file.Read (&frame_indexes [0], required_size);
         
         if (read_size != required_size)

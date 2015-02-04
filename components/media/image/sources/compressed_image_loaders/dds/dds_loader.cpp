@@ -41,25 +41,10 @@ typedef unsigned char uint8;
 const char DDS_MAGIC_ID [4] = {'D', 'D', 'S', ' '};
 
 // surface description flags
-const unsigned long DDSF_CAPS           = 0x00000001l;
-const unsigned long DDSF_HEIGHT         = 0x00000002l;
-const unsigned long DDSF_WIDTH          = 0x00000004l;
-const unsigned long DDSF_PITCH          = 0x00000008l;
-const unsigned long DDSF_PIXELFORMAT    = 0x00001000l;
 const unsigned long DDSF_MIPMAPCOUNT    = 0x00020000l;
-const unsigned long DDSF_LINEARSIZE     = 0x00080000l;
-const unsigned long DDSF_DEPTH          = 0x00800000l;
 
 // pixel format flags
-const unsigned long DDSF_ALPHAPIXELS    = 0x00000001l;
 const unsigned long DDSF_FOURCC         = 0x00000004l;
-const unsigned long DDSF_RGB            = 0x00000040l;
-const unsigned long DDSF_RGBA           = 0x00000041l;
-
-// dwCaps1 flags
-const unsigned long DDSF_COMPLEX         = 0x00000008l;
-const unsigned long DDSF_TEXTURE         = 0x00001000l;
-const unsigned long DDSF_MIPMAP          = 0x00400000l;
 
 // dwCaps2 flags
 const unsigned long DDSF_CUBEMAP            = 0x00000200l;
@@ -69,7 +54,6 @@ const unsigned long DDSF_CUBEMAP_POSITIVEY  = 0x00001000l;
 const unsigned long DDSF_CUBEMAP_NEGATIVEY  = 0x00002000l;
 const unsigned long DDSF_CUBEMAP_POSITIVEZ  = 0x00004000l;
 const unsigned long DDSF_CUBEMAP_NEGATIVEZ  = 0x00008000l;
-const unsigned long DDSF_CUBEMAP_ALL_FACES  = 0x0000FC00l;
 const unsigned long DDSF_VOLUME             = 0x00200000l;
 
 // compressed texture types
@@ -98,16 +82,13 @@ const unsigned long FOURCC_A8L8          = 51;
 const unsigned long FOURCC_A4L4          = 52;
 
 ///Блоки форматов DDS
-const uint32 FOURCC_DDS                             = MAKEFOURCC ('D', 'D', 'S', ' ');
 const uint32 FOURCC_DXT1                            = MAKEFOURCC ('D', 'X', 'T', '1');
 const uint32 FOURCC_DXT2                            = MAKEFOURCC ('D', 'X', 'T', '2');
 const uint32 FOURCC_DXT3                            = MAKEFOURCC ('D', 'X', 'T', '3');
 const uint32 FOURCC_DXT4                            = MAKEFOURCC ('D', 'X', 'T', '4');
 const uint32 FOURCC_DXT5                            = MAKEFOURCC ('D', 'X', 'T', '5');
-const uint32 FOURCC_RXGB                            = MAKEFOURCC ('R', 'X', 'G', 'B');
 const uint32 FOURCC_ATI1                            = MAKEFOURCC ('A', 'T', 'I', '1');
 const uint32 FOURCC_ATI2                            = MAKEFOURCC ('A', 'T', 'I', '2');
-const uint32 FOURCC_A2XY                            = MAKEFOURCC ('A', '2', 'X', 'Y');
 const uint32 FOURCC_DX10                            = MAKEFOURCC ('D', 'X', '1', '0');
 const uint32 FOURCC_ATC_RGB_AMD                     = MAKEFOURCC ('A', 'T', 'C', ' ');
 const uint32 FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD     = MAKEFOURCC ('A', 'T', 'C', 'I');

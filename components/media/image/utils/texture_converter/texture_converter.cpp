@@ -35,33 +35,16 @@ const char DDS_MAGIC_ID [4] = {'D', 'D', 'S', ' '};
 const unsigned long DDSD_CAPS           = 0x00000001l;
 const unsigned long DDSD_HEIGHT         = 0x00000002l;
 const unsigned long DDSD_WIDTH          = 0x00000004l;
-const unsigned long DDSD_PITCH          = 0x00000008l;
 const unsigned long DDSD_PIXELFORMAT    = 0x00001000l;
 const unsigned long DDSD_MIPMAPCOUNT    = 0x00020000l;
-const unsigned long DDSD_LINEARSIZE     = 0x00080000l;
-const unsigned long DDSD_DEPTH          = 0x00800000l;
 
 // pixel format flags
-const unsigned long DDPF_ALPHAPIXELS    = 0x00000001l;
 const unsigned long DDPF_FOURCC         = 0x00000004l;
-const unsigned long DDPF_RGB            = 0x00000040l;
-const unsigned long DDPF_RGBA           = 0x00000041l;
 
 // dwCaps1 flags
 const unsigned long DDSCAPS_COMPLEX         = 0x00000008l;
 const unsigned long DDSCAPS_TEXTURE         = 0x00001000l;
 const unsigned long DDSCAPS_MIPMAP          = 0x00400000l;
-
-// dwCaps2 flags
-const unsigned long DDSCAPS2_CUBEMAP            = 0x00000200l;
-const unsigned long DDSCAPS2_CUBEMAP_POSITIVEX  = 0x00000400l;
-const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEX  = 0x00000800l;
-const unsigned long DDSCAPS2_CUBEMAP_POSITIVEY  = 0x00001000l;
-const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEY  = 0x00002000l;
-const unsigned long DDSCAPS2_CUBEMAP_POSITIVEZ  = 0x00004000l;
-const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEZ  = 0x00008000l;
-const unsigned long DDSCAPS2_CUBEMAP_ALL_FACES  = 0x0000FC00l;
-const unsigned long DDSCAPS2_VOLUME             = 0x00200000l;
 
 typedef unsigned int  uint32;
 typedef unsigned char uint8;
