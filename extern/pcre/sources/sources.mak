@@ -1,1 +1,1 @@
-SOURCE_FILES := pcre_*.c chartables.c
+SOURCE_FILES := pcre_*.c

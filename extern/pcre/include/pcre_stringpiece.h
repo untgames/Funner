@@ -38,23 +38,27 @@
 #ifndef _PCRE_STRINGPIECE_H
 #define _PCRE_STRINGPIECE_H
 
-#include <string.h>
+#include <cstring>
 #include <string>
 #include <iosfwd>    // for ostream forward-declaration
 
 #if 0
 #define HAVE_TYPE_TRAITS
 #include <type_traits.h>
-#elif 1
+#elif 0
 #define HAVE_TYPE_TRAITS
 #include <bits/type_traits.h>
 #endif
 
+#include <pcre.h>
+
+using std::memcmp;
+using std::strlen;
 using std::string;
 
 namespace pcrecpp {
 
-class StringPiece {
+class PCRECPP_EXP_DEFN StringPiece {
  private:
   const char*   ptr_;
   int           length_;
@@ -66,7 +70,10 @@ class StringPiece {
   StringPiece()
     : ptr_(NULL), length_(0) { }
   StringPiece(const char* str)
-    : ptr_(str), length_(static_cast<int>(strlen(str))) { }
+    : ptr_(str), length_(static_cast<int>(strlen(ptr_))) { }
+  StringPiece(const unsigned char* str)
+    : ptr_(reinterpret_cast<const char*>(str)),
+      length_(static_cast<int>(strlen(ptr_))) { }
   StringPiece(const string& str)
     : ptr_(str.data()), length_(static_cast<int>(str.size())) { }
   StringPiece(const char* offset, int len)
@@ -167,6 +174,7 @@ template<> struct __type_traits<pcrecpp::StringPiece> {
 #endif
 
 // allow StringPiece to be logged
-std::ostream& operator<<(std::ostream& o, const pcrecpp::StringPiece& piece);
+PCRECPP_EXP_DECL std::ostream& operator<<(std::ostream& o,
+                                          const pcrecpp::StringPiece& piece);
 
 #endif /* _PCRE_STRINGPIECE_H */
