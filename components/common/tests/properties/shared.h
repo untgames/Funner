@@ -21,9 +21,9 @@
 
 using namespace common;
 
-inline void dump (const PropertyLayout& layout)
+inline void dump (const PropertyLayout& layout, size_t correct_hash)
 {
-  printf ("layout: size=%u, buffer_size=%u, hash=%08x:\n", layout.Size (), layout.BufferSize (), layout.Hash ());
+  printf ("layout: size=%u, buffer_size=%u, hash_correct=%d:\n", layout.Size (), layout.BufferSize (), layout.Hash () == correct_hash);
   
   for (size_t i=0; i<layout.Size (); i++)
   {

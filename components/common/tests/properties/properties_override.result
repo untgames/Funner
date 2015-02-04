@@ -1,4 +1,4 @@
 Results of properties_override_test:
-map has 2 properties (hash=627782c8, layout_hash=b59805b3):
+map has 2 properties (hash_correct=1, layout_hash_correct=1):
  #0: name='WindowStyle', type=string, value='AA'
  #1: name='CustomCursors', type=string, value='0'

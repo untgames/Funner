@@ -1,9 +1,9 @@
 Results of properties_set_buffer_test:
-before:map has 3 properties (hash=f3d34923, layout_hash=a8d5908f):
+before:map has 3 properties (hash_correct=1, layout_hash_correct=1):
  #0: name='X', type=string, value=''
  #1: name='Y', type=integer, value='0'
  #2: name='Z', type=float, value='0'
-after:map has 3 properties (hash=772e4050, layout_hash=a8d5908f):
+after:map has 3 properties (hash_correct=1, layout_hash_correct=1):
  #0: name='X', type=string, value=''
  #1: name='Y', type=integer, value='1'
  #2: name='Z', type=float, value='3.14'

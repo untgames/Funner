@@ -2,8 +2,9 @@
 
 void dump_properties (const PropertyMap& properties)
 {
-  printf ("map has %u properties (hash=%08x, layout_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.LayoutHash ());
+  printf ("map has %u properties (hash_correct=%d, layout_hash_correct=%d):\n",
+    properties.Size (), properties.Hash () == (sizeof (void*) == 4 ? 0x627782c8 : 0x16f6aa34),
+    properties.LayoutHash () == (sizeof (void*) == 4 ? 0xb59805b3 : 0x1b73306c));
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
