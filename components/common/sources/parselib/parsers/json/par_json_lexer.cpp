@@ -108,8 +108,8 @@ void JsonLexer::ReadSymbolReference (char*& write_position)
 
     code_buffer [buffer_size] = 0;
 
-    char*         symbol_code_end = 0;
-    unsigned long symbol_code     = strtoul (code_buffer, &symbol_code_end, base);
+    char*    symbol_code_end = 0;
+    uint32_t symbol_code     = strtoul (code_buffer, &symbol_code_end, base);
 
     if (!symbol_code || !symbol_code_end || symbol_code_end - code_buffer != 4)
     {

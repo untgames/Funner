@@ -154,8 +154,8 @@ void XmlLexer::ReadSymbolReference (char*& write_position)
       symbol_code_start++;
     }
 
-    char*         symbol_code_end = 0;
-    unsigned long symbol_code     = strtoul (symbol_code_start, &symbol_code_end, base);
+    char*    symbol_code_end = 0;
+    uint32_t symbol_code     = strtoul (symbol_code_start, &symbol_code_end, base);
 
     if (!symbol_code || !symbol_code_end || *symbol_code_end != ';')
       SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
