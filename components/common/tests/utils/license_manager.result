@@ -9,7 +9,7 @@ Loading license 'data/future_license.xml'
 Exception: 'License 'data/future_license.xml' is not valid yet
     at common::LicenseManager::Load'
 Loading license 'data/invalid_date_license.xml'
-Exception: 'Can't convert date string '2036005006'
+Exception: 'Invalid date string '2036005006' format, must be yyyy-mm-dd
     at common::LicenseManager::ParseDate
     at common::LicenseManager::Load'
 Loading license 'data/invalid_license.xml'

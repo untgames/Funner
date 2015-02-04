@@ -274,7 +274,7 @@ class LicenseManagerImpl
     {
       static const char* METHOD_NAME = "common::LicenseManager::ParseDate";
 
-      if (!rematch (date_string, "[:digit:][:digit:][:digit:][:digit:]-[:digit:][:digit:]-[:digit:][:digit:]"))
+      if (!rematch (date_string, "[12][[:digit:]][[:digit:]][[:digit:]]\\-[01][[:digit:]]\\-[0-3][[:digit:]]"))
         throw xtl::format_operation_exception (METHOD_NAME, "Invalid date string '%s' format, must be yyyy-mm-dd", date_string);
 
       tm tm_date;
@@ -284,7 +284,6 @@ class LicenseManagerImpl
       tm_date.tm_mday = atoi (date_string + 8);
       tm_date.tm_mon  = atoi (date_string + 5) - 1;
       tm_date.tm_year = atoi (date_string) - 1900;
-
 
 #if defined (ANDROID) || defined (__MINGW32__) || defined (WINCE) || defined (TABLETOS)
       time_t date = mktime (&tm_date);
