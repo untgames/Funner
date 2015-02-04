@@ -1,4 +1,4 @@
 Results of properties_parser_test:
-map has 2 properties (hash=d7cae3c4, layout_hash=86f26cbf):
+map has 2 properties (hash_correct=1, layout_hash_correct=1):
  #0: name='A', type=string, value='1'
  #1: name='B', type=string, value='2'
