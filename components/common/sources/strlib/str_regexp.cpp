@@ -1,8 +1,12 @@
-#include <xtl/uninitialized_storage.h>
-#include <common/strlib.h>
-#include <common/singleton.h>
 #include <locale.h>
 #include <pcre.h>
+
+#include <xtl/common_exceptions.h>
+#include <xtl/string.h>
+#include <xtl/uninitialized_storage.h>
+
+#include <common/singleton.h>
+#include <common/strlib.h>
 
 using namespace stl;
 
@@ -58,10 +62,10 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
   pcre *re = pcre_compile (pattern,0,&error,&err_offset,loc_tables);
 
   if (!re)
-    return -1;      
-    
-  int str_length  = strlen (str),
-      matches     = pcre_exec (re,0,str,str_length,0,0,offset_buf,max_buf_size);
+    throw xtl::format_operation_exception ("common::parse_internal", "Invalid pattern '%s', error '%s' at %d", pattern, error, err_offset);
+
+  int str_length = xtl::xstrlen (str),
+      matches    = pcre_exec (re,0,str,str_length,0,0,offset_buf,max_buf_size);
   
   if (matches <= 0)
     return 0;    
@@ -71,8 +75,8 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
     
     //поиск всех вхождений
     
-  int* offset       = offset_buf;
-  int  all_matches  = matches;
+  int* offset      = offset_buf;
+  int  all_matches = matches;
   
   for (;;)
   {
@@ -203,7 +207,13 @@ string replace (const char* str,const char* pattern,const char* replacement,cons
 
 bool rematch (const char* string,const char* pattern,const char* flags)
 {
-  return parse_internal (string,pattern,flags) != 0;
+  OffsetBufferSingleton::Instance instance;
+
+  OffsetBuffer& offset_buffer = instance->buffer;
+
+  int* offset = offset_buffer.data ();
+
+  return parse_internal (string, pattern, flags, offset, MAX_TOKENS * 3) > 0;
 }
 
 }
