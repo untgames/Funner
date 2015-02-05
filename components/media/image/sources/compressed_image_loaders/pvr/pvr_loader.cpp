@@ -27,7 +27,6 @@ namespace pvr_loader
 
 static char PVR_VERSION [] = { 0x50, 0x56, 0x52, 0x03 };
 
-typedef size_t             uint32_t;
 typedef unsigned long long uint64_t;
 
 enum PixelFormat
@@ -101,7 +100,7 @@ class PvrCompressedImage: public ICustomCompressedImage
         if (memcmp (&header.version, &PVR_VERSION, sizeof (uint32_t)))
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Wrong tag", file_name);
 
-        format = (size_t)(header.pixel_format & 0xffffffff);
+        format = (uint32_t)(header.pixel_format & 0xffffffff);
         
         if ((format != PixelFormat_PVRTC2RGB && format != PixelFormat_PVRTC2RGBA && format != PixelFormat_PVRTC4RGB && format != PixelFormat_PVRTC4RGBA) || (header.pixel_format >> 32))
           throw xtl::format_not_supported_exception ("", "PVR file '%s' with given format %u not supported (only PVRTC4 & PVRTC2 supported)", file_name, format);
@@ -119,8 +118,8 @@ class PvrCompressedImage: public ICustomCompressedImage
 
         file.Seek (header.meta_data_size, FileSeekMode_Current);
 
-        size_t width  = header.width;
-        size_t height = header.height;
+        uint32_t width  = header.width;
+        uint32_t height = header.height;
 
         this->width  = width;
         this->height = height;
@@ -242,10 +241,10 @@ class PvrCompressedImage: public ICustomCompressedImage
     typedef stl::vector<CompressedImageBlockDesc> MipLevelArray;
 
   private:
-    size_t        format;       //формат изображения
-    size_t        width;        //ширина изображения
-    size_t        height;       //высота изображения
-    size_t        layers_count; //количество слоев
+    uint32_t      format;       //формат изображения
+    uint32_t      width;        //ширина изображения
+    uint32_t      height;       //высота изображения
+    uint32_t      layers_count; //количество слоев
     Buffer        data;         //данные изображения
     MipLevelArray mip_levels;   //мип-уровни
 };
