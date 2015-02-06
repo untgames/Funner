@@ -25,7 +25,7 @@ VertexWeightStream::VertexWeightStream (Impl* in_impl)
   : impl (in_impl, false)
   {}  
 
-VertexWeightStream::VertexWeightStream (size_t weights_count)
+VertexWeightStream::VertexWeightStream (uint32_t weights_count)
   : impl (new Impl, false)
 {
   Resize (weights_count);
@@ -86,12 +86,12 @@ VertexWeight* VertexWeightStream::Data ()
     Количество вершин
 */
 
-size_t VertexWeightStream::Size () const
+uint32_t VertexWeightStream::Size () const
 {
   return impl->data_buffer.Size () / sizeof (VertexWeight);
 }
 
-void VertexWeightStream::Resize (size_t weights_count)
+void VertexWeightStream::Resize (uint32_t weights_count)
 {
   impl->data_buffer.Resize (weights_count * sizeof (VertexWeight));
 }
@@ -109,12 +109,12 @@ void VertexWeightStream::Clear ()
     Резервирование памяти
 */
 
-size_t VertexWeightStream::Capacity () const
+uint32_t VertexWeightStream::Capacity () const
 {
   return impl->data_buffer.Capacity () / sizeof (VertexWeight);
 }
 
-void VertexWeightStream::Reserve (size_t weights_count)
+void VertexWeightStream::Reserve (uint32_t weights_count)
 {
   impl->data_buffer.Reserve (weights_count * sizeof (VertexWeight));
 }

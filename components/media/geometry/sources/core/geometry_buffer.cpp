@@ -10,7 +10,7 @@ Buffer::Buffer ()
   : start (0), finish (0), end_of_storage (0)
   {}
   
-Buffer::Buffer (size_t size)
+Buffer::Buffer (uint32_t size)
   : start (0), finish (0), end_of_storage (0)
 {
   Resize (size);
@@ -30,7 +30,7 @@ Buffer::~Buffer ()
     ::operator delete (start);
 }
 
-void Buffer::Resize (size_t new_size)
+void Buffer::Resize (uint32_t new_size)
 {
   size_t size = finish - start;
   
@@ -43,7 +43,7 @@ void Buffer::Resize (size_t new_size)
   finish = start + new_size;
 }
 
-void Buffer::Reserve (size_t new_size)
+void Buffer::Reserve (uint32_t new_size)
 {
   size_t size = end_of_storage - start;
 

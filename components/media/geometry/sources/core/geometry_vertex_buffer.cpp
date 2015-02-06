@@ -82,7 +82,7 @@ size_t VertexBuffer::Id () const
      оличество массивов вершинных атрибутов
 */
 
-size_t VertexBuffer::StreamsCount () const
+uint32_t VertexBuffer::StreamsCount () const
 {
   return impl->streams.size ();
 }
@@ -91,7 +91,7 @@ size_t VertexBuffer::StreamsCount () const
     ѕолучение массива
 */
 
-const VertexStream& VertexBuffer::Stream (size_t index) const
+const VertexStream& VertexBuffer::Stream (uint32_t index) const
 {
   if (index >= impl->streams.size ())
     throw xtl::make_range_exception ("media::geometry::VertexBuffer::Stream", "index", index, impl->streams.size ());
@@ -99,7 +99,7 @@ const VertexStream& VertexBuffer::Stream (size_t index) const
   return impl->streams [index];
 }
 
-VertexStream& VertexBuffer::Stream (size_t index)
+VertexStream& VertexBuffer::Stream (uint32_t index)
 {
   return const_cast<VertexStream&> (const_cast<const VertexBuffer&> (*this).Stream (index));
 }
@@ -122,7 +122,7 @@ VertexWeightStream& VertexBuffer::Weights ()
     ѕрисоединение/отсоединение массивов
 */
 
-size_t VertexBuffer::Attach (VertexStream& vs)
+uint32_t VertexBuffer::Attach (VertexStream& vs)
 {
     //проверка зарегистрирован ли канал
     
@@ -132,12 +132,15 @@ size_t VertexBuffer::Attach (VertexStream& vs)
     if (i->Id () == id)
       return i - impl->streams.begin ();
 
+  if (impl->streams.size () == (uint32_t)-1)
+    throw xtl::format_operation_exception ("media::geometry::VertexBuffer::Attach", "Streams count exceeded max limit");
+
   impl->streams.push_back (vs);
 
   return impl->streams.size () - 1;
 }
 
-void VertexBuffer::Detach (size_t index)
+void VertexBuffer::Detach (uint32_t index)
 {
   if (index >= impl->streams.size ())
     return;
@@ -165,16 +168,16 @@ void VertexBuffer::Clear ()
      оличество вершин (минимум среди всех вершинных массивов)
 */
 
-size_t VertexBuffer::VerticesCount () const
+uint32_t VertexBuffer::VerticesCount () const
 {
   if (impl->streams.empty ())
     return 0;
 
-  size_t vertices_count = size_t (-1);
+  uint32_t vertices_count = uint32_t (-1);
   
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
   {
-    size_t size = i->Size ();
+    uint32_t size = i->Size ();
     
     if (size < vertices_count)
       vertices_count = size;
@@ -187,9 +190,9 @@ size_t VertexBuffer::VerticesCount () const
     —уммарный размер вершины
 */
 
-size_t VertexBuffer::VertexSize () const
+uint32_t VertexBuffer::VertexSize () const
 {
-  size_t vertex_size = 0;
+  uint32_t vertex_size = 0;
 
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
     vertex_size += i->VertexSize ();

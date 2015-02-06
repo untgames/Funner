@@ -122,7 +122,7 @@ class XmlMeshLibraryLoader
 
       for_each_child (*vs_iter, "channel", xtl::bind (&XmlMeshLibraryLoader::ParseVertexFormatChannel, this, _1, xtl::ref (vertex_format)));
       
-        //создание вершинного потока        
+        //создание вершинного потока
       
       VertexStream vs (vertices_count, VertexDeclaration (vertex_format, vertex_size));
       
@@ -301,7 +301,7 @@ class XmlMeshLibraryLoader
         throw xtl::make_argument_exception (METHOD_NAME, "type", type_string);
 
       if (vertex_buffer_index >= mesh.VertexBuffersCount ())
-        throw xtl::make_range_exception (METHOD_NAME, "vertex_buffer", vertex_buffer_index, mesh.VertexBuffersCount ());
+        throw xtl::make_range_exception (METHOD_NAME, "vertex_buffer", vertex_buffer_index, (size_t)mesh.VertexBuffersCount ());
 
       const VertexBuffer& vertex_buffer  = mesh.VertexBuffer (vertex_buffer_index);
       size_t              vertices_count = vertex_buffer.VerticesCount (),
@@ -369,7 +369,7 @@ class XmlMeshLibraryLoader
 
       mesh.Rename (name);                 
                  
-        //поиск вершинных буферов        
+        //поиск вершинных буферов
         
       for (Parser::AttributeIterator vb_iter=make_attribute_iterator (*mesh_iter, "vertex_buffers.#text"); vb_iter; ++vb_iter)
       {

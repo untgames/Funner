@@ -16,11 +16,11 @@ int main ()
 
     get_vertex_format ((CustomVertex*)0, vf1);
 
-    printf ("hash1: %08x\n", vf1.Hash ());
+    printf ("hash1 correct: %d\n", vf1.Hash () == (sizeof (void*) == 4 ? 0x6816d837 : 0x57abaa38));
 
     VertexFormat vf2 = vf1.Clone ();
 
-    printf ("hash2: %08x\n", vf2.Hash ());
+    printf ("hash2 correct: %d\n", vf2.Hash () == (sizeof (void*) == 4 ? 0x6816d837 : 0x57abaa38));
 
     const VertexAttribute* attr = vf1.FindAttribute ("tangent");
 
@@ -58,8 +58,8 @@ int main ()
 
     dump (vf1);
 
-    printf ("hash1: %08x\n", vf1.Hash ());
-    printf ("hash2: %08x\n", vf2.Hash ());
+    printf ("hash1 correct: %d\n", vf1.Hash () == (sizeof (void*) == 4 ? 0x62f6f6f1 : 0xa3373580));
+    printf ("hash2 correct: %d\n", vf2.Hash () == (sizeof (void*) == 4 ? 0x6816d837 : 0x57abaa38));
   }
   catch (std::exception& exception)
   {

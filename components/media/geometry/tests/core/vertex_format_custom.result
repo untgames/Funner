@@ -1,6 +1,6 @@
 Results of vertex_format_custom_test:
-hash1: 6816d837
-hash2: 6816d837
+hash1 correct: 1
+hash2 correct: 1
 00: Name pointer is same
 01: Name pointer is same
 02: Name pointer is same
@@ -62,5 +62,5 @@ vertex format (3 attributes, min_vertex_size=38):
   attribute: semantic='normal' type='float3' offset=12
   attribute: semantic='texcoord0' type='float2' offset=24
   attribute: name='tangent' semantic='custom' type='short3' offset=32
-hash1: 62f6f6f1
-hash2: 6816d837
+hash1 correct: 1
+hash2 correct: 1

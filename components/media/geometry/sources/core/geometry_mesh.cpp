@@ -130,12 +130,12 @@ void Mesh::Rename (const char* name)
 */
 
 //количество вершинных буферов
-size_t Mesh::VertexBuffersCount () const
+uint32_t Mesh::VertexBuffersCount () const
 {
   return impl->vertex_buffers.size ();
 }
 
-const media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index) const
+const media::geometry::VertexBuffer& Mesh::VertexBuffer (uint32_t index) const
 {
   if (index >= impl->vertex_buffers.size ())
     throw xtl::make_range_exception ("media::geometry::Mesh::VertexBuffer", "index", index, impl->vertex_buffers.size ());
@@ -143,7 +143,7 @@ const media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index) const
   return impl->vertex_buffers [index];
 }
 
-media::geometry::VertexBuffer& Mesh::VertexBuffer (size_t index)
+media::geometry::VertexBuffer& Mesh::VertexBuffer (uint32_t index)
 {
   return const_cast<media::geometry::VertexBuffer&> (const_cast<const Mesh&> (*this).VertexBuffer (index));
 }
@@ -163,8 +163,11 @@ media::geometry::IndexBuffer& Mesh::IndexBuffer ()
     Присоединение/отсоединение буферов
 */
 
-size_t Mesh::Attach (media::geometry::VertexBuffer& vb)
+uint32_t Mesh::Attach (media::geometry::VertexBuffer& vb)
 {
+  if (impl->vertex_buffers.size () == (uint32_t)-1)
+    throw xtl::format_operation_exception ("media::geometry::Mesh::Attach", "Vertex buffers array max size exceeded");
+
   impl->vertex_buffers.push_back (vb);
 
   return impl->vertex_buffers.size () - 1;
@@ -175,7 +178,7 @@ void Mesh::Attach (media::geometry::IndexBuffer& ib)
   impl->index_buffer = ib;
 }
     
-void Mesh::DetachVertexBuffer (size_t index)
+void Mesh::DetachVertexBuffer (uint32_t index)
 {
   if (index >= impl->vertex_buffers.size ())
     return;
@@ -203,12 +206,12 @@ void Mesh::DetachAllBuffers ()
     Количество примитивов / доступ к примитивам
 */
 
-size_t Mesh::PrimitivesCount () const
+uint32_t Mesh::PrimitivesCount () const
 {
   return impl->primitives.size ();
 }
 
-const Primitive& Mesh::Primitive (size_t index) const
+const Primitive& Mesh::Primitive (uint32_t index) const
 {
   if (index >= impl->primitives.size ())
     throw xtl::make_range_exception ("media::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
@@ -230,11 +233,16 @@ const Primitive& Mesh::Primitive (size_t index) const
     Добавление/удаление примитивов примитивов
 */
 
-size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, size_t base_vertex, const char* material)
+uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, const char* material)
 {
+  static const char* METHOD_NAME = "media::geometry::Mesh::AddPrimitive";
+
   if (type < 0 || type >= PrimitiveType_Num)
-    throw xtl::make_argument_exception ("media::geometry::Mesh::AddPrimitive", "type", type);
+    throw xtl::make_argument_exception (METHOD_NAME, "type", type);
     
+  if (impl->primitives.size () == (uint32_t)-1)
+    throw xtl::format_operation_exception (METHOD_NAME, "Primitives max count exceeded");
+
   if (!material)
     material = "";
     
@@ -248,7 +256,7 @@ size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t firs
   primitive.material             = 0;
   primitive.material_name_offset = impl->material_names.size ();
 
-  impl->material_names.append (material, strlen (material) + 1);
+  impl->material_names.append (material, xtl::xstrlen (material) + 1);
 
   try
   {
@@ -265,12 +273,12 @@ size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t firs
   }
 }
 
-size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material)
+uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, const char* material)
 {
   return AddPrimitive (type, vertex_buffer, first, count, 0, material);
 }
 
-void Mesh::RemovePrimitive (size_t primitive_index)
+void Mesh::RemovePrimitive (uint32_t primitive_index)
 {
   if (primitive_index >= impl->primitives.size ())
     return;

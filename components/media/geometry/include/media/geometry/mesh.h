@@ -41,10 +41,10 @@ PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type =
 struct Primitive
 {
   PrimitiveType type;          //тип примитива
-  size_t        vertex_buffer; //индекс вершинного буфера
-  size_t        first;         //индекс первой вершины/индекса
-  size_t        count;         //количество примитивов
-  size_t        base_vertex;   //индекс базовой вершины
+  uint32_t      vertex_buffer; //индекс вершинного буфера
+  uint32_t      first;         //индекс первой вершины/индекса
+  uint32_t      count;         //количество примитивов
+  uint32_t      base_vertex;   //индекс базовой вершины
   const char*   material;      //им€ материала
 };
 
@@ -85,10 +85,10 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬ершинные буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const geometry::VertexBuffer& VertexBuffer (size_t index) const;
-          geometry::VertexBuffer& VertexBuffer (size_t index);
+    const geometry::VertexBuffer& VertexBuffer (uint32_t index) const;
+          geometry::VertexBuffer& VertexBuffer (uint32_t index);
           
-    size_t VertexBuffersCount () const; //количество вершинных буферов
+    uint32_t VertexBuffersCount () const; //количество вершинных буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///»ндексный буфер
@@ -99,10 +99,10 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕрисоединение/отсоединение буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Attach (geometry::VertexBuffer&);
-    void   Attach (geometry::IndexBuffer&);
+    uint32_t Attach (geometry::VertexBuffer&);
+    void     Attach (geometry::IndexBuffer&);
 
-    void DetachVertexBuffer     (size_t index);
+    void DetachVertexBuffer     (uint32_t index);
     void DetachIndexBuffer      ();
     void DetachAllVertexBuffers ();
     void DetachAllBuffers       (); //отсоединение всех буферов
@@ -110,16 +110,16 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// оличество примитивов / доступ к примитивам
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                     PrimitivesCount () const;
-    const geometry::Primitive& Primitive       (size_t index) const;
+    uint32_t                   PrimitivesCount () const;
+    const geometry::Primitive& Primitive       (uint32_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒобавление/удаление примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, size_t base_vertex, const char* material); //return: индекс примитива
-    size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material); //return: индекс примитива
-    void   RemovePrimitive     (size_t primitive_index);
-    void   RemoveAllPrimitives ();
+    uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, const char* material); //return: индекс примитива
+    uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, const char* material); //return: индекс примитива
+    void     RemovePrimitive     (uint32_t primitive_index);
+    void     RemoveAllPrimitives ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќчистка меша
@@ -149,7 +149,7 @@ void swap (Mesh&, Mesh&);
 ///ѕроверка корректности меша
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool check (const Mesh&, const xtl::function<void (const char*)>& log_fn);
-bool check (const Mesh&, size_t joints_count, const xtl::function<void (const char*)>& log_fn);
+bool check (const Mesh&, uint32_t joints_count, const xtl::function<void (const char*)>& log_fn);
 
 }
 

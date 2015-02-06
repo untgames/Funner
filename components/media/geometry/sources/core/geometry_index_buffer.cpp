@@ -50,8 +50,8 @@ template <class SrcT> void convert_dispatch (const SrcT* src, void* dst, size_t 
 struct IndexBuffer::Impl: public xtl::reference_counter
 {
   IndexType data_type;     //тип данных
-  size_t    indices_count; //количество индексов
-  Buffer    indices; //массив индексов
+  uint32_t  indices_count; //количество индексов
+  Buffer    indices;       //массив индексов
   
   Impl (IndexType in_data_type)
     : data_type (in_data_type)
@@ -81,7 +81,7 @@ IndexBuffer::IndexBuffer (Impl* in_impl)
   : impl (in_impl, false)
   {}
 
-IndexBuffer::IndexBuffer (size_t indices_count, IndexType data_type)
+IndexBuffer::IndexBuffer (uint32_t indices_count, IndexType data_type)
   : impl (new Impl (data_type), false)
 {
   Resize (indices_count);
@@ -192,12 +192,12 @@ void* IndexBuffer::Data ()
     Количество индексов
 */
 
-size_t IndexBuffer::Size () const
+uint32_t IndexBuffer::Size () const
 {
   return impl->indices_count;
 }
 
-void IndexBuffer::Resize (size_t indices_count)
+void IndexBuffer::Resize (uint32_t indices_count)
 {
   impl->indices.Resize (indices_count * get_index_type_size (impl->data_type));
   
@@ -219,12 +219,12 @@ void IndexBuffer::Clear ()
     Резервирование памяти
 */
 
-size_t IndexBuffer::Capacity () const
+uint32_t IndexBuffer::Capacity () const
 {
   return impl->indices.Capacity () / get_index_type_size (impl->data_type);
 }
 
-void IndexBuffer::Reserve (size_t indices_count)
+void IndexBuffer::Reserve (uint32_t indices_count)
 {
   impl->indices.Reserve (indices_count * get_index_type_size (impl->data_type));
 }

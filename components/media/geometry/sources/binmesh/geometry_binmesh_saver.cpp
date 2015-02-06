@@ -4,23 +4,23 @@ using namespace common;
 using namespace media::geometry;
 
 /*
- * array <> format: size_t elements_count; elements
+ * array <> format: uint32_t elements_count; elements
  *
  * File format: int header; int version; data
  *
  * data format: array<vertex_stream>; array<vertex_weight_stream>; array<vertex_buffer_desc>; array<index_buffer>; array<mesh>
  *
- * vertex_stream format: size_t vertices_count; size_t vertex_size; array<vertex_stream_channel>; binary<data>
- * vertex_stream_channel format: VertexAttributeSemantic semantic; VertexAttributeType type; size_t offset
+ * vertex_stream format: uint32_t vertices_count; uint32_t vertex_size; array<vertex_stream_channel>; binary<data>
+ * vertex_stream_channel format: VertexAttributeSemantic semantic; VertexAttributeType type; uint32_t offset
  * vertex_weight_stream format: array<VertexWeight>
  *
- * vertex_buffer_desc format: array<size_t> vertex_weigth_stream_id (0-1); array<size_t> vertex_stream_id;
+ * vertex_buffer_desc format: array<uint32_t> vertex_weigth_stream_id (0-1); array<uint32_t> vertex_stream_id;
  *
  * index_buffer format: IndexType type, array<index_type> indices
  *
- * mesh format: array<char> name; array<size_t> index_buffer (0-1); array<size_t> vertex_buffers; array<primitive> primitives;
+ * mesh format: array<char> name; array<uint32_t> index_buffer (0-1); array<uint32_t> vertex_buffers; array<primitive> primitives;
  *
- * primitive format: PrimitiveType type; array<char> material; size_t vertex_buffer; size_t first; size_t count
+ * primitive format: PrimitiveType type; array<char> material; uint32_t vertex_buffer; uint32_t first; uint32_t count
  */
 
 namespace components
@@ -60,7 +60,7 @@ void file_write (OutputFile& file, const char* string)
 class BinMeshLibrarySaver
 {
   private:
-    typedef stl::hash_map<size_t, size_t> ResourceMap;
+    typedef stl::hash_map<uint32_t, uint32_t> ResourceMap;
 
       //сохранение вершинного потока
     void SaveVertexStream (const VertexStream& vs)
@@ -74,19 +74,19 @@ class BinMeshLibrarySaver
 
       const VertexFormat& vertex_format = vs.Format ();
 
-      size_t vertices_count = vs.Size (),
-             vertex_size    = vs.VertexSize ();
+      uint32_t vertices_count = vs.Size (),
+               vertex_size    = vs.VertexSize ();
 
       file_write (result_file, &vertices_count, sizeof (vertices_count));
       file_write (result_file, &vertex_size, sizeof (vertex_size));
 
         //сохранение вершинных данных
 
-      size_t channels_count = vertex_format.AttributesCount ();
+      uint32_t channels_count = vertex_format.AttributesCount ();
 
       file_write (result_file, &channels_count, sizeof (channels_count));
 
-      for (size_t i = 0; i < channels_count; i++)
+      for (uint32_t i = 0; i < channels_count; i++)
       {
         const VertexAttribute& attribute = vertex_format.Attribute (i);
 
@@ -109,7 +109,7 @@ class BinMeshLibrarySaver
     {
         //сохранение заголовка потока
 
-      size_t weights_count = vws.Size ();
+      uint32_t weights_count = vws.Size ();
 
       file_write (result_file, &weights_count, sizeof (weights_count));
 
@@ -137,22 +137,22 @@ class BinMeshLibrarySaver
 
       ResourceMap::const_iterator weights_iter = vertex_weights.find (vb.Weights ().Id ());
 
-      size_t weights_count = weights_iter != vertex_weights.end () ? 1 : 0;
+      uint32_t weights_count = weights_iter != vertex_weights.end () ? 1 : 0;
 
       file_write (result_file, &weights_count, sizeof (weights_count));
 
       if (weights_count)
       {
-        size_t weights_index = weights_iter->second;
+        uint32_t weights_index = weights_iter->second;
 
         file_write (result_file, &weights_index, sizeof (weights_index));
       }
 
         //сохранение ссылок на вершинные потоки
 
-      size_t vertex_streams_count = 0;
+      uint32_t vertex_streams_count = 0;
 
-      for (size_t i = 0; i < vb.StreamsCount (); i++)
+      for (uint32_t i = 0; i < vb.StreamsCount (); i++)
       {
         ResourceMap::const_iterator iter = vertex_streams.find (vb.Stream (i).Id ());
 
@@ -162,14 +162,14 @@ class BinMeshLibrarySaver
 
       file_write (result_file, &vertex_streams_count, sizeof (vertex_streams_count));
 
-      for (size_t i = 0; i < vb.StreamsCount (); i++)
+      for (uint32_t i = 0; i < vb.StreamsCount (); i++)
       {
         ResourceMap::const_iterator iter = vertex_streams.find (vb.Stream (i).Id ());
 
         if (iter == vertex_streams.end ())
           continue;
 
-        size_t vertex_stream_index = iter->second;
+        uint32_t vertex_stream_index = iter->second;
 
         file_write (result_file, &vertex_stream_index, sizeof (vertex_stream_index));
       }
@@ -196,7 +196,7 @@ class BinMeshLibrarySaver
 
       file_write (result_file, &data_type, sizeof (data_type));
 
-      size_t indices_count = ib.Size ();
+      uint32_t indices_count = ib.Size ();
 
       file_write (result_file, &indices_count, sizeof (indices_count));
       
@@ -212,9 +212,9 @@ class BinMeshLibrarySaver
       //сохранение вершинных буферов меша
     void SaveMeshVertexBuffers (const Mesh& mesh)
     {
-      size_t vertex_buffers_count = 0;
+      uint32_t vertex_buffers_count = 0;
 
-      for (size_t i = 0, count = mesh.VertexBuffersCount (); i < count; i++)
+      for (uint32_t i = 0, count = mesh.VertexBuffersCount (); i < count; i++)
       {
         ResourceMap::const_iterator vb_iter = vertex_buffers.find (mesh.VertexBuffer (i).Id ());
 
@@ -224,13 +224,13 @@ class BinMeshLibrarySaver
 
       file_write (result_file, &vertex_buffers_count, sizeof (vertex_buffers_count));
 
-      for (size_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
+      for (uint32_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
       {
         ResourceMap::const_iterator vb_iter = vertex_buffers.find (mesh.VertexBuffer (i).Id ());
 
         if (vb_iter != vertex_buffers.end ())
         {
-          size_t vertex_buffer_index = vb_iter->second;
+          uint32_t vertex_buffer_index = vb_iter->second;
 
           file_write (result_file, &vertex_buffer_index, sizeof (vertex_buffer_index));
         }
@@ -242,7 +242,7 @@ class BinMeshLibrarySaver
     {
       file_write (result_file, &primitive.type, sizeof (primitive.type));
 
-      size_t material_name_length = xtl::xstrlen (primitive.material);
+      uint32_t material_name_length = xtl::xstrlen (primitive.material);
 
       file_write (result_file, &material_name_length, sizeof (material_name_length));
       file_write (result_file, primitive.material,    sizeof (char) * material_name_length);
@@ -256,11 +256,11 @@ class BinMeshLibrarySaver
       //сохранение примитивов
     void SaveMeshPrimitives (const Mesh& mesh)
     {
-      size_t primitives_count = mesh.PrimitivesCount ();
+      uint32_t primitives_count = mesh.PrimitivesCount ();
 
       file_write (result_file, &primitives_count, sizeof (primitives_count));
 
-      for (size_t i = 0; i < primitives_count; i++)
+      for (uint32_t i = 0; i < primitives_count; i++)
         SavePrimitive (mesh.Primitive (i));
     }
 
@@ -270,25 +270,25 @@ class BinMeshLibrarySaver
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
         return;        
         
-      size_t id_length = xtl::xstrlen (id);
+      uint32_t id_length = xtl::xstrlen (id);
       
       file_write (result_file, &id_length, sizeof (id_length));
       file_write (result_file, id, sizeof (char) * id_length);
 
-      size_t name_length = xtl::xstrlen (mesh.Name ());
+      uint32_t name_length = xtl::xstrlen (mesh.Name ());
 
       file_write (result_file, &name_length, sizeof (name_length));
       file_write (result_file, mesh.Name (), sizeof (char) * name_length);
 
       ResourceMap::const_iterator ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
 
-      size_t index_buffers_count = ib_iter != index_buffers.end () ? 1 : 0;
+      uint32_t index_buffers_count = ib_iter != index_buffers.end () ? 1 : 0;
 
       file_write (result_file, &index_buffers_count, sizeof (index_buffers_count));
 
       if (index_buffers_count)
       {
-        size_t index_buffer_index = ib_iter->second;
+        uint32_t index_buffer_index = ib_iter->second;
 
         file_write (result_file, &index_buffer_index, sizeof (index_buffer_index));
       }
@@ -302,14 +302,14 @@ class BinMeshLibrarySaver
     {
         //запись количества потоков
 
-      stl::set<size_t> vertex_streams_set;
+      stl::set<uint32_t> vertex_streams_set;
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
-        for (size_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
-          for (size_t k = 0, vertex_buffer_streams_count = i->VertexBuffer (j).StreamsCount (); k < vertex_buffer_streams_count; k++)
+        for (uint32_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
+          for (uint32_t k = 0, vertex_buffer_streams_count = i->VertexBuffer (j).StreamsCount (); k < vertex_buffer_streams_count; k++)
             vertex_streams_set.insert (i->VertexBuffer (j).Stream (k).Id ());
 
-      size_t vertex_streams_count = vertex_streams_set.size ();
+      uint32_t vertex_streams_count = vertex_streams_set.size ();
 
       file_write (result_file, &vertex_streams_count, sizeof (vertex_streams_count));
 
@@ -319,11 +319,11 @@ class BinMeshLibrarySaver
       {
         const Mesh& mesh = *i;
 
-        for (size_t k=0, count=mesh.VertexBuffersCount (); k<count; k++)
+        for (uint32_t k=0, count=mesh.VertexBuffersCount (); k<count; k++)
         {
           const VertexBuffer& vb = mesh.VertexBuffer (k);
 
-          for (size_t j = 0, vertex_buffer_streams_count = vb.StreamsCount (); j < vertex_buffer_streams_count; j++)
+          for (uint32_t j = 0, vertex_buffer_streams_count = vb.StreamsCount (); j < vertex_buffer_streams_count; j++)
             SaveVertexStream (vb.Stream (j));
         }
       }
@@ -334,10 +334,10 @@ class BinMeshLibrarySaver
     {
         //запись количества потоков
 
-      stl::set<size_t> weights_streams_set;
+      stl::set<uint32_t> weights_streams_set;
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
-        for (size_t k = 0, count = i->VertexBuffersCount (); k < count; k++)
+        for (uint32_t k = 0, count = i->VertexBuffersCount (); k < count; k++)
         {
           const VertexWeightStream& vws = i->VertexBuffer (k).Weights ();
 
@@ -345,14 +345,14 @@ class BinMeshLibrarySaver
             weights_streams_set.insert (vws.Id ());
         }
 
-      size_t weights_streams_count = weights_streams_set.size ();
+      uint32_t weights_streams_count = weights_streams_set.size ();
 
       file_write (result_file, &weights_streams_count, sizeof (weights_streams_count));
 
         //запись потоков
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
-        for (size_t k = 0, count = i->VertexBuffersCount (); k<count; k++)
+        for (uint32_t k = 0, count = i->VertexBuffersCount (); k<count; k++)
         {
           const VertexWeightStream& vws = i->VertexBuffer (k).Weights ();
 
@@ -369,11 +369,11 @@ class BinMeshLibrarySaver
       //сохранение вершинных буферов
     void SaveVertexBuffers ()
     {
-      stl::set<size_t> vertex_buffers_set;
+      stl::set<uint32_t> vertex_buffers_set;
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
       {
-        for (size_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
+        for (uint32_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
         {
           const VertexBuffer& vb = i->VertexBuffer (j);
 
@@ -382,19 +382,19 @@ class BinMeshLibrarySaver
         }
       }
 
-      size_t vertex_buffers_count = vertex_buffers_set.size ();
+      uint32_t vertex_buffers_count = vertex_buffers_set.size ();
 
       file_write (result_file, &vertex_buffers_count, sizeof (vertex_buffers_count));
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
-        for (size_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
+        for (uint32_t j = 0, count = i->VertexBuffersCount (); j < count; j++)
           SaveVertexBuffer (i->VertexBuffer (j));
     }
 
       //сохранение индексных буферов
     void SaveIndexBuffers ()
     {
-      stl::set<size_t> index_buffers_set;
+      stl::set<uint32_t> index_buffers_set;
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
       {
@@ -404,7 +404,7 @@ class BinMeshLibrarySaver
           index_buffers_set.insert (ib.Id ());
       }
 
-      size_t index_buffers_count = index_buffers_set.size ();
+      uint32_t index_buffers_count = index_buffers_set.size ();
 
       file_write (result_file, &index_buffers_count, sizeof (index_buffers_count));
 
@@ -415,7 +415,7 @@ class BinMeshLibrarySaver
       //сохранение мешей
     void SaveMeshes ()
     {
-      size_t meshes_count = 0;
+      uint32_t meshes_count = 0;
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
         if (i->VertexBuffersCount () && i->PrimitivesCount ())

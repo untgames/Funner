@@ -11,9 +11,9 @@ using namespace common;
 struct VertexStream::Impl: public xtl::reference_counter
 {
   VertexFormat format;         //формат вершин
-  size_t       vertex_size;    //размер вершины
+  uint32_t     vertex_size;    //размер вершины
   Buffer       data_buffer;    //буфер с данными
-  size_t       vertices_count; //количество вершин
+  uint32_t     vertices_count; //количество вершин
   
   Impl ();
   Impl (const VertexDeclaration&);
@@ -47,7 +47,7 @@ VertexStream::VertexStream (const VertexDeclaration& declaration)
   : impl (new Impl (declaration), false)
   {}
 
-VertexStream::VertexStream (size_t vertices_count, const VertexDeclaration& declaration)
+VertexStream::VertexStream (uint32_t vertices_count, const VertexDeclaration& declaration)
   : impl (new Impl (declaration), false)
 {
   Resize (vertices_count);
@@ -142,7 +142,7 @@ const VertexFormat& VertexStream::Format () const
     –азмер вершины
 */
 
-size_t VertexStream::VertexSize () const
+uint32_t VertexStream::VertexSize () const
 {
   return impl->vertex_size;
 }
@@ -165,12 +165,12 @@ void* VertexStream::Data ()
      оличество вершин
 */
 
-size_t VertexStream::Size () const
+uint32_t VertexStream::Size () const
 {
   return impl->vertices_count;
 }
 
-void VertexStream::Resize (size_t vertices_count)
+void VertexStream::Resize (uint32_t vertices_count)
 {
   impl->data_buffer.Resize (vertices_count * impl->vertex_size);
   
@@ -190,12 +190,12 @@ void VertexStream::Clear ()
     –езервирование пам€ти
 */
 
-size_t VertexStream::Capacity () const
+uint32_t VertexStream::Capacity () const
 {
   return impl->vertex_size ? impl->data_buffer.Capacity () / impl->vertex_size : 0;
 }
 
-void VertexStream::Reserve (size_t vertices_count)
+void VertexStream::Reserve (uint32_t vertices_count)
 {
   impl->data_buffer.Reserve (vertices_count * impl->vertex_size);
 }

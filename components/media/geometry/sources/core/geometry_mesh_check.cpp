@@ -243,7 +243,7 @@ namespace media
 namespace geometry
 {
 
-bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (const char*)>& log_handler)
+bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (const char*)>& log_handler)
 {
   Log log (mesh, log_handler);
   
@@ -364,7 +364,7 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
 
 bool check (const Mesh& mesh, const xtl::function<void (const char*)>& log_handler)
 {
-  return check (mesh, size_t (-1), log_handler);
+  return check (mesh, uint32_t (-1), log_handler);
 }
 
 }

@@ -70,7 +70,7 @@ void MeshLibrary::Rename (const char* name)
      оличество мешей / проверка на пустоту
 */
 
-size_t MeshLibrary::Size () const
+uint32_t MeshLibrary::Size () const
 {
   return impl->meshes.Size ();
 }
@@ -123,6 +123,9 @@ const Mesh* MeshLibrary::Find (const char* name) const
 
 void MeshLibrary::Attach (const char* name, Mesh& mesh)
 {
+  if (Size () == (uint32_t)-1)
+    throw xtl::format_operation_exception ("media::geometry::MeshLibrary::Attach", "Mesh library max size exceeded");
+
   impl->meshes.Insert (name, mesh);
 }
 

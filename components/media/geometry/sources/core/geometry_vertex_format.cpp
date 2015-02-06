@@ -26,7 +26,7 @@ struct VertexFormat::Impl
   StringArray          names;                   //имена атрибутов
   size_t               attributes_hash;         //хэш от массива атрибутов
   bool                 need_hash_update;        //необходим пересчёт хэша атрибутов
-  size_t               min_vertex_size;         //минимальный размер вершины
+  uint32_t             min_vertex_size;         //минимальный размер вершины
   bool                 need_vertex_size_update; //необходим пересчёт размера вершины
 
   Impl ()
@@ -98,7 +98,7 @@ VertexFormat& VertexFormat::operator = (const VertexFormat& vf)
 }
 
 /*
-    Клонирование  
+    Клонирование
 */
 
 VertexFormat VertexFormat::Clone () const
@@ -122,23 +122,23 @@ VertexFormat VertexFormat::Clone () const
     Количество атрибутов
 */
 
-size_t VertexFormat::AttributesCount () const
+uint32_t VertexFormat::AttributesCount () const
 {
   return impl->attributes.size ();
 }
 
 /*
-    Резервирование количества атрибутов 
+    Резервирование количества атрибутов
 */
 
-void VertexFormat::ReserveAttributes (size_t count, size_t name_buffer_size)
+void VertexFormat::ReserveAttributes (uint32_t count, uint32_t name_buffer_size)
 {
   impl->attributes.reserve (count);
   impl->names.Reserve (count);
   impl->names.ReserveBuffer (name_buffer_size);
 }
 
-size_t VertexFormat::ReservedAttributesCount () const
+uint32_t VertexFormat::ReservedAttributesCount () const
 {
   return impl->attributes.capacity ();
 }
@@ -159,7 +159,7 @@ const VertexAttribute* VertexFormat::Attributes () const
     Получение атрибута
 */
 
-const VertexAttribute& VertexFormat::Attribute (size_t index) const
+const VertexAttribute& VertexFormat::Attribute (uint32_t index) const
 {
   if (index >= impl->attributes.size ())
     throw xtl::make_range_exception ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes.size ());
@@ -167,7 +167,7 @@ const VertexAttribute& VertexFormat::Attribute (size_t index) const
   return impl->attributes [index];
 }
 
-const char* VertexFormat::AttributeName (size_t index) const
+const char* VertexFormat::AttributeName (uint32_t index) const
 {
   if (index >= impl->attributes.size ())
     throw xtl::make_range_exception ("media::geometry::VertexFormat::AttributeName", "index", index, impl->attributes.size ());
@@ -212,7 +212,7 @@ const VertexAttribute* VertexFormat::FindAttribute (const char* name) const
     Добавление атрибутов
 */
 
-size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
+uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset)
 {
   static const char* METHOD_NAME = "media::geometry::VertexFormat::AddAttribute";
 
@@ -260,7 +260,10 @@ size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic sem
       throw xtl::format_not_supported_exception (METHOD_NAME, "Anonymous attribute with semantic '%s' has been already inserted", get_semantic_name (semantic));
   }
     
-    //добавление атрибута  
+  if (impl->attributes.size () == (uint32_t)-1)
+    throw xtl::format_operation_exception (METHOD_NAME, "Attributes max count exceeded");
+
+    //добавление атрибута
 
   size_t old_capacity        = impl->names.Capacity (),
          old_buffer_capacity = impl->names.BufferCapacity ();  
@@ -293,17 +296,17 @@ size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic sem
   return impl->attributes.size () - 1;
 }
 
-size_t VertexFormat::AddAttribute (const char* name, VertexAttributeType type, size_t offset)
+uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeType type, uint32_t offset)
 {
   return AddAttribute (name, VertexAttributeSemantic_Custom, type, offset);
 }
 
-size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
+uint32_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset)
 {
   return AddAttribute ("", semantic, type, offset);
 }
 
-size_t VertexFormat::AddAttributes (const VertexFormat& format)
+uint32_t VertexFormat::AddAttributes (const VertexFormat& format)
 {
   for (VertexAttributeArray::const_iterator iter=format.impl->attributes.begin (), end=format.impl->attributes.end (); iter!=end; ++iter)
   {
@@ -335,7 +338,7 @@ size_t VertexFormat::AddAttributes (const VertexFormat& format)
     Удаление атрибутов
 */
 
-void VertexFormat::RemoveAttribute (size_t position)
+void VertexFormat::RemoveAttribute (uint32_t position)
 {
   if (position >= impl->attributes.size ())
     return;
@@ -406,7 +409,7 @@ void VertexFormat::Clear ()
     Расчёт размера вершины
 */
 
-size_t VertexFormat::GetMinimalVertexSize () const
+uint32_t VertexFormat::GetMinimalVertexSize () const
 {
   if (!impl->need_vertex_size_update)
     return impl->min_vertex_size;
@@ -416,11 +419,11 @@ size_t VertexFormat::GetMinimalVertexSize () const
   if (impl->attributes.empty ())
     return impl->min_vertex_size = 0;
 
-  size_t max_offset = 0;
+  uint32_t max_offset = 0;
   
   for (VertexAttributeArray::const_iterator iter=impl->attributes.begin (), end=impl->attributes.end (); iter != end; ++iter)
   {
-    size_t offset = iter->offset + get_type_size (iter->type);
+    uint32_t offset = iter->offset + get_type_size (iter->type);
 
     if (offset > max_offset)
       max_offset = offset;
