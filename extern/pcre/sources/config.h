@@ -259,9 +259,10 @@ sure both macros are undefined; an emulation function will then be used. */
 /* to make a symbol visible */
 #define PCRE_EXP_DATA_DEFN __attribute__ ((visibility ("default")))
 
+#ifndef _MSC_VER
 /* to make a symbol visible */
 #define PCRE_EXP_DECL extern __attribute__ ((visibility ("default")))
-
+#endif
 
 /* If you are compiling for a system other than a Unix-like system or
    Win32, and it needs some magic to be inserted before the definition
