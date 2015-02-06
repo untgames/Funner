@@ -303,14 +303,14 @@ void qualcomm_texture_compress (const Params& params)
   switch (source_image.Format ())
   {
     case media::PixelFormat_RGB8:
-      source_format = Q_FORMAT_RGB_888;
+      source_format = Q_FORMAT_RGB_8UI;
       break;
     case media::PixelFormat_BGR8:
       source_image.Convert (media::PixelFormat_RGB8);
-      source_format = Q_FORMAT_RGB_888;
+      source_format = Q_FORMAT_RGB_8UI;
       break;
     case media::PixelFormat_RGBA8:
-      source_format = Q_FORMAT_RGBA_8888;
+      source_format = Q_FORMAT_RGBA_8UI;
       break;
     case media::PixelFormat_BGRA8:
       source_format = Q_FORMAT_BGRA_8888;
@@ -440,21 +440,21 @@ void qualcomm_texture_decompress (const Params& params)
   if (!xtl::xstrcmp (source_image.Format (), "atc"))
   {
     source_format       = Q_FORMAT_ATITC_RGB;
-    destination_format  = Q_FORMAT_RGB_888;
+    destination_format  = Q_FORMAT_RGB_8UI;
     destination_size   *= 3;
     result_pixel_format = media::PixelFormat_RGB8;
   }
   else if (!xtl::xstrcmp (source_image.Format (), "atci"))
   {
     source_format       = Q_FORMAT_ATC_RGBA_EXPLICIT_ALPHA;
-    destination_format  = Q_FORMAT_RGBA_8888;
+    destination_format  = Q_FORMAT_RGBA_8UI;
     destination_size   *= 4;
     result_pixel_format = media::PixelFormat_RGBA8;
   }
   else if (!xtl::xstrcmp (source_image.Format (), "atca"))
   {
     source_format       = Q_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA;
-    destination_format  = Q_FORMAT_RGBA_8888;
+    destination_format  = Q_FORMAT_RGBA_8UI;
     destination_size   *= 4;
     result_pixel_format = media::PixelFormat_RGBA8;
   }
