@@ -10,6 +10,7 @@ endif
 #Константы
 ###################################################################################################
 EXE_SUFFIX     :=
+DLL_PREFIX     := lib
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
@@ -42,5 +43,5 @@ define tools.link.dll
 endef
 
 define tools.link
-$(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$1), && cp $1 $(DIST_LIB_DIR) && mv $(DIST_LIB_DIR)/$(notdir $1) $(DIST_LIB_DIR)/$(LIB_PREFIX)$(notdir $1))
+$(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$1), && cp $1 $(DIST_LIB_DIR) && mv $(DIST_LIB_DIR)/$(notdir $1) $(DIST_LIB_DIR)/$(notdir $1))
 endef
