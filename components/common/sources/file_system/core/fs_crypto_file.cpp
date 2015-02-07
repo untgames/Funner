@@ -109,12 +109,12 @@ struct CryptoFileImpl::Impl
       filesize_t size        = dirty_end_pos - dirty_start_pos,
                  crypto_size = dirty_end_pos - data_start_pos;
 
-      size_t result = write_crypto_context.Update (crypto_size, data_buffer.data () + dirty_start_pos - data_start_pos, read_write_buffer.data ());
+      size_t result = write_crypto_context.Update ((size_t)crypto_size, data_buffer.data () + dirty_start_pos - data_start_pos, read_write_buffer.data ());
 
       if (result != crypto_size)
         throw xtl::format_operation_exception ("", "Can't encrypt/decrypt data from file");
 
-      result = source_file->Write (read_write_buffer.data (), size);
+      result = source_file->Write (read_write_buffer.data (), (size_t)size);
 
       if (result != size)
         throw xtl::format_operation_exception ("", "Can't write data to file");
@@ -356,11 +356,11 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
       if (!read_size)
         break; //end of file
 
-      memcpy (dst, src, read_size);
+      memcpy (dst, src, (size_t)read_size);
 
         //переход к следующему блоку
 
-      size -= read_size;
+      size -= (size_t)read_size;
       dst  += read_size;
       pos  += read_size;
     }
@@ -371,7 +371,7 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
 
     impl->file_pos = pos;
 
-    return result;
+    return (size_t)result;
   }
   catch (xtl::exception& exception)
   {
@@ -405,7 +405,7 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
 
       filesize_t offset         = pos - impl->data_start_pos;
       filesize_t available_size = impl->data_end_pos - pos;
-      size_t     write_size     = size < available_size ? size : available_size;
+      size_t     write_size     = size < available_size ? size : (size_t)available_size;
       char*      dst            = impl->data_buffer.data () + offset;
 
       if (!write_size)
@@ -437,7 +437,7 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
 
     impl->file_pos = pos;
 
-    return result;
+    return (size_t)result;
   }
   catch (xtl::exception& exception)
   {

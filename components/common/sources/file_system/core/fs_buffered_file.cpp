@@ -51,7 +51,7 @@ struct BufferedFileImpl::Impl
         
       char*     data       = buffer.data () + (data_dirty_start_pos - data_start_pos);
       filepos_t size       = data_dirty_end_pos - data_dirty_start_pos;
-      size_t    write_size = base_file->Write (data, size);
+      size_t    write_size = base_file->Write (data, (size_t)size);
 
       if (write_size != size)
         throw xtl::format_operation_exception ("", "Can't write file");
@@ -92,14 +92,14 @@ struct BufferedFileImpl::Impl
 
           filesize_t available_size = base_file->Size () - data_start_pos;
 
-          if (available_size > buffer.size ())
-            available_size = buffer.size ();
-
           if (data_start_pos > data_tail_start_pos)
             available_size = 0;
 
           if ((filepos_t)(data_start_pos + available_size) > data_tail_start_pos)
             available_size = data_tail_start_pos - data_start_pos;
+
+          if (available_size > buffer.size ())
+            available_size = buffer.size ();
 
             //чтение данных
         
@@ -108,7 +108,7 @@ struct BufferedFileImpl::Impl
             if (base_file->Seek (data_start_pos) != data_start_pos)
               throw xtl::format_operation_exception ("", "Can't seek file");
 
-            size_t result = base_file->Read (buffer.data (), available_size);        
+            size_t result = base_file->Read (buffer.data (), (size_t)available_size);
 
             data_end_pos = data_start_pos + result;
           }
@@ -277,7 +277,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
       filepos_t   offset         = pos - impl->data_start_pos;
       filesize_t  available_size = impl->data_end_pos - pos;
-      size_t      read_size      = size < available_size ? size : available_size;
+      size_t      read_size      = size < available_size ? size : (size_t)available_size;
       const char* src            = impl->buffer.data () + offset;
 
         //проверка возможности чтения
@@ -300,7 +300,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
     impl->file_pos = pos;
 
-    return result;
+    return (size_t)result;
   }
   catch (xtl::exception& exception)
   {
@@ -359,7 +359,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
       filepos_t  offset         = pos - impl->data_start_pos;
       filesize_t available_size = impl->data_end_pos - pos;
-      size_t     write_size     = size < available_size ? size : available_size;
+      size_t     write_size     = size < available_size ? size : (size_t)available_size;
       char*      dst            = impl->buffer.data () + offset;
 
       if (!write_size)
@@ -391,7 +391,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
     impl->file_pos = pos;
 
-    return result;
+    return (size_t)result;
   }
   catch (xtl::exception& exception)
   {
