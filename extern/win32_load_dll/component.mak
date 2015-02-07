@@ -4,10 +4,11 @@
 TARGETS := EXTERN.WIN32_LOAD_DLL EXTERN.WIN32_LOAD_DLL.SAMPLE_DLL EXTERN.WIN32_LOAD_DLL.TESTS
 
 #Цель - Library
-EXTERN.WIN32_LOAD_DLL.TYPE         := static-lib
-EXTERN.WIN32_LOAD_DLL.NAME         := funner.extern.win32_load_dll
-EXTERN.WIN32_LOAD_DLL.SOURCE_DIRS  := sources
-EXTERN.WIN32_LOAD_DLL.IMPORTS      := compile.extern.win32_load_dll
+EXTERN.WIN32_LOAD_DLL.TYPE                     := static-lib
+EXTERN.WIN32_LOAD_DLL.NAME                     := funner.extern.win32_load_dll
+EXTERN.WIN32_LOAD_DLL.SOURCE_DIRS              := sources
+EXTERN.WIN32_LOAD_DLL.vcx86-64.COMPILER_CFLAGS := -wd4244
+EXTERN.WIN32_LOAD_DLL.IMPORTS                  := compile.extern.win32_load_dll
 
 TEST_DLL_DIR  := ../../tmp/$(CURRENT_TOOLSET)/EXTERN.WIN32_LOAD_DLL.SAMPLE_DLL
 TEST_DLL_PATH := "$(TEST_DLL_DIR)/sample-dll.dll"

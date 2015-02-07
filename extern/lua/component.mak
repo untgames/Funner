@@ -8,24 +8,25 @@ TARGETS += EXTERN.LUA_UTILS EXTERN.LUA_TESTS
 endif
 
 #Цель №1 - LUALIB
-EXTERN.LUALIB.TYPE                 := static-lib        #Тип цели
-EXTERN.LUALIB.NAME                 := funner.extern.lua        #Имя выходного файла
-EXTERN.LUALIB.INCLUDE_DIRS         := include				   #Относительные пути к каталогам c заголовочными файлами
-EXTERN.LUALIB.SOURCE_DIRS          := sources           #Относительные пути к каталогам c исходными файлами
-EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
-EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
-EXTERN.LUALIB.clang.COMPILER_CFLAGS   := -w -x c++
-EXTERN.LUALIB.android.COMPILER_CFLAGS := -include android_lconv_wrapper.h
-EXTERN.LUALIB.wince.COMPILER_CFLAGS   := -FIwince_wrapper.h -DLUA_ANSI
-EXTERN.LUALIB.wp8.COMPILER_CFLAGS     := -FIwp8_wrapper.h
+EXTERN.LUALIB.TYPE                     := static-lib
+EXTERN.LUALIB.NAME                     := funner.extern.lua
+EXTERN.LUALIB.INCLUDE_DIRS             := include
+EXTERN.LUALIB.SOURCE_DIRS              := sources
+EXTERN.LUALIB.msvc.COMPILER_CFLAGS     := -TP
+EXTERN.LUALIB.vcx86-64.COMPILER_CFLAGS := -wd4334
+EXTERN.LUALIB.g++.COMPILER_CFLAGS      := -x c++
+EXTERN.LUALIB.clang.COMPILER_CFLAGS    := -w -x c++
+EXTERN.LUALIB.android.COMPILER_CFLAGS  := -include android_lconv_wrapper.h
+EXTERN.LUALIB.wince.COMPILER_CFLAGS    := -FIwince_wrapper.h -DLUA_ANSI
+EXTERN.LUALIB.wp8.COMPILER_CFLAGS      := -FIwp8_wrapper.h
 
 #Цель №2 - LUA_UTILS
-EXTERN.LUA_UTILS.TYPE                   := test-suite     	 #Тип цели
-EXTERN.LUA_UTILS.INCLUDE_DIRS           := include	sources  #Относительные пути к каталогам c заголовочными файлами
-EXTERN.LUA_UTILS.SOURCE_DIRS            := utils          	 #Относительные пути к каталогам c исходными файлами
-EXTERN.LUA_UTILS.LIBS                   := funner.extern.lua       #Список используемых при линковке библиотек
+EXTERN.LUA_UTILS.TYPE                   := test-suite
+EXTERN.LUA_UTILS.INCLUDE_DIRS           := include sources
+EXTERN.LUA_UTILS.SOURCE_DIRS            := utils
+EXTERN.LUA_UTILS.LIBS                   := funner.extern.lua
 EXTERN.LUA_UTILS.TARGET_DIR              = $(DIST_BIN_DIR)
-EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS   := -TP              #Флаги сборки (зависят от конфигурации)
+EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS   := -TP
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS    := -x c++
 EXTERN.LUA_UTILS.clang.COMPILER_CFLAGS  := -x c++
 EXTERN.LUA_UTILS.bada_simulator.IMPORTS := link.extern.bada_addons
