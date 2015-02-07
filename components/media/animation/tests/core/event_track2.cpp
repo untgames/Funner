@@ -15,7 +15,7 @@ int main ()
   {
     EventTrack track;
 
-    track.AddEvent (0.1, 0.1, "event");
+    track.AddEvent (0.1f, 0.1f, "event");
     track.GetEvents (0.f, 1.f, event_handler);
   }
   catch (std::exception& exception)

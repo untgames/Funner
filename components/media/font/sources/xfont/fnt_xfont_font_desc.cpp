@@ -82,8 +82,8 @@ struct XFontFontDesc::Impl
         glyph_info->bearing_x = common::get<float> (*i, "BearingX");
         glyph_info->bearing_y = common::get<float> (*i, "BearingY");
 
-        rasterized_glyph_info->width       = glyph_info->width;
-        rasterized_glyph_info->height      = glyph_info->height;
+        rasterized_glyph_info->width       = (size_t)glyph_info->width;
+        rasterized_glyph_info->height      = (size_t)glyph_info->height;
         rasterized_glyph_info->image_index = common::get (*i, "ImageIndex", 0u);
         rasterized_glyph_info->x_pos       = common::get<size_t> (*i, "XPos");
         rasterized_glyph_info->y_pos       = common::get<size_t> (*i, "YPos");
@@ -183,7 +183,7 @@ bool XFontFontDesc::CanCreateFont (size_t index, const FontCreationParams& param
   if (index > 1)
     throw xtl::make_range_exception ("media::xfont::XFontFontDesc::CanCreateFont", "index", index, 0u, 1u);
 
-  if (abs ((int)impl->font.FontSize () - (int)params.font_size) > params.font_size_eps)
+  if ((size_t)abs ((int)impl->font.FontSize () - (int)params.font_size) > params.font_size_eps)
     return false;
 
   return true;

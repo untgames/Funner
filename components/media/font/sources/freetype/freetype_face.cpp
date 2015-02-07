@@ -76,7 +76,7 @@ struct FreetypeFace::Impl
     size_t size_diff  = (size_t)-1;
     bool   size_found = false;
 
-    for (size_t i = 0; i < face->num_fixed_sizes; i++)
+    for (int i = 0; i < face->num_fixed_sizes; i++)
     {
       size_t current_size = face->available_sizes [i].width;
 
@@ -106,7 +106,7 @@ struct FreetypeFace::Impl
     if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
       return;
 
-    for (size_t i = 0; i < face->num_fixed_sizes; i++)
+    for (int i = 0; i < face->num_fixed_sizes; i++)
     {
       size_t current_fixed_size = face->available_sizes [i].width;
 
@@ -122,7 +122,7 @@ struct FreetypeFace::Impl
       }
     }
 
-    library.FT_Set_Char_Size (face, (size << 6) * (72.f / horizontal_dpi), 0, horizontal_dpi, vertical_dpi);
+    library.FT_Set_Char_Size (face, (FT_F26Dot6)((size << 6) * (72.f / horizontal_dpi)), 0, horizontal_dpi, vertical_dpi);
 
     current_size           = size;
     current_horizontal_dpi = horizontal_dpi;

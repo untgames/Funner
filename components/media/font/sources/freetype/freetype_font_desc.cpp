@@ -39,7 +39,10 @@ struct FreetypeFontDesc::Impl
     {
       common::InputFile font_file (file_name);
 
-      font_data = DataBufferPtr (new DataBuffer (font_file.Size ()));
+      if (font_file.Size () > (size_t)-1)
+        throw xtl::format_operation_exception ("", "Font file '%s' size too large", file_name);
+
+      font_data = DataBufferPtr (new DataBuffer ((size_t)font_file.Size ()));
 
       font_file.Read (font_data->data (), font_data->size ());
 
@@ -53,7 +56,7 @@ struct FreetypeFontDesc::Impl
 
       faces.reserve (faces_count);
 
-      for (size_t i = 0; i < faces_count; i++)
+      for (int i = 0; i < faces_count; i++)
         faces.push_back (FreetypeFacePtr (new FreetypeFace (font_data, library, i), false));
     }
     catch (xtl::exception& e)
@@ -208,9 +211,6 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
         for (size_t i = 0; i < charset_size; i++, current_glyph++, current_char_code++)
         {
-          if (current_glyph - builder.Glyphs () >= *current_char_code)
-            exit (0);
-
           for (size_t j = previous_glyph_code + 1; j < *current_char_code; j++, current_glyph++)
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 

@@ -309,7 +309,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     {
       unsigned char* src_row  = bitmap->buffer;
       int            src_step = abs (bitmap->pitch);
-      int            dst_step = bitmap->pitch > 0 ? -row_size : row_size;
+      int            dst_step = bitmap->pitch > 0 ? -(int)row_size : row_size;
 
       dst_row = bitmap->pitch > 0 ? dst_row + (bitmap->rows - 1) * row_size : dst_row;
 

@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <errno.h>
+#include <stdint.h>
 
 #include <stl/string>
 
