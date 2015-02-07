@@ -104,10 +104,12 @@ MEDIA.TEXTURE_CONVERTER.SOURCES.macosx.IMPORTS := compile.extern.qualcomm_textur
 MEDIA.TEXTURE_CONVERTER.TESTS.TYPE              := test-suite
 MEDIA.TEXTURE_CONVERTER.TESTS.SOURCE_DIRS       := tests/texture_converter
 MEDIA.TEXTURE_CONVERTER.TESTS.USED_APPLICATIONS := texture-converter
+MEDIA.TEXTURE_CONVERTER.TESTS.win32.IMPORTS     := run.extern.qualcomm_texture_converter
 MEDIA.TEXTURE_CONVERTER.TESTS.macosx.IMPORTS    := run.extern.qualcomm_texture_converter
 
 #Цель
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.TYPE              := test-suite
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.SOURCE_DIRS       := tests/qualcomm_texture_converter
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.USED_APPLICATIONS := texture-converter
+MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.win32.IMPORTS     := run.extern.qualcomm_texture_converter
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.macosx.IMPORTS    := run.extern.qualcomm_texture_converter
