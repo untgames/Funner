@@ -32,6 +32,56 @@ inline bool read (const char* string, unsigned long& value)
   return read (string, *(long*)&value);
 }
 
+inline bool read (const char* string, long long& value)
+{
+  if (!string || !*string)
+    return false;
+
+  long long tmp = strtoll (string, (char**)&string, 0);
+
+  if (!*string)
+  {
+    value = tmp;
+    return true;
+  }
+
+  if (*string != '.')
+    return false;
+
+  while (*++string)
+    if (!isdigit ((unsigned char)*string))
+      return false;
+
+  value = tmp;
+
+  return true;
+}
+
+inline bool read (const char* string, unsigned long long& value)
+{
+  if (!string || !*string)
+    return false;
+
+  unsigned long long tmp = strtoull (string, (char**)&string, 0);
+
+  if (!*string)
+  {
+    value = tmp;
+    return true;
+  }
+
+  if (*string != '.')
+    return false;
+
+  while (*++string)
+    if (!isdigit ((unsigned char)*string))
+      return false;
+
+  value = tmp;
+
+  return true;
+}
+
 inline bool read (const char* string, bool& value)
 {
   long tmp_value;
@@ -229,6 +279,16 @@ inline bool read (const wchar_t* string, long& result_value)
 }
 
 inline bool read (const wchar_t* string, unsigned long& result_value)
+{
+  return detail::read_wchar_string (string, result_value);
+}
+
+inline bool read (const wchar_t* string, long long& result_value)
+{
+  return detail::read_wchar_string (string, result_value);
+}
+
+inline bool read (const wchar_t* string, unsigned long long& result_value)
 {
   return detail::read_wchar_string (string, result_value);
 }

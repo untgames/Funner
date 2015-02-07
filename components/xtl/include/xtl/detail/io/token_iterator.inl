@@ -311,6 +311,18 @@ inline bool read (token_iterator<const char*, BaseIter>& iter, unsigned long& va
 }
 
 template <class BaseIter>
+inline bool read (token_iterator<const char*, BaseIter>& iter, signed long long& value)
+{
+  return detail::read_value (iter, value);
+}
+
+template <class BaseIter>
+inline bool read (token_iterator<const char*, BaseIter>& iter, unsigned long long& value)
+{
+  return detail::read_value (iter, value);
+}
+
+template <class BaseIter>
 inline bool read (token_iterator<const char*, BaseIter>& iter, bool& value)
 {
   return detail::read_value (iter, value);
@@ -394,6 +406,18 @@ inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, signed long& v
 
 template <class BaseIter>
 inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, unsigned long& value)
+{
+  return detail::read_value (iter, value);
+}
+
+template <class BaseIter>
+inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, signed long long& value)
+{
+  return detail::read_value (iter, value);
+}
+
+template <class BaseIter>
+inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, unsigned long long& value)
 {
   return detail::read_value (iter, value);
 }

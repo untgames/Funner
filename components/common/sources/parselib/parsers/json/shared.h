@@ -1,6 +1,8 @@
 #ifndef COMMONLIB_PARSER_JSON_SHARED_HEADER
 #define COMMONLIB_PARSER_JSON_SHARED_HEADER
 
+#include <stdint.h>
+
 #include <stl/vector>
 
 #include <xtl/common_exceptions.h>

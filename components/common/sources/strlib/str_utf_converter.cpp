@@ -1,5 +1,6 @@
-#include <wchar.h>
 #include <string.h>
+#include <stdint.h>
+#include <wchar.h>
 
 #include <stl/string>
 

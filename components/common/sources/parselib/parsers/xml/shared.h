@@ -3,6 +3,7 @@
 
 #include <cctype>
 #include <cstring>
+#include <stdint.h>
 
 #include <stl/string>
 #include <stl/vector>
