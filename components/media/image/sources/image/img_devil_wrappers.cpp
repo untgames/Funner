@@ -226,7 +226,12 @@ ILint ILAPIENTRY devil_file_tell (ILHANDLE file_ptr)
 {
   try
   {
-    return ((StdFile*)file_ptr)->Tell ();
+    filepos_t current_pos = ((StdFile*)file_ptr)->Tell ();
+
+    if (current_pos > INT_MAX)
+      throw xtl::format_operation_exception ("", "File position is larger than DevIL can handle");
+
+    return (ILint)current_pos;
   }
   catch (std::exception& exception)
   {

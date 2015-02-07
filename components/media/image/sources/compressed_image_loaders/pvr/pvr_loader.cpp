@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdint.h>
 
 #include <stl/vector>
 
@@ -126,7 +127,7 @@ class PvrCompressedImage: public ICustomCompressedImage
 
           //чтение данных
           
-        size_t data_length = file.Size () - file.Tell ();
+        size_t data_length = (size_t)(file.Size () - file.Tell ());
 
         data.resize (data_length, false);
 

@@ -53,7 +53,7 @@ class AniLoader
           
           Read (chunk_size);
           
-          size_t new_pos = file.Tell () + chunk_size; 
+          size_t new_pos = (size_t)file.Tell () + chunk_size;
           
           if      (!memcmp ("anih", tag, sizeof tag)) ParseAniHeader ();
           else if (!memcmp ("LIST", tag, sizeof tag)) ParseFramesList ();
@@ -110,7 +110,7 @@ class AniLoader
           
           Read (chunk_size);
           
-          size_t new_pos = file.Tell () + chunk_size;
+          size_t new_pos = (size_t)file.Tell () + chunk_size;
 
           if (new_pos != (size_t)file.Seek (new_pos))
             throw xtl::format_operation_exception ("", "Can' skip chunk '%s'", tag);

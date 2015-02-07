@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <stl/vector>
 
 #include <xtl/common_exceptions.h>
