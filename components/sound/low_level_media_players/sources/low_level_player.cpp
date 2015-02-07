@@ -128,7 +128,7 @@ class LowLevelPlayerDevice : public common::Lockable
       if (player != active_player || ! active_player)
         return;
 
-      sample_read_offset += position * media_sample.Frequency () - last_read_sample;
+      sample_read_offset += (size_t)(position * media_sample.Frequency ()) - last_read_sample;
     }
 
     ///Telling
@@ -343,7 +343,7 @@ LowLevelPlayer<driver_type>::~LowLevelPlayer ()
 template<DriverType driver_type>
 float LowLevelPlayer<driver_type>::Duration ()
 {
-  return impl->sound_sample.Duration ();
+  return (float)impl->sound_sample.Duration ();
 }
 
 /*
