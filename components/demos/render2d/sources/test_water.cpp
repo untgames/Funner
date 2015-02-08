@@ -100,7 +100,7 @@ struct Test
 
       if (common::milliseconds () - last_update >= 10)
       {
-        height_map->Update ((common::milliseconds () - last_update) / 1000.0f);
+        height_map->Update (TimeValue (common::milliseconds () - last_update, 1000));
         
         water->PutStorm (math::vec3f (frand ()-0.5f, frand ()-0.5f, 0.0f), 0.1f);
         

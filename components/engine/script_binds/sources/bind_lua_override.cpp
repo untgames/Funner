@@ -104,7 +104,10 @@ struct DoFileOverride
 
     common::InputFile input_file (file_name.c_str ());
 
-    xtl::uninitialized_storage<char> file_content (input_file.Size ());
+    if (input_file.Size () > (size_t)-1)
+      throw xtl::format_operation_exception ("DoFileOverride", "File '%s' too large", file_name.c_str ());
+
+    xtl::uninitialized_storage<char> file_content ((size_t)input_file.Size ());
 
     input_file.Read (file_content.data (), file_content.size ());
 
@@ -133,7 +136,10 @@ struct RequireOverride
 
     common::InputFile input_file (file_name.c_str ());
 
-    xtl::uninitialized_storage<char> file_content (input_file.Size ());
+    if (input_file.Size () > (size_t)-1)
+      throw xtl::format_operation_exception ("RequireOverride", "File '%s' too large", file_name.c_str ());
+
+    xtl::uninitialized_storage<char> file_content ((size_t)input_file.Size ());
 
     input_file.Read (file_content.data (), file_content.size ());
 

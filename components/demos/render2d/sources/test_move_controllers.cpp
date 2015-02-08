@@ -163,7 +163,7 @@ struct Test
 
       sprite1->SetPosition (cos (current_angle) * sprite_position_radius, sin (current_angle) * sprite_position_radius, 0.f);
 
-      scene.Root ().Update (dt);
+      scene.Root ().Update (TimeValue (size_t (dt * 1000), 1000));
 
       last_update_time = current_time;
 
