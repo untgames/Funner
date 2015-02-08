@@ -15,9 +15,9 @@ int main ()
 
   print ("A =", A, A+N);
 
-  n = count_if (A, A+N, negative);
+  n = (int)count_if (A, A+N, negative);
   printf ("Number of negative elements: %d\n", n);
-  n = count_if (A, A+N, positive);
+  n = (int)count_if (A, A+N, positive);
   printf ("Number of positive elements: %d\n", n);
 
   return 0;

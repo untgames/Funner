@@ -13,7 +13,7 @@ int main ()
   
   for(int i=0;i<100;i++) numbers [i] = i % 3;
   
-  int elements = count_if (numbers.begin (),numbers.end (),odd);
+  int elements = (int)count_if (numbers.begin (),numbers.end (),odd);
   
   printf ("Found %d odd elements.\n",elements);
   

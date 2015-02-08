@@ -10,7 +10,7 @@ int main ()
   printf ("Results of alg_find03_3:\n");
 
   const char* WS = "\t\n ";
-  const int n_WS = strlen (WS);
+  const int n_WS = (int)strlen (WS);
 
   const char* s1 = "This sentence contains five words.";
   const char* s2 = "OneWord";

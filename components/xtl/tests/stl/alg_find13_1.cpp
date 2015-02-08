@@ -7,7 +7,7 @@ using namespace stl;
 
 void check (const int* first, const int* last, int value)
 {
-  int n = count (first, last, value);
+  int n = (int)count (first, last, value);
   printf ("Number of elements that match %d: %d\n", value, n);
 }
 

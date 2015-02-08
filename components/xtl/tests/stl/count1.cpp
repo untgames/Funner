@@ -13,7 +13,7 @@ int main ()
   for (int i=0;i<100;i++)
     numbers [i] = i % 3;
     
-  int elements = count (numbers.begin (),numbers.end (),2);
+  int elements = (int)count (numbers.begin (),numbers.end (),2);
   
   printf ("Found %d 2's.\n",elements);
   
