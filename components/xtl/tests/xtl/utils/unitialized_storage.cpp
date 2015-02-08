@@ -25,7 +25,7 @@ int main ()
   my_storage s1 (10);
   
   for (size_t i=0; i<s1.size (); i++)
-    s1.data ()[i] = i;
+    s1.data ()[i] = (int)i;
     
   print ("s1", s1);
   

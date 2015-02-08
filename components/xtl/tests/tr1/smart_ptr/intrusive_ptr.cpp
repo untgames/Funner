@@ -42,7 +42,7 @@ public:
 
     long use_count() const
     {
-        return use_count_;
+        return (long)use_count_;
     }
 
 #if !defined(BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP)

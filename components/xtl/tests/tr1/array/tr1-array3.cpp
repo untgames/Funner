@@ -14,7 +14,7 @@ int main()
 
     // copy and change order
     array<stl::string,4> seasons_orig = seasons;
-    for (unsigned i=seasons.size()-1; i>0; --i) {
+    for (size_t i=seasons.size()-1; i>0; --i) {
         stl::swap (seasons.at (i), seasons.at ((i+1) % seasons.size ()));
     }
 

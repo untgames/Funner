@@ -3,7 +3,7 @@
 //данный тест ошибку, связанную с отсоединением слота самого себя в обработчике
 //ошибка проявилялась на WinXP
 
-const size_t NUM = 100000;
+const int NUM = 100000;
 
 typedef signal<void (int)> my_signal;
 
@@ -22,7 +22,7 @@ int main ()
   for (size_t i=0; i<NUM; i++)
     self_destroy_connections [i] = self_destroy_signals [i].connect (&self_disconnect);
 
-  for (size_t i=0; i<NUM; i++)
+  for (int i=0; i<NUM; i++)
   {
     self_destroy_signals [i](i);
   }
