@@ -4,7 +4,7 @@
 
 using namespace stl;
 
-int my_random_number (int max)
+size_t my_random_number (size_t max)
 {
   return myrand () % max;
 }

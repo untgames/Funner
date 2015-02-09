@@ -60,7 +60,7 @@ void print (const math::quat<T>& v)
 {
   printf ("value=[");
 
-  for (size_t i=0; i<4; i++)
+  for (unsigned int i=0; i<4; i++)
   {
     printf (" ");
     print  (v [i]);

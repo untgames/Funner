@@ -65,8 +65,8 @@ class underflow_error: public runtime_error   { public: underflow_error (const c
 
 template <class Container> void stl_raise_length_error (const Container&,size_t new_size, size_t old_size);
 template <class Container> void stl_raise_length_error (const Container&,size_t new_size);
-template <class Container> void stl_raise_out_of_range (const Container&,int position);
-template <class Container> void stl_raise_out_of_range (const Container&,int first,int last);
+template <class Container> void stl_raise_out_of_range (const Container&,long long position);
+template <class Container> void stl_raise_out_of_range (const Container&,long long first,long long last);
 template <class Container> void stl_raise_out_of_range (const Container&,typename Container::iterator position);
 template <class Container> void stl_raise_out_of_range (const Container&,
                                                         typename Container::iterator first,

@@ -44,13 +44,13 @@ inline void to_string (stl::string& buffer, const wchar_t* string)
   if (!string)
     string = L"";
 
-  int source_size = wcslen (string);
+  size_t source_size = wcslen (string);
 
   buffer.fast_resize (source_size * 4);
 
-  int result_size = (int)wcstombs (&buffer [0], string, source_size);  
+  size_t result_size = wcstombs (&buffer [0], string, source_size);
 
-  buffer.resize (result_size <= 0 ? 0 : result_size);
+  buffer.resize (result_size);
 }
 
 #endif

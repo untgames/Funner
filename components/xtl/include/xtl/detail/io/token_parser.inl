@@ -29,7 +29,27 @@ inline bool read (const char* string, long& value)
 
 inline bool read (const char* string, unsigned long& value)
 {
-  return read (string, *(long*)&value);
+  if (!string || !*string)
+    return false;
+
+  unsigned long tmp = strtoul (string, (char**)&string, 0);
+
+  if (!*string)
+  {
+    value = tmp;
+    return true;
+  }
+
+  if (*string != '.')
+    return false;
+
+  while (*++string)
+    if (!isdigit ((unsigned char)*string))
+      return false;
+
+  value = tmp;
+
+  return true;
 }
 
 inline bool read (const char* string, long long& value)
@@ -123,7 +143,7 @@ inline bool read (const char* string, wchar_t& value)
 
   wchar_t tmp = 0;
   
-  int length = strlen (string), result_length = mbrtowc (&tmp, string, length, 0);
+  size_t length = strlen (string), result_length = mbrtowc (&tmp, string, length, 0);
   
   if (length != result_length)
     return false;
@@ -196,17 +216,17 @@ struct wchar_string_converter
       if (!string)
         return;
 
-      int string_length = wcslen (string);
+      size_t string_length = wcslen (string);
       
-      static const int MAX_LENGTH = BUFFER_SIZE-1; //данный размер совпадает с количеством символов multibyte строке, поскольку работа производится только с базовыми типами: числа и простые символы
+      static const size_t MAX_LENGTH = BUFFER_SIZE-1; //данный размер совпадает с количеством символов multibyte строке, поскольку работа производится только с базовыми типами: числа и простые символы
 
       if (string_length > MAX_LENGTH)
         string_length = MAX_LENGTH;
 
-      int length = wcsrtombs (buffer, &string, string_length, 0);
+      size_t length = wcsrtombs (buffer, &string, string_length, 0);
 
-      if (length >= 0 && length < BUFFER_SIZE) buffer [length]        = '\0';
-      else                                     buffer [BUFFER_SIZE-1] = '\0';
+      if (length < BUFFER_SIZE) buffer [length]        = '\0';
+      else                      buffer [BUFFER_SIZE-1] = '\0';
     }
 
     const char* get () const { return buffer; }

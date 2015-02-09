@@ -65,7 +65,7 @@ inline void __median (Iter first,Iter mid,Iter last,Compare less)
     // sort median element to middle
   if (last-first > 40) //медиана из 9-ти элементов
   { 
-    volatile int step = (last-first+1) / 8;  //volatile для обхода бага компилятора gcc 4.0 под MacOS
+    volatile size_t step = (size_t)(last-first+1) / 8;  //volatile для обхода бага компилятора gcc 4.0 под MacOS
     
     __med3 (first,first+step,first+2*step,less);
     __med3 (mid-step,mid,mid+step,less);

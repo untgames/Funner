@@ -101,16 +101,16 @@ inline void stl_raise_length_error (const Container& c,size_t new_size)
 }
 
 template <class Container>
-inline void stl_raise_out_of_range (const Container& c,int position)
+inline void stl_raise_out_of_range (const Container& c,long long position)
 {
-  raise<out_of_range> ("%s: Invalid position %d in container with %u elements",
+  raise<out_of_range> ("%s: Invalid position %lld in container with %u elements",
                        stl_get_container_name (c),position,c.size ());
 }
 
 template <class Container>
-inline void stl_raise_out_of_range (const Container& c,int first,int last)
+inline void stl_raise_out_of_range (const Container& c,long long first,long long last)
 {
-  raise<out_of_range> ("%s: Invalid range [%d;%d) in container with %u elements",
+  raise<out_of_range> ("%s: Invalid range [%lld;%lld) in container with %u elements",
                        stl_get_container_name (c),first,last,c.size ());
 }
 
