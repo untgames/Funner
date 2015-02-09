@@ -1,5 +1,6 @@
-PROFILES                += win32 x86 vcx86 x86_win32
-COMMON_LINK_FLAGS       += /MACHINE:X86
+PROFILES            += win32 x86 vcx86 x86_win32
+COMMON_LINK_FLAGS   += /MACHINE:X86
+LINK_INCLUDE_PREFIX := _
 
 include $(TOOLSETS_DIR)/common/msvc.mak
 
