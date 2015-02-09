@@ -118,11 +118,14 @@ void command_line_license_period (const char* period, Params& params)
   if (!rematch (period, "[:digit:]-[:digit:][:digit:]"))
     throw xtl::format_operation_exception (METHOD_NAME, "Invalid period parameter '%s' format, must be y-mm", period);
 
-  size_t years_period   = atoi (period),
-         monthes_period = atoi (period + 2);
+  int years_period   = atoi (period),
+      monthes_period = atoi (period + 2);
 
-  if (monthes_period > 11)
-    throw xtl::format_operation_exception (METHOD_NAME, "Period's month part can't be greater than 11");
+  if (monthes_period < 0 || monthes_period > 11)
+    throw xtl::format_operation_exception (METHOD_NAME, "Period's month part can't be greater than 11 or less than 0");
+
+  if (years_period < 0)
+    throw xtl::format_operation_exception (METHOD_NAME, "Period's years part can't be less than 0");
 
   if (!params.since_date)
     time (&params.since_date);

@@ -33,11 +33,11 @@ stl::string GetTempDirPath ()
 {
   stl::wstring result;
   
-  result.fast_resize (MAX_PATH);
+  result.fast_resize (MAX_PATH + 1);
   
-  int length = GetTempPathW (result.size (), &result [0]);
+  DWORD length = GetTempPathW ((DWORD)result.size (), &result [0]);
 
-  if (length < 0 || length > (int)result.size ())
+  if (length == 0 || length > result.size ())
     raise_error ("::GetTempPathW");
 
   result.resize (length);

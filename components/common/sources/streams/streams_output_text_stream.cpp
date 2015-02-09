@@ -164,7 +164,7 @@ namespace
 void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_BUFFER_SIZE])
 {
   char* pos         = buffer;
-  char  base_format = sign ? 'd' : 'u';
+  char  base_format = sign ? 'lld' : 'llu';
 
   *pos++ = '%';
 
@@ -198,7 +198,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
 }
 
 //печать целого числа
-void write_int (OutputTextStream& stream, unsigned int value, const char* format, bool sign)
+void write_int (OutputTextStream& stream, unsigned long long value, const char* format, bool sign)
 {
   if (!format)
     throw xtl::make_null_argument_exception ("common::write", "format");
@@ -216,22 +216,32 @@ void write_int (OutputTextStream& stream, unsigned int value, const char* format
 
 void write (OutputTextStream& stream, int value, const char* format)
 {
-  write_int (stream, static_cast<unsigned int> (value), format, true);
+  write_int (stream, static_cast<unsigned long long> (value), format, true);
 }
 
 void write (OutputTextStream& stream, long value, const char* format)
 {
-  write_int (stream, static_cast<int> (value), format, true);
+  write_int (stream, static_cast<unsigned long long> (value), format, true);
+}
+
+void write (OutputTextStream& stream, long long value, const char* format)
+{
+  write_int (stream, static_cast<unsigned long long> (value), format, true);
 }
 
 void write (OutputTextStream& stream, unsigned int value, const char* format)
 {
-  write_int (stream, value, format, false);
+  write_int (stream, static_cast<unsigned long long> (value), format, false);
 }
 
 void write (OutputTextStream& stream, unsigned long value, const char* format)
 {
-  write_int (stream, static_cast<unsigned int> (value), format, false);
+  write_int (stream, static_cast<unsigned long long> (value), format, false);
+}
+
+void write (OutputTextStream& stream, unsigned long long value, const char* format)
+{
+  write_int (stream, value, format, false);
 }
 
 /*

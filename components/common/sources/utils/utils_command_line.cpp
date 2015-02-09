@@ -87,7 +87,7 @@ struct CommandLine::Impl
       }
 
         //разбор аргументов
-      for (int i = 0, args_count = args.Size (); i < args_count; i++)
+      for (size_t i = 0, args_count = args.Size (); i < args_count; i++)
       {
         const char* arg = args [i];
 

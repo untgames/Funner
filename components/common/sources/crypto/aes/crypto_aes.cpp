@@ -41,7 +41,7 @@ enum AesOperation
 class AesContext: public ICryptoContext
 {
   public:
-    AesContext (AesOperation in_operation, const void* key, size_t key_bits, bool in_ofb, const char* init_string)
+    AesContext (AesOperation in_operation, const void* key, int key_bits, bool in_ofb, const char* init_string)
       : operation (in_operation)
       , ofb (in_ofb)
       , num ()

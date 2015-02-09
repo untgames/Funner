@@ -332,22 +332,22 @@ int main ()
 
     printf ("Is file buffered: %s\n",file.IsBuffered () ? "true" : "false");
 
-    int message_len = strlen (MESSAGE1);
+    size_t message_len = xtl::xstrlen (MESSAGE1);
 
     for (size_t i=0;i<10;i++)
       file.Write (MESSAGE1,message_len);
 
-    message_len = strlen (MESSAGE2);
+    message_len = xtl::xstrlen (MESSAGE2);
 
     file.Seek (message_len*9,FileSeekMode_Current);
 
     for (size_t i=0;i<10;i++)
     {
       file.Write (MESSAGE2,message_len);
-      file.Seek  (-message_len*2,FileSeekMode_Current);
+      file.Seek  (-(int)message_len*2,FileSeekMode_Current);
     }
 
-    file.Seek  (-message_len,FileSeekMode_Current);
+    file.Seek  (-(int)message_len,FileSeekMode_Current);
     file.Write (MESSAGE3,strlen (MESSAGE3));
     file.Write (MESSAGE3,strlen (MESSAGE3));
     

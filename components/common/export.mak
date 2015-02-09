@@ -15,6 +15,7 @@ export.link.common.IMPORTS                     := link.common.auto_license_gener
 export.link.common.LINK_INCLUDES               := StandardFilePathsMount
 export.link.common.mingw.LIBS                  := shell32
 export.link.common.vcx86.LIBS                  := shell32
+export.link.common.vcx86-64.LIBS               := shell32
 export.link.common.winrt.LIBS                  := shell32
 export.link.common.wince.LIBS                  := coredll
 export.link.common.linux.LIBS                  := rt

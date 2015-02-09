@@ -28,7 +28,7 @@ int main ()
     printf ("  strnhash is %x\n", strnhash ((const wchar_t*)test_array, i));
     printf ("  strnihash is %x\n", strnihash ((const wchar_t*)test_array, i));
 
-    *data = WCHAR_TEST_ARRAY_SIZE - i;
+    *data = (wchar_t)(WCHAR_TEST_ARRAY_SIZE - i);
   }
 
   delete [] test_array;

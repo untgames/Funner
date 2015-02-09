@@ -590,7 +590,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       {
         math::vec4f v (0.0f);
         
-        for (size_t i=0; i<available; i++)
+        for (unsigned int i=0; i<available; i++)
           if (!read (iter, v [i]))
             return false;
 
@@ -1018,7 +1018,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     size_t new_property_size = get_size (type) * elements_count,
            old_property_size = get_size (desc.type) * desc.elements_count;
           
-    int size_diff = new_property_size - old_property_size;
+    ptrdiff_t size_diff = new_property_size - old_property_size;
     
       //предварительные операции    
 

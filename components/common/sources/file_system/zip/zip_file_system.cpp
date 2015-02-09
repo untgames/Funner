@@ -174,7 +174,10 @@ zzip_ssize_t zip_read_func (int fd, void* buf, zzip_size_t len)
 
   try
   {
-    return ZipFilesTableSingleton::Instance ()->GetFile (fd).Read (buf, len);
+    if (len > (zzip_ssize_t)-1)
+      throw xtl::make_range_exception ("", "len", len, (zzip_size_t)0, (zzip_size_t)(zzip_ssize_t)-1);
+
+    return (zzip_ssize_t)ZipFilesTableSingleton::Instance ()->GetFile (fd).Read (buf, len);
   }
   catch (std::exception& exception)
   {
@@ -242,7 +245,10 @@ zzip_ssize_t zip_write_func (int fd, _zzip_const void* buf, zzip_size_t len)
     if (!len)
       return 0;
 
-    return ZipFilesTableSingleton::Instance ()->GetFile (fd).Write (buf, len);
+    if (len > (zzip_ssize_t)-1)
+      throw xtl::make_range_exception ("", "len", len, (zzip_size_t)0, (zzip_size_t)(zzip_ssize_t)-1);
+
+    return (zzip_ssize_t)ZipFilesTableSingleton::Instance ()->GetFile (fd).Write (buf, len);
   }
   catch (std::exception& exception)
   {

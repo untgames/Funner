@@ -241,8 +241,10 @@ void write (OutputTextStream&, size_t count, wchar_t symbol);
     //сделать проверку формата!!!
 void write (OutputTextStream&, int value, const char* format="");
 void write (OutputTextStream&, long value, const char* format="");
+void write (OutputTextStream&, long long value, const char* format="");
 void write (OutputTextStream&, unsigned int value, const char* format="");
 void write (OutputTextStream&, unsigned long value, const char* format="");
+void write (OutputTextStream&, unsigned long long value, const char* format="");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вывод чисел с плавающей точкой

@@ -885,7 +885,7 @@ class XmlParser
       }
     }    
 
-    XmlEncoding DetectEncoding (const unsigned char* buffer, int buffer_size, size_t& text_offset)
+    XmlEncoding DetectEncoding (const unsigned char* buffer, size_t buffer_size, size_t& text_offset)
     {
         if (!buffer)
           return XmlEncoding_Unknown;

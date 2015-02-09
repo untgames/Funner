@@ -548,7 +548,7 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
       p_buf += 4;
 
       unsigned int term1 = crc_tableil8_o56[crc & 0xff] ^ crc_tableil8_o48[(crc >> 8) & 0xff];
-      unsigned int term2 = crc >> 16;
+      unsigned int term2 = (unsigned int)crc >> 16;
 
       crc = term1 ^ crc_tableil8_o40[term2 & 0xff] ^ crc_tableil8_o32[(term2 >> 8) & 0xff];
     }
@@ -568,7 +568,7 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
         p_buf += 4;
 
         unsigned int term1 = crc_tableil8_o88[crc & 0xff] ^ crc_tableil8_o80[(crc >> 8) & 0xff];
-        unsigned int term2 = crc >> 16;
+        unsigned int term2 = (unsigned int)crc >> 16;
 
         crc = term1 ^ crc_tableil8_o72[term2 & 0xff] ^ crc_tableil8_o64[(term2 >> 8) & 0xff];
         term1 = crc_tableil8_o56[(*(unsigned int*)p_buf) & 0xff] ^ crc_tableil8_o48[((*(unsigned int*)p_buf) >> 8) & 0xff];

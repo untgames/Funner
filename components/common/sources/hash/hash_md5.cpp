@@ -2,6 +2,8 @@
 #include <cstring>
 #include <new>
 
+#include <stl/algorithm>
+
 #include <common/hash.h>
 
 using namespace common;
@@ -288,7 +290,17 @@ void md5 (const void* buf, size_t len, unsigned char result_hash_value [16])
   MD5_CTX context;
 
   Md5Init   (&context);
-  Md5Update (&context,(unsigned char*)buf,len);
+
+  while (len)
+  {
+    unsigned int update_size = (unsigned int)stl::min (len, (size_t)(unsigned int)-1);
+
+    Md5Update (&context, (unsigned char*)buf, update_size);
+
+    buf = (const char*)buf + update_size;
+    len -= update_size;
+  }
+
   Md5Final  (result_hash_value, &context);
 }
 
@@ -317,7 +329,15 @@ Md5Context::~Md5Context ()
           
 void Md5Context::Update (const void* buf,size_t len)
 {
-  Md5Update (&impl->context,(unsigned char*)buf,len);  
+  while (len)
+  {
+    unsigned int update_size = (unsigned int)stl::min (len, (size_t)(unsigned int)-1);
+
+    Md5Update (&impl->context, (unsigned char*)buf, update_size);
+
+    buf = (const char*)buf + update_size;
+    len -= update_size;
+  }
 }
 
 void Md5Context::Finish (unsigned char result_hash_value [16])

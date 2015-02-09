@@ -21,9 +21,14 @@ namespace common
 
 void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string& result)
 {
+  static const char* METHOD_NAME = "common::encode_base64";
+
   if (!src_buffer && src_buffer_size)
-    throw xtl::make_null_argument_exception ("common::encode_base64", "src_buffer");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "src_buffer");
     
+  if (src_buffer_size > INT_MAX)
+    throw xtl::make_range_exception (METHOD_NAME, "src_buffer_size", src_buffer_size, 0u, (size_t)INT_MAX);
+
   if (!src_buffer)
     src_buffer = "";
 
@@ -35,7 +40,7 @@ void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string&
   
   result.fast_resize (saved_result_size + src_buffer_size * 2 + 5);
   
-  int dst_length = base64_encode_block ((const char*)src_buffer, src_buffer_size, &result [saved_result_size], &state);
+  int dst_length = base64_encode_block ((const char*)src_buffer, (int)src_buffer_size, &result [saved_result_size], &state);
   
   if (dst_length < 0)
     throw xtl::format_operation_exception ("common::encode_base64", "::base64_encode_block failed");
@@ -53,9 +58,14 @@ void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string&
 
 void decode_base64 (size_t src_buffer_size, const char* src_buffer, stl::string& result)
 {
+  static const char* METHOD_NAME = "common::encode_base64";
+
   if (!src_buffer && src_buffer_size)
-    throw xtl::make_null_argument_exception ("common::encode_base64", "src_buffer");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "src_buffer");
     
+  if (src_buffer_size > INT_MAX)
+    throw xtl::make_range_exception (METHOD_NAME, "src_buffer_size", src_buffer_size, 0u, (size_t)INT_MAX);
+
   if (!src_buffer)
     src_buffer = "";
 
@@ -67,7 +77,7 @@ void decode_base64 (size_t src_buffer_size, const char* src_buffer, stl::string&
   
   result.fast_resize (saved_result_size + src_buffer_size * 2 + 5);
   
-  int dst_length = base64_decode_block ((const char*)src_buffer, src_buffer_size, &result [saved_result_size], &state);
+  int dst_length = base64_decode_block ((const char*)src_buffer, (int)src_buffer_size, &result [saved_result_size], &state);
   
   if (dst_length < 0)
     throw xtl::format_operation_exception ("common::decode_base64", "::base64_decode_block failed");

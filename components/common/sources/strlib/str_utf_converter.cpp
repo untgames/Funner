@@ -684,16 +684,13 @@ stl::wstring towstring (const char* string, int length)
     throw xtl::make_null_argument_exception ("common::towstring", "string");
 
   if (length == -1)
-    length = strlen (string);
+    length = xtl::xstrlen (string);
 
   stl::wstring result;
 
   result.fast_resize (length);
 
-  int result_size = mbsrtowcs (&result [0], &string, length, 0);
-
-  if (result_size < 0)
-    return L"(common::towstring error)";
+  size_t result_size = mbsrtowcs (&result [0], &string, length, 0);
 
   result.fast_resize (result_size);
 

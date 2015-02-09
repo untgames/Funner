@@ -28,7 +28,7 @@ int main ()
     printf ("  strnhash is %x\n", strnhash ((const char*)test_array, i));
     printf ("  strnihash is %x\n", strnihash ((const char*)test_array, i));
 
-    *data = CHAR_TEST_ARRAY_SIZE - i;
+    *data = (unsigned char)(CHAR_TEST_ARRAY_SIZE - i);
   }
 
   delete [] test_array;

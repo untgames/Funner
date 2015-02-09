@@ -322,7 +322,15 @@ void CC_SHA256 (const void* data, size_t size, unsigned char result_hash_value [
 
   sha256_starts (&ctx);
 
-  sha256_update (&ctx, (uint8*)data, size);
+  while (size)
+  {
+    unsigned int update_size = (unsigned int)stl::min (size, (size_t)(unsigned int)-1);
+
+    sha256_update (&ctx, (uint8*)data, update_size);
+
+    data = (const char*)data + update_size;
+    size -= update_size;
+  }
 
   sha256_finish (&ctx, result_hash_value);
 }
@@ -353,7 +361,15 @@ struct Sha256Context::Impl
     if (need_init)
       Init ();
 
-    sha256_update (&context, (uint8*)data, data_size);
+    while (data_size)
+    {
+      unsigned int update_size = (unsigned int)stl::min (data_size, (size_t)(unsigned int)-1);
+
+      sha256_update (&context, (uint8*)data, update_size);
+
+      data       = (const char*)data + update_size;
+      data_size -= update_size;
+    }
   }
 
   void Finish (unsigned char (&result_hash_value) [32])

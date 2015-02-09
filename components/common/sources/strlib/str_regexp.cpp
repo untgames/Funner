@@ -34,6 +34,8 @@ typedef Singleton<OffsetBufferHolder> OffsetBufferSingleton;
 
 int parse_internal (const char* str,const char* pattern,const char* flags,int* offset_buf=0,size_t max_buf_size=0)
 {
+  static const char* METHOD_NAME = "common::parse_internal";
+
     //opt!!!
   const char* cur_locale = setlocale (LC_COLLATE,NULL);
 
@@ -62,10 +64,14 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
   pcre *re = pcre_compile (pattern,0,&error,&err_offset,loc_tables);
 
   if (!re)
-    throw xtl::format_operation_exception ("common::parse_internal", "Invalid pattern '%s', error '%s' at %d", pattern, error, err_offset);
+    throw xtl::format_operation_exception (METHOD_NAME, "Invalid pattern '%s', error '%s' at %d", pattern, error, err_offset);
 
-  int str_length = xtl::xstrlen (str),
-      matches    = pcre_exec (re,0,str,str_length,0,0,offset_buf,max_buf_size);
+  size_t str_length = xtl::xstrlen (str);
+
+  if (str_length > INT_MAX)
+    throw xtl::format_operation_exception (METHOD_NAME, "String length is larger then max");
+
+  int matches = pcre_exec (re,0,str,(int)str_length,0,0,offset_buf,(int)max_buf_size);
   
   if (matches <= 0)
     return 0;    
@@ -96,7 +102,7 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
       options = PCRE_NOTEMPTY | PCRE_ANCHORED;
     }    
 
-    matches = pcre_exec (re,0,str,str_length,start_offset,options,offset,max_buf_size);
+    matches = pcre_exec (re,0,str,(int)str_length,start_offset,options,offset,(int)max_buf_size);
 
     if (matches == PCRE_ERROR_NOMATCH)
     {

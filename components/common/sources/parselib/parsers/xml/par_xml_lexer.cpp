@@ -368,8 +368,8 @@ void XmlLexer::ReadIdentifier (bool identifier)
 
 void XmlLexer::ProcessTagBeginBracket (bool process_cdata)
 {
-  static const char CDATA_TAG []   = "[CDATA[";
-  static const int  CDATA_TAG_SIZE = strlen (CDATA_TAG);
+  static const char   CDATA_TAG []   = "[CDATA[";
+  static const size_t CDATA_TAG_SIZE = xtl::xstrlen (CDATA_TAG);
 
   switch (*++position)
   {
@@ -386,7 +386,7 @@ void XmlLexer::ProcessTagBeginBracket (bool process_cdata)
 
       current_lexem = XmlLexem_Keyword;
 
-      if (process_cdata && !strncmp (position, CDATA_TAG, CDATA_TAG_SIZE))
+      if (process_cdata && !xtl::xstrncmp (position, CDATA_TAG, CDATA_TAG_SIZE))
       {
         position += CDATA_TAG_SIZE;
 
