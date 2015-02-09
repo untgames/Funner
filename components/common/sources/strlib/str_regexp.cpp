@@ -1,3 +1,4 @@
+#include <climits>
 #include <locale.h>
 #include <pcre.h>
 
