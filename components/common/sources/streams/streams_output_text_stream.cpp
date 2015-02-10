@@ -256,7 +256,7 @@ namespace
 {
 
 //приведение формата к printf-форме
-void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE], size_t int_size)
+void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE], unsigned int int_size)
 {
   char* pos = buffer;
   
@@ -279,8 +279,8 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
   if (dot)
   {
     const char*  frac_format = dot + 1;
-    unsigned int frac_size   = strlen (frac_format),
-                 width       = dot - format + frac_size + 1;
+    unsigned int frac_size   = (unsigned int)strlen (frac_format),
+                 width       = (unsigned int)(dot - format) + frac_size + 1;
                 
     if (*frac_format != '0')
     {
@@ -330,7 +330,7 @@ void write (OutputTextStream& stream, double value, const char* format)
   
   while (*pos == ' ') pos++;
 
-  get_float_printf_format (format, format_buffer, strlen (pos));
+  get_float_printf_format (format, format_buffer, (unsigned int)strlen (pos));
 
   xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
 

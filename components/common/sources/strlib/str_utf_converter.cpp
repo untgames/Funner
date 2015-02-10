@@ -678,12 +678,12 @@ void convert_encoding(Encoding       source_encoding,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-stl::wstring towstring (const char* string, int length)
+stl::wstring towstring (const char* string, size_t length)
 {
   if (!string)
     throw xtl::make_null_argument_exception ("common::towstring", "string");
 
-  if (length == -1)
+  if (length == (size_t)-1)
     length = xtl::xstrlen (string);
 
   stl::wstring result;
@@ -691,6 +691,9 @@ stl::wstring towstring (const char* string, int length)
   result.fast_resize (length);
 
   size_t result_size = mbsrtowcs (&result [0], &string, length, 0);
+
+  if (result_size == (size_t)-1)
+    return L"(common::towstring error)";
 
   result.fast_resize (result_size);
 
@@ -713,21 +716,21 @@ stl::wstring towstring (const stl::string& string)
   return towstring (&string [0], string.size ());
 }
 
-stl::string tostring (const wchar_t* string, int length)
+stl::string tostring (const wchar_t* string, size_t length)
 {
   if (!string)
     throw xtl::make_null_argument_exception ("common::tostring", "string");
 
-  if (length == -1)
+  if (length == (size_t)-1)
     length = wcslen (string);
 
   stl::string result;
 
   result.fast_resize (length * 4);
 
-  int result_size = wcsrtombs (&result [0], &string, length, 0);
+  size_t result_size = wcsrtombs (&result [0], &string, length, 0);
 
-  if (result_size < 0)
+  if (result_size == (size_t)-1)
     return "(common::tostring error)";
 
   result.fast_resize (result_size);
@@ -883,12 +886,12 @@ stl::wstring wchar_compress (const stl::string& source)
   return wchar_compress (source.c_str (), source.length ());
 }
 
-stl::string  to_utf8_string  (const wchar_t* string, int length)
+stl::string  to_utf8_string  (const wchar_t* string, size_t length)
 {
   if (!string)
     throw xtl::make_null_argument_exception ("common::to_utf8_string", "string");
 
-  if (length == -1)
+  if (length == (size_t)-1)
     length = wcslen (string);
 
   stl::string result;
@@ -924,12 +927,12 @@ stl::string  to_utf8_string  (const stl::wstring& string)
   return to_utf8_string (&string [0], string.size ());
 }
 
-stl::wstring to_wstring_from_utf8 (const char* string, int length)
+stl::wstring to_wstring_from_utf8 (const char* string, size_t length)
 {
   if (!string)
     throw xtl::make_null_argument_exception ("common::to_wstring_from_utf8", "string");
 
-  if (length == -1)
+  if (length == (size_t)-1)
     length = strlen (string);
 
   stl::wstring result;

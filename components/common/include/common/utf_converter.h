@@ -32,20 +32,20 @@ void convert_encoding (Encoding       source_encoding,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка UTF8 <-> wchar_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-stl::string  to_utf8_string  (const wchar_t* string, int length);
+stl::string  to_utf8_string  (const wchar_t* string, size_t length);
 stl::string  to_utf8_string  (const wchar_t* string);
 stl::string  to_utf8_string  (const stl::wstring&);
-stl::wstring to_wstring_from_utf8 (const char* string, int length);
+stl::wstring to_wstring_from_utf8 (const char* string, size_t length);
 stl::wstring to_wstring_from_utf8 (const char* string);
 stl::wstring to_wstring_from_utf8 (const stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перекодировка char <-> wchar_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-stl::string  tostring  (const wchar_t* string, int length);
+stl::string  tostring  (const wchar_t* string, size_t length);
 stl::string  tostring  (const wchar_t* string);
 stl::string  tostring  (const stl::wstring&);
-stl::wstring towstring (const char* string, int length);
+stl::wstring towstring (const char* string, size_t length);
 stl::wstring towstring (const char* string);
 stl::wstring towstring (const stl::string&);
 
