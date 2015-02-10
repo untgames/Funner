@@ -6,7 +6,7 @@ size_t current_layout_hash = 0;
 size_t get_correct_hash ()
 {
   size_t CORRECT_HASHES_32 [] = { 0x54a83a00, 0x41fe0a00, 0x490df002, 0xf09537d6, 0x584dfd50, 0x0f0012ff, 0xffffffff };
-  size_t CORRECT_HASHES_64 [] = { 0x2a585a20, 0x94336779, 0x494b4f39, 0x2038e3ef, 0x7bd87551, 0x51687721, 0xffffffff };
+  size_t CORRECT_HASHES_64 [] = { 0x612d49c0, 0x65a5c778, 0x66fa8797, 0xeca9b434, 0x9bfcb969, 0xedaccd16, 0xffffffff };
 
   return sizeof (void*) == 4 ? CORRECT_HASHES_32 [current_hash++] : CORRECT_HASHES_64 [current_hash++];
 }
@@ -14,7 +14,7 @@ size_t get_correct_hash ()
 size_t get_correct_layout_hash ()
 {
   size_t CORRECT_HASHES_32 [] = { 0x7d77abc3, 0x4befc2d0, 0xf790e824, 0xba565b70, 0xd7f7fcf3, 0xacba5d65, 0xffffffff };
-  size_t CORRECT_HASHES_64 [] = { 0x3765c0a7, 0x3ae52ebb, 0xd6a531f3, 0x7b2fb9e6, 0x80913057, 0x688cee53, 0xffffffff };
+  size_t CORRECT_HASHES_64 [] = { 0x139eaa9d, 0x6f2d8707, 0x7df2b619, 0x74687881, 0xbaf16e55, 0x8388a354, 0xffffffff };
 
   return sizeof (void*) == 4 ? CORRECT_HASHES_32 [current_layout_hash++] : CORRECT_HASHES_64 [current_layout_hash++];
 }

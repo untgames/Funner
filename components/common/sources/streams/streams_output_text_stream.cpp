@@ -163,24 +163,24 @@ namespace
 //приведение формата к printf-форме
 void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_BUFFER_SIZE])
 {
-  char* pos         = buffer;
-  char  base_format = sign ? 'lld' : 'llu';
+  char*       pos         = buffer;
+  const char* base_format = sign ? "lld" : "llu";
 
   *pos++ = '%';
 
   if (!strncmp (format, "hex:", 4))
   {
-    base_format  = 'x';
+    base_format  = "llx";
     format      += 4;
   }
   else if (!strncmp (format, "oct:", 4))
   {
-    base_format  = 'o';
+    base_format  = "llo";
     format      += 4;
   }
   else if (!strncmp (format, "dec:", 4))
   {
-    base_format  = 'u';
+    base_format  = "llu";
     format      += 4;
   }
 
@@ -193,7 +193,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
       break;
   }
 
-  xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u%c",
+  xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u%s",
                              *format == '0' ? "0" : "", strlen (format), base_format);
 }
 
@@ -278,9 +278,9 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
 
   if (dot)
   {
-    const char* frac_format = dot + 1;
-    size_t      frac_size   = strlen (frac_format),    
-                width       = dot - format + frac_size + 1;
+    const char*  frac_format = dot + 1;
+    unsigned int frac_size   = strlen (frac_format),
+                 width       = dot - format + frac_size + 1;
                 
     if (*frac_format != '0')
     {
@@ -324,8 +324,8 @@ void write (OutputTextStream& stream, double value, const char* format)
   
   get_int_printf_format (format, true, format_buffer);
 
-  xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, int (value));
-  
+  xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, (long long)value);
+
   const char* pos = value_buffer;
   
   while (*pos == ' ') pos++;

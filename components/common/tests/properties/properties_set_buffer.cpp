@@ -33,13 +33,13 @@ int main ()
 
     PropertyMap properties2 (properties1.Layout ());
 
-    dump_properties (properties2, sizeof (void*) == 4 ? 0xf3d34923 : 0x04e9662a, sizeof (void*) == 4 ? 0xa8d5908f : 0x777b6a4a);
+    dump_properties (properties2, sizeof (void*) == 4 ? 0xf3d34923 : 0xb13dea5e, sizeof (void*) == 4 ? 0xa8d5908f : 0x8d3f849b);
 
     printf ("after:");
 
     properties2.SetBufferData (properties1.BufferData ());
 
-    dump_properties (properties2, sizeof (void*) == 4 ? 0x772e4050 : 0x80146f59, sizeof (void*) == 4 ? 0xa8d5908f : 0x777b6a4a);
+    dump_properties (properties2, sizeof (void*) == 4 ? 0x772e4050 : 0x35c0e32d, sizeof (void*) == 4 ? 0xa8d5908f : 0x8d3f849b);
 
     xtl::uninitialized_storage<char> data;
 

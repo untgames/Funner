@@ -35,19 +35,19 @@ int main ()
     properties1.SetProperty ("Y", "3.14");
     properties1.SetProperty ("Z", "hello world");
     
-    dump_properties (properties1, sizeof (void*) == 4 ? 0x490df002 : 0x719e36a0, sizeof (void*) == 4 ? 0xf790e824 : 0xd5292b98);
+    dump_properties (properties1, sizeof (void*) == 4 ? 0x490df002 : 0x66fa8797, sizeof (void*) == 4 ? 0xf790e824 : 0x7df2b619);
     
     printf ("change properties\n");    
     
     properties1.SetProperty ("Y", "3.12");    
     
-    dump_properties (properties1, sizeof (void*) == 4 ? 0xb4f27967 : 0x8c61bfc5, sizeof (void*) == 4 ? 0xf790e824 : 0xd5292b98);
+    dump_properties (properties1, sizeof (void*) == 4 ? 0xb4f27967 : 0x9b050ef2, sizeof (void*) == 4 ? 0xf790e824 : 0x7df2b619);
     
     printf ("remove properties\n");
     
     properties1.RemoveProperty ("Y");
 
-    dump_properties (properties1, sizeof (void*) == 4 ? 0x0d6abeb3 : 0x344db67a, sizeof (void*) == 4 ? 0xba565b70 : 0x57d72eb0);
+    dump_properties (properties1, sizeof (void*) == 4 ? 0x0d6abeb3 : 0x11563d51, sizeof (void*) == 4 ? 0xba565b70 : 0x74687881);
     
     printf ("clear\n");
     
@@ -65,20 +65,20 @@ int main ()
     
     TEST (properties1.SetPropertyName ("UnknownProperty", "NewName"));    
     
-    dump_properties (properties1, sizeof (void*) == 4 ? 0x88c76d7c : 0xfccd9aa4, sizeof (void*) == 4 ? 0x50dbace6 : 0x76e9ab13);
+    dump_properties (properties1, sizeof (void*) == 4 ? 0x88c76d7c : 0x18807abf, sizeof (void*) == 4 ? 0x50dbace6 : 0xf52e246e);
     
     printf ("change type\n");
     
     TEST (properties1.SetPropertyType ("X", PropertyType_Float));
     TEST (properties1.SetPropertyType ("NewZ", PropertyType_Vector));
     
-    dump_properties (properties1, sizeof (void*) == 4 ? 0xfcdacd2a : 0x4e6271ef, sizeof (void*) == 4 ? 0x1dea3343 : 0xf95ead3d);
+    dump_properties (properties1, sizeof (void*) == 4 ? 0xfcdacd2a : 0x1ad6122a, sizeof (void*) == 4 ? 0x1dea3343 : 0x93e44cba);
     
     printf ("clone\n");
     
     PropertyMap properties2 = properties1.Clone ();
     
-    dump_properties (properties2, sizeof (void*) == 4 ? 0xfcdacd2a : 0x4e6271ef, sizeof (void*) == 4 ? 0x1dea3343 : 0xf95ead3d);
+    dump_properties (properties2, sizeof (void*) == 4 ? 0xfcdacd2a : 0x1ad6122a, sizeof (void*) == 4 ? 0x1dea3343 : 0x93e44cba);
     
     printf ("is_present\n");
     

@@ -24,7 +24,7 @@ int main ()
     writer.WriteComment ("Scalar types serialization");
     writer.BeginFrame   ("scalar");
     writer.Write        ("int", -1);
-    writer.Write        ("size_t", (size_t)-1);
+    writer.Write        ("size_t", (unsigned int)-1);
     writer.Write        ("float", math::constf::pi);
     writer.Write        ("double", math::constd::pi);
     writer.Write        ("long_double", math::constants<long double>::pi);

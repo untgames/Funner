@@ -11,7 +11,7 @@ Results of xml_writer_test:
   -->
   <test1>
     <!-- Scalar types serialization -->
-    <scalar int="-1" size_t="ffffffff" float="3.14159" double="3.14159" long_double="3.14159" escaped_symbols="&lt;&gt;&amp;&quot;">
+    <scalar int="-1" unsigned int="ffffffff" float="3.14159" double="3.14159" long_double="3.14159" escaped_symbols="&lt;&gt;&amp;&quot;">
       <string>
         Hello world
       </string>

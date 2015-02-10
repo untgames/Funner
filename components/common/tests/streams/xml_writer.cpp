@@ -26,7 +26,7 @@ int main ()
     writer.WriteComment    ("Scalar types serialization");
     writer.BeginNode       ("scalar");
     writer.WriteAttribute  ("int", -1);
-    writer.WriteAttribute  ("size_t", (size_t)-1, "hex:");
+    writer.WriteAttribute  ("unsigned int", (unsigned int)-1, "hex:");
     writer.WriteAttribute  ("float", math::constf::pi);
     writer.WriteAttribute  ("double", math::constd::pi);
     writer.WriteAttribute  ("long_double", math::constants<long double>::pi);

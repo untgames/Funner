@@ -16,27 +16,27 @@ int main ()
     
     layout1.AddProperty ("C", PropertyType_Matrix);
     
-    dump (layout1, sizeof (void*) == 4 ? 0x3cde1c35 : 0xfed17db9);
+    dump (layout1, sizeof (void*) == 4 ? 0x3cde1c35 : 0x49e0a0e0);
     
     printf ("remove property\n");
     
     layout1.RemoveProperty (index);
     
-    dump (layout1, sizeof (void*) == 4 ? 0xd2a0b67b : 0x8d29c13e);
+    dump (layout1, sizeof (void*) == 4 ? 0xd2a0b67b : 0xfa650253);
     
     printf ("change type/elements_count\n");
     
     layout1.SetPropertyType ("A", PropertyType_Vector);
     layout1.SetPropertyElementsCount ("C", PropertyType_Integer);
     
-    dump (layout1, sizeof (void*) == 4 ? 0x3bab9723 : 0xc05f94e3);
+    dump (layout1, sizeof (void*) == 4 ? 0x3bab9723 : 0x6677448b);
     
     PropertyLayout layout2;
     
     layout2.AddProperty ("A", PropertyType_Vector);
     layout2.AddProperty ("C", PropertyType_Integer);    
     
-    dump (layout1, sizeof (void*) == 4 ? 0x3bab9723 : 0xc05f94e3);
+    dump (layout1, sizeof (void*) == 4 ? 0x3bab9723 : 0x6677448b);
     
     printf ("IsPresent('A'): %s\n", layout2.IsPresent ("A") ? "true" : "false");
   }
