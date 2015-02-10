@@ -351,12 +351,12 @@ class CryptoFile: public File
     CryptoFile (const File& source_file, 
                 const char* read_crypto_method, 
                 const void* key, 
-                size_t      key_bits);
+                unsigned short key_bits);
     CryptoFile (const File& source_file, 
                 const char* read_crypto_method, 
                 const char* write_crypto_method, 
                 const void* key, 
-                size_t      key_bits);
+                unsigned short key_bits);
 };
 
 /*
@@ -486,7 +486,7 @@ class FileCryptoParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FileCryptoParameters  (const char* read_method, const char* write_method, const void* key, size_t key_bits);
+    FileCryptoParameters  (const char* read_method, const char* write_method, const void* key, unsigned short key_bits);
     FileCryptoParameters  (const char* read_method, const char* write_method, const char* key_string);
     FileCryptoParameters  (const FileCryptoParameters&);
     ~FileCryptoParameters ();
@@ -496,10 +496,10 @@ class FileCryptoParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* ReadMethod  () const; //метод шифрования при чтении из файла
-    const char* WriteMethod () const; //метод шифрования при записи в файл
-    const void* Key         () const; //указатель на буфер, содержащий ключ шифрования
-    size_t      KeyBits     () const; //количество битов в ключе
+    const char*    ReadMethod  () const; //метод шифрования при чтении из файла
+    const char*    WriteMethod () const; //метод шифрования при записи в файл
+    const void*    Key         () const; //указатель на буфер, содержащий ключ шифрования
+    unsigned short KeyBits     () const; //количество битов в ключе
 
   private:
     struct Impl;
@@ -633,7 +633,7 @@ class FileSystem
                                      const char* read_crypto_method, 
                                      const char* write_crypto_method, 
                                      const void* key, 
-                                     size_t      key_bits);
+                                     unsigned short key_bits);
     static void                 SetCryptoParameters       (const char* path, const FileCryptoParameters& parameters);
     static bool                 HasCryptoParameters       (const char* path);
     static FileCryptoParameters GetCryptoParameters       (const char* path);

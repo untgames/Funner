@@ -149,7 +149,7 @@ int PropertyBindingMap::IndexOf (const char* name) const
   
   for (Impl::BindingDescArray::const_iterator iter=impl->bindings.begin (), end=impl->bindings.end (); iter!=end; ++iter)
     if ((*iter)->name_hash == name_hash)
-      return iter - impl->bindings.begin ();
+      return (int)(iter - impl->bindings.begin ());
       
   return -1;
 }
@@ -228,6 +228,8 @@ void PropertyBindingMap::SetPropertyBinding (size_t index, const common::Propert
 
 size_t PropertyBindingMap::AddProperty (const char* name, const common::PropertyBinding& binding)
 {
+  //TODO check max properties count
+
   if (!name)
     throw xtl::make_null_argument_exception ("common::PropertyBindingMap::AddProperty", "name");
     

@@ -1,6 +1,7 @@
 #ifndef COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 #define COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 
+#include <climits>
 #include <cstring>
 #include <stdlib.h>
 
@@ -230,8 +231,8 @@ class BufferedFileImpl: public FileImpl
 class CryptoFileImpl: public FileImpl
 {
   public:
-    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
-    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const char* write_crypto_method,const void* key,unsigned short key_bits);
+    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const void* key,unsigned short key_bits);
     ~CryptoFileImpl ();
 
     const char* GetPath       ();

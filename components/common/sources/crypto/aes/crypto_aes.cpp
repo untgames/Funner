@@ -139,7 +139,7 @@ class AesComponent
     }
 
   private:
-    template <bool ofb> static ICryptoContext* CreateEncryptContext (const char*, const void* key, size_t key_bits, const char* init_string)
+    template <bool ofb> static ICryptoContext* CreateEncryptContext (const char*, const void* key, unsigned short key_bits, const char* init_string)
     {
       try
       {
@@ -152,7 +152,7 @@ class AesComponent
       }
     }
 
-    template <bool ofb> static ICryptoContext* CreateDecryptContext (const char*, const void* key, size_t key_bits, const char* init_string)
+    template <bool ofb> static ICryptoContext* CreateDecryptContext (const char*, const void* key, unsigned short key_bits, const char* init_string)
     {
       try
       {

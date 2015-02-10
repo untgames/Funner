@@ -139,7 +139,7 @@ bool read_hex (const char* string, size_t& value)
 //чтение данных в буфер
 bool read_line (FILE* file, stl::string& buffer)
 {
-  if (!fgets (&buffer [0], buffer.capacity (), file))
+  if (!fgets (&buffer [0], (int)buffer.capacity (), file))
   {
     buffer.clear ();
     return false;

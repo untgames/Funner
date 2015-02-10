@@ -10,10 +10,10 @@ struct FileCryptoParameters::Impl: public xtl::reference_counter
 {
   stl::string                      read_method;
   stl::string                      write_method;
-  size_t                           key_bits;
+  unsigned short                   key_bits;
   xtl::uninitialized_storage<char> key;
   
-  Impl (const char* in_read_method, const char* in_write_method, const void* in_key, size_t in_key_bits)
+  Impl (const char* in_read_method, const char* in_write_method, const void* in_key, unsigned short in_key_bits)
     : read_method (in_read_method)
     , write_method (in_write_method)
     , key_bits (in_key_bits)
@@ -34,7 +34,7 @@ struct FileCryptoParameters::Impl: public xtl::reference_counter
     Конструкторы / деструктор / присваивание
 */
 
-FileCryptoParameters::FileCryptoParameters (const char* read_method, const char* write_method, const void* key, size_t key_bits)
+FileCryptoParameters::FileCryptoParameters (const char* read_method, const char* write_method, const void* key, unsigned short key_bits)
 {
   static const char* METHOD_NAME = "common::FileFileCryptoParameters";
   
@@ -68,11 +68,14 @@ FileCryptoParameters::FileCryptoParameters (const char* read_method,const char* 
   if (key_length % 2)
     throw xtl::make_argument_exception (METHOD_NAME, "key_string", key_string, "Key string must have even value length");
 
+  if (key_length * CHAR_BIT > USHRT_MAX)
+    throw xtl::make_argument_exception (METHOD_NAME, "key_string", key_string, "Key string too long");
+
   xtl::uninitialized_storage<char> key (key_length / 2);
 
   compress_buffer (key_length, key_string, key.data ());
 
-  impl = new Impl (read_method, write_method, key.data (), key.size () * CHAR_BIT);
+  impl = new Impl (read_method, write_method, key.data (), (unsigned short)key.size () * CHAR_BIT);
 }
 
 FileCryptoParameters::FileCryptoParameters (const FileCryptoParameters& params)
@@ -121,7 +124,7 @@ const void* FileCryptoParameters::Key () const
 }
 
 //количество битов в ключе
-size_t FileCryptoParameters::KeyBits () const
+unsigned short FileCryptoParameters::KeyBits () const
 {
   return impl->key_bits;
 }

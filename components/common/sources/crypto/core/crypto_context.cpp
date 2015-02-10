@@ -26,7 +26,7 @@ struct CryptoContext::Impl
     Конструкторы / деструктор
 */
 
-CryptoContext::CryptoContext (const char* method, const void* key, size_t key_bits, const char* init_string)
+CryptoContext::CryptoContext (const char* method, const void* key, unsigned short key_bits, const char* init_string)
   : impl (new Impl)
 {
   try

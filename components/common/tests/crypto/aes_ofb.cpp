@@ -9,7 +9,7 @@ using namespace common;
 
 struct Test
 {
-  size_t              key_size;
+  unsigned short      key_size;
   size_t              data_size;
   const unsigned char key [32];
   const unsigned char iv [16];

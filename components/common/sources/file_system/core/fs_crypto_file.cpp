@@ -34,7 +34,7 @@ struct CryptoFileImpl::Impl
   filepos_t     dirty_end_pos;        //позици€ конца данных, требующих записи
 
 /// онструктор
-  Impl (const FileImplPtr& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
+  Impl (const FileImplPtr& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, unsigned short key_bits)
     : source_file (in_source_file)
     , read_crypto_context (read_crypto_method, key, key_bits)
     , write_crypto_context (write_crypto_method, key, key_bits)
@@ -210,7 +210,7 @@ struct CryptoFileImpl::Impl
      онструктор / деструктор
 */
 
-CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
+CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, unsigned short key_bits)
   : FileImpl (file->Mode ())
 {
   try
@@ -224,7 +224,7 @@ CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, con
   }
 }
 
-CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const void* key, size_t key_bits)
+CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const void* key, unsigned short key_bits)
   : FileImpl (file->Mode () & ~(FileMode_Resize | FileMode_Write))
 {
   try
