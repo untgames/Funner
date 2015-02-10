@@ -67,15 +67,15 @@ struct matrix_to_quat {
       }
       else
       {
-        const size_t nxt [3] = {1,  2,  0};
+        const unsigned short nxt [3] = {1,  2,  0};
 
-        size_t i = 0;
+        unsigned short i = 0;
 
         if (m [1][1] > m[0][0]) i = 1;
         if (m [2][2] > m[i][i]) i = 2;
 
-        size_t j = nxt [i];
-        size_t k = nxt [j];
+        unsigned short j = nxt [i];
+        unsigned short k = nxt [j];
 
         T s = sqrt ((m [i][i] - (m [j][j] + m [k][k])) + T (1));
 
@@ -385,25 +385,25 @@ inline void affine_decompose (const math::mat4f& matrix, math::vec3f& position, 
   math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
 
   //выделение преобразования переноса  
-  for (size_t i = 0; i < 3; i++)
+  for (unsigned short i = 0; i < 3; i++)
   {
     position [i] = local_matrix [3][i];
     local_matrix [3][i] = 0;
   }
 
   //выделение преобразования масштабирования
-  for (size_t i = 0; i < 3; i++)
+  for (unsigned short i = 0; i < 3; i++)
   {
     //определение длины вектора-столбца преобразований
     float square_length = 0;
 
-    for (size_t j = 0; j < 3; j++)
+    for (unsigned short j = 0; j < 3; j++)
       square_length += local_matrix [i][j] * local_matrix [i][j];
 
     scale [i] = sqrt (square_length);
 
     //нормирование
-    for (size_t j = 0; j < 3; j++)
+    for (unsigned short j = 0; j < 3; j++)
       local_matrix [i][j] /= scale [i];
   }
 
@@ -414,7 +414,7 @@ inline void affine_decompose (const math::mat4f& matrix, math::vec3f& position, 
   {
     scale.x = -scale.x;
 
-    for (size_t j=0; j<3; j++)
+    for (unsigned short j=0; j<3; j++)
       local_matrix [0][j] = -local_matrix [0][j];
   }
 

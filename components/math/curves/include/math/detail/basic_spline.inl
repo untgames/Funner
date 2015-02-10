@@ -191,9 +191,9 @@ template <class Frame> struct spline_frame_selector
     return *frame;
   }
 
-  Frame        *first, *last;
-  unsigned int count;
-  bool         closed;
+  Frame  *first, *last;
+  size_t count;
+  bool   closed;
 };
 
 template <class Frame>

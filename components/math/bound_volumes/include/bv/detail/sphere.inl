@@ -222,7 +222,7 @@ inline bool intersects (const sphere<T>& s, const axis_aligned_box<T>& box)
 
   T min_distance = T (0);
 
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
   {
     T d1 = s.center ()[i] - box.minimum ()[i], d2 = s.center ()[i] - box.maximum ()[i];
                  
