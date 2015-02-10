@@ -13,12 +13,12 @@ using namespace media;
 
 #pragma pack (1)
 
-const size_t IMAGES_COUNT             = 1000;
-const size_t MAX_IMAGE_WIDTH          = 100;
-const size_t MAX_IMAGE_HEIGHT         = 100;
-const size_t START_LARGE_IMAGE_WIDTH  = 128;
-const size_t START_LARGE_IMAGE_HEIGHT = 128;
-const char*  RESULT_IMAGE_NAME        = "results/atlas.tga";
+const unsigned int IMAGES_COUNT             = 1000;
+const unsigned int MAX_IMAGE_WIDTH          = 100;
+const unsigned int MAX_IMAGE_HEIGHT         = 100;
+const unsigned int START_LARGE_IMAGE_WIDTH  = 128;
+const unsigned int START_LARGE_IMAGE_HEIGHT = 128;
+const char*        RESULT_IMAGE_NAME        = "results/atlas.tga";
 
 struct Rect
 {
@@ -208,11 +208,11 @@ int main ()
     
     images.reserve (IMAGES_COUNT);
     
-    for (size_t i=0; i<IMAGES_COUNT; i++)
+    for (unsigned int i=0; i<IMAGES_COUNT; i++)
     {
 //      ImageDesc image (i, rand () % MAX_IMAGE_WIDTH + 1, rand () % MAX_IMAGE_HEIGHT + 1);
-      ImageDesc image (i, size_t (1 + (sinf (float (i)) + 1.0) * MAX_IMAGE_WIDTH),
-                       size_t (1 + (cosf (float (i)) + 1.0f) * MAX_IMAGE_HEIGHT));
+      ImageDesc image (i, (unsigned int) (1 + (sinf (float (i)) + 1.0) * MAX_IMAGE_WIDTH),
+                       (unsigned int) (1 + (cosf (float (i)) + 1.0f) * MAX_IMAGE_HEIGHT));
 //      ImageDesc image (i, i + 1, i + 1);
 
       unsigned char* colors = &image.color.red;
@@ -231,8 +231,8 @@ int main ()
     size_t bad_inserts;
     Node* root = 0;
     
-    size_t large_image_width = START_LARGE_IMAGE_WIDTH,
-           large_image_height = START_LARGE_IMAGE_HEIGHT;
+    unsigned int large_image_width  = START_LARGE_IMAGE_WIDTH,
+                 large_image_height = START_LARGE_IMAGE_HEIGHT;
            
     clock_t start_time = clock ();
     

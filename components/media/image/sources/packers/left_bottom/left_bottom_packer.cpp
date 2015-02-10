@@ -26,7 +26,8 @@ namespace left_bottom_packer
 {
 
 static size_t intersects_count = 0;
-const size_t PACK_TRY_COUNT = 100;
+
+const unsigned int PACK_TRY_COUNT = 100;
 
 struct MyRand
 {
@@ -34,7 +35,7 @@ struct MyRand
 
   MyRand () : next (0) {}
 
-  size_t operator () (int max_rand)
+  size_t operator () (size_t max_rand)
   {
     next = next * 1103515245 + 12345;
 
@@ -64,7 +65,7 @@ size_t get_next_higher_power_of_two (size_t k)
 template <class T>
 inline bool my_intersects (const axis_aligned_box<T>& box1, const axis_aligned_box<T>& box2)
 {
-  for (size_t i=0; i<3; i++)
+  for (unsigned char i=0; i<3; i++)
     if (box1.maximum ()[i] < box2.minimum ()[i] || box1.minimum ()[i] > box2.maximum ()[i])
       return false;
 
@@ -78,14 +79,14 @@ class TileImageBuilder
     typedef stl::vector<size_t> IndexArray;
 
   public:
-    void AddImages (size_t images_count, const math::vec2ui* in_sizes)
+    void AddImages (unsigned int images_count, const math::vec2ui* in_sizes)
     {
       images.resize (images_count);
 
       average_image_width  = 0;
       average_image_height = 0;
 
-      for (size_t i = 0; i < images_count; i++)
+      for (unsigned int i = 0; i < images_count; i++)
       {
         average_image_width  += in_sizes[i].x;
         average_image_height += in_sizes[i].y;
@@ -96,7 +97,7 @@ class TileImageBuilder
       average_image_height /= images_count;
     }
 
-    void BuildTileImage (math::vec2ui* out_origins, bool* out_was_packed, size_t margin, size_t max_image_size, size_t pack_flags)
+    void BuildTileImage (math::vec2ui* out_origins, bool* out_was_packed, unsigned int margin, unsigned int max_image_size, unsigned int pack_flags)
     {
       if (!(pack_flags & AtlasPackFlag_PackToMaxImageSize))
         max_image_size = 0;
@@ -107,14 +108,14 @@ class TileImageBuilder
 
       indices.resize (images.size ());
 
-      size_t minimum_area = 0;
-      size_t result_image_horisontal_side, result_image_vertical_side;
+      size_t       minimum_area = 0;
+      unsigned int result_image_horisontal_side, result_image_vertical_side;
 
       for (ImagesArray::iterator iter = images.begin (), end = images.end (); iter != end; ++iter)
          minimum_area += iter->x * iter->y;
 
       if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
-        result_image_horisontal_side = result_image_vertical_side = stl::max ((size_t)1, get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2);
+        result_image_horisontal_side = result_image_vertical_side = stl::max ((unsigned int)1, (unsigned int)get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2);
       else
         result_image_horisontal_side = result_image_vertical_side = (size_t)sqrt ((float)minimum_area) + 1;
 
@@ -124,7 +125,7 @@ class TileImageBuilder
 
       MyRand my_rand;
 
-      size_t pack_try_count = pack_flags & AtlasPackFlag_Fast ? 1 : PACK_TRY_COUNT;
+      unsigned int pack_try_count = pack_flags & AtlasPackFlag_Fast ? 1 : PACK_TRY_COUNT;
 
         //массивы для сохранения результатов разных попыток упаковки (для выбора наилучшей)
       xtl::uninitialized_storage<math::vec2ui> origins    (images.size () * pack_try_count);
@@ -193,13 +194,13 @@ class TileImageBuilder
   private:
     struct FreeSpace
     {
-      size_t x_pos;
-      size_t y_pos;
-      size_t width;
-      size_t height;
-      bool   swap_axises;
+      unsigned int x_pos;
+      unsigned int y_pos;
+      unsigned int width;
+      unsigned int height;
+      bool         swap_axises;
 
-      FreeSpace (size_t in_x_pos, size_t in_y_pos, size_t in_width, size_t in_height, bool in_swap_axises)
+      FreeSpace (unsigned int in_x_pos, unsigned int in_y_pos, unsigned int in_width, unsigned int in_height, bool in_swap_axises)
         : x_pos (in_x_pos), y_pos (in_y_pos), width (in_width), height (in_height), swap_axises (in_swap_axises)
         {}
 
@@ -240,8 +241,8 @@ class TileImageBuilder
       free_spaces.insert (free_space);
     }
 
-    bool PackImages (size_t margin, bool swap_axises, bool fast,  bool top_right_edge_margin, size_t result_image_horizontal_side,
-                     size_t result_image_vertical_side, const IndexArray& indices, bool pack_to_max_image_size,
+    bool PackImages (unsigned int margin, bool swap_axises, bool fast,  bool top_right_edge_margin, unsigned int result_image_horizontal_side,
+                     unsigned int result_image_vertical_side, const IndexArray& indices, bool pack_to_max_image_size,
                      math::vec2ui* out_origins, bool* out_was_packed, size_t& used_area)
     {
       FreeSpacesSet free_spaces;
@@ -352,9 +353,9 @@ class TileImageBuilder
     }
 
   private:
-    ImagesArray images;
-    size_t      average_image_width;
-    size_t      average_image_height;
+    ImagesArray  images;
+    unsigned int average_image_width;
+    unsigned int average_image_height;
 };
 
 void left_bottom_pack (const AtlasBuilder::PackHandlerParams& params)

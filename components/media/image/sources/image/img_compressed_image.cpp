@@ -19,12 +19,12 @@ const char* COMPRESSED_IMAGE_COMPONENT_MASK = "media.compressed_image.*"; //маск
 class DefaultCompressedImage: public ICustomCompressedImage
 {
   public:
-    size_t      Width       () { return 0; }
-    size_t      Height      () { return 0; }
-    size_t      LayersCount () { return 0; }
-    size_t      MipsCount   () { return 0; }
-    const char* Format      () { return ""; }
-    const void* Data        () { return 0;  }
+    unsigned int Width       () { return 0; }
+    unsigned int Height      () { return 0; }
+    unsigned int LayersCount () { return 0; }
+    unsigned int MipsCount   () { return 0; }
+    const char*  Format      () { return ""; }
+    const void*  Data        () { return 0;  }
 
     const CompressedImageBlockDesc* Blocks ()
     {
@@ -110,7 +110,7 @@ CompressedImage& CompressedImage::operator = (const CompressedImage& image)
     Размеры картинки в пикселях
 */
 
-size_t CompressedImage::Width () const
+unsigned int CompressedImage::Width () const
 {
   try
   {
@@ -123,7 +123,7 @@ size_t CompressedImage::Width () const
   }
 }
 
-size_t CompressedImage::Height () const
+unsigned int CompressedImage::Height () const
 {
   try
   {
@@ -140,7 +140,7 @@ size_t CompressedImage::Height () const
     Количество слоёв / mip-уровней / блоков
 */
 
-size_t CompressedImage::LayersCount () const
+unsigned int CompressedImage::LayersCount () const
 {
   try
   {
@@ -153,7 +153,7 @@ size_t CompressedImage::LayersCount () const
   }
 }
 
-size_t CompressedImage::MipsCount () const
+unsigned int CompressedImage::MipsCount () const
 {
   try
   {
@@ -166,7 +166,7 @@ size_t CompressedImage::MipsCount () const
   }
 }
 
-size_t CompressedImage::BlocksCount () const
+unsigned int CompressedImage::BlocksCount () const
 {
   try
   {
@@ -230,12 +230,12 @@ const CompressedImageBlockDesc* CompressedImage::Blocks () const
     Размер образа / получение битовой карты
 */
 
-size_t CompressedImage::BitmapSize (size_t layer, size_t mip_level) const
+unsigned int CompressedImage::BitmapSize (unsigned int layer, unsigned int mip_level) const
 {
   try
   {
-    size_t layers_count = LayersCount (),
-           mips_count   = MipsCount ();
+    unsigned int layers_count = LayersCount (),
+                 mips_count   = MipsCount ();
     
     if (layer >= layers_count)
       throw xtl::make_range_exception ("", "layer", layer, layers_count);
@@ -244,7 +244,7 @@ size_t CompressedImage::BitmapSize (size_t layer, size_t mip_level) const
       throw xtl::make_range_exception ("", "mip_level", mip_level, mips_count);
 
     const CompressedImageBlockDesc* blocks = Blocks ();
-    size_t                          index  = layers_count * mip_level + layer;
+    unsigned int                    index  = layers_count * mip_level + layer;
     
     return blocks [index].size;
   }
@@ -255,12 +255,12 @@ size_t CompressedImage::BitmapSize (size_t layer, size_t mip_level) const
   }
 }
 
-const void* CompressedImage::Bitmap (size_t layer, size_t mip_level) const
+const void* CompressedImage::Bitmap (unsigned int layer, unsigned int mip_level) const
 {
   try
   {
-    size_t layers_count = LayersCount (),
-           mips_count   = MipsCount ();
+    unsigned int layers_count = LayersCount (),
+                 mips_count   = MipsCount ();
 
     if (layer >= layers_count)
       throw xtl::make_range_exception ("", "layer", layer, layers_count);
@@ -269,7 +269,7 @@ const void* CompressedImage::Bitmap (size_t layer, size_t mip_level) const
       throw xtl::make_range_exception ("", "mip_level", mip_level, mips_count);
 
     const CompressedImageBlockDesc* blocks = Blocks ();
-    size_t                          index  = layers_count * mip_level + layer;
+    unsigned int                    index  = layers_count * mip_level + layer;
 
     return (char*)impl->image->Data () + blocks [index].offset;
   }

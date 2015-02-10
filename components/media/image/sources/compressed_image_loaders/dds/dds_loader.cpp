@@ -378,9 +378,9 @@ class DdsCompressedImage: public ICustomCompressedImage
 
         //чтение данных
 
-        size_t data_size = 0;
+        unsigned int data_size = 0;
 
-        for (size_t level = 0; level < mips_count; level++)
+        for (unsigned int level = 0; level < mips_count; level++)
           data_size += GetMipLevelSize (level) * layers_count;
 
         if (data_size != file.Size () - file.Tell ())
@@ -392,15 +392,15 @@ class DdsCompressedImage: public ICustomCompressedImage
 
         xtl::uninitialized_storage<unsigned char> read_buffer (GetMipLevelSize (0));
 
-        size_t data_offset = 0;
+        unsigned int data_offset = 0;
 
-        for (size_t layer = 0; layer < layers_count; layer++)
+        for (unsigned int layer = 0; layer < layers_count; layer++)
         {
-          size_t w = width, h = height, d = depth ? depth : 1;
+          unsigned int w = width, h = height, d = depth ? depth : 1;
 
-          for (size_t level = 0; level < mips_count; level++)
+          for (unsigned int level = 0; level < mips_count; level++)
           {
-            size_t mip_level_size = GetMipLevelSize (level);
+            unsigned int mip_level_size = GetMipLevelSize (level);
 
             if (file.Read (read_buffer.data (), mip_level_size) != mip_level_size)
               throw xtl::format_operation_exception ("", "Can't read data from file");
@@ -413,11 +413,11 @@ class DdsCompressedImage: public ICustomCompressedImage
             blocks.push_back (element);
 
             // Flip & copy to actual pixel buffer
-            size_t        row_size           = ((w + 3) / 4) * bytes_per_block;
+            unsigned int  row_size           = ((w + 3) / 4) * bytes_per_block;
             unsigned char *current_block     = read_buffer.data (),
                           *destination_block = (unsigned char*)data.data () + data_offset + ((h + 3) / 4 - 1) * row_size;
 
-            for (size_t i = 0; i < (h + 3) / 4; i++)
+            for (unsigned int i = 0; i < (h + 3) / 4; i++)
             {
               memcpy (destination_block, current_block, row_size);
 
@@ -425,17 +425,17 @@ class DdsCompressedImage: public ICustomCompressedImage
               {
                 case FOURCC_ATC_RGB_AMD:
                 case FOURCC_DXT1:
-                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                  for (unsigned int j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT1BlockFull (destination_block + j * bytes_per_block);
                   break;
                 case FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD:  //???????
                 case FOURCC_DXT3:
-                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                  for (unsigned int j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT3BlockFull (destination_block + j * bytes_per_block);
                   break;
                 case FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD:  //???????
                 case FOURCC_DXT5:
-                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                  for (unsigned int j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT5BlockFull (destination_block + j * bytes_per_block);
                   break;
                 default:
@@ -463,25 +463,25 @@ class DdsCompressedImage: public ICustomCompressedImage
     }
 
     ///Ўирина изображени€
-    size_t Width ()
+    unsigned int Width ()
     {
       return width;
     }
 
     ///¬ысота изображени€
-    size_t Height ()
+    unsigned int Height ()
     {
       return height;
     }
 
     /// оличество слоЄв
-    size_t LayersCount ()
+    unsigned int LayersCount ()
     {
       return layers_count;
     }
 
     /// оличество мип-уровней
-    size_t MipsCount ()
+    unsigned int MipsCount ()
     {
       return mips_count;
     }
@@ -613,7 +613,7 @@ class DdsCompressedImage: public ICustomCompressedImage
       FlipDXT1BlockFull(block+8);
     }
     
-    stl::string GetFourCCString (size_t code)
+    stl::string GetFourCCString (unsigned int code)
     {
       stl::string result;
 
@@ -713,7 +713,7 @@ class DdsCompressedImage: public ICustomCompressedImage
       }
     }
 
-    size_t GetMipLevelSize (size_t mip)
+    unsigned int GetMipLevelSize (unsigned int mip)
     {
       static const char* METHOD_NAME = "media::DdsCompressedImage::GetMipLevelSize";
 
@@ -721,11 +721,11 @@ class DdsCompressedImage: public ICustomCompressedImage
         throw xtl::format_operation_exception (METHOD_NAME, "Can't calculate mip level size, data block size unknown");
 
       if (mip >= mips_count)
-        throw xtl::make_range_exception (METHOD_NAME, "mip", mip, 0u, mips_count);
+        throw xtl::make_range_exception (METHOD_NAME, "mip", (size_t)mip, 0u, (size_t)mips_count);
 
-      size_t w = width, h = height, d = depth ? depth : 1;
+      unsigned int w = width, h = height, d = depth ? depth : 1;
 
-      for (size_t level = 0; level < mip; level++)
+      for (unsigned int level = 0; level < mip; level++)
       {
         //reduce mip sizes
         w = (w > 1) ? w >> 1 : 1;
@@ -744,13 +744,13 @@ class DdsCompressedImage: public ICustomCompressedImage
     typedef stl::vector<CompressedImageBlockDesc> BlockDescArray;
 
   private:
-    size_t         bytes_per_block; //размер блока данных
+    unsigned int   bytes_per_block; //размер блока данных
     uint32         format;          //формат изображени€
-    size_t         width;           //ширина изображени€
-    size_t         height;          //высота изображени€
-    size_t         depth;           //глубина изображени€
-    size_t         layers_count;    //количество слоЄв
-    size_t         mips_count;      //количество mip-уровней
+    unsigned int   width;           //ширина изображени€
+    unsigned int   height;          //высота изображени€
+    unsigned int   depth;           //глубина изображени€
+    unsigned int   layers_count;    //количество слоЄв
+    unsigned int   mips_count;      //количество mip-уровней
     Buffer         data;            //данные изображени€
     BlockDescArray blocks;          //дескрипторы блоков
 };

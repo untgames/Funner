@@ -127,11 +127,11 @@ class PvrCompressedImage: public ICustomCompressedImage
 
           //чтение данных
           
-        size_t data_length = (size_t)(file.Size () - file.Tell ());
+        unsigned int data_length = (unsigned int)(file.Size () - file.Tell ());
 
         data.resize (data_length, false);
 
-        size_t read_size = file.Read (data.data (), data.size ());
+        unsigned int read_size = (unsigned int)file.Read (data.data (), data.size ());
         
         if (read_size != data.size ())
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Error at read %u bytes from file (read_size=%u)", file_name, data.size (), read_size);
@@ -140,12 +140,12 @@ class PvrCompressedImage: public ICustomCompressedImage
           
         mip_levels.reserve (header.mips_count);
 
-        size_t data_offset = 0,
-               bpp         = format == PixelFormat_PVRTC4RGB || format == PixelFormat_PVRTC4RGBA  ? 4 : 2;
+        unsigned int data_offset = 0,
+                     bpp         = format == PixelFormat_PVRTC4RGB || format == PixelFormat_PVRTC4RGBA  ? 4 : 2;
 
         while (data_offset < data_length)
         {
-          size_t block_size, width_blocks, height_blocks;
+          unsigned int block_size, width_blocks, height_blocks;
 
           if (bpp == 4)
           {
@@ -165,7 +165,7 @@ class PvrCompressedImage: public ICustomCompressedImage
           if (width_blocks < 2)  width_blocks  = 2;
           if (height_blocks < 2) height_blocks = 2;
 
-          size_t data_size = width_blocks * height_blocks * ((block_size  * bpp) / 8);
+          unsigned int data_size = width_blocks * height_blocks * ((block_size  * bpp) / 8);
 
           CompressedImageBlockDesc mip_level;
 
@@ -189,27 +189,27 @@ class PvrCompressedImage: public ICustomCompressedImage
     }
   
 ///Ширина изображения
-    size_t Width ()
+    unsigned int Width ()
     {
       return width;
     }
     
 ///Высота изображения
-    size_t Height ()
+    unsigned int Height ()
     {
       return height;
     }
 
 ///Количество слоёв
-    size_t LayersCount ()
+    unsigned int LayersCount ()
     {
       return layers_count; //формат поддерживает только однослойные изображения
     }
 
 ///Количество мип-уровней
-    size_t MipsCount ()
+    unsigned int MipsCount ()
     {
-      return mip_levels.size ();
+      return (unsigned int)mip_levels.size ();
     }
     
 ///Формат изображения

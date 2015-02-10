@@ -19,11 +19,11 @@ int main ()
     printf ("format:       '%s'\n", image.Format ());
     printf ("layers:\n");
     
-    for (size_t i=0; i<image.LayersCount (); i++)
+    for (unsigned int i=0; i<image.LayersCount (); i++)
     {
       printf ("  layer%u:\n", i);
 
-      for (size_t j=0; j<image.MipsCount (); j++)
+      for (unsigned int j=0; j<image.MipsCount (); j++)
       {
         size_t size = image.BitmapSize (i, j);          
         size_t hash = common::crc32 (image.Bitmap (i, j), size);

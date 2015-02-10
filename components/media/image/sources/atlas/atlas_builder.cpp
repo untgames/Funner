@@ -157,20 +157,20 @@ class IImageHolder : public xtl::reference_counter
     virtual void UnloadImage () {};
 
     //ѕолучение атрибутов картинки
-    virtual const void* ImageBitmap () = 0;
-    virtual size_t      ImageWidth  () = 0;
-    virtual size_t      ImageHeight () = 0;
-    virtual size_t      ImageHash   () = 0;
-    virtual PixelFormat ImageFormat () = 0;
-    virtual const char* ImageName   () = 0;
-    virtual size_t      ImageTag    () = 0;
+    virtual const void*  ImageBitmap () = 0;
+    virtual unsigned int ImageWidth  () = 0;
+    virtual unsigned int ImageHeight () = 0;
+    virtual size_t       ImageHash   () = 0;
+    virtual PixelFormat  ImageFormat () = 0;
+    virtual const char*  ImageName   () = 0;
+    virtual unsigned int ImageTag    () = 0;
 };
 
 // ласс, хран€щий картинку в пам€ти
 class MemoryImageHolder : public IImageHolder
 {
   public:
-    MemoryImageHolder (const media::Image& in_image, size_t in_tag)
+    MemoryImageHolder (const media::Image& in_image, unsigned int in_tag)
       : image (in_image)
       , tag (in_tag)
     {
@@ -183,12 +183,12 @@ class MemoryImageHolder : public IImageHolder
       return image.Bitmap ();
     }
 
-    size_t ImageWidth ()
+    unsigned int ImageWidth ()
     {
       return image.Width ();
     }
 
-    size_t ImageHeight ()
+    unsigned int ImageHeight ()
     {
       return image.Height ();
     }
@@ -208,7 +208,7 @@ class MemoryImageHolder : public IImageHolder
       return image.Name ();
     }
 
-    size_t ImageTag ()
+    unsigned int ImageTag ()
     {
       return tag;
     }
@@ -216,14 +216,14 @@ class MemoryImageHolder : public IImageHolder
   private:
     media::Image image;
     size_t       image_hash;
-    size_t       tag;
+    unsigned int tag;
 };
 
 // ласс, загружающий картинку из файла по требованию
 class LoadOnDemandImageHolder : public IImageHolder
 {
   public:
-    LoadOnDemandImageHolder (const char* in_image_name, size_t in_tag)
+    LoadOnDemandImageHolder (const char* in_image_name, unsigned int in_tag)
       : image_name (in_image_name)
       , tag (in_tag)
     {
@@ -252,12 +252,12 @@ class LoadOnDemandImageHolder : public IImageHolder
       return image.Bitmap ();
     }
 
-    size_t ImageWidth ()
+    unsigned int ImageWidth ()
     {
       return image_width;
     }
 
-    size_t ImageHeight ()
+    unsigned int ImageHeight ()
     {
       return image_height;
     }
@@ -277,26 +277,26 @@ class LoadOnDemandImageHolder : public IImageHolder
       return image_name.c_str ();
     }
 
-    size_t ImageTag ()
+    unsigned int ImageTag ()
     {
       return tag;
     }
 
   private:
-    Image       image;
-    stl::string image_name;
-    PixelFormat image_format;
-    size_t      image_width;
-    size_t      image_height;
-    size_t      image_hash;
-    size_t      tag;
+    Image        image;
+    stl::string  image_name;
+    PixelFormat  image_format;
+    unsigned int image_width;
+    unsigned int image_height;
+    size_t       image_hash;
+    unsigned int tag;
 };
 
 // ласс, хран€щий данные о картинке
 class DataImageHolder : public IImageHolder
 {
   public:
-    DataImageHolder (size_t in_width, size_t in_height, PixelFormat in_format, const void* in_data, const char* in_name, size_t in_tag)
+    DataImageHolder (unsigned int in_width, unsigned int in_height, PixelFormat in_format, const void* in_data, const char* in_name, unsigned int in_tag)
       : width (in_width)
       , height (in_height)
       , hash (common::crc32 (in_data, in_width * in_height * get_bytes_per_pixel (in_format)))
@@ -312,12 +312,12 @@ class DataImageHolder : public IImageHolder
       return data;
     }
 
-    size_t ImageWidth ()
+    unsigned int ImageWidth ()
     {
       return width;
     }
 
-    size_t ImageHeight ()
+    unsigned int ImageHeight ()
     {
       return height;
     }
@@ -337,19 +337,19 @@ class DataImageHolder : public IImageHolder
       return name.c_str ();
     }
 
-    size_t ImageTag ()
+    unsigned int ImageTag ()
     {
       return tag;
     }
 
   private:
-    size_t      width;
-    size_t      height;
-    size_t      hash;
-    size_t      tag;
-    const void* data;
-    PixelFormat format;
-    stl::string name;
+    unsigned int width;
+    unsigned int height;
+    size_t       hash;
+    unsigned int tag;
+    const void*  data;
+    PixelFormat  format;
+    stl::string  name;
 };
 
 typedef xtl::intrusive_ptr<IImageHolder> ImageHolderPtr;
@@ -358,24 +358,24 @@ typedef xtl::intrusive_ptr<IImageHolder> ImageHolderPtr;
 struct ImageDesc : public xtl::reference_counter
 {
   ImageHolderPtr image_holder;       //картинка
-  size_t         duplicate_of_index; //индекс картинки в массиве images, дубликатом которой €вл€етс€ эта картинка
+  unsigned int   duplicate_of_index; //индекс картинки в массиве images, дубликатом которой €вл€етс€ эта картинка
 };
 
 struct PackResult : public xtl::reference_counter
 {
-  size_t                                   image_width;   //ширина результирующей картинки
-  size_t                                   image_height;  //высота результирующей картинки
+  unsigned int                             image_width;   //ширина результирующей картинки
+  unsigned int                             image_height;  //высота результирующей картинки
   xtl::uninitialized_storage<math::vec2ui> origins;       //позиции картинок
-  xtl::uninitialized_storage<size_t>       indices;       //индексы картинок
+  xtl::uninitialized_storage<unsigned int> indices;       //индексы картинок
 };
 
-typedef stl::vector<size_t>            IndexArray;
-typedef xtl::intrusive_ptr<PackResult> PackResultPtr;
-typedef stl::vector<PackResultPtr>     PackResultsArray;
-typedef xtl::intrusive_ptr<ImageDesc>  ImageDescPtr;
-typedef stl::vector<ImageDescPtr>      ImagesDescsArray;
-typedef stl::hash_map<size_t, size_t>  BitmapHashMap;
-typedef AtlasBuilder::PackHandler      PackHandler;
+typedef stl::vector<unsigned int>           IndexArray;
+typedef xtl::intrusive_ptr<PackResult>      PackResultPtr;
+typedef stl::vector<PackResultPtr>          PackResultsArray;
+typedef xtl::intrusive_ptr<ImageDesc>       ImageDescPtr;
+typedef stl::vector<ImageDescPtr>           ImagesDescsArray;
+typedef stl::hash_map<size_t, unsigned int> BitmapHashMap;
+typedef AtlasBuilder::PackHandler           PackHandler;
 
 }
 
@@ -389,9 +389,9 @@ struct AtlasBuilder::Impl
   ImagesDescsArray images;            //картинки
   BitmapHashMap    images_hash_map;   //карта хешей картинок
   PackResultsArray pack_results;      //результаты упаковки
-  size_t           max_image_size;    //максимальный размер одного атласа
-  size_t           margin;            //размер пол€
-  size_t           pack_flags;        //флаги сжати€
+  unsigned int     max_image_size;    //максимальный размер одного атласа
+  unsigned int     margin;            //размер пол€
+  unsigned int     pack_flags;        //флаги сжати€
   bool             needs_rebuild;     //необходимо ли перестроить атлас
   
   /// онструктор
@@ -404,7 +404,7 @@ struct AtlasBuilder::Impl
     {}
 
   ///ƒобавление изображений
-  void Insert (Image& image, AtlasBuilderInsertMode mode, size_t tag)
+  void Insert (Image& image, AtlasBuilderInsertMode mode, unsigned int tag)
   {
     try
     {
@@ -439,10 +439,13 @@ struct AtlasBuilder::Impl
     }
   }
 
-  void Insert (const char* image_name, bool keep_in_memory, size_t tag)
+  void Insert (const char* image_name, bool keep_in_memory, unsigned int tag)
   {
     try
     {
+      if (images.size () >= (unsigned int)-1)
+        throw xtl::format_operation_exception ("", "Images count limit exceeded");
+
       ImageHolderPtr image_holder;
 
       if (keep_in_memory)
@@ -459,7 +462,7 @@ struct AtlasBuilder::Impl
     }
   }
 
-  void Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data, const char* name, size_t tag)
+  void Insert (unsigned int width, unsigned int height, PixelFormat format, const void* data, bool copy_data, const char* name, unsigned int tag)
   {
     if (copy_data)
     {
@@ -487,7 +490,7 @@ struct AtlasBuilder::Impl
 
     if (iter == images_hash_map.end ())
     {
-      image_desc->duplicate_of_index = images.size ();
+      image_desc->duplicate_of_index = (unsigned int)images.size ();
       images_hash_map.insert_pair (bitmap_hash, image_desc->duplicate_of_index);
     }
     else
@@ -513,7 +516,7 @@ struct AtlasBuilder::Impl
         //построение массива индексов уникальных картинок
       IndexArray images_to_process;
 
-      for (size_t i = 0, count = images.size (); i != count; i++)
+      for (unsigned int i = 0, count = (unsigned int)images.size (); i != count; i++)
       {
         ImageDescPtr image_desc = images [i];
 
@@ -528,11 +531,11 @@ struct AtlasBuilder::Impl
 
       while (!images_to_process.empty ())
       {
-        size_t images_count = images_to_process.size ();
+        unsigned int images_count = (unsigned int)images_to_process.size ();
 
-        for (size_t i = 0; i < images_count; i++)
+        for (unsigned int i = 0; i < images_count; i++)
         {
-          size_t image_index = images_to_process [i];
+          unsigned int image_index = images_to_process [i];
 
           ImageHolderPtr image_holder = images [image_index]->image_holder;
 
@@ -558,23 +561,23 @@ struct AtlasBuilder::Impl
                      *current_size       = sizes.data ();
         bool         *current_was_packed = was_packed.data ();
 
-        size_t result_image_width  = 0,
-               result_image_height = 0;
+        unsigned int result_image_width  = 0,
+                     result_image_height = 0;
 
         packed_indices.clear   ();
         packed_indices.reserve (images_count);
 
-        size_t top_right_edge_margin = pack_flags & AtlasPackFlag_TopRightEdgeMargin ? margin : 0;
+        unsigned int top_right_edge_margin = pack_flags & AtlasPackFlag_TopRightEdgeMargin ? margin : 0;
 
-        for (size_t i = 0; i < images_count; i++, current_origin++, current_size++, current_was_packed++)
+        for (unsigned int i = 0; i < images_count; i++, current_origin++, current_size++, current_was_packed++)
         {
           if (!*current_was_packed)
             continue;
 
           packed_indices.push_back (i);
 
-          size_t right = current_origin->x + current_size->x,
-                 top   = current_origin->y + current_size->y;
+          unsigned int right = current_origin->x + current_size->x,
+                       top   = current_origin->y + current_size->y;
 
           if (current_origin->x)
             right += top_right_edge_margin;
@@ -592,8 +595,8 @@ struct AtlasBuilder::Impl
 
         if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
         {
-          result_image_width  = get_next_higher_power_of_two (result_image_width);
-          result_image_height = get_next_higher_power_of_two (result_image_height);
+          result_image_width  = (unsigned int)get_next_higher_power_of_two (result_image_width);
+          result_image_height = (unsigned int)get_next_higher_power_of_two (result_image_height);
         }
 
         if (pack_flags & AtlasPackFlag_SquareAxises)
@@ -602,15 +605,15 @@ struct AtlasBuilder::Impl
         }
 
           //подсчет количества упакованных неуникальных картинок
-        size_t packed_images_count = 0;
+        unsigned int packed_images_count = 0;
 
-        for (size_t i = 0, images_count = images.size (); i < images_count; i++)
+        for (unsigned int i = 0, images_count = (unsigned int)images.size (); i < images_count; i++)
         {
-          size_t duplicate_of_index = images [i]->duplicate_of_index;
+          unsigned int duplicate_of_index = images [i]->duplicate_of_index;
 
           for (IndexArray::iterator iter = packed_indices.begin (), end = packed_indices.end (); iter != end; ++iter)
           {
-            size_t image_index = images_to_process [*iter];
+            unsigned int image_index = images_to_process [*iter];
 
             if (image_index == duplicate_of_index)
             {
@@ -630,15 +633,15 @@ struct AtlasBuilder::Impl
 
         current_origin = pack_result->origins.data ();
 
-        size_t* current_index = pack_result->indices.data ();
+        unsigned int* current_index = pack_result->indices.data ();
 
-        for (size_t i = 0, images_count = images.size (); i < images_count; i++)
+        for (unsigned int i = 0, images_count = (unsigned int)images.size (); i < images_count; i++)
         {
-          size_t duplicate_of_index = images [i]->duplicate_of_index;
+          unsigned int duplicate_of_index = images [i]->duplicate_of_index;
 
           for (IndexArray::iterator iter = packed_indices.begin (), end = packed_indices.end (); iter != end; ++iter)
           {
-            size_t image_index = images_to_process [*iter];
+            unsigned int image_index = images_to_process [*iter];
 
             if (image_index == duplicate_of_index)
             {
@@ -668,16 +671,16 @@ struct AtlasBuilder::Impl
     needs_rebuild = false;
   }
 
-  void BuildAtlas (size_t index, const char* atlas_image_name, Atlas& out_atlas)
+  void BuildAtlas (unsigned int index, const char* atlas_image_name, Atlas& out_atlas)
   {
     Atlas result;
 
     PackResult& pack_result = *pack_results [index];
 
-    size_t*       current_index  = pack_result.indices.data ();
+    unsigned int* current_index  = pack_result.indices.data ();
     math::vec2ui* current_origin = pack_result.origins.data ();
 
-    for (size_t i = 0, count = pack_result.indices.size (); i < count; i++, current_index++, current_origin++)
+    for (unsigned int i = 0, count = (unsigned int)pack_result.indices.size (); i < count; i++, current_index++, current_origin++)
     {
       ImageDescPtr   current_image_desc = images [*current_index];
       ImageHolderPtr image_holder       = current_image_desc->image_holder;
@@ -703,14 +706,14 @@ struct AtlasBuilder::Impl
     result.Swap (out_atlas);
   }
 
-  void BuildAtlasImage (size_t index, Image& out_atlas_image)
+  void BuildAtlasImage (unsigned int index, Image& out_atlas_image)
   {
     PackResult& pack_result = *pack_results [index];
 
     media::PixelFormat atlas_format  = (*images.begin ())->image_holder->ImageFormat ();
-    size_t*            current_index = pack_result.indices.data ();
+    unsigned int*      current_index = pack_result.indices.data ();
 
-    for (size_t i = 0, count = pack_result.indices.size (); i < count; i++, current_index++)
+    for (unsigned int i = 0, count = (unsigned int)pack_result.indices.size (); i < count; i++, current_index++)
       atlas_format = max_image_format (atlas_format, images [*current_index]->image_holder->ImageFormat ());
 
     Image result_image (pack_result.image_width, pack_result.image_height, 1, atlas_format);
@@ -721,7 +724,7 @@ struct AtlasBuilder::Impl
 
     math::vec2ui* current_origin = pack_result.origins.data ();
 
-    for (size_t i = 0, count = pack_result.indices.size (); i < count; i++, current_index++, current_origin++)
+    for (unsigned int i = 0, count = (unsigned int)pack_result.indices.size (); i < count; i++, current_index++, current_origin++)
     {
       ImageDescPtr   current_image_desc = images [*current_index];
       ImageHolderPtr image_holder       = current_image_desc->image_holder;
@@ -778,13 +781,13 @@ AtlasBuilder::~AtlasBuilder ()
    ”становка/получение максимального размера одного атласа
 */
 
-void AtlasBuilder::SetMaxImageSize (size_t max_image_size)
+void AtlasBuilder::SetMaxImageSize (unsigned int max_image_size)
 {
   impl->max_image_size = max_image_size;
   impl->needs_rebuild  = true;
 }
 
-size_t AtlasBuilder::MaxImageSize () const
+unsigned int AtlasBuilder::MaxImageSize () const
 {
   return impl->max_image_size;
 }
@@ -793,13 +796,13 @@ size_t AtlasBuilder::MaxImageSize () const
    ”становка/получение размера пол€
 */
 
-void AtlasBuilder::SetMargin (size_t margin)
+void AtlasBuilder::SetMargin (unsigned int margin)
 {
   impl->margin        = margin;
   impl->needs_rebuild = true;
 }
 
-size_t AtlasBuilder::Margin () const
+unsigned int AtlasBuilder::Margin () const
 {
   return impl->margin;
 }
@@ -808,13 +811,13 @@ size_t AtlasBuilder::Margin () const
    ”становка/получение флагов упаковки
 */
 
-void AtlasBuilder::SetPackFlags (size_t pack_flags)
+void AtlasBuilder::SetPackFlags (unsigned int pack_flags)
 {
   impl->pack_flags    = pack_flags;
   impl->needs_rebuild = true;
 }
 
-size_t AtlasBuilder::PackFlags () const
+unsigned int AtlasBuilder::PackFlags () const
 {
   return impl->pack_flags;
 }
@@ -823,26 +826,26 @@ size_t AtlasBuilder::PackFlags () const
    ƒобавление изображений
 */
 
-void AtlasBuilder::Insert (Image& image, AtlasBuilderInsertMode mode, size_t tag)
+void AtlasBuilder::Insert (Image& image, AtlasBuilderInsertMode mode, unsigned int tag)
 {
   impl->Insert (image, mode, tag);
 
   impl->needs_rebuild = true;
 }
 
-void AtlasBuilder::Insert (const char* image_name, bool keep_in_memory, size_t tag)
+void AtlasBuilder::Insert (const char* image_name, bool keep_in_memory, unsigned int tag)
 {
   if (!image_name)
-    throw xtl::make_null_argument_exception ("media::AtlasBuilder::Insert (const char*, bool, size_t)", "image_name");
+    throw xtl::make_null_argument_exception ("media::AtlasBuilder::Insert (const char*, bool, unsigned int)", "image_name");
 
   impl->Insert (image_name, keep_in_memory, tag);
 
   impl->needs_rebuild = true;
 }
 
-void AtlasBuilder::Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data, const char* name, size_t tag)
+void AtlasBuilder::Insert (unsigned int width, unsigned int height, PixelFormat format, const void* data, bool copy_data, const char* name, unsigned int tag)
 {
-  static const char* METHOD_NAME = "media::AtlasBuilder::Insert (size_t, size_t, PixelFormat, const void*, bool, const char*, size_t)";
+  static const char* METHOD_NAME = "media::AtlasBuilder::Insert (unsigned int, unsigned int, PixelFormat, const void*, bool, const char*, unsigned int)";
 
   if (!data)
     throw xtl::make_null_argument_exception (METHOD_NAME, "data");
@@ -868,13 +871,13 @@ void AtlasBuilder::Reset ()
    ѕолучение результатов упаковки
 */
 
-size_t AtlasBuilder::AtlasesCount ()
+unsigned int AtlasBuilder::AtlasesCount ()
 {
   try
   {
     impl->Build ();
 
-    return impl->pack_results.size ();
+    return (unsigned int)impl->pack_results.size ();
   }
   catch (xtl::exception& e)
   {
@@ -883,7 +886,7 @@ size_t AtlasBuilder::AtlasesCount ()
   }
 }
 
-void AtlasBuilder::BuildAtlas (size_t index, const char* atlas_image_name, Atlas& result)
+void AtlasBuilder::BuildAtlas (unsigned int index, const char* atlas_image_name, Atlas& result)
 {
   try
   {
@@ -904,7 +907,7 @@ void AtlasBuilder::BuildAtlas (size_t index, const char* atlas_image_name, Atlas
   }
 }
 
-void AtlasBuilder::BuildAtlasImage (size_t index, Image& result)
+void AtlasBuilder::BuildAtlasImage (unsigned int index, Image& result)
 {
   try
   {

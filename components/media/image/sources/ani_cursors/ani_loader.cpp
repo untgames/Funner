@@ -71,7 +71,7 @@ class AniLoader
         if (frames.empty ())
           frames = images;          
 
-        Image result (frames.size (), &frames [0]);
+        Image result ((unsigned int)frames.size (), &frames [0]);
 
         result.Swap (image);
       }

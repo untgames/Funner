@@ -21,7 +21,7 @@ struct Tile
   const char*  image;
   math::vec2ui origin;
   math::vec2ui size;
-  size_t       tag;
+  unsigned int tag;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,10 +46,10 @@ class Atlas
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество тайлов и изображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t TilesCount      () const;
-    size_t ImagesCount     () const;    
-    size_t ImageTilesCount (const char* image_name) const;
-    size_t ImageTilesCount (size_t image_index) const;
+    unsigned int TilesCount      () const;
+    unsigned int ImagesCount     () const;
+    unsigned int ImageTilesCount (const char* image_name) const;
+    unsigned int ImageTilesCount (unsigned int image_index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск
@@ -59,44 +59,44 @@ class Atlas
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const media::Tile& Tile      (size_t index) const;
+    const media::Tile& Tile      (unsigned int index) const;
     const media::Tile& Tile      (const char* name) const;
-    const media::Tile& ImageTile (size_t image_index, size_t index) const;        
-    const media::Tile& ImageTile (const char* image_name, size_t index) const;    
+    const media::Tile& ImageTile (unsigned int image_index, unsigned int index) const;
+    const media::Tile& ImageTile (const char* image_name, unsigned int index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Insert (const media::Tile& new_tile);
-    size_t Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag = 0);
+    unsigned int Insert (const media::Tile& new_tile);
+    unsigned int Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Set (size_t tile_index, const media::Tile& new_tile);
-    void Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag = 0);
+    void Set (unsigned int tile_index, const media::Tile& new_tile);
+    void Set (unsigned int tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag = 0);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Remove         (size_t tile_index);
+    void Remove         (unsigned int tile_index);
     void Remove         (const char* name);
     void RemoveAllTiles ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени изображения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* ImageName (size_t index) const;
+    const char* ImageName (unsigned int index) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение размеров картинок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                SetImageSize (const char* image_name, size_t width, size_t height);    
+    void                SetImageSize (const char* image_name, unsigned int width, unsigned int height);
     void                SetImageSize (const char* image_name, const math::vec2ui& size);
-    void                SetImageSize (size_t index, size_t width, size_t height);    
-    void                SetImageSize (size_t index, const math::vec2ui& size);    
+    void                SetImageSize (unsigned int index, unsigned int width, unsigned int height);
+    void                SetImageSize (unsigned int index, const math::vec2ui& size);
     const math::vec2ui& ImageSize    (const char* image_name) const; //no throw
-    const math::vec2ui& ImageSize    (size_t index) const; //no throw
+    const math::vec2ui& ImageSize    (unsigned int index) const; //no throw
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление пустых изображений

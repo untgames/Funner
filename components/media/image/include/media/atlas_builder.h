@@ -46,13 +46,13 @@ class AtlasBuilder
   public:
     struct PackHandlerParams
     {
-      size_t              images_count;    //количество упаковываемых картинок
+      unsigned int        images_count;    //количество упаковываемых картинок
       const math::vec2ui* in_sizes;        //размеры картинок
       math::vec2ui*       out_origins;     //результирующие координаты картинок
       bool*               out_was_packed;  //дл€ каждой картинки true - если была упакована, false - если не влезла. ћожет быть равен 0
-      size_t              margin;          //отступ между картинками
-      size_t              max_image_size;  //максимальный размер результирующей картинки (используетс€ только если установлен флаг )
-      size_t              pack_flags;      //параметры упаковки
+      unsigned int        margin;          //отступ между картинками
+      unsigned int        max_image_size;  //максимальный размер результирующей картинки (используетс€ только если установлен флаг )
+      unsigned int        pack_flags;      //параметры упаковки
     };
 
     typedef xtl::function<void (const PackHandlerParams&)> PackHandler;
@@ -67,27 +67,27 @@ class AtlasBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”становка/получение максимального размера одного атласа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetMaxImageSize (size_t max_image_size);
-    size_t MaxImageSize    () const;
+    void         SetMaxImageSize (unsigned int max_image_size);
+    unsigned int MaxImageSize    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”становка/получение размера пол€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetMargin (size_t margin);
-    size_t Margin    () const;
+    void         SetMargin (unsigned int margin);
+    unsigned int Margin    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”становка/получение флагов упаковки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetPackFlags (size_t pack_flags);
-    size_t PackFlags    () const;
+    void         SetPackFlags (unsigned int pack_flags);
+    unsigned int PackFlags    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒобавление изображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Insert (Image&, AtlasBuilderInsertMode mode = AtlasBuilderInsertMode_Default, size_t tag = 0);
-    void Insert (const char* image_name, bool keep_in_memory = true, size_t tag = 0);
-    void Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data = true, const char* name = "", size_t tag = 0);
+    void Insert (Image&, AtlasBuilderInsertMode mode = AtlasBuilderInsertMode_Default, unsigned int tag = 0);
+    void Insert (const char* image_name, bool keep_in_memory = true, unsigned int tag = 0);
+    void Insert (unsigned int width, unsigned int height, PixelFormat format, const void* data, bool copy_data = true, const char* name = "", unsigned int tag = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—брос
@@ -97,9 +97,9 @@ class AtlasBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение результатов упаковки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AtlasesCount    ();
-    void   BuildAtlas      (size_t index, const char* atlas_image_name, Atlas& result);
-    void   BuildAtlasImage (size_t index, Image& result);
+    unsigned int AtlasesCount    ();
+    void   BuildAtlas      (unsigned int index, const char* atlas_image_name, Atlas& result);
+    void   BuildAtlasImage (unsigned int index, Image& result);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбмен
