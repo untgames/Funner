@@ -26,29 +26,29 @@ class NullImageImpl: public ImageImpl
     }
 
 ///Размеры картинки / изменение размеров
-    size_t Width  () { return 1; }
-    size_t Height () { return 1; }
-    size_t Depth  () { return 1; }
+    unsigned int Width  () { return 1; }
+    unsigned int Height () { return 1; }
+    unsigned int Depth  () { return 1; }
 
-    void Resize (size_t width, size_t height, size_t depth)
+    void Resize (unsigned int width, unsigned int height, unsigned int depth)
     {
       throw xtl::format_not_supported_exception ("media::NullImageImpl::Resize", "Resize not supported");
     }
 
 ///Работа с образом
-    void* Bitmap (size_t z)
+    void* Bitmap (unsigned int z)
     {
       static char buffer [8];
 
       return buffer;
     }
 
-    void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+    void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
     {
       throw xtl::format_not_supported_exception ("media::NullImageImpl::PutImage", "Image operations are not supported");      
     }
     
-    void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data)
+    void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data)
     {
       throw xtl::format_not_supported_exception ("media::NullImageImpl::GetImage", "Image operations are not supported");            
     }

@@ -86,7 +86,7 @@ void fill (const SrcT& src_color, Image& image)
 {
   size_t layer_size = image.Width () * image.Height ();
 
-  for (size_t z=0, depth=image.Depth (); z<depth; z++)
+  for (unsigned int z=0, depth=image.Depth (); z<depth; z++)
   {
     DstT* dst_color = reinterpret_cast<DstT*> (image.Bitmap (z));
 
@@ -163,7 +163,7 @@ const char* get_format_name (PixelFormat format)
 }
 
 //количество бит на пиксель
-size_t get_bits_per_pixel (PixelFormat format)
+unsigned short get_bits_per_pixel (PixelFormat format)
 {
   switch (format)
   {
@@ -182,17 +182,17 @@ size_t get_bits_per_pixel (PixelFormat format)
   return 0; 
 }
 
-size_t get_bytes_per_pixel (PixelFormat format)
+unsigned short get_bytes_per_pixel (PixelFormat format)
 {
   return get_bits_per_pixel (format) / 8;
 }
 
 ///Поиск границ непрозрачных пикселей внутри картинки
-void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_t& crop_y, size_t& crop_width, size_t& crop_height)
+void crop_by_alpha (const Image& image, unsigned int crop_alpha, unsigned int& crop_x, unsigned int& crop_y, unsigned int& crop_width, unsigned int& crop_height)
 {
-  size_t alpha_offset = 0,
-         image_width  = image.Width (),
-         image_height = image.Height ();
+  unsigned int alpha_offset = 0,
+               image_width  = image.Width (),
+               image_height = image.Height ();
 
   switch (image.Format ())
   {
@@ -217,17 +217,17 @@ void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_
 
   const unsigned char* image_bitmap = (const unsigned char*)image.Bitmap ();
 
-  size_t max_x       = image.Width (),
-         max_y       = image.Height ();
-  bool   pixel_found = false;
+  unsigned int max_x       = image.Width (),
+               max_y       = image.Height ();
+  bool         pixel_found = false;
   
-  size_t step = get_bytes_per_pixel (image.Format ());
+  unsigned short step = get_bytes_per_pixel (image.Format ());
 
-  for (size_t y = 0; y < image_height; y++)
+  for (unsigned int y = 0; y < image_height; y++)
   {
     const unsigned char* data = image_bitmap + (image_height - 1 - y) * image_width * step + alpha_offset;
     
-    for (size_t x = 0; x < image_width; x++, data += step)
+    for (unsigned int x = 0; x < image_width; x++, data += step)
     {
       if (*data < crop_alpha)
         continue;

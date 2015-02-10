@@ -88,7 +88,7 @@ Image::Image (const char* file_name, PixelFormat format)
   }
 }
 
-Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
+Image::Image (unsigned int layers_count, Image* layers, LayersCloneMode clone_mode)
 {
   try
   {
@@ -111,12 +111,12 @@ Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::Image::Image(size_t,Image*,LayersCloneMode)");
+    e.touch ("media::Image::Image(unsigned int,Image*,LayersCloneMode)");
     throw;
   }
 }
 
-Image::Image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+Image::Image (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
   try
   {
@@ -124,7 +124,7 @@ Image::Image (size_t width, size_t height, size_t depth, PixelFormat format, con
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::Image(size_t,size_t,size_t,PixelFormat,const void*)");
+    e.touch ("media::Image(unsigned int,unsigned int,unsigned int,PixelFormat,const void*)");
     throw;
   }
 }
@@ -199,29 +199,29 @@ void Image::Convert (PixelFormat new_format)
   impl->Convert (new_format);
 }
 
-size_t Image::Width () const
+unsigned int Image::Width () const
 {
   return impl->Width ();
 }
 
-size_t Image::Height () const
+unsigned int Image::Height () const
 {
   return impl->Height ();
 }
 
-size_t Image::Depth () const
+unsigned int Image::Depth () const
 {
   return impl->Depth ();
 }
 
-void Image::Resize (size_t width, size_t height, size_t depth)
+void Image::Resize (unsigned int width, unsigned int height, unsigned int depth)
 {
   if (width == impl->Width () && height == impl->Height () && depth == impl->Depth ())
     return;
 
-  if (!width)  throw xtl::make_argument_exception ("media::Image::Resize", "width", width);
-  if (!height) throw xtl::make_argument_exception ("media::Image::Resize", "height", height);
-  if (!depth)  throw xtl::make_argument_exception ("media::Image::Resize", "depth", depth);
+  if (!width)  throw xtl::make_argument_exception ("media::Image::Resize", "width", (size_t)width);
+  if (!height) throw xtl::make_argument_exception ("media::Image::Resize", "height", (size_t)height);
+  if (!depth)  throw xtl::make_argument_exception ("media::Image::Resize", "depth", (size_t)depth);
 
   impl->Resize (width, height, depth);
 }
@@ -263,7 +263,7 @@ void Image::Fill (PixelFormat format, const void* data)
     Работа с образом
 */
 
-const void* Image::Bitmap (size_t z) const
+const void* Image::Bitmap (unsigned int z) const
 {
   if (z >= impl->Depth ())
     throw xtl::make_range_exception ("media::Image::Bitmap", "z", z, impl->Depth ());
@@ -271,12 +271,12 @@ const void* Image::Bitmap (size_t z) const
   return impl->Bitmap (z);
 }
 
-void* Image::Bitmap (size_t z)
+void* Image::Bitmap (unsigned int z)
 {
   return const_cast<void*> (const_cast<const Image&> (*this).Bitmap (z));
 }
 
-void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+void Image::PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
   if (!data)
     throw xtl::make_null_argument_exception ("media::Image::PutImage", "data");
@@ -284,7 +284,7 @@ void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height,
   impl->PutImage (x, y, z, width, height, depth, format, data);
 }
 
-void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) const
+void Image::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data) const
 {
   if (!data)
     throw xtl::make_null_argument_exception ("media::Image::GetImage", "data");
@@ -296,7 +296,7 @@ namespace
 {
 
 template <class T, class Img1, class Img2, class Fn>
-void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width, size_t height, size_t depth, Img2& img2, size_t img2_x, size_t img2_y, size_t img2_z, Fn fn)
+void blit (Img1& img1, unsigned int img1_x, unsigned int img1_y, unsigned int img1_z, unsigned int width, unsigned int height, unsigned int depth, Img2& img2, unsigned int img2_x, unsigned int img2_y, unsigned int img2_z, Fn fn)
 {
   if (img2_x >= img2.Width ())  return;
   if (img2_y >= img2.Height ()) return;
@@ -309,9 +309,9 @@ void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width
   if (!width || !height || !depth)
     return;
 
-  PixelFormat img2_format     = img2.Format ();
-  size_t      bytes_per_pixel = get_bytes_per_pixel (img2_format),
-              offset          = bytes_per_pixel * (img2_z * img2.Width () * img2.Height () + img2_y * img2.Width () + img2_x);                       
+  PixelFormat    img2_format     = img2.Format ();
+  unsigned short bytes_per_pixel = get_bytes_per_pixel (img2_format);
+  size_t         offset          = bytes_per_pixel * (img2_z * img2.Width () * img2.Height () + img2_y * img2.Width () + img2_x);
 
   if (width == img2.Width () && height == img2.Height ())
   {
@@ -325,7 +325,7 @@ void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width
            step_z       = step_y * img2.Height ();
     bool   layered_copy = width == img2.Width ();
 
-    for (size_t i=0; i<depth; i++, offset += step_z)
+    for (unsigned int i=0; i<depth; i++, offset += step_z)
     {
       T* src = reinterpret_cast<T*> (img2.Bitmap ()) + offset;
       
@@ -335,7 +335,7 @@ void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width
       }
       else
       {
-        for (size_t j=0; j<height; j++, src += step_y)
+        for (unsigned int j=0; j<height; j++, src += step_y)
           (img1.*fn) (img1_x, img1_y + j, img1_z + i, width, 1, 1, img2_format, src);
       }      
     }
@@ -344,14 +344,14 @@ void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width
 
 }
 
-void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, const Image& source_image, size_t source_x, size_t source_y, size_t source_z)
+void Image::PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, const Image& source_image, unsigned int source_x, unsigned int source_y, unsigned int source_z)
 {
-  blit<const char> (*this, x, y, z, width, height, depth, source_image, source_x, source_y, source_z, (void (Image::*)(size_t, size_t, size_t, size_t, size_t, size_t, PixelFormat, const void*))&Image::PutImage);
+  blit<const char> (*this, x, y, z, width, height, depth, source_image, source_x, source_y, source_z, (void (Image::*)(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, PixelFormat, const void*))&Image::PutImage);
 }
 
-void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, Image& target_image, size_t target_x, size_t target_y, size_t target_z) const
+void Image::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, Image& target_image, unsigned int target_x, unsigned int target_y, unsigned int target_z) const
 {
-  blit<char> (*this, x, y, z, width, height, depth, target_image, target_x, target_y, target_z, (void (Image::*)(size_t, size_t, size_t, size_t, size_t, size_t, PixelFormat, void*) const)&Image::GetImage);
+  blit<char> (*this, x, y, z, width, height, depth, target_image, target_x, target_y, target_z, (void (Image::*)(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, PixelFormat, void*) const)&Image::GetImage);
 }
 
 /*

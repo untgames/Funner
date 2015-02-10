@@ -178,7 +178,7 @@ ILint ILAPIENTRY devil_file_read (void* data, ILuint size, ILuint count, ILHANDL
     if (size == 0 || count == 0)
       return 0;
 
-    return ((StdFile*)file_ptr)->Read (data, size * count) / size;
+    return (ILint)((StdFile*)file_ptr)->Read (data, size * count) / size;
   }
   catch (std::exception& exception)
   {
@@ -270,7 +270,7 @@ ILint ILAPIENTRY devil_file_write (const void* buffer, ILuint size, ILuint count
     if (size == 0 || count == 0)
       return 0;
 
-    return ((StdFile*)file_ptr)->Write (buffer, size * count) / size;
+    return (ILint)((StdFile*)file_ptr)->Write (buffer, size * count) / size;
   }
   catch (std::exception& exception)
   {

@@ -17,14 +17,14 @@ const char* DDS_SUFFIX     = ".dds";
 class MultilayerImageImpl: public ImageImpl
 {
   public:
-    MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode);
+    MultilayerImageImpl (unsigned int count, Image* images, LayersCloneMode clone_mode);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () { return layers_width;   }
-    size_t Height () { return layers_height;  }
-    size_t Depth  () { return layers.size (); }
+    unsigned int Width  () { return layers_width;   }
+    unsigned int Height () { return layers_height;  }
+    unsigned int Depth  () { return (unsigned int)layers.size (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Формат
@@ -36,7 +36,7 @@ class MultilayerImageImpl: public ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ImageImpl* Clone ()
     {
-      return new MultilayerImageImpl (layers.size (), &layers [0], LayersCloneMode_Copy);
+      return new MultilayerImageImpl ((unsigned int)layers.size (), &layers [0], LayersCloneMode_Copy);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,18 +47,18 @@ class MultilayerImageImpl: public ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение размера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Resize (size_t width, size_t height, size_t depth);
+    void Resize (unsigned int width, unsigned int height, unsigned int depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с образом картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void* Bitmap (size_t z);
+    void* Bitmap (unsigned int z);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа с автоматическим преобразованием формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
-   void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data);
+   void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
+   void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение
@@ -75,9 +75,9 @@ class MultilayerImageImpl: public ImageImpl
     typedef stl::vector<Image> ImageArray;
 
   private:
-    ImageArray  layers;  
-    size_t      layers_width, layers_height;
-    PixelFormat layers_format;
+    ImageArray   layers;
+    unsigned int layers_width, layers_height;
+    PixelFormat  layers_format;
 };
 
 }
@@ -88,7 +88,7 @@ class MultilayerImageImpl: public ImageImpl
 
 
 
-MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
+MultilayerImageImpl::MultilayerImageImpl (unsigned int count, Image* images, LayersCloneMode clone_mode)
 {
   try
   {
@@ -111,7 +111,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
       {
         layers.reserve (count);
 
-        for (size_t i=0; i<count; i++)
+        for (unsigned int i=0; i<count; i++)
           layers.push_back (images [i].Clone ());
 
         break;
@@ -120,7 +120,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
         throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
     }
 
-    for (size_t i=1; i<count; i++)
+    for (unsigned int i=1; i<count; i++)
     {
       layers [i].Resize (layers_width, layers_height, layers [i].Depth ());
       layers [i].Convert (layers_format);
@@ -137,17 +137,17 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
     Работа с образом
 */
 
-void* MultilayerImageImpl::Bitmap (size_t z)
+void* MultilayerImageImpl::Bitmap (unsigned int z)
 {
   return layers [z].Bitmap ();
 }
 
-void MultilayerImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+void MultilayerImageImpl::PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
-  size_t last_z = z + depth;
+  unsigned int last_z = z + depth;
   
   if (last_z > layers.size ())
-    last_z = layers.size ();
+    last_z = (unsigned int)layers.size ();
     
   const char* source     = (const char*)data;
   size_t      layer_size = width * height * get_bytes_per_pixel (format);
@@ -156,12 +156,12 @@ void MultilayerImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, 
     layers [z].PutImage (x, y, 0, width, height, 1, format, source);
 }
 
-void MultilayerImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data)
+void MultilayerImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data)
 {
-  size_t last_z = z + depth;
+  unsigned int last_z = z + depth;
   
   if (last_z > layers.size ())
-    last_z = layers.size ();
+    last_z = (unsigned int)layers.size ();
     
   char*  destination = (char*)data;
   size_t layer_size  = width * height * get_bytes_per_pixel (format);
@@ -174,7 +174,7 @@ void MultilayerImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, 
     Изменение размера
 */
 
-void MultilayerImageImpl::Resize (size_t width, size_t height, size_t new_layers_count)
+void MultilayerImageImpl::Resize (unsigned int width, unsigned int height, unsigned int new_layers_count)
 {
   ImageArray new_layers;
   
@@ -231,7 +231,7 @@ void MultilayerImageImpl::SaveSixLayersImage (const char* file_name, const char*
          basename2 = common::basename (basename1),
          suffix    = common::suffix (basename1);
     
-  for (size_t i=0; i<6; i++)
+  for (unsigned char i=0; i<6; i++)
     layers [i].Save ((basename2 + suffixes [i] + suffix).c_str ());
 }
 
@@ -251,9 +251,9 @@ void MultilayerImageImpl::SaveSkyBox (const char* file_name)
 
 void MultilayerImageImpl::SaveDDS (const char* file_name)
 {
-  Image save_image (layers_width, layers_height, layers.size(), layers_format);
+  Image save_image (layers_width, layers_height, (unsigned int)layers.size (), layers_format);
 
-  for (size_t i=0; i<layers.size (); i++)
+  for (unsigned int i=0; i<layers.size (); i++)
     save_image.PutImage (0, 0, i, layers_width, layers_height, 1, layers_format, layers [i].Bitmap ());
 
   save_image.Save (file_name);
@@ -284,12 +284,12 @@ namespace media
     Создание реализации
 */
 
-ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode)
+ImageImpl* create_multilayer_image (unsigned int count, Image* images, LayersCloneMode clone_mode)
 {
   return new MultilayerImageImpl (count, images, clone_mode);
 }
 
-void load_image_array (const char* file_name, size_t count, const char** suffixes, Image* images)
+void load_image_array (const char* file_name, unsigned int count, const char** suffixes, Image* images)
 {
   if (!file_name)
     throw xtl::make_null_argument_exception ("media::load_image_array", "file_name");
@@ -300,7 +300,7 @@ void load_image_array (const char* file_name, size_t count, const char** suffixe
 
   try
   {
-    for (size_t i=0; i<6; i++)
+    for (unsigned char i=0; i<6; i++)
       images [i].Load ((basename2 + suffixes [i] + suffix).c_str ());      
   }
   catch (xtl::exception& exception)

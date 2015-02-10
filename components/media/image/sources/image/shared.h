@@ -58,25 +58,25 @@ class ImageImpl: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Width  () = 0;
-    virtual size_t Height () = 0;
-    virtual size_t Depth  () = 0;
+    virtual unsigned int Width  () = 0;
+    virtual unsigned int Height () = 0;
+    virtual unsigned int Depth  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение размера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Resize (size_t width, size_t height, size_t depth) = 0;
+    virtual void Resize (unsigned int width, unsigned int height, unsigned int depth) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с образом картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void* Bitmap (size_t z) = 0;
+    virtual void* Bitmap (unsigned int z) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа с автоматическим преобразованием формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data) = 0;
-    virtual void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) = 0;
+    virtual void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data) = 0;
+    virtual void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение картинки
@@ -98,11 +98,11 @@ class ImageImpl: public xtl::reference_counter
 ///Создание реализаций картинок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ImageImpl* create_bitmap_image ();
-ImageImpl* create_bitmap_image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
+ImageImpl* create_bitmap_image (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
 ImageImpl* create_bitmap_image (const char* file_name);
 ImageImpl* create_null_image ();
 
-ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode);
+ImageImpl* create_multilayer_image (unsigned int count, Image* images, LayersCloneMode clone_mode);
 ImageImpl* create_cubemap_image    (const char* file_name);
 ImageImpl* create_skybox_image     (const char* file_name);
 

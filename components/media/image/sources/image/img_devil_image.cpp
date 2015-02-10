@@ -18,7 +18,7 @@ class DevILImageImpl: public ImageImpl
     DevILImageImpl  ();
     DevILImageImpl  (const DevILImageImpl&);
     DevILImageImpl  (const char* file_name);
-    DevILImageImpl  (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
+    DevILImageImpl  (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
     ~DevILImageImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,17 +35,17 @@ class DevILImageImpl: public ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры картинки / изменение размеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () { return width; }
-    size_t Height () { return height; }
-    size_t Depth  () { return depth; }
-    void   Resize (size_t width, size_t height, size_t depth);
+    unsigned int Width  () { return width; }
+    unsigned int Height () { return height; }
+    unsigned int Depth  () { return depth; }
+    void         Resize (unsigned int width, unsigned int height, unsigned int depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с образом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void* Bitmap   (size_t z);
-    void  PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
-    void  GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data);
+    void* Bitmap   (unsigned int z);
+    void  PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
+    void  GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение
@@ -79,10 +79,10 @@ void raise_devil_exception (const char* source, const char* format, ...)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct DevILPixelFormat
 {
-  ILenum format, type;
-  size_t components;
+  ILenum        format, type;
+  unsigned char components;
 
-  DevILPixelFormat (ILenum in_format, ILenum in_type, size_t in_components) :
+  DevILPixelFormat (ILenum in_format, ILenum in_type, unsigned char in_components) :
      format (in_format), type (in_type), components (in_components) {}
 };
 
@@ -281,9 +281,11 @@ DevILImageImpl::DevILImageImpl (const char* file_name)
   }
 }
 
-DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_depth, PixelFormat in_format, const void* in_data)
+DevILImageImpl::DevILImageImpl (unsigned int in_width, unsigned int in_height, unsigned int in_depth, PixelFormat in_format, const void* in_data)
   : width (in_width), height (in_height), depth (in_depth), format (in_format)
 {
+  static const char* METHOD_NAME = "media::DevILImageImpl::DevILImageImpl(unsigned int,unsigned int,unsigned int,PixelFormat,const void*)";
+
   LoadComponent ();
 
   ilGenImages (1, &il_image);
@@ -294,12 +296,12 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
     ilGenImages    (1, &il_image);    
   }
   
-  check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilGenImages");
+  check_devil_errors (METHOD_NAME, "ilGenImages");
 
   try
   {
     ilBindImage        (il_image);
-    check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilBindImage");
+    check_devil_errors (METHOD_NAME, "ilBindImage");
 
     DevILPixelFormat devil_format = get_devil_format (format);
 
@@ -308,8 +310,7 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
     ILenum error = ilGetError();
 
     if (error != IL_NO_ERROR)
-      raise_devil_exception ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)",
-                             "Can't create image %dx%dx%d with format=%s. %s", width, height, depth, get_format_name (format),
+      raise_devil_exception (METHOD_NAME, "Can't create image %dx%dx%d with format=%s. %s", width, height, depth, get_format_name (format),
                              iluErrorString (error));
   }
   catch (...)
@@ -359,7 +360,7 @@ void DevILImageImpl::Convert (PixelFormat new_format)
     Размеры картинки
 */
 
-void DevILImageImpl::Resize (size_t in_width, size_t in_height, size_t in_depth)
+void DevILImageImpl::Resize (unsigned int in_width, unsigned int in_height, unsigned int in_depth)
 {
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Resize", "ilBindImage");
@@ -380,7 +381,7 @@ void DevILImageImpl::Resize (size_t in_width, size_t in_height, size_t in_depth)
     Работа с образом
 */
 
-void* DevILImageImpl::Bitmap (size_t z)
+void* DevILImageImpl::Bitmap (unsigned int z)
 {
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Bitmap", "ilBindImage");
@@ -393,7 +394,7 @@ void* DevILImageImpl::Bitmap (size_t z)
   return data;
 }
 
-void DevILImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+void DevILImageImpl::PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
   if (format == PixelFormat_Default)
     format = this->format;
@@ -407,7 +408,7 @@ void DevILImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, size_
   check_devil_errors ("media::DevILImageImpl::PutImage", "ilSetPixels");
 }
 
-void DevILImageImpl::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data)
+void DevILImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data)
 {
   if (format == PixelFormat_Default)
     format = this->format;
@@ -452,7 +453,7 @@ ImageImpl* create_bitmap_image ()
   return new DevILImageImpl;
 }
 
-ImageImpl* create_bitmap_image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
+ImageImpl* create_bitmap_image (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
   return new DevILImageImpl (width, height, depth, format, data);
 }

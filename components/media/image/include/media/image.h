@@ -48,9 +48,9 @@ enum CubemapLayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение характеристик формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get_format_name     (PixelFormat); //им€ формата
-size_t      get_bits_per_pixel  (PixelFormat); //количество бит на пиксель
-size_t      get_bytes_per_pixel (PixelFormat); //количество байт на пиксель
+const char*    get_format_name     (PixelFormat); //им€ формата
+unsigned short get_bits_per_pixel  (PixelFormat); //количество бит на пиксель
+unsigned short get_bytes_per_pixel (PixelFormat); //количество байт на пиксель
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–ежим копировани€ слоЄв многослойной картинки
@@ -75,8 +75,8 @@ class Image
              Image  ();
              Image  (const Image& source);
              Image  (const Image& source, PixelFormat format);
-             Image  (size_t width, size_t height, size_t depth, PixelFormat format, const void* data = 0);
-             Image  (size_t layers_count, Image* layers, LayersCloneMode clone_mode = LayersCloneMode_Default);
+             Image  (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data = 0);
+             Image  (unsigned int layers_count, Image* layers, LayersCloneMode clone_mode = LayersCloneMode_Default);
     explicit Image  (const char* file_name, PixelFormat format = PixelFormat_Default);
              ~Image ();
 
@@ -123,14 +123,14 @@ class Image
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–азмеры картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () const;
-    size_t Height () const;
-    size_t Depth  () const;
+    unsigned int Width  () const;
+    unsigned int Height () const;
+    unsigned int Depth  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///»зменение размера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Resize (size_t width, size_t height, size_t depth);
+    void Resize (unsigned int width, unsigned int height, unsigned int depth);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«аполнение определенным значением
@@ -140,16 +140,16 @@ class Image
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с образом картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void*       Bitmap (size_t z = 0);
-    const void* Bitmap (size_t z = 0) const;
+    void*       Bitmap (unsigned int z = 0);
+    const void* Bitmap (unsigned int z = 0) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// опирование образа с автоматическим преобразованием формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
-    void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, PixelFormat format, void* data) const;
-    void PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, const Image& source_image, size_t source_x, size_t source_y, size_t source_z);
-    void GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, Image& target_image, size_t target_x, size_t target_y, size_t target_z) const;
+    void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
+    void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data) const;
+    void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, const Image& source_image, unsigned int source_x, unsigned int source_y, unsigned int source_z);
+    void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, Image& target_image, unsigned int target_x, unsigned int target_y, unsigned int target_z) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбмен
@@ -177,7 +177,7 @@ void swap (Image&, Image&);
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕоиск границ непрозрачных пикселей внутри картинки
 //////////////////////////////////////////////////////////////////////////////////////////////////
-void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_t& crop_y, size_t& crop_width, size_t& crop_height);
+void crop_by_alpha (const Image& image, unsigned int crop_alpha, unsigned int& crop_x, unsigned int& crop_y, unsigned int& crop_width, unsigned int& crop_height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—истема управлени€ картинками
