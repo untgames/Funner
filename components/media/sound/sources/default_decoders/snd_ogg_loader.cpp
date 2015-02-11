@@ -197,15 +197,19 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
 {
   static const char* METHOD_NAME = "media::sound::OggInputStream::Read";
 
-  size_t ret_value, readed_bytes, decoded_bytes = 0, buffer_size = samples_count * 2 * channels_count;
+  long   readed_bytes;
+  size_t ret_value, decoded_bytes = 0, buffer_size = samples_count * 2 * channels_count;
   int    current_section;
+
+  if (buffer_size > INT_MAX)
+    throw xtl::format_operation_exception (METHOD_NAME, "Samples count read limit exceeded");
 
   if (first_sample != ov_pcm_tell (&vf))
     check_vorbis_file_error (ov_pcm_seek (&vf, first_sample), METHOD_NAME, "Can't seek in vorbis file, error at ::ov_pcm_seek");
 
   while (1)
   {
-    readed_bytes = ov_read (&vf, (char*)data + decoded_bytes, buffer_size - decoded_bytes, 0, 2, 1, &current_section);
+    readed_bytes = ov_read (&vf, (char*)data + decoded_bytes, (int)(buffer_size - decoded_bytes), 0, 2, 1, &current_section);
     if (readed_bytes > 0)
     {
       decoded_bytes += readed_bytes;
