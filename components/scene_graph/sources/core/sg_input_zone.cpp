@@ -147,7 +147,7 @@ bool InputZone::IsPlaneEnabled (NodeOrt normal) const
     case NodeOrt_X:
     case NodeOrt_Y:
     case NodeOrt_Z:
-      return (impl->plane_mask & (1 << normal)) != 0;
+      return (impl->plane_mask & (int)(1 << normal)) != 0;
     default:
       return false;
   }

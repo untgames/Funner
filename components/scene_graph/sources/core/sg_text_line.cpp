@@ -616,7 +616,7 @@ void TextLine::RebuildCharsCore ()
 
     media::Font&            font               = *impl->font;
     const media::GlyphInfo* glyphs             = font.Glyphs ();
-    size_t                  glyphs_count       = font.GlyphsCount (),
+    unsigned int            glyphs_count       = font.GlyphsCount (),
                             first_glyph_code   = font.FirstGlyphCode (),
                             last_glyph_code    = first_glyph_code + glyphs_count;
     float                   current_pen_x      = 0.0f,
@@ -629,7 +629,7 @@ void TextLine::RebuildCharsCore ()
                             &default_color     = impl->color;
     CharDesc                *dst_first_char    = CharsForUpdate (),
                             *dst_char          = dst_first_char;
-    size_t                  prev_glyph_index   = 0;
+    unsigned int            prev_glyph_index   = 0;
 
     impl->text_dimensions.min = 0.f;
     impl->text_dimensions.max = 0.f;
@@ -638,7 +638,7 @@ void TextLine::RebuildCharsCore ()
     {
         //проверка наличия кода символа в шрифте
 
-      size_t current_symbol_code = *src_char;
+      unsigned int current_symbol_code = *src_char;
 
       if (!is_symbol_valid (current_symbol_code, first_glyph_code, last_glyph_code))
       {
@@ -650,7 +650,7 @@ void TextLine::RebuildCharsCore ()
 
         //получение глифа
 
-      size_t                  glyph_index = current_symbol_code - first_glyph_code;
+      unsigned int            glyph_index = current_symbol_code - first_glyph_code;
       const media::GlyphInfo& glyph       = glyphs [glyph_index];
 
         //перенос пера

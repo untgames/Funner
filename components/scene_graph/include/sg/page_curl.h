@@ -99,7 +99,7 @@ class PageCurl : public VisualModel
 ///Опциональные параметры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                SetGridSize                      (const math::vec2ui& size);  //детализация разбиения сетки
-    void                SetGridSize                      (size_t x, size_t y);
+    void                SetGridSize                      (unsigned int x, unsigned int y);
     const math::vec2ui& GridSize                         () const;
     void                SetPageColor                     (const math::vec4f& color);  //цвет страницы
     void                SetPageColor                     (float red, float green, float blue, float alpha);
@@ -112,8 +112,8 @@ class PageCurl : public VisualModel
     float               ShadowLogBase                    () const;
     void                SetShadowMinLogValue             (float value);               //минимальное значение тени при логарифмировании
     float               ShadowMinLogValue                () const;
-    void                SetFindBestCurlSteps             (size_t count);              //количество итераций поиска наилучшей позиции загиба
-    size_t              FindBestCurlSteps                () const;
+    void                SetFindBestCurlSteps             (unsigned int count);              //количество итераций поиска наилучшей позиции загиба
+    unsigned int        FindBestCurlSteps                () const;
     void                SetBindingMismatchWeight         (float weight);              //вес отклонения позиции сгиба страницы при поиске наилучешй позиции загиба
     float               BindingMismatchWeight            () const;
     void                SetRigidPage                     (bool state);                //является ли страница жесткой

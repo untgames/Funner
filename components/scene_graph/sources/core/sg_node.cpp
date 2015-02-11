@@ -491,7 +491,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
     if (need_world_position_update)
     {
-      for (size_t i = 0; i < 3; i++)
+      for (unsigned char i = 0; i < 3; i++)
         world_position [i] = world_tm [i][3];
         
       need_world_position_update = false;        
@@ -1292,7 +1292,7 @@ math::vec3f get_world_rotation (Node* node)
 void Node::BindProperties (common::PropertyBindingMap& bindings)
 {
   bindings.AddProperty ("Name", xtl::bind (&Node::Name, this), xtl::bind (&Node::SetName, this, _1));
-  bindings.AddProperty ("UseCount", xtl::bind (&Node::UseCount, this));
+//  bindings.AddProperty ("UseCount", xtl::bind (&Node::UseCount, this));  //TODO size_t is not available in PropertyMap for 64 bit platforms
   bindings.AddProperty ("Position", xtl::bind (&Node::Position, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetPosition), this, _1));
   bindings.AddProperty ("Orientation", xtl::bind (&Node::Orientation, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::quatf&)> (&Node::SetOrientation), this, _1));
   bindings.AddProperty ("Rotation", xtl::bind (&get_rotation, this), xtl::bind (&set_rotation, this, _1));  

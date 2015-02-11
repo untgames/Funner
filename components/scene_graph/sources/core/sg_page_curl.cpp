@@ -34,7 +34,7 @@ struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
   float          shadow_width;                       //ширина тени
   float          shadow_log_base;                    //основание логарифма генерации тени
   float          shadow_min_log_value;               //минимальное значение тени при логарифмировании
-  size_t         find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
+  unsigned int   find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
   float          binding_mismatch_weight;            //вес отклонени€ позиции сгиба страницы при поиске наилучешй позиции загиба
   bool           is_rigid_page;                      //€вл€етс€ ли страница жесткой
   float          rigid_page_perspective_factor;      //коэффициент увеличени€ кра€ жесткой страницы дл€ симул€ции перспективы
@@ -256,7 +256,7 @@ void PageCurl::SetGridSize (const math::vec2ui& size)
   UpdateNotify ();
 }
 
-void PageCurl::SetGridSize (size_t x, size_t y)
+void PageCurl::SetGridSize (unsigned int x, unsigned int y)
 {
   SetGridSize (math::vec2ui (x, y));
 }
@@ -329,14 +329,14 @@ float PageCurl::ShadowMinLogValue () const
   return impl->shadow_min_log_value;
 }
 
-void PageCurl::SetFindBestCurlSteps (size_t count)
+void PageCurl::SetFindBestCurlSteps (unsigned int count)
 {
   impl->find_best_curl_steps = count;
 
   UpdateNotify ();
 }
 
-size_t PageCurl::FindBestCurlSteps () const
+unsigned int PageCurl::FindBestCurlSteps () const
 {
   return impl->find_best_curl_steps;
 }
