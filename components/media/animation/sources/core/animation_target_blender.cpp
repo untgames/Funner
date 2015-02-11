@@ -43,8 +43,8 @@ template <class T> math::matrix<T, 4> property_cast (const math::matrix<T, 2>& s
 {
   math::matrix<T, 4> result;
   
-  for (size_t i=0; i<2; i++)
-    for (size_t j=0; j<2; j++)  
+  for (unsigned char i=0; i<2; i++)
+    for (unsigned char j=0; j<2; j++)
       result [i][j] = src [i][j];
 
   return result;
@@ -54,8 +54,8 @@ template <class T> math::matrix<T, 4> property_cast (const math::matrix<T, 3>& s
 {
   math::matrix<T, 4> result;
 
-  for (size_t i=0; i<3; i++)
-    for (size_t j=0; j<3; j++)  
+  for (unsigned char i=0; i<3; i++)
+    for (unsigned char j=0; j<3; j++)
       result [i][j] = src [i][j];
 
   return result;

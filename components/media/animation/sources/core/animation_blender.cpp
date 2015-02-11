@@ -186,7 +186,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
 
       //размещение целей анимации
       
-    for (size_t i=0, count=animation.TargetsCount (); i<count; i++)
+    for (unsigned int i=0, count=animation.TargetsCount (); i<count; i++)
     {
       const char* target_name    = animation.TargetName (i);
       size_t      channels_count = animation.ChannelsCount (i);
@@ -206,7 +206,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
         
           //добавление каналов
           
-        for (size_t j=0; j<channels_count; j++)
+        for (unsigned int j=0; j<channels_count; j++)
           if (name_map) target->blender.AddSource (state, animation.Channel (i, j), *name_map);
           else          target->blender.AddSource (state, animation.Channel (i, j));
       }
@@ -225,7 +225,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
         {
             //добавление каналов
           
-          for (size_t j=0; j<channels_count; j++)
+          for (unsigned int j=0; j<channels_count; j++)
             if (name_map) target->blender.AddSource (state, animation.Channel (i, j), *name_map);
             else          target->blender.AddSource (state, animation.Channel (i, j));
             

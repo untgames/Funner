@@ -11,7 +11,7 @@ namespace
 */
 
 const float  EPSILON                           = 0.0001f; //погрешность для проверки с нулём
-const size_t DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE = 4;       //резервируемое количество событий для одного вызова GetEvents
+const unsigned int DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE = 4;       //резервируемое количество событий для одного вызова GetEvents
 
 /*
     Информация о событии
@@ -155,21 +155,21 @@ size_t EventTrack::Id () const
     Количество событий
 */
 
-size_t EventTrack::Size () const
+unsigned int EventTrack::Size () const
 {
-  return impl->events.size ();
+  return (unsigned int)impl->events.size ();
 }
 
 /*
     Резервирование числа событий
 */
 
-size_t EventTrack::Capacity () const
+unsigned int EventTrack::Capacity () const
 {
-  return impl->events.capacity ();
+  return (unsigned int)impl->events.capacity ();
 }
 
-void EventTrack::Reserve (size_t events_count)
+void EventTrack::Reserve (unsigned int events_count)
 {
   impl->events.reserve (events_count);
 }
@@ -212,7 +212,7 @@ float EventTrack::MaxUnwrappedTime () const
     Добавление / изменение событий
 */
 
-size_t EventTrack::AddEvent (float delay, float period, const char* event)
+unsigned int EventTrack::AddEvent (float delay, float period, const char* event)
 {
   static const char* METHOD_NAME = "media::animation::EventTrack::AddEvent";
 
@@ -225,14 +225,17 @@ size_t EventTrack::AddEvent (float delay, float period, const char* event)
   if (period < 0)
     throw xtl::make_argument_exception (METHOD_NAME, "period", period, "Period must be not negative");
 
+  if (impl->events.size () >= (unsigned int)-1)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't add event, events count limit exceeded");
+
   impl->events.push_back (EventDescPtr (new EventDesc (delay, period, event), false));
   
   impl->need_limits_recompute = true;
 
-  return impl->events.size () - 1;
+  return (unsigned int)impl->events.size () - 1;
 }
 
-void EventTrack::SetDelay (size_t event_index, float delay)
+void EventTrack::SetDelay (unsigned int event_index, float delay)
 {
   static const char* METHOD_NAME = "media::animation::EventTrack::SetDelay";
 
@@ -247,7 +250,7 @@ void EventTrack::SetDelay (size_t event_index, float delay)
   impl->need_limits_recompute = true;  
 }
 
-void EventTrack::SetPeriod (size_t event_index, float period)
+void EventTrack::SetPeriod (unsigned int event_index, float period)
 {
   static const char* METHOD_NAME = "media::animation::EventTrack::SetPeriod";
 
@@ -262,9 +265,9 @@ void EventTrack::SetPeriod (size_t event_index, float period)
   impl->need_limits_recompute = true;  
 }
 
-void EventTrack::SetEvent (size_t event_index, float delay, float period, const char* event)
+void EventTrack::SetEvent (unsigned int event_index, float delay, float period, const char* event)
 {
-  static const char* METHOD_NAME = "media::animation::EventTrack::SetEvent (size_t, float, float, const char*)";
+  static const char* METHOD_NAME = "media::animation::EventTrack::SetEvent (unsigned int, float, float, const char*)";
 
   if (event_index >= impl->events.size ())
     throw xtl::make_range_exception (METHOD_NAME, "event_index", event_index, impl->events.size ());
@@ -283,9 +286,9 @@ void EventTrack::SetEvent (size_t event_index, float delay, float period, const 
   impl->need_limits_recompute = true;  
 }
 
-void EventTrack::SetEvent (size_t event_index, const char* event)
+void EventTrack::SetEvent (unsigned int event_index, const char* event)
 {
-  static const char* METHOD_NAME = "media::animation::EventTrack::SetEvent (size_t, const char*)";
+  static const char* METHOD_NAME = "media::animation::EventTrack::SetEvent (unsigned int, const char*)";
 
   if (event_index >= impl->events.size ())
     throw xtl::make_range_exception (METHOD_NAME, "event_index", event_index, impl->events.size ());
@@ -300,7 +303,7 @@ void EventTrack::SetEvent (size_t event_index, const char* event)
     Получение событий
 */
 
-const char* EventTrack::GetEvent (size_t event_index) const
+const char* EventTrack::GetEvent (unsigned int event_index) const
 {
   if (event_index >= impl->events.size ())
     throw xtl::make_range_exception ("media::animation::EventTrack::GetEvent", "event_index", event_index, impl->events.size ());
@@ -308,7 +311,7 @@ const char* EventTrack::GetEvent (size_t event_index) const
   return impl->events [event_index]->event.c_str ();
 }
 
-float EventTrack::GetDelay (size_t event_index) const
+float EventTrack::GetDelay (unsigned int event_index) const
 {
   if (event_index >= impl->events.size ())
     throw xtl::make_range_exception ("media::animation::EventTrack::GetTime", "event_index", event_index, impl->events.size ());
@@ -316,7 +319,7 @@ float EventTrack::GetDelay (size_t event_index) const
   return impl->events [event_index]->delay;
 }
 
-float EventTrack::GetPeriod (size_t event_index) const
+float EventTrack::GetPeriod (unsigned int event_index) const
 {
   if (event_index >= impl->events.size ())
     throw xtl::make_range_exception ("media::animation::EventTrack::GetTime", "event_index", event_index, impl->events.size ());
@@ -417,7 +420,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
    Удаление ключевых точек
 */
 
-void EventTrack::Remove (size_t event_index)
+void EventTrack::Remove (unsigned int event_index)
 {
   if (event_index >= impl->events.size ())
     return;

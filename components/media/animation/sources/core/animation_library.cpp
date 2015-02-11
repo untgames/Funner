@@ -64,9 +64,9 @@ AnimationLibrary& AnimationLibrary::operator = (const AnimationLibrary& source)
    Количество элементов в библиотеке / проверка на пустоту
 */
 
-size_t AnimationLibrary::Size () const
+unsigned int AnimationLibrary::Size () const
 {
-  return impl->animations.Size ();
+  return (unsigned int)impl->animations.Size ();
 }
 
 bool AnimationLibrary::IsEmpty () const
@@ -117,6 +117,9 @@ const Animation* AnimationLibrary::Find (const char* id) const
 
 void AnimationLibrary::Attach (const char* id, Animation& animation)
 {
+  if (impl->animations.Size () >= (unsigned int)-1)
+    throw xtl::format_operation_exception ("media::animation::AnimationLibrary::Attach", "Can't attach animation, animations count limit exceeded");
+
   impl->animations.Insert (id, animation);
 }
 
