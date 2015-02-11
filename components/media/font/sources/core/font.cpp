@@ -71,7 +71,7 @@ const char* Font::StyleName () const
    Размер таблицы глифов
 */
 
-size_t Font::GlyphsCount () const
+unsigned int Font::GlyphsCount () const
 {
   return impl->GlyphsCount ();
 }
@@ -80,7 +80,7 @@ size_t Font::GlyphsCount () const
    Код первого глифа
 */
 
-size_t Font::FirstGlyphCode () const
+unsigned int Font::FirstGlyphCode () const
 {
   return impl->FirstGlyphCode ();
 }
@@ -89,7 +89,7 @@ size_t Font::FirstGlyphCode () const
    Размер шрифта
 */
 
-size_t Font::FontSize () const
+unsigned int Font::FontSize () const
 {
   return impl->FontSize ();
 }
@@ -107,12 +107,12 @@ const GlyphInfo* Font::Glyphs () const
    Информация о кёрнингах
 */
 
-KerningInfo Font::Kerning (size_t left_glyph_index, size_t right_glyph_index) const
+KerningInfo Font::Kerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   return impl->Kerning (left_glyph_index, right_glyph_index);
 }
 
-bool Font::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
+bool Font::HasKerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   return impl->HasKerning (left_glyph_index, right_glyph_index);
 }

@@ -62,7 +62,7 @@ int main ()
 
       common::FileSystem::Mkdir ("results");
 
-      for (size_t i = 0; i < rasterized_font.ImagesCount (); i++)
+      for (unsigned int i = 0; i < rasterized_font.ImagesCount (); i++)
       {
         Image image;
 

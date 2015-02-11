@@ -78,10 +78,13 @@ struct FontLibrary::Impl : public xtl::reference_counter
 
     loaded_fonts.reserve (font_desc->FontsCount ());
 
-    for (size_t i = 0, count = font_desc->FontsCount (); i < count; i++)
+    for (unsigned int i = 0, count = font_desc->FontsCount (); i < count; i++)
     {
       loaded_fonts.push_back (FontEntryPtr (new FontEntry (FontDesc (file_name, font_desc.get (), i)), false));
     }
+
+    if (loaded_fonts.size () + fonts.size () > (unsigned int)-1)
+      throw xtl::format_operation_exception ("media::FontLibrary::LoadFont", "Can't load more fonts, limit exceeded");
 
     fonts.insert (fonts.end (), loaded_fonts.begin (), loaded_fonts.end ());
   }
@@ -145,9 +148,9 @@ void FontLibrary::SetName (const char* name)
 /*
    Количество дескрипторов шрифтов в библиотеке / проверка на пустоту
 */
-size_t FontLibrary::Size () const
+unsigned int FontLibrary::Size () const
 {
-  return impl->fonts.size ();
+  return (unsigned int)impl->fonts.size ();
 }
 
 bool FontLibrary::IsEmpty () const

@@ -13,7 +13,7 @@ class FreetypeStroker
 {
   public:
     //Конструктор/деструктор
-    FreetypeStroker (const FreetypeLibrary& in_library, size_t stroke_size)
+    FreetypeStroker (const FreetypeLibrary& in_library, unsigned int stroke_size)
       : library (in_library)
       , stroker (0)
     {
@@ -128,11 +128,11 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
   typedef xtl::uninitialized_storage<unsigned char*> BitmapPointersArray;
   typedef xtl::uninitialized_storage<unsigned int>   GlyphMap;
   typedef xtl::uninitialized_storage<unsigned char>  BitmapBuffer;
-  typedef stl::hash_map<size_t, size_t>              BitmapHashMap;
+  typedef stl::hash_map<size_t, unsigned int>        BitmapHashMap;
 
   common::Log             log;                //протокол
   RasterizedFontParamsPtr font_params;        //параметры шрифта
-  size_t                  glyphs_count;       //количество глифов
+  unsigned int            glyphs_count;       //количество глифов
   bool                    rasterized;         //выполнялась ли процедура растеризации
   SizesArray              sizes;              //размеры битмапов символов
   BitmapPointersArray     bitmap_pointers;    //указатели на битмапы символов
@@ -164,22 +164,22 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
 
     glyph_map.resize (glyphs_count);
 
-    size_t unique_glyphs_count    = utf32_charset.size () + 1;
-    size_t estimated_bitmaps_size = unique_glyphs_count * font_params->choosen_size * font_params->choosen_size / 2;
+    unsigned int unique_glyphs_count    = (unsigned int)utf32_charset.size () + 1;
+    unsigned int estimated_bitmaps_size = unique_glyphs_count * font_params->choosen_size * font_params->choosen_size / 2;
 
     sizes.resize       (unique_glyphs_count);
     bitmap_data.resize (estimated_bitmaps_size);
 
-    xtl::uninitialized_storage<size_t> bitmaps_offsets (unique_glyphs_count);
+    xtl::uninitialized_storage<unsigned int> bitmaps_offsets (unique_glyphs_count);
 
     common::Lock lock (*font_params->face);
 
     font_params->face->SetSize (font_params->choosen_size, font_params->font_params.horizontal_dpi, font_params->font_params.vertical_dpi);
 
-    size_t current_glyph_bitmap_offset = 0;
+    unsigned int current_glyph_bitmap_offset = 0;
 
     math::vec2ui* current_size          = sizes.data ();
-    size_t*       current_bitmap_offset = bitmaps_offsets.data ();
+    unsigned int* current_bitmap_offset = bitmaps_offsets.data ();
 
     {
       FreetypeGlyphRasterizer glyph_rasterizer ('?', *font_params, stroker.Stroker ());
@@ -209,16 +209,16 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     current_size++;
     current_bitmap_offset++;
 
-    size_t              previous_glyph_code  = utf32_charset.data () [0];
-    size_t              current_unique_index = 1;
+    unsigned int        previous_glyph_code  = utf32_charset.data () [0];
+    unsigned int        current_unique_index = 1;
     unsigned int*       current_mapping      = glyph_map.data ();
     const unsigned int* current_char_code    = utf32_charset.data ();
 
     xtl::uninitialized_storage<FT_UInt>& ft_char_indices = font_params->ft_char_indices;
 
-    for (size_t i = 0, count = utf32_charset.size (); i < count; i++, current_mapping++, current_char_code++)
+    for (unsigned int i = 0, count = (unsigned int)utf32_charset.size (); i < count; i++, current_mapping++, current_char_code++)
     {
-      for (size_t j = previous_glyph_code + 1; j < *current_char_code; j++, current_mapping++)
+      for (unsigned int j = previous_glyph_code + 1; j < *current_char_code; j++, current_mapping++)
         *current_mapping = 0;
 
       previous_glyph_code = *current_char_code;
@@ -245,7 +245,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
         continue;
       }
 
-      size_t new_offset = CopyBitmapToBuffer (bitmap, current_glyph_bitmap_offset);
+      unsigned int new_offset = CopyBitmapToBuffer (bitmap, current_glyph_bitmap_offset);
 
       size_t bitmap_hash = common::crc32 (bitmap_data.data () + current_glyph_bitmap_offset, bitmap->width * bitmap->rows);
 
@@ -273,7 +273,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
       current_unique_index++;
     }
 
-    size_t actual_unique_glyphs = current_unique_index;
+    unsigned int actual_unique_glyphs = current_unique_index;
 
     sizes.resize (actual_unique_glyphs);
     bitmap_data.resize (current_glyph_bitmap_offset);
@@ -285,21 +285,21 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     unsigned char*  bitmap_data_base          = bitmap_data.data ();
     unsigned char** current_dst_bitmap_offset = bitmap_pointers.data ();
 
-    for (size_t i = 0; i < actual_unique_glyphs; i++, current_bitmap_offset++, current_dst_bitmap_offset++)
+    for (unsigned int i = 0; i < actual_unique_glyphs; i++, current_bitmap_offset++, current_dst_bitmap_offset++)
       *current_dst_bitmap_offset = bitmap_data_base + *current_bitmap_offset;
 
     rasterized = true;
   }
 
-  size_t CopyBitmapToBuffer (FT_Bitmap* bitmap, size_t offset)
+  unsigned int CopyBitmapToBuffer (FT_Bitmap* bitmap, unsigned int offset)
   {
-    size_t bitmap_size = bitmap->width * bitmap->rows;
+    unsigned int bitmap_size = bitmap->width * bitmap->rows;
 
     if (offset + bitmap_size > bitmap_data.size ())
       bitmap_data.resize (bitmap_data.size () * 2);
 
     unsigned char* dst_row  = bitmap_data.data () + offset;
-    size_t         row_size = bitmap->width;
+    unsigned int   row_size = bitmap->width;
 
     if (bitmap->pitch < 0 && -bitmap->pitch == bitmap->width)
     {
@@ -355,7 +355,7 @@ FreetypeRasterizedFont& FreetypeRasterizedFont::operator = (const FreetypeRaster
    Получение количества символов шрифта
 */
 
-size_t FreetypeRasterizedFont::GlyphsCount () const
+unsigned int FreetypeRasterizedFont::GlyphsCount () const
 {
   return impl->glyphs_count;
 }
@@ -364,11 +364,11 @@ size_t FreetypeRasterizedFont::GlyphsCount () const
    Получение растеризованных глифов (битовые карты глифов - 8 битные монохромные)
 */
 
-size_t FreetypeRasterizedFont::UniqueGlyphsCount () const
+unsigned int FreetypeRasterizedFont::UniqueGlyphsCount () const
 {
   impl->Rasterize ();
 
-  return impl->sizes.size ();
+  return (unsigned int)impl->sizes.size ();
 }
 
 const unsigned int* FreetypeRasterizedFont::GlyphsMap () const

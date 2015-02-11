@@ -54,10 +54,10 @@ struct XFontFontDesc::Impl
       font.Rename            (common::get<const char*> (*iter, "Name", ""));
       font.SetFamilyName     (common::get<const char*> (*iter, "FamilyName", ""));
       font.SetStyleName      (common::get<const char*> (*iter, "StyleName", ""));
-      font.SetFirstGlyphCode (common::get<size_t> (*iter, "FirstCharCode"));
-      font.SetFontSize       (common::get<size_t> (*iter, "FontSize"));
+      font.SetFirstGlyphCode (common::get<unsigned int> (*iter, "FirstCharCode"));
+      font.SetFontSize       (common::get<unsigned int> (*iter, "FontSize"));
 
-      size_t glyph_count = 0;
+      unsigned int glyph_count = 0;
 
       for (common::Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++);
 
@@ -82,11 +82,11 @@ struct XFontFontDesc::Impl
         glyph_info->bearing_x = common::get<float> (*i, "BearingX");
         glyph_info->bearing_y = common::get<float> (*i, "BearingY");
 
-        rasterized_glyph_info->width       = (size_t)glyph_info->width;
-        rasterized_glyph_info->height      = (size_t)glyph_info->height;
+        rasterized_glyph_info->width       = (unsigned int)glyph_info->width;
+        rasterized_glyph_info->height      = (unsigned int)glyph_info->height;
         rasterized_glyph_info->image_index = common::get (*i, "ImageIndex", 0u);
-        rasterized_glyph_info->x_pos       = common::get<size_t> (*i, "XPos");
-        rasterized_glyph_info->y_pos       = common::get<size_t> (*i, "YPos");
+        rasterized_glyph_info->x_pos       = common::get<unsigned int> (*i, "XPos");
+        rasterized_glyph_info->y_pos       = common::get<unsigned int> (*i, "YPos");
       }
 
       for (common::Parser::NamesakeIterator i = iter->First ("Kernings.Kerning"); i; ++i)
@@ -96,7 +96,7 @@ struct XFontFontDesc::Impl
         kerning_info.x_kerning = common::get<float> (*i, "XKerning");
         kerning_info.y_kerning = common::get<float> (*i, "YKerning");
 
-        font.InsertKerning (common::get<size_t> (*i, "LeftGlyph"), common::get<size_t> (*i, "RightGlyph"), kerning_info);
+        font.InsertKerning (common::get<unsigned int> (*i, "LeftGlyph"), common::get<unsigned int> (*i, "RightGlyph"), kerning_info);
       }
 
       font.SetRasterizer (xtl::bind (&font_rasterizer_creator, _1, rasterize_params));
@@ -130,7 +130,7 @@ XFontFontDesc::~XFontFontDesc ()
    Количество шрифтов в наборе
 */
 
-size_t XFontFontDesc::FontsCount ()
+unsigned int XFontFontDesc::FontsCount ()
 {
   return 1;
 }
@@ -139,18 +139,18 @@ size_t XFontFontDesc::FontsCount ()
    Имя гарнитуры / имя семейства / имя стиля
 */
 
-const char* XFontFontDesc::FamilyName (size_t index)
+const char* XFontFontDesc::FamilyName (unsigned int index)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::FamilyName", "index", index, 0u, 1u);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::FamilyName", "index", index, 0, 1);
 
   return impl->font.FamilyName ();
 }
 
-const char* XFontFontDesc::StyleName (size_t index)
+const char* XFontFontDesc::StyleName (unsigned int index)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::StyleName", "index", index, 0u, 1u);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::StyleName", "index", index, 0, 1);
 
   return impl->font.StyleName ();
 }
@@ -159,12 +159,12 @@ const char* XFontFontDesc::StyleName (size_t index)
    Создание шрифта
 */
 
-Font XFontFontDesc::CreateFont (size_t index, const FontCreationParams& params)
+Font XFontFontDesc::CreateFont (unsigned int index, const FontCreationParams& params)
 {
   try
   {
     if (index > 1)
-      throw xtl::make_range_exception ("", "index", index, 0u, 1u);
+      throw xtl::make_range_exception ("", "index", index, 0, 1);
 
     if (!CanCreateFont (index, params))
       throw xtl::make_argument_exception ("", "params");
@@ -178,12 +178,12 @@ Font XFontFontDesc::CreateFont (size_t index, const FontCreationParams& params)
   }
 }
 
-bool XFontFontDesc::CanCreateFont (size_t index, const FontCreationParams& params)
+bool XFontFontDesc::CanCreateFont (unsigned int index, const FontCreationParams& params)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::CanCreateFont", "index", index, 0u, 1u);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::CanCreateFont", "index", index, 0, 1);
 
-  if ((size_t)abs ((int)impl->font.FontSize () - (int)params.font_size) > params.font_size_eps)
+  if ((unsigned int)abs ((int)impl->font.FontSize () - (int)params.font_size) > params.font_size_eps)
     return false;
 
   return true;

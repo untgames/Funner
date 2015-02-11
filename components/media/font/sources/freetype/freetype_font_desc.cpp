@@ -39,16 +39,16 @@ struct FreetypeFontDesc::Impl
     {
       common::InputFile font_file (file_name);
 
-      if (font_file.Size () > (size_t)-1)
+      if (font_file.Size () > (unsigned int)-1)
         throw xtl::format_operation_exception ("", "Font file '%s' size too large", file_name);
 
-      font_data = DataBufferPtr (new DataBuffer ((size_t)font_file.Size ()));
+      font_data = DataBufferPtr (new DataBuffer ((unsigned int)font_file.Size ()));
 
       font_file.Read (font_data->data (), font_data->size ());
 
       FT_Face test_face;
 
-      library.FT_New_Memory_Face ((const FT_Byte*)font_data->data (), font_data->size (), -1, &test_face);
+      library.FT_New_Memory_Face ((const FT_Byte*)font_data->data (), (FT_Long)font_data->size (), -1, &test_face);
 
       FT_Long faces_count = test_face->num_faces;
 
@@ -88,16 +88,16 @@ FreetypeFontDesc::~FreetypeFontDesc ()
    Количество шрифтов в наборе
 */
 
-size_t FreetypeFontDesc::FontsCount ()
+unsigned int FreetypeFontDesc::FontsCount ()
 {
-  return impl->faces.size ();
+  return (unsigned int)impl->faces.size ();
 }
 
 /*
    Имя гарнитуры / имя семейства / имя стиля
 */
 
-const char* FreetypeFontDesc::FamilyName (size_t index)
+const char* FreetypeFontDesc::FamilyName (unsigned int index)
 {
   if (index > impl->faces.size ())
     throw xtl::make_range_exception ("media::freetype::FreetypeFontDesc::FamilyName", "index", index, 0u, impl->faces.size ());
@@ -105,7 +105,7 @@ const char* FreetypeFontDesc::FamilyName (size_t index)
   return impl->faces [index]->FaceHandle ()->family_name;
 }
 
-const char* FreetypeFontDesc::StyleName (size_t index)
+const char* FreetypeFontDesc::StyleName (unsigned int index)
 {
   if (index > impl->faces.size ())
     throw xtl::make_range_exception ("media::freetype::FreetypeFontDesc::StyleName", "index", index, 0u, impl->faces.size ());
@@ -117,7 +117,7 @@ const char* FreetypeFontDesc::StyleName (size_t index)
    Создание шрифта
 */
 
-Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& params)
+Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams& params)
 {
   try
   {
@@ -132,7 +132,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     if (!charset)
       throw xtl::make_argument_exception ("", "params.charset");
 
-    size_t charset_size = 0;
+    unsigned int charset_size = 0;
 
     for (const unsigned int* current_char = charset; *current_char; current_char++)
       charset_size++;
@@ -160,7 +160,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     builder.SetFamilyName (face_handle->family_name);
     builder.SetStyleName  (face_handle->style_name);
 
-    size_t choosen_size = face->GetNearestFontSize (params.font_size, params.font_size_eps);
+    unsigned int choosen_size = face->GetNearestFontSize (params.font_size, params.font_size_eps);
 
     builder.SetFontSize (choosen_size);
 
@@ -173,7 +173,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
       builder.SetFirstGlyphCode (first_glyph_code);
 
-      size_t glyphs_count = utf32_charset.data () [charset_size - 1] - first_glyph_code + 1;
+      unsigned int glyphs_count = utf32_charset.data () [charset_size - 1] - first_glyph_code + 1;
 
       builder.SetGlyphsCount (glyphs_count);
 
@@ -181,7 +181,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
       ft_char_indices.resize (charset_size);
 
-      for (size_t i = 0; i < charset_size; i++)
+      for (unsigned int i = 0; i < charset_size; i++)
         ft_char_indices.data () [i] = impl->library.FT_Get_Char_Index (face_handle, utf32_charset.data () [i]);
 
         //Get glyphs data
@@ -204,14 +204,14 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
         else
           memset (&null_glyph, 0, sizeof (null_glyph));
 
-        size_t previous_glyph_code = first_glyph_code;
+        unsigned int previous_glyph_code = first_glyph_code;
 
         GlyphInfo          *current_glyph     = builder.Glyphs ();
         const unsigned int *current_char_code = utf32_charset.data ();
 
-        for (size_t i = 0; i < charset_size; i++, current_glyph++, current_char_code++)
+        for (unsigned int i = 0; i < charset_size; i++, current_glyph++, current_char_code++)
         {
-          for (size_t j = previous_glyph_code + 1; j < *current_char_code; j++, current_glyph++)
+          for (unsigned int j = previous_glyph_code + 1; j < *current_char_code; j++, current_glyph++)
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 
           previous_glyph_code = *current_char_code;
@@ -248,9 +248,9 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
           //Формирование кёрнингов
 
-        for (size_t i = 0; i < charset_size; i++)
+        for (unsigned int i = 0; i < charset_size; i++)
         {
-          for (size_t j = 0; j < charset_size; j++)
+          for (unsigned int j = 0; j < charset_size; j++)
           {
             FT_Vector kerning;
 
@@ -285,7 +285,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
   }
 }
 
-bool FreetypeFontDesc::CanCreateFont (size_t index, const FontCreationParams& params)
+bool FreetypeFontDesc::CanCreateFont (unsigned int index, const FontCreationParams& params)
 {
   if (index > impl->faces.size ())
     throw xtl::make_range_exception ("media::freetype::FreetypeFontDesc::CanCreateFont", "index", index, 0u, impl->faces.size ());

@@ -38,19 +38,19 @@ class XFontFontDesc : public IFontDesc, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество шрифтов в наборе
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t FontsCount ();
+    unsigned int FontsCount ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя гарнитуры / имя семейства / имя стиля
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* FamilyName (size_t index);
-    const char* StyleName (size_t index);
+    const char* FamilyName (unsigned int index);
+    const char* StyleName (unsigned int index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Font CreateFont    (size_t index, const FontCreationParams& params);
-    bool CanCreateFont (size_t index, const FontCreationParams& params);
+    Font CreateFont    (unsigned int index, const FontCreationParams& params);
+    bool CanCreateFont (unsigned int index, const FontCreationParams& params);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчет ссылок
@@ -71,7 +71,7 @@ typedef xtl::uninitialized_storage<RasterizedGlyphInfo> RasterizedGlyphBuffer;
 struct RasterizedFontParams : public xtl::reference_counter
 {
   RasterizedGlyphBuffer rasterized_glyphs;   //растеризованные глифы
-  size_t                images_count;        //количество картинок
+  unsigned int          images_count;        //количество картинок
   stl::string           image_name_format;   //формат имени картинки
 };
 
@@ -97,8 +97,8 @@ class XFontFontRasterizer : public IFontRasterizer, public xtl::reference_counte
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Построение картинок
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ImagesCount ();
-    void   BuildImage  (size_t image_index, media::Image& out_image);
+    unsigned int ImagesCount ();
+    void         BuildImage  (unsigned int image_index, media::Image& out_image);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчет ссылок
