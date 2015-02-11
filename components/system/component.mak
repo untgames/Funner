@@ -19,6 +19,7 @@ SYSTEMLIB.SOURCES.SOURCE_DIRS                       += sources/platform/default
 SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/application sources/platform/windows/non_unistd
 SYSTEMLIB.SOURCES.x86_win32.SOURCE_DIRS             := sources/platform/windows/thread
+SYSTEMLIB.SOURCES.x86-64_win32.SOURCE_DIRS          := sources/platform/windows/thread
 SYSTEMLIB.SOURCES.winrt.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/non_unistd sources/platform/windows/thread sources/platform/windows/win8
 SYSTEMLIB.SOURCES.wince.SOURCE_DIRS                 := sources/platform/pthread
 SYSTEMLIB.SOURCES.wince.IMPORTS                     := compile.extern.pthreads_wince

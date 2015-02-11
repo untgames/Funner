@@ -18,7 +18,7 @@ inline Point::Point ()
   : x (0), y (0)
   {}
 
-inline Point::Point (size_t in_x, size_t in_y)
+inline Point::Point (unsigned int in_x, unsigned int in_y)
   : x (in_x), y (in_y)
   {}
 
@@ -31,7 +31,7 @@ inline Rect::Rect ()
   left = top = right = bottom = 0;
 }
 
-inline Rect::Rect (size_t in_left, size_t in_top, size_t in_right, size_t in_bottom)
+inline Rect::Rect (unsigned int in_left, unsigned int in_top, unsigned int in_right, unsigned int in_bottom)
 {
   left   = in_left;
   top    = in_top;

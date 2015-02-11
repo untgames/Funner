@@ -324,7 +324,7 @@ bool WindowsThreadManager::WaitCondition (condition_t handle, mutex_t mutex_hand
     if (!mutex_handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    return pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, common::milliseconds () + wait_in_milliseconds);
+    return pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, (int)(common::milliseconds () + wait_in_milliseconds));
   }
   catch (xtl::exception& exception)
   {

@@ -17,7 +17,7 @@ const char*  LOG_NAME                     = "system.windows"; //имя протокола вы
     Получение информации о видео-режиме
 */
 
-bool get_mode_desc (const char* device_name, int mode_index, size_t xdpi, size_t ydpi, ScreenModeDesc& mode_desc, Rect* screen_rect=0)
+bool get_mode_desc (const char* device_name, int mode_index, unsigned short xdpi, unsigned short ydpi, ScreenModeDesc& mode_desc, Rect* screen_rect=0)
 {
   DEVMODE dev_mode_desc;
   
@@ -35,8 +35,8 @@ bool get_mode_desc (const char* device_name, int mode_index, size_t xdpi, size_t
 
   mode_desc.width        = dev_mode_desc.dmPelsWidth;
   mode_desc.height       = dev_mode_desc.dmPelsHeight;
-  mode_desc.color_bits   = dev_mode_desc.dmBitsPerPel;
-  mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;  
+  mode_desc.color_bits   = (unsigned short)dev_mode_desc.dmBitsPerPel;
+  mode_desc.refresh_rate = (unsigned short)dev_mode_desc.dmDisplayFrequency;
   mode_desc.xdpi         = xdpi;
   mode_desc.ydpi         = ydpi;
 
@@ -72,12 +72,12 @@ struct ScreenDesc: public xtl::reference_counter
   HDC             device_context; //контекст устройства
   stl::string     name;           //имя устройства
   stl::string     win_name;       //имя устройства в Windows
-  size_t          xdpi;           //плотность пикселей по горизонтали
-  size_t          ydpi;           //плотность пикселей по вертикали
+  unsigned short  xdpi;           //плотность пикселей по горизонтали
+  unsigned short  ydpi;           //плотность пикселей по вертикали
   ScreenModeArray modes;          //режимы экрана
   
 ///Конструктор
-  ScreenDesc (const char* in_name, const char* in_win_name, size_t in_xdpi, size_t in_ydpi)
+  ScreenDesc (const char* in_name, const char* in_win_name, unsigned short in_xdpi, unsigned short in_ydpi)
     : device_context ()
     , name (in_name)
     , win_name (in_win_name)

@@ -59,7 +59,7 @@ int main ()
 
     for (int i=0; i<THREADS_COUNT; i++)
       if (!touch_set [i])
-        printf ("fail at index %d\n");
+        printf ("fail at index %d\n", i);
 
     printf ("exit\n");        
   }

@@ -40,7 +40,7 @@ class SysTempFile
       
       dir_name.fast_resize (MAX_PATH);
       
-      DWORD dir_len = GetTempPathW (dir_name.size (), &dir_name [0]);
+      DWORD dir_len = GetTempPathW ((DWORD)dir_name.size (), &dir_name [0]);
       
       if (!dir_len || dir_len > MAX_PATH)
         raise_error ("::GetTempPath");
@@ -541,7 +541,7 @@ struct syslib::web_view_handle: public IUnknown
   {
     stl::wstring wRequest = common::towstring (request);
 
-    BSTR bs = SysAllocStringLen (wRequest.data (), wRequest.size ());
+    BSTR bs = SysAllocStringLen (wRequest.data (), (UINT)wRequest.size ());
 
     if (!bs)
       throw xtl::format_operation_exception ("", "::SysAllocStringLen failed");

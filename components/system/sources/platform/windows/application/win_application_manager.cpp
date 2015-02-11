@@ -138,7 +138,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
         is_exited = GetMessage (&msg, 0, 0, 0) == 0;
         
         if (is_exited && listener)
-          listener->OnExit (msg.wParam);
+          listener->OnExit ((int)msg.wParam);
 
         TranslateMessage (&msg);
         DispatchMessage  (&msg);
@@ -299,7 +299,7 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
     
     result.fast_resize (VALUE_BUFFER_SIZE);
     
-    DWORD result_size = ::GetEnvironmentVariableA (name, &result [0], result.size () + 1);
+    DWORD result_size = ::GetEnvironmentVariableA (name, &result [0], (DWORD)result.size () + 1);
     
     if (result_size > 0 && result_size <= result.size ())
     {
@@ -313,7 +313,7 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
       
     result.fast_resize (result_size - 1);
     
-    result_size = ::GetEnvironmentVariableA (name, &result [0], result.size () + 1);
+    result_size = ::GetEnvironmentVariableA (name, &result [0], (DWORD)result.size () + 1);
     
     if (result_size > 0 && result_size == result.size ())
       return result;

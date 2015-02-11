@@ -4,8 +4,8 @@ using namespace syslib;
 
 struct syslib::thread_handle
 {  
-  uintptr_t thread;
-  size_t    id;
+  uintptr_t    thread;
+  unsigned int id;
 };
 
 namespace

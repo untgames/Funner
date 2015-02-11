@@ -44,7 +44,7 @@ Win32Timer::Win32Timer (size_t period_in_milliseconds, const TimerHandler& in_ha
   {
     SetLastError (0);
 
-    timer = SetTimer (0, 0, period_in_milliseconds, &TimerProc);
+    timer = SetTimer (0, 0, (UINT)period_in_milliseconds, &TimerProc);
 
     if (!timer)
       raise_error ("::SetTimer");
