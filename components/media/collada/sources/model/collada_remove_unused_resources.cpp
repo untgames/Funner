@@ -241,7 +241,7 @@ class ItemsSelector
           
         if (controller)
         {        
-          for (size_t joint_index=0, joints_count=skin.JointsCount (); joint_index<joints_count; joint_index++)
+          for (unsigned int joint_index=0, joints_count=skin.JointsCount (); joint_index<joints_count; joint_index++)
           {
             const char* joint_name = skin.JointName (joint_index);
             const Node* joint      = 0;

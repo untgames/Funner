@@ -106,7 +106,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
 
     bool is_source_found = false;
 
-    int source_size = 0;
+    size_t source_size = 0;
 
     for (Parser::NamesakeIterator animation_source_iter = animation_iter->First ("source"); animation_source_iter; ++animation_source_iter)
     {
@@ -160,7 +160,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
       raise_parser_exception (*sampler, "Incorrect 'sampler', can't find 'source' for id '%s'", input_source);
 
     if (samples_count < 0)
-      samples_count = source_size;
+      samples_count = (int)source_size;
 
     if (source_size != samples_count)
       raise_parser_exception (*sampler, "Incorrect 'sampler', 'source' for id '%s' has different size from previous source", input_source);

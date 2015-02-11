@@ -74,7 +74,7 @@ struct Params
   stl::string         crop_exclude;                      //необрезаемые слои
   stl::string         layers_exclude;                    //неэкспортируемые слои
   common::StringArray loop_sprites;                      //спрайты, требующие лупа
-  size_t              crop_alpha;                        //коэффициент обрезания по прозрачности
+  unsigned int        crop_alpha;                        //коэффициент обрезания по прозрачности
   math::vec2f         total_scale;                       //общий коэффициент сжатия по осям
   math::vec2f         total_offset;                      //общее смещение по осям
   bool                silent;                            //минимальное число сообщений
@@ -90,8 +90,8 @@ struct Params
 //прямоугольная область
 struct Rect
 {
-  size_t x, y;
-  size_t width, height;
+  unsigned int x, y;
+  unsigned int width, height;
 };
 
 //дескриптор изображения
@@ -800,7 +800,7 @@ void process_textures (Params& params, ConvertData& data)
       
     if (params.need_pot_extent)
     {
-      media::Image pot_image (get_next_higher_power_of_two (source_image.Width ()), get_next_higher_power_of_two (source_image.Height ()),
+      media::Image pot_image ((unsigned int)get_next_higher_power_of_two (source_image.Width ()), (unsigned int)get_next_higher_power_of_two (source_image.Height ()),
         1, source_image.Format ());
         
       pot_image.PutImage (0, 0, 0, source_image.Width (), source_image.Height (), 1, source_image.Format (), source_image.Bitmap ());

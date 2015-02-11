@@ -28,9 +28,9 @@ enum PrimitiveType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение характеристик
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get_type_name        (PrimitiveType); //имя типа примитива
-size_t      get_points_count     (PrimitiveType, size_t primitivies_count=1); //количество точек
-size_t      get_primitives_count (PrimitiveType, size_t points_count=1); //количество примитивов
+const char*  get_type_name        (PrimitiveType); //имя типа примитива
+unsigned int get_points_count     (PrimitiveType, unsigned int primitivies_count=1); //количество точек
+unsigned int get_primitives_count (PrimitiveType, unsigned int points_count=1); //количество примитивов
 
 //получение типа примитива по имени
 PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type = PrimitiveType_Num);

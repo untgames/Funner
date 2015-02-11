@@ -12,7 +12,7 @@ namespace physics
 namespace shapes
 {
 
-typedef size_t TriangleIndices [3];
+typedef unsigned int TriangleIndices [3];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќписание тела в виде выпуклого многогранника

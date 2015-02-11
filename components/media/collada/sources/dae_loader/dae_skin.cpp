@@ -67,16 +67,16 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
   if (common::ParseNode param_node = iter->First ("bind_shape_matrix"))
     read (param_node, "#text", bind_shape_matrix);
 
-  size_t influence_count = get<size_t> (vertex_weights_node, "count");
+  unsigned int influence_count = get<unsigned int> (vertex_weights_node, "count");
 
-  stl::vector<size_t> per_vertex_count (influence_count),
-                      vertex_first_weight (influence_count);
+  stl::vector<unsigned int> per_vertex_count (influence_count),
+                            vertex_first_weight (influence_count);
 
   read (vertex_weights_node, "vcount.#text", per_vertex_count.begin (), influence_count);
 
-  size_t vertex_joint_weights_count = 0;
+  unsigned int vertex_joint_weights_count = 0;
 
-  for (size_t i=0; i<influence_count; i++)
+  for (unsigned int i=0; i<influence_count; i++)
   {
     vertex_first_weight [i]     = vertex_joint_weights_count;
     vertex_joint_weights_count += per_vertex_count [i];
@@ -92,13 +92,13 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     if (vertex_indices_map->Size () != surface.VerticesCount ())
       continue;
 
-    size_t           channel   = surface.InfluenceChannels ().Create (id);
+    unsigned int     channel   = surface.InfluenceChannels ().Create (id);
     VertexInfluence* influence = surface.InfluenceChannels ().Data (channel);
 
-    size_t* index         = vertex_indices_map->Indices (),
-            indices_count = vertex_indices_map->Size ();
+    unsigned int* index         = vertex_indices_map->Indices (),
+                  indices_count = vertex_indices_map->Size ();
 
-    for (size_t i=0; i<indices_count; i++, index++, influence++)
+    for (unsigned int i=0; i<indices_count; i++, index++, influence++)
     {
       if (*index >= influence_count)
       {
@@ -168,7 +168,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
   if (joints.size () != inv_matrixes.size ())
     raise_parser_exception (*iter, "Different count of joints and inv_matrixes");
 
-  for (size_t i = 0; i < joints.size (); i++)
+  for (unsigned int i = 0; i < joints.size (); i++)
   {
     skin.CreateJoint (joints[i].c_str ());
     skin.SetJointInvMatrix (i, inv_matrixes[i]);

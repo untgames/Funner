@@ -72,9 +72,9 @@ Playlist Playlist::Clone () const
     Количество источников / проверка на пустоту
 */
 
-size_t Playlist::Size () const
+unsigned int Playlist::Size () const
 {
-  return impl->sources.Size ();
+  return (unsigned int)impl->sources.Size ();
 }
 
 bool Playlist::IsEmpty () const
@@ -91,7 +91,7 @@ const char** Playlist::Items () const
   return impl->sources.Data ();
 }
 
-const char* Playlist::Item (size_t index) const
+const char* Playlist::Item (unsigned int index) const
 {
   try
   {
@@ -108,14 +108,17 @@ const char* Playlist::Item (size_t index) const
     Добавление и удаление источников
 */
 
-size_t Playlist::AddSource (const char* source_name)
+unsigned int Playlist::AddSource (const char* source_name)
 {
   try
   {
     if (!source_name)
       throw xtl::make_null_argument_exception ("", "source_name");
       
-    return impl->sources.Add (source_name);
+    if (impl->sources.Size () >= (unsigned int)-1)
+      throw xtl::format_operation_exception ("", "Can't add source, sources count limit exceeded");
+
+    return (unsigned int)impl->sources.Add (source_name);
   }
   catch (xtl::exception& e)
   {
@@ -124,7 +127,7 @@ size_t Playlist::AddSource (const char* source_name)
   }
 }
 
-void Playlist::RemoveSource (size_t source_index)
+void Playlist::RemoveSource (unsigned int source_index)
 {
   impl->sources.Remove (source_index);
 }
@@ -134,7 +137,7 @@ void Playlist::RemoveSource (const char* source_name)
   if (!source_name)
     return;
     
-  for (size_t i=0; i<impl->sources.Size ();)
+  for (unsigned int i=0; i<impl->sources.Size ();)
     if (!strcmp (impl->sources [i], source_name)) impl->sources.Remove (i);
     else                                          i++;
 }
@@ -148,14 +151,14 @@ void Playlist::Clear ()
     Резервирование памяти
 */
 
-void Playlist::Reserve (size_t count)
+void Playlist::Reserve (unsigned int count)
 {
   impl->sources.Reserve (count);
 }
 
-size_t Playlist::Capacity () const
+unsigned int Playlist::Capacity () const
 {
-  return impl->sources.Capacity ();
+  return (unsigned int)impl->sources.Capacity ();
 }
 
 /*

@@ -387,7 +387,7 @@ PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type)
     Получение количества точек
 */
 
-size_t get_points_count (PrimitiveType type, size_t primitives_count)
+unsigned int get_points_count (PrimitiveType type, unsigned int primitives_count)
 {
   switch (type)
   {
@@ -406,7 +406,7 @@ size_t get_points_count (PrimitiveType type, size_t primitives_count)
     Определение количества примитивов
 */
 
-size_t get_primitives_count (PrimitiveType type, size_t points_count)
+unsigned int get_primitives_count (PrimitiveType type, unsigned int points_count)
 {
   switch (type)
   {

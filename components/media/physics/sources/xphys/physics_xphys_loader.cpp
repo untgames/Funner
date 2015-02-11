@@ -148,7 +148,7 @@ class XmlPhysicsLibraryLoader
 
         mesh.SetTrianglesCount (triangles_count);
 
-        read (indices_node, "#text", (size_t*)mesh.Triangles (), triangles_count * 3);
+        read (indices_node, "#text", (unsigned int*)mesh.Triangles (), triangles_count * 3);
       }
       else if (!mesh.IsConvex ())
         throw xtl::format_operation_exception (METHOD_NAME, "Not convex mesh '%s' has no indices", mesh.Name ());

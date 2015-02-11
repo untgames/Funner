@@ -52,7 +52,7 @@ void print (const math::vector<T, N>& v)
 {
   printf ("[");
   
-  for (size_t i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);
@@ -67,7 +67,7 @@ void print (const math::matrix<T, N>& v)
 {
   printf ("[");
   
-  for (size_t i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);
@@ -204,7 +204,7 @@ void dump (Surface& surface, int level, Model& model)
     printf      ("\n");
   }
   
-  for (size_t i=0; i<surface.TexVertexChannels ().Size (); i++)
+  for (unsigned int i=0; i<surface.TexVertexChannels ().Size (); i++)
   {
     print_space (level);
     printf      ("texture_channel '%u'\n", surface.TexVertexChannels ().Name (i));
@@ -219,7 +219,7 @@ void dump (Surface& surface, int level, Model& model)
     }
   }
   
-  for (size_t i=0; i<surface.ColorChannels ().Size (); i++)
+  for (unsigned int i=0; i<surface.ColorChannels ().Size (); i++)
   {
     print_space (level);
     printf      ("color_channel '%u'\n", surface.ColorChannels ().Name (i));
@@ -234,7 +234,7 @@ void dump (Surface& surface, int level, Model& model)
     }
   }  
   
-  for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
+  for (unsigned int i = 0; i < surface.InfluenceChannels ().Size (); i++)
   {
     print_space (level);
     printf ("influence_channel: '%s'\n", surface.InfluenceChannels ().Name (i));
@@ -358,7 +358,7 @@ void dump (Skin& skin, int level, Model& model)
   printf      ("joints count: '%u'\n", skin.JointsCount ());
   print_space (level++);
   printf      ("joints' inv matrixes:\n");
-  for (size_t i=0; i<skin.JointsCount (); i++)
+  for (unsigned int i=0; i<skin.JointsCount (); i++)
   {
     print_space (level);
     printf      ("joint '%s' inv_matrix: ", skin.JointName (i));

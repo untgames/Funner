@@ -142,7 +142,7 @@ unsigned int XFontFontDesc::FontsCount ()
 const char* XFontFontDesc::FamilyName (unsigned int index)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::FamilyName", "index", index, 0, 1);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::FamilyName", "index", (size_t)index, (size_t)0, (size_t)1);
 
   return impl->font.FamilyName ();
 }
@@ -150,7 +150,7 @@ const char* XFontFontDesc::FamilyName (unsigned int index)
 const char* XFontFontDesc::StyleName (unsigned int index)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::StyleName", "index", index, 0, 1);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::StyleName", "index", (size_t)index, (size_t)0, (size_t)1);
 
   return impl->font.StyleName ();
 }
@@ -164,7 +164,7 @@ Font XFontFontDesc::CreateFont (unsigned int index, const FontCreationParams& pa
   try
   {
     if (index > 1)
-      throw xtl::make_range_exception ("", "index", index, 0, 1);
+      throw xtl::make_range_exception ("", "index", (size_t)index, (size_t)0, (size_t)1);
 
     if (!CanCreateFont (index, params))
       throw xtl::make_argument_exception ("", "params");
@@ -181,7 +181,7 @@ Font XFontFontDesc::CreateFont (unsigned int index, const FontCreationParams& pa
 bool XFontFontDesc::CanCreateFont (unsigned int index, const FontCreationParams& params)
 {
   if (index > 1)
-    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::CanCreateFont", "index", index, 0, 1);
+    throw xtl::make_range_exception ("media::xfont::XFontFontDesc::CanCreateFont", "index", (size_t)index, (size_t)0, (size_t)1);
 
   if ((unsigned int)abs ((int)impl->font.FontSize () - (int)params.font_size) > params.font_size_eps)
     return false;

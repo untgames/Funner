@@ -3,8 +3,8 @@
 namespace
 {
 
-const float  EPS                   = 0.001f;
-const size_t SURFACES_RESERVE_SIZE = 8;     //резервируемое количество поверхностей
+const float        EPS                   = 0.001f;
+const unsigned int SURFACES_RESERVE_SIZE = 8;     //резервируемое количество поверхностей
 
 const char* MAIN_VERTEX_STREAM_NAME = "main";
 
@@ -26,8 +26,8 @@ struct Binormal: public media::geometry::CustomAttribute<math::vec3f>
   math::vec3f binormal;
 };
 
-template <size_t Channel> struct TexTangent;
-template <size_t Channel> struct TexBinormal;
+template <unsigned int Channel> struct TexTangent;
+template <unsigned int Channel> struct TexBinormal;
 
 template <> struct TexTangent<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
@@ -141,7 +141,7 @@ template <> struct TexBinormal<7>: public media::geometry::CustomAttribute<math:
   math::vec3f texbinormal7;
 };
 
-template <size_t Channel> struct TexChannel: public media::geometry::TexChannel<Channel>
+template <unsigned int Channel> struct TexChannel: public media::geometry::TexChannel<Channel>
 {
   typedef TexTangent<Channel>  Tangentf;
   typedef TexBinormal<Channel> Binormalf;
@@ -173,8 +173,8 @@ class Converter
     {
       VertexStreamMap                vertex_streams; //вершинный потоки
       media::geometry::PrimitiveType primitive_type; //тип примитивов
-      size_t                         first_index;    //номер первого индекса
-      size_t                         indices_count;  //количество индексов
+      unsigned int                   first_index;    //номер первого индекса
+      unsigned int                   indices_count;  //количество индексов
       stl::string                    material;       //имя материала
     };    
 
@@ -237,7 +237,7 @@ class Converter
     {
       typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf> ColladaVertex;
 
-      size_t vertices_count = src_surface.VerticesCount ();
+      unsigned int vertices_count = src_surface.VerticesCount ();
 
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaVertex> ());
       
@@ -247,7 +247,7 @@ class Converter
       if (!dst_vertex)
         return;
 
-      for (size_t i=0; i<vertices_count; i++, src_vertex++, dst_vertex++)
+      for (unsigned int i=0; i<vertices_count; i++, src_vertex++, dst_vertex++)
       {
         dst_vertex->position = src_vertex->coord;
         dst_vertex->normal   = src_vertex->normal;
@@ -315,14 +315,14 @@ class Converter
       dst_vertex.texbinormal7 = src_vertex.binormal;       
     }
     
-    template<size_t channel_index>
+    template<unsigned int channel_index>
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
     {
       typedef media::geometry::Vertex<typename TexChannel<channel_index>::Coord3f,
                                       typename TexChannel<channel_index>::Tangentf,
                                       typename TexChannel<channel_index>::Binormalf> ColladaTexVertex;
 
-      size_t vertices_count = src_surface.VerticesCount ();
+      unsigned int vertices_count = src_surface.VerticesCount ();
 
         //создание вершинного потока
 
@@ -336,18 +336,18 @@ class Converter
       if (!dst_vertex)
         return vs; //throw!!!
 
-      for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
+      for (unsigned int j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
         SetVertexTexCoord (*src_vertex, *dst_vertex);
       
       return vs;
     }
     
       //преобразование текстурных вершин с цветами
-    media::geometry::VertexStream CreateTexColoredVertices (const media::collada::Surface& src_surface, size_t tex_channel_index, size_t color_channel_index)
+    media::geometry::VertexStream CreateTexColoredVertices (const media::collada::Surface& src_surface, unsigned int tex_channel_index, unsigned int color_channel_index)
     {
       typedef media::geometry::Vertex<media::geometry::Color3f, TexChannel<0>::Coord3f, Tangent, Binormal> ColladaTexVertex;
 
-      size_t vertices_count = src_surface.VerticesCount ();
+      unsigned int vertices_count = src_surface.VerticesCount ();
 
         //создание вершинного потока
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaTexVertex> ());
@@ -361,7 +361,7 @@ class Converter
       if (!dst_vertex)
         return vs; //!!!!!throw
 
-      for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++, src_color++)
+      for (unsigned int j=0; j<vertices_count; j++, src_vertex++, dst_vertex++, src_color++)
       {
         dst_vertex->color      = *src_color;
         dst_vertex->texcoord0  = src_vertex->coord;
@@ -381,7 +381,7 @@ class Converter
       const TexVertexChannelList& tex_channels   = src_surface.TexVertexChannels ();
       const ColorChannelList&     color_channels = src_surface.ColorChannels ();
 
-      for (size_t i=0; i<tex_channels.Size (); i++)
+      for (unsigned int i=0; i<tex_channels.Size (); i++)
       {
           //определение вида потока: текстурные координаты либо текстурные координат + цвет
 
@@ -438,9 +438,9 @@ class Converter
       typedef media::collada::Surface::InfluenceChannelList InfluenceChannelList;
 
       const InfluenceChannelList& channels       = src_surface.InfluenceChannels ();
-      size_t                      vertices_count = src_surface.VerticesCount ();
+      unsigned int                vertices_count = src_surface.VerticesCount ();
       
-      for (size_t i=0; i<channels.Size (); i++)
+      for (unsigned int i=0; i<channels.Size (); i++)
       {
           //создание вершинного потока
         
@@ -456,7 +456,7 @@ class Converter
         if (!dst_influence)
           return;
 
-        for (size_t j=0; j<vertices_count; j++, src_influence++, dst_influence++)
+        for (unsigned int j=0; j<vertices_count; j++, src_influence++, dst_influence++)
         {
           dst_influence->first_weight  = src_influence->first_weight;
           dst_influence->weights_count = src_influence->weights_count;
@@ -471,8 +471,8 @@ class Converter
       //преобразование индексов
     void ConvertSurfaceIndices (const media::collada::Surface& src_surface, media::geometry::IndexBuffer& dst_index_buffer)
     { 
-      size_t indices_count             = src_surface.IndicesCount (),
-             current_index_buffer_size = dst_index_buffer.Size ();
+      unsigned int indices_count             = src_surface.IndicesCount (),
+                   current_index_buffer_size = dst_index_buffer.Size ();
       
       dst_index_buffer.Resize (current_index_buffer_size + indices_count);
       
@@ -492,14 +492,14 @@ class Converter
 
       const media::geometry::VertexStream& main_vs          = main_vs_iter->second;
       char*                                main_vs_data     = (char*)main_vs.Data ();
-      size_t                               main_vertex_size = main_vs.VertexSize ();
-      size_t                               normal_offset    = 0;
+      unsigned int                         main_vertex_size = main_vs.VertexSize ();
+      unsigned int                         normal_offset    = 0;
 
       math::vec3f ort_y (0.f, 1.f, 0.f), ort_z (0.f, 0.f, 1.f);
 
       const media::geometry::VertexFormat& main_vs_format = main_vs.Format ();
 
-      for (size_t i = 0, count = main_vs_format.AttributesCount (); i < count; i++)
+      for (unsigned int i = 0, count = main_vs_format.AttributesCount (); i < count; i++)
       {
         const media::geometry::VertexAttribute& attribute = main_vs_format.Attribute (i);
 
@@ -517,12 +517,12 @@ class Converter
 
         const media::geometry::VertexStream& vs = vs_iter->second;
 
-        bool   tangent_found  = false;
-        size_t tangent_offset = 0;
+        bool         tangent_found  = false;
+        unsigned int tangent_offset = 0;
 
         const media::geometry::VertexFormat& vertex_format = vs.Format ();
 
-        for (size_t i = 0, count = vertex_format.AttributesCount (); i < count; i++)
+        for (unsigned int i = 0, count = vertex_format.AttributesCount (); i < count; i++)
         {
           const media::geometry::VertexAttribute& attribute = vertex_format.Attribute (i);
 
@@ -542,10 +542,10 @@ class Converter
         if (!tangent_found)
           continue;
 
-        char*  vs_data     = (char*)vs.Data ();
-        size_t vertex_size = vs.VertexSize ();
+        char*        vs_data     = (char*)vs.Data ();
+        unsigned int vertex_size = vs.VertexSize ();
 
-        for (size_t i = 0, count = main_vs.Size (); i < count; i++)
+        for (unsigned int i = 0, count = main_vs.Size (); i < count; i++)
         {
           math::vec3f& tangent = *(math::vec3f*)(vs_data + vertex_size * i + tangent_offset);
 
@@ -617,23 +617,23 @@ class Converter
       
         //резервирование памяти для хранения индексов
         
-      size_t indices_count = 0;
+      unsigned int indices_count = 0;
       
-      for (size_t i=0; i<src_mesh.Surfaces ().Size (); i++)
+      for (unsigned int i=0; i<src_mesh.Surfaces ().Size (); i++)
         indices_count += src_mesh.Surfaces () [i].IndicesCount ();
         
       dst_mesh->index_buffer.Reserve (indices_count);
 
         //преобразование поверхностей
 
-      for (size_t i=0; i<src_mesh.Surfaces ().Size (); i++)
+      for (unsigned int i=0; i<src_mesh.Surfaces ().Size (); i++)
         ConvertSurface (src_mesh.Surfaces () [i], *dst_mesh);
 
         //Преобразование индексов в минимально возможный тип данных
       unsigned int max_index_value = 0;
       unsigned int *current_index  = dst_mesh->index_buffer.Data<unsigned int> ();
 
-      for (size_t i = 0, size = dst_mesh->index_buffer.Size (); i < size; i++, current_index++)
+      for (unsigned int i = 0, size = dst_mesh->index_buffer.Size (); i < size; i++, current_index++)
       {
         max_index_value = stl::max (max_index_value, *current_index);
       }
@@ -679,14 +679,14 @@ class Converter
         //преобразование весов
         
       media::geometry::VertexWeightStream& vws           = skin->weights;
-      size_t                               weights_count = src_skin.WeightsCount ();
+      unsigned int                         weights_count = src_skin.WeightsCount ();
 
       vws.Resize (weights_count);
       
       const media::collada::VertexJointWeight* src_weight = src_skin.Weights ();
       media::geometry::VertexWeight*           dst_weight = vws.Data ();
       
-      for (size_t i=0; i<weights_count; i++, src_weight++, dst_weight++)
+      for (unsigned int i=0; i<weights_count; i++, src_weight++, dst_weight++)
       {
         dst_weight->joint_index  = src_weight->joint;
         dst_weight->joint_weight = src_weight->weight;
@@ -771,7 +771,7 @@ class Converter
       
         //регистрация вершинного буфера
         
-      size_t vertex_buffer_index = dst_mesh.Attach (vertex_buffer);      
+      unsigned int vertex_buffer_index = dst_mesh.Attach (vertex_buffer);
 
         //добавление примитива
         
@@ -857,7 +857,7 @@ class Converter
 
     void ConvertNode (const char* id, const media::collada::Node& src_node)
     {
-      size_t index = 0;
+      unsigned int index = 0;
 
       for (media::collada::Node::MeshList::ConstIterator i=src_node.Meshes ().CreateIterator (); i; ++i, ++index)
         ConvertInstanceMesh (common::format ("%s.mesh#%u", id, index).c_str (), *i);

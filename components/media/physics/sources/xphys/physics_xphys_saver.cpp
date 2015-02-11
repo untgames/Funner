@@ -58,7 +58,7 @@ class XmlPhysicsLibrarySaver
 
         writer.WriteAttribute ("count", mesh.TrianglesCount ());
 
-        writer.WriteData (xtl::make_iterator_range (mesh.TrianglesCount () * 3, (size_t*)mesh.Triangles ()));
+        writer.WriteData (xtl::make_iterator_range (mesh.TrianglesCount () * 3, (unsigned int*)mesh.Triangles ()));
       }
     }
 

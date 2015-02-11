@@ -76,7 +76,7 @@ unsigned int RasterizedFont::ImagesCount () const
 void RasterizedFont::BuildImage (unsigned int image_index, media::Image& out_image) const
 {
   if (image_index >= ImagesCount ())
-    throw xtl::make_range_exception ("media::RasterizedFont::BuildImage", "image_index", image_index, 0, ImagesCount ());
+    throw xtl::make_range_exception ("media::RasterizedFont::BuildImage", "image_index", (size_t)image_index, (size_t)0, (size_t)ImagesCount ());
 
   impl->rasterizer->BuildImage (image_index, out_image);
 }

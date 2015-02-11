@@ -121,15 +121,20 @@ void Skin::SetBindShapeMatrix (const math::mat4f& tm)
     Работа с соединениями
 */
 
-size_t Skin::JointsCount () const
+unsigned int Skin::JointsCount () const
 {
-  return impl->joints.size ();
+  return (unsigned int)impl->joints.size ();
 }
 
-size_t Skin::CreateJoint (const char* name)
+unsigned int Skin::CreateJoint (const char* name)
 {
+  static const char* METHOD_NAME = "media::collada::Skin::CreateJoint";
+
   if (!name)
-    throw xtl::make_null_argument_exception ("media::collada::Skin::CreateJoint", "name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  if (impl->joints.size () >= (unsigned int)-1)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't create joint, joint count limit exceeded");
 
   Joint* joint = new Joint (name);
   
@@ -137,7 +142,7 @@ size_t Skin::CreateJoint (const char* name)
   {
     impl->joints.push_back (joint);
     
-    return impl->joints.size () - 1;
+    return (unsigned int)impl->joints.size () - 1;
   }
   catch (...)
   {
@@ -146,7 +151,7 @@ size_t Skin::CreateJoint (const char* name)
   }
 }
 
-void Skin::RemoveJoint (size_t joint)
+void Skin::RemoveJoint (unsigned int joint)
 {
   if (joint >= impl->joints.size ())
     return;
@@ -161,7 +166,7 @@ void Skin::RemoveAllJoints ()
   impl->RemoveAllJoints ();    
 }
 
-void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
+void Skin::SetJointInvMatrix (unsigned int joint, const math::mat4f& inv_matrix)
 {
   if (joint >= impl->joints.size ())
     throw xtl::make_range_exception ("media::collada::Skin::SetJointInvMatrix", "joint", joint, impl->joints.size ());
@@ -169,7 +174,7 @@ void Skin::SetJointInvMatrix (size_t joint, const math::mat4f& inv_matrix)
   impl->joints [joint]->inv_matrix = inv_matrix;
 }
 
-const math::mat4f& Skin::JointInvMatrix (size_t joint) const
+const math::mat4f& Skin::JointInvMatrix (unsigned int joint) const
 {
   if (joint >= impl->joints.size ())
     throw xtl::make_range_exception ("media::collada::Skin::GetJointInvMatrix", "joint", joint, impl->joints.size ());
@@ -184,12 +189,12 @@ int Skin::FindJoint (const char* name) const
 
   for (JointArray::iterator i=impl->joints.begin (), end=impl->joints.end (); i!=end; ++i)
     if ((*i)->name == name)
-      return i - impl->joints.begin ();
+      return (int)(i - impl->joints.begin ());
       
   return -1;
 }
 
-const char* Skin::JointName (size_t joint) const
+const char* Skin::JointName (unsigned int joint) const
 {
   if (joint >= impl->joints.size ())
     throw xtl::make_range_exception ("media::collada::Skin::JointName", "joint", joint, impl->joints.size ());
@@ -218,12 +223,12 @@ const char* Skin::BaseMesh () const
     Веса соединений
 */
 
-size_t Skin::WeightsCount () const
+unsigned int Skin::WeightsCount () const
 {
-  return impl->weights.size ();
+  return (unsigned int)impl->weights.size ();
 }
 
-void Skin::WeightsResize (size_t new_size)
+void Skin::WeightsResize (unsigned int new_size)
 {
   impl->weights.resize (new_size);
 }
