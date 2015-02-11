@@ -38,8 +38,8 @@ template <class Vertex, class T> struct vertex_format
 {
   static void get_format (VertexFormat& format)
   {
-    static const Vertex* test_vertex = reinterpret_cast<const Vertex*> (8);
-    static const size_t  offset      = reinterpret_cast<const char*> (static_cast<const T*> (test_vertex)) - reinterpret_cast<const char*> (test_vertex);
+    static const Vertex*  test_vertex = reinterpret_cast<const Vertex*> (8);
+    static const uint32_t offset      = (uint32_t)(reinterpret_cast<const char*> (static_cast<const T*> (test_vertex)) - reinterpret_cast<const char*> (test_vertex));
 
     format.AddAttribute (T::name (), T::semantic (), attribute_type<typename T::type>::value, offset);
   }

@@ -62,7 +62,7 @@ void dump (const VertexFormat& format, size_t vertex_size=size_t (-1))
     printf ("vertex format (%u attributes, min_vertex_size=%u):\n", format.AttributesCount (), format.GetMinimalVertexSize ());
   }
   
-  for (size_t i=0; i<format.AttributesCount (); i++)
+  for (uint32_t i=0; i<format.AttributesCount (); i++)
     dump (format.Attribute (i));
 }
 

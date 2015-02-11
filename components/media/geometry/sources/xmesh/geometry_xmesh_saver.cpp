@@ -86,7 +86,7 @@ class XmlMeshLibrarySaver
 
         //сохранение вершинных данных
         
-      for (size_t i=0; i<vertex_format.AttributesCount (); i++)
+      for (uint32_t i=0; i<vertex_format.AttributesCount (); i++)
       {
         const VertexAttribute& attribute = vertex_format.Attribute (i);
 
@@ -176,7 +176,7 @@ class XmlMeshLibrarySaver
         
       XmlWriter::Scope streams_scope (writer, "streams");
       
-      for (size_t i=0; i<vb.StreamsCount (); i++)
+      for (uint32_t i=0; i<vb.StreamsCount (); i++)
       {
         ResourceMap::const_iterator iter = vertex_streams.find (vb.Stream (i).Id ());
         
@@ -254,7 +254,7 @@ class XmlMeshLibrarySaver
     {
       XmlWriter::Scope scope (writer, "vertex_buffers");
       
-      for (size_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
+      for (uint32_t i=0, count=mesh.VertexBuffersCount (); i<count; i++)
       {
         ResourceMap::const_iterator vb_iter = vertex_buffers.find (mesh.VertexBuffer (i).Id ());
 
@@ -268,7 +268,7 @@ class XmlMeshLibrarySaver
     {
       XmlWriter::Scope scope (writer, "primitives");
       
-      for (size_t i=0; i<mesh.PrimitivesCount (); i++)
+      for (uint32_t i=0; i<mesh.PrimitivesCount (); i++)
         SavePrimitive (mesh.Primitive (i));      
     }
     
@@ -303,11 +303,11 @@ class XmlMeshLibrarySaver
       {
         const Mesh& mesh = *i;
         
-        for (size_t k=0, count=mesh.VertexBuffersCount (); k<count; k++)
+        for (uint32_t k=0, count=mesh.VertexBuffersCount (); k<count; k++)
         {
           const VertexBuffer& vb = mesh.VertexBuffer (k);
 
-          for (size_t j=0; j<vb.StreamsCount (); j++)
+          for (uint32_t j=0; j<vb.StreamsCount (); j++)
             SaveVertexStream (vb.Stream (j));
 
           SaveVertexWeightStream (vb.Weights ());          
@@ -324,7 +324,7 @@ class XmlMeshLibrarySaver
       {
         const Mesh& mesh = *i;
         
-        for (size_t j=0, count=mesh.VertexBuffersCount (); j<count; j++)        
+        for (uint32_t j=0, count=mesh.VertexBuffersCount (); j<count; j++)
           SaveVertexBuffer (mesh.VertexBuffer (j));
       }
     }

@@ -72,7 +72,7 @@ void MeshLibrary::Rename (const char* name)
 
 uint32_t MeshLibrary::Size () const
 {
-  return impl->meshes.Size ();
+  return (uint32_t)impl->meshes.Size ();
 }
 
 bool MeshLibrary::IsEmpty () const

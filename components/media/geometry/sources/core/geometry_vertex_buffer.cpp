@@ -84,7 +84,7 @@ size_t VertexBuffer::Id () const
 
 uint32_t VertexBuffer::StreamsCount () const
 {
-  return impl->streams.size ();
+  return (uint32_t)impl->streams.size ();
 }
 
 /*
@@ -130,14 +130,14 @@ uint32_t VertexBuffer::Attach (VertexStream& vs)
     
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
     if (i->Id () == id)
-      return i - impl->streams.begin ();
+      return (uint32_t)(i - impl->streams.begin ());
 
   if (impl->streams.size () == (uint32_t)-1)
     throw xtl::format_operation_exception ("media::geometry::VertexBuffer::Attach", "Streams count exceeded max limit");
 
   impl->streams.push_back (vs);
 
-  return impl->streams.size () - 1;
+  return (uint32_t)impl->streams.size () - 1;
 }
 
 void VertexBuffer::Detach (uint32_t index)

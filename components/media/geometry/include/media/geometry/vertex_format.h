@@ -175,11 +175,11 @@ void swap (VertexFormat&, VertexFormat&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение характеристик
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get_semantic_name    (VertexAttributeSemantic); //имя семантики
-const char* get_type_name        (VertexAttributeType);     //имя типа
-size_t      get_type_size        (VertexAttributeType);     //размер типа атрибута вершин в байтах
-size_t      get_components_count (VertexAttributeType);     //количество компонентов
-bool        is_compatible        (VertexAttributeSemantic, VertexAttributeType); //проверка совместимости
+const char*    get_semantic_name    (VertexAttributeSemantic); //имя семантики
+const char*    get_type_name        (VertexAttributeType);     //имя типа
+unsigned short get_type_size        (VertexAttributeType);     //размер типа атрибута вершин в байтах
+unsigned char  get_components_count (VertexAttributeType);     //количество компонентов
+bool           is_compatible        (VertexAttributeSemantic, VertexAttributeType); //проверка совместимости
 
 //получение семантики по имени
 VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic=VertexAttributeSemantic_Num);

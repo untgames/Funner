@@ -69,13 +69,13 @@ VertexStream::VertexStream (const VertexBuffer& src_vb)
   : impl (new Impl, false)
 {
   VertexFormat& dst_format = impl->format;
-  size_t       offset = 0;
+  uint32_t      offset = 0;
 
-  for (size_t i=0, count=src_vb.StreamsCount (); i<count; i++)
+  for (uint32_t i=0, count=src_vb.StreamsCount (); i<count; i++)
   {
     const VertexFormat& src_format = src_vb.Stream (i).Format ();
     
-    for (size_t j=0, count=src_format.AttributesCount (); j<count; j++)
+    for (uint32_t j=0, count=src_format.AttributesCount (); j<count; j++)
     {
       const VertexAttribute& attribute = src_format.Attribute (j);
       
@@ -238,7 +238,7 @@ void VertexStream::Convert (const VertexStream& src_stream)
   
     //определение количества вершин
     
-  size_t vertices_count = src_stream.Size ();
+  uint32_t vertices_count = src_stream.Size ();
   
     //имезенение размера массива вершин
   
@@ -250,7 +250,7 @@ void VertexStream::Convert (const VertexStream& src_stream)
   
     //копирование данных из вершинного буфера
   
-  for (size_t i=0, count=impl->format.AttributesCount (); i<count; i++)
+  for (uint32_t i=0, count=impl->format.AttributesCount (); i<count; i++)
   {
     const VertexAttribute&    dst_attribute = impl->format.Attribute (i);
           void*               dst_ptr       = static_cast<char*> (impl->data_buffer.Data ()) + dst_attribute.offset;
@@ -279,7 +279,7 @@ void VertexStream::Convert (const VertexBuffer& vb)
   
     //определение количества вершин
     
-  size_t vertices_count = vb.VerticesCount ();
+  uint32_t vertices_count = vb.VerticesCount ();
   
     //имезенение размера массива вершин
   
@@ -291,14 +291,14 @@ void VertexStream::Convert (const VertexBuffer& vb)
   
     //копирование данных из вершинного буфера
   
-  for (size_t i=0, count=impl->format.AttributesCount (); i<count; i++)
+  for (uint32_t i=0, count=impl->format.AttributesCount (); i<count; i++)
   {
     const VertexAttribute&    dst_attribute = impl->format.Attribute (i);
           void*               dst_ptr       = static_cast<char*> (impl->data_buffer.Data ()) + dst_attribute.offset;
     const VertexAttributeType dst_type      = dst_attribute.type;
     const size_t              dst_stride    = impl->vertex_size;
 
-    for (size_t j=0, count=vb.StreamsCount (); j<count; j++)
+    for (uint32_t j=0, count=vb.StreamsCount (); j<count; j++)
     {
       const VertexStream&    src_stream    = vb.Stream (j);
       const VertexAttribute* src_attribute = src_stream.Format ().FindAttribute (dst_attribute.semantic);
