@@ -47,7 +47,7 @@ struct Source
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Capabilities
 {
-  size_t channels_count;          //количество поддерживаемых каналов
+  unsigned short channels_count; //количество поддерживаемых каналов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,10 +55,10 @@ struct Capabilities
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct SampleDesc
 {
-  size_t samples_count;   //количество сэмплов
-  size_t frequency;       //количество сэмплов в секунду (частота)
-  size_t channels;        //количество каналов
-  size_t bits_per_sample; //количество битов на сэмпл
+  unsigned int   samples_count;   //количество сэмплов
+  unsigned int   frequency;       //количество сэмплов в секунду (частота)
+  unsigned short channels;        //количество каналов
+  unsigned char  bits_per_sample; //количество битов на сэмпл
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,12 +106,12 @@ struct IDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество микшируемых каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t ChannelsCount () = 0;
+    virtual unsigned short ChannelsCount () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сэмпла для проигрывания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<size_t (size_t first_sample, size_t samples_count, void* data)> SampleReadFunction;
+    typedef xtl::function<unsigned int (unsigned int first_sample, unsigned int samples_count, void* data)> SampleReadFunction;
 
     virtual ISample* CreateSample (const char* name) = 0;
     virtual ISample* CreateSample (const SampleDesc& desc, const SampleReadFunction& fn) = 0;
@@ -119,29 +119,29 @@ struct IDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего проигрываемого звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void     SetSample (size_t channel, ISample* sample) = 0;
-    virtual ISample* GetSample (size_t channel) = 0;
+    virtual void     SetSample (unsigned short channel, ISample* sample) = 0;
+    virtual ISample* GetSample (unsigned short channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка цикличности проигрывания канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool IsLooped (size_t channel) = 0;
+    virtual bool IsLooped (unsigned short channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetSource (size_t channel, const Source&) = 0;
-    virtual void GetSource (size_t channel, Source&) = 0;
+    virtual void SetSource (unsigned short channel, const Source&) = 0;
+    virtual void GetSource (unsigned short channel, Source&) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление проигрыванием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void  Play      (size_t channel, bool looping = false) = 0;
-    virtual void  Pause     (size_t channel) = 0;
-    virtual void  Stop      (size_t channel) = 0;
-    virtual void  Seek      (size_t channel, float time_in_seconds, SeekMode seek_mode) = 0;
-    virtual float Tell      (size_t channel) = 0;
-    virtual bool  IsPlaying (size_t channel) = 0;
+    virtual void  Play      (unsigned short channel, bool looping = false) = 0;
+    virtual void  Pause     (unsigned short channel) = 0;
+    virtual void  Stop      (unsigned short channel) = 0;
+    virtual void  Seek      (unsigned short channel, float time_in_seconds, SeekMode seek_mode) = 0;
+    virtual float Tell      (unsigned short channel) = 0;
+    virtual bool  IsPlaying (unsigned short channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка уровня громкости для устройства

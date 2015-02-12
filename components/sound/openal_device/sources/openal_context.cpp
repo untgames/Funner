@@ -44,7 +44,7 @@ const char* get_al_error_message (ALenum error)
 //настройки инициализации контекста
 struct ContextInitProperties
 {
-  size_t frequency;
+  unsigned int frequency;
 
   ContextInitProperties () : frequency (0) {}
 };

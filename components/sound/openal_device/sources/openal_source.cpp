@@ -11,8 +11,8 @@ using namespace common;
 namespace
 {
 
-const char*  LOG_NAME                           = "sound::low_level::openal";                               //имя потока протоколирования
-const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY); //период обновления буферов источника в тиках
+const char*        LOG_NAME                           = "sound::low_level::openal";                                      //имя потока протоколирования
+const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY); //период обновления буферов источника в тиках
 
 }
 
@@ -67,7 +67,7 @@ void OpenALSource::Activate ()
   if (is_active)
     return;
 
-  for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
+  for (unsigned int i=0; i<SOURCE_BUFFERS_COUNT; i++)
   {
     try
     {
@@ -75,7 +75,7 @@ void OpenALSource::Activate ()
     }
     catch (...)
     {
-      for (size_t j=0; j<i; j++)
+      for (unsigned int j=0; j<i; j++)
         device.DeallocateSourceBuffer (al_buffers [j]);
 
       throw;
@@ -108,7 +108,7 @@ void OpenALSource::Deactivate ()
 
   context.alSourcei (al_source, AL_BUFFER, 0); //detach all buffers
 
-  for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
+  for (unsigned int i=0; i<SOURCE_BUFFERS_COUNT; i++)
     device.DeallocateSourceBuffer (al_buffers [i]);
 
   if (next_active) next_active->prev_active = prev_active;
@@ -222,9 +222,9 @@ OpenALSample* OpenALSource::GetSample () const
     Получение позиции в миллисекундах
 */
 
-size_t OpenALSource::TellInMilliseconds () const
+unsigned int OpenALSource::TellInMilliseconds () const
 {
-  return is_playing ? milliseconds () - play_time_start + play_time_offset : play_time_offset;
+  return is_playing ? (unsigned int)(milliseconds () - play_time_start + play_time_offset) : play_time_offset;
 }
 
 /*
@@ -311,7 +311,7 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
     }
 
   play_time_start  = milliseconds ();
-  play_time_offset = size_t (offset * 1000.f);
+  play_time_offset = (unsigned int)(offset * 1000.f);
 
   UpdateSampleNotify ();
 }
@@ -339,9 +339,9 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
   if (!sound_sample)
     throw xtl::format_operation_exception ("sound::low_level::openal::OpenALSource::FillBuffer", "Can't fill buffer, empty sound sample");
 
-  size_t max_samples_count       = sound_sample->BytesToSamples (device.GetSampleBufferSize ()),
-         available_samples_count = max_samples_count;
-  char*  buffer                  = (char*)device.GetSampleBuffer ();
+  unsigned int max_samples_count       = sound_sample->BytesToSamples (device.GetSampleBufferSize ()),
+               available_samples_count = max_samples_count;
+  char*        buffer                  = (char*)device.GetSampleBuffer ();
 
   if (is_looped)
   {
@@ -350,7 +350,7 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
       if (play_sample_position == sound_sample->SamplesCount ())
         play_sample_position = 0;
 
-      size_t samples_count = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
+      unsigned int samples_count = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
 
       if (!samples_count)
         break;
@@ -363,26 +363,27 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
   else
   {
 #ifdef __APPLE__  //Mac OSX and iOS skips some samples at the beginning of each sound
-    const size_t NULL_SAMPLES = 150 * sound_sample->Channels ();
+    const unsigned int NULL_SAMPLES = 150 * sound_sample->Channels ();
 
-    size_t null_samples      = stl::min ((int)available_samples_count, stl::max (0, (int)NULL_SAMPLES - (int)play_sample_position));
-    size_t null_samples_size = sound_sample->SamplesToBytes (null_samples);
+    unsigned int null_samples      = stl::min ((int)available_samples_count, stl::max (0, (int)NULL_SAMPLES - (int)play_sample_position));
+    unsigned int null_samples_size = sound_sample->SamplesToBytes (null_samples);
 
     if (null_samples)
       memset (buffer, 0, null_samples_size);
 
-    size_t samples_count = sound_sample_decoder->Read (stl::max (0, (int)play_sample_position - (int)NULL_SAMPLES), stl::max (0, (int)available_samples_count - (int)null_samples), buffer + null_samples_size);
+    unsigned int samples_count = sound_sample_decoder->Read (stl::max (0, (int)play_sample_position - (int)NULL_SAMPLES), stl::max (0, (int)available_samples_count - (int)null_samples), buffer + null_samples_size);
 
     available_samples_count -= samples_count + null_samples;
     play_sample_position    += samples_count + null_samples;
 #else
-    size_t samples_count     = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
+    unsigned int samples_count = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
+
     available_samples_count -= samples_count;
     play_sample_position    += samples_count;
 #endif
   }
 
-  size_t readed_samples_count = max_samples_count - available_samples_count;
+  unsigned int readed_samples_count = max_samples_count - available_samples_count;
 
   if (!readed_samples_count)
     return;
@@ -419,7 +420,7 @@ void OpenALSource::FillBuffers ()
   {
       //первоначальное заполнение буферов
 
-    for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
+    for (unsigned int i=0; i<SOURCE_BUFFERS_COUNT; i++)
       FillBuffer (al_buffers [i]);
   }
   else if (processed_buffers_count)

@@ -177,13 +177,13 @@ class LowLevelPlayerDevice : public common::Lockable
     }
 
     //Read data for device
-    size_t ReadSampleData (size_t first_sample, size_t samples_count, void* data)
+    unsigned int ReadSampleData (unsigned int first_sample, unsigned int samples_count, void* data)
     {
       common::Lock (*this);
 
       first_sample -= sample_read_offset;
 
-      size_t return_value = media_sample.Read (first_sample, samples_count, data);
+      unsigned int return_value = media_sample.Read (first_sample, samples_count, data);
 
       last_read_sample = first_sample + return_value;
 
@@ -232,8 +232,8 @@ class LowLevelPlayerDevice : public common::Lockable
     media::SoundSample                                      media_sample;       //media sample
     DevicePtr                                               device;             //low level device
     SamplePtr                                               low_level_sample;   //low level sample
-    size_t                                                  sample_read_offset; //offset to use for calculation in read function
-    size_t                                                  last_read_sample;   //index of last readed sample from media sample
+    unsigned int                                            sample_read_offset; //offset to use for calculation in read function
+    unsigned int                                            last_read_sample;   //index of last readed sample from media sample
     media::players::IStreamPlayer*                          active_player;      //current playing player
     bool                                                    looping;            //looping state for current playback
     media::players::StreamPlayerManager::StreamEventHandler event_handler;      //events handler

@@ -16,12 +16,12 @@ using namespace sound::low_level::openal;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t MAX_DEVICE_CHANNELS_COUNT  = 1024;   //максимальное количество каналов проигрывания
-const size_t MAX_SOUND_CHANNELS         = 2;      //максимальное количество каналов
-const size_t MAX_SOUND_BYTES_PER_SAMPLE = 2;      //максимальная разрядность звука
+const unsigned short MAX_DEVICE_CHANNELS_COUNT  = 1024;   //максимальное количество каналов проигрывания
+const unsigned short MAX_SOUND_CHANNELS         = 2;      //максимальное количество каналов
+const unsigned char  MAX_SOUND_BYTES_PER_SAMPLE = 2;      //максимальная разрядность звука
 
 //время обновления буферов источника в миллисекундах
-const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
+const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
 
 const float  DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
 const float  DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD = 0.03f;
@@ -35,18 +35,34 @@ namespace
 
 struct OpenALDeviceProperties
 {
-  size_t min_channels_count;
-  size_t max_channels_count;
+  unsigned short min_channels_count;
+  unsigned short max_channels_count;
 
   OpenALDeviceProperties () : min_channels_count (0), max_channels_count (MAX_DEVICE_CHANNELS_COUNT) {}
 };
 
 void process_init_string (const char* property, const char* value, OpenALDeviceProperties& properties)
 {
+  static const char* METHOD_NAME = "sound::low_level::openal::process_init_string";
+
   if (!xstricmp (property, "min_channels_count"))
-    properties.min_channels_count = atoi (value);
+  {
+    int min_channels_count = atoi (value);
+
+    if (min_channels_count > (unsigned short)-1 || min_channels_count < 0)
+      throw xtl::format_operation_exception (METHOD_NAME, "min_channels_count property is out of range");
+
+    properties.min_channels_count = min_channels_count;
+  }
   else if (!xstricmp (property, "max_channels_count"))
-    properties.max_channels_count = atoi (value);
+  {
+    int max_channels_count = atoi (value);
+
+    if (max_channels_count > (unsigned short)-1 || max_channels_count < 0)
+      throw xtl::format_operation_exception (METHOD_NAME, "min_channels_count property is out of range");
+
+    properties.max_channels_count = max_channels_count;
+  }
 }
 
 }
@@ -66,8 +82,8 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   gain                                 = 1.f;
   is_muted                             = false;
   buffer_update_frequency              = SOURCE_BUFFERS_UPDATE_FREQUENCY;
-  source_properties_update_frequency   = (size_t)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
-  listener_properties_update_frequency = (size_t)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
+  source_properties_update_frequency   = (unsigned int)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
+  listener_properties_update_frequency = (unsigned int)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
   first_active_source                  = 0;
   al_buffers_pool_size                 = 0;  
   
@@ -94,7 +110,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
       //создание каналов проигрывания
 
-    for (size_t i = 0; i < properties.max_channels_count; i++)
+    for (unsigned short i = 0; i < properties.max_channels_count; i++)
     {
       try
       {
@@ -120,7 +136,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
                           properties.min_channels_count, channels.size ());
     }
 
-    info.channels_count = channels.size ();
+    info.channels_count = (unsigned short)channels.size ();
   }
   catch (...)
   {
@@ -221,11 +237,11 @@ void OpenALDevice::GetCapabilities (Capabilities& target_info)
    Количество микшируемых каналов
 */
 
-size_t OpenALDevice::ChannelsCount ()
+unsigned short OpenALDevice::ChannelsCount ()
 {
   common::Lock lock (*this);
 
-  return channels.size ();
+  return (unsigned short)channels.size ();
 }
 
 /*
@@ -355,11 +371,11 @@ void* OpenALDevice::GetSampleBuffer ()
   return sample_buffer.data ();
 }
 
-size_t OpenALDevice::GetSampleBufferSize () const
+unsigned int OpenALDevice::GetSampleBufferSize () const
 {
   common::Lock lock (*this);
 
-  return sample_buffer.size ();
+  return (unsigned int)sample_buffer.size ();
 }
 
 /*
@@ -403,7 +419,7 @@ ISample* OpenALDevice::CreateSample (const SampleDesc& desc, const SampleReadFun
     Установка текущего проигрываемого звука
 */
 
-void OpenALDevice::SetSample (size_t channel, ISample* sample)
+void OpenALDevice::SetSample (unsigned short channel, ISample* sample)
 {
   static const char* METHOD_NAME = "sound::low_level::OpenALDevice::SetSample";
 
@@ -420,7 +436,7 @@ void OpenALDevice::SetSample (size_t channel, ISample* sample)
   channels [channel]->SetSample (openal_sample);
 }
 
-ISample* OpenALDevice::GetSample (size_t channel)
+ISample* OpenALDevice::GetSample (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -434,7 +450,7 @@ ISample* OpenALDevice::GetSample (size_t channel)
     Проверка цикличности проигрывания канала
 */
 
-bool OpenALDevice::IsLooped (size_t channel)
+bool OpenALDevice::IsLooped (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -448,7 +464,7 @@ bool OpenALDevice::IsLooped (size_t channel)
     Установка параметров источника
 */
 
-void OpenALDevice::SetSource (size_t channel, const Source& source)
+void OpenALDevice::SetSource (unsigned short channel, const Source& source)
 {
   common::Lock lock (*this);
 
@@ -458,7 +474,7 @@ void OpenALDevice::SetSource (size_t channel, const Source& source)
   channels [channel]->SetSource (source);
 }
 
-void OpenALDevice::GetSource (size_t channel, Source& source)
+void OpenALDevice::GetSource (unsigned short channel, Source& source)
 {
   common::Lock lock (*this);
 
@@ -472,7 +488,7 @@ void OpenALDevice::GetSource (size_t channel, Source& source)
     Управление проигрыванием
 */
 
-void OpenALDevice::Play (size_t channel, bool looping)
+void OpenALDevice::Play (unsigned short channel, bool looping)
 {
   common::Lock lock (*this);
 
@@ -482,7 +498,7 @@ void OpenALDevice::Play (size_t channel, bool looping)
   channels [channel]->Play (looping);
 }
 
-void OpenALDevice::Pause (size_t channel)
+void OpenALDevice::Pause (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -492,7 +508,7 @@ void OpenALDevice::Pause (size_t channel)
   channels [channel]->Pause ();
 }
 
-void OpenALDevice::Stop (size_t channel)
+void OpenALDevice::Stop (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -502,7 +518,7 @@ void OpenALDevice::Stop (size_t channel)
   channels [channel]->Stop ();
 }
 
-void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mode)
+void OpenALDevice::Seek (unsigned short channel, float time_in_seconds, SeekMode seek_mode)
 {
   common::Lock lock (*this);
 
@@ -512,7 +528,7 @@ void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mo
   channels [channel]->Seek (time_in_seconds, seek_mode);
 }
 
-float OpenALDevice::Tell (size_t channel)
+float OpenALDevice::Tell (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -522,7 +538,7 @@ float OpenALDevice::Tell (size_t channel)
   return channels [channel]->Tell ();
 }
 
-bool OpenALDevice::IsPlaying (size_t channel)
+bool OpenALDevice::IsPlaying (unsigned short channel)
 {
   common::Lock lock (*this);
 
@@ -669,16 +685,16 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
 
   if (!xstrcmp (name, "buffer_update_frequency"))
   {
-    buffer_update_frequency = (size_t)value;
+    buffer_update_frequency = (unsigned int)value;
   }
   else if (!xstrcmp (name, "source_update_frequency"))
   {
-    source_properties_update_frequency = (size_t)value;
+    source_properties_update_frequency = (unsigned int)value;
     source_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, 1.0f / source_properties_update_frequency);
   }
   else if (!xstrcmp (name, "listener_update_frequency"))
   {
-    listener_properties_update_frequency = (size_t)value;
+    listener_properties_update_frequency = (unsigned int)value;
     listener_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, 1.0f / listener_properties_update_frequency);
   }
   else
@@ -805,7 +821,7 @@ void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
 
   if (al_buffers_pool_size == DEVICE_BUFFERS_POOL_SIZE)
   {
-    size_t flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
+    unsigned int flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
 
     OpenALContextManager::Instance context_manager;
 

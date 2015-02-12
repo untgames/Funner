@@ -57,7 +57,7 @@ void print (const math::vector<T, N>& v)
 {
   printf ("[");
 
-  for (size_t i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);

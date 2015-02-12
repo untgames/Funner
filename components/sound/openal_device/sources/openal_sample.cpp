@@ -6,7 +6,7 @@ using namespace sound::low_level::openal;
 namespace
 {
 
-const size_t MAX_SAMPLE_BUFFER_SIZE = 1024 * 64;
+const unsigned int MAX_SAMPLE_BUFFER_SIZE = 1024 * 64;
 
 }
 
@@ -88,12 +88,12 @@ void OpenALSample::GetDesc (SampleDesc& out_desc)
    Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
 */
 
-size_t OpenALSample::SamplesToBytes (size_t sample_count)
+unsigned int OpenALSample::SamplesToBytes (unsigned int sample_count)
 {
   return desc.bits_per_sample / 8 * sample_count * desc.channels;
 }
 
-size_t OpenALSample::BytesToSamples (size_t byte_count)
+unsigned int OpenALSample::BytesToSamples (unsigned int byte_count)
 {
   if (!desc.bits_per_sample || !desc.channels)
     return 0;
@@ -102,7 +102,7 @@ size_t OpenALSample::BytesToSamples (size_t byte_count)
 
 }
 
-double OpenALSample::SamplesToSeconds (size_t sample_count)
+double OpenALSample::SamplesToSeconds (unsigned int sample_count)
 {
   if (!desc.frequency)
     return 0;
@@ -111,26 +111,26 @@ double OpenALSample::SamplesToSeconds (size_t sample_count)
 
 }
 
-size_t OpenALSample::SecondsToSamples (double second_count)
+unsigned int OpenALSample::SecondsToSamples (double second_count)
 {
-  return size_t(desc.frequency * second_count);
+  return (unsigned int)(desc.frequency * second_count);
 }
 
 /*
    Получение параметров
 */
 
-size_t OpenALSample::Channels ()
+unsigned short OpenALSample::Channels ()
 {
   return desc.channels;
 }
 
-size_t OpenALSample::Frequency ()
+unsigned int OpenALSample::Frequency ()
 {
   return desc.frequency;
 }
 
-size_t OpenALSample::SamplesCount ()
+unsigned int OpenALSample::SamplesCount ()
 {
   return desc.samples_count;
 }

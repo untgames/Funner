@@ -82,7 +82,7 @@ typedef xtl::shared_ptr<SoundManagerEmitter>            SoundManagerEmitterPtr;
 typedef stl::hash_map<Emitter*, SoundManagerEmitterPtr> EmitterSet;
 typedef xtl::com_ptr<low_level::IDevice>                DevicePtr;
 typedef xtl::com_ptr<low_level::IDriver>                DriverPtr;
-typedef stl::stack<size_t>                              ChannelsSet;
+typedef stl::stack<unsigned short>                      ChannelsSet;
 
 struct SoundManager::Impl : public xtl::trackable
 {
@@ -106,7 +106,7 @@ struct SoundManager::Impl : public xtl::trackable
 
       device->GetCapabilities (capabilities);
 
-      for (size_t i = 0; i < capabilities.channels_count; i++)
+      for (unsigned short i = 0; i < capabilities.channels_count; i++)
         free_channels.push (i);
     }
     catch (xtl::exception& exception)
@@ -238,7 +238,8 @@ struct SoundManager::Impl : public xtl::trackable
 
         if (!free_channels.empty ())
         {
-          size_t channel_to_use = free_channels.top ();
+          unsigned short channel_to_use = free_channels.top ();
+
           free_channels.pop ();
 
           manager_emitter->channel_number = channel_to_use;
