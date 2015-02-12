@@ -22,14 +22,14 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
     OggInputStream  (const char* file_name, media::SoundSampleInfo& sound_sample_info);
     ~OggInputStream () {ov_clear (&vf);}
 
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
     void AddRef () { addref (this); }
     void Release () { release (this); }
 
     common::InputFile file;
     OggVorbis_File    vf;
-    size_t            channels_count;
+    unsigned short    channels_count;
 };
 
 /*
@@ -193,13 +193,14 @@ OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sa
   }
 }
 
-size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int OggInputStream::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   static const char* METHOD_NAME = "media::sound::OggInputStream::Read";
 
-  long   readed_bytes;
-  size_t ret_value, decoded_bytes = 0, buffer_size = samples_count * 2 * channels_count;
-  int    current_section;
+  long         readed_bytes;
+  unsigned int ret_value, decoded_bytes = 0;
+  size_t       buffer_size = samples_count * 2 * channels_count;
+  int          current_section;
 
   if (buffer_size > INT_MAX)
     throw xtl::format_operation_exception (METHOD_NAME, "Samples count read limit exceeded");
@@ -227,7 +228,7 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
   {
     short* samples = (short*)data;
 
-    for (size_t current_sample = 0; current_sample < (buffer_size >> 1); current_sample += 6)
+    for (unsigned int current_sample = 0; current_sample < (buffer_size >> 1); current_sample += 6)
     {
       // WAVEFORMATEXTENSIBLE Order : FL, FR, FC, LFE, RL, RR
       // OggVorbis Order            : FL, FC, FR,  RL, RR, LFE

@@ -14,7 +14,7 @@ int main ()
 {
   try
   {
-    size_t i = 0;
+    unsigned int i = 0;
     unsigned char hash[2][16];
 
     SoundSample* sample2 = new SoundSample (file_name);
@@ -23,13 +23,14 @@ int main ()
 
     char* data_buffers[2];
 
-    size_t buffer_size = sample1.SamplesToBytes (1) * sample1.SamplesCount ();
+    unsigned int buffer_size = sample1.SamplesToBytes (1) * sample1.SamplesCount ();
+
     data_buffers[0] = new char [buffer_size];
     data_buffers[1] = new char [buffer_size];
 
     sample1.Read (0, sample1.SamplesCount(), data_buffers[0]);
 
-    size_t one_read = sample1.SamplesCount() / 6 + sample1.SamplesCount() / 15;
+    unsigned int one_read = sample1.SamplesCount() / 6 + sample1.SamplesCount() / 15;
 
     for (; i < sample1.SamplesCount();)
       i += sample1.Read (i, one_read, data_buffers[1] + i * sample1.SamplesToBytes (1));

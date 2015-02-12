@@ -17,7 +17,7 @@ class ISoundInputStream
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение декодированного звука количеством size сэмплов начиная с position сэмпла в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Read (size_t first_sample, size_t samples_count, void* data) = 0;
+    virtual unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data) = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -34,10 +34,10 @@ class ISoundInputStream
 //////////////////////////////////////////////////////////////////////////////////////////////////
 struct SoundSampleInfo
 {
-  size_t samples_count;    //количество сэмплов в файле
-  size_t frequency;        //частота дискретизации
-  size_t channels;         //количество каналов
-  size_t bits_per_sample;  //количество битов на один сэмпл
+  unsigned int   samples_count;    //количество сэмплов в файле
+  unsigned int   frequency;        //частота дискретизации
+  unsigned short channels;         //количество каналов
+  unsigned char  bits_per_sample;  //количество битов на один сэмпл
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,25 +79,25 @@ class SoundSample
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SamplesToBytes   (size_t sample_count) const;   //перевод количества сэмплов в размер в байтах
-    size_t BytesToSamples   (size_t byte_count)   const;   //перевод количества байт в размер в сэмплах
-    double SamplesToSeconds (size_t sample_count) const;   //перевод количества сэмплов в размер в секундах
-    size_t SecondsToSamples (double second_count) const;   //переводколичества секунд в размер в сэмплах
+    unsigned int SamplesToBytes   (unsigned int sample_count) const;   //перевод количества сэмплов в размер в байтах
+    unsigned int BytesToSamples   (unsigned int byte_count)   const;   //перевод количества байт в размер в сэмплах
+    double       SamplesToSeconds (unsigned int sample_count) const;   //перевод количества сэмплов в размер в секундах
+    unsigned int SecondsToSamples (double second_count) const;   //переводколичества секунд в размер в сэмплах
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Характеристики
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SamplesCount  () const; //количество сэмплов
-    size_t SizeInBytes   () const; //размер звука в байтах
-    size_t Frequency     () const; //количество сэмплов в секунду (частота)
-    size_t Channels      () const; //количество каналов
-    size_t BitsPerSample () const; //количество битов на сэмпл
-    double Duration      () const { return SamplesToSeconds (SamplesCount ()); } //продолжительность
+    unsigned int   SamplesCount  () const; //количество сэмплов
+    unsigned int   SizeInBytes   () const; //размер звука в байтах
+    unsigned int   Frequency     () const; //количество сэмплов в секунду (частота)
+    unsigned short Channels      () const; //количество каналов
+    unsigned char  BitsPerSample () const; //количество битов на сэмпл
+    double         Duration      () const { return SamplesToSeconds (SamplesCount ()); } //продолжительность
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Read (size_t first_sample, size_t samples_count, void* data); //ret: прочитанное количество сэмплов
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data); //ret: прочитанное количество сэмплов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сохранение
