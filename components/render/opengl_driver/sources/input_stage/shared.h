@@ -61,9 +61,9 @@ class Buffer: public IBindableBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка типа буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool   IsVertexBuffer () const { return (desc.bind_flags & BindFlag_VertexBuffer) != 0; }
-    bool   IsIndexBuffer  () const { return (desc.bind_flags & BindFlag_IndexBuffer) != 0; }
-    size_t GetBindFlags   () const { return desc.bind_flags; }
+    bool         IsVertexBuffer () const { return (desc.bind_flags & BindFlag_VertexBuffer) != 0; }
+    bool         IsIndexBuffer  () const { return (desc.bind_flags & BindFlag_IndexBuffer) != 0; }
+    unsigned int GetBindFlags   () const { return desc.bind_flags; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
@@ -73,15 +73,15 @@ class Buffer: public IBindableBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t offset, size_t size, const void* data, IDeviceContext*);
-    void GetData (size_t offset, size_t size, void* data, IDeviceContext*);
+    void SetData (unsigned int offset, unsigned int size, const void* data, IDeviceContext*);
+    void GetData (unsigned int offset, unsigned int size, void* data, IDeviceContext*);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / чтение данных после отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetDataCore (size_t offset, size_t size, const void* data) = 0;
-    virtual void GetDataCore (size_t offset, size_t size, void* data) = 0;
+    virtual void SetDataCore (unsigned int offset, unsigned int size, const void* data) = 0;
+    virtual void GetDataCore (unsigned int offset, unsigned int size, void* data) = 0;
 
   private:
     BufferDesc desc; //дескриптор буфера
@@ -123,8 +123,8 @@ class SystemMemoryBuffer: public Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / чтение данных после отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDataCore (size_t offset, size_t size, const void* data);
-    void GetDataCore (size_t offset, size_t size, void* data);
+    void SetDataCore (unsigned int offset, unsigned int size, const void* data);
+    void GetDataCore (unsigned int offset, unsigned int size, void* data);
 
   private:
     xtl::uninitialized_storage <char> buffer;                //буфер в системной памяти
@@ -152,7 +152,7 @@ class SystemMemoryInputBuffer: public SystemMemoryBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / чтение данных после отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDataCore (size_t offset, size_t size, const void* data);
+    void SetDataCore (unsigned int offset, unsigned int size, const void* data);
     
   private:
     GLenum target; //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
@@ -173,7 +173,7 @@ class ConstantBuffer: public SystemMemoryBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / чтение данных после отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDataCore (size_t offset, size_t size, const void* data);
+    void SetDataCore (unsigned int offset, unsigned int size, const void* data);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,8 +207,8 @@ class VboBuffer: public Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / чтение данных после отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDataCore (size_t offset, size_t size, const void* data);
-    void GetDataCore (size_t offset, size_t size, void* data);
+    void SetDataCore (unsigned int offset, unsigned int size, const void* data);
+    void GetDataCore (unsigned int offset, unsigned int size, void* data);
 
   private:
     GLenum target;     //целевой тип аппаратного буфера (GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER)
@@ -224,7 +224,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InputLayout  (const ContextManager&, const InputLayoutDesc&, size_t ffp_tex_units_count);
+    InputLayout  (const ContextManager&, const InputLayoutDesc&, unsigned int ffp_tex_units_count);
     ~InputLayout ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,8 +235,8 @@ class InputLayout: virtual public IInputLayout, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Установка состояния в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void Bind (size_t                      base_vertex,
-              size_t                      base_index,
+   void Bind (unsigned int                base_vertex,
+              unsigned int                base_index,
               BufferPtr*                  vertex_buffers,
               IVertexAttributeDictionary* dictionary,
               Buffer*                     index_buffer,
@@ -245,7 +245,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
   private:
     struct ShaderAttributeLayout;
 
-    void                   BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout);
+    void                   BindVertexAttributes (unsigned int base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout);
     ShaderAttributeLayout& GetShaderLayout      (IVertexAttributeDictionary& dictionary);
     void                   RemoveShaderLayout   (IVertexAttributeDictionary*);
 
@@ -264,10 +264,10 @@ class InputLayout: virtual public IInputLayout, public ContextObject
     ShaderAttributeLayoutMap    shader_layouts;          //расположение атрибутов шейдера
     common::StringArray         shader_attribute_names;  //имена шейдерных атрибутов
     GLenum                      index_data_type;         //тип индексов
-    size_t                      index_size;              //размер индекса
-    size_t                      index_buffer_offset;     //смещение в индексном буфере до первого индекса
-    size_t                      ffp_tex_units_count;     //количество текстурных юнитов поддерживаемое аппаратно для FFP
-    size_t                      used_semantics_mask;     //маска используемых семантик
+    unsigned int                index_size;              //размер индекса
+    unsigned int                index_buffer_offset;     //смещение в индексном буфере до первого индекса
+    unsigned int                ffp_tex_units_count;     //количество текстурных юнитов поддерживаемое аппаратно для FFP
+    unsigned int                used_semantics_mask;     //маска используемых семантик
     size_t                      attributes_hash;         //хеш атрибутов
 };
 

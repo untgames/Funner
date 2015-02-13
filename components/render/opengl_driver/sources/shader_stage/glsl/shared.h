@@ -57,13 +57,13 @@ class GlslProgram: virtual public ICompiledProgram, public ContextObject, public
       stl::string          name;           //имя параметра
       size_t               name_hash;      //хэш имени
       ProgramParameterType type;           //тип параметра
-      size_t               elements_count; //количество элементов
+      unsigned int         elements_count; //количество элементов
     };
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    GlslProgram (const ContextManager& manager, size_t shaders_count, IShader** shaders, const LogFunction& error_log);
+    GlslProgram (const ContextManager& manager, unsigned int shaders_count, IShader** shaders, const LogFunction& error_log);
     ~GlslProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ class GlslProgram: virtual public ICompiledProgram, public ContextObject, public
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров программы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t           GetParametersCount ();
+    unsigned int     GetParametersCount ();
     const Parameter* GetParameters      ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ class GlslBindableProgram: virtual public IBindableProgram, public ContextObject
 ///Получение транспонированных матриц
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <unsigned int Size>
-    float* GetTransposedMatrixes (size_t count, float* data);
+    float* GetTransposedMatrixes (unsigned int count, float* data);
 
   private:
     struct Parameter;
@@ -202,7 +202,7 @@ class GlslShaderManager: virtual public IShaderManager, public ContextObject
 ///Создание шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShader*          CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
-    ICompiledProgram* CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log);
+    ICompiledProgram* CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction& error_log);
 };
 
 }

@@ -64,7 +64,7 @@ struct ProgramParametersLayout::Impl
         throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "Null argument desc.parameters[%u].name", i);
 
       if (param.slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
-        throw xtl::make_range_exception (METHOD_NAME, "desc.parameters.slot", param.slot, 0u, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+        throw xtl::make_range_exception (METHOD_NAME, "desc.parameters.slot", (size_t)param.slot, (size_t)0, (size_t)DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
       if (param.type >= ProgramParameterType_Num)
         throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument value desc.parameters[%u].type=%d", i,
@@ -125,9 +125,9 @@ struct ProgramParametersLayout::Impl
         //подсчёт количества параметров в группах
 
       for (GroupArray::iterator iter=new_groups.begin (), end=new_groups.end ()-1; iter!=end; ++iter)
-        iter->count = iter [1].parameters - iter [0].parameters;
+        iter->count = (unsigned int)(iter [1].parameters - iter [0].parameters);
 
-      new_groups.back ().count = new_parameters.end () - new_groups.back ().parameters;
+      new_groups.back ().count = (unsigned int)(new_parameters.end () - new_groups.back ().parameters);
     }
 
       //обмен

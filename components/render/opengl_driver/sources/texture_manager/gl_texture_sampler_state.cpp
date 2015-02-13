@@ -152,7 +152,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   const ContextCaps& caps = GetCaps ();
 
   if (in_desc.max_anisotropy < 1)
-    throw xtl::make_argument_exception (METHOD_NAME, "desc.max_anisotropy", in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
+    throw xtl::make_argument_exception (METHOD_NAME, "desc.max_anisotropy", (size_t)in_desc.max_anisotropy, "Maximum anisotropy must be >= 1.0");
 
   if (!caps.has_ext_texture3d && in_desc.wrap_w != TexcoordWrap_Default)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set desc.wrap_w=%s (GL_EXT_texture3D extension not supported)", get_name (in_desc.wrap_w));
@@ -244,7 +244,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   
   static const char* wrap_name [Texcoord_Num] = {"desc.wrap_u", "desc.wrap_v", "desc.wrap_w"};
 
-  for (size_t i=0; i<Texcoord_Num; i++)
+  for (unsigned int i=0; i<Texcoord_Num; i++)
   {
 #ifndef OPENGL_ES_SUPPORT
     switch (wrap [i])
@@ -312,14 +312,14 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
       throw xtl::make_argument_exception (METHOD_NAME, "desc.comparision_function", in_desc.comparision_function);  
   }
   
-  size_t max_anisotropy = in_desc.max_anisotropy;
+  unsigned int max_anisotropy = in_desc.max_anisotropy;
 
   if (max_anisotropy > caps.max_anisotropy)
     max_anisotropy = caps.max_anisotropy;
     
 #ifdef OPENGL_ES_SUPPORT
 
-  for (size_t i=0; i<4; i++)
+  for (unsigned int i=0; i<4; i++)
     if (in_desc.border_color [i] != 0.0f)
       throw xtl::format_not_supported_exception (METHOD_NAME, "Texture border color not supported. Must be zero (color=[%.3f %.3f %.3f %.3f])",
         in_desc.border_color [0], in_desc.border_color [1], in_desc.border_color [2], in_desc.border_color [3]);
@@ -335,7 +335,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   impl->gl_mag_filter           = gl_mag_filter;
   impl->gl_comparision_function = gl_comparision_function;
 
-  for (size_t i=0; i<Texcoord_Num; i++)
+  for (unsigned int i=0; i<Texcoord_Num; i++)
     impl->gl_wrap [i] = gl_wrap [i];
 
     //оповещение о необходимости ребиндинга уровня

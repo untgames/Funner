@@ -37,7 +37,7 @@ class FboFrameBufferManager: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (size_t fbo_id, size_t cache_id);
+    void SetFrameBuffer (unsigned int fbo_id, size_t cache_id);
 };
 
 typedef xtl::com_ptr<FboFrameBufferManager> FrameBufferManagerPtr;
@@ -68,7 +68,7 @@ class FboRenderBuffer: public RenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение OpenGL идентификатора буфера кадра для возможности ручной записи / чтения данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetFrameBufferId ();
+    unsigned int GetFrameBufferId ();
 
   private:
     FrameBufferManagerPtr frame_buffer_manager; //менеджер буферов кадра
@@ -96,8 +96,8 @@ class FboFrameBuffer: public IFrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отрисовке в целевые буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void InvalidateRenderTargets (size_t, const Rect&) {}
-    void InvalidateRenderTargets (size_t) {}
+    void InvalidateRenderTargets (unsigned int, const Rect&) {}
+    void InvalidateRenderTargets (unsigned int) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых текстур
@@ -111,7 +111,7 @@ class FboFrameBuffer: public IFrameBuffer, public ContextObject
     void SetAttachment (RenderTargetType target_type, View* view);
     void SetAttachment (RenderTargetType target_type, IRenderTargetTexture* texture, const ViewDesc& view_desc, const TextureDesc& texture_desc);
     void SetAttachment (RenderTargetType target_type, FboRenderBuffer* render_buffer);
-    void SetAttachment (GLenum textarget, GLenum attachment, size_t texture_id, const ViewDesc& view_desc);
+    void SetAttachment (GLenum textarget, GLenum attachment, unsigned int texture_id, const ViewDesc& view_desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Завершение инициализации

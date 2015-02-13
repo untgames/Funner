@@ -69,7 +69,7 @@ IFrameBuffer* FboFrameBufferManager::CreateFrameBuffer (View* color_view, View* 
     Установка текущего буфера кадра
 */
 
-void FboFrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
+void FboFrameBufferManager::SetFrameBuffer (unsigned int fbo_id, size_t cache_id)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBufferManager::SetFrameBuffer";
 

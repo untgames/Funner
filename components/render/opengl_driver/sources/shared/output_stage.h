@@ -54,9 +54,9 @@ class OutputStage
 ///Настройка подуровня попиксельного отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////          
     void                SetDepthStencilState (IDepthStencilState* state);
-    void                SetStencilReference  (size_t reference);
+    void                SetStencilReference  (unsigned int reference);
     IDepthStencilState* GetDepthStencilState () const;
-    size_t              GetStencilReference  () const;
+    unsigned int        GetStencilReference  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния уровня в контекст OpenGL

@@ -297,14 +297,14 @@ GLenum get_uncompressed_gl_type (PixelFormat format)
 }
 
 //получение ближайшей сверху степени двойки
-size_t get_next_higher_power_of_two (size_t k) 
+unsigned int get_next_higher_power_of_two (unsigned int k)
 {
   if (!k)
     return 1;
 
   k--;
 
-  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
+  for (unsigned int i=1; i < sizeof (unsigned int) * 8; i *= 2)
           k |= k >> i;
 
   return k + 1;

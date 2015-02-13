@@ -23,8 +23,8 @@ struct TextureExtesions;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RenderTargetTextureDesc: public TextureDesc
 {
-  GLenum target; //тип текстуры
-  size_t id;     //идентификатор текстуры
+  GLenum       target; //тип текстуры
+  unsigned int id;     //идентификатор текстуры
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ struct RenderTargetTextureDesc: public TextureDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct MipLevelDesc
 {
-  size_t width, height; //ширина / высота изображения на уровне
+  unsigned int width, height; //ширина / высота изображения на уровне
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ class IRenderTargetTexture: virtual public IObject
 ///Получение дескриптора целевой текстуры отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void GetDesc (RenderTargetTextureDesc&) = 0;
-    virtual void GetMipLevelDesc (size_t level, MipLevelDesc& desc) = 0;
+    virtual void GetMipLevelDesc (unsigned int level, MipLevelDesc& desc) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры в контекст OpenGL
@@ -85,10 +85,10 @@ class TextureManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущей текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void           SetTexture (size_t sampler_slot, ITexture* texture);
-    void           SetSampler (size_t sampler_slot, ISamplerState* state);
-    ITexture*      GetTexture (size_t sampler_slot) const;
-    ISamplerState* GetSampler (size_t sampler_slot) const;
+    void           SetTexture (unsigned int sampler_slot, ITexture* texture);
+    void           SetSampler (unsigned int sampler_slot, ISamplerState* state);
+    ITexture*      GetTexture (unsigned int sampler_slot) const;
+    ISamplerState* GetSampler (unsigned int sampler_slot) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)

@@ -23,7 +23,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D");
 
   if (tex_desc.layers != 6)
-    throw xtl::make_argument_exception (METHOD_NAME, "desc.layers", tex_desc.layers, "Cubemap texture must has desc.layers = 6");
+    throw xtl::make_argument_exception (METHOD_NAME, "desc.layers", (size_t)tex_desc.layers, "Cubemap texture must has desc.layers = 6");
 
   if (tex_desc.width != tex_desc.height)
     throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Cubemap texture sizes must be equal (desc.width=%u, desc.height=%u)", tex_desc.width, tex_desc.height);
@@ -111,15 +111,15 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     unpacked_buffer.resize (get_uncompressed_image_size (tex_desc.width, tex_desc.height, tex_desc.format));  
   }
 
-  size_t mips_count = GetMipsCount ();  
+  unsigned int mips_count = GetMipsCount ();
 
-  for (size_t i=0; i<mips_count; i++)
+  for (unsigned int i=0; i<mips_count; i++)
   {
     MipLevelDesc level_desc;
 
     GetMipLevelDesc (i, level_desc);
 
-    for (size_t j=0; j<6; j++)
+    for (unsigned int j=0; j<6; j++)
     {
       TextureLevelData level_data;
 
@@ -179,7 +179,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     Получение дескриптора слоя текстуры
 */
 
-void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
+void TextureCubemap::GetLayerDesc (unsigned int layer, LayerDesc& desc)
 {
   if (layer > 6)
     throw xtl::make_range_exception ("render::low_level::opengl::TextureCubemap::GetLayerDesc", "layer", layer, 6);
@@ -193,29 +193,29 @@ void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
 */
 
 void TextureCubemap::SetUncompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  GLenum      type,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  GLenum       type,
+  const void*  buffer)
 {
   glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mip_level, x, y, width, height, format, type, buffer);  
 }
 
 void TextureCubemap::SetCompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  size_t      buffer_size,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  unsigned int buffer_size,
+  const void*  buffer)
 {
   GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mip_level, x, y, width, height, format, buffer_size, buffer);
 }

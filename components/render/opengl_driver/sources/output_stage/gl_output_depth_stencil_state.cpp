@@ -234,7 +234,7 @@ void DepthStencilState::GetDesc (DepthStencilDesc& out_desc)
     Установка состояния в контекст OpenGL
 */
 
-void DepthStencilState::Bind (size_t reference)
+void DepthStencilState::Bind (unsigned int reference)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilState::Bind";
   

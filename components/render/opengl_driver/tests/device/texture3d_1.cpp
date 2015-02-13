@@ -2,8 +2,8 @@
 
 using namespace common;
 
-const size_t LAYERS_COUNT = 4;
-const size_t TEX_SIZE     = 32;
+const unsigned int LAYERS_COUNT = 4;
+const unsigned int TEX_SIZE     = 32;
 
 int main ()
 {
@@ -31,10 +31,10 @@ int main ()
 
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 
-    for (size_t i=0; i<image_data.size (); i++)
+    for (unsigned int i=0; i<image_data.size (); i++)
       image_data.data () [i]   = char (0xfa);
 
-    for (size_t i = 0; i < LAYERS_COUNT; i++)
+    for (unsigned int i = 0; i < LAYERS_COUNT; i++)
       texture->SetData (i, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_L8, image_data.data ());
 
     md5 (image_data.data (), image_data.size (), hash[0]);

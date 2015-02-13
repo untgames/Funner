@@ -21,14 +21,14 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
     Установка / чтение данных после отсечения
 */
 
-void SystemMemoryBuffer::SetDataCore (size_t offset, size_t size, const void* data)
+void SystemMemoryBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
 {
   memcpy (buffer.data () + offset, data, size);
 
   need_data_hash_recalc = true;
 }
 
-void SystemMemoryBuffer::GetDataCore (size_t offset, size_t size, void* data)
+void SystemMemoryBuffer::GetDataCore (unsigned int offset, unsigned int size, void* data)
 {
   memcpy (data, buffer.data () + offset, size);
 }

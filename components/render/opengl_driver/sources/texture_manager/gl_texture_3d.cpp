@@ -93,9 +93,9 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 
   TextureDataSelector data_selector (tex_desc, data);
 
-  size_t depth = tex_desc.layers;
+  unsigned int depth = tex_desc.layers;
 
-  for (size_t mip_level=0; mip_level<GetMipsCount (); mip_level++)
+  for (unsigned int mip_level=0; mip_level<GetMipsCount (); mip_level++)
   {
     MipLevelDesc level_desc;
 
@@ -128,12 +128,12 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 */
 
 void Texture3D::GetData
- (size_t          layer,
-  size_t          mip_level,
-  size_t          x,
-  size_t          y,
-  size_t          width,
-  size_t          height,
+ (unsigned int    layer,
+  unsigned int    mip_level,
+  unsigned int    x,
+  unsigned int    y,
+  unsigned int    width,
+  unsigned int    height,
   PixelFormat     target_format,
   void*           buffer,
   IDeviceContext* context)
@@ -202,21 +202,21 @@ void Texture3D::GetData
 */
 
 void Texture3D::SetUncompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  GLenum      type,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  GLenum       type,
+  const void*  buffer)
 {
   if (glTexSubImage3D) glTexSubImage3D    (GL_TEXTURE_3D, mip_level, x, y, layer, width, height, 1, format, type, buffer);
   else                 glTexSubImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, x, y, layer, width, height, 1, format, type, buffer);
 }
 
-void Texture3D::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+void Texture3D::SetCompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, unsigned int, const void*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture3D::SetCompressedData", "Compression for 3D textures not supported");
 }

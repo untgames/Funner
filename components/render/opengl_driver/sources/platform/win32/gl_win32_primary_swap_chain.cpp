@@ -143,7 +143,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
   }  
   
 ///Установка состояния полноэкранного режима
-  void SetFullscreenState (bool state, size_t color_bits)
+  void SetFullscreenState (bool state, unsigned int color_bits)
   {
     if (GetFullscreenState () == state)
       return;

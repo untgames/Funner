@@ -192,7 +192,7 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
   }
 }
 
-ITexture* SwapChainFrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, size_t buffer_index)
+ITexture* SwapChainFrameBufferManager::CreateColorBuffer (ISwapChain* swap_chain, unsigned int buffer_index)
 {
   try
   {
@@ -273,7 +273,7 @@ IFrameBuffer* SwapChainFrameBufferManager::CreateFrameBuffer (View* color_view, 
     Установка активного буфера кадра
 */
 
-void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, size_t frame_buffer_id, size_t cache_id)
+void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, unsigned int frame_buffer_id, size_t cache_id)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBufferManager::SetFrameBuffer";  
 

@@ -119,9 +119,9 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
       unpacked_buffer.resize (get_uncompressed_image_size (tex_desc.width, tex_desc.height, tex_desc.format));  
     }
 
-    size_t mips_count = GetMipsCount ();    
+    unsigned int mips_count = GetMipsCount ();
 
-    for (size_t i=0; i<mips_count; i++)
+    for (unsigned int i=0; i<mips_count; i++)
     {
       MipLevelDesc level_desc;
 
@@ -186,29 +186,29 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 */
 
 void Texture2D::SetUncompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  GLenum      type,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  GLenum       type,
+  const void*  buffer)
 {
   glTexSubImage2D (GL_TEXTURE_2D, mip_level, x, y, width, height, format, type, buffer);
 }
 
 void Texture2D::SetCompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  size_t      buffer_size,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  unsigned int buffer_size,
+  const void*  buffer)
 {
   GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_2D, mip_level, x, y, width, height, format, buffer_size, buffer);
 }

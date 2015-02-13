@@ -35,7 +35,7 @@ TextureDataSelector::TextureDataSelector (const TextureDesc& in_desc, const Text
   }  
 }
 
-bool TextureDataSelector::GetLevelData (size_t width, size_t height, size_t depth, TextureLevelData& out)
+bool TextureDataSelector::GetLevelData (unsigned int width, unsigned int height, unsigned int depth, TextureLevelData& out)
 {
   if (!data)
   {
@@ -45,7 +45,7 @@ bool TextureDataSelector::GetLevelData (size_t width, size_t height, size_t dept
     return false;    
   }
 
-  size_t size = get_image_size (width, height, depth, format);  
+  unsigned int size = get_image_size (width, height, depth, format);
 
   if (data->sizes && data->sizes [index] >= size)
     size = data->sizes [index];    

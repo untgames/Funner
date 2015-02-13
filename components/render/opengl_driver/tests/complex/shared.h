@@ -172,7 +172,7 @@ struct Test
       clear_color.blue  = 0.7f;
       clear_color.alpha = 1.0f;
 
-      size_t rt_index = 0;
+      unsigned int rt_index = 0;
 
       device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 1.0f, 0);
 

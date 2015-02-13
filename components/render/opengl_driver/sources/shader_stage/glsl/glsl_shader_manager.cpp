@@ -23,7 +23,7 @@ Profile profiles [] = {
 };
 
 //количество профилей
-const size_t PROFILES_COUNT = sizeof (profiles) / sizeof (*profiles);
+const unsigned int PROFILES_COUNT = sizeof (profiles) / sizeof (*profiles);
 
 }
 
@@ -77,7 +77,7 @@ IShader* GlslShaderManager::CreateShader (const ShaderDesc& desc, const LogFunct
     //определение типа шейдера
 
   GLenum type = 0;
-  size_t i;
+  unsigned int i;
 
   for (i=0; i<PROFILES_COUNT; i++)
     if (!strcmp (desc.profile, profiles [i].name))
@@ -94,7 +94,7 @@ IShader* GlslShaderManager::CreateShader (const ShaderDesc& desc, const LogFunct
   return new GlslShader (GetContextManager (), type, desc, error_log);
 }
 
-ICompiledProgram* GlslShaderManager::CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log)
+ICompiledProgram* GlslShaderManager::CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction& error_log)
 {
   if (!shaders)
     throw xtl::make_null_argument_exception ("render::low_level::opengl::GlslShaderManager::CreateProgram", "shaders");

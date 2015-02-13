@@ -15,16 +15,16 @@ struct GlslBindableProgram::Parameter
 {
   int                  location;  //имя константы
   ProgramParameterType type;      //тип константы
-  size_t               count;     //количество элементов массива
-  size_t               offset;    //смещение относительно начала константного буфера
+  unsigned int         count;     //количество элементов массива
+  unsigned int         offset;    //смещение относительно начала константного буфера
 };
 
 struct GlslBindableProgram::Group
 {
-  size_t     slot;       //номер слота с константым буфером
-  size_t     data_hash;  //хеш данных константного буфера
-  size_t     count;      //количество элементов группы
-  Parameter* parameters; //указатель на начало области с элементами
+  unsigned int slot;       //номер слота с константым буфером
+  size_t       data_hash;  //хеш данных константного буфера
+  unsigned int count;      //количество элементов группы
+  Parameter*   parameters; //указатель на начало области с элементами
 };
 
 /*
@@ -41,7 +41,7 @@ GlslBindableProgram::GlslBindableProgram
   try
   {
     const GlslProgram::Parameter* uniforms       = program.GetParameters ();
-    size_t                        uniforms_count = program.GetParametersCount ();
+    unsigned int                  uniforms_count = program.GetParametersCount ();
 
     stl::vector<int> uniform_linked (uniforms_count);
 
@@ -79,7 +79,7 @@ GlslBindableProgram::GlslBindableProgram
           size_t                        name_hash  = common::strhash (src_parameter.name);
           const GlslProgram::Parameter* uniform    = 0;
             
-          for (size_t k=0; k<uniforms_count; k++)
+          for (unsigned int k=0; k<uniforms_count; k++)
           {
             if (uniforms [k].name_hash == name_hash && uniforms [k].name == src_parameter.name)
             {
@@ -115,7 +115,7 @@ GlslBindableProgram::GlslBindableProgram
 
         dst_group.slot       = src_group.slot;
         dst_group.data_hash  = 0;
-        dst_group.count      = parameters.size () - start_parameters_count;
+        dst_group.count      = (unsigned int)(parameters.size () - start_parameters_count);
         dst_group.parameters = &parameters [start_parameters_count];
 
         if (!dst_group.count)
@@ -127,7 +127,7 @@ GlslBindableProgram::GlslBindableProgram
     
       //проверка связанности всех параметров программы
 
-    for (size_t i=0; i<uniforms_count; i++)
+    for (unsigned int i=0; i<uniforms_count; i++)
       if (!uniform_linked [i])
         throw xtl::format_operation_exception ("", "Program uniform parameter '%s' with type %s and elements count %u has not found in program parameters layout", uniforms [i].name.c_str (),
           get_name (uniforms [i].type), uniforms [i].elements_count);
@@ -237,14 +237,14 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 */
 
 template <unsigned int Size>
-float* GlslBindableProgram::GetTransposedMatrixes (size_t count, float* data)
+float* GlslBindableProgram::GetTransposedMatrixes (unsigned int count, float* data)
 {
   float* buffer = (float*)GetContextManager ().GetTempBuffer (count * sizeof (math::matrix<float, Size>));
 
   math::matrix<float, Size> *out_matrix = (math::matrix<float, Size>*)buffer,
                             *in_matrix  = (math::matrix<float, Size>*)data;
 
-  for (size_t i = 0; i < count; i++, out_matrix++, in_matrix++)
+  for (unsigned int i = 0; i < count; i++, out_matrix++, in_matrix++)
     *out_matrix = math::transpose (*in_matrix);
 
   return buffer;

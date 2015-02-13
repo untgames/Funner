@@ -32,8 +32,8 @@ struct rgba8_t
 
 struct depth24_stencil8
 {
-  size_t depth_component : 24;
-  size_t stencil_index   : 8;
+  unsigned int depth_component : 24;
+  unsigned int stencil_index   : 8;
 };
 
 /*
@@ -47,7 +47,7 @@ void scale_pixel (ubyte& dest,ubyte s1,ubyte s2,ubyte s3,ubyte s4)
 
 void scale_pixel (uint16& dest, uint16 s1, uint16 s2, uint16 s3, uint16 s4)
 {
-  dest = (size_t)(s1 + s2 + s3 + s4) >> 2;
+  dest = (unsigned int)(s1 + s2 + s3 + s4) >> 2;
 }
 
 void scale_pixel (uint32& dest, uint32 s1, uint32 s2, uint32 s3, uint32 s4)
@@ -57,33 +57,33 @@ void scale_pixel (uint32& dest, uint32 s1, uint32 s2, uint32 s3, uint32 s4)
 
 void scale_pixel (depth24_stencil8& dest, const depth24_stencil8& s1, const depth24_stencil8& s2, const depth24_stencil8& s3, const depth24_stencil8& s4)
 {
-  dest.stencil_index   = (size_t)(s1.stencil_index + s2.stencil_index + s3.stencil_index + s4.stencil_index) / 4;
-  dest.depth_component = (size_t)(s1.depth_component + s2.depth_component + s3.depth_component + s4.depth_component) / 4;
+  dest.stencil_index   = (unsigned int)(s1.stencil_index + s2.stencil_index + s3.stencil_index + s4.stencil_index) / 4;
+  dest.depth_component = (unsigned int)(s1.depth_component + s2.depth_component + s3.depth_component + s4.depth_component) / 4;
 }
 
 void scale_pixel (two_color8_t& dest, two_color8_t s1, two_color8_t s2, two_color8_t s3, two_color8_t s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
+  dest.red   = (unsigned int)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (unsigned int)(s1.green + s2.green + s3.green + s4.green) / 4;
 }
 
 void scale_pixel (rgb8_t& dest,const rgb8_t& s1,const rgb8_t& s2,const rgb8_t& s3,const rgb8_t& s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
-  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
+  dest.red   = (unsigned int)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (unsigned int)(s1.green + s2.green + s3.green + s4.green) / 4;
+  dest.blue  = (unsigned int)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
 }
 
 void scale_pixel (rgba8_t& dest,const rgba8_t& s1,const rgba8_t& s2,const rgba8_t& s3,const rgba8_t& s4)
 {
-  dest.red   = (size_t)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
-  dest.green = (size_t)(s1.green + s2.green + s3.green + s4.green) / 4;
-  dest.blue  = (size_t)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
-  dest.alpha = (size_t)(s1.alpha + s2.alpha + s3.alpha + s4.alpha) / 4;
+  dest.red   = (unsigned int)(s1.red   + s2.red   + s3.red   + s4.red)   / 4;
+  dest.green = (unsigned int)(s1.green + s2.green + s3.green + s4.green) / 4;
+  dest.blue  = (unsigned int)(s1.blue  + s2.blue  + s3.blue  + s4.blue ) / 4;
+  dest.alpha = (unsigned int)(s1.alpha + s2.alpha + s3.alpha + s4.alpha) / 4;
 }
 
 template <class T>
-void scale_image_2x_down_impl (size_t width, size_t height, const void* in_src, void* in_dest)
+void scale_image_2x_down_impl (unsigned int width, unsigned int height, const void* in_src, void* in_dest)
 {
   const T* src  = static_cast<const T*> (in_src);
   T*       dest = static_cast<T*> (in_dest);
@@ -93,23 +93,23 @@ void scale_image_2x_down_impl (size_t width, size_t height, const void* in_src, 
           *s3 = src + width,
           *s4 = s3  + 1; 
 
-  size_t  w2  = width >> 1,
-          h2  = height >> 1;
+  unsigned int  w2  = width >> 1,
+                h2  = height >> 1;
 
-  for (size_t h = 0; h < h2; h++, s1 += width, s2 += width, s3 += width, s4 += width)
-    for (size_t w = 0; w < w2; w++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
+  for (unsigned int h = 0; h < h2; h++, s1 += width, s2 += width, s3 += width, s4 += width)
+    for (unsigned int w = 0; w < w2; w++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
       scale_pixel (*dest,*s1,*s2,*s3,*s4);
 
   if (height == 1)
   {
     s3 = s1; s4 = s2;
-    for (size_t w = 0; w < w2; w++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
+    for (unsigned int w = 0; w < w2; w++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
       scale_pixel (*dest,*s1,*s2,*s3,*s4);
   }
   if (width == 1)
   {
     s3 = s1; s4 = s2;
-    for (size_t h = 0; h < h2; h++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
+    for (unsigned int h = 0; h < h2; h++, s1 += 2, s2 += 2, s3 += 2, s4 += 2, dest++)
       scale_pixel (*dest,*s1,*s2,*s3,*s4);
   }
 }
@@ -125,7 +125,7 @@ fixed float2fixed (float data)
 }
 
 template <class T>
-void scale_image_impl (size_t width, size_t height, const void* in_src, size_t new_width, size_t new_height, void* in_dst)
+void scale_image_impl (unsigned int width, unsigned int height, const void* in_src, unsigned int new_width, unsigned int new_height, void* in_dst)
 {
   const T* src = static_cast<const T*> (in_src);
   T*       dst = static_cast<T*> (in_dst);
@@ -136,7 +136,7 @@ void scale_image_impl (size_t width, size_t height, const void* in_src, size_t n
         
   const T* line = src;
          
-  for (size_t dst_y=0; dst_y<new_height; dst_y++, src_y += dy)
+  for (unsigned int dst_y=0; dst_y<new_height; dst_y++, src_y += dy)
   {
     if (fixed2int (src_y))
     {
@@ -146,7 +146,7 @@ void scale_image_impl (size_t width, size_t height, const void* in_src, size_t n
     
     const T* s = line;
     
-    for (size_t src_x=0, dst_x=0; dst_x<new_width; dst_x++, src_x += dx, dst++)
+    for (unsigned int src_x=0, dst_x=0; dst_x<new_width; dst_x++, src_x += dx, dst++)
     {
       if (fixed2int (src_x))
       {
@@ -170,7 +170,7 @@ namespace low_level
 namespace opengl
 {
 
-void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest)
+void scale_image_2x_down (PixelFormat format, unsigned int width, unsigned int height, const void* src, void* dest)
 {
   switch (format)
   {
@@ -199,7 +199,7 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
   }
 }
 
-void scale_image (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest)
+void scale_image (PixelFormat format, unsigned int width, unsigned int height, unsigned int new_width, unsigned int new_height, const void* src, void* dest)
 {
   switch (format)
   {

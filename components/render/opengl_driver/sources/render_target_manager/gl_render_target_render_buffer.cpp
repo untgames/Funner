@@ -26,7 +26,7 @@ const GLenum MODE_NAMES [] = {
 #endif
 };
                               
-const size_t MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
+const unsigned int MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
 
 struct RenderBufferTempState
 {
@@ -35,7 +35,7 @@ struct RenderBufferTempState
     {
         //сохранение состояния параметров пофрагментных операций
 
-      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+      for (unsigned int i=0; i<MODE_NAMES_COUNT; i++)
         mode_states [i] = glIsEnabled (MODE_NAMES [i]) != 0;
 
       glGetIntegerv (GL_COLOR_WRITEMASK, color_write_mask);
@@ -44,7 +44,7 @@ struct RenderBufferTempState
 
         //отключение пофрагментных операций
 
-      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+      for (unsigned int i=0; i<MODE_NAMES_COUNT; i++)
         glDisable (MODE_NAMES [i]);
 
       glColorMask   (1, 1, 1, 1);
@@ -58,7 +58,7 @@ struct RenderBufferTempState
     {
         //восстановление состояния параметров пофрагментных операций
 
-      for (size_t i=0; i<MODE_NAMES_COUNT; i++)
+      for (unsigned int i=0; i<MODE_NAMES_COUNT; i++)
         if (mode_states [i]) glEnable (MODE_NAMES [i]);
         else                 glDisable (MODE_NAMES [i]);
 
@@ -83,10 +83,10 @@ struct RenderBufferTempState
 
 struct Depth24Stencil8
 {
-  size_t depth_component : 24;
-  size_t stencil_index : 8;
+  unsigned int depth_component : 24;
+  unsigned int stencil_index : 8;
 
-  void Set (size_t in_depth_component, unsigned char in_stencil_index)
+  void Set (unsigned int in_depth_component, unsigned char in_stencil_index)
   {
     depth_component = in_depth_component >> 8;
     stencil_index   = in_stencil_index;
@@ -105,8 +105,8 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, RenderTargetT
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::RenderBuffer";
 
-  PixelFormat format;
-  size_t      bind_flags;
+  PixelFormat  format;
+  unsigned int bind_flags;
 
   switch (target_type)
   {
@@ -174,7 +174,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
   }
 
-  static size_t BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
+  static unsigned int BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
 
   if (desc.bind_flags & BAD_BIND_FLAGS)
     throw xtl::make_argument_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
@@ -187,7 +187,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case AccessFlag_ReadWrite:
       break;
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", (size_t)desc.access_flags);
   }
 
   switch (desc.usage_mode)
@@ -231,7 +231,7 @@ void RenderBuffer::GetDesc (TextureDesc& out_desc)
     Изменение размеров
 */
 
-void RenderBuffer::SetSize (size_t width, size_t height)
+void RenderBuffer::SetSize (unsigned int width, unsigned int height)
 {
   desc.width  = width;
   desc.height = height;
@@ -278,7 +278,7 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
+void RenderBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
 
@@ -346,13 +346,13 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
       {
         case PixelFormat_D16:
         {
-          xtl::uninitialized_storage<size_t> depth_buffer (width * height);
+          xtl::uninitialized_storage<unsigned int> depth_buffer (width * height);
 
-          size_t*               dst_pixel = depth_buffer.data ();
+          unsigned int*         dst_pixel = depth_buffer.data ();
           const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
 
-          for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
-            *dst_pixel = size_t (*src_pixel) << 16;
+          for (unsigned int count=width*height; count--; src_pixel++, dst_pixel++)
+            *dst_pixel = unsigned int (*src_pixel) << 16;
 
           glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
 
@@ -360,12 +360,12 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         }
         case PixelFormat_D24X8:
         {
-          xtl::uninitialized_storage<size_t> depth_buffer (width * height);
+          xtl::uninitialized_storage<unsigned int> depth_buffer (width * height);
 
-          size_t*       dst_pixel = depth_buffer.data ();
-          const size_t* src_pixel = static_cast<const size_t*> (buffer);
+          unsigned int*       dst_pixel = depth_buffer.data ();
+          const unsigned int* src_pixel = static_cast<const unsigned int*> (buffer);
 
-          for (size_t count=width*height; count--; src_pixel++, dst_pixel++)
+          for (unsigned int count=width*height; count--; src_pixel++, dst_pixel++)
             *dst_pixel = *src_pixel << 8;
 
           glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
@@ -385,16 +385,16 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
           {
               //разделение данных буфера на компоненты глубины и трафарета
 
-            xtl::uninitialized_storage<size_t>        depth_buffer (width * height);
+            xtl::uninitialized_storage<unsigned int>  depth_buffer (width * height);
             xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
 
             const Depth24Stencil8* src_pixel         = static_cast<const Depth24Stencil8*> (buffer);
-            size_t*                dst_depth_pixel   = depth_buffer.data ();
+            unsigned int*          dst_depth_pixel   = depth_buffer.data ();
             unsigned char*         dst_stencil_pixel = stencil_buffer.data ();
 
-            for (size_t count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
+            for (unsigned int count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
             {
-              *dst_depth_pixel   = (size_t)(src_pixel->depth_component) << 8;
+              *dst_depth_pixel   = (unsigned int)(src_pixel->depth_component) << 8;
               *dst_stencil_pixel = src_pixel->stencil_index;
             }
 
@@ -443,14 +443,14 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
 #else //OPENGL_ES_SUPPORT & OPENGL_ES2_SUPPORT
 
-void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
+void RenderBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderBuffer::SetData", "RenderBuffer::SetData not supported");  
 }
 
 #endif
 
-void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context)
+void RenderBuffer::GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::GetData";
 
@@ -513,9 +513,9 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         {
           glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, buffer);
 
-          size_t* pixel = static_cast<size_t*> (buffer);
+          unsigned int* pixel = static_cast<unsigned int*> (buffer);
 
-          for (size_t count=width*height; count--; pixel++)
+          for (unsigned int count=width*height; count--; pixel++)
             *pixel >>= 8;
 
           break;
@@ -533,7 +533,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
           {
               //создание буферов для хранения разделенных данных глубины и трафарета
 
-            xtl::uninitialized_storage<size_t>        depth_buffer (width * height);
+            xtl::uninitialized_storage<unsigned int>  depth_buffer (width * height);
             xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
 
               //копирование
@@ -544,10 +544,10 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
               //упаковка прочитанных данных
 
             Depth24Stencil8*     dst_pixel         = static_cast<Depth24Stencil8*> (buffer);
-            const size_t*        src_depth_pixel   = depth_buffer.data ();
+            const unsigned int*  src_depth_pixel   = depth_buffer.data ();
             const unsigned char* src_stencil_pixel = stencil_buffer.data ();
 
-            for (size_t count=width*height; count--; dst_pixel++, src_depth_pixel++, src_stencil_pixel++)
+            for (unsigned int count=width*height; count--; dst_pixel++, src_depth_pixel++, src_stencil_pixel++)
               dst_pixel->Set (*src_depth_pixel, *src_stencil_pixel);
           }
 

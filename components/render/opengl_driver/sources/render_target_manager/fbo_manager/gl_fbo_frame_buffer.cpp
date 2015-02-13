@@ -161,7 +161,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
+void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, unsigned int texture_id, const ViewDesc& view_desc)
 {
   const ContextCaps& caps = GetCaps ();
 
@@ -186,7 +186,7 @@ void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t 
 
 #else
 
-void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
+void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, unsigned int texture_id, const ViewDesc& view_desc)
 {
   const ContextCaps& caps = GetCaps ();
 
@@ -246,7 +246,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, FboRenderBuffe
 {
   const ContextCaps& caps = GetCaps ();
 
-  size_t render_buffer_id = render_buffer->GetRenderBufferId ();
+  unsigned int render_buffer_id = render_buffer->GetRenderBufferId ();
 
   switch (target_type)
   {

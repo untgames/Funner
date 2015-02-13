@@ -125,8 +125,8 @@ struct PBuffer::Impl
 
       log.Printf ("...PBuffer %ux%u successfully created", width, height);
 
-      desc.frame_buffer.width  = (size_t)width;
-      desc.frame_buffer.height = (size_t)height;
+      desc.frame_buffer.width  = width;
+      desc.frame_buffer.height = height;
     }
     catch (...)
     {
@@ -183,7 +183,7 @@ struct PBuffer::Impl
     Конструктор / деструктор
 */
 
-PBuffer::PBuffer (PrimarySwapChain* swap_chain, size_t width, size_t height)
+PBuffer::PBuffer (PrimarySwapChain* swap_chain, unsigned int width, unsigned int height)
   : impl (new Impl (swap_chain))
 {
   impl->create_largest_flag = false;

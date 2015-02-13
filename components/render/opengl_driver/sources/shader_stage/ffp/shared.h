@@ -23,7 +23,7 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онстанты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t FFP_MAX_LIGHTS_COUNT = 8; //максимальное количество источников освещени€
+const unsigned int FFP_MAX_LIGHTS_COUNT = 8; //максимальное количество источников освещени€
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“ип источника света
@@ -189,7 +189,7 @@ enum FfpDynamicParameterType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћассив смещений полей структуры FppState, обновл€емых вместе с динамическим параметром
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef stl::vector<size_t> FfpFieldOffsetArray;
+typedef stl::vector<unsigned int> FfpFieldOffsetArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒинамический параметр ffp-шейдера (аналог uniform-var в glsl)
@@ -197,7 +197,7 @@ typedef stl::vector<size_t> FfpFieldOffsetArray;
 struct FfpDynamicParameter
 {
   FfpDynamicParameterType type;          //тип параметра
-  size_t                  count;         //количество элементов
+  unsigned int            count;         //количество элементов
   FfpFieldOffsetArray     field_offsets; //смещени€ полей в структуре FfpState, обновл€емых при изменении параметра
 };
 
@@ -310,7 +310,7 @@ class FfpShaderManager : virtual public IShaderManager, public ContextObject
 ///—оздание шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IShader*          CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log);
-    ICompiledProgram* CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log);
+    ICompiledProgram* CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction& error_log);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

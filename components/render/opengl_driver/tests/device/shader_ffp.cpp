@@ -23,7 +23,7 @@ int main ()
 
     stl::string shader_source = read_shader (SHADER_FILE_NAME);
 
-    ShaderDesc shader_desc = {"my_shader", size_t (-1), shader_source.c_str (), "ffp", ""};
+    ShaderDesc shader_desc = {"my_shader", unsigned int (-1), shader_source.c_str (), "ffp", ""};
 
     ProgramPtr program (test.device->CreateProgram (1, &shader_desc, &print));
     

@@ -11,7 +11,7 @@ namespace
     Константы
 */
 
-const size_t FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
+const unsigned int FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
 
 /*
     Пара: тэг - значение
@@ -52,7 +52,7 @@ class FfpProgramParser
     
   private:
       //добавление динамического параметра
-    void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FfpDynamicParameterType type, size_t count)
+    void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FfpDynamicParameterType type, unsigned int count)
     {
       FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
 
@@ -71,7 +71,7 @@ class FfpProgramParser
     }
     
       //добавление смещения на динамический параметр
-    void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, size_t offset, FfpDynamicParameterType type, size_t count)
+    void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, unsigned int offset, FfpDynamicParameterType type, unsigned int count)
     {
       FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
 
@@ -101,7 +101,7 @@ class FfpProgramParser
     
       //разбор значений
     template <class T, FfpDynamicParameterType Type>
-    void ParseValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    void ParseValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
       iter = iter->First (node_name);
       
@@ -140,36 +140,36 @@ class FfpProgramParser
     }
 
       //разбор целочисленных значений
-    void ParseIntegerValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    void ParseIntegerValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
       ParseValues<int, FfpDynamicParameterType_Int> (iter, node_name, offset, count);
     }
 
       //разбор вещественных значений
-    void ParseFloatValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
+    void ParseFloatValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
       ParseValues<float, FfpDynamicParameterType_Float> (iter, node_name, offset, count);
     }
     
       //разбор векторов
-    void ParseVector4f (Parser::Iterator iter, const char* node_name, size_t offset)
+    void ParseVector4f (Parser::Iterator iter, const char* node_name, unsigned int offset)
     {
       ParseFloatValues (iter, node_name, offset, 4);
     }
 
-    void ParseVector3f (Parser::Iterator iter, const char* node_name, size_t offset)
+    void ParseVector3f (Parser::Iterator iter, const char* node_name, unsigned int offset)
     {
       ParseFloatValues (iter, node_name, offset, 3);
     }
 
       //разбор матрицы
-    void ParseMatrix4f (Parser::Iterator iter, const char* node_name, size_t offset)
+    void ParseMatrix4f (Parser::Iterator iter, const char* node_name, unsigned int offset)
     {
       ParseFloatValues (iter, node_name, offset, 16);
     }
     
       //разбор объявления параметров
-    void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FfpDynamicParameterType type, size_t count)
+    void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FfpDynamicParameterType type, unsigned int count)
     {
       for (Parser::NamesakeIterator iter=params_iter->First (name); iter; ++iter)
       {
@@ -179,13 +179,13 @@ class FfpProgramParser
           continue;
         }
 
-        for (size_t i=0; i<iter->AttributesCount (); i++)
+        for (unsigned int i=0; i<iter->AttributesCount (); i++)
           AddDynamicParameter (iter, iter->Attribute (i), type, count);
       }
     }
     
       //разбор строкового свойства
-    void ParseEnum (Parser::Iterator iter, const char* node_name, size_t offset, const Tag2Value* pairs)
+    void ParseEnum (Parser::Iterator iter, const char* node_name, unsigned int offset, const Tag2Value* pairs)
     {
       iter = iter->First (node_name);
 
@@ -216,7 +216,7 @@ class FfpProgramParser
     }
     
       //разбор параметров источника освещения
-    void ParseLight (Parser::Iterator light_iter, size_t base_offset)
+    void ParseLight (Parser::Iterator light_iter, unsigned int base_offset)
     {
       static const Tag2Value light_types [] = {
         {"Point",  LightType_Point},
@@ -240,13 +240,13 @@ class FfpProgramParser
     }    
   
       //разбор параметров текстрирования
-    void ParseTexmap (Parser::Iterator texmap_iter, size_t base_offset)
+    void ParseTexmap (Parser::Iterator texmap_iter, unsigned int base_offset)
     {
-      ParseMatrix4f (texmap_iter, "Transform", base_offset + offsetof (TexmapDesc, transform));
-      ParseMatrix4f (texmap_iter, "Texgen",    base_offset + offsetof (TexmapDesc, transform));
-      ParseVector4f (texmap_iter, "TexgenU",   base_offset + offsetof (TexmapDesc, transform [0][0]));
-      ParseVector4f (texmap_iter, "TexgenV",   base_offset + offsetof (TexmapDesc, transform [1][0]));
-      ParseVector4f (texmap_iter, "TexgenW",   base_offset + offsetof (TexmapDesc, transform [2][0]));
+      ParseMatrix4f (texmap_iter, "Transform", base_offset + (unsigned int)offsetof (TexmapDesc, transform));
+      ParseMatrix4f (texmap_iter, "Texgen",    base_offset + (unsigned int)offsetof (TexmapDesc, transform));
+      ParseVector4f (texmap_iter, "TexgenU",   base_offset + (unsigned int)offsetof (TexmapDesc, transform [0][0]));
+      ParseVector4f (texmap_iter, "TexgenV",   base_offset + (unsigned int)offsetof (TexmapDesc, transform [1][0]));
+      ParseVector4f (texmap_iter, "TexgenW",   base_offset + (unsigned int)offsetof (TexmapDesc, transform [2][0]));
       
       static const Tag2Value texcoord_sources [] = {
         {"Explicit",      TexcoordSource_Explicit},
@@ -350,16 +350,16 @@ class FfpProgramParser
 
         //разбор параметров освещения
         
-      size_t light_index = 0;
+      unsigned int light_index = 0;
         
       for (Parser::Iterator light_iter = program_iter->First ("Light"); light_iter && light_index < FFP_MAX_LIGHTS_COUNT; ++light_iter, ++light_index)
       {
-        ParseLight (light_iter, offsetof (FfpState, lights [0]) + light_index * sizeof (LightDesc));
+        ParseLight (light_iter, (unsigned int)offsetof (FfpState, lights [0]) + light_index * sizeof (LightDesc));
       }
 
         //разбор параметров текстурирования
 
-      for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
         char texmap_name [32];
         
@@ -368,7 +368,7 @@ class FfpProgramParser
         Parser::Iterator texmap_iter = program_iter->First (texmap_name);
         
         if (texmap_iter)
-          ParseTexmap (texmap_iter, offsetof (FfpState, maps [0]) + i * sizeof (TexmapDesc));
+          ParseTexmap (texmap_iter, (unsigned int)offsetof (FfpState, maps [0]) + i * sizeof (TexmapDesc));
       }
     }    
 
@@ -399,14 +399,14 @@ FfpProgram::FfpProgram (const ContextManager& manager, const ShaderDesc& shader_
 
   base_state.material.alpha_compare_mode = CompareMode_AlwaysPass;
 
-  for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
+  for (unsigned int i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
   {
     LightDesc& light = base_state.lights [i];
     
     light.constant_attenuation = 1.0f;
   }
   
-  for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+  for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
   {
     TexmapDesc& texmap = base_state.maps [i];
 

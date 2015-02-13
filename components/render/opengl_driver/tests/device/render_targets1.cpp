@@ -66,7 +66,7 @@ int main ()
       clear_color.blue  = 0.7f;
       clear_color.alpha = 0;
 
-      size_t rt_index = 0;
+      unsigned int rt_index = 0;
 
       test.device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 0.5f, 12);
       test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);

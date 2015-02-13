@@ -61,13 +61,13 @@ enum TextureDimension
 struct TextureDesc
 {
   TextureDimension dimension;             //размерность текстуры
-  size_t           width;                 //ширина текстуры
-  size_t           height;                //высота текстуры
-  size_t           layers;                //количество слоёв (для кубических текстур), глубина (для трёхмерных текстур)
+  unsigned int     width;                 //ширина текстуры
+  unsigned int     height;                //высота текстуры
+  unsigned int     layers;                //количество слоёв (для кубических текстур), глубина (для трёхмерных текстур)
   PixelFormat      format;                //формат пикселей
   bool             generate_mips_enable;  //разрешена ли генерация mip-уровней
-  size_t           access_flags;          //флаги доступа к буферу
-  size_t           bind_flags;            //флаги биндинга буфера
+  unsigned int     access_flags;          //флаги доступа к буферу
+  unsigned int     bind_flags;            //флаги биндинга буфера
   UsageMode        usage_mode;            //режим использования буфера
 };
 
@@ -76,8 +76,8 @@ struct TextureDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TextureData
 {
-  const void*   data;  //текстурные данные
-  const size_t* sizes; //размеры мип-уровней (если равен 0, то расчитывается автоматически)
+  const void*         data;  //текстурные данные
+  const unsigned int* sizes; //размеры мип-уровней (если равен 0, то расчитывается автоматически)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +94,8 @@ class ITexture : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context = 0) = 0;
-    virtual void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context = 0) = 0;
+    virtual void SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* context = 0) = 0;
+    virtual void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* context = 0) = 0;
 };
 
 }

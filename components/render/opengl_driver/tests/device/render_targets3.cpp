@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t ARRAYS_RESERVE_SIZE = 2048;
+const unsigned int ARRAYS_RESERVE_SIZE = 2048;
 
 enum RenderTargetType
 {
@@ -83,11 +83,11 @@ int main ()
     
     textures.reserve (ARRAYS_RESERVE_SIZE);    
     
-    static size_t tex_sizes [2] = {36, 32};
+    static unsigned int tex_sizes [2] = {36, 32};
     
     for (int i=0; i<2; i++)
     {    
-      size_t volatile tex_size = tex_sizes [i];
+      unsigned int volatile tex_size = tex_sizes [i];
       
       for (int dim=0; dim<TextureDimension_Num; dim++)
       {
@@ -169,7 +169,7 @@ int main ()
       
       texture->GetDesc (texture_desc);
       
-      for (size_t layer=0; layer<texture_desc.layers; layer++)
+      for (unsigned int layer=0; layer<texture_desc.layers; layer++)
       {
         ViewDesc view_desc;
         
@@ -203,11 +203,11 @@ int main ()
     
     StatusTable status (views.size () * views.size ());
     
-    for (size_t i=0; i<views.size (); i++)
+    for (unsigned int i=0; i<views.size (); i++)
     {      
       ViewPtr color_view = views [i];
       
-      for (size_t j=0; j<views.size (); j++)
+      for (unsigned int j=0; j<views.size (); j++)
       {
         ViewPtr depth_stencil_view = views [j];
                 
@@ -240,7 +240,7 @@ int main ()
 
     printf ("Status info:\n");
 
-    for (size_t i=0; i<views.size (); i++)
+    for (unsigned int i=0; i<views.size (); i++)
     {
       printf ("%03u) ", i+1);
       dump   (views [i].get ());
@@ -250,7 +250,7 @@ int main ()
     printf ("Status table (rows - render-target view, columns - depth-stencil view):\n");
     printf ("    ");
     
-    for (size_t i=0; i<views.size (); i++)
+    for (unsigned int i=0; i<views.size (); i++)
       switch (get_target_type (views [i].get ()))
       {
         case RenderTargetType_Null:
@@ -263,7 +263,7 @@ int main ()
 
     printf ("\n");
 
-    for (size_t i=0; i<views.size (); i++)
+    for (unsigned int i=0; i<views.size (); i++)
     {
       switch (get_target_type (views [i].get ()))
       {
@@ -275,7 +275,7 @@ int main ()
           continue;
       }
       
-      for (size_t j=0; j<views.size (); j++)
+      for (unsigned int j=0; j<views.size (); j++)
       {
         switch (get_target_type (views [j].get ()))
         {

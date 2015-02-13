@@ -45,9 +45,9 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
 
     TextureDataSelector data_selector (tex_desc, data);
 
-    for (size_t i=0; i<GetMipsCount (); i++)
+    for (unsigned int i=0; i<GetMipsCount (); i++)
     {
-      size_t level_width = tex_desc.width >> i;
+      unsigned int level_width = tex_desc.width >> i;
       
       TextureLevelData level_data;
       
@@ -68,12 +68,12 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
     Установка данных
 */
 
-void Texture1D::SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t, size_t width, size_t, GLenum format, GLenum type, const void* buffer)
+void Texture1D::SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int, unsigned int width, unsigned int, GLenum format, GLenum type, const void* buffer)
 {
   glTexSubImage1D (GL_TEXTURE_1D, mip_level, x, width, format, type, buffer);
 }
 
-void Texture1D::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+void Texture1D::SetCompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, unsigned int, const void*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture1D::SetCompressedData", "Compression for 1D textures not supported");
 }

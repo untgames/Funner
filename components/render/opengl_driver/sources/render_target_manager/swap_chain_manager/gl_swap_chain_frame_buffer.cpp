@@ -286,10 +286,10 @@ void SwapChainFrameBuffer::Bind ()
     Оповещение об отрисовке в целевые буферы
 */
 
-void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot, const Rect& update_rect)
+void SwapChainFrameBuffer::InvalidateRenderTargets (unsigned int render_target_slot, const Rect& update_rect)
 {
   if (render_target_slot)
-    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(size_t,const Rect&)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(unsigned int,const Rect&)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
 
   if (update_rect.x < dirty_rect.x)
   {
@@ -303,8 +303,8 @@ void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot, c
     dirty_rect.y       = update_rect.y;
   }
 
-  size_t right  = update_rect.x + update_rect.width,
-         bottom = update_rect.y + update_rect.height;
+  unsigned int right  = update_rect.x + update_rect.width,
+               bottom = update_rect.y + update_rect.height;
 
   if (right > dirty_rect.x + dirty_rect.width)
     dirty_rect.width = right - dirty_rect.x;
@@ -313,15 +313,15 @@ void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot, c
     dirty_rect.height = bottom - dirty_rect.y;
 }
 
-void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot)
+void SwapChainFrameBuffer::InvalidateRenderTargets (unsigned int render_target_slot)
 {
   if (render_target_slot)
-    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(size_t)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(unsigned int)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
 
-  size_t color_width  = render_targets [RenderTargetType_Color].mip_level_desc.width,
-         color_height = render_targets [RenderTargetType_Color].mip_level_desc.height,
-         ds_width     = render_targets [RenderTargetType_DepthStencil].mip_level_desc.width,
-         ds_height    = render_targets [RenderTargetType_DepthStencil].mip_level_desc.height;
+  unsigned int color_width  = render_targets [RenderTargetType_Color].mip_level_desc.width,
+               color_height = render_targets [RenderTargetType_Color].mip_level_desc.height,
+               ds_width     = render_targets [RenderTargetType_DepthStencil].mip_level_desc.width,
+               ds_height    = render_targets [RenderTargetType_DepthStencil].mip_level_desc.height;
 
   dirty_rect.x      = 0;
   dirty_rect.y      = 0;
@@ -348,7 +348,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
   
     //копирование изображений из различных целевых буферов в текстуру
         
-  for (size_t i=0; i<RenderTargetType_Num; i++)
+  for (unsigned int i=0; i<RenderTargetType_Num; i++)
   {
     RenderTarget& render_target = render_targets [i];
 
@@ -363,10 +363,10 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
 
       //отсечение
       
-    size_t x      = dirty_rect.x,
-           y      = dirty_rect.y,
-           width  = dirty_rect.width,
-           height = dirty_rect.height;
+    unsigned int x      = dirty_rect.x,
+                 y      = dirty_rect.y,
+                 width  = dirty_rect.width,
+                 height = dirty_rect.height;
 
     if (x > mip_level_desc.width || y > mip_level_desc.height)
       continue;

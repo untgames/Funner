@@ -47,7 +47,7 @@ IShader* FfpShaderManager::CreateShader  (const ShaderDesc& shader_desc, const L
     Создание программы
 */
 
-ICompiledProgram* FfpShaderManager::CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction&)
+ICompiledProgram* FfpShaderManager::CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction&)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FfpShaderManager::CreateProgram";
 

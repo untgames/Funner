@@ -439,7 +439,7 @@ const char* get_name (QueryType type)
 */
 
 //получение размеров несжатого текселя
-size_t get_texel_size (PixelFormat format)
+unsigned int get_texel_size (PixelFormat format)
 {
   switch (format)
   {
@@ -470,9 +470,9 @@ size_t get_texel_size (PixelFormat format)
 }
 
 //получение размера изображения
-size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
+unsigned int get_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format)
 {
-  static const size_t DXT_BLOCK_SIZE = 16;
+  static const unsigned int DXT_BLOCK_SIZE = 16;
 
   switch (format)
   {
@@ -509,12 +509,12 @@ size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat fo
   }
 }
 
-size_t get_image_size (size_t width, size_t height, PixelFormat format)
+unsigned int get_image_size (unsigned int width, unsigned int height, PixelFormat format)
 {
   return get_image_size (width, height, 1, format);
 }
 
-size_t get_image_size (size_t width, PixelFormat format)
+unsigned int get_image_size (unsigned int width, PixelFormat format)
 {
   return get_image_size (width, 1, 1, format);
 }
@@ -624,23 +624,23 @@ PixelFormat get_uncompressed_format (PixelFormat format)
 }
 
 //получение размеров распакованного текселя
-size_t get_uncompressed_texel_size (PixelFormat format)
+unsigned int get_uncompressed_texel_size (PixelFormat format)
 {
   return get_texel_size (get_uncompressed_format (format));
 }
 
 //получение размера изображения после распаковки
-size_t get_uncompressed_image_size (size_t width, PixelFormat format)
+unsigned int get_uncompressed_image_size (unsigned int width, PixelFormat format)
 {
   return get_image_size (width, get_uncompressed_format (format));
 }
 
-size_t get_uncompressed_image_size (size_t width, size_t height, PixelFormat format)
+unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, PixelFormat format)
 {
   return get_image_size (width, height, get_uncompressed_format (format));
 }
 
-size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
+unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format)
 {
   return get_image_size (width, height, depth, get_uncompressed_format (format));
 }
@@ -652,24 +652,24 @@ size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, P
 namespace
 {
 
-size_t get_max_size (size_t a, size_t b)
+unsigned int get_max_size (unsigned int a, unsigned int b)
 {
   return a > b ? a : b;
 }
 
 }
 
-size_t get_mips_count (size_t size)
+unsigned int get_mips_count (unsigned int size)
 {
-  return (size_t)(log ((double)size) / log (2.0)) + 1;
+  return (unsigned int)(log ((double)size) / log (2.0)) + 1;
 }
 
-size_t get_mips_count (size_t width, size_t height)
+unsigned int get_mips_count (unsigned int width, unsigned int height)
 {
   return get_mips_count (get_max_size (width, height));
 }
 
-size_t get_mips_count (size_t width, size_t height, size_t depth)
+unsigned int get_mips_count (unsigned int width, unsigned int height, unsigned int depth)
 {
   return get_mips_count (get_max_size (width, get_max_size (height, depth)));
 }

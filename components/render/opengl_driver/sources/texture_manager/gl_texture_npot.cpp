@@ -56,15 +56,15 @@ TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_
 */
 
 void TextureNpot::SetUncompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  GLenum      type,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  GLenum       type,
+  const void*  buffer)
 {
   if (mip_level)
     throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureNpot::SetUncompressedData",
@@ -73,7 +73,7 @@ void TextureNpot::SetUncompressedData
   glTexSubImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, x, y, width, height, format, type, buffer);
 }
 
-void TextureNpot::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+void TextureNpot::SetCompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, unsigned int, const void*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureNpot::SetCompressedData", "Compression for Npot textures not supported");
 }

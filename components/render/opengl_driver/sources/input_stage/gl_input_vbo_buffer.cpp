@@ -100,7 +100,7 @@ VboBuffer::~VboBuffer ()
     Установка / чтение данных после отсечения
 */
 
-void VboBuffer::SetDataCore (size_t offset, size_t size, const void* data)
+void VboBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
 {
   Bind ();  
   
@@ -109,7 +109,7 @@ void VboBuffer::SetDataCore (size_t offset, size_t size, const void* data)
   CheckErrors ("render::low_level::opengl::VboBuffer::SetDataCore");
 }
 
-void VboBuffer::GetDataCore (size_t offset, size_t size, void* data)
+void VboBuffer::GetDataCore (unsigned int offset, unsigned int size, void* data)
 {
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 

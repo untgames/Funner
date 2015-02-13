@@ -35,7 +35,7 @@ class TextureManagerState: public IStageState
     SamplerSlot* GetSlots () { return &samplers [0]; }
 
       //получение слота сэмплирования
-    SamplerSlot& GetSlot (size_t slot)
+    SamplerSlot& GetSlot (unsigned int slot)
     {
       if (slot >= DEVICE_SAMPLER_SLOTS_COUNT)
         throw xtl::make_range_exception ("render::low_level::opengl::TextureManagerState::GetSlot", "slot", slot, DEVICE_SAMPLER_SLOTS_COUNT);
@@ -44,7 +44,7 @@ class TextureManagerState: public IStageState
     }
 
       //установка текстуры
-    void SetTexture (size_t slot, BindableTexture* in_texture)
+    void SetTexture (unsigned int slot, BindableTexture* in_texture)
     {
       TexturePtr& texture = GetSlot (slot).texture;
 
@@ -57,13 +57,13 @@ class TextureManagerState: public IStageState
     }
 
       //получение текстуры
-    BindableTexture* GetTexture (size_t slot)
+    BindableTexture* GetTexture (unsigned int slot)
     {
       return GetSlot (slot).texture.get ();
     }
 
       //установка состояния сэмплирования
-    void SetSampler (size_t slot, SamplerState* in_state)
+    void SetSampler (unsigned int slot, SamplerState* in_state)
     {
       SamplerStatePtr& state = GetSlot (slot).sampler_state;
 
@@ -76,7 +76,7 @@ class TextureManagerState: public IStageState
     }
 
       //получение состояния сэмплирования
-    SamplerState* GetSampler (size_t slot)
+    SamplerState* GetSampler (unsigned int slot)
     {
       return GetSlot (slot).sampler_state.get ();
     }
@@ -101,7 +101,7 @@ class TextureManagerState: public IStageState
     {
       bool need_rebind = false;
 
-      for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
         if (mask.ss_textures [i])
         {
@@ -140,7 +140,7 @@ class TextureManagerState: public IStageState
 };
 
 //проверка размера на степень двойки
-bool is_power_of_two (size_t size)
+bool is_power_of_two (unsigned int size)
 {
   return ((size - 1) & size) == 0;
 }
@@ -186,11 +186,11 @@ struct TextureManager::Impl: public ContextObject
 
         //получение кэш-переменных
 
-      size_t *current_texture_id       = GetContextCache () + CacheEntry_TextureId0,
-             *current_texture_target   = GetContextCache () + CacheEntry_TextureTarget0,
-             enabled_textures          = 0,
-             &current_enabled_textures = GetContextCache () [CacheEntry_EnabledTextures],
-             &current_active_slot      = GetContextCache () [CacheEntry_ActiveTextureSlot];
+      size_t       *current_texture_id       = GetContextCache () + CacheEntry_TextureId0,
+                   *current_texture_target   = GetContextCache () + CacheEntry_TextureTarget0,
+                   &current_enabled_textures = GetContextCache () [CacheEntry_EnabledTextures],
+                   &current_active_slot      = GetContextCache () [CacheEntry_ActiveTextureSlot];
+      unsigned int enabled_textures          = 0,
 
         //выбор текущего контекста
 
@@ -203,7 +203,7 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps     = GetCaps ();
       SamplerSlot*       samplers = state.GetSlots ();
 
-      for (size_t i = 0, count = stl::min (caps.texture_units_count, DEVICE_SAMPLER_SLOTS_COUNT); i < count; i++)
+      for (unsigned int i = 0, count = stl::min (caps.texture_units_count, DEVICE_SAMPLER_SLOTS_COUNT); i < count; i++)
       {
         BindableTexture* texture        = samplers [i].texture.get ();
         SamplerState*    sampler_state  = samplers [i].sampler_state.get ();
@@ -242,7 +242,7 @@ struct TextureManager::Impl: public ContextObject
         {
             //проверка случая установки для одной и той же текстуры различных сэмплеров
 
-          for (size_t j=0; j<i; j++)
+          for (unsigned int j=0; j<i; j++)
             if (samplers [j].texture == texture && samplers [j].sampler_state && samplers [j].sampler_state != sampler_state)
             {
               throw xtl::format_not_supported_exception (METHOD_NAME, "Sampler slot #%u conflicts with sampler slot #%u. "
@@ -261,7 +261,7 @@ struct TextureManager::Impl: public ContextObject
           if (caps.has_ffp)
           {
             if (current_texture_target [i])
-              glDisable (current_texture_target [i]);
+              glDisable ((unsigned int)current_texture_target [i]);
 
             if (texture_target)
             {
@@ -272,7 +272,7 @@ struct TextureManager::Impl: public ContextObject
               if (current_texture_target [i])
               {
                 current_texture_id [i] = 0;
-                glBindTexture (current_texture_target [i], 0);
+                glBindTexture ((unsigned int)current_texture_target [i], 0);
               }
             }
           }
@@ -281,7 +281,7 @@ struct TextureManager::Impl: public ContextObject
             if (current_texture_target [i] && !texture_target)
             {
               current_texture_id [i] = 0;
-              glBindTexture (current_texture_target [i], 0);
+              glBindTexture ((unsigned int)current_texture_target [i], 0);
             }
           }
 
@@ -321,26 +321,26 @@ struct TextureManager::Impl: public ContextObject
         Установка текущей текстуры и сэмплера
     */
 
-    void SetTexture (size_t sampler_slot, ITexture* texture)
+    void SetTexture (unsigned int sampler_slot, ITexture* texture)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::SetTexture";
 
       return state.SetTexture (CheckSamplerSlot (sampler_slot), cast_object<BindableTexture> (*this, texture, METHOD_NAME, "texture"));
     }
 
-    void SetSampler (size_t sampler_slot, ISamplerState* sampler_state)
+    void SetSampler (unsigned int sampler_slot, ISamplerState* sampler_state)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::SetSampler";
 
       return state.SetSampler (CheckSamplerSlot (sampler_slot), cast_object<SamplerState> (*this, sampler_state, METHOD_NAME, "state"));
     }
 
-    ITexture* GetTexture (size_t sampler_slot)
+    ITexture* GetTexture (unsigned int sampler_slot)
     {
       return state.GetTexture (sampler_slot);
     }
 
-    ISamplerState* GetSampler (size_t sampler_slot)
+    ISamplerState* GetSampler (unsigned int sampler_slot)
     {
       return state.GetSampler (sampler_slot);
     }
@@ -375,7 +375,7 @@ struct TextureManager::Impl: public ContextObject
 
   private:
       //проверка номера слота сэмплирования
-    size_t CheckSamplerSlot (size_t sampler_slot)
+    unsigned int CheckSamplerSlot (unsigned int sampler_slot)
     {
       const ContextCaps& caps = GetCaps ();
 
@@ -386,7 +386,7 @@ struct TextureManager::Impl: public ContextObject
       return sampler_slot;
     }
 
-    ITexture* CreateScaledTexture2D (const TextureDesc& desc, const TextureData* data, size_t max_texture_size)
+    ITexture* CreateScaledTexture2D (const TextureDesc& desc, const TextureData* data, unsigned int max_texture_size)
     {
       const ContextCaps& caps = GetCaps ();
 
@@ -667,7 +667,7 @@ ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc& sampler_de
    Установка текущей текстуры и сэмплера
 */
 
-void TextureManager::SetTexture (size_t sampler_slot, ITexture* texture)
+void TextureManager::SetTexture (unsigned int sampler_slot, ITexture* texture)
 {
   try
   {
@@ -680,7 +680,7 @@ void TextureManager::SetTexture (size_t sampler_slot, ITexture* texture)
   }
 }
 
-void TextureManager::SetSampler (size_t sampler_slot, ISamplerState* state)
+void TextureManager::SetSampler (unsigned int sampler_slot, ISamplerState* state)
 {
   try
   {
@@ -693,7 +693,7 @@ void TextureManager::SetSampler (size_t sampler_slot, ISamplerState* state)
   }
 }
 
-ITexture* TextureManager::GetTexture (size_t sampler_slot) const
+ITexture* TextureManager::GetTexture (unsigned int sampler_slot) const
 {
   try
   {
@@ -706,7 +706,7 @@ ITexture* TextureManager::GetTexture (size_t sampler_slot) const
   }
 }
 
-ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
+ISamplerState* TextureManager::GetSampler (unsigned int sampler_slot) const
 {
   try
   {

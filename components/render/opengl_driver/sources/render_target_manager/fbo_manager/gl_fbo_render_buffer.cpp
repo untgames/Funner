@@ -172,7 +172,7 @@ FboRenderBuffer::~FboRenderBuffer ()
     Получение OpenGL идентификатора буфера кадра для возможности ручной записи / чтения данных
 */
 
-size_t FboRenderBuffer::GetFrameBufferId ()
+unsigned int FboRenderBuffer::GetFrameBufferId ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboRenderBuffer::GetFrameBufferId";
 

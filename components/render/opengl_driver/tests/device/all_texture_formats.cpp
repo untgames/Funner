@@ -2,18 +2,18 @@
 
  //Маски сравнения пикселей в результатах тестирования
 
-size_t compare_mask [PixelFormat_Num][PixelFormat_Num];
+unsigned int compare_mask [PixelFormat_Num][PixelFormat_Num];
 
 struct TextureSize
 {
-  size_t width;
-  size_t height;
-  size_t layers;
+  unsigned int width;
+  unsigned int height;
+  unsigned int layers;
 };
 
 struct TestStatus
 {
-  size_t count, successfull, match_count;
+  unsigned int count, successfull, match_count;
 };
 
 const char* get_short_name (PixelFormat param)
@@ -44,16 +44,16 @@ int myrand ()
   return ((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff;
 }
 
-void print_diff (size_t size, const char* src, const char* dst)
+void print_diff (unsigned int size, const char* src, const char* dst)
 {  
-  static const size_t LINE_WIDTH = 15;
+  static const unsigned int LINE_WIDTH = 15;
 
   printf ("                 Source buffer                                          Destination buffer"
           "                 Diff buffer\n");  
 
-  for (size_t i=0; size; i++)
+  for (unsigned int i=0; size; i++)
   {
-    size_t line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
+    unsigned int line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
 
     printf ("%03x| ", i * LINE_WIDTH);
     
@@ -78,18 +78,18 @@ void print_diff (size_t size, const char* src, const char* dst)
   }
 }
 
-bool is_buffers_equal (const char* src, const char* dst, size_t size, size_t pixel_size, size_t mask)
+bool is_buffers_equal (const char* src, const char* dst, unsigned int size, unsigned int pixel_size, unsigned int mask)
 {
-  static const size_t masks [4] = {0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000};
+  static const unsigned int masks [4] = {0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000};
 
-  for (size_t i = 0; i < size / pixel_size; i++, src+=pixel_size, dst+=pixel_size)
+  for (unsigned int i = 0; i < size / pixel_size; i++, src+=pixel_size, dst+=pixel_size)
   {
-    size_t src_pixel = 0, dst_pixel = 0; 
+    unsigned int src_pixel = 0, dst_pixel = 0;
 
-    for (size_t j=0; j<pixel_size; j++)
+    for (unsigned int j=0; j<pixel_size; j++)
     {
-      src_pixel += size_t ((src[j]) << (8 * j)) & masks[j];
-      dst_pixel += size_t ((dst[j]) << (8 * j)) & masks[j];
+      src_pixel += unsigned int ((src[j]) << (8 * j)) & masks[j];
+      dst_pixel += unsigned int ((dst[j]) << (8 * j)) & masks[j];
     }                                    
 
     src_pixel &= mask;
@@ -119,21 +119,21 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
     xtl::uninitialized_storage <char> src_buffer (tex_desc.width * tex_desc.height * 4),
                                       dst_buffer (src_buffer.size ());
 
-    for (size_t i = 0; i < src_buffer.size (); i++)
+    for (unsigned int i = 0; i < src_buffer.size (); i++)
       src_buffer.data ()[i] = (char)myrand () & 63;
 
-    for (size_t i = 0; i < tex_desc.layers; i++)
+    for (unsigned int i = 0; i < tex_desc.layers; i++)
     {  
-      size_t volatile mips_count = get_mips_count (tex_desc.width, tex_desc.height);
+      unsigned int volatile mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
       if (is_compressed (tex_desc.format))
         mips_count -= 2;
 
-      for (size_t j = 0; j < mips_count; j++)
+      for (unsigned int j = 0; j < mips_count; j++)
       {
         if (tex_desc.dimension == TextureDimension_3D)
         {
-          size_t layers_count = tex_desc.layers >> j;
+          unsigned int layers_count = tex_desc.layers >> j;
           
           if (!layers_count)
             layers_count = 1;
@@ -144,8 +144,8 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
         
         status.count++;
         
-        size_t level_width  = tex_desc.width >> j,
-               level_height = tex_desc.height >> j;
+        unsigned int level_width  = tex_desc.width >> j,
+                     level_height = tex_desc.height >> j;
         
         switch (tex_desc.format)
         {
@@ -173,8 +173,8 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
         {                    
           memset (dst_buffer.data (), 0xff, dst_buffer.size ());
           
-          size_t data_size = level_width * level_height;
-          size_t texel_size;
+          unsigned int data_size = level_width * level_height;
+          unsigned int texel_size;
 
           switch (test_format)
           {
@@ -245,16 +245,16 @@ void print_status_table (TestStatus status [PixelFormat_Num][PixelFormat_Num])
 {
   printf ("       ");
 
-  for (size_t i=0; i<PixelFormat_Num; i++)
+  for (unsigned int i=0; i<PixelFormat_Num; i++)
     printf ("%s ", get_short_name ((PixelFormat)i));
     
   printf ("\n");
     
-  for (size_t i=0; i<PixelFormat_Num; i++)
+  for (unsigned int i=0; i<PixelFormat_Num; i++)
   {
     printf ("%s| ", get_short_name ((PixelFormat)i));
 
-    for (size_t j=0; j<PixelFormat_Num; j++)
+    for (unsigned int j=0; j<PixelFormat_Num; j++)
     {
       TestStatus& s = status [j][i];
       
@@ -272,7 +272,7 @@ void set_compare_masks ()
 {
   memset (compare_mask, 0, sizeof compare_mask);
 
-  for (size_t i = 0; i < PixelFormat_Num; i++)
+  for (unsigned int i = 0; i < PixelFormat_Num; i++)
     compare_mask [i][i] = 0xffffffff;
 
   compare_mask [PixelFormat_RGB8][PixelFormat_RGBA8] = 0x00ffffff;
@@ -329,14 +329,14 @@ int main ()
     desc.access_flags         = AccessFlag_Read | AccessFlag_Write;    
     desc.generate_mips_enable = false;
 
-    for (size_t i = 0; i < TextureDimension_Num; i++)
+    for (unsigned int i = 0; i < TextureDimension_Num; i++)
     {
       desc.dimension = (TextureDimension)i;
       desc.width     = sizes [i].width;
       desc.height    = sizes [i].height;
       desc.layers    = sizes [i].layers;
 
-      for (size_t j = 0; j < PixelFormat_Num; j++)
+      for (unsigned int j = 0; j < PixelFormat_Num; j++)
       {
         switch (j)
         {
@@ -357,7 +357,7 @@ int main ()
 
           xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 
-          for (size_t k = 0; k < PixelFormat_Num; k++)
+          for (unsigned int k = 0; k < PixelFormat_Num; k++)
           {          
             status [i][j][k] = test_texture_format (texture.get (), (PixelFormat)k);
           }
@@ -369,7 +369,7 @@ int main ()
       }
     }
       
-    for (size_t i=0; i<TextureDimension_Num; i++)
+    for (unsigned int i=0; i<TextureDimension_Num; i++)
     {
       printf ("Status table for %s texture:\n", get_name ((TextureDimension)i));
       

@@ -20,7 +20,7 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
     Установка данных
 */
 
-void Texture1DNoSubimage::SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t, size_t width, size_t, GLenum format, GLenum type, const void* buffer)
+void Texture1DNoSubimage::SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int, unsigned int width, unsigned int, GLenum format, GLenum type, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture1DNoSubimage::SetUncompressedData";
   
@@ -35,7 +35,7 @@ void Texture1DNoSubimage::SetUncompressedData (size_t layer, size_t mip_level, s
   glTexImage1D (GL_TEXTURE_1D, mip_level, gl_internal_format, width, 0, format, type, buffer);
 }
 
-void Texture1DNoSubimage::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+void Texture1DNoSubimage::SetCompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, unsigned int, const void*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture1DNoSubimage::SetCompressedData", "Compression for 1D textures not supported");
 }

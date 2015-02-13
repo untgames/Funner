@@ -89,7 +89,7 @@ class DepthStencilState: virtual public IDepthStencilState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (size_t stencil_reference);
+    void Bind (unsigned int stencil_reference);
 
   private:
     typedef CommandListBuilder::ExecuterPtr ExecuterPtr;

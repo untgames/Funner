@@ -69,14 +69,14 @@ struct PixelFormatDesc
   const WglExtensionEntries* wgl_extension_entries;   //таблица WGL-расширений (должна быть скопирована в методе, получившем PixelFormatDesc, может быть 0)
   int                        pixel_format_index;      //индекс формата пикселей в таблице форматов адаптера
   Acceleration               acceleration;            //тип ускорения формата пикселей
-  size_t                     color_bits;              //количество бит на цвет
-  size_t                     alpha_bits;              //количество бит на альфу
-  size_t                     depth_bits;              //количество бит на глубину
-  size_t                     stencil_bits;            //количество бит на трафарет
-  size_t                     samples_count;           //количество sample'ов (0=multisample off)
-  size_t                     buffers_count;           //количество буферов в цепочке обмена (0=default 2 buffers)
+  unsigned int               color_bits;              //количество бит на цвет
+  unsigned int               alpha_bits;              //количество бит на альфу
+  unsigned int               depth_bits;              //количество бит на глубину
+  unsigned int               stencil_bits;            //количество бит на трафарет
+  unsigned int               samples_count;           //количество sample'ов (0=multisample off)
+  unsigned int               buffers_count;           //количество буферов в цепочке обмена (0=default 2 buffers)
   SwapMethod                 swap_method;             //метод обмена заднего и переднего буферов
-  size_t                     aux_buffers;             //количество вспомогательных буферов отрисовки
+  unsigned int               aux_buffers;             //количество вспомогательных буферов отрисовки
   bool                       support_draw_to_pbuffer; //поддержка рисования в PBuffer
   bool                       support_stereo;          //поддержка стерео-рендеринга
 };
@@ -245,7 +245,7 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PBuffer  (PrimarySwapChain* primary_swap_chain, size_t width, size_t height);
+    PBuffer  (PrimarySwapChain* primary_swap_chain, unsigned int width, unsigned int height);
     PBuffer  (PrimarySwapChain* swap_chain);
     ~PBuffer ();
     
@@ -357,7 +357,7 @@ class IAdapterLibrary: virtual public ILibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с форматом пикселей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual int  DescribePixelFormat (HDC dc, int pixel_format, size_t size, PIXELFORMATDESCRIPTOR* out_pfd) = 0;
+    virtual int  DescribePixelFormat (HDC dc, int pixel_format, unsigned int size, PIXELFORMATDESCRIPTOR* out_pfd) = 0;
     virtual void SetPixelFormat      (HDC dc, int pixel_format) = 0;    
     virtual void ReleasePixelFormat  (HDC dc) = 0;
 

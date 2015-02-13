@@ -144,7 +144,7 @@ bool AsyncPredicate::GetResult ()
 
     //получение значения результата запроса
 
-  size_t count = 0;
+  unsigned int count = 0;
 
   if (glGetQueryObjectuiv) glGetQueryObjectuiv    (query, GL_QUERY_RESULT, &count);
   else                     glGetQueryObjectuivARB (query, GL_QUERY_RESULT, &count);

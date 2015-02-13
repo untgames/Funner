@@ -417,9 +417,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   }
 #endif
 
-  size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
-         settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
-         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);
+  unsigned int settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
+               settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
+               settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);
 
   if (settings_max_texture_size)
   {

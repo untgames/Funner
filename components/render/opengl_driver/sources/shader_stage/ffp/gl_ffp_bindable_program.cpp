@@ -11,16 +11,16 @@ using namespace common;
 struct FfpBindableProgram::Parameter
 {
   const FfpDynamicParameter* location; //указатель на динамический параметр шейдера
-  size_t                     offset;   //смещение относительно начала константного буфера
-  size_t                     size;     //размер параметра в байтах
+  unsigned int               offset;   //смещение относительно начала константного буфера
+  unsigned int               size;     //размер параметра в байтах
 };
 
 struct FfpBindableProgram::Group
 {
-  size_t     slot;        //номер слота с константым буфером
-  size_t     data_hash;   //хеш данных константного буфера
-  size_t     count;       //количество элементов группы
-  Parameter* parameters;  //указатель на начало области с элементами
+  unsigned int slot;        //номер слота с константым буфером
+  size_t       data_hash;   //хеш данных константного буфера
+  unsigned int count;       //количество элементов группы
+  Parameter*   parameters;  //указатель на начало области с элементами
 };
 
 /*
@@ -170,7 +170,7 @@ FfpBindableProgram::FfpBindableProgram
 
       dst_group.slot       = src_group.slot;
       dst_group.data_hash  = 0;
-      dst_group.count      = group_parameters_count;
+      dst_group.count      = (unsigned int)group_parameters_count;
       dst_group.parameters = &parameters [start_parameters_count];
 
       groups.push_back (dst_group);
@@ -290,8 +290,8 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
         //обновление всех полей FfpState, ассоциированных с динамическим параметром
 
-      const size_t* offset      = &param.location->field_offsets [0],
-                    update_size = param.size;
+      const unsigned int* offset      = &param.location->field_offsets [0],
+                          update_size = param.size;
 
       for (size_t k=0, count=param.location->field_offsets.size (); k<count; k++, offset++)
         memcpy (dst_data + *offset, src_data, update_size);
@@ -359,7 +359,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   {
     bool lighting = false;
     
-    for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
+    for (unsigned int i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
       if (ffp_state.lights [i].enable)
       {
         lighting = true;
@@ -387,7 +387,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
         //установка параметров источника
 
-      for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
+      for (unsigned int i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
       {
         const LightDesc& light    = ffp_state.lights [i];
         GLenum           light_id = GL_LIGHT0 + i;
@@ -493,16 +493,16 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     
   if (need_update_texmaps)
   {    
-    size_t       ffp_texture_units_count  = caps.has_arb_multitexture ? caps.ffp_texture_units_count : 1;
-    const size_t active_texture_slot      = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
-                 current_enabled_textures = GetContextCacheValue (CacheEntry_EnabledTextures);
+    unsigned int       ffp_texture_units_count  = caps.has_arb_multitexture ? caps.ffp_texture_units_count : 1;
+    const unsigned int active_texture_slot      = (unsigned int)GetContextCacheValue (CacheEntry_ActiveTextureSlot),
+                       current_enabled_textures = (unsigned int)GetContextCacheValue (CacheEntry_EnabledTextures);
 
     if (ffp_texture_units_count > DEVICE_SAMPLER_SLOTS_COUNT)
       ffp_texture_units_count = DEVICE_SAMPLER_SLOTS_COUNT;
 
     glMatrixMode (GL_TEXTURE);
 
-    for (size_t i=0; i<ffp_texture_units_count; i++)
+    for (unsigned int i=0; i<ffp_texture_units_count; i++)
     {
         //установка активного слота текстурирования
 
@@ -556,7 +556,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
       TexcoordSource source [] = {texmap.source_u, texmap.source_v, texmap.source_w};
       
-      for (size_t i=0; i<3; i++)
+      for (unsigned int i=0; i<3; i++)
       {
         GLenum coord = GL_S + i, coord_gen_mode = GL_TEXTURE_GEN_S + i;
 

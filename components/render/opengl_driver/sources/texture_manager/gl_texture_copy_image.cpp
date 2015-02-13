@@ -69,7 +69,7 @@ inline void set_luminance (PixelL8*   pixel, unsigned char value) { pixel->lumin
 */
 
 template <class SrcT, class DstT>
-void copy_image_dispatch2 (size_t pixels_count, const void* source_buffer, void* destination_buffer)
+void copy_image_dispatch2 (unsigned int pixels_count, const void* source_buffer, void* destination_buffer)
 {
   const SrcT* src = reinterpret_cast<const SrcT*> (source_buffer);
   DstT*       dst = reinterpret_cast<DstT*> (destination_buffer);
@@ -85,7 +85,7 @@ void copy_image_dispatch2 (size_t pixels_count, const void* source_buffer, void*
 }
 
 template <class SrcT>
-void copy_image_dispatch (size_t pixels_count, const void* src_buffer, PixelFormat dst_format, void* dst_buffer)
+void copy_image_dispatch (unsigned int pixels_count, const void* src_buffer, PixelFormat dst_format, void* dst_buffer)
 {
   switch (dst_format)
   {
@@ -110,7 +110,7 @@ namespace low_level
 namespace opengl
 {
 
-void copy_image (size_t pixels_count, PixelFormat src_format, const void* src_buffer, PixelFormat dst_format, void* dst_buffer)
+void copy_image (unsigned int pixels_count, PixelFormat src_format, const void* src_buffer, PixelFormat dst_format, void* dst_buffer)
 {
   switch (src_format)
   {

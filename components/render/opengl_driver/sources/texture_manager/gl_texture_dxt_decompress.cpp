@@ -39,22 +39,22 @@ void unpack (const Color32& src_color, rgba8_t& dst_color)
 }
 
 template <class Block, class Pixel>
-void unpack (size_t width, size_t height, const Block* dxt_data, Pixel* unpacked_data)
+void unpack (unsigned int width, unsigned int height, const Block* dxt_data, Pixel* unpacked_data)
 {
   ColorBlock color_block;
   Block*     dxt_data_pointer = (Block*)dxt_data;
   
-  size_t columns = stl::min (width, (size_t)4), rows= stl::min (height, (size_t)4);
+  unsigned int columns = stl::min (width, (unsigned int)4), rows = stl::min (height, (unsigned int)4);
 
-  for (size_t i = 0; i < height; i += 4)
-    for (size_t j = 0; j < width; j += 4, dxt_data_pointer++)
+  for (unsigned int i = 0; i < height; i += 4)
+    for (unsigned int j = 0; j < width; j += 4, dxt_data_pointer++)
     {
       dxt_data_pointer->decodeBlock (&color_block);
 
       const Color32* colors = color_block.colors ();
 
-      for (size_t k=0; k < rows; k++)
-        for (size_t l = 0; l < columns; l++)
+      for (unsigned int k=0; k < rows; k++)
+        for (unsigned int l = 0; l < columns; l++)
           unpack (colors [k * 4 + l], unpacked_data [(i + k) * width + j + l]);
     }
 }
@@ -74,7 +74,7 @@ namespace low_level
 namespace opengl
 {
 
-void unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data)
+void unpack_dxt (PixelFormat format, unsigned int width, unsigned int height, const void* dxt_data, void* unpacked_data)
 {
   switch (format)
   {

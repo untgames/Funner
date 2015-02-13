@@ -11,7 +11,7 @@ struct State
     layout       = device.GetImmediateContext ()->ISGetInputLayout ();
     index_buffer = device.GetImmediateContext ()->ISGetIndexBuffer ();
 
-    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
       vertex_buffer [i] = device.GetImmediateContext ()->ISGetVertexBuffer (i);
   }
   
@@ -20,7 +20,7 @@ struct State
     printf ("ISGetInputLayout: %d\n", layout == src.layout);
     printf ("ISGetIndexBuffer: %d\n", index_buffer == src.index_buffer);
     
-    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
       printf ("ISGetVertexBuffer(%d): %d\n", i, vertex_buffer [i] == src.vertex_buffer [i]);
   }
 };
@@ -44,7 +44,7 @@ int main ()
     
     BufferPtr vertex_buffer (test.device->CreateBuffer (buffer_desc), false);
     
-    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
       test.device->GetImmediateContext ()->ISSetVertexBuffer (i, vertex_buffer.get ());
       
     buffer_desc.bind_flags = BindFlag_IndexBuffer;
@@ -70,7 +70,7 @@ int main ()
     test.device->GetImmediateContext ()->ISSetInputLayout (0);
     test.device->GetImmediateContext ()->ISSetIndexBuffer (0);
     
-    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
       test.device->GetImmediateContext ()->ISSetVertexBuffer (i, 0);
 
     printf ("after reset\n");

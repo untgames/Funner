@@ -46,7 +46,7 @@ void SystemMemoryInputBuffer::Bind ()
     Установка данных после отсечения
 */
 
-void SystemMemoryInputBuffer::SetDataCore (size_t offset, size_t size, const void* data)
+void SystemMemoryInputBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
 {
   SystemMemoryBuffer::SetDataCore (offset, size, data);
 

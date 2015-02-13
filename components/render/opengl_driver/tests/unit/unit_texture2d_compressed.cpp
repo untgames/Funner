@@ -38,15 +38,15 @@ int main ()
     texture_desc.access_flags         = AccessFlag_ReadWrite;
     texture_desc.generate_mips_enable = false;
 
-    stl::vector<size_t> sizes (image.BlocksCount ());
+    stl::vector<unsigned int> sizes (image.BlocksCount ());
 
     const media::CompressedImageBlockDesc* blocks = image.Blocks ();
     
-    size_t mips_count = image.BlocksCount ();    
+    unsigned int mips_count = image.BlocksCount ();
     
     printf ("Load %u mips:\n", mips_count);    
 
-    for (size_t i=0, count=sizes.size (); i<count; i++)
+    for (unsigned int i=0, count=(unsigned int)sizes.size (); i<count; i++)
     {
       sizes [i] = blocks [i].size;
       
@@ -64,13 +64,13 @@ int main ()
     
     xtl::uninitialized_storage<char> buffer (get_image_size (image.Width (), image.Height (), PixelFormat_RGB8));
     
-    size_t width = image.Width (), height = image.Height ();    
+    unsigned int width = image.Width (), height = image.Height ();
     
     printf ("Set %u mips:\n", mips_count);
     
-    for (size_t i=0; i<mips_count; i++)
+    for (unsigned int i=0; i<mips_count; i++)
     {            
-      size_t size = get_image_size (width, height, PixelFormat_RGB8);
+      unsigned int size = get_image_size (width, height, PixelFormat_RGB8);
       
       texture->GetData (0, i, 0, 0, width, height, PixelFormat_RGB8, buffer.data ());
            
