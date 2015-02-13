@@ -142,7 +142,7 @@ struct ScreenArrayBuilder
   {
     HDC dc = GetDC (0);
     
-    EnumDisplayMonitors (dc, 0, &ScreenArrayBuilder::MonitorEnumProc, reinterpret_cast<DWORD> (this));
+    EnumDisplayMonitors (dc, 0, &ScreenArrayBuilder::MonitorEnumProc, (LPARAM)this);
     
     ReleaseDC (0, dc);
   }
