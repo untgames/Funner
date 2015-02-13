@@ -499,7 +499,7 @@ struct ScreenSearcher
   
   ScreenSearcher (HDC dc, ScreenDescArray& in_screens) : intersection_region_size (0), screens (in_screens)
   {
-    EnumDisplayMonitors (dc, 0, &ScreenSearcher::MonitorEnumProc, reinterpret_cast<DWORD> (this));
+    EnumDisplayMonitors (dc, 0, &ScreenSearcher::MonitorEnumProc, (LPARAM)this);
   }
 
   static BOOL CALLBACK MonitorEnumProc (HMONITOR monitor, HDC dc, LPRECT intersection_region, LPARAM data)
