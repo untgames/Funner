@@ -134,9 +134,9 @@ class PrimitiveBuffers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование буферов для динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveDynamicBuffers (size_t vertices_count, size_t indices_count);
-    size_t DynamicVerticesCount  () const;
-    size_t DynamicIndicesCount   () const;
+    void         ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count);
+    unsigned int DynamicVerticesCount  () const;
+    unsigned int DynamicIndicesCount   () const;
       
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

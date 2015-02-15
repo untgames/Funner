@@ -15,7 +15,7 @@ namespace
 struct DynamicTextureChannel: public xtl::reference_counter
 {
   DynamicTexturePtr dynamic_texture; //динамическая текстура
-  size_t            channel_index;   //номер канала
+  unsigned int      channel_index;   //номер канала
 };
 
 typedef xtl::intrusive_ptr<DynamicTextureChannel> DynamicTextureChannelPtr;
@@ -129,9 +129,9 @@ void DynamicTextureMaterialStorage::UpdateCacheCore ()
     
     MaterialImpl& material = *impl->material;
     
-    size_t dynamic_textures_count = 0;
+    unsigned int dynamic_textures_count = 0;
     
-    for (size_t i=0, count=material.TexturesCount (); i<count; i++)
+    for (unsigned int i=0, count=material.TexturesCount (); i<count; i++)
     {
       if (material.Texture (i))
         continue;
@@ -148,7 +148,7 @@ void DynamicTextureMaterialStorage::UpdateCacheCore ()
     
     try
     {
-      for (size_t i=0, count=stl::min (material.TexturesCount (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
+      for (unsigned int i=0, count=stl::min (material.TexturesCount (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
       {
         if (material.Texture (i))
           continue;                

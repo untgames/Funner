@@ -7,7 +7,7 @@ using namespace common;
     Константы
 */
 
-const size_t MIN_BUFFER_SIZE = 16; //минимальный размер буфера констант
+const unsigned int MIN_BUFFER_SIZE = 16; //минимальный размер буфера констант
 
 /*
     Описание реализации буфера свойств
@@ -20,7 +20,7 @@ struct PropertyBuffer::Impl
   common::PropertyMap  properties;         //исходные свойства
   xtl::auto_connection update_connection;  //соединение обновления свойств
   bool                 need_update;        //флаг необходимости обновления буфера
-  size_t               cached_buffer_size; //закэшированный размер буфера
+  unsigned int         cached_buffer_size; //закэшированный размер буфера
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -113,7 +113,7 @@ void PropertyBuffer::UpdateCacheCore ()
     if (!impl->need_update)
       return;      
     
-    size_t buffer_size = impl->properties.BufferSize ();    
+    unsigned int buffer_size = (unsigned int)impl->properties.BufferSize ();
     
     bool need_recreate_buffer = !impl->buffer || buffer_size > impl->cached_buffer_size;
     

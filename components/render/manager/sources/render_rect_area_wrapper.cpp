@@ -41,7 +41,7 @@ void RectArea::SetRect (const render::manager::Rect& rect)
   impl->SetRect (rect);
 }
 
-void RectArea::SetRect (int x, int y, size_t width, size_t height)
+void RectArea::SetRect (int x, int y, unsigned int width, unsigned int height)
 {
   impl->SetRect (render::manager::Rect (x, y, width, height));
 }
@@ -61,12 +61,12 @@ int RectArea::Y () const
   return impl->Rect ().y;
 }
 
-size_t RectArea::Width () const
+unsigned int RectArea::Width () const
 {
   return impl->Rect ().width;
 }
 
-size_t RectArea::Height () const
+unsigned int RectArea::Height () const
 {
   return impl->Rect ().height;
 }

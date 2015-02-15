@@ -9,8 +9,8 @@ namespace
     Константы
 */
 
-const size_t RESERVED_BUFFER_POOL_SIZE = 256;
-const size_t MIN_BUFER_SIZE            = 64;
+const unsigned int RESERVED_BUFFER_POOL_SIZE = 256;
+const unsigned int MIN_BUFER_SIZE            = 64;
 
 /*
     Вспомогательные структуры
@@ -36,7 +36,7 @@ struct BufferPool: public xtl::reference_counter, private Cache
   Log                           log;                   //поток отладочного вывода
 
 ///Конструктор
-  BufferPool (size_t buffer_size, const DeviceManagerPtr& device_manager)
+  BufferPool (unsigned int buffer_size, const DeviceManagerPtr& device_manager)
     : Cache (&device_manager->CacheManager ())
     , first_available_index (0)
     , settings (&device_manager->Settings ())
@@ -131,14 +131,14 @@ struct BufferPool: public xtl::reference_counter, private Cache
 typedef xtl::intrusive_ptr<BufferPool> BufferPoolPtr;
 
 //получение ближайшей сверху степени двойки
-size_t get_next_higher_power_of_two (size_t k) 
+unsigned int get_next_higher_power_of_two (unsigned int k)
 {
   if (!k)
     return 1;
 
   k--;
 
-  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
+  for (unsigned int i=1; i < sizeof (unsigned int) * 8; i *= 2)
     k |= k >> i;
 
   return k + 1;
@@ -205,9 +205,9 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
   {
     const common::PropertyLayout& layout = source_map.Layout ();
     
-    size_t hash                  = layout.Hash (),
-           buffer_size           = layout.BufferSize (),
-           corrected_buffer_size = stl::max (get_next_higher_power_of_two (buffer_size), MIN_BUFER_SIZE);
+    size_t       hash                  = layout.Hash ();
+    unsigned int buffer_size           = (unsigned int)layout.BufferSize (),
+                 corrected_buffer_size = stl::max (get_next_higher_power_of_two (buffer_size), MIN_BUFER_SIZE);
            
       //поиск лэйаута
       

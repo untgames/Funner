@@ -20,9 +20,9 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
       //резервирование вершинных атрибутов
     
-    size_t attributes_count = 0;
+    unsigned int attributes_count = 0;
     
-    for (size_t i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
+    for (unsigned int i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
       attributes_count += source.Stream (i).Format ().AttributesCount ();
       
     attributes.reserve (attributes_count);
@@ -32,7 +32,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
     
       //конвертаци€
 
-    for (size_t i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
+    for (unsigned int i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
     {
       const media::geometry::VertexStream& vs = source.Stream (i);
       
@@ -40,7 +40,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
       media::geometry::VertexFormat vertex_format = Clone (layout_manager, vs.Format ());      
 
-      for (size_t j=0, attr_count=vertex_format.AttributesCount (); j<attr_count; j++)
+      for (unsigned int j=0, attr_count=vertex_format.AttributesCount (); j<attr_count; j++)
       {
         const media::geometry::VertexAttribute& src_va = vertex_format.Attribute (j);
         VertexAttribute                         dst_va;
@@ -157,9 +157,9 @@ media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, 
     ¬ершинные потоки
 */
 
-size_t VertexBuffer::StreamsCount ()
+unsigned int VertexBuffer::StreamsCount ()
 {
-  return streams.size ();
+  return (unsigned int)streams.size ();
 }
 
 const LowLevelBufferPtr* VertexBuffer::Streams ()
@@ -194,7 +194,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layo
 
     memset (&layout_desc, 0, sizeof layout_desc);
 
-    layout_desc.vertex_attributes_count = attributes.size ();
+    layout_desc.vertex_attributes_count = (unsigned int)attributes.size ();
     layout_desc.vertex_attributes       = &attributes [0];
     layout_desc.index_type              = type;
     layout_desc.index_buffer_offset     = 0;

@@ -65,8 +65,8 @@ class Window
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () const;
-    size_t Height () const;
+    unsigned int Width  () const;
+    unsigned int Height () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Принудительное обновление содержимого окна (обмен буферов)
@@ -103,7 +103,7 @@ void swap (Window&, Window&);
 class INativeWindowListener
 {
   public:
-    virtual void OnSizeChanged     (size_t width, size_t height) = 0;
+    virtual void OnSizeChanged     (unsigned int width, unsigned int height) = 0;
     virtual void OnViewportChanged (const Rect&) = 0;
     virtual void OnHandleChanged   (void* handle) = 0;
     virtual void OnPaint           () = 0;
@@ -121,8 +121,8 @@ class INativeWindow
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t GetWidth  () = 0;
-    virtual size_t GetHeight () = 0;
+    virtual unsigned int GetWidth  () = 0;
+    virtual unsigned int GetHeight () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область вывода

@@ -34,8 +34,8 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetClearFlags (size_t clear_flags);
-    size_t ClearFlags    ();
+    void         SetClearFlags (unsigned int clear_flags);
+    unsigned int ClearFlags    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояния уровней устройства отрисовки
@@ -132,12 +132,12 @@ class Effect: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проходы рендеринга / вложенные эффекты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                OperationsCount     ();
-    size_t                AddOperation        (const EffectPassPtr&); //returns order number of operation in rendering sequence
-    size_t                AddOperation        (const InstantiatedEffectPtr&);    //returns order number of operation in rendering sequence
-    EffectPassPtr         OperationPass       (size_t order_number);
-    InstantiatedEffectPtr OperationEffect     (size_t order_number);
-    void                  RemoveOperation     (size_t order_number);
+    unsigned int          OperationsCount     ();
+    unsigned int          AddOperation        (const EffectPassPtr&); //returns order number of operation in rendering sequence
+    unsigned int          AddOperation        (const InstantiatedEffectPtr&);    //returns order number of operation in rendering sequence
+    EffectPassPtr         OperationPass       (unsigned int order_number);
+    InstantiatedEffectPtr OperationEffect     (unsigned int order_number);
+    void                  RemoveOperation     (unsigned int order_number);
     void                  RemoveAllOperations ();
 
   private:
@@ -161,7 +161,7 @@ class EffectRenderer: public Object
 ///Добавление операций в список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddOperations (const RendererOperationList& operations,
-                        size_t                       eye_distance,
+                        unsigned int                 eye_distance,
                         const math::mat4f&           vp_matrix,
                         const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,

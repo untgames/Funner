@@ -70,12 +70,12 @@ Window RenderManager::Window (size_t index)
   return Wrappers::Wrap<render::manager::Window> (impl->Window (index));
 }
 
-RenderTarget RenderManager::CreateRenderBuffer (size_t width, size_t height, PixelFormat format)
+RenderTarget RenderManager::CreateRenderBuffer (unsigned int width, unsigned int height, PixelFormat format)
 {
   return Wrappers::Wrap<RenderTarget> (impl->CreateRenderBuffer (width, height, format));
 }
 
-RenderTarget RenderManager::CreateDepthStencilBuffer (size_t width, size_t height)
+RenderTarget RenderManager::CreateDepthStencilBuffer (unsigned int width, unsigned int height)
 {
   return Wrappers::Wrap<RenderTarget> (impl->CreateDepthStencilBuffer (width, height));
 }
@@ -130,7 +130,7 @@ Texture RenderManager::CreateTexture (const media::CompressedImage& image, Textu
   return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, dimension));
 }
 
-Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat format, bool generate_mips_enable)
+Texture RenderManager::CreateTexture2D (unsigned int width, unsigned int height, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
@@ -143,7 +143,7 @@ Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat
   }
 }
 
-Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mips_enable)
+Texture RenderManager::CreateTexture3D (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
@@ -156,7 +156,7 @@ Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t dept
   }
 }
 
-Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bool generate_mips_enable)
+Texture RenderManager::CreateTextureCubemap (unsigned int size, PixelFormat format, bool generate_mips_enable)
 {
   try
   {

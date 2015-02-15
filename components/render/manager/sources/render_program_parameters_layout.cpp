@@ -9,7 +9,7 @@ namespace
     Константы
 */
 
-const size_t RESERVED_LAYOUTS_COUNT = 4; //резервируемое количество связанных лэйаутов
+const unsigned int RESERVED_LAYOUTS_COUNT = 4; //резервируемое количество связанных лэйаутов
 
 /*
      Слот параметров
@@ -154,8 +154,8 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 
           parameter.name   = property->name;
           parameter.slot   = i;
-          parameter.count  = property->elements_count;
-          parameter.offset = property->offset;
+          parameter.count  = (unsigned int)property->elements_count;
+          parameter.offset = (unsigned int)property->offset;
           
           switch (property->type)
           {            
@@ -189,7 +189,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 
       memset (&desc, 0, sizeof (desc));
 
-      desc.parameters_count = new_parameters.size ();
+      desc.parameters_count = (unsigned int)new_parameters.size ();
       desc.parameters       = new_parameters.empty () ? &default_parameter : &new_parameters [0];
 
         //расчёт хэша

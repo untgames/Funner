@@ -32,9 +32,9 @@ struct RendererPrimitive
   render::low_level::IStateBlock*     state_block;      //блок состояний примитива
   bool                                indexed;          //является ли данный примитив индексированным или состоящим только из вершин без индексов
   render::low_level::PrimitiveType    type;             //тип примитива
-  size_t                              first;            //индекс первой вершины/индекса
-  size_t                              count;            //количество примитивов
-  size_t                              base_vertex;      //индекс базовой вершины
+  unsigned int                        first;            //индекс первой вершины/индекса
+  unsigned int                        count;            //количество примитивов
+  unsigned int                        base_vertex;      //индекс базовой вершины
   size_t                              tags_count;       //количество тэгов материала
   const size_t*                       tags;             //тэги материала
   const DynamicPrimitiveIndex* const* dynamic_indices;  //указатель на массив динамических индексов
@@ -52,7 +52,7 @@ inline size_t get_batching_hash (const RendererPrimitive& p)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitiveGroup
 {
-  size_t                   primitives_count; //количество примитивов в группе
+  unsigned int             primitives_count; //количество примитивов в группе
   const RendererPrimitive* primitives;       //примитивы
 };
 
@@ -99,6 +99,6 @@ inline size_t get_batching_hash (const RendererOperation& op)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererOperationList
 {
-  size_t                   operations_count; //количество операций
+  unsigned int             operations_count; //количество операций
   const RendererOperation* operations;       //операции
 };

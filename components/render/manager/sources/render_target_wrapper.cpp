@@ -25,12 +25,12 @@ RenderTarget& RenderTarget::operator = (const RenderTarget& render_target)
   return *this;
 }
 
-size_t RenderTarget::Width () const
+unsigned int RenderTarget::Width () const
 {
   return impl->Width ();
 }
 
-size_t RenderTarget::Height () const
+unsigned int RenderTarget::Height () const
 {
   return impl->Height ();
 }

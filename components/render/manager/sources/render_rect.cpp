@@ -10,7 +10,7 @@ Rect::Rect ()
   height = 0;
 }
   
-Rect::Rect (int in_x, int in_y, size_t in_width, size_t in_height)
+Rect::Rect (int in_x, int in_y, unsigned int in_width, unsigned int in_height)
 {
   x      = in_x;
   y      = in_y;

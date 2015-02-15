@@ -21,11 +21,11 @@ using render::low_level::DEVICE_RENDER_TARGET_SLOTS_COUNT;
     Константы
 */
 
-const size_t RESERVE_OPERATION_ARRAY          = 512; //резервируемое число операций в массиве операций прохода
-const size_t RESERVE_FRAME_ARRAY              = 32;  //резервируемое число вложенных фреймов в эффекте
-const size_t RESERVE_MVP_MATRIX_ARRAY         = 512; //резервируемое число матриц MVP (для динамических примитивов)
-const size_t RESERVE_BATCHES_ARRAY            = 128; //резервируемое количество пакетов
-const size_t RESERVE_NORMALIZED_SCISSOR_ARRAY = 16;  //резервируемое количество областей отсечения
+const unsigned int RESERVE_OPERATION_ARRAY          = 512; //резервируемое число операций в массиве операций прохода
+const unsigned int RESERVE_FRAME_ARRAY              = 32;  //резервируемое число вложенных фреймов в эффекте
+const unsigned int RESERVE_MVP_MATRIX_ARRAY         = 512; //резервируемое число матриц MVP (для динамических примитивов)
+const unsigned int RESERVE_BATCHES_ARRAY            = 128; //резервируемое количество пакетов
+const unsigned int RESERVE_NORMALIZED_SCISSOR_ARRAY = 16;  //резервируемое количество областей отсечения
 
 /*
     Вспомогательные структуры
@@ -36,7 +36,7 @@ struct PassOperation: public RendererOperation
 {
   ProgramParametersLayout*     frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
   render::low_level::IBuffer*  frame_entity_parameters_buffer; //буфер параметров пары фрейм-объект
-  size_t                       eye_distance;                   //расстояние от z-near
+  unsigned int                 eye_distance;                   //расстояние от z-near
   int                          mvp_matrix_index;               //ссылка на матрицу Model-View-Projection
   int                          normalized_scissor_index;       //ссылка на область отсечения в относительных координатах
   
@@ -44,7 +44,7 @@ struct PassOperation: public RendererOperation
   PassOperation (const RendererOperation&    base,
                  ProgramParametersLayout*    in_frame_entity_parameters_layout,
                  render::low_level::IBuffer* in_frame_entity_parameters_buffer,
-                 size_t                      in_eye_distance,
+                 unsigned int                in_eye_distance,
                  int                         in_mvp_matrix_index,
                  int                         in_normalized_scissor_index)
     : RendererOperation (base)
@@ -68,7 +68,7 @@ struct PassOperation: public RendererOperation
 struct BatchingManagerDesc
 {
   BatchingManager* manager;
-  size_t           saved_dynamic_vertices_count;
+  unsigned int     saved_dynamic_vertices_count;
 
   BatchingManagerDesc (BatchingManager* in_manager) : manager (in_manager), saved_dynamic_vertices_count (manager->AllocatedDynamicVerticesCount ()) {}
 };
@@ -146,7 +146,7 @@ struct RenderPass: public xtl::reference_counter
   LowLevelStateBlockPtr       scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
   ProgramPtr                  program;                 //программа
   ProgramParametersLayoutPtr  parameters_layout;       //расположение параметров
-  size_t                      clear_flags;             //флаги очистки экрана
+  unsigned int                clear_flags;             //флаги очистки экрана
   OperationArray              operations;              //операции рендеринга
   OperationPtrArray           operation_ptrs;          //указатели на операции
   const RendererOperation*    last_operation;          //последняя добавленная операция
@@ -332,7 +332,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
 
     impl->operations.reserve (effect->OperationsCount ());
 
-    for (size_t i=0, count=effect->OperationsCount (); i<count; i++)
+    for (unsigned int i=0, count=effect->OperationsCount (); i<count; i++)
     {
         //операция рендеринга может быть либо проходом рендеринга, либо рисованием вложенной группы эффектов
       
@@ -417,7 +417,7 @@ EffectRenderer::~EffectRenderer ()
 
 void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
-  size_t                       eye_distance,
+  unsigned int                 eye_distance,
   const math::mat4f&           vp_matrix,
   const math::mat4f&           mvp_matrix,
   render::low_level::IBuffer*  entity_dependent_property_buffer,
@@ -497,7 +497,7 @@ void EffectRenderer::AddOperations
             {
               impl->mvp_matrices.push_back (mvp_matrix);
 
-              mvp_matrix_index = impl->mvp_matrices.size () - 1;
+              mvp_matrix_index = (int)impl->mvp_matrices.size () - 1;
             }
 
             if (!dynamic_primitive->IsEntityDependent ())
@@ -531,13 +531,13 @@ void EffectRenderer::AddOperations
           for (; iter!=end; ++iter)
             if (iter->scissor == operation->scissor)
             {
-              normalized_scissor_index = iter - impl->normalized_scissors.begin ();
+              normalized_scissor_index = (int)(iter - impl->normalized_scissors.begin ());
               break;
             }
 
           if (iter == end)
           {
-            normalized_scissor_index = impl->normalized_scissors.size ();
+            normalized_scissor_index = (int)impl->normalized_scissors.size ();
 
             impl->normalized_scissors.push_back (NormalizedScissor (operation->scissor, vp_matrix));
           }
@@ -646,7 +646,7 @@ namespace
 ///Контекст целевых буферов рендеринга
 struct RenderTargetContext
 {
-  size_t        targets_count;
+  unsigned int  targets_count;
   const rectf*  current_local_scissor;
   bool          has_scissors;
   Rect          viewport_rects [DEVICE_RENDER_TARGET_SLOTS_COUNT];
@@ -727,7 +727,7 @@ struct RenderOperationsExecutor
   void SetRenderTargets (RenderPass& pass, RenderTargetContext& render_target_context)
   {
     render::low_level::IView* depth_stencil_view  = 0;
-    size_t                    depth_stencil_width = 0, depth_stencil_height = 0;
+    unsigned int              depth_stencil_width = 0, depth_stencil_height = 0;
 
       //получение информации о буфере отсечения
 
@@ -754,14 +754,14 @@ struct RenderOperationsExecutor
     render::low_level::IView*   render_target_views [DEVICE_RENDER_TARGET_SLOTS_COUNT];
     render::low_level::Viewport viewports [DEVICE_RENDER_TARGET_SLOTS_COUNT];
 
-    size_t target_width       = 0, target_height = 0;
-    bool   target_initialized = false;
+    unsigned int target_width       = 0, target_height = 0;
+    bool         target_initialized = false;
 
     const char** color_target_names = pass.color_targets.Data ();
 
-    render_target_context.targets_count = stl::min (pass.color_targets.Size (), DEVICE_RENDER_TARGET_SLOTS_COUNT);
+    render_target_context.targets_count = stl::min ((unsigned int)pass.color_targets.Size (), DEVICE_RENDER_TARGET_SLOTS_COUNT);
 
-    for (size_t i=0; i<render_target_context.targets_count; i++)
+    for (unsigned int i=0; i<render_target_context.targets_count; i++)
     {
       const char* target_name = color_target_names [i];
 
@@ -778,7 +778,7 @@ struct RenderOperationsExecutor
 
       ViewportImpl*       viewport        = &*desc->viewport;
       const math::vec2ui& viewport_offset = desc->render_target->ViewportOffset ();
-      size_t              width           = desc->render_target->Width (),
+      unsigned int        width           = desc->render_target->Width (),
                           height          = desc->render_target->Height ();
 
       render_target_views [i]            = &desc->render_target->View ();
@@ -840,7 +840,7 @@ struct RenderOperationsExecutor
 
     device_context.OSSetRenderTargets (render_target_context.targets_count, render_target_views, depth_stencil_view);
 
-    for (size_t i=0; i<render_target_context.targets_count; i++)
+    for (unsigned int i=0; i<render_target_context.targets_count; i++)
       device_context.RSSetViewport (i, viewports [i]);
 
       //установка областей отсечения
@@ -852,7 +852,7 @@ struct RenderOperationsExecutor
 ///Очистка целевых буферов
   void ClearViews (RenderPass& pass, const RenderTargetContext& render_target_context)
   {
-    size_t src_clear_flags = frame.ClearFlags () & pass.clear_flags, dst_clear_flags = 0;
+    unsigned int src_clear_flags = frame.ClearFlags () & pass.clear_flags, dst_clear_flags = 0;
     
     if (src_clear_flags & ClearFlag_RenderTarget) dst_clear_flags |= render::low_level::ClearFlag_RenderTarget;
     if (src_clear_flags & ClearFlag_Depth)        dst_clear_flags |= render::low_level::ClearFlag_Depth;
@@ -861,10 +861,10 @@ struct RenderOperationsExecutor
     
     if (dst_clear_flags)
     {
-      size_t                     indices [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+      unsigned int               indices [DEVICE_RENDER_TARGET_SLOTS_COUNT];
       render::low_level::Color4f colors [DEVICE_RENDER_TARGET_SLOTS_COUNT], &color = (render::low_level::Color4f&)frame.ClearColor ();
 
-      for (size_t i=0; i<render_target_context.targets_count; i++)
+      for (unsigned int i=0; i<render_target_context.targets_count; i++)
       {
         indices [i] = i;
         colors [i]  = color;
@@ -891,7 +891,7 @@ struct RenderOperationsExecutor
   
   void SetScissorRects (const RenderTargetContext& render_target_context, const rectf* operation_scissor)
   {
-    for (size_t i=0; i<render_target_context.targets_count; i++)
+    for (unsigned int i=0; i<render_target_context.targets_count; i++)
     {
       const Rect& common_scissor_rect = render_target_context.scissors [i] ? render_target_context.scissors [i]->Rect () : render_target_context.viewport_rects [i];
 
@@ -907,8 +907,8 @@ struct RenderOperationsExecutor
 
       operation_scissor_rect.x      = int (operation_scissor->x * viewport_rect.width);
       operation_scissor_rect.y      = int (operation_scissor->y * viewport_rect.height);
-      operation_scissor_rect.width  = size_t (operation_scissor->width * viewport_rect.width);
-      operation_scissor_rect.height = size_t (operation_scissor->height * viewport_rect.height);
+      operation_scissor_rect.width  = (unsigned int) (operation_scissor->width * viewport_rect.width);
+      operation_scissor_rect.height = (unsigned int) (operation_scissor->height * viewport_rect.height);
 
       Rect result;
       
@@ -918,14 +918,14 @@ struct RenderOperationsExecutor
       int right  = stl::min (common_scissor_rect.x + common_scissor_rect.width, operation_scissor_rect.x + operation_scissor_rect.width),
           bottom = stl::min (common_scissor_rect.y + common_scissor_rect.height, operation_scissor_rect.y + operation_scissor_rect.height);
 
-      result.width  = size_t (right - result.x);
-      result.height = size_t (bottom - result.y);
+      result.width  = (unsigned int) (right - result.x);
+      result.height = (unsigned int) (bottom - result.y);
 
       SetScissorRect (i, result);
     }
   }
 
-  void SetScissorRect (size_t rt_index, const Rect& src_rect)
+  void SetScissorRect (unsigned int rt_index, const Rect& src_rect)
   {
     render::low_level::Rect dst_rect;
 
@@ -1177,7 +1177,7 @@ struct RenderOperationsExecutor
     {
       const TexmapDesc* texmaps = program->Texmaps ();
       
-      for (size_t i=0, count=program->TexmapsCount (); i<count; i++)
+      for (unsigned int i=0, count=program->TexmapsCount (); i<count; i++)
       {
         const TexmapDesc& texmap = texmaps [i];
         
@@ -1213,7 +1213,7 @@ struct RenderOperationsExecutor
 
         OperationPtrArray::iterator iter = operation_iter;
 
-        size_t indices_count = 0, first = batching_manager.PassFirstIndex ();
+        unsigned int indices_count = 0, first = batching_manager.PassFirstIndex ();
 
         for (;iter!=operation_end && (*iter)->batching_hash == batching_hash; ++iter)
         {

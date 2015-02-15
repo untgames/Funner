@@ -12,8 +12,8 @@ struct RenderTargetImpl::Impl
   DeviceManagerPtr    device_manager;  //менеджер устройства отрисовки
   LowLevelTexturePtr  texture;         //целевая текстура
   LowLevelViewPtr     view;            //отображение для рендеринга в текстуру
-  size_t              width;           //ширина цели рендеринга
-  size_t              height;          //высота цели рендеринга
+  unsigned int        width;           //ширина цели рендеринга
+  unsigned int        height;          //высота цели рендеринга
   math::vec2ui        viewport_offset; //смещение облсти вывода
   
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -28,7 +28,7 @@ struct RenderTargetImpl::Impl
     Конструктор / деструктор
 */
 
-RenderTargetImpl::RenderTargetImpl (const DeviceManagerPtr& device_manager, render::low_level::ITexture* texture, size_t layer, size_t mip_level)
+RenderTargetImpl::RenderTargetImpl (const DeviceManagerPtr& device_manager, render::low_level::ITexture* texture, unsigned int layer, unsigned int mip_level)
 {
   try
   {
@@ -69,7 +69,7 @@ render::low_level::IView& RenderTargetImpl::View ()
     Обновление текстуры
 */
 
-void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, size_t layer, size_t mip_level)
+void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, unsigned int layer, unsigned int mip_level)
 {
   try
   {
@@ -112,18 +112,18 @@ void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, size_t l
     Размеры цели рендеринга
 */
 
-void RenderTargetImpl::Resize (size_t width, size_t height)
+void RenderTargetImpl::Resize (unsigned int width, unsigned int height)
 {
   impl->width  = width;
   impl->height = height;
 }
 
-size_t RenderTargetImpl::Width ()
+unsigned int RenderTargetImpl::Width ()
 {
   return impl->width;
 }
 
-size_t RenderTargetImpl::Height ()
+unsigned int RenderTargetImpl::Height ()
 {
   return impl->height;
 }

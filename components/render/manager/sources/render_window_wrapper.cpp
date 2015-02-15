@@ -45,12 +45,12 @@ RenderTarget Window::DepthStencilBuffer () const
   return Wrappers::Wrap<RenderTarget> (impl->DepthStencilBuffer ());
 }
 
-size_t Window::Width () const
+unsigned int Window::Width () const
 {
   return impl->Width ();
 }
 
-size_t Window::Height () const
+unsigned int Window::Height () const
 {
   return impl->Height ();
 }

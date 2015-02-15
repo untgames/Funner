@@ -61,9 +61,9 @@ class BatchingManager: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование буферов для динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveDynamicBuffers (size_t vertices_count, size_t indices_count);
-    size_t DynamicVerticesCount  () const;
-    size_t DynamicIndicesCount   () const;
+    void         ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count);
+    unsigned int DynamicVerticesCount  () const;
+    unsigned int DynamicIndicesCount   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Динамические буферы
@@ -75,22 +75,22 @@ class BatchingManager: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выделение вершин и индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitiveVertex* AllocateDynamicVertices    (size_t count, size_t* out_base_vertex_index = 0);
-    DynamicPrimitiveIndex*  AllocateDynamicIndices     (IndexPoolType type, size_t count);
+    DynamicPrimitiveVertex* AllocateDynamicVertices    (unsigned int count, unsigned int* out_base_vertex_index = 0);
+    DynamicPrimitiveIndex*  AllocateDynamicIndices     (IndexPoolType type, unsigned int count);
     void                    ResetDynamicBuffers        ();
     void                    ResetLinearIndexBuffer     ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Предвыделение вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PreallocateDynamicVertices         (size_t count);
+    void PreallocateDynamicVertices         (unsigned int count);
     void ResetDynamicVerticesPreallocations ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текущее количество выделенных вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetAllocatedDynamicVerticesCount (size_t count);
-    size_t AllocatedDynamicVerticesCount    ();
+    void         SetAllocatedDynamicVerticesCount (unsigned int count);
+    unsigned int AllocatedDynamicVerticesCount    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение блока состояний по материалу
@@ -100,10 +100,10 @@ class BatchingManager: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тэг текущего прохода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetPassUserData   (const void* tag);
-    void        SetPassFirstIndex (size_t offset);
-    const void* PassUserData      ();
-    size_t      PassFirstIndex    ();
+    void         SetPassUserData   (const void* tag);
+    void         SetPassFirstIndex (unsigned int offset);
+    const void*  PassUserData      ();
+    unsigned int PassFirstIndex    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Номер активного кадра

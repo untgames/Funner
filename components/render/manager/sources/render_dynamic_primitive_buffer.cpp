@@ -6,7 +6,7 @@ namespace render
 namespace manager
 {
 
-void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, size_t offset, const void* src_data, size_t src_data_size, size_t buffer_capacity, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer)
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, unsigned int offset, const void* src_data, unsigned int src_data_size, unsigned int buffer_capacity, unsigned int& dst_buffer_size, LowLevelBufferPtr& dst_buffer)
 {
   try
   {

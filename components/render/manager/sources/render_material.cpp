@@ -272,9 +272,9 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       {
         const TexmapDesc* program_texmap = cached_program->Texmaps ();
 
-        for (size_t i = 0, count = cached_program->TexmapsCount (); i < count; i++, program_texmap++)
+        for (unsigned int i = 0, count = cached_program->TexmapsCount (); i < count; i++, program_texmap++)
         {
-          size_t channel = program_texmap->channel;
+          unsigned int channel = program_texmap->channel;
 
           if (channel >= DEVICE_SAMPLER_SLOTS_COUNT)
             continue;
@@ -458,12 +458,12 @@ ProgramPtr MaterialImpl::Program ()
     Получение текстуры
 */
 
-size_t MaterialImpl::TexturesCount ()
+unsigned int MaterialImpl::TexturesCount ()
 {
-  return impl->texmaps.size ();
+  return (unsigned int)impl->texmaps.size ();
 }
 
-TexturePtr MaterialImpl::Texture (size_t index)
+TexturePtr MaterialImpl::Texture (unsigned int index)
 {
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::manager::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
@@ -475,7 +475,7 @@ TexturePtr MaterialImpl::Texture (size_t index)
   return texmap.cached_texture;
 }
 
-LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
+LowLevelTexturePtr MaterialImpl::DeviceTexture (unsigned int index)
 {
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::manager::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
@@ -487,7 +487,7 @@ LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
   return texmap.cached_device_texture;
 }
 
-const char* MaterialImpl::TextureName (size_t index)
+const char* MaterialImpl::TextureName (unsigned int index)
 {
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::manager::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
@@ -495,7 +495,7 @@ const char* MaterialImpl::TextureName (size_t index)
   return impl->texmaps [index]->texture.Name ();
 }
 
-LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
+LowLevelSamplerStatePtr MaterialImpl::Sampler (unsigned int index)
 {
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::manager::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
@@ -537,7 +537,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     
     bool new_has_dynamic_textures = false;
     
-    for (size_t i=0, count=material.TexmapCount (); i<count; i++)
+    for (unsigned int i = 0, count = (unsigned int)material.TexmapCount (); i < count; i++)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       

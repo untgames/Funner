@@ -497,7 +497,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       for (size_t i=0; i<dynamic_groups_count; i++, dynamic_group++)
         BuildRendererOperations (*dynamic_group, scissor, dynamic_group->dynamic_primitive);
 
-      cached_operation_list.operations_count = cached_operations.size ();
+      cached_operation_list.operations_count = (unsigned int)cached_operations.size ();
       cached_operation_list.operations       = cached_operations.empty () ? (RendererOperation*)0 : &cached_operations [0];
       
       InvalidateCacheDependencies ();
@@ -615,7 +615,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
       stl::equal_range (lods.begin (), lods.end (), index, EntityLodLess ()).first;
 
     if (iter != lods.end ())
-      return iter - lods.begin ();
+      return (int)(iter - lods.begin ());
       
     return -1;
   }

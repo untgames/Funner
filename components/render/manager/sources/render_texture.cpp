@@ -13,11 +13,11 @@ namespace
 
 struct RenderTargetViewDesc
 {
-  size_t          layer;         //номер слоя
-  size_t          mip_level;     //номер мип-уровня
+  unsigned int    layer;         //номер слоя
+  unsigned int    mip_level;     //номер мип-уровня
   RenderTargetPtr render_target; //цель рендеринга 
   
-  RenderTargetViewDesc (size_t in_layer, size_t in_mip_level, const RenderTargetPtr& in_render_target)
+  RenderTargetViewDesc (unsigned int in_layer, unsigned int in_mip_level, const RenderTargetPtr& in_render_target)
     : layer (in_layer)
     , mip_level (in_mip_level)
     , render_target (in_render_target)
@@ -56,9 +56,9 @@ struct TextureImpl::Impl: public DebugIdHolder
   TextureDimension               dimension;      //размерность текстуры
   render::manager::PixelFormat   format;         //формат текстуры
   render::low_level::PixelFormat target_format;  //целевой формат текстуры
-  size_t                         width;          //ширина текстуры
-  size_t                         height;         //высота текстуры
-  size_t                         depth;          //глубина текстуры либо количество слоёв
+  unsigned int                   width;          //ширина текстуры
+  unsigned int                   height;         //высота текстуры
+  unsigned int                   depth;          //глубина текстуры либо количество слоёв
   RenderTargetArray              render_targets; //цели рендеринга
   stl::string                    name;           //имя текстуры
 
@@ -89,7 +89,7 @@ struct TextureImpl::Impl: public DebugIdHolder
   }
   
 ///Получение цели рендеринга
-  RenderTargetPtr GetRenderTarget (size_t layer, size_t mip_level)
+  RenderTargetPtr GetRenderTarget (unsigned int layer, unsigned int mip_level)
   {
       //поиск цели рендеринга среди списка уже созданных
     
@@ -114,9 +114,9 @@ struct TextureImpl::Impl: public DebugIdHolder
 TextureImpl::TextureImpl 
  (const DeviceManagerPtr&           device_manager,
   render::manager::TextureDimension dimension,
-  size_t                            width,
-  size_t                            height,
-  size_t                            depth,
+  unsigned int                      width,
+  unsigned int                      height,
+  unsigned int                      depth,
   render::manager::PixelFormat      format,
   bool                              generate_mips_enable,
   const char*                       name)
@@ -201,7 +201,7 @@ TextureImpl::TextureImpl
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::manager::TextureDimension,size_t,size_t,size_t,render::manager::PixelFormat,bool,const char*)");
+    e.touch ("render::manager::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::manager::TextureDimension,unsigned int,unsigned int,unsigned int,render::manager::PixelFormat,bool,const char*)");
     throw;
   }
 }
@@ -328,7 +328,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::manage
     desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
     desc.usage_mode           = UsageMode_Static;
     
-    stl::vector<size_t> sizes (image.BlocksCount ());
+    stl::vector<unsigned int> sizes (image.BlocksCount ());
     const media::CompressedImageBlockDesc* blocks = image.Blocks ();
 
     for (size_t i=0, count=sizes.size (); i<count; i++)
@@ -424,17 +424,17 @@ render::manager::PixelFormat TextureImpl::Format ()
   return impl->format;
 }
 
-size_t TextureImpl::Width ()
+unsigned int TextureImpl::Width ()
 {
   return impl->width;
 }
 
-size_t TextureImpl::Height ()
+unsigned int TextureImpl::Height ()
 {
   return impl->height;
 }
 
-size_t TextureImpl::Depth ()
+unsigned int TextureImpl::Depth ()
 {
   return impl->depth;
 }
@@ -443,7 +443,7 @@ size_t TextureImpl::Depth ()
     Получение цели рендеринга
 */
 
-RenderTargetPtr TextureImpl::RenderTarget (size_t layer, size_t mip_level)
+RenderTargetPtr TextureImpl::RenderTarget (unsigned int layer, unsigned int mip_level)
 {
   try
   {
@@ -531,7 +531,7 @@ void TextureImpl::Update (const media::Image& image)
     
       //обновление данных
 
-    for (size_t i=0; i<impl->depth; i++)
+    for (unsigned int i=0; i<impl->depth; i++)
       impl->texture->SetData (i, 0, 0, 0, impl->width, impl->height, source_format, image.Bitmap (i));
   }
   catch (xtl::exception& e)
@@ -565,7 +565,7 @@ media::PixelFormat get_format (render::manager::PixelFormat format)
 
 }
 
-void TextureImpl::Capture (size_t layer, size_t mip_level, media::Image& image)
+void TextureImpl::Capture (unsigned int layer, unsigned int mip_level, media::Image& image)
 {
   try
   {
@@ -579,36 +579,36 @@ void TextureImpl::Capture (size_t layer, size_t mip_level, media::Image& image)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::TextureImpl::Capture(size_t,size_t,media::Image&)");
+    e.touch ("render::manager::TextureImpl::Capture(unsigned int,unsigned int,media::Image&)");
     throw;
   }
 }
 
-void TextureImpl::Capture (size_t mip_level, media::Image& image)
+void TextureImpl::Capture (unsigned int mip_level, media::Image& image)
 {
   try
   {
     media::PixelFormat image_format = get_format (impl->format);
     
-    size_t width = impl->width, height = impl->height, depth = impl->depth;
+    unsigned int width = impl->width, height = impl->height, depth = impl->depth;
     
-    for (size_t i=0; i<mip_level; i++)
+    for (unsigned int i=0; i<mip_level; i++)
     {
-      width  = stl::max (width / 2, (size_t)1);
-      height = stl::max (height / 2, (size_t)1);
-      depth  = impl->dimension == TextureDimension_Cubemap ? depth : stl::max (depth / 2, (size_t)1);
+      width  = stl::max (width / 2, (unsigned int)1);
+      height = stl::max (height / 2, (unsigned int)1);
+      depth  = impl->dimension == TextureDimension_Cubemap ? depth : stl::max (depth / 2, (unsigned int)1);
     }
 
     media::Image result_image (width, height, depth, image_format);
 
-    for (size_t i=0; i<depth; i++)
+    for (unsigned int i=0; i<depth; i++)
       impl->texture->GetData (i, mip_level, 0, 0, width, height, impl->target_format, result_image.Bitmap (i));
 
     result_image.Swap (image);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::TextureImpl::Capture(size_t,media::Image&)");
+    e.touch ("render::manager::TextureImpl::Capture(unsigned int,media::Image&)");
     throw;
   }
 }
