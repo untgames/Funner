@@ -64,7 +64,7 @@ class MyStack: public IStack
     }
 
     float       GetFloat   (unsigned int index) { return xtl::any_multicast<float> (array.at (index)); }
-    int         GetInteger (unsigned int index) { return xtl::any_multicast<int> (array.at (index)); }
+    ptrdiff_t   GetInteger (unsigned int index) { return xtl::any_multicast<ptrdiff_t> (array.at (index)); }
     bool        GetBoolean (unsigned int index) { return xtl::any_multicast<bool> (array.at (index)); }
     void*       GetPointer (unsigned int index) { return xtl::any_multicast<void*> (array.at (index)); }
     const char* GetString  (unsigned int index) { return xtl::any_multicast<const char*> (array.at (index)); }
@@ -72,7 +72,7 @@ class MyStack: public IStack
     xtl::any&   GetVariant (unsigned int index) { return array.at (index); }
 
     void Push (float value)        { array.push_back (xtl::any (value)); }
-    void Push (int value)          { array.push_back (xtl::any (value)); }
+    void Push (ptrdiff_t value)    { array.push_back (xtl::any (value)); }
     void Push (bool value)         { array.push_back (xtl::any (value)); }
     void Push (void* pointer)      { array.push_back (xtl::any (pointer)); }
     void Push (const char* string) { array.push_back (xtl::any (string)); }

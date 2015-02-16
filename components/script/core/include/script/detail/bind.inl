@@ -71,6 +71,8 @@ template <> struct argument_selector<int>:                      public int_argum
 template <> struct argument_selector<unsigned int>:             public int_argument_selector<unsigned int> {};
 template <> struct argument_selector<long>:                     public int_argument_selector<long> {};
 template <> struct argument_selector<unsigned long>:            public int_argument_selector<unsigned long> {};
+template <> struct argument_selector<long long>:                public int_argument_selector<long long> {};
+template <> struct argument_selector<unsigned long long>:       public int_argument_selector<unsigned long long> {};
 template <> struct argument_selector<float>:                    public float_argument_selector<float> {};
 template <> struct argument_selector<double>:                   public float_argument_selector<double> {};
 template <> struct argument_selector<long double>:              public float_argument_selector<long double> {};
@@ -106,11 +108,11 @@ struct argument_invoker_helper: public argument_invoker<T> {};
 template <class T>
 struct argument_invoker_helper<T, true>
 {
-    //enum-типы приводятся к int
+    //enum-типы приводятся к ptrdiff_t
 
-  typedef int type;
+  typedef ptrdiff_t type;
 
-  static int make (const T& value) { return static_cast<int> (value); }
+  static ptrdiff_t make (const T& value) { return static_cast<ptrdiff_t> (value); }
 };
 
 template <class T>
@@ -121,15 +123,19 @@ inline typename argument_invoker_helper<T>::type make_invoker_argument (const T&
 
 inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
 inline bool        make_invoker_argument (bool value)               { return value; }
-inline int         make_invoker_argument (char value)               { return value; }
-inline int         make_invoker_argument (signed char value)        { return value; }
-inline int         make_invoker_argument (unsigned char value)      { return value; }
-inline int         make_invoker_argument (short value)              { return value; }
-inline int         make_invoker_argument (unsigned short value)     { return value; }
-inline int         make_invoker_argument (int value)                { return value; }
-inline int         make_invoker_argument (unsigned int value)       { return value; }
-inline int         make_invoker_argument (long value)               { return value; }
-inline int         make_invoker_argument (unsigned long value)      { return value; }
+inline ptrdiff_t   make_invoker_argument (char value)               { return value; }
+inline ptrdiff_t   make_invoker_argument (signed char value)        { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned char value)      { return value; }
+inline ptrdiff_t   make_invoker_argument (short value)              { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned short value)     { return value; }
+inline ptrdiff_t   make_invoker_argument (int value)                { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned int value)       { return value; }
+inline ptrdiff_t   make_invoker_argument (long value)               { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned long value)      { return value; }
+#if defined (_M_X64) || defined (__x86_64__)
+inline ptrdiff_t   make_invoker_argument (long long value)          { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned long long value) { return value; }
+#endif
 inline float       make_invoker_argument (float value)              { return value; }
 inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
 inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }

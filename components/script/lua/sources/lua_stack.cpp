@@ -53,11 +53,11 @@ float Stack::GetFloat (unsigned int index)
   return (float)lua_tonumber (state, index);
 }
 
-int Stack::GetInteger (unsigned int index)
+ptrdiff_t Stack::GetInteger (unsigned int index)
 {
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
 
-  return (int)lua_tointeger (state, index);
+  return lua_tointeger (state, index);
 }
 
 bool Stack::GetBoolean (unsigned int index)
@@ -184,7 +184,7 @@ void Stack::Push (float value)
   lua_pushnumber (state, value);
 }        
 
-void Stack::Push (int value)
+void Stack::Push (ptrdiff_t value)
 {
   check_stack     (state);  
   lua_pushinteger (state, value);

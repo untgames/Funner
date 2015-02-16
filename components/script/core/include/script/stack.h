@@ -56,7 +56,7 @@ class IStack
 ///Получение аргумента из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float       GetFloat   (unsigned int index) = 0;
-    virtual int         GetInteger (unsigned int index) = 0;
+    virtual ptrdiff_t   GetInteger (unsigned int index) = 0;
     virtual bool        GetBoolean (unsigned int index) = 0;
     virtual void*       GetPointer (unsigned int index) = 0;
     virtual const char* GetString  (unsigned int index) = 0;
@@ -66,7 +66,7 @@ class IStack
 ///Помещение аргументов в стек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Push (float value) = 0;
-    virtual void Push (int value) = 0;
+    virtual void Push (ptrdiff_t value) = 0;
     virtual void Push (bool value) = 0;
     virtual void Push (void* pointer) = 0;
     virtual void Push (const char* string) = 0;

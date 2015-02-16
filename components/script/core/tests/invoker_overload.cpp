@@ -44,7 +44,7 @@ int main ()
     stack.PushSymbol ("dummy");
     stack.Push (3.0f);
     stack.Push ("Hello world");
-    stack.Push (2);
+    stack.Push ((ptrdiff_t)2);
 
     f1 (stack);
     stack.Dump ();
@@ -52,7 +52,7 @@ int main ()
     stack.Clear ();
     stack.PushSymbol ("dummy");
     stack.Push (3.0f);
-    stack.Push (2);
+    stack.Push ((ptrdiff_t)2);
 
     f1 (stack);
     stack.Dump ();

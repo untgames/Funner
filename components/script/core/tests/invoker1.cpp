@@ -19,8 +19,8 @@ int main ()
     stack.PushSymbol ("dummy");
     stack.Push (3.0f);
     stack.Push ("Hello world");
-    stack.Push (12);
-    stack.Push (100);
+    stack.Push ((ptrdiff_t)12);
+    stack.Push ((ptrdiff_t)100);
 
     f1 (stack);
 

@@ -106,7 +106,7 @@ class Stack: public IStack
 ///Получение аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float       GetFloat   (unsigned int index);
-    int         GetInteger (unsigned int index);
+    ptrdiff_t   GetInteger (unsigned int index);
     bool        GetBoolean (unsigned int index);
     void*       GetPointer (unsigned int index);
     const char* GetString  (unsigned int index);
@@ -117,7 +117,7 @@ class Stack: public IStack
 ///Помещение аргументов в стек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Push       (float value);
-    void Push       (int value);
+    void Push       (ptrdiff_t value);
     void Push       (bool value);
     void Push       (void* pointer);
     void Push       (const char* string);
