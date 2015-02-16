@@ -109,7 +109,7 @@ class Window: public IWindow, private xtl::trackable
     }
     
 ///Установка размеров окна
-    void SetSize (size_t width, size_t height)
+    void SetSize (unsigned int width, unsigned int height)
     {
       try
       {
@@ -123,7 +123,7 @@ class Window: public IWindow, private xtl::trackable
     }
     
 ///Получение ширины окна
-    size_t GetWidth ()
+    unsigned int GetWidth ()
     {
       try
       {
@@ -137,7 +137,7 @@ class Window: public IWindow, private xtl::trackable
     }
     
 ///Получение высоты окна
-    size_t GetHeight ()
+    unsigned int GetHeight ()
     {
       try
       {

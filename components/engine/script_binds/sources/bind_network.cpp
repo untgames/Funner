@@ -26,7 +26,7 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
     typedef xtl::shared_ptr<ScriptTcpClient> Pointer;
     
 ///Конструктор    
-    ScriptTcpClient (const char* host, unsigned short port, size_t timeout) : TcpClient (host, port, timeout) {}
+    ScriptTcpClient (const char* host, unsigned short port, unsigned int timeout) : TcpClient (host, port, timeout) {}
     
 ///Приём данных
     stl::string Receive ()
@@ -38,7 +38,7 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
       
       result.fast_resize (TcpClient::ReceiveAvailable ());      
       
-      if (!ReceiveExactly (&result [0], result.size (), 1000))
+      if (!ReceiveExactly (&result [0], (unsigned int)result.size (), 1000))
         return stl::string ();
         
       return result;
@@ -62,7 +62,7 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
       return CreateWithTimeout (host, port, 0);
     }
     
-    static Pointer CreateWithTimeout (const char* host, unsigned short port, size_t timeout)
+    static Pointer CreateWithTimeout (const char* host, unsigned short port, unsigned int timeout)
     {
       return Pointer (new ScriptTcpClient (host, port, timeout));
     }

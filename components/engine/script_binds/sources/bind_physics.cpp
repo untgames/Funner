@@ -195,17 +195,17 @@ ShapeList create_shape_list ()
   return ShapeList ();
 }
 
-const Shape& get_shape_list_shape (const ShapeList& list, size_t index)
+const Shape& get_shape_list_shape (const ShapeList& list, unsigned int index)
 {
   return list [index];
 }
 
-const math::vec3f& get_shape_list_shape_position (const ShapeList& list, size_t index)
+const math::vec3f& get_shape_list_shape_position (const ShapeList& list, unsigned int index)
 {
   return list.Transform (index).position;
 }
 
-const math::quatf& get_shape_list_shape_orientation (const ShapeList& list, size_t index)
+const math::quatf& get_shape_list_shape_orientation (const ShapeList& list, unsigned int index)
 {
   return list.Transform (index).orientation;
 }

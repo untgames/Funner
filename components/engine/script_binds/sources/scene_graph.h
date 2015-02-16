@@ -52,7 +52,7 @@ struct argument_selector<math::angle<float> >
 {
   typedef float dump_type;
 
-  static math::angle<float> get (IStack& stack, size_t index) { return math::degree (stack.GetFloat (index)); }
+  static math::angle<float> get (IStack& stack, unsigned int index) { return math::degree (stack.GetFloat (index)); }
   
   static float make_invoker_argument (const math::angle<float>& angle) { return math::degree (angle); }
 };
