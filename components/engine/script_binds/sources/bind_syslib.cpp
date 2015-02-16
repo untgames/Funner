@@ -150,7 +150,7 @@ void bind_window_library (Environment& environment)
   lib.Register ("set_Y",                make_invoker (&set_window_y));
   lib.Register ("get_Position",         make_invoker (&get_window_position));
   lib.Register ("get_Position",         make_invoker (&get_window_position));
-  lib.Register ("SetPosition",          make_invoker ((void (syslib::Window::*)(size_t, size_t))&syslib::Window::SetPosition));
+  lib.Register ("SetPosition",          make_invoker ((void (syslib::Window::*)(unsigned int, unsigned int))&syslib::Window::SetPosition));
   lib.Register ("set_Position",         make_invoker (&set_window_position));
   lib.Register ("set_Position",         make_invoker (&set_window_position));
   lib.Register ("set_Width",            make_invoker (&syslib::Window::SetWidth));

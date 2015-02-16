@@ -44,6 +44,8 @@ void to_string (stl::string& buffer, int value);
 void to_string (stl::string& buffer, unsigned int value);
 void to_string (stl::string& buffer, long value);
 void to_string (stl::string& buffer, unsigned long value);
+void to_string (stl::string& buffer, long long value);
+void to_string (stl::string& buffer, unsigned long long value);
 void to_string (stl::string& buffer, const volatile bool& value); //const volatile& для избежания неявного преобразования к bool в xtl::any
 void to_string (stl::string& buffer, float value);
 void to_string (stl::string& buffer, const double& value);
@@ -67,6 +69,8 @@ void to_value (const stl::string& buffer, int& value);
 void to_value (const stl::string& buffer, unsigned int& value);
 void to_value (const stl::string& buffer, long& value);
 void to_value (const stl::string& buffer, unsigned long& value);
+void to_value (const stl::string& buffer, long long& value);
+void to_value (const stl::string& buffer, unsigned long long& value);
 void to_value (const stl::string& buffer, bool& value);
 void to_value (const stl::string& buffer, float& value);
 void to_value (const stl::string& buffer, double& value);
