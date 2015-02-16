@@ -80,7 +80,7 @@ ObjectType get_object_type (DWORD type)
   return ObjectType_Unknown;
 }
 
-size_t get_object_data_size (ObjectType type)
+unsigned int get_object_data_size (ObjectType type)
 {
   switch (type)
   {
@@ -172,7 +172,7 @@ OtherDevice::OtherDevice
   if (operation_result != DI_OK)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't enumerate device objects, error '%s'", get_direct_input_error_name (operation_result));
 
-  size_t device_data_size = 0;
+  unsigned int device_data_size = 0;
 
   for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter)
     if (iter->second.offset >= device_data_size)
@@ -192,7 +192,7 @@ OtherDevice::OtherDevice
     objects_data_format.data ()[i].dwFlags = 0;
   }
 
-  DIDATAFORMAT data_format = { sizeof(DIDATAFORMAT), sizeof(DIOBJECTDATAFORMAT), DIDF_ABSAXIS, device_data_size, objects.size (), objects_data_format.data () };
+  DIDATAFORMAT data_format = { sizeof(DIDATAFORMAT), sizeof(DIOBJECTDATAFORMAT), DIDF_ABSAXIS, device_data_size, (DWORD)objects.size (), objects_data_format.data () };
 
   operation_result = device_interface->SetDataFormat (&data_format);
 
@@ -266,7 +266,7 @@ OtherDevice::OtherDevice
   xtl::uninitialized_storage<char> initial_device_data (device_data_size);
 
   device_interface->Poll ();
-  device_interface->GetDeviceState (initial_device_data.size (), initial_device_data.data ());
+  device_interface->GetDeviceState ((DWORD)initial_device_data.size (), initial_device_data.data ());
 
   if (events_buffer_size)
   {
@@ -397,22 +397,22 @@ float OtherDevice::GetProperty (const char* name)
    Регистрация объекта
 */
 
-void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType type)
+void OtherDevice::RegisterObject (const char* name, unsigned int offset, ObjectType type)
 {
   stl::wstring unicode_name;
-  int          length = strlen (name);
+  size_t       length = xtl::xstrlen (name);
 
   unicode_name.fast_resize (length);
 
-  int result_size = mbstowcs (&unicode_name [0], name, length);
+  size_t result_size = mbstowcs (&unicode_name [0], name, length);
 
-  if (result_size < 0) unicode_name.fast_resize (result_size);
-  else                 unicode_name.clear ();
+  if (result_size != (size_t)-1) unicode_name.fast_resize (result_size);
+  else                           unicode_name.clear ();
 
   RegisterObject (unicode_name.c_str (), offset, type);
 }
 
-void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, ObjectType type)
+void OtherDevice::RegisterObject (const wchar_t* unicode_name, unsigned int offset, ObjectType type)
 {
   stl::string object_name;
 
@@ -485,7 +485,7 @@ void OtherDevice::PollDevice ()
   if (events_buffer_size)
     operation_result = device_interface->GetDeviceData (sizeof (DIDEVICEOBJECTDATA), events_buffer.data (), &events_count, 0);
   else
-    operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+    operation_result = device_interface->GetDeviceState ((DWORD)current_device_data.size (), current_device_data.data ());
 
   if (operation_result == DI_BUFFEROVERFLOW)
   {
@@ -525,7 +525,7 @@ void OtherDevice::PollDevice ()
           }
         }
         else
-          operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
+          operation_result = device_interface->GetDeviceState ((DWORD)current_device_data.size (), current_device_data.data ());
 
         if (operation_result != DI_OK)
         {
