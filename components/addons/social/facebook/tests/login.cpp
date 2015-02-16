@@ -30,7 +30,7 @@ void dump (const User& user)
   printf ("  id        '%s'\n", user.Id ());
   printf ("  nickname  '%s'\n", user.Nickname ());
   printf ("  is friend %c\n", user.IsFriend () ? 'y' : 'n');
-  printf ("  handle    %d\n",   user.Handle ());
+  printf ("  handle    %p\n",   user.Handle ());
   printf ("  properties:\n");
   dump (user.Properties ());
 }

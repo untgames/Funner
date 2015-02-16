@@ -5,13 +5,13 @@ Product:
   id          ''
   handle       0
   properties:
-    map has 0 properties (hash=ffffffff, layout_hash=ffffffff):
+    map has 0 properties:
 filled product
 Product:
   description 'Description'
   id          'Id'
   handle       1
   properties:
-    map has 2 properties (hash=9f20724f, layout_hash=a6232eec):
+    map has 2 properties:
      #0: name='String', type=string, value='StringValue'
      #1: name='IntValue', type=integer, value='10'

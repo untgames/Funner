@@ -35,7 +35,7 @@ void dump (const Achievement& achievement)
   printf ("  title    '%s'\n",      achievement.Title ());
   printf ("  hidden   %c\n",       achievement.IsHidden () ? 'y' : 'n');
   printf ("  progress %.2g\n",     achievement.Progress ());
-  printf ("  handle   %d\n",       achievement.Handle ());
+  printf ("  handle   %p\n",       achievement.Handle ());
   printf ("  properties:\n");
   dump (achievement.Properties ());
 }
@@ -49,7 +49,7 @@ void dump (const Score& score)
   printf ("  value           %.2g\n", score.Value ());
   printf ("  formatted value '%s'\n", score.FormattedValue ());
   printf ("  rank            %u\n",   score.Rank ());
-  printf ("  handle          %d\n",   score.Handle ());
+  printf ("  handle          %p\n",   score.Handle ());
   printf ("  properties:\n");
   dump (score.Properties ());
 }
@@ -58,7 +58,7 @@ void dump (const Leaderboard& leaderboard)
 {
   printf ("Leaderboard '%s':\n", leaderboard.Id ());
   printf ("  title '%s'\n",      leaderboard.Title ());
-  printf ("  handle %d\n",       leaderboard.Handle ());
+  printf ("  handle %p\n",       leaderboard.Handle ());
   printf ("  properties:\n");
   dump (leaderboard.Properties ());
   printf ("  user score [\n");
@@ -81,7 +81,7 @@ void dump (const User& user)
   printf ("  id        '%s'\n", user.Id ());
   printf ("  nickname  '%s'\n", user.Nickname ());
   printf ("  is friend %c\n", user.IsFriend () ? 'y' : 'n');
-  printf ("  handle    %d\n",   user.Handle ());
+  printf ("  handle    %p\n",   user.Handle ());
   printf ("  properties:\n");
   dump (user.Properties ());
 }
