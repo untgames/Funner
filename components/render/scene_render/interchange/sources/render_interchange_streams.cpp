@@ -27,7 +27,7 @@ void write (OutputStream& s, const media::Image& image)
 
     size_t layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
 
-    for (size_t i=0; i<depth; i++)
+    for (unsigned int i=0; i<depth; i++)
       s.WriteData (image.Bitmap (i), layer_size);
   }
 }
@@ -50,9 +50,9 @@ media::Image read (InputStream& s, xtl::type<media::Image>)
 
     media::Image image (width, height, depth, (media::PixelFormat)format);
 
-    size_t layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
+    unsigned int layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
 
-    for (size_t i=0; i<depth; i++)
+    for (unsigned int i=0; i<depth; i++)
       s.ReadData (image.Bitmap (i), layer_size);
 
     return image;

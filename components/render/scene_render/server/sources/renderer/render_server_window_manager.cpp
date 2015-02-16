@@ -10,7 +10,7 @@ namespace
     Константы
 */
 
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 4; //резервируемое количество слушателей
+const unsigned int LISTENER_ARRAY_RESERVE_SIZE = 4; //резервируемое количество слушателей
 
 /*
     Вспомогательные классы
@@ -21,7 +21,7 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
 {
   public:
 ///Конструктор
-    NativeWindow (void* in_handle, size_t in_width, size_t in_height, const manager::Rect& in_viewport)
+    NativeWindow (void* in_handle, unsigned int in_width, unsigned int in_height, const manager::Rect& in_viewport)
       : handle (in_handle)
       , width (in_width)
       , height (in_height)
@@ -36,7 +36,7 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
     }
 
 ///Установка размеров экрана
-    void SetSize (size_t in_width, size_t in_height)
+    void SetSize (unsigned int in_width, unsigned int in_height)
     {
       try
       {
@@ -54,8 +54,8 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
     }
 
 ///Размеры окна
-    size_t GetWidth  () { return width; }
-    size_t GetHeight () { return height; }
+    unsigned int GetWidth  () { return width; }
+    unsigned int GetHeight () { return height; }
 
 ///Установка области вывода
     void SetViewport (const manager::Rect& rect)
@@ -125,8 +125,8 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
 
   private:
     void*         handle;
-    size_t        width;
-    size_t        height;
+    unsigned int  width;
+    unsigned int  height;
     manager::Rect viewport;
     ListenerArray listeners;
 };
@@ -138,7 +138,7 @@ class Window: public xtl::reference_counter
 {
   public:
 /// Конструктор
-    Window (RenderManager& render_manager, const char* in_name, const char* init_string, void* handle, size_t width, size_t height, const manager::Rect& viewport)
+    Window (RenderManager& render_manager, const char* in_name, const char* init_string, void* handle, unsigned int width, unsigned int height, const manager::Rect& viewport)
       : log (render_manager.Log ())
     {
       try
@@ -250,7 +250,7 @@ WindowManager::~WindowManager ()
     Добавление и удаление окон  
 */
 
-void WindowManager::AttachWindow (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, const manager::Rect& rect)
+void WindowManager::AttachWindow (size_t id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, const manager::Rect& rect)
 {
   try
   {
@@ -329,7 +329,7 @@ manager::Window& WindowManager::GetWindow (const char* name) const
     Обновление окон
 */
 
-void WindowManager::SetWindowSize (size_t id, size_t width, size_t height)
+void WindowManager::SetWindowSize (size_t id, unsigned int width, unsigned int height)
 {
   try
   {

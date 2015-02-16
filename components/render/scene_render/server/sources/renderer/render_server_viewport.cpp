@@ -503,8 +503,8 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 
         Rect target_rect (int ((viewport_area.x - screen_area.x) * x_scale),
                           int ((viewport_area.y - screen_area.y) * y_scale),
-                          size_t (ceil (viewport_area.width * x_scale)),
-                          size_t (ceil (viewport_area.height * y_scale)));
+                          (unsigned int)(ceil (viewport_area.width * x_scale)),
+                          (unsigned int)(ceil (viewport_area.height * y_scale)));
 
         frame_render_targets.RemoveRenderTarget (entry.desc.Name ());
         frame_render_targets.SetRenderTarget    (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));

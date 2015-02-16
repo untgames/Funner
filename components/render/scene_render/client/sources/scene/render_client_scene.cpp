@@ -93,7 +93,7 @@ struct Scene::Impl
     {
       scene.Traverse (NodeCollector (scene_manager, owner, ids));
 
-      scene_manager.Context ().SetSceneNodes (id, render::scene::interchange::RawArray<object_id_t> (&ids [0], ids.size ()));
+      scene_manager.Context ().SetSceneNodes (id, render::scene::interchange::RawArray<object_id_t> (&ids [0], (uint32)ids.size ()));
     }
     catch (...)
     {
