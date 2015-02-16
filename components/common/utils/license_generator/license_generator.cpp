@@ -61,7 +61,7 @@ void parse_date (const char* date_string, time_t& result_date)
 {
   static const char* METHOD_NAME = "parse_date";
 
-  if (!rematch (date_string, "[:digit:][:digit:][:digit:][:digit:]-[:digit:][:digit:]-[:digit:][:digit:]"))
+  if (!rematch (date_string, "[12][[:digit:]][[:digit:]][[:digit:]]\\-[01][[:digit:]]\\-[0-3][[:digit:]]"))
     throw xtl::format_operation_exception (METHOD_NAME, "Invalid date string '%s' format, must be yyyy-mm-dd", date_string);
 
   tm tm_date;
@@ -115,7 +115,7 @@ void command_line_license_period (const char* period, Params& params)
   if (params.till_date)
     throw xtl::format_operation_exception (METHOD_NAME, "license validity period is already setted");
 
-  if (!rematch (period, "[:digit:]-[:digit:][:digit:]"))
+  if (!rematch (period, "[[:digit:]]\\-[01][[:digit:]]"))
     throw xtl::format_operation_exception (METHOD_NAME, "Invalid period parameter '%s' format, must be y-mm", period);
 
   int years_period   = atoi (period),
