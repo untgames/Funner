@@ -54,8 +54,8 @@ class TriangleMesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с вершинами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t VerticesCount    () const;
-    void   SetVerticesCount (size_t count);
+    unsigned int VerticesCount    () const;
+    void         SetVerticesCount (unsigned int count);
 
     const math::vec3f* Vertices () const;
           math::vec3f* Vertices ();
@@ -63,8 +63,8 @@ class TriangleMesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с индексами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t TrianglesCount    () const;
-    void   SetTrianglesCount (size_t count);
+    unsigned int TrianglesCount    () const;
+    void         SetTrianglesCount (unsigned int count);
 
     const TriangleIndices* Triangles () const;
           TriangleIndices* Triangles ();

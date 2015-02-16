@@ -128,7 +128,7 @@ class XmlPhysicsLibraryLoader
 
       ParseNode vertices_node = mesh_iter->First ("vertices");
 
-      size_t vertices_count = get<size_t> (vertices_node, "count");
+      unsigned int vertices_count = get<unsigned int> (vertices_node, "count");
 
       if (!vertices_count)
         throw xtl::format_operation_exception (METHOD_NAME, "Empty vertices in mesh '%s'", mesh.Name ());
@@ -141,7 +141,7 @@ class XmlPhysicsLibraryLoader
 
       if (indices_node)
       {
-        size_t triangles_count = get<size_t> (indices_node, "count");
+        unsigned int triangles_count = get<unsigned int> (indices_node, "count");
 
         if (!triangles_count)
           throw xtl::format_operation_exception (METHOD_NAME, "Empty indices in mesh '%s'", mesh.Name ());
