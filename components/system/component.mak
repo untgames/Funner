@@ -44,7 +44,8 @@ SYSTEMLIB.SOURCES.tabletos.SOURCE_DIRS              := sources/platform/tabletos
 SYSTEMLIB.SOURCES.win8.COMPILER_CFLAGS              := -ZW
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
-  SYSTEMLIB.SOURCES.x86.IMPORTS := compile.extern.geekinfo
+  SYSTEMLIB.SOURCES.x86.IMPORTS    := compile.extern.geekinfo
+  SYSTEMLIB.SOURCES.x86-64.IMPORTS := compile.extern.geekinfo
 endif
 
 #Цель - System library tests

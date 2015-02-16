@@ -33,4 +33,7 @@ ifeq (,$(filter android,$(PROFILES)))
 ifneq (,$(filter x86,$(PROFILES)))
   COMPONENT_DIRS += geekinfo
 endif
+ifneq (,$(filter x86-64,$(PROFILES)))
+  COMPONENT_DIRS += geekinfo
+endif
 endif

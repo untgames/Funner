@@ -44,4 +44,5 @@ export.link.system.win8.EXCLUDE_DEFAULT_LIBS := funner.win8_compat.stdio
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   export.link.system.x86.IMPORTS            := link.extern.geekinfo
+  export.link.system.x86-64.IMPORTS         := link.extern.geekinfo
 endif
