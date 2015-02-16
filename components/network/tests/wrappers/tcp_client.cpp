@@ -18,13 +18,13 @@ int client ()
 
       memset (receive_buffer, 0, sizeof (receive_buffer));
       
-      size_t required_size = sizeof (receive_buffer) - 1;
+      unsigned int required_size = sizeof (receive_buffer) - 1;
           
       if (!client.ReceiveExactly (receive_buffer, required_size, 3000))
       {      
         memset (receive_buffer, 0, sizeof (receive_buffer));
         
-        size_t size = client.Receive (receive_buffer, required_size, 1000);
+        unsigned int size = client.Receive (receive_buffer, required_size, 1000);
         
         printf ("Receive failed. Received %u bytes\n", size);
       }
@@ -54,11 +54,11 @@ int server ()
 
     Socket client_socket = socket.Accept ();
 
-    client_socket.Send (MESSAGE1, xtl::xstrlen (MESSAGE1));        
+    client_socket.Send (MESSAGE1, (unsigned int)xtl::xstrlen (MESSAGE1));
     
     syslib::Application::Sleep (1000);
         
-    client_socket.Send (MESSAGE2, xtl::xstrlen (MESSAGE2));  
+    client_socket.Send (MESSAGE2, (unsigned int)xtl::xstrlen (MESSAGE2));
   }
   catch (xtl::exception& e)
   {

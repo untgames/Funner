@@ -17,9 +17,9 @@ namespace
     Константы
 */
 
-const size_t DEFAULT_ASYNC_RECEIVE_BUFFER_RECEIVE_SIZE = 16384;
-const size_t ASYNC_SENDING_QUEUE_MAX_SIZE              = 16;
-const size_t ASYNC_TIMEOUT_IN_MILLISECONDS             = 1000;
+const unsigned int DEFAULT_ASYNC_RECEIVE_BUFFER_RECEIVE_SIZE = 16384;
+const unsigned int ASYNC_SENDING_QUEUE_MAX_SIZE              = 16;
+const unsigned int ASYNC_TIMEOUT_IN_MILLISECONDS             = 1000;
 
 /*
     Типы
@@ -37,18 +37,18 @@ struct Block
   typedef xtl::com_ptr<Block> Pointer;
 
   xtl::reference_counter ref_count; //количество ссылок на буфер
-  size_t                 size;      //размер буфера
+  unsigned int           size;      //размер буфера
   char                   data [1];  //данные
 
 ///Конструктор
-  Block (size_t in_size, const void* in_data)
+  Block (unsigned int in_size, const void* in_data)
     : size (in_size)
   {
     memcpy (data, in_data, size);
   }
 
 ///Создание буфера
-  static Pointer Create (size_t size, const void* data)
+  static Pointer Create (unsigned int size, const void* data)
   {
     Block* block = new (stl::allocate<char> (sizeof (Block) - sizeof (char) + size)) Block (size, data);
 
@@ -62,7 +62,7 @@ struct Block
   {
     if (ref_count.decrement ())
     {
-      const size_t buf_size = size;
+      const unsigned int buf_size = size;
 
       stl::destroy (this);
       stl::deallocate ((void*)this, buf_size);
@@ -77,7 +77,7 @@ class SharedQueue
 {
   public:
 ///Конструктор
-    SharedQueue (size_t in_max_size)
+    SharedQueue (unsigned int in_max_size)
       : max_size (in_max_size)
     {      
     }
@@ -89,7 +89,7 @@ class SharedQueue
     }
 
 ///Помещение буфера в очередь
-    bool Push (const BlockPtr& block, size_t timeout_in_milliseconds)
+    bool Push (const BlockPtr& block, unsigned int timeout_in_milliseconds)
     {
       syslib::Lock lock (mutex);
 
@@ -113,7 +113,7 @@ class SharedQueue
     }
 
 ///Извлечение буфера из очереди
-    BlockPtr Pop (size_t timeout_in_milliseconds)
+    BlockPtr Pop (unsigned int timeout_in_milliseconds)
     {
       syslib::Lock lock (mutex);
 
@@ -146,7 +146,7 @@ class SharedQueue
     syslib::Condition full_condition;  //событие изменения состояния очереди
     syslib::Condition empty_condition; //событие изменения состояния очереди
     BlockQueue        blocks;          //блоки
-    size_t            max_size;        //максимальный размер очереди
+    unsigned int      max_size;        //максимальный размер очереди
 };
 
 ///Асинхронная обработка данных
@@ -243,7 +243,7 @@ class AsyncSender: public AsyncProcessor
     }
 
 ///Запрос на отсылку данных
-    void SendRequest (const void* buffer, size_t size)
+    void SendRequest (const void* buffer, unsigned int size)
     {
       try
       { 
@@ -265,7 +265,7 @@ class AsyncSender: public AsyncProcessor
       if (!block)
         return;
 
-      size_t size = block->size;
+      unsigned int size = block->size;
       char*  data = block->data;
 
       while (size)
@@ -273,7 +273,7 @@ class AsyncSender: public AsyncProcessor
         if (IsStopRequested ())
           break;
 
-        size_t send_size = socket.Send (data, size, ASYNC_TIMEOUT_IN_MILLISECONDS);        
+        unsigned int send_size = socket.Send (data, size, ASYNC_TIMEOUT_IN_MILLISECONDS);
 
         if (!send_size)
         {
@@ -323,7 +323,7 @@ class AsyncReceiver: public AsyncProcessor, public common::Lockable
 ///Итерация обработки очереди
     void DoStep ()
     {
-      size_t recv_size = socket.Receive (buffer.data (), buffer.size (), ASYNC_TIMEOUT_IN_MILLISECONDS);
+      unsigned int recv_size = socket.Receive (buffer.data (), (unsigned int)buffer.size (), ASYNC_TIMEOUT_IN_MILLISECONDS);
 
       if (!recv_size)
       {
@@ -350,7 +350,7 @@ class AsyncReceiver: public AsyncProcessor, public common::Lockable
     Описание реализации клиента
 */
 
-typedef xtl::signal<void (const void*, size_t)> AsyncDataReceivingSignal;
+typedef xtl::signal<void (const void*, unsigned int)> AsyncDataReceivingSignal;
 
 struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 {
@@ -408,7 +408,7 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
   }
   
 ///Принятие данных
-  size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+  unsigned int Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
   {
     if (!buffer && size)
       throw xtl::make_null_argument_exception ("", "buffer");
@@ -416,17 +416,17 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
     if (!size)
       return 0;
       
-    char*  pos       = (char*)buffer;
-    size_t recv_size = 0;
+    char*        pos       = (char*)buffer;
+    unsigned int recv_size = 0;
 
     {
       common::Lock lock (*this);
 
-      size_t received = recv_finish - recv_start;
+      unsigned int received = (unsigned int)(recv_finish - recv_start);
       
       if (received)
       {
-        size_t copy_size = stl::min (received, size);
+        unsigned int copy_size = stl::min (received, size);
         
         memcpy (pos, recv_start, copy_size);
         
@@ -443,7 +443,7 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
     return recv_size;
   }
   
-  bool ReceiveExactly (void* buffer, size_t size, size_t timeout_in_milliseconds)
+  bool ReceiveExactly (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
   {
     if (!buffer && size)
       throw xtl::make_null_argument_exception ("", "buffer");
@@ -453,8 +453,8 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 
     char* pos = (char*)buffer;
     
-    size_t start_time = common::milliseconds (),
-           recv_size  = 0;
+    size_t       start_time = common::milliseconds ();
+    unsigned int recv_size  = 0;
 
     try
     {
@@ -465,11 +465,11 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
         if (time_spent > timeout_in_milliseconds)
           throw xtl::format_operation_exception ("", "Timeout in ReceiveExactly");
 
-        size_t cur_recv_size = 0;
+        unsigned int cur_recv_size = 0;
 
         try
         {
-          cur_recv_size = Receive (pos, size, timeout_in_milliseconds - time_spent);
+          cur_recv_size = Receive (pos, size, (unsigned int)(timeout_in_milliseconds - time_spent));
         }
         catch (...)
         {
@@ -508,7 +508,7 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
   }
 
 ///Асинхронный обработчик получения данных
-  void OnAsyncDataReceived (const void* data, size_t size)
+  void OnAsyncDataReceived (const void* data, unsigned int size)
   {
     common::Lock lock (*this);
 
@@ -525,7 +525,7 @@ TcpClient::TcpClient ()
 {
 }
 
-TcpClient::TcpClient (const SocketAddress& address, size_t timeout_in_milliseconds, bool tcp_no_delay)
+TcpClient::TcpClient (const SocketAddress& address, unsigned int timeout_in_milliseconds, bool tcp_no_delay)
   : impl (new Impl)
 {
   try
@@ -534,12 +534,12 @@ TcpClient::TcpClient (const SocketAddress& address, size_t timeout_in_millisecon
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::TcpClient(const SocketAddress&,size_t,bool)");
+    e.touch ("network::TcpClient::TcpClient(const SocketAddress&,unsigned int,bool)");
     throw;
   }
 }
 
-TcpClient::TcpClient (const InetAddress& address, unsigned short port, size_t timeout_in_milliseconds, bool tcp_no_delay)
+TcpClient::TcpClient (const InetAddress& address, unsigned short port, unsigned int timeout_in_milliseconds, bool tcp_no_delay)
   : impl (new Impl)
 {
   try
@@ -548,7 +548,7 @@ TcpClient::TcpClient (const InetAddress& address, unsigned short port, size_t ti
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::TcpClient(const InetAddress&,unsigned short,size_t,bool)");
+    e.touch ("network::TcpClient::TcpClient(const InetAddress&,unsigned short,unsigned int,bool)");
     throw;
   }
 }
@@ -575,7 +575,7 @@ TcpClient& TcpClient::operator = (const TcpClient& client)
     Соединение
 */
 
-void TcpClient::Connect (const SocketAddress& address, size_t timeout_in_milliseconds, bool tcp_no_delay)
+void TcpClient::Connect (const SocketAddress& address, unsigned int timeout_in_milliseconds, bool tcp_no_delay)
 {
   try
   {
@@ -600,12 +600,12 @@ void TcpClient::Connect (const SocketAddress& address, size_t timeout_in_millise
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::Connect(const InetAddress&,unsigned short,size_t,bool)");
+    e.touch ("network::TcpClient::Connect(const InetAddress&,unsigned short,unsigned int,bool)");
     throw;
   }
 }
 
-void TcpClient::Connect (const InetAddress& address, unsigned short port, size_t timeout_in_milliseconds, bool tcp_no_delay)
+void TcpClient::Connect (const InetAddress& address, unsigned short port, unsigned int timeout_in_milliseconds, bool tcp_no_delay)
 {
   try
   {
@@ -613,7 +613,7 @@ void TcpClient::Connect (const InetAddress& address, unsigned short port, size_t
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::Connect(const InetAddress&,unsigned short,size_t,bool)");
+    e.touch ("network::TcpClient::Connect(const InetAddress&,unsigned short,unsigned int,bool)");
     throw;
   }
 }
@@ -635,7 +635,7 @@ void TcpClient::Close ()
     Передача данных
 */
 
-void TcpClient::Send (const void* buffer, size_t size)
+void TcpClient::Send (const void* buffer, unsigned int size)
 {
   try
   {
@@ -656,7 +656,7 @@ void TcpClient::Send (const void* buffer, size_t size)
       
     while (size)
     {
-      size_t send_size = impl->socket.Send (data, size);
+      unsigned int send_size = impl->socket.Send (data, size);
 
       size -= send_size;
       data += send_size;
@@ -664,7 +664,7 @@ void TcpClient::Send (const void* buffer, size_t size)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::Send(const void* size_t)");
+    e.touch ("network::TcpClient::Send(const void* unsigned int)");
     throw;
   }
 }
@@ -676,7 +676,7 @@ void TcpClient::Send (const char* string)
     if (!string)
       throw xtl::make_null_argument_exception ("", "string");
 
-    Send (string, strlen (string));
+    Send (string, (unsigned int)xtl::xstrlen (string));
   }
   catch (xtl::exception& e)
   {
@@ -689,7 +689,7 @@ void TcpClient::Send (const char* string)
     Приём данных
 */
 
-size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+unsigned int TcpClient::Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
 {
   try
   {
@@ -704,12 +704,12 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::Receive(void*,size_t,size_t)");
+    e.touch ("network::TcpClient::Receive(void*,unsigned int,unsigned int)");
     throw;
   }
 }
 
-bool TcpClient::ReceiveExactly (void* buffer, size_t size, size_t timeout_in_milliseconds)
+bool TcpClient::ReceiveExactly (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
 {
   try
   {
@@ -724,7 +724,7 @@ bool TcpClient::ReceiveExactly (void* buffer, size_t size, size_t timeout_in_mil
   }
   catch (xtl::exception& e)
   {
-    e.touch ("network::TcpClient::ReceiveExactly(void*,size_t,size_t)");
+    e.touch ("network::TcpClient::ReceiveExactly(void*,unsigned int,unsigned int)");
     throw;
   }
 }
@@ -733,13 +733,13 @@ bool TcpClient::ReceiveExactly (void* buffer, size_t size, size_t timeout_in_mil
     Количество байт доступных для чтения без блокировки
 */
 
-size_t TcpClient::ReceiveAvailable () const
+unsigned int TcpClient::ReceiveAvailable () const
 {
   try
   {
     common::Lock lock (*impl);
 
-    return impl->recv_finish - impl->recv_start + impl->socket.ReceiveAvailable ();
+    return (unsigned int)(impl->recv_finish - impl->recv_start + impl->socket.ReceiveAvailable ());
   }
   catch (xtl::exception& e)
   {
@@ -752,7 +752,7 @@ size_t TcpClient::ReceiveAvailable () const
     Параметры сокета
 */
 
-void TcpClient::SetReceiveBufferSize (size_t size)
+void TcpClient::SetReceiveBufferSize (unsigned int size)
 {
   try
   {
@@ -765,7 +765,7 @@ void TcpClient::SetReceiveBufferSize (size_t size)
   }
 }
 
-void TcpClient::SetSendBufferSize (size_t size)
+void TcpClient::SetSendBufferSize (unsigned int size)
 {
   try
   {
@@ -778,7 +778,7 @@ void TcpClient::SetSendBufferSize (size_t size)
   }
 }
 
-size_t TcpClient::ReceiveBufferSize () const
+unsigned int TcpClient::ReceiveBufferSize () const
 {
   try
   {
@@ -791,7 +791,7 @@ size_t TcpClient::ReceiveBufferSize () const
   }
 }
 
-size_t TcpClient::SendBufferSize () const
+unsigned int TcpClient::SendBufferSize () const
 {
   try
   {
@@ -885,7 +885,7 @@ void TcpClient::SwitchToAsyncReceiving () const
   if (impl->async_receiver)
     return;
 
-  size_t available = impl->recv_finish - impl->recv_start;
+  unsigned int available = (unsigned int)(impl->recv_finish - impl->recv_start);
 
   if (available)
   {

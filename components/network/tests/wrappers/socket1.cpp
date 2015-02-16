@@ -43,7 +43,7 @@ int server ()
 
     Socket client_socket = socket.Accept ();
 
-    client_socket.Send (MESSAGE, xtl::xstrlen (MESSAGE) + 1);
+    client_socket.Send (MESSAGE, (unsigned int)xtl::xstrlen (MESSAGE) + 1);
   }
   catch (xtl::exception& e)
   {

@@ -24,7 +24,7 @@ struct Receiver
     buffer.append ((const char*)data, size);
 
     if (buffer.size () == xtl::xstrlen (MESSAGE1) + xtl::xstrlen (MESSAGE2))
-      client.Send (MESSAGE1, xtl::xstrlen (MESSAGE1));
+      client.Send (MESSAGE1, (unsigned int)xtl::xstrlen (MESSAGE1));
   }
 };
 
@@ -69,11 +69,11 @@ int server ()
 
     Socket client_socket = socket.Accept ();
 
-    client_socket.Send (MESSAGE1, xtl::xstrlen (MESSAGE1));
+    client_socket.Send (MESSAGE1, (unsigned int)xtl::xstrlen (MESSAGE1));
     
     syslib::Application::Sleep (1000);
         
-    client_socket.Send (MESSAGE2, xtl::xstrlen (MESSAGE2));
+    client_socket.Send (MESSAGE2, (unsigned int)xtl::xstrlen (MESSAGE2));
 
     stl::string buffer;
 

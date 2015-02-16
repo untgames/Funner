@@ -61,21 +61,21 @@ class SocketImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры сокета
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   SetReceiveBufferSize (size_t size) = 0;
-    virtual void   SetSendBufferSize    (size_t size) = 0;
-    virtual size_t ReceiveBufferSize    () = 0;
-    virtual size_t SendBufferSize       () = 0;
+    virtual void         SetReceiveBufferSize (unsigned int size) = 0;
+    virtual void         SetSendBufferSize    (unsigned int size) = 0;
+    virtual unsigned int ReceiveBufferSize    () = 0;
+    virtual unsigned int SendBufferSize       () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds) = 0;
-    virtual size_t Send    (const void* buffer, size_t size, size_t timeout_in_milliseconds) = 0;
+    virtual unsigned int Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds) = 0;
+    virtual unsigned int Send    (const void* buffer, unsigned int size, unsigned int timeout_in_milliseconds) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество байт доступных для чтения без блокировки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t ReceiveAvailable () = 0;
+    virtual unsigned int ReceiveAvailable () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок

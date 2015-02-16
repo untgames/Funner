@@ -16,8 +16,8 @@ class TcpClient
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TcpClient  ();
-    TcpClient  (const SocketAddress& address, size_t timeout_in_milliseconds = 0, bool tcp_no_delay = false);
-    TcpClient  (const InetAddress& address, unsigned short port, size_t timeout_in_milliseconds = 0, bool tcp_no_delay = false);
+    TcpClient  (const SocketAddress& address, unsigned int timeout_in_milliseconds = 0, bool tcp_no_delay = false);
+    TcpClient  (const InetAddress& address, unsigned short port, unsigned int timeout_in_milliseconds = 0, bool tcp_no_delay = false);
     TcpClient  (const TcpClient&);
     ~TcpClient ();
 
@@ -26,34 +26,34 @@ class TcpClient
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Соединение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Connect (const SocketAddress& address, size_t timeout_in_milliseconds = 0, bool tcp_no_delay = false);
-    void Connect (const InetAddress& address, unsigned short port, size_t timeout_in_milliseconds = 0, bool tcp_no_delay = false);
+    void Connect (const SocketAddress& address, unsigned int timeout_in_milliseconds = 0, bool tcp_no_delay = false);
+    void Connect (const InetAddress& address, unsigned short port, unsigned int timeout_in_milliseconds = 0, bool tcp_no_delay = false);
     void Close   ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Передача данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Send (const void* buffer, size_t size);
+    void Send (const void* buffer, unsigned int size);
     void Send (const char* string);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приём данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Receive        (void* buffer, size_t size, size_t timeout_in_milliseconds = 0);
-    bool   ReceiveExactly (void* buffer, size_t size, size_t timeout_in_milliseconds = 0);
+    unsigned int Receive        (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds = 0);
+    bool         ReceiveExactly (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество байт доступных для чтения без блокировки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ReceiveAvailable () const;
+    unsigned int ReceiveAvailable () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры сокета
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetReceiveBufferSize (size_t size);
-    void   SetSendBufferSize    (size_t size);
-    size_t ReceiveBufferSize    () const;
-    size_t SendBufferSize       () const;
+    void         SetReceiveBufferSize (unsigned int size);
+    void         SetSendBufferSize    (unsigned int size);
+    unsigned int ReceiveBufferSize    () const;
+    unsigned int SendBufferSize       () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги сокета
@@ -71,7 +71,7 @@ class TcpClient
     void SwitchToAsyncReceiving  () const;
     void SwitchToAsyncSending    () const;
 
-    typedef xtl::function<void (const void* buffer, size_t size)> AsyncReceivingHandler;
+    typedef xtl::function<void (const void* buffer, unsigned int size)> AsyncReceivingHandler;
 
     xtl::connection RegisterAsyncReceivingEventHandler (const AsyncReceivingHandler& handler);
 
