@@ -158,17 +158,17 @@ class TestDriver: public IDriver, public Object
       throw xtl::make_not_implemented_exception ("TestDriver::CreatePlaneShape");
     }
 
-    IShape* CreateConvexShape (size_t vertices_count, const math::vec3f* vertices)
+    IShape* CreateConvexShape (unsigned int vertices_count, const math::vec3f* vertices)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateConvexShape");
     }
 
-    IShape* CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles)
+    IShape* CreateTriangleMeshShape (unsigned int vertices_count, const math::vec3f* vertices, unsigned int triangles_count, unsigned int* triangles)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateTriangleShape");
     }
 
-    IShape* CreateCompoundShape (size_t shapes_count, IShape** shapes, Transform* local_transforms)
+    IShape* CreateCompoundShape (unsigned int shapes_count, IShape** shapes, Transform* local_transforms)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateCompoundShape");
     }

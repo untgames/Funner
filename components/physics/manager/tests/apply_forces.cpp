@@ -1,9 +1,17 @@
 #include "shared.h"
 
+#ifdef _MSC_VER
+#include <float.h>
+#endif
+
 int main ()
 {
   printf ("Results of apply_forces_test:\n");
   
+#ifdef _MSC_VER
+  _controlfp (_RC_CHOP, _MCW_RC);
+#endif
+
   try
   {
     PhysicsManager manager (DRIVER_NAME);

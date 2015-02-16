@@ -70,7 +70,7 @@ void ShapeList::Add (const Shape& shape, const math::quatf& orientation)
   Add (shape, physics::Transform (orientation));
 }
 
-void ShapeList::Remove (size_t index)
+void ShapeList::Remove (unsigned int index)
 {
   if (index >= impl->shapes.size ())
     return;
@@ -87,12 +87,12 @@ void ShapeList::Clear ()
    Получение тел
 */
 
-size_t ShapeList::Size () const
+unsigned int ShapeList::Size () const
 {
-  return impl->shapes.size ();
+  return (unsigned int)impl->shapes.size ();
 }
 
-Shape& ShapeList::operator [] (size_t index)
+Shape& ShapeList::operator [] (unsigned int index)
 {
   if (index >= impl->shapes.size ())
     throw xtl::make_range_exception ("physics::ShapeList::operator []", "index", index, 0u, impl->shapes.size ());
@@ -100,12 +100,12 @@ Shape& ShapeList::operator [] (size_t index)
   return impl->shapes [index]->shape;
 }
 
-const Shape& ShapeList::operator [] (size_t index) const
+const Shape& ShapeList::operator [] (unsigned int index) const
 {
   return const_cast<ShapeList&> (*this) [index];
 }
 
-physics::Transform& ShapeList::Transform (size_t index)
+physics::Transform& ShapeList::Transform (unsigned int index)
 {
   if (index >= impl->shapes.size ())
     throw xtl::make_range_exception ("physics::ShapeList::Transform", "index", index, 0u, impl->shapes.size ());
@@ -113,7 +113,7 @@ physics::Transform& ShapeList::Transform (size_t index)
   return impl->shapes [index]->transform;
 }
 
-const physics::Transform& ShapeList::Transform (size_t index) const
+const physics::Transform& ShapeList::Transform (unsigned int index) const
 {
   return const_cast<ShapeList&> (*this).Transform (index);
 }

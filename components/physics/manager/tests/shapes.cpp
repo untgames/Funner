@@ -15,10 +15,10 @@ int main ()
 
     scene.SetSimulationStep (1.f / 16.f);
 
-    math::vec3f mesh_vertices []        = { math::vec3f (0, -1.5, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
-    size_t      triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
-    size_t      mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
-    size_t      triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
+    math::vec3f  mesh_vertices []        = { math::vec3f (0, -1.5, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
+    unsigned int triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
+    unsigned int mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
+    unsigned int triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
 
     media::physics::Shape                media_shape;
     media::physics::shapes::TriangleMesh mesh;
@@ -29,12 +29,12 @@ int main ()
     mesh.SetVerticesCount (mesh_vertices_count);
     mesh.SetTrianglesCount (triangles_indices_count / 3);
 
-    for (size_t i = 0; i < mesh_vertices_count; i++)
+    for (unsigned int i = 0; i < mesh_vertices_count; i++)
       mesh.Vertices () [i] = mesh_vertices [i];
 
     media::physics::shapes::TriangleIndices* indices = mesh.Triangles ();
 
-    for (size_t i = 0; i < triangles_indices_count; i++)
+    for (unsigned int i = 0; i < triangles_indices_count; i++)
       (*indices) [i] = triangles_indices [i];
 
     media_shape.SetData (mesh);
