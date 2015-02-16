@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* f (float x, const char* y, int z, size_t w)
+const char* f (float x, const char* y, int z, unsigned int w)
 {
   printf ("f(%g,%s,%d,%u)\n", x, y, z, w);
 
@@ -28,7 +28,7 @@ int main ()
 
     stl::string buffer;
 
-    for (size_t i=0; i<stack.Size (); i++)
+    for (unsigned int i=0; i<stack.Size (); i++)
     {
       to_string (buffer, stack.GetVariant (i));
 

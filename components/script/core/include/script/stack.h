@@ -50,17 +50,17 @@ class IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество аргументов в стеке
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Size () = 0;
+    virtual unsigned int Size () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение аргумента из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual float       GetFloat   (size_t index) = 0;
-    virtual int         GetInteger (size_t index) = 0;
-    virtual bool        GetBoolean (size_t index) = 0;
-    virtual void*       GetPointer (size_t index) = 0;
-    virtual const char* GetString  (size_t index) = 0;
-    virtual xtl::any&   GetVariant (size_t index) = 0;
+    virtual float       GetFloat   (unsigned int index) = 0;
+    virtual int         GetInteger (unsigned int index) = 0;
+    virtual bool        GetBoolean (unsigned int index) = 0;
+    virtual void*       GetPointer (unsigned int index) = 0;
+    virtual const char* GetString  (unsigned int index) = 0;
+    virtual xtl::any&   GetVariant (unsigned int index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение аргументов в стек
@@ -77,12 +77,12 @@ class IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void     PushSymbol (const char* symbol) = 0;
     virtual void     PushSymbol (ISymbol*) = 0;
-    virtual ISymbol* GetSymbol  (size_t index) = 0;
+    virtual ISymbol* GetSymbol  (unsigned int index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Pop (size_t arguments_count) = 0;
+    virtual void Pop (unsigned int arguments_count) = 0;
 
   protected:
     virtual ~IStack () {}

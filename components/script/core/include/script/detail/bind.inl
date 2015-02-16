@@ -12,43 +12,43 @@ namespace detail
 //общая версия
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }  
+  static T get (IStack& stack, unsigned int index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
 };
 
 //извлечение enum-типов
 template <class T> struct common_argument_selector<T, true>
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }  
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение целочисленного аргумента
 template <class T> struct int_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение вещественного аргумента
 template <class T> struct float_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetFloat (index)); }
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetFloat (index)); }
 };
 
 //извлечение void-указателей
 struct raw_pointer_argument_selector
 {
-  static void* get (IStack& stack, size_t index) { return stack.GetPointer (index); }
+  static void* get (IStack& stack, unsigned int index) { return stack.GetPointer (index); }
 };
 
 //извлечение строк
 struct string_argument_selector
 {
-  static const char* get (IStack& stack, size_t index) { return stack.GetString (index); }
+  static const char* get (IStack& stack, unsigned int index) { return stack.GetString (index); }
 };
 
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
-  static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
+  static xtl::any& get (IStack& stack, unsigned int index) { return stack.GetVariant (index); }
 };
 
 //диспетчеризация взятия аргумента для различных типов данных
@@ -82,7 +82,7 @@ template <> struct argument_selector<const volatile char*>:     public string_ar
 
 template <> struct argument_selector<bool>
 {
-  static bool get (IStack& stack, size_t index) { return stack.GetBoolean (index); }
+  static bool get (IStack& stack, unsigned int index) { return stack.GetBoolean (index); }
 };
 
 template <class Traits, class Allocator>
@@ -157,7 +157,7 @@ inline const char* make_invoker_argument (stl::basic_string<char, Traits, Alloca
 
 //взятие аргумента из стека
 template <class T>
-T get_argument (IStack& stack, size_t index)
+T get_argument (IStack& stack, unsigned int index)
 {
   try
   {

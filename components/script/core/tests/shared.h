@@ -53,7 +53,7 @@ class MyStack: public IStack
   public:
     MyStack (IInterpreter* in_interpreter = 0) : interpreter (in_interpreter) {}
   
-    size_t Size () { return array.size (); }
+    unsigned int Size () { return (unsigned int)array.size (); }
     
     IInterpreter& Interpreter ()
     {
@@ -63,13 +63,13 @@ class MyStack: public IStack
       return *interpreter;
     }
 
-    float       GetFloat   (size_t index) { return xtl::any_multicast<float> (array.at (index)); }
-    int         GetInteger (size_t index) { return xtl::any_multicast<int> (array.at (index)); }
-    bool        GetBoolean (size_t index) { return xtl::any_multicast<bool> (array.at (index)); }
-    void*       GetPointer (size_t index) { return xtl::any_multicast<void*> (array.at (index)); }
-    const char* GetString  (size_t index) { return xtl::any_multicast<const char*> (array.at (index)); }
-    ISymbol*    GetSymbol  (size_t index) { return new MySymbol (GetString (index)); }
-    xtl::any&   GetVariant (size_t index) { return array.at (index); }
+    float       GetFloat   (unsigned int index) { return xtl::any_multicast<float> (array.at (index)); }
+    int         GetInteger (unsigned int index) { return xtl::any_multicast<int> (array.at (index)); }
+    bool        GetBoolean (unsigned int index) { return xtl::any_multicast<bool> (array.at (index)); }
+    void*       GetPointer (unsigned int index) { return xtl::any_multicast<void*> (array.at (index)); }
+    const char* GetString  (unsigned int index) { return xtl::any_multicast<const char*> (array.at (index)); }
+    ISymbol*    GetSymbol  (unsigned int index) { return new MySymbol (GetString (index)); }
+    xtl::any&   GetVariant (unsigned int index) { return array.at (index); }
 
     void Push (float value)        { array.push_back (xtl::any (value)); }
     void Push (int value)          { array.push_back (xtl::any (value)); }
@@ -81,10 +81,10 @@ class MyStack: public IStack
     void PushSymbol (const char* string) { MyStack::Push (string); }
     void PushSymbol (ISymbol* symbol)    { MyStack::Push (symbol->Name ()); }
 
-    void Pop (size_t arguments_count)
+    void Pop (unsigned int arguments_count)
     {
       if (arguments_count > array.size ())
-        arguments_count = array.size ();
+        arguments_count = (unsigned int)array.size ();
       
       array.erase (array.end () - arguments_count, array.end ());
     }
@@ -94,7 +94,7 @@ class MyStack: public IStack
       array.clear ();
     }
     
-    void Dump (size_t index)
+    void Dump (unsigned int index)
     {
       try
       {
@@ -114,7 +114,7 @@ class MyStack: public IStack
     {
       printf ("stack (size=%u):\n", Size ());
 
-      for (size_t i=0; i<Size (); i++)
+      for (unsigned int i=0; i<Size (); i++)
       {
         printf ("  item[%u]: ", i);
         Dump   (i);
@@ -144,7 +144,7 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
 
     bool HasFunction (const char*) { return true; }
     
-    void Invoke (size_t arguments_count, size_t results_count)
+    void Invoke (unsigned int arguments_count, unsigned int results_count)
     {
       if (arguments_count >= stack.Size ())
         throw xtl::format_exception<StackException> ("MyInterpreter::Invoke", "Stack underflow");
@@ -153,7 +153,7 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
       
       printf ("invoke '%s'\n", function_name);
       
-      for (size_t i=0; i<arguments_count; i++)
+      for (unsigned int i=0; i<arguments_count; i++)
       {
         printf     ("  arg%u: ", i + 1);
         stack.Dump (stack.Size () - arguments_count + i);

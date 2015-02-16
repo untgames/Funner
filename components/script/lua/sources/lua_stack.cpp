@@ -37,7 +37,7 @@ IInterpreter& Stack::Interpreter ()
      оличество аргументов в стеке
 */
 
-size_t Stack::Size ()
+unsigned int Stack::Size ()
 {
   return lua_gettop (state) + 1;
 }
@@ -46,40 +46,40 @@ size_t Stack::Size ()
     ѕолучение аргументов из стека
 */
 
-float Stack::GetFloat (size_t index)
+float Stack::GetFloat (unsigned int index)
 {
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetFloat");
   
   return (float)lua_tonumber (state, index);
 }
 
-int Stack::GetInteger (size_t index)
+int Stack::GetInteger (unsigned int index)
 {
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
 
-  return lua_tointeger (state, index);
+  return (int)lua_tointeger (state, index);
 }
 
-bool Stack::GetBoolean (size_t index)
+bool Stack::GetBoolean (unsigned int index)
 {
   check_item (state, index, LUA_TBOOLEAN, "script::lua::Stack::GetBoolean");
   
   return lua_toboolean (state, index) != 0;
 }
 
-void* Stack::GetPointer (size_t index)
+void* Stack::GetPointer (unsigned int index)
 {
   check_item (state, index, LUA_TLIGHTUSERDATA, "script::lua::Stack::GetPointer");
   return lua_touserdata (state, index);
 }
 
-const char* Stack::GetString (size_t index)
+const char* Stack::GetString (unsigned int index)
 {
   check_item (state, index, LUA_TSTRING, "script::lua::Stack::GetString");  
   return lua_tostring (state, index);  
 }
 
-ISymbol* Stack::GetSymbol (size_t index)
+ISymbol* Stack::GetSymbol (unsigned int index)
 {
   try
   {
@@ -145,7 +145,7 @@ ISymbol* Stack::GetSymbol (size_t index)
   }
 }
 
-xtl::any& Stack::GetVariant (size_t index)
+xtl::any& Stack::GetVariant (unsigned int index)
 {
     //проверка индекса
     
@@ -244,7 +244,7 @@ void Stack::Push (const xtl::any& value)
     return;
   }
 
-  static const size_t BUFFER_SIZE = sizeof (xtl::any); 
+  static const unsigned int BUFFER_SIZE = sizeof (xtl::any);
 
   void* buffer = lua_newuserdata (state, BUFFER_SIZE); 
 
@@ -274,9 +274,9 @@ void Stack::Push (const xtl::any& value)
     ”даление аргументов из стека
 */
 
-void Stack::Pop (size_t arguments_count)
+void Stack::Pop (unsigned int arguments_count)
 {
-  size_t stack_size = static_cast<size_t> (lua_gettop (state));
+  unsigned int stack_size = static_cast<unsigned int> (lua_gettop (state));
 
   if (arguments_count > stack_size)
     arguments_count = stack_size;

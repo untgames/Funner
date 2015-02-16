@@ -126,9 +126,9 @@ Interpreter::Interpreter (const script::Environment& in_environment)
   profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&Interpreter::StopProfiling, this)));
   profiler_lib.Register ("Update", make_invoker<void ()> (xtl::bind (&Interpreter::UpdateProfileInfo, this)));
   profiler_lib.Register ("Clean", make_invoker<void ()> (xtl::bind (&Interpreter::CleanProfileInfo, this)));
-  profiler_lib.Register ("TreeString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileTreeState, this, _1)),
+  profiler_lib.Register ("TreeString", make_invoker (make_invoker<const char* (unsigned int)> (xtl::bind (&Interpreter::ProfileTreeState, this, _1)),
                                                      make_invoker<const char* ()> (xtl::bind (&Interpreter::ProfileTreeState, this, -1))));
-  profiler_lib.Register ("FlatString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileFlatState, this, _1)),
+  profiler_lib.Register ("FlatString", make_invoker (make_invoker<const char* (unsigned int)> (xtl::bind (&Interpreter::ProfileFlatState, this, _1)),
                                                      make_invoker<const char* ()> (xtl::bind (&Interpreter::ProfileFlatState, this, -1))));
 }
 
@@ -202,7 +202,7 @@ void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_
     Вызов функции луа
 */
 
-void Interpreter::Invoke (size_t arguments_count, size_t results_count)
+void Interpreter::Invoke (unsigned int arguments_count, unsigned int results_count)
 {
   if (lua_pcall (state, arguments_count, results_count, 0))
     raise_error (state, "script::lua::Interpreter::Invoke");
@@ -314,14 +314,14 @@ void Interpreter::CleanProfileInfo ()
   ShinyManager_updateClean (&Shiny_instance);
 }
 
-const char* Interpreter::ProfileTreeState (size_t max_lines)
+const char* Interpreter::ProfileTreeState (unsigned int max_lines)
 {
   const char* error = ShinyManager_getOutputErrorString (&Shiny_instance);
 
   if (error)
     return error;
 
-  size_t nodes_count = stl::min (max_lines, (size_t)Shiny_instance.nodeCount);
+  unsigned int nodes_count = stl::min (max_lines, (unsigned int)Shiny_instance.nodeCount);
 
   profile_info_string.resize (ShinyPrintNodesSize (Shiny_instance.nodeCount) - 1);
 
@@ -332,7 +332,7 @@ const char* Interpreter::ProfileTreeState (size_t max_lines)
   return profile_info_string.c_str ();
 }
 
-const char* Interpreter::ProfileFlatState (size_t max_lines)
+const char* Interpreter::ProfileFlatState (unsigned int max_lines)
 {
   const char* error = ShinyManager_getOutputErrorString (&Shiny_instance);
 
@@ -341,7 +341,7 @@ const char* Interpreter::ProfileFlatState (size_t max_lines)
 
   ShinyManager_sortZones (&Shiny_instance);
 
-  size_t zones_count = stl::min (max_lines, (size_t)Shiny_instance.zoneCount);
+  unsigned int zones_count = stl::min (max_lines, (unsigned int)Shiny_instance.zoneCount);
 
   profile_info_string.resize (ShinyPrintZonesSize (Shiny_instance.zoneCount) - 1);
 
