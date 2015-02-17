@@ -700,7 +700,7 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   if (SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) && (flags & kSCNetworkReachabilityFlagsReachable) && (flags & kSCNetworkReachabilityFlagsTransientConnection))
     properties.SetProperty ("CellularOnlyInternet", 1);
 
-  properties.SetProperty ("ApplicationIconBadgeNumber", [UIApplication sharedApplication].applicationIconBadgeNumber);
+  properties.SetProperty ("ApplicationIconBadgeNumber", (int)[UIApplication sharedApplication].applicationIconBadgeNumber);
 
   [pool release];
 
