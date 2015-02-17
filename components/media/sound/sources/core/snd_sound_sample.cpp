@@ -175,7 +175,7 @@ double SoundSample::SamplesToSeconds (unsigned int sample_count) const
 
 unsigned int SoundSample::SecondsToSamples (double second_count) const
 {
-  return unsigned int(impl->info.frequency * second_count);
+  return (unsigned int)(impl->info.frequency * second_count);
 }
 
 /*

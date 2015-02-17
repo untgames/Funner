@@ -3,6 +3,8 @@
 
 #define OV_EXCLUDE_STATIC_CALLBACKS
 
+#include <climits>
+
 #include <ogg/os_types.h>
 #include <vorbis/vorbisfile.h>
 
