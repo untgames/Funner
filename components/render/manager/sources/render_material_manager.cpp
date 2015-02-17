@@ -117,7 +117,7 @@ struct MaterialManager::Impl
     {
       MaterialLibraryEntry& entry = **iter;
       
-      if (source_library && entry.source_library == source_library || name && entry.resource_name == name)
+      if ((source_library && entry.source_library == source_library) || (name && entry.resource_name == name))
       {
         loaded_libraries.erase (iter);
         return;

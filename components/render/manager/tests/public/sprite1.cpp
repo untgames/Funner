@@ -34,12 +34,12 @@ void idle (Test& test, Entity& entity, Frame& frame)
 {
   try
   {
-    static size_t start = common::milliseconds ();
+//    static size_t start = common::milliseconds ();
 
     static size_t last_fps = 0;
     static size_t frames_count = 0;
 
-    float t = float (common::milliseconds () - start) / 1000.f;
+//    float t = float (common::milliseconds () - start) / 1000.f;
 
     if (common::milliseconds () - last_fps > 1000)
     {
@@ -61,7 +61,7 @@ void idle (Test& test, Entity& entity, Frame& frame)
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();  
 
-    float angle = t * 3.1415926f / 4.0f;
+//    float angle = t * 3.1415926f / 4.0f;
     
 ////    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
 //    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *

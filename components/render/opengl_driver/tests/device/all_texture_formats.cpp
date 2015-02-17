@@ -88,8 +88,8 @@ bool is_buffers_equal (const char* src, const char* dst, unsigned int size, unsi
 
     for (unsigned int j=0; j<pixel_size; j++)
     {
-      src_pixel += unsigned int ((src[j]) << (8 * j)) & masks[j];
-      dst_pixel += unsigned int ((dst[j]) << (8 * j)) & masks[j];
+      src_pixel += (unsigned int) ((src[j]) << (8 * j)) & masks[j];
+      dst_pixel += (unsigned int) ((dst[j]) << (8 * j)) & masks[j];
     }                                    
 
     src_pixel &= mask;

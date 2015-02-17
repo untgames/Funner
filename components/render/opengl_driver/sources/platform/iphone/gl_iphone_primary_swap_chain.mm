@@ -538,7 +538,7 @@ void PrimarySwapChain::DoneForContext ()
    Получение идентификатора буфера
 */
 
-size_t PrimarySwapChain::GetFrameBufferId ()
+unsigned int PrimarySwapChain::GetFrameBufferId ()
 {
   if (!impl->frame_buffer)
     throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::GetFrameBufferId", "Can't get frame buffer before initializing swap chain");

@@ -162,7 +162,7 @@ struct FrameImpl::Impl: public CacheHolder
 ///Получение номера уровня детализации по расстоянию
   unsigned int GetLod (double distance)
   {
-    return unsigned int (log (distance));
+    return (unsigned int)log (distance);
   }
   
 ///Работа с кэшем
@@ -627,7 +627,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
     
     dynamic_textures.Update (this);
       
-      //вызов обработчика      
+      //вызов обработчика
 
     unsigned int eye_distance = 0, lod = 0;
       
@@ -637,7 +637,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 
       entity_draw_handler (frame, entity_wrap, desc.user_data, entity_draw_params);
             
-        //расчёт расстояния от z-near до объекта        
+        //расчёт расстояния от z-near до объекта
         
       math::vec4f mvp_lod_point       = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
       double      normalized_distance = (stl::max (stl::min (mvp_lod_point.z / mvp_lod_point.w, 1.0f), -1.0f) + 1.0f) * 0.5f,

@@ -354,7 +354,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           if (!desc.options)
             desc.options = "";
 
-          if (desc.source_code_size == unsigned int (~0))
+          if (desc.source_code_size == (unsigned int) (~0))
             desc.source_code_size = (unsigned int)strlen (desc.source_code);
 
             //добавление скомпилированного шейдера к шейдерам программы

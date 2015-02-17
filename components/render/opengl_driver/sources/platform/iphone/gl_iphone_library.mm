@@ -68,7 +68,7 @@ Library::~Library ()
    Получение адреса точки входа
 */
 
-void* Library::GetProcAddress (const char* name, size_t search_flags)
+void* Library::GetProcAddress (const char* name, unsigned int search_flags)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::iphone::Library::GetProcAddress";
 

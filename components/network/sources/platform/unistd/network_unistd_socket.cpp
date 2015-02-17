@@ -405,7 +405,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Параметры сокета
-    void SetReceiveBufferSize (size_t size)
+    void SetReceiveBufferSize (unsigned int size)
     {
       try
       {
@@ -418,7 +418,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    void SetSendBufferSize (size_t size)
+    void SetSendBufferSize (unsigned int size)
     {
       try
       {
@@ -431,7 +431,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t ReceiveBufferSize ()
+    unsigned int ReceiveBufferSize ()
     {
       try
       {
@@ -444,7 +444,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t SendBufferSize ()
+    unsigned int SendBufferSize ()
     {
       try
       {
@@ -458,7 +458,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Чтение / запись данных
-    size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+    unsigned int Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
     {
       try
       {
@@ -493,7 +493,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
+    unsigned int Send (const void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
     {
       try
       {
@@ -530,13 +530,13 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Количество байт доступных для чтения без блокировки
-    size_t ReceiveAvailable ()
+    unsigned int ReceiveAvailable ()
     {
       //Попробовать ioctl!!!!!!!!
 
       try
       {
-        size_t receive_buffer_size = ReceiveBufferSize ();
+        unsigned int receive_buffer_size = ReceiveBufferSize ();
 
         if (receive_buffer_size > receive_available_buffer.size ())
           receive_available_buffer.resize (receive_buffer_size);

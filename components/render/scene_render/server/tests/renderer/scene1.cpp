@@ -46,10 +46,10 @@ void idle (Test& test, scene_graph::Light& light)
     
     test.mesh.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
-    static float LIGHT_R = 100.0f;
+//    static float LIGHT_R = 100.0f;
 
-    float light_x = cos (math::radian (math::degree (-angle))) * LIGHT_R,
-          light_z = sin (math::radian (math::degree (-angle))) * LIGHT_R;
+//    float light_x = cos (math::radian (math::degree (-angle))) * LIGHT_R,
+//          light_z = sin (math::radian (math::degree (-angle))) * LIGHT_R;
 
 //    light.SetPosition  (light_x, 400.0f, light_z);
 //    light.SetPosition  (10, 0.0f, 0);
