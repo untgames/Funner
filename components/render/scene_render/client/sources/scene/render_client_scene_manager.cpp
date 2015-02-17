@@ -49,7 +49,7 @@ struct SceneManager::Impl
   client::Context& context;     //контекст
   common::Log      log;         //поток отладочного протоколирования
   SceneUpdateList  update_list; //список обновлений
-  object_id_t      current_id;  //текущий доступный идентификатор  
+  object_id_t      current_id;  //текущий доступный идентификатор
   SceneMap         scenes;      //сцены
   NodeMap          nodes;       //узлы
 
@@ -198,6 +198,9 @@ NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
       return iter->second.node;
 
     NodePtr node (SceneFactory::Create (src_node, *this), false);
+
+    if (!node)         //TODO Temprorary fix for http://jira.untgames.com:8088/browse/FUNNER-21
+      return node;
 
     iter = impl->nodes.insert_pair (&src_node, node).first;
 
