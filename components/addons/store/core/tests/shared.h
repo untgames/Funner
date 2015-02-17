@@ -34,7 +34,7 @@ void dump (const Product& product)
   printf ("Product:\n");
   printf ("  description '%s'\n", product.Description ());
   printf ("  id          '%s'\n", product.Id ());
-  printf ("  handle       %d\n",  (int)product.Handle ());
+  printf ("  handle       %d\n",  (int)(size_t)product.Handle ());
   printf ("  properties:\n");
   dump (product.Properties ());
 }
@@ -60,7 +60,7 @@ void dump (const Transaction& transaction)
   printf ("  product id  '%s'\n", transaction.ProductId ());
   printf ("  quantity     %d\n", transaction.Quantity ());
   printf ("  receipt     '%s'\n", transaction.ReceiptBase64 ());
-  printf ("  handle       %d\n",  (int)transaction.Handle ());
+  printf ("  handle       %d\n",  (int)(size_t)transaction.Handle ());
   printf ("  properties:\n");
   dump (transaction.Properties ());
 }
