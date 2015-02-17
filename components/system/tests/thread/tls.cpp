@@ -7,9 +7,9 @@ bool                touch_set [THREADS_COUNT];
 
 void cleanup (void* data)
 {
-  int index = (int)data;
+  size_t index = (size_t)data;
   
-  if (index < 0 || index >= THREADS_COUNT)
+  if (index >= THREADS_COUNT)
     return;
     
   touch_set [index] = true;
@@ -22,7 +22,7 @@ int run ()
     
   static int count = 0;
 
-  tls->SetValue ((void*)xtl::atomic_increment (count));
+  tls->SetValue ((void*)(size_t)xtl::atomic_increment (count));
 
   return 0;
 }

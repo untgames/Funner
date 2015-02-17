@@ -530,7 +530,7 @@ void Texture::SetData
         const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
 
         for (size_t count = tmp_buffer.size (); count--; src_pixel++, dst_pixel++)
-          *dst_pixel = unsigned int (*src_pixel) << 16;
+          *dst_pixel = (unsigned int)(*src_pixel) << 16;
 
         buffer  = tmp_buffer.data ();
         gl_type = GL_UNSIGNED_INT;
