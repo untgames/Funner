@@ -15,7 +15,7 @@ COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Toolchains/Xcode
 LINKER_GCC        := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 IPHONE_SDK_PATH   := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
 
-include $(TOOLSETS_DIR)/iphone.mak
+include $(TOOLSETS_DIR)/common/iphone.mak
 
 ###################################################################################################
 #Отладка на устройстве

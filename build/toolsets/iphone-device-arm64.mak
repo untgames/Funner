@@ -8,4 +8,4 @@ COMMON_CFLAGS     += -arch arm64
 COMMON_LINK_FLAGS += -arch arm64
 FAT_LIB_ARCH_TYPE := arm64
 
-include $(TOOLSETS_DIR)/iphone-device.mak
+include $(TOOLSETS_DIR)/common/iphone-device.mak
