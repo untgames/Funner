@@ -18,7 +18,7 @@ semaphore_t WindowsThreadManager::CreateSemaphore (size_t initial_value)
   {
     stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
 
-    handle->semaphore = ::CreateSemaphoreA (0, initial_value, LONG_MAX, 0);
+    handle->semaphore = ::CreateSemaphoreA (0, (LONG)initial_value, LONG_MAX, 0);
 
     if (!handle->semaphore)
       raise_error ("::CreateSemaphore");
@@ -57,7 +57,7 @@ bool WindowsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_mil
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    DWORD status = WaitForSingleObject (handle->semaphore, wait_in_milliseconds);
+    DWORD status = WaitForSingleObject (handle->semaphore, (DWORD)wait_in_milliseconds);
     
     if (status == WAIT_TIMEOUT)
       return false;

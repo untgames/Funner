@@ -32,13 +32,13 @@ struct MeshCommonData
 struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
   MeshCommonData&                  common_data;                  //общие данные для примитива
-  size_t                           primitive_index;              //индекс примитива в меше
+  unsigned int                     primitive_index;              //индекс примитива в меше
   render::low_level::PrimitiveType type;                         //тип примитива
   VertexBufferPtr                  vertex_buffer;                //вершинный буфер
   LowLevelInputLayoutPtr           layout;                       //лэйаут примитива
-  size_t                           first;                        //индекс первой вершины/индекса
-  size_t                           count;                        //количество примитивов
-  size_t                           base_vertex;                  //индекс базовой вершины
+  unsigned int                     first;                        //индекс первой вершины/индекса
+  unsigned int                     count;                        //количество примитивов
+  unsigned int                     base_vertex;                  //индекс базовой вершины
   MaterialProxy                    material;                     //материал
   Log                              log;                          //поток протоколирования
   MaterialPtr                      cached_material;              //закэшированный материал
@@ -47,7 +47,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
   LowLevelStateBlockPtr            cached_state_block;           //закэшированный блок состояний  
   
 ///Конструктор
-  MeshPrimitive (CacheHolder& parent_holder, size_t in_primitive_index, const MaterialProxy& in_material, MeshCommonData& in_common_data)
+  MeshPrimitive (CacheHolder& parent_holder, unsigned int in_primitive_index, const MaterialProxy& in_material, MeshCommonData& in_common_data)
     : common_data (in_common_data)
     , primitive_index (in_primitive_index)
     , type (PrimitiveType_PointList)
@@ -127,7 +127,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
       const LowLevelBufferPtr* streams = vertex_buffer->Streams ();
 
-      for (size_t i=0, streams_count=vertex_buffer->StreamsCount (); i<streams_count; i++)
+      for (unsigned int i=0, streams_count=vertex_buffer->StreamsCount (); i<streams_count; i++)
       {        
         context.ISSetVertexBuffer (i, streams [i].get ());
         
@@ -257,7 +257,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       
       memset (&cached_group, 0, sizeof (cached_group));
       
-      cached_group.primitives_count = cached_primitives.size ();
+      cached_group.primitives_count = (unsigned int)cached_primitives.size ();
       
       if (!cached_primitives.empty ())
         cached_group.primitives = &cached_primitives [0];
@@ -319,8 +319,8 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
   SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
   RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не зависящие от объекта
-  size_t                     line_lists_count;                             //количество списков с линиями
-  size_t                     sprite_lists_count;                           //количество списков со спрайтами
+  unsigned int               line_lists_count;                             //количество списков с линиями
+  unsigned int               sprite_lists_count;                           //количество списков со спрайтами
   stl::string                name;                                         //имя примитива
   RenderPrimitiveGroupsArray render_groups;                                //группы
   Log                        log;                                          //поток протоколирования
@@ -434,7 +434,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     
     vertex_buffers.reserve (source.VertexBuffersCount ());
     
-    for (size_t i=0, count=source.VertexBuffersCount (); i<count; i++)
+    for (unsigned int i=0, count=source.VertexBuffersCount (); i<count; i++)
       vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage));
 
       //конвертация индексного буфера (если он есть)
@@ -465,7 +465,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     
     mesh->primitives.reserve (source.PrimitivesCount ());
     
-    for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
+    for (unsigned int i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
       
@@ -795,7 +795,7 @@ void PrimitiveImpl::RemoveSimplePrimitiveList (SimplePrimitiveListImplBase* list
 
   SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
 
-  for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
+  for (unsigned int i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
   {
     SimplePrimitiveListArray& lists = *arrays [i];
 
@@ -836,7 +836,7 @@ void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
 
   SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
 
-  for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
+  for (unsigned int i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
   {
     SimplePrimitiveListArray& lists = *arrays [i];
 
@@ -895,7 +895,7 @@ void PrimitiveImpl::UpdateCacheCore ()
     {
       RendererPrimitiveGroup group;
 
-      group.primitives_count = impl->cached_entity_independent_dynamic_primitives.size ();
+      group.primitives_count = (unsigned int)impl->cached_entity_independent_dynamic_primitives.size ();
       group.primitives       = &impl->cached_entity_independent_dynamic_primitives [0];
 
       impl->render_groups.push_back (group);

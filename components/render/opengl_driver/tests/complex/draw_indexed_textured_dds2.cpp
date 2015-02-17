@@ -152,9 +152,9 @@ int main ()
     TexturePtr      texture (test.device->CreateTexture (texture_desc), false);
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);
 
-    size_t mip_width = image.Width (), mip_height = image.Height ();
+    unsigned int mip_width = image.Width (), mip_height = image.Height ();
 
-    for (size_t mip = 0;; mip++)
+    for (unsigned int mip = 0;; mip++)
     {
       texture->SetData (0, mip, 0, 0, mip_width, mip_height, pixel_format, image.Bitmap (0, mip));
 

@@ -4,7 +4,7 @@ using namespace syslib;
 using namespace xtl;
 using namespace common;
 
-const size_t MAX_TITLE_LENGTH = 256;
+const unsigned int MAX_TITLE_LENGTH = 256;
 
 /*
     Описание реализации Window
@@ -407,7 +407,7 @@ Window::Window (WindowStyle style, const char* init_string)
   }
 }
 
-Window::Window (WindowStyle style, size_t width, size_t height, const char* init_string)
+Window::Window (WindowStyle style, unsigned int width, unsigned int height, const char* init_string)
 {
   try
   {
@@ -417,7 +417,7 @@ Window::Window (WindowStyle style, size_t width, size_t height, const char* init
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Window::Window(WindowStyle,size_t,size_t)");
+    exception.touch ("syslib::Window::Window(WindowStyle,unsigned int,unsigned int)");
     throw;
   }
 }
@@ -457,7 +457,7 @@ void Window::Init (WindowStyle style)
   }
 }
 
-void Window::Init (WindowStyle style, size_t width, size_t height)
+void Window::Init (WindowStyle style, unsigned int width, unsigned int height)
 {
   try
   {
@@ -466,7 +466,7 @@ void Window::Init (WindowStyle style, size_t width, size_t height)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Window::Init(WindowStyle,size_t,size_t)");
+    exception.touch ("syslib::Window::Init(WindowStyle,unsigned int,unsigned int)");
     throw;
   }
 }
@@ -725,7 +725,7 @@ Rect Window::ClientRect () const
     Размеры окна
 */
 
-size_t Window::Width () const
+unsigned int Window::Width () const
 {
   try
   {
@@ -742,7 +742,7 @@ size_t Window::Width () const
   }
 }
 
-size_t Window::Height () const
+unsigned int Window::Height () const
 {
   try
   {
@@ -759,7 +759,7 @@ size_t Window::Height () const
   }
 }
 
-size_t Window::ClientWidth () const
+unsigned int Window::ClientWidth () const
 {
   try
   {
@@ -776,7 +776,7 @@ size_t Window::ClientWidth () const
   }
 }
 
-size_t Window::ClientHeight () const
+unsigned int Window::ClientHeight () const
 {
   try
   {
@@ -793,17 +793,17 @@ size_t Window::ClientHeight () const
   }
 }
 
-void Window::SetWidth (size_t width)
+void Window::SetWidth (unsigned int width)
 {
   SetSize (width, Height ());
 }
 
-void Window::SetHeight (size_t height)
+void Window::SetHeight (unsigned int height)
 {
   SetSize (Width (), height);
 }
 
-void Window::SetSize (size_t width, size_t height)
+void Window::SetSize (unsigned int width, unsigned int height)
 {
   try
   {
@@ -823,17 +823,17 @@ void Window::SetSize (size_t width, size_t height)
   }
 }
 
-void Window::SetClientWidth (size_t width)
+void Window::SetClientWidth (unsigned int width)
 {
   SetClientSize (width, ClientHeight ());
 }
 
-void Window::SetClientHeight (size_t height)
+void Window::SetClientHeight (unsigned int height)
 {
   SetClientSize (ClientWidth (), height);
 }
 
-void Window::SetClientSize (size_t width, size_t height)
+void Window::SetClientSize (unsigned int width, unsigned int height)
 {
   try
   {
@@ -916,8 +916,8 @@ void Window::SetPosition (const Point& position)
 
     Platform::GetWindowRect (impl->CheckedHandle (), rect);
     
-    size_t width  = rect.right - rect.left,
-           height = rect.bottom - rect.top;
+    unsigned int width  = rect.right - rect.left,
+                 height = rect.bottom - rect.top;
     
     rect.left   = position.x;
     rect.top    = position.y;
@@ -933,7 +933,7 @@ void Window::SetPosition (const Point& position)
   }
 }
 
-void Window::SetPosition (size_t x, size_t y)
+void Window::SetPosition (unsigned int x, unsigned int y)
 {
   SetPosition (Point (x, y));
 }
@@ -968,7 +968,7 @@ void Window::SetCursorPosition (const Point& position)
   }
 }
 
-void Window::SetCursorPosition (size_t x, size_t y)
+void Window::SetCursorPosition (unsigned int x, unsigned int y)
 {
   SetCursorPosition (Point (x, y));
 }

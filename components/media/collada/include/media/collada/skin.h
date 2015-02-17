@@ -51,14 +51,14 @@ class Skin
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с соединениями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t             JointsCount       () const;                            //количество соединений
-    size_t             CreateJoint       (const char* name);                  //создание соединения
-    void               RemoveJoint       (size_t joint);                      //удаление соединения
-    void               RemoveAllJoints   ();                                  //удаление всех соединений
-    void               SetJointInvMatrix (size_t joint, const math::mat4f& invTM); //установка обратной матрицы соединения
-    const math::mat4f& JointInvMatrix    (size_t joint) const;                //получение обратной матрицы соединения
-    int                FindJoint         (const char* name) const;            //возвращает номер соединения по имени или -1 в случае неудачи
-    const char*        JointName         (size_t joint) const;                //имя соединения
+    unsigned int       JointsCount       () const;                                       //количество соединений
+    unsigned int       CreateJoint       (const char* name);                             //создание соединения
+    void               RemoveJoint       (unsigned int joint);                           //удаление соединения
+    void               RemoveAllJoints   ();                                             //удаление всех соединений
+    void               SetJointInvMatrix (unsigned int joint, const math::mat4f& invTM); //установка обратной матрицы соединения
+    const math::mat4f& JointInvMatrix    (unsigned int joint) const;                     //получение обратной матрицы соединения
+    int                FindJoint         (const char* name) const;                       //возвращает номер соединения по имени или -1 в случае неудачи
+    const char*        JointName         (unsigned int joint) const;                     //имя соединения
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый меш / морф
@@ -69,8 +69,8 @@ class Skin
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Веса соединений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t WeightsCount  () const;
-    void   WeightsResize (size_t new_size);
+    unsigned int WeightsCount  () const;
+    void         WeightsResize (unsigned int new_size);
 
           VertexJointWeight* Weights ();          
     const VertexJointWeight* Weights () const;

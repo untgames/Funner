@@ -149,11 +149,11 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
     IDepthStencilState*       CreateDepthStencilState       (const DepthStencilDesc&);
     ISamplerState*            CreateSamplerState            (const SamplerDesc&);
     IBuffer*                  CreateBuffer                  (const BufferDesc&, const void*);
-    IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IProgram*                 CreateProgram                 (unsigned int shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
     ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
-    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes = 0);
-    ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, unsigned int buffer_offset, const unsigned int* mip_sizes = 0);
+    ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, unsigned int buffer_index);
     ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain);
     IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
     IPredicate*               CreatePredicate               ();
@@ -165,65 +165,65 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///Управление входным уровнем (input-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void          ISSetInputLayout  (IInputLayout* state);
-    void          ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer);
+    void          ISSetVertexBuffer (unsigned int vertex_buffer_slot,  IBuffer* buffer);
     void          ISSetIndexBuffer  (IBuffer* buffer);
     IInputLayout* ISGetInputLayout  ();
-    IBuffer*      ISGetVertexBuffer (size_t vertex_buffer_slot);
+    IBuffer*      ISGetVertexBuffer (unsigned int vertex_buffer_slot);
     IBuffer*      ISGetIndexBuffer  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление уровнем вывода вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void     SOSetTargets      (size_t buffers_count, IBuffer** buffers, const size_t* offsets);
-    void     SOSetTarget       (size_t stream_output_slot, IBuffer* buffer, size_t offset);
-    IBuffer* SOGetTarget       (size_t stream_output_slot);
-    size_t   SOGetTargetOffset (size_t stream_output_slot);
+    void         SOSetTargets      (unsigned int buffers_count, IBuffer** buffers, const unsigned int* offsets);
+    void         SOSetTarget       (unsigned int stream_output_slot, IBuffer* buffer, unsigned int offset);
+    IBuffer*     SOGetTarget       (unsigned int stream_output_slot);
+    unsigned int SOGetTargetOffset (unsigned int stream_output_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление шейдерными уровнями (shader-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                      SSSetProgram                 (IProgram* program);
     void                      SSSetProgramParametersLayout (IProgramParametersLayout* parameters_layout);
-    void                      SSSetSampler                 (size_t sampler_slot, ISamplerState* state);
-    void                      SSSetTexture                 (size_t sampler_slot, ITexture* texture);
-    void                      SSSetConstantBuffer          (size_t buffer_slot, IBuffer* buffer);
+    void                      SSSetSampler                 (unsigned int sampler_slot, ISamplerState* state);
+    void                      SSSetTexture                 (unsigned int sampler_slot, ITexture* texture);
+    void                      SSSetConstantBuffer          (unsigned int buffer_slot, IBuffer* buffer);
     IProgramParametersLayout* SSGetProgramParametersLayout ();
     IProgram*                 SSGetProgram                 ();
-    ISamplerState*            SSGetSampler                 (size_t sampler_slot);
-    ITexture*                 SSGetTexture                 (size_t sampler_slot);
-    IBuffer*                  SSGetConstantBuffer          (size_t buffer_slot);
+    ISamplerState*            SSGetSampler                 (unsigned int sampler_slot);
+    ITexture*                 SSGetTexture                 (unsigned int sampler_slot);
+    IBuffer*                  SSGetConstantBuffer          (unsigned int buffer_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление растеризатором (rasterizer-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              RSSetState     (IRasterizerState* state);
-    void              RSSetViewport  (size_t render_target_slot, const Viewport& viewport);
-    void              RSSetScissor   (size_t render_target_slot, const Rect& scissor_rect);
-    IRasterizerState* RSGetState     ();
-    const Viewport&   RSGetViewport  (size_t render_target_slot);
-    const Rect&       RSGetScissor   (size_t render_target_slot);
+    void              RSSetState    (IRasterizerState* state);
+    void              RSSetViewport (unsigned int render_target_slot, const Viewport& viewport);
+    void              RSSetScissor  (unsigned int render_target_slot, const Rect& scissor_rect);
+    IRasterizerState* RSGetState    ();
+    const Viewport&   RSGetViewport (unsigned int render_target_slot);
+    const Rect&       RSGetScissor  (unsigned int render_target_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление выходным уровнем (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                OSSetBlendState        (IBlendState* state);
     void                OSSetDepthStencilState (IDepthStencilState* state);
-    void                OSSetStencilReference  (size_t reference);    
-    void                OSSetRenderTargets     (size_t count, IView** render_target_view, IView* depth_stencil_view);
-    void                OSSetRenderTargetView  (size_t render_target_slot, IView* view);
+    void                OSSetStencilReference  (unsigned int reference);
+    void                OSSetRenderTargets     (unsigned int count, IView** render_target_view, IView* depth_stencil_view);
+    void                OSSetRenderTargetView  (unsigned int render_target_slot, IView* view);
     void                OSSetDepthStencilView  (IView* view);
     IBlendState*        OSGetBlendState        ();
     IDepthStencilState* OSGetDepthStencilState ();
-    size_t              OSGetStencilReference  ();
-    IView*              OSGetRenderTargetView  (size_t render_target_slot);
+    unsigned int        OSGetStencilReference  ();
+    IView*              OSGetRenderTargetView  (unsigned int render_target_slot);
     IView*              OSGetDepthStencilView  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ClearRenderTargetView (size_t view_index, const Color4f& color);
-    void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
-    void ClearViews            (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil);
+    void ClearRenderTargetView (unsigned int view_index, const Color4f& color);
+    void ClearDepthStencilView (unsigned int clear_flags, float depth, unsigned char stencil);
+    void ClearViews            (unsigned int clear_flags, unsigned int views_count, const unsigned int* view_indices, const Color4f* colors, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
@@ -241,10 +241,10 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///Рисование примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DrawAuto             (PrimitiveType primitive_type);
-    void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
-    void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
-    void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location);
-    void DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location);
+    void Draw                 (PrimitiveType primitive_type, unsigned int first_vertex, unsigned int vertices_count);
+    void DrawIndexed          (PrimitiveType primitive_type, unsigned int first_index, unsigned int indices_count, unsigned int base_vertex);
+    void DrawInstanced        (PrimitiveType primitive_type, unsigned int vertex_count_per_instance, unsigned int instance_count, unsigned int first_vertex, unsigned int first_instance_location);
+    void DrawIndexedInstanced (PrimitiveType primitive_type, unsigned int index_count_per_instance, unsigned int instance_count, unsigned int first_index, unsigned int base_vertex, unsigned int first_instance_location);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ожидание завершения выполнения буфера команд
@@ -273,7 +273,7 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния устройства в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout = 0);
+    void Bind (unsigned int base_vertex, unsigned int base_index, IndicesLayout* out_indices_layout = 0);
 
   private:
     ContextManager      context_manager;        //менеджер контекстов OpenGL
@@ -284,8 +284,8 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
     TextureManager      texture_manager;        //менеджер текстур
     ShaderStage         shader_stage;           //уровень шейдинга
     QueryManager        query_manager;          //менеджер запросов
-    size_t              cached_base_vertex;     //кэшированный индекс базовой вершины
-    size_t              cached_base_index;      //кэшированный индекс базового индекса
+    unsigned int        cached_base_vertex;     //кэшированный индекс базовой вершины
+    unsigned int        cached_base_index;      //кэшированный индекс базового индекса
     IndicesLayout       cached_indices_layout;  //кэшированное расположение индексов
     bool                need_validate_programs; //нужно ли валидировать программы
 };

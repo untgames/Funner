@@ -151,7 +151,7 @@ template <class T> class Pool: public xtl::noncopyable
     T* const* DataStart () { return &start; }
 
 /// Выделение
-    T* Allocate (size_t count)
+    T* Allocate (unsigned int count)
     {
       T* prev_pos = pos;
 
@@ -166,7 +166,7 @@ template <class T> class Pool: public xtl::noncopyable
     }    
 
 /// Предвыделение
-    bool Preallocate (size_t count)
+    bool Preallocate (unsigned int count)
     {
       end -= count;
 
@@ -179,9 +179,9 @@ template <class T> class Pool: public xtl::noncopyable
     }
 
 /// Сброс
-    void Reset (T* new_start, size_t size, bool save_relative_position)
+    void Reset (T* new_start, unsigned int size, bool save_relative_position)
     {
-      size_t offset = pos - start;
+      unsigned int offset = (unsigned int)(pos - start);
 
       start = new_start;
       end   = new_start + size;
@@ -189,12 +189,12 @@ template <class T> class Pool: public xtl::noncopyable
     }
 
 /// Размер
-    size_t Size () { return pos - start; }   
+    unsigned int Size () { return (unsigned int)(pos - start); }
 
 /// Установка размера
-    bool SetSize (size_t size)
+    bool SetSize (unsigned int size)
     {
-      if (size > size_t (end - start))
+      if (size > end - start)
         return false;
 
       pos = start + size;
@@ -243,7 +243,7 @@ struct BatchingManager::Impl: public Cache
   DynamicIndexPool                      temp_index_pool;      //пул динамических индексов для построения примитивов
   StateBlockMap                         state_blocks;         //блоки состояний
   const void*                           pass_tag;             //тэг прохода
-  size_t                                pass_first_index;     //первый индекс в проходе
+  unsigned int                          pass_first_index;     //первый индекс в проходе
   FrameId                               active_frame;         //номер активного кадра
 
 /// Конструктор
@@ -259,7 +259,7 @@ struct BatchingManager::Impl: public Cache
   }
 
 /// Резервирование динамических буферов
-  void ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
+  void ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
   {
     try
     {
@@ -331,19 +331,19 @@ render::manager::DeviceManager& BatchingManager::DeviceManager ()
     Резервирование буферов для динамических примитивов
 */
 
-void BatchingManager::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
+void BatchingManager::ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
 {
   impl->ReserveDynamicBuffers (vertices_count, indices_count);
 
   InvalidateCacheDependencies ();
 }
 
-size_t BatchingManager::DynamicVerticesCount () const
+unsigned int BatchingManager::DynamicVerticesCount () const
 {
   return impl->dynamic_vb.Capacity ();
 }
 
-size_t BatchingManager::DynamicIndicesCount () const
+unsigned int BatchingManager::DynamicIndicesCount () const
 {
   return impl->dynamic_ib.Capacity ();
 }
@@ -371,7 +371,7 @@ const DynamicPrimitiveIndex* const* BatchingManager::TempIndexBuffer ()
     Выделение вершин и индексов
 */
 
-DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, size_t* out_base_vertex_index)
+DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (unsigned int count, unsigned int* out_base_vertex_index)
 {
   DynamicPrimitiveVertex* result = impl->dynamic_vertex_pool.Allocate (count);
 
@@ -380,7 +380,7 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
     impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.Size ());
 
     if (out_base_vertex_index)
-      *out_base_vertex_index = result - impl->dynamic_vb.Data ();
+      *out_base_vertex_index = (unsigned int)(result - impl->dynamic_vb.Data ());
 
     return result;
   }
@@ -389,7 +389,7 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
     count, impl->dynamic_vertex_pool.Size (), impl->dynamic_vb.Capacity ());
 }
 
-DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType pool_type, size_t count)
+DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType pool_type, unsigned int count)
 {
   static const char* METHOD_NAME = "render::manager::BatchingManager::AllocateDynamicIndices";
 
@@ -437,14 +437,14 @@ void BatchingManager::ResetDynamicBuffers ()
 
   impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), false);
   impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), false);
-  impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.capacity (), false);
+  impl->temp_index_pool.Reset (impl->temp_ib.data (), (unsigned int)impl->temp_ib.capacity (), false);
 }
 
 /*
     Предвыделение вершин
 */
 
-void BatchingManager::PreallocateDynamicVertices (size_t count)
+void BatchingManager::PreallocateDynamicVertices (unsigned int count)
 {
   if (impl->dynamic_vertex_pool.Preallocate (count))
     return;
@@ -461,7 +461,7 @@ void BatchingManager::ResetDynamicVerticesPreallocations ()
     Текущее количество выделенных вершин
 */
 
-void BatchingManager::SetAllocatedDynamicVerticesCount (size_t count)
+void BatchingManager::SetAllocatedDynamicVerticesCount (unsigned int count)
 {
   if (impl->dynamic_vertex_pool.SetSize (count))
     return;
@@ -471,7 +471,7 @@ void BatchingManager::SetAllocatedDynamicVerticesCount (size_t count)
   throw xtl::format_operation_exception ("render::manager::BatchingManager::SetAllocatedDynamicVerticesCount", "Can't change dynamic vertex pool size to %u", count);  
 }
 
-size_t BatchingManager::AllocatedDynamicVerticesCount ()
+unsigned int BatchingManager::AllocatedDynamicVerticesCount ()
 {
   return impl->dynamic_vertex_pool.Size ();
 }
@@ -524,12 +524,12 @@ const void* BatchingManager::PassUserData ()
   return impl->pass_tag;
 }
 
-void BatchingManager::SetPassFirstIndex (size_t first)
+void BatchingManager::SetPassFirstIndex (unsigned int first)
 {
   impl->pass_first_index = first;
 }
 
-size_t BatchingManager::PassFirstIndex ()
+unsigned int BatchingManager::PassFirstIndex ()
 {
   return impl->pass_first_index;
 }

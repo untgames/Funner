@@ -29,7 +29,7 @@ inline void copy_attribute (const VertexInfluence& src, VertexInfluence& dst)
 template <class T1, unsigned int Size1, class T2, unsigned int Size2>
 inline void copy_attribute (const vector<T1, Size1>& src, vector<T2, Size2>& dst)
 {
-  size_t min_size, max_size, i;
+  uint32_t min_size, max_size, i;
   
   if (Size1 < Size2) min_size = Size1, max_size = Size2;
   else               min_size = Size2, max_size = Size1;

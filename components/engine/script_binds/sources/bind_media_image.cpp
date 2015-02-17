@@ -36,7 +36,7 @@ void bind_image_format_library (Environment& environment)
 }
 
 ///Функции
-Image create_image (size_t width, size_t height, size_t depth, PixelFormat format)
+Image create_image (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format)
 {
   return Image (width, height, depth, format);
 }
@@ -56,19 +56,19 @@ void fill_rgba (Image& image, math::vec4f color)
   image.Fill (PixelFormat_RGBA8, &color);
 }
 
-size_t put_image (IStack& stack)
+unsigned int put_image (IStack& stack)
 {
-  Image  sender   = stack.GetVariant (1).cast<Image&> ();
-  size_t x        = stack.GetInteger (2);
-  size_t y        = stack.GetInteger (3);
-  size_t z        = stack.GetInteger (4);
-  size_t width    = stack.GetInteger (5);
-  size_t height   = stack.GetInteger (6);
-  size_t depth    = stack.GetInteger (7);
-  Image  source   = stack.GetVariant (8).cast<Image&> ();
-  size_t target_x = stack.GetInteger (9);
-  size_t target_y = stack.GetInteger (10);
-  size_t target_z = stack.GetInteger (11);
+  Image        sender   = stack.GetVariant (1).cast<Image&> ();
+  unsigned int x        = (unsigned int)stack.GetInteger (2);
+  unsigned int y        = (unsigned int)stack.GetInteger (3);
+  unsigned int z        = (unsigned int)stack.GetInteger (4);
+  unsigned int width    = (unsigned int)stack.GetInteger (5);
+  unsigned int height   = (unsigned int)stack.GetInteger (6);
+  unsigned int depth    = (unsigned int)stack.GetInteger (7);
+  Image        source   = stack.GetVariant (8).cast<Image&> ();
+  unsigned int target_x = (unsigned int)stack.GetInteger (9);
+  unsigned int target_y = (unsigned int)stack.GetInteger (10);
+  unsigned int target_z = (unsigned int)stack.GetInteger (11);
 
   sender.PutImage (x, y, z, width, height, depth, source, target_x, target_y, target_z);
 

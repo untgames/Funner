@@ -35,11 +35,11 @@ class MaterialImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                   TexturesCount ();
-    TexturePtr               Texture       (size_t index); //может вернуть 0 в случае динамической текстуры
-    LowLevelTexturePtr       DeviceTexture (size_t index); //может вернуть 0 в случае динамической текстуры
-    const char*              TextureName   (size_t index);
-    LowLevelSamplerStatePtr  Sampler       (size_t index);
+    unsigned int             TexturesCount ();
+    TexturePtr               Texture       (unsigned int index); //может вернуть 0 в случае динамической текстуры
+    LowLevelTexturePtr       DeviceTexture (unsigned int index); //может вернуть 0 в случае динамической текстуры
+    const char*              TextureName   (unsigned int index);
+    LowLevelSamplerStatePtr  Sampler       (unsigned int index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление отдельных текстур

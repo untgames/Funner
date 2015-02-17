@@ -23,8 +23,8 @@ struct ModelPrimitive
 {
   PrimitiveType   type;          //тип примитива
   VertexBufferPtr vertex_buffer; //вершинный буфер
-  size_t          first;         //индекс первой вершины/индекса
-  size_t          count;         //количество примитивов
+  unsigned int    first;         //индекс первой вершины/индекса
+  unsigned int    count;         //количество примитивов
 };
 
 typedef stl::vector<ModelPrimitive> PrimitiveArray;
@@ -72,7 +72,7 @@ struct Model
 
 //      printf ("Add vertex buffers\n");
 
-      for (size_t i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
+      for (unsigned int i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
       {
         media::geometry::VertexBuffer& vb = mesh.VertexBuffer (i);
 
@@ -116,7 +116,7 @@ struct Model
           const unsigned int* src_index = (unsigned int*)ib.Data ();
           unsigned short*     dst_index = &index_data [0];
           
-          for (size_t i=0; i<ib.Size (); i++, src_index++, dst_index++)
+          for (unsigned int i=0; i<ib.Size (); i++, src_index++, dst_index++)
             *dst_index = static_cast<unsigned short> (*src_index);
 
           BufferPtr (device->CreateBuffer (desc), false).swap (ib_buffer);
@@ -132,7 +132,7 @@ struct Model
 
 //      printf ("Add primitives\n");
 
-      for (size_t i=0, primitives_count=mesh.PrimitivesCount (); i<primitives_count; i++)
+      for (unsigned int i=0, primitives_count=mesh.PrimitivesCount (); i<primitives_count; i++)
       {
         const media::geometry::Primitive& src_primitive = mesh.Primitive (i);
         ModelPrimitive                    dst_primitive;
@@ -189,7 +189,7 @@ struct Model
     {
       media::geometry::Mesh& mesh = *iter;
 
-      for (size_t i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
+      for (unsigned int i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
       {
         media::geometry::VertexBuffer& vb = mesh.VertexBuffer (i);
 
@@ -201,7 +201,7 @@ struct Model
 
         stl::vector<VertexAttribute> vertex_attributes;
 
-        for (size_t j=0, streams_count=vb.StreamsCount (); j<streams_count; j++)
+        for (unsigned int j=0, streams_count=vb.StreamsCount (); j<streams_count; j++)
         {
           media::geometry::VertexStream& vs = vb.Stream (j);
 
@@ -233,7 +233,7 @@ struct Model
 
           const media::geometry::VertexFormat& vf = vs.Format ();
 
-          for (size_t k=0, attr_count=vf.AttributesCount (); k<attr_count; k++)
+          for (unsigned int k=0, attr_count=vf.AttributesCount (); k<attr_count; k++)
           {
             const media::geometry::VertexAttribute& src_va = vf.Attribute (k);
             VertexAttribute                         dst_va;
@@ -300,7 +300,7 @@ struct Model
             }
 
             dst_va.stride = vs.VertexSize ();
-            dst_va.slot   = model_vb->vertex_streams.size ();
+            dst_va.slot   = (unsigned int)model_vb->vertex_streams.size ();
             dst_va.offset = src_va.offset;
 
 //            printf ("va #%u: semantic=%s type=%s format=%s stride=%u slot=%u offset=%u\n",
@@ -317,7 +317,7 @@ struct Model
 
         memset (&layout_desc, 0, sizeof layout_desc);
 
-        layout_desc.vertex_attributes_count = vertex_attributes.size ();
+        layout_desc.vertex_attributes_count = (unsigned int)vertex_attributes.size ();
         layout_desc.vertex_attributes       = &vertex_attributes [0];
         layout_desc.index_type              = InputDataType_UShort;
         layout_desc.index_buffer_offset     = 0;
@@ -346,7 +346,7 @@ struct Model
 
         context.ISSetInputLayout (vb.input_layout.get ());
 
-        for (size_t i=0; i<vb.vertex_streams.size (); i++)
+        for (unsigned int i=0; i<vb.vertex_streams.size (); i++)
         {
           BufferPtr vs = vb.vertex_streams [i];
 
@@ -497,7 +497,7 @@ int main ()
     stl::string shader_source  = read_shader (SHADER_FILE_NAME);
 
     ShaderDesc shader_descs [] = {
-      {"ffp_shader", size_t (-1), shader_source.c_str (), "ffp", ""},
+      {"ffp_shader", (unsigned int)-1, shader_source.c_str (), "ffp", ""},
     };
 
     static ProgramParameter shader_parameters[] = {

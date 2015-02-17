@@ -641,7 +641,7 @@ int SensorManager::FindSensorByType (const char* type)
     if (!type)
       return -1;
     
-    for (size_t i=0, count=Platform::GetSensorsCount (); i<count; i++)
+    for (int i = 0, count = (int)Platform::GetSensorsCount (); i < count; i++)
       if (!strcmp (SensorManager::Sensor (i).Type (), type))
         return i;
         

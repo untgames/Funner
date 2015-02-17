@@ -2,14 +2,14 @@
 
 struct TextureSize
 {
-  size_t width;
-  size_t height;
-  size_t layers;
+  unsigned int width;
+  unsigned int height;
+  unsigned int layers;
 };
 
 struct TestStatus
 {
-  size_t count, successfull;
+  unsigned int count, successfull;
 };
 
 const char* get_short_name (TextureDimension param)
@@ -52,16 +52,16 @@ int myrand ()
   return ((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff;
 }
 
-void print_diff (size_t size, const char* src, const char* dst)
+void print_diff (unsigned int size, const char* src, const char* dst)
 {  
-  static const size_t LINE_WIDTH = 16;
+  static const unsigned int LINE_WIDTH = 16;
 
   printf ("                 Source buffer                                          Destination buffer"
           "                 Diff buffer\n");  
 
-  for (size_t i=0; size; i++)
+  for (unsigned int i=0; size; i++)
   {
-    size_t line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
+    unsigned int line_size = size < LINE_WIDTH ? size : LINE_WIDTH, j;
 
     printf ("%03x| ", i * LINE_WIDTH);
     
@@ -113,22 +113,22 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
     xtl::uninitialized_storage <char> src_buffer (tex_desc.width * tex_desc.height * 4),
                                       dst_buffer (src_buffer.size ());
 
-    for (size_t i = 0; i < src_buffer.size (); i++)
+    for (unsigned int i = 0; i < src_buffer.size (); i++)
       src_buffer.data ()[i] = (char)myrand () & 63;
 //      src_buffer.data ()[i] = i & 63;      
 
-    for (size_t i = 0; i < tex_desc.layers; i++)
+    for (unsigned int i = 0; i < tex_desc.layers; i++)
     {  
-      size_t volatile mips_count = get_mips_count (tex_desc.width, tex_desc.height);
+      unsigned int volatile mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
       if (is_compressed (tex_desc.format))
         mips_count -= 2;
 
-      for (size_t j = 0; j < mips_count; j++)
+      for (unsigned int j = 0; j < mips_count; j++)
       {
         if (tex_desc.dimension == TextureDimension_3D)
         {
-          size_t layers_count = tex_desc.layers >> j;
+          unsigned int layers_count = tex_desc.layers >> j;
           
           if (!layers_count)
             layers_count = 1;
@@ -137,8 +137,8 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
             continue;            
         }
        
-        size_t level_width  = tex_desc.width >> j,
-               level_height = tex_desc.height >> j;
+        unsigned int level_width  = tex_desc.width >> j,
+                     level_height = tex_desc.height >> j;
         
         switch (tex_desc.format)
         {
@@ -166,7 +166,7 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
         {                    
           memset (dst_buffer.data (), 0xff, dst_buffer.size ());
           
-          size_t data_size = level_width * level_height;
+          unsigned int data_size = level_width * level_height;
 
           switch (tex_desc.format)
           {
@@ -193,7 +193,7 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
 
           if (tex_desc.format == PixelFormat_D24X8)
           {
-            for (size_t k=3; k < src_buffer.size (); k += 4)
+            for (unsigned int k=3; k < src_buffer.size (); k += 4)
             {
               src_buffer.data ()[k] = 0;
               dst_buffer.data ()[k] = 0;
@@ -230,16 +230,16 @@ void print_status_table (TestStatus status [TextureDimension_Num][PixelFormat_Nu
 {
   printf ("       ");
 
-  for (size_t i=0; i<TextureDimension_Num; i++)
+  for (unsigned int i=0; i<TextureDimension_Num; i++)
     printf ("%s     ", get_short_name ((TextureDimension)i));
     
   printf ("\n");
     
-  for (size_t i=0; i<PixelFormat_Num; i++)
+  for (unsigned int i=0; i<PixelFormat_Num; i++)
   {
     printf ("%s| ", get_short_name ((PixelFormat)i));
 
-    for (size_t j=0; j<TextureDimension_Num; j++)
+    for (unsigned int j=0; j<TextureDimension_Num; j++)
     {
       TestStatus& s = status [j][i];
       
@@ -268,8 +268,8 @@ int main ()
 
     TextureDesc desc;
     
-    for (size_t i = 0; i < TextureDimension_Num; i++)
-      for (size_t j = 0; j < PixelFormat_Num; j++)
+    for (unsigned int i = 0; i < TextureDimension_Num; i++)
+      for (unsigned int j = 0; j < PixelFormat_Num; j++)
       {
         switch (j)
         {
@@ -313,8 +313,8 @@ int main ()
     static const char *mips_titles [2] = {"manual-mips", "auto-mips"},
                       *pot_titles [2] = {"power of two", "non power of two"};
       
-    for (size_t i=0; i<2; i++)
-      for (size_t j=0; j<2; j++)
+    for (unsigned int i=0; i<2; i++)
+      for (unsigned int j=0; j<2; j++)
       {
         printf ("Status table for %s textures with %s:\n", pot_titles [i], mips_titles [j]);
         

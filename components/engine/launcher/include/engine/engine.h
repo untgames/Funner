@@ -85,13 +85,13 @@ class IWindow
     virtual void* GetParentHandle () = 0;
     
     ///Установка размеров окна
-    virtual void SetSize (size_t width, size_t height) = 0;
+    virtual void SetSize (unsigned int width, unsigned int height) = 0;
     
     ///Получение ширины окна
-    virtual size_t GetWidth () = 0;
+    virtual unsigned int GetWidth () = 0;
     
     ///Получение высоты окна
-    virtual size_t GetHeight () = 0;
+    virtual unsigned int GetHeight () = 0;
     
     ///Установка положения окна
     virtual void SetPosition (int x, int y) = 0;

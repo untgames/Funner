@@ -2,10 +2,10 @@
 
 void dump (const math::mat4f& m)
 {
-  for (size_t i = 0; i < 4; i++)
+  for (unsigned int i = 0; i < 4; i++)
   {
     printf ("  [ ");
-    for (size_t j = 0; j < 4; j++)
+    for (unsigned int j = 0; j < 4; j++)
       printf ("%0.2f ", m [i] [j]);
     printf ("]\n");
   }

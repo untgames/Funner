@@ -52,7 +52,7 @@ void Object::Release ()
 
 unsigned int Object::UseCount ()
 {
-  return use_count ();
+  return (unsigned int)use_count ();
 }
 
 /*

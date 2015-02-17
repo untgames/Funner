@@ -25,36 +25,36 @@ struct Atlas::Impl
     }
 
 ///Количество тайлов
-    size_t TilesCount ()
+    unsigned int TilesCount ()
     {
-      return tiles.size ();
+      return (unsigned int)tiles.size ();
     }
     
-    size_t ImageTilesCount (size_t image_index)
+    unsigned int ImageTilesCount (unsigned int image_index)
     {
       if (image_index >= images.size ())
         return 0;
         
-      return images [image_index]->tiles.size ();
+      return (unsigned int)images [image_index]->tiles.size ();
     }
 
-    size_t ImageTilesCount (const char* image_name)
+    unsigned int ImageTilesCount (const char* image_name)
     {
       if (!image_name)
         return 0;
         
-      int image_index = FindImageIndex (image_name);
+      long long image_index = FindImageIndex (image_name);
         
       if (image_index == -1)
         return 0;
 
-      return images [image_index]->tiles.size ();
+      return (unsigned int)images [(unsigned int)image_index]->tiles.size ();
     }
     
 ///Количество изображений
-    size_t ImagesCount () const
+    unsigned int ImagesCount () const
     {
-      return images.size ();
+      return (unsigned int)images.size ();
     }    
 
 ///Поиск
@@ -72,10 +72,10 @@ struct Atlas::Impl
     }
     
 ///Получение тайла
-    const media::Tile& Tile (size_t index)
+    const media::Tile& Tile (unsigned int index)
     {
       if (index >= TilesCount ())
-        throw xtl::make_range_exception ("media::Atlas::Tile(size_t)", "index", index, TilesCount ());
+        throw xtl::make_range_exception ("media::Atlas::Tile(unsigned int)", "index", index, TilesCount ());
 
       return tiles [index]->tile;
     }
@@ -95,9 +95,9 @@ struct Atlas::Impl
       return *tile;
     }
     
-    const media::Tile& ImageTile (size_t image_index, size_t index)
+    const media::Tile& ImageTile (unsigned int image_index, unsigned int index)
     {
-      static const char* METHOD_NAME = "media::Atlas::ImageTile(const char*, size_t)";
+      static const char* METHOD_NAME = "media::Atlas::ImageTile(unsigned int, unsigned int)";
       
       if (image_index >= images.size ())
         throw xtl::make_range_exception (METHOD_NAME, "image_index", image_index, images.size ());
@@ -110,23 +110,23 @@ struct Atlas::Impl
       return image.tiles [index]->tile;      
     }
     
-    const media::Tile& ImageTile (const char* image_name, size_t index)
+    const media::Tile& ImageTile (const char* image_name, unsigned int index)
     {
-      static const char* METHOD_NAME = "media::Atlas::ImageTile(const char*, size_t)";
+      static const char* METHOD_NAME = "media::Atlas::ImageTile(const char*, unsigned int)";
 
       if (!image_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "image_name");
 
-      int image_index = FindImageIndex (image_name);
+      long long image_index = FindImageIndex (image_name);
 
       if (image_index == -1)
         throw xtl::make_argument_exception (METHOD_NAME, "image_name", image_name, "Image not found");
         
-      return ImageTile ((size_t)image_index, index);
+      return ImageTile ((unsigned int)image_index, index);
     }
     
 ///Добавление тайла
-    size_t Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag)
+    unsigned int Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
     {
       static const char* METHOD_NAME = "media::Atlas::Insert";
 
@@ -135,6 +135,9 @@ struct Atlas::Impl
 
       if (!image)
         throw xtl::make_null_argument_exception (METHOD_NAME, "image");
+
+      if (tiles.size () >= (unsigned int)-1)
+        throw xtl::format_operation_exception (METHOD_NAME, "Tiles count limit exceeded");
 
       TilePtr tile (new TileEntry (name, image, origin, size, tag), false);
 
@@ -150,16 +153,16 @@ struct Atlas::Impl
         throw;
       }
 
-      return tiles.size () - 1;
+      return (unsigned int)tiles.size () - 1;
     }
 
 ///Изменение тайла
-    void Set (size_t tile_index, const media::Tile& new_tile)
+    void Set (unsigned int tile_index, const media::Tile& new_tile)
     {
       Set (tile_index, new_tile.name, new_tile.image, new_tile.origin, new_tile.size, new_tile.tag);
     }
 
-    void Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag)
+    void Set (unsigned int tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
     {
       static const char* METHOD_NAME = "media::Atlas::Set";
 
@@ -201,7 +204,7 @@ struct Atlas::Impl
     }
     
 ///Удаление тайла
-    void Remove (size_t tile_index)
+    void Remove (unsigned int tile_index)
     {
       if (tile_index >= TilesCount ())
         return;
@@ -219,7 +222,7 @@ struct Atlas::Impl
       TileArray::iterator remove_iter = FindTile (name);
 
       if (remove_iter != tiles.end ())
-        Remove (remove_iter - tiles.begin ());
+        Remove ((unsigned int)(remove_iter - tiles.begin ()));
     }
 
     void RemoveAllTiles ()
@@ -228,7 +231,7 @@ struct Atlas::Impl
     }
     
 ///Получение имени изображения
-    const char* ImageName (size_t image_index)
+    const char* ImageName (unsigned int image_index)
     {
       if (image_index >= images.size ())
         throw xtl::make_range_exception ("media::Atlas::ImageName", "image_index", image_index, images.size ());
@@ -237,7 +240,7 @@ struct Atlas::Impl
     }
     
 ///Поиск изображения по индексу
-    int FindImageIndex (const char* name)
+    long long FindImageIndex (const char* name)
     {
       if (!name)
         return -1;
@@ -252,11 +255,11 @@ struct Atlas::Impl
 ///Установка размеров изображения
     void SetImageSize (const char* image_name, const math::vec2ui& size)
     {
-      int image_index = FindImageIndex (image_name);
+      long long image_index = FindImageIndex (image_name);
       
       if (image_index != -1)
       {
-        SetImageSize ((size_t)image_index, size);
+        SetImageSize ((unsigned int)image_index, size);
         return;
       }
       
@@ -267,15 +270,15 @@ struct Atlas::Impl
       images.push_back (image);
     }
 
-    void SetImageSize (size_t index, const math::vec2ui& size)
+    void SetImageSize (unsigned int index, const math::vec2ui& size)
     {      
       if (index >= images.size ())
-        throw xtl::make_range_exception ("media::Atlas::SetImageSize(size_t,const math::vec2ui&)", "index", index, images.size ());
+        throw xtl::make_range_exception ("media::Atlas::SetImageSize(unsigned int,const math::vec2ui&)", "index", index, images.size ());
 
       images [index]->size = size;
     }
     
-    const math::vec2ui& ImageSize (size_t index)
+    const math::vec2ui& ImageSize (unsigned int index)
     {
       if (index >= images.size ())
       {
@@ -302,7 +305,7 @@ struct Atlas::Impl
       stl::string name;
       stl::string image;
 
-      TileEntry (const char* in_name, const char* in_image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag)
+      TileEntry (const char* in_name, const char* in_image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
         : name (in_name)
         , image (in_image)
         {
@@ -345,11 +348,11 @@ struct Atlas::Impl
     
     void UpdateImageReference (const TilePtr& tile)
     {
-      int image_index = FindImageIndex (tile->image.c_str ());
+      long long image_index = FindImageIndex (tile->image.c_str ());
 
       if (image_index != -1)
       {
-        images [image_index]->tiles.push_back (tile);
+        images [(unsigned int)image_index]->tiles.push_back (tile);
       }
       else
       {
@@ -363,12 +366,12 @@ struct Atlas::Impl
     
     void RemoveImageReference (const TilePtr& tile)
     {
-      int image_index = FindImageIndex (tile->image.c_str ());
+      long long image_index = FindImageIndex (tile->image.c_str ());
       
       if (image_index == -1)
         return;
 
-      TileImage& image = *images [image_index];
+      TileImage& image = *images [(unsigned int)image_index];
 
       for (TileArray::iterator iter=image.tiles.begin (), end=image.tiles.end (); iter!=end; ++iter)
         if (*iter == tile)
@@ -443,22 +446,22 @@ Atlas& Atlas::operator = (const Atlas& source)
    Количество тайлов и изображений
 */
 
-size_t Atlas::TilesCount () const
+unsigned int Atlas::TilesCount () const
 {
   return impl->TilesCount ();
 }
 
-size_t Atlas::ImagesCount () const
+unsigned int Atlas::ImagesCount () const
 {
   return impl->ImagesCount ();
 }
 
-size_t Atlas::ImageTilesCount (const char* image_name) const
+unsigned int Atlas::ImageTilesCount (const char* image_name) const
 {
   return impl->ImageTilesCount (image_name);
 }
 
-size_t Atlas::ImageTilesCount (size_t image_index) const
+unsigned int Atlas::ImageTilesCount (unsigned int image_index) const
 {
   return impl->ImageTilesCount (image_index);
 }
@@ -476,7 +479,7 @@ const media::Tile* Atlas::Find (const char* name) const
    Получение тайла
 */
 
-const media::Tile& Atlas::Tile (size_t index) const
+const media::Tile& Atlas::Tile (unsigned int index) const
 {
   return impl->Tile (index);
 }
@@ -486,12 +489,12 @@ const media::Tile& Atlas::Tile (const char* name) const
   return impl->Tile (name);
 }
 
-const media::Tile& Atlas::ImageTile (size_t image_index, size_t index) const
+const media::Tile& Atlas::ImageTile (unsigned int image_index, unsigned int index) const
 {
   return impl->ImageTile (image_index, index);
 }
 
-const media::Tile& Atlas::ImageTile (const char* image_name, size_t index) const
+const media::Tile& Atlas::ImageTile (const char* image_name, unsigned int index) const
 {
   return impl->ImageTile (image_name, index);
 }
@@ -500,12 +503,12 @@ const media::Tile& Atlas::ImageTile (const char* image_name, size_t index) const
    Добавление тайла
 */
 
-size_t Atlas::Insert (const media::Tile& new_tile)
+unsigned int Atlas::Insert (const media::Tile& new_tile)
 {
   return impl->Insert (new_tile.name, new_tile.image, new_tile.origin, new_tile.size, new_tile.tag);
 }
 
-size_t Atlas::Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag)
+unsigned int Atlas::Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
 {
   return impl->Insert (name, image, origin, size, tag);
 }
@@ -514,12 +517,12 @@ size_t Atlas::Insert (const char* name, const char* image, const math::vec2ui& o
    Изменение тайла
 */
 
-void Atlas::Set (size_t tile_index, const media::Tile& new_tile)
+void Atlas::Set (unsigned int tile_index, const media::Tile& new_tile)
 {
   impl->Set (tile_index, new_tile);
 }
 
-void Atlas::Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag)
+void Atlas::Set (unsigned int tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
 {
   impl->Set (tile_index, name, image, origin, size, tag);
 }
@@ -528,7 +531,7 @@ void Atlas::Set (size_t tile_index, const char* name, const char* image, const m
    Удаление тайла
 */
 
-void Atlas::Remove (size_t tile_index)
+void Atlas::Remove (unsigned int tile_index)
 {
   impl->Remove (tile_index);
 }
@@ -547,7 +550,7 @@ void Atlas::RemoveAllTiles ()
     Получение имени изображения
 */
 
-const char* Atlas::ImageName (size_t image_index) const
+const char* Atlas::ImageName (unsigned int image_index) const
 {
   return impl->ImageName (image_index);
 }
@@ -556,22 +559,22 @@ const char* Atlas::ImageName (size_t image_index) const
     Установка / получение размеров картинок
 */
 
-void Atlas::SetImageSize (size_t image_index, size_t width, size_t height)
+void Atlas::SetImageSize (unsigned int image_index, unsigned int width, unsigned int height)
 {
   SetImageSize (image_index, math::vec2ui (width, height));
 }
 
-void Atlas::SetImageSize (size_t image_index, const math::vec2ui& size)
+void Atlas::SetImageSize (unsigned int image_index, const math::vec2ui& size)
 {
   impl->SetImageSize (image_index, size);
 }
 
-const math::vec2ui& Atlas::ImageSize (size_t image_index) const
+const math::vec2ui& Atlas::ImageSize (unsigned int image_index) const
 {
   return impl->ImageSize (image_index);
 }
 
-void Atlas::SetImageSize (const char* image_name, size_t width, size_t height)
+void Atlas::SetImageSize (const char* image_name, unsigned int width, unsigned int height)
 {
   SetImageSize (image_name, math::vec2ui (width, height));
 }
@@ -588,7 +591,7 @@ void Atlas::SetImageSize (const char* image_name, const math::vec2ui& size)
 
 const math::vec2ui& Atlas::ImageSize (const char* image_name) const
 {
-  return impl->ImageSize ((size_t)impl->FindImageIndex (image_name));
+  return impl->ImageSize ((unsigned int)impl->FindImageIndex (image_name));
 }
 
 /*

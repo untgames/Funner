@@ -7,7 +7,7 @@ struct State
   
   void Init (IDevice& device)
   {
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
     {
       samplers [i] = device.GetImmediateContext ()->SSGetSampler (i);
       textures [i] = device.GetImmediateContext ()->SSGetTexture (i);
@@ -16,10 +16,10 @@ struct State
 
   void Check (const State& src)
   {
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       printf ("SSGetTexture(%u): %d\n", i, textures [i] == src.textures [i]);
       
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       printf ("SSGetSamplerState(%u): %d\n", i, samplers [i] == src.samplers [i]);      
   }
 };
@@ -75,7 +75,7 @@ int main ()
     mask.ss_program = false;
     mask.ss_program_parameters_layout = false;
     
-    for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       mask.ss_constant_buffers [i] = false;
     
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);

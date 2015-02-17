@@ -13,8 +13,8 @@ ScaledTexture::ScaledTexture
   TextureManager&       texture_manager,
   const TextureDesc&    original_desc,
   const TextureData*    data,
-  size_t                scaled_width,
-  size_t                scaled_height)
+  unsigned int          scaled_width,
+  unsigned int          scaled_height)
     : BindableTexture (context_manager),
       original_width (original_desc.width),
       original_height (original_desc.height)
@@ -83,7 +83,7 @@ void ScaledTexture::GetDesc (RenderTargetTextureDesc& out_desc)
   shadow_texture->GetDesc (out_desc);
 }
 
-void ScaledTexture::GetMipLevelDesc (size_t level, MipLevelDesc& out_desc)
+void ScaledTexture::GetMipLevelDesc (unsigned int level, MipLevelDesc& out_desc)
 {
   shadow_texture->GetMipLevelDesc (level, out_desc);
 }
@@ -120,10 +120,10 @@ void ScaledTexture::Bind ()
     Работа с данными
 */
 
-void ScaledTexture::ScaleImage (size_t width, size_t height, PixelFormat source_format, const void* buffer, Buffer& scaled_buffer, PixelFormat& scaled_format)
+void ScaledTexture::ScaleImage (unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, Buffer& scaled_buffer, PixelFormat& scaled_format)
 {
-  size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
-         scaled_height = (size_t)ceil ((float)height * vertical_scale);
+  unsigned int scaled_width  = (unsigned int)ceil ((float)width * horisontal_scale),
+               scaled_height = (unsigned int)ceil ((float)height * vertical_scale);
 
   if (is_compressed (source_format))
   {
@@ -145,13 +145,13 @@ void ScaledTexture::ScaleImage (size_t width, size_t height, PixelFormat source_
   }
 }
 
-void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
+void ScaledTexture::SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
-  size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
-         scaled_height = (size_t)ceil ((float)height * vertical_scale);
+  unsigned int scaled_width  = (unsigned int)ceil ((float)width * horisontal_scale),
+               scaled_height = (unsigned int)ceil ((float)height * vertical_scale);
 
-  x = (size_t)ceil ((float)x * horisontal_scale);
-  y = (size_t)ceil ((float)y * vertical_scale);
+  x = (unsigned int)ceil ((float)x * horisontal_scale);
+  y = (unsigned int)ceil ((float)y * vertical_scale);
 
   Buffer      scaled_buffer;
   PixelFormat scaled_format = source_format;
@@ -172,15 +172,15 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
   }
 }
 
-void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context)
+void ScaledTexture::GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* context)
 {
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
   if (is_compressed (target_format))
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't get data in format %s from scaled texture", get_name (target_format));
 
-  size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
-         scaled_height = (size_t)ceil ((float)height * vertical_scale);
+  unsigned int scaled_width  = (unsigned int)ceil ((float)width * horisontal_scale),
+               scaled_height = (unsigned int)ceil ((float)height * vertical_scale);
 
   xtl::uninitialized_storage <char> scaled_buffer (get_image_size (scaled_width, scaled_height, target_format));
 

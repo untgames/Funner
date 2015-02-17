@@ -37,7 +37,7 @@ int main ()
 
     if (verts1)
     {
-      for (size_t i=0; i<vs1.Size (); i++)
+      for (uint32_t i=0; i<vs1.Size (); i++)
       {
         verts1 [i].position  = vec3f  ((float)i, (float)i * 2, (float)i * 3);
         verts1 [i].normal    = vec3f  ((float)(i & 1), (float)((i + 1) & 1), 0);
@@ -50,7 +50,7 @@ int main ()
 
     VertexWeight* weights = vws.Data ();
 
-    for (size_t i=0; i<vws.Size (); i++)
+    for (uint32_t i=0; i<vws.Size (); i++)
     {
       weights [i].joint_index  = i;
       weights [i].joint_weight = float (i) / float (vws.Size ());
@@ -64,7 +64,7 @@ int main ()
 
     if (verts2)
     {
-      for (size_t i=0; i<vs1.Size (); i++)
+      for (uint32_t i=0; i<vs1.Size (); i++)
       {
         verts2 [i].first_weight  = i;
         verts2 [i].weights_count = 1;
@@ -74,7 +74,7 @@ int main ()
 
     IndexBuffer ib (5);
 
-    for (size_t i=0; i<ib.Size (); i++)
+    for (uint32_t i=0; i<ib.Size (); i++)
       ib.Data<unsigned int> () [i] = i;
 
     Mesh mesh1;

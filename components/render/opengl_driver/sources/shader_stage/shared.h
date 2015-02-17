@@ -126,7 +126,7 @@ class IShaderManager : virtual public IObject
 ///Создание шейдера / программы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    virtual IShader*          CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log) = 0;
-   virtual ICompiledProgram* CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction& error_log) = 0;
+   virtual ICompiledProgram* CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction& error_log) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

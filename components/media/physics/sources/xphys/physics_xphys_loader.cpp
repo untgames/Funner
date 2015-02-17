@@ -32,7 +32,7 @@ void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& v
   if (components.Size () != Size)
     raise_parser_exception (*iter, "Invalid vector format");
 
-  for (size_t i = 0; i < Size; i++)
+  for (unsigned int i = 0; i < Size; i++)
     value [i] = (float)atof (components [i]);
 }
 
@@ -43,7 +43,7 @@ void read (Parser::Iterator iter, const char* str, math::quatf& value)
   if (components.Size () != 4)
     raise_parser_exception (*iter, "Invalid quaternion format");
 
-  for (size_t i = 0; i < 4; i++)
+  for (unsigned char i = 0; i < 4; i++)
     value [i] = (float)atof (components [i]);
 }
 
@@ -128,7 +128,7 @@ class XmlPhysicsLibraryLoader
 
       ParseNode vertices_node = mesh_iter->First ("vertices");
 
-      size_t vertices_count = get<size_t> (vertices_node, "count");
+      unsigned int vertices_count = get<unsigned int> (vertices_node, "count");
 
       if (!vertices_count)
         throw xtl::format_operation_exception (METHOD_NAME, "Empty vertices in mesh '%s'", mesh.Name ());
@@ -141,14 +141,14 @@ class XmlPhysicsLibraryLoader
 
       if (indices_node)
       {
-        size_t triangles_count = get<size_t> (indices_node, "count");
+        unsigned int triangles_count = get<unsigned int> (indices_node, "count");
 
         if (!triangles_count)
           throw xtl::format_operation_exception (METHOD_NAME, "Empty indices in mesh '%s'", mesh.Name ());
 
         mesh.SetTrianglesCount (triangles_count);
 
-        read (indices_node, "#text", (size_t*)mesh.Triangles (), triangles_count * 3);
+        read (indices_node, "#text", (unsigned int*)mesh.Triangles (), triangles_count * 3);
       }
       else if (!mesh.IsConvex ())
         throw xtl::format_operation_exception (METHOD_NAME, "Not convex mesh '%s' has no indices", mesh.Name ());

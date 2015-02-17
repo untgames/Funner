@@ -10,7 +10,7 @@ void dump_vector (const math::vector<T, N>& v)
 {
   printf ("[");
   
-  for (size_t i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);
@@ -24,7 +24,7 @@ void dump_matrix (const math::matrix<T, N>& v)
 {
   printf ("[");
   
-  for (size_t i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
   {
     printf (" ");
     dump_vector (v [i]);

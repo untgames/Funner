@@ -7,6 +7,7 @@ export.link.system.LIBS                      := funner.system
 export.link.system.IMPORTS                   := link.common
 export.link.system.LINK_INCLUDES             := ThreadPool
 export.link.system.x86_win32.LIBS            := user32 gdi32 wtsapi32
+export.link.system.x86-64_win32.LIBS         := user32 gdi32 wtsapi32
 export.link.system.wince.LIBS                := Coredll
 export.link.system.macosx.LINK_FLAGS         := -framework CoreFoundation -framework AppKit -framework Carbon -framework IOKit -framework WebKit
 export.link.system.iphone.LINK_FLAGS         := -framework CoreFoundation -framework Foundation -framework UIKit -framework QuartzCore -framework CoreGraphics -framework SystemConfiguration
@@ -43,4 +44,5 @@ export.link.system.win8.EXCLUDE_DEFAULT_LIBS := funner.win8_compat.stdio
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   export.link.system.x86.IMPORTS            := link.extern.geekinfo
+  export.link.system.x86-64.IMPORTS         := link.extern.geekinfo
 endif

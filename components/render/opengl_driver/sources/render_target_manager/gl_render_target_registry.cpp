@@ -144,7 +144,7 @@ ITexture* RenderTargetRegistry::CreateRenderBuffer (const TextureDesc& desc)
   return impl->render_buffer_creater (desc);
 }
 
-ITexture* RenderTargetRegistry::CreateColorBuffer (ISwapChain* swap_chain, size_t index)
+ITexture* RenderTargetRegistry::CreateColorBuffer (ISwapChain* swap_chain, unsigned int index)
 {
   if (!impl->color_buffer_creater)
     throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderTargetRegistry::CreateColorBuffer", "Color buffers not supported");

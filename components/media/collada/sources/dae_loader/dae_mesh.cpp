@@ -62,10 +62,10 @@ typedef stl::vector<float> FloatBuffer;
 
 struct MeshSource
 {
-  FloatBuffer data;   //данные
-  stl::string params; //параметры
-  size_t      count;  //количество элементов
-  size_t      stride; //шаг
+  FloatBuffer  data;   //данные
+  stl::string  params; //параметры
+  unsigned int count;  //количество элементов
+  unsigned int stride; //шаг
 };
 
 /*
@@ -104,11 +104,11 @@ class MeshSourceMap
 
 struct MeshInput
 {
-  ParseNode   node;   //узел дерева разбора
-  MeshSource* source; //источник данных
-  size_t      offset; //смещение в массиве индексов
+  ParseNode    node;   //узел дерева разбора
+  MeshSource*  source; //источник данных
+  unsigned int offset; //смещение в массиве индексов
 
-  MeshInput (const ParseNode& in_node, MeshSource* in_source, size_t in_offset) :
+  MeshInput (const ParseNode& in_node, MeshSource* in_source, unsigned int in_offset) :
     node (in_node), source (in_source), offset (in_offset) {}
 };
 
@@ -134,7 +134,7 @@ class MeshInputBuilder
     }
     
 ///ƒобавление канала данных меша
-    bool AddChannel (const char* semantic, size_t set, const ParseNode& node, MeshSource* source, size_t offset)
+    bool AddChannel (const char* semantic, unsigned int set, const ParseNode& node, MeshSource* source, unsigned int offset)
     {
       size_t                 hash = strhash (semantic, set);
       MeshInputMap::iterator iter = input_map.find (hash);
@@ -149,7 +149,7 @@ class MeshInputBuilder
 
       try
       {       
-        input_map [hash] = inputs.size () - 1;
+        input_map [hash] = (unsigned int)inputs.size () - 1;
         
         RegisterSet (set);
           
@@ -163,7 +163,7 @@ class MeshInputBuilder
     }
     
 ///ѕоиск канала
-    const MeshInput* FindChannel (const char* semantic, size_t set=0)
+    const MeshInput* FindChannel (const char* semantic, unsigned int set=0)
     {
       size_t                 hash = strhash (semantic, set);
       MeshInputMap::iterator iter = input_map.find (hash);
@@ -172,19 +172,19 @@ class MeshInputBuilder
     }
     
 ///ѕолучение количества каналов данных
-    size_t GetChannelsCount  () const { return inputs.size (); }
+    unsigned int GetChannelsCount  () const { return (unsigned int)inputs.size (); }
     
 /// оличество подмножеств
-    size_t GetSetsCount () const { return sets.size (); }
+    unsigned int GetSetsCount () const { return (unsigned int)sets.size (); }
     
 ///ћаксимальное смещение канала
-    size_t GetMaxOffset () const { return max_offset; }
+    unsigned int GetMaxOffset () const { return max_offset; }
 
 ///ѕолучение значени€ подмножества
-    size_t GetSetValue (size_t index) const { return sets [index]; }
+    unsigned int GetSetValue (unsigned int index) const { return sets [index]; }
 
   private:
-    void RegisterSet (size_t set)
+    void RegisterSet (unsigned int set)
     {
       for (SetArray::iterator i=sets.begin (), end=sets.end (); i!=end; ++i)
         if (*i == set)
@@ -194,15 +194,15 @@ class MeshInputBuilder
     }
 
   private:
-    typedef stl::hash_map<size_t, size_t> MeshInputMap;
-    typedef stl::vector<MeshInput>        MeshInputArray;
-    typedef stl::vector<size_t>           SetArray;
+    typedef stl::hash_map<size_t, unsigned int> MeshInputMap;
+    typedef stl::vector<MeshInput>              MeshInputArray;
+    typedef stl::vector<unsigned int>           SetArray;
     
   private:
     MeshInputArray inputs;
     MeshInputMap   input_map;
     SetArray       sets;
-    size_t         max_offset;
+    unsigned int   max_offset;
 };
 
 /*
@@ -211,25 +211,25 @@ class MeshInputBuilder
 
 struct VertexKey
 {
-  size_t* inputs;
-  size_t  inputs_count;
+  unsigned int* inputs;
+  unsigned int  inputs_count;
   
-  VertexKey (size_t* in_inputs, size_t in_inputs_count) : inputs (in_inputs), inputs_count (in_inputs_count) {}
+  VertexKey (unsigned int* in_inputs, unsigned int in_inputs_count) : inputs (in_inputs), inputs_count (in_inputs_count) {}
   
-  bool operator == (const VertexKey& key) const { return inputs_count == key.inputs_count && memcmp (inputs, key.inputs, inputs_count * sizeof (size_t)) == 0; }
+  bool operator == (const VertexKey& key) const { return inputs_count == key.inputs_count && memcmp (inputs, key.inputs, inputs_count * sizeof (unsigned int)) == 0; }
   bool operator != (const VertexKey& key) const { return !(*this == key); }
 };
 
 size_t hash (const VertexKey& key)
 {
-  return common::crc32 (key.inputs, sizeof (size_t) * key.inputs_count);
+  return common::crc32 (key.inputs, sizeof (unsigned int) * key.inputs_count);
 }
 
 class MeshVertexBuffer
 {
   public:
 /// онструктор
-    MeshVertexBuffer (size_t in_inputs_count, size_t reserve_vertices_count)
+    MeshVertexBuffer (unsigned int in_inputs_count, unsigned int reserve_vertices_count)
     {
       inputs_count = in_inputs_count;
       
@@ -237,7 +237,7 @@ class MeshVertexBuffer
     }
     
 ///ƒобавление вершины
-    size_t AddVertex (size_t* inputs)
+    unsigned int AddVertex (unsigned int* inputs)
     {
       VertexKey key (inputs, inputs_count);
       
@@ -250,7 +250,7 @@ class MeshVertexBuffer
 
         //если вершины нет в буфере - добавление еЄ в буфер вершин и карту вершин
 
-      size_t vertex_index = vertices.size ();
+      unsigned int vertex_index = (unsigned int)vertices.size ();
 
       vertices.push_back (inputs);
 
@@ -268,18 +268,18 @@ class MeshVertexBuffer
     }
     
 /// оличество вершин в буфере
-    size_t GetVerticesCount () const { return vertices.size (); }
+    unsigned int GetVerticesCount () const { return (unsigned int)vertices.size (); }
     
 ///ѕолучение массива вершин
-    size_t** GetVertices () { return &vertices [0]; }
+    unsigned int** GetVertices () { return &vertices [0]; }
 
   private:
-    typedef stl::hash_map<VertexKey, size_t> VertexBufferMap;
-    typedef stl::vector<size_t*>             VertexBuffer;  
+    typedef stl::hash_map<VertexKey, unsigned int> VertexBufferMap;
+    typedef stl::vector<unsigned int*>             VertexBuffer;
     
     VertexBuffer    vertices;
     VertexBufferMap vertices_map;
-    size_t          inputs_count;
+    unsigned int    inputs_count;
 };
 
 /*
@@ -311,38 +311,38 @@ class VertexStreamReader
 
 ///„тение канала данных в поле, определе€емое указателем на член-класса
     template <class T, class Field>
-    void Read (const char* semantic, size_t set, const char* params, T* buffer, Field T::* field)
+    void Read (const char* semantic, unsigned int set, const char* params, T* buffer, Field T::* field)
     {
       ReadCore (semantic, set, params, buffer, field_selector<T, Field> (field));
     }
 
 ///Ќепосредственное чтение канала данных
     template <class T>
-    void Read (const char* semantic, size_t set, const char* params, T* buffer)
+    void Read (const char* semantic, unsigned int set, const char* params, T* buffer)
     {
       ReadCore (semantic, set, params, buffer, identity_selector ());
     }    
     
 ///„тение массива индексов вершин
-    void ReadVertexIndices (size_t* buffer)
+    void ReadVertexIndices (unsigned int* buffer)
     {
       const MeshInput* input = inputs.FindChannel ("VERTEX");
 
       if (!input)
         raise_parser_exception (surface_node, "No input channel with semantic='VERTEX'");
 
-      size_t offset         = input->offset,
-             max_count      = input->source->count,
-             vertices_count = vertex_buffer.GetVerticesCount ();
+      unsigned int offset         = input->offset,
+                   max_count      = input->source->count,
+                   vertices_count = vertex_buffer.GetVerticesCount ();
 
       if (offset >= inputs.GetChannelsCount ())
         raise_parser_exception (input->node, "Offset %u is greater of inputs count %u", offset, inputs.GetChannelsCount ());
 
-      size_t **input_vertex = vertex_buffer.GetVertices (), *output_index = buffer;
+      unsigned int **input_vertex = vertex_buffer.GetVertices (), *output_index = buffer;
 
-      for (size_t i=0; i<vertices_count; i++, input_vertex++, output_index++)
+      for (unsigned int i=0; i<vertices_count; i++, input_vertex++, output_index++)
       {
-        size_t index = (*input_vertex) [offset];
+        unsigned int index = (*input_vertex) [offset];
         
         if (index >= max_count)
           raise_parser_exception (surface_node.First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
@@ -370,7 +370,7 @@ class VertexStreamReader
   
       //чтение канала данных
     template <class T, class Fn>  
-    void ReadCore (const char* semantic, size_t set, const char* params, T* buffer, Fn fn)
+    void ReadCore (const char* semantic, unsigned int set, const char* params, T* buffer, Fn fn)
     {
       const MeshInput* input = inputs.FindChannel (semantic, set);
       
@@ -382,7 +382,7 @@ class VertexStreamReader
           raise_parser_exception (input->node, "Wrong params '%s'. Must be '%s'", input->source->params.c_str (), params);
 
       const float* source         = &input->source->data [0];
-      size_t       max_count      = input->source->count,
+      unsigned int max_count      = input->source->count,
                    offset         = input->offset,
                    stride         = input->source->stride,
                    vertices_count = vertex_buffer.GetVerticesCount ();
@@ -390,12 +390,12 @@ class VertexStreamReader
       if (offset >= inputs.GetChannelsCount ())
         raise_parser_exception (input->node, "Offset %u is greater of inputs count %u", offset, inputs.GetChannelsCount ());
 
-      size_t** input_vertex  = vertex_buffer.GetVertices ();
+      unsigned int** input_vertex  = vertex_buffer.GetVertices ();
       T*       output_vertex = buffer;  
 
-      for (size_t i=0; i<vertices_count; i++, input_vertex++, output_vertex++)
+      for (unsigned int i=0; i<vertices_count; i++, input_vertex++, output_vertex++)
       {
-        size_t index = (*input_vertex) [offset];
+        unsigned int index = (*input_vertex) [offset];
         
         if (index >= max_count)
           raise_parser_exception (surface_node.First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
@@ -409,7 +409,7 @@ class VertexStreamReader
     template <unsigned int N>
     void SetField (const float* src, math::vector<float, N>& res)
     {
-      for (size_t i=0; i<N; i++)
+      for (unsigned int i=0; i<N; i++)
         res [i] = src [i];
     }
   
@@ -464,9 +464,9 @@ void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
 
     Parser::Iterator accessor_iter = get_first_child (*iter, "technique_common.accessor");
 
-    size_t data_count = get<size_t> (*iter, "float_array.count"),
-           count      = get<size_t> (*accessor_iter, "count"),
-           stride     = get<size_t> (*accessor_iter, "stride");    
+    unsigned int data_count = get<unsigned int> (*iter, "float_array.count"),
+                 count      = get<unsigned int> (*accessor_iter, "count"),
+                 stride     = get<unsigned int> (*accessor_iter, "stride");
 
     if (data_count < count * stride)
       raise_parser_exception (*accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count. count=%u, stride=%u, "
@@ -546,7 +546,7 @@ void DaeParser::ParseSurfaceInput
   const char *semantic    = get<const char*> (*iter, "semantic"),
              *source_name = get<const char*> (*iter, "source");
 
-  size_t offset = get<size_t> (*iter, "offset");
+  unsigned int offset = get<unsigned int> (*iter, "offset");
 
   source_name++; //избавл€емс€ от префиксного '#'
 
@@ -588,7 +588,7 @@ void DaeParser::ParseSurfaceInput
   
     //регистраци€ канала данных
 
-  size_t set = get<size_t> (*iter, "set", 0);
+  unsigned int set = get<unsigned int> (*iter, "set", 0);
     
   if (!inputs.AddChannel (semantic, set, *iter, source, offset))
     raise_parser_exception (*iter, "Input channel '%s' from set '%u' already registered. Will be ignored", semantic, set);
@@ -603,7 +603,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 {  
     //получение количества индексов
 
-  size_t indices_count = get<size_t> (*surface_iter, "count");
+  unsigned int indices_count = get<unsigned int> (*surface_iter, "count");
 
     //преобразование количества индексов
 
@@ -628,12 +628,12 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
     //чтение исходного буфера индексов
 
-  typedef stl::vector<size_t> IndexBuffer;
+  typedef stl::vector<unsigned int> IndexBuffer;
 
   IndexBuffer input_indices;
 
-  size_t inputs_count        = surface_info.inputs.GetMaxOffset () + 1,
-         input_indices_count = indices_count * inputs_count;
+  unsigned int inputs_count        = surface_info.inputs.GetMaxOffset () + 1,
+               input_indices_count = indices_count * inputs_count;
 
   input_indices.resize (input_indices_count);
 
@@ -650,7 +650,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
   
   output_indices.resize (indices_count);
     
-  size_t* index = &output_indices [0];  
+  unsigned int* index = &output_indices [0];
 
   for (IndexBuffer::iterator index_iter=input_indices.begin (), index_end=input_indices.end (); index_iter != index_end;
        index_iter += inputs_count, index++)
@@ -683,18 +683,18 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
     //построение каналов текстурных координат
     
-  for (size_t i=0; i<surface_info.inputs.GetSetsCount (); i++)
+  for (unsigned int i=0; i<surface_info.inputs.GetSetsCount (); i++)
   {
-    size_t set = surface_info.inputs.GetSetValue (i);
+    unsigned int set = surface_info.inputs.GetSetValue (i);
     
     if (surface_info.inputs.FindChannel ("TEXCOORD", set))
     {    
-      size_t channel_set = set;
+      unsigned int channel_set = set;
 
       if (common::wcmatch (authoring_tool.c_str (), "OpenCOLLADA for 3ds Max*"))
         channel_set++;
 
-      size_t channel = surface.TexVertexChannels ().Create (channel_set);
+      unsigned int channel = surface.TexVertexChannels ().Create (channel_set);
 
       TexVertex* tex_vertices = surface.TexVertexChannels ().Data (channel);      
 
@@ -705,7 +705,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
     if (surface_info.inputs.FindChannel ("COLOR", set))
     {
-      size_t channel = surface.ColorChannels ().Create (set);
+      unsigned int channel = surface.ColorChannels ().Create (set);
       
       math::vec3f* colors = surface.ColorChannels ().Data (channel);
       

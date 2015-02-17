@@ -57,7 +57,7 @@ int main ()
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
     printf ("Tile 0 is:\n");
-    print (atlas.Tile ((size_t)0));
+    print (atlas.Tile ((unsigned int)0));
     printf ("Tile 1 is:\n");
     print (atlas.Tile (1));
 
@@ -65,7 +65,7 @@ int main ()
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
-    atlas.Remove ((size_t)0);
+    atlas.Remove ((unsigned int)0);
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 

@@ -40,7 +40,7 @@ MediaSampleDecoder::MediaSampleDecoder (const media::SoundSample& in_sample)
    Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 */
 
-size_t MediaSampleDecoder::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int MediaSampleDecoder::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   try
   {

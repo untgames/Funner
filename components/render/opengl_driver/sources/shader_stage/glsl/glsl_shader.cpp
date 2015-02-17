@@ -87,7 +87,7 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
     }
 
     const char* source_codes []       = { defines_string.c_str (), desc.source_code };
-    GLint       source_codes_sizes [] = { defines_string.length (), desc.source_code_size };
+    GLint       source_codes_sizes [] = { (unsigned int)defines_string.length (), desc.source_code_size };
 
     if (glShaderSource)
     {

@@ -26,7 +26,7 @@ class Converter
     }
 
     ///Преобразование поверхности
-    void ConvertSurface (const media::collada::Surface& src_surface, media::physics::shapes::TriangleMesh& dst_mesh, size_t first_vertex, size_t first_index)
+    void ConvertSurface (const media::collada::Surface& src_surface, media::physics::shapes::TriangleMesh& dst_mesh, unsigned int first_vertex, unsigned int first_index)
     {
         //преобразование массивов поверхности
       size_t                        vertices_count = src_surface.VerticesCount ();
@@ -36,11 +36,11 @@ class Converter
       for (size_t i = 0; i < vertices_count; i++, src_vertex++, dst_vertex++)
         *dst_vertex = src_vertex->coord;
 
-      size_t        indices_count = src_surface.IndicesCount ();
-      const size_t* src_index     = src_surface.Indices ();
-      size_t*       dst_index     = dst_mesh.Triangles () [0] + first_index;
+      unsigned int        indices_count = src_surface.IndicesCount ();
+      const unsigned int* src_index     = src_surface.Indices ();
+      unsigned int*       dst_index     = dst_mesh.Triangles () [0] + first_index;
 
-      for (size_t i = 0; i < indices_count; i++, src_index++, dst_index++)
+      for (unsigned int i = 0; i < indices_count; i++, src_index++, dst_index++)
         *dst_index = *src_index + first_vertex;
     }    
     
@@ -76,7 +76,7 @@ class Converter
 
         //преобразование поверхностей
 
-      size_t first_vertex = 0, first_index = 0;
+      unsigned int first_vertex = 0, first_index = 0;
 
       for (media::collada::Mesh::SurfaceList::ConstIterator iter = src_mesh.Surfaces ().CreateIterator (); iter; ++iter)
       {

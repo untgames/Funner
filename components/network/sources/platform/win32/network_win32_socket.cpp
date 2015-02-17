@@ -17,7 +17,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
 {
   public:
 ///Конструктор/деструктор
-    WinSocket (int in_socket, const SocketAddress& in_remote_address)
+    WinSocket (SOCKET in_socket, const SocketAddress& in_remote_address)
     : socket (in_socket)
     , local_address_getted (false)
     , remote_address (in_remote_address)
@@ -202,7 +202,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       try
       {
         sockaddr_storage address_storage;
-        size_t           address_storage_size;
+        int              address_storage_size;
 
         FillSockaddrStorage (address, address_storage, address_storage_size);
 
@@ -225,7 +225,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       try
       {
         sockaddr_storage address_storage;
-        size_t           address_storage_size;
+        int              address_storage_size;
 
         FillSockaddrStorage (address, address_storage, address_storage_size);
 
@@ -261,7 +261,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       sockaddr_storage address_storage;
       int              address_storage_size = sizeof (address_storage);
 
-      int new_socket = accept (socket, (sockaddr*)&address_storage, &address_storage_size);
+      SOCKET new_socket = accept (socket, (sockaddr*)&address_storage, &address_storage_size);
 
       SocketAddress new_socket_remote_address;
 
@@ -424,11 +424,11 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Параметры сокета
-    void SetReceiveBufferSize (size_t size)
+    void SetReceiveBufferSize (unsigned int size)
     {
       try
       {
-        SetSocketOption<int> (SO_RCVBUF, size);
+        SetSocketOption<unsigned int> (SO_RCVBUF, size);
       }
       catch (xtl::exception& e)
       {
@@ -437,11 +437,11 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    void SetSendBufferSize (size_t size)
+    void SetSendBufferSize (unsigned int size)
     {
       try
       {
-        SetSocketOption<int> (SO_SNDBUF, size);
+        SetSocketOption<unsigned int> (SO_SNDBUF, size);
       }
       catch (xtl::exception& e)
       {
@@ -450,11 +450,11 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t ReceiveBufferSize ()
+    unsigned int ReceiveBufferSize ()
     {
       try
       {
-        return GetSocketOption<int> (SO_RCVBUF);
+        return GetSocketOption<unsigned int> (SO_RCVBUF);
       }
       catch (xtl::exception& e)
       {
@@ -463,11 +463,11 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t SendBufferSize ()
+    unsigned int SendBufferSize ()
     {
       try
       {
-        return GetSocketOption<int> (SO_SNDBUF);
+        return GetSocketOption<unsigned int> (SO_SNDBUF);
       }
       catch (xtl::exception& e)
       {
@@ -477,7 +477,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Чтение / запись данных
-    size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+    unsigned int Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
     {
       try
       {        
@@ -515,7 +515,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    size_t Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
+    unsigned int Send (const void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
     {
       try
       {
@@ -549,7 +549,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     }
 
 ///Количество байт доступных для чтения без блокировки
-    size_t ReceiveAvailable ()
+    unsigned int ReceiveAvailable ()
     {
       try
       {
@@ -607,7 +607,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-    void FillSockaddrStorage (const SocketAddress& address, sockaddr_storage& address_storage, size_t& address_storage_size)
+    void FillSockaddrStorage (const SocketAddress& address, sockaddr_storage& address_storage, int& address_storage_size)
     {
       switch (address.InetAddress ().Size ())
       {

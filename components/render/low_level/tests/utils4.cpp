@@ -1,6 +1,6 @@
 #include "shared.h"
 
-void test (size_t w, size_t h, size_t d)
+void test (unsigned int w, unsigned int h, unsigned int d)
 {
   printf ("get_mips_count(%u, %u, %u)=%u\n", w, h, d, get_mips_count (w, h, d));
 }

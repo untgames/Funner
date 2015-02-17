@@ -14,7 +14,7 @@ struct Channel
   Array      data;
   ChannelKey name;
 
-  Channel (size_t verts_count, ChannelKey in_name) : data (verts_count), name (in_name) {}
+  Channel (unsigned int verts_count, ChannelKey in_name) : data (verts_count), name (in_name) {}
 
   ChannelKey GetName ()
   {
@@ -30,7 +30,7 @@ struct Channel<T, const char*>
   Array       data;
   stl::string name;
 
-  Channel (size_t verts_count, const char* in_name) : data (verts_count), name (in_name) {}
+  Channel (unsigned int verts_count, const char* in_name) : data (verts_count), name (in_name) {}
 
   const char* GetName ()
   {
@@ -45,7 +45,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
 {
   enum { DEFAULT_CHANNELS_RESERVE = 8 };
   public:
-    ChannelListImpl (size_t in_vertices_count) : vertices_count (in_vertices_count)
+    ChannelListImpl (unsigned int in_vertices_count) : vertices_count (in_vertices_count)
     {
       channels.reserve (DEFAULT_CHANNELS_RESERVE);
     }
@@ -78,17 +78,22 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество каналов / проверка на пустоту
 ///////////////////////////////////////////////////////////////////////////////////////////////////      
-    size_t Size    () const { return channels.size (); }
-    bool   IsEmpty () const { return channels.empty (); }
+    unsigned int Size    () const { return (unsigned int)channels.size (); }
+    bool         IsEmpty () const { return channels.empty (); }
         
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание / удаление канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Create (Key name)
+    unsigned int Create (Key name)
     {
+      static const char* METHOD_NAME = "media::collada::Surface::IChannelList::Create";
+
       try
       {
         CheckKeyName (name);
+
+        if (channels.size () >= (unsigned int)-1)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't create new channel, channels count limit exceeded");
 
         Channel<T, Key>* channel = new Channel<T, Key> (vertices_count, name);
 
@@ -96,7 +101,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
         {
           channels.push_back (channel);
 
-          return channels.size () - 1;
+          return (unsigned int)channels.size () - 1;
         }
         catch (...)
         {
@@ -106,12 +111,12 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
       }
       catch (xtl::exception& e)
       {
-        e.touch ("media::collada::Surface::IChannelList::Create");
+        e.touch (METHOD_NAME);
         throw;
       }
     }
     
-    void Remove (size_t channel)
+    void Remove (unsigned int channel)
     {
       if (channel >= channels.size ())
         throw xtl::make_range_exception ("media::collada::Surface::IChannelList::Remove", "channel", channel, channels.size ());
@@ -132,7 +137,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Key Name (size_t channel) const
+    Key Name (unsigned int channel) const
     {
       if (channel >= channels.size ())
         throw xtl::make_range_exception ("media::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
@@ -151,7 +156,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
 
         for (typename ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
           if ((*i)->name == name)
-            return i - channels.begin ();
+            return (int)(i - channels.begin ());
 
         return -1;
       }
@@ -165,7 +170,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const T* Data (size_t channel) const
+    const T* Data (unsigned int channel) const
     {
       if (channel >= channels.size ())
         throw xtl::make_range_exception ("media::collada::Surface::IChannelList::Data", "channel", channel, channels.size ());
@@ -173,7 +178,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
       return &channels [channel]->data [0];
     }
 
-    T* Data (size_t channel)
+    T* Data (unsigned int channel)
     {
       return const_cast<T*> (const_cast<const ChannelListImpl&> (*this).Data (channel));
     }
@@ -196,11 +201,11 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
     
    private:     
      ChannelArray channels;
-     size_t       vertices_count;
+     unsigned int vertices_count;
 };
 
-typedef ChannelListImpl<TexVertex, size_t>            TexVertexChannelListImpl;
-typedef ChannelListImpl<math::vec3f, size_t>          ColorChannelListImpl;
+typedef ChannelListImpl<TexVertex, unsigned int>      TexVertexChannelListImpl;
+typedef ChannelListImpl<math::vec3f, unsigned int>    ColorChannelListImpl;
 typedef ChannelListImpl<VertexInfluence, const char*> InfluenceChannelListImpl;
 
 }
@@ -210,7 +215,7 @@ typedef ChannelListImpl<VertexInfluence, const char*> InfluenceChannelListImpl;
 */
 
 typedef stl::vector<Vertex> VertexArray;
-typedef stl::vector<size_t> IndexArray;
+typedef stl::vector<unsigned int> IndexArray;
 
 struct Surface::Impl: public xtl::reference_counter
 {
@@ -222,7 +227,7 @@ struct Surface::Impl: public xtl::reference_counter
   TexVertexChannelListImpl  texvertex_channels; //каналы текстурирования
   InfluenceChannelListImpl  influence_channels; //каналы вершинных весов
   
-  Impl (collada::PrimitiveType in_primitive_type, size_t in_vertices_count, size_t in_indices_count) :
+  Impl (collada::PrimitiveType in_primitive_type, unsigned int in_vertices_count, unsigned int in_indices_count) :
     primitive_type (in_primitive_type), vertices (in_vertices_count), indices (in_indices_count),
     color_channels (in_vertices_count), texvertex_channels (in_vertices_count), influence_channels (in_vertices_count)
   {
@@ -245,7 +250,7 @@ struct Surface::Impl: public xtl::reference_counter
     Конструктор / деструктор
 */
 
-Surface::Surface (media::collada::PrimitiveType type, size_t verts_count, size_t indices_count)
+Surface::Surface (media::collada::PrimitiveType type, unsigned int verts_count, unsigned int indices_count)
   : impl (new Impl (type, verts_count, indices_count), false)
   {}
   
@@ -307,14 +312,14 @@ PrimitiveType Surface::PrimitiveType () const
     Количество вершин и индексов
 */
 
-size_t Surface::VerticesCount () const
+unsigned int Surface::VerticesCount () const
 {
-  return impl->vertices.size ();
+  return (unsigned int)impl->vertices.size ();
 }
 
-size_t Surface::IndicesCount () const
+unsigned int Surface::IndicesCount () const
 {
-  return impl->indices.size ();
+  return (unsigned int)impl->indices.size ();
 }
 
 /*
@@ -335,12 +340,12 @@ const Vertex* Surface::Vertices () const
     Индексы примитивов
 */
 
-size_t* Surface::Indices ()
+unsigned int* Surface::Indices ()
 {
   return &impl->indices [0];
 }
 
-const size_t* Surface::Indices () const
+const unsigned int* Surface::Indices () const
 {
   return &impl->indices [0];
 }

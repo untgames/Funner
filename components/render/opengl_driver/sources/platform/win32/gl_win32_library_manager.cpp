@@ -369,7 +369,7 @@ class WglAdapterLibrary: public AdapterLibrary
     }    
 
 ///Получение адреса точки входа OpenGL
-    void* GetProcAddress (const char* name, size_t search_flags)
+    void* GetProcAddress (const char* name, unsigned int search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
 
@@ -464,7 +464,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (!fDrvSwapBuffers && !fDrvSwapLayerBuffers)
           throw xtl::format_not_supported_exception ("", "No DrvSwapBuffers/DevSwapLayerBuffers entries in dll '%s'", GetName ());
 
-        static const size_t REQUIRED_ICD_VERSION = 1;        
+        static const unsigned int REQUIRED_ICD_VERSION = 1;
 
         if (!fDrvValidateVersion (REQUIRED_ICD_VERSION))
           throw xtl::format_not_supported_exception ("", "Adapter library '%s' doesn't support version %u", GetName (), REQUIRED_ICD_VERSION);          
@@ -612,7 +612,7 @@ class IcdAdapterLibrary: public AdapterLibrary
     }    
     
 ///Получение адреса точки входа OpenGL
-    void* GetProcAddress (const char* name, size_t search_flags)
+    void* GetProcAddress (const char* name, unsigned int search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
 

@@ -1,5 +1,6 @@
 PROFILES          += win32 x86-64 vcx86-64 x86-64_win32
 COMMON_LINK_FLAGS += /MACHINE:X64
+ML_NAME           := ml64
 
 include $(TOOLSETS_DIR)/common/msvc.mak
 

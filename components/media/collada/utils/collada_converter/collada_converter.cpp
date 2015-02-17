@@ -79,7 +79,7 @@ struct Params
   stl::string   output_resources_namespace;   //пространство имён, применяемое при сохранении ресурсов
   stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
   stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
-  size_t        max_texture_size;             //максимальный размер текстуры
+  unsigned int  max_texture_size;             //максимальный размер текстуры
   bool          convert_to_meters;            //нужно ли переводить единицы измерения в метры
   bool          fix_zero_tangents;            //нужно ли генерировать вместо нулевых касательных произвольные
   bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
@@ -507,7 +507,7 @@ void save_meshes (const Params& params, const Model& model)
       
       size_t count = mesh.PrimitivesCount ();
       
-      for (size_t i=0; i<count; i++)
+      for (unsigned int i=0; i<count; i++)
       {
         const media::geometry::Primitive& primitive = mesh.Primitive (i);
         
@@ -781,8 +781,8 @@ void save_scene (const Params& params, const Model& model)
 
       for (Mesh::SurfaceList::ConstIterator surface_iter = instance_mesh_iter->Surfaces ().CreateIterator (); surface_iter; ++surface_iter)
       {
-        const Vertex* vertices = surface_iter->Vertices ();
-        const size_t* index    = surface_iter->Indices ();
+        const Vertex*       vertices = surface_iter->Vertices ();
+        const unsigned int* index    = surface_iter->Indices ();
 
         for (size_t i = 0, count = surface_iter->IndicesCount (); i < count; i++, index++)
         {
@@ -834,13 +834,13 @@ TexturePtr load_texture (const Params& params, const char* path)
 
     TexturePtr texture (new media::Image (texture_path.c_str ()));
 
-    size_t new_width = texture->Width (), new_height = texture->Height (), new_depth = texture->Depth ();
+    unsigned int new_width = texture->Width (), new_height = texture->Height (), new_depth = texture->Depth ();
 
     if (params.pot)
     {
-      new_width  = get_next_higher_power_of_two (new_width);
-      new_height = get_next_higher_power_of_two (new_height);
-      new_depth  = get_next_higher_power_of_two (new_depth);
+      new_width  = (unsigned int)get_next_higher_power_of_two (new_width);
+      new_height = (unsigned int)get_next_higher_power_of_two (new_height);
+      new_depth  = (unsigned int)get_next_higher_power_of_two (new_depth);
     }
 
     if (params.max_texture_size)

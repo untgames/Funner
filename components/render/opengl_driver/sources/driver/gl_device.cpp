@@ -172,7 +172,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc, const void* data)
 
   try
   {
-    static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
+    static const unsigned int BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
 
     if (desc.bind_flags & BAD_FLAGS)
       throw xtl::make_argument_exception ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
@@ -213,7 +213,7 @@ void Device::ISSetInputLayout (IInputLayout* state)
   input_stage.SetInputLayout (state);
 }
 
-void Device::ISSetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)
+void Device::ISSetVertexBuffer (unsigned int vertex_buffer_slot, IBuffer* buffer)
 {
   input_stage.SetVertexBuffer (vertex_buffer_slot, buffer);
 }
@@ -228,7 +228,7 @@ IInputLayout* Device::ISGetInputLayout ()
   return input_stage.GetInputLayout ();
 }
 
-IBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
+IBuffer* Device::ISGetVertexBuffer (unsigned int vertex_buffer_slot)
 {
   return input_stage.GetVertexBuffer (vertex_buffer_slot);
 }
@@ -242,22 +242,22 @@ IBuffer* Device::ISGetIndexBuffer ()
     ”правление уровнем вывода вершин
 */
 
-void Device::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
+void Device::SOSetTargets (unsigned int buffers_count, IBuffer** buffers, const unsigned int* offsets)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOSetTargets");
 }
 
-void Device::SOSetTarget (size_t stream_output_slot, IBuffer* buffer, size_t offset)
+void Device::SOSetTarget (unsigned int stream_output_slot, IBuffer* buffer, unsigned int offset)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOSetTarget");
 }
 
-IBuffer* Device::SOGetTarget (size_t stream_output_slot)
+IBuffer* Device::SOGetTarget (unsigned int stream_output_slot)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTarget");
 }
 
-size_t Device::SOGetTargetOffset (size_t stream_output_slot)
+unsigned int Device::SOGetTargetOffset (unsigned int stream_output_slot)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTargetOffset");
 }
@@ -279,7 +279,7 @@ IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramPa
   }
 }
 
-IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+IProgram* Device::CreateProgram (unsigned int shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
   try
   {
@@ -302,7 +302,7 @@ void Device::SSSetProgramParametersLayout (IProgramParametersLayout* layout)
   shader_stage.SetProgramParametersLayout (layout);  
 }
 
-void Device::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
+void Device::SSSetConstantBuffer (unsigned int buffer_slot, IBuffer* buffer)
 {
   shader_stage.SetConstantBuffer (buffer_slot, buffer);
 }
@@ -317,7 +317,7 @@ IProgram* Device::SSGetProgram ()
   return shader_stage.GetProgram ();
 }
 
-IBuffer* Device::SSGetConstantBuffer (size_t buffer_slot)
+IBuffer* Device::SSGetConstantBuffer (unsigned int buffer_slot)
 {
   return shader_stage.GetConstantBuffer (buffer_slot);
 }
@@ -381,27 +381,27 @@ ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* dat
   }
 }
 
-ITexture* Device::CreateTexture (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes)
+ITexture* Device::CreateTexture (const TextureDesc&, IBuffer* buffer, unsigned int buffer_offset, const unsigned int* mip_sizes)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateTexture");
 }
 
-void Device::SSSetSampler (size_t sampler_slot, ISamplerState* state)
+void Device::SSSetSampler (unsigned int sampler_slot, ISamplerState* state)
 {
   texture_manager.SetSampler (sampler_slot, state);
 }
 
-void Device::SSSetTexture (size_t sampler_slot, ITexture* texture)
+void Device::SSSetTexture (unsigned int sampler_slot, ITexture* texture)
 {
   texture_manager.SetTexture (sampler_slot, texture);
 }
 
-ISamplerState* Device::SSGetSampler (size_t sampler_slot)
+ISamplerState* Device::SSGetSampler (unsigned int sampler_slot)
 {
   return texture_manager.GetSampler (sampler_slot);
 }
 
-ITexture* Device::SSGetTexture (size_t sampler_slot)
+ITexture* Device::SSGetTexture (unsigned int sampler_slot)
 {
   return texture_manager.GetTexture (sampler_slot);
 }
@@ -428,12 +428,12 @@ void Device::RSSetState (IRasterizerState* state)
   output_stage.SetRasterizerState (state);
 }
 
-void Device::RSSetViewport (size_t render_target_slot, const Viewport& viewport)
+void Device::RSSetViewport (unsigned int render_target_slot, const Viewport& viewport)
 {
   render_target_manager.SetViewport (render_target_slot, viewport);
 }
 
-void Device::RSSetScissor (size_t render_target_slot, const Rect& scissor_rect)
+void Device::RSSetScissor (unsigned int render_target_slot, const Rect& scissor_rect)
 {
   render_target_manager.SetScissor (render_target_slot, scissor_rect);
 }
@@ -443,12 +443,12 @@ IRasterizerState* Device::RSGetState ()
   return output_stage.GetRasterizerState ();
 }
 
-const Viewport& Device::RSGetViewport (size_t render_target_slot)
+const Viewport& Device::RSGetViewport (unsigned int render_target_slot)
 {
   return render_target_manager.GetViewport (render_target_slot);
 }
 
-const Rect& Device::RSGetScissor (size_t render_target_slot)
+const Rect& Device::RSGetScissor (unsigned int render_target_slot)
 {
   return render_target_manager.GetScissor (render_target_slot);
 }
@@ -493,7 +493,7 @@ void Device::OSSetDepthStencilState (IDepthStencilState* state)
   output_stage.SetDepthStencilState (state);
 }
 
-void Device::OSSetStencilReference (size_t reference)
+void Device::OSSetStencilReference (unsigned int reference)
 {
   output_stage.SetStencilReference (reference);
 }
@@ -508,7 +508,7 @@ IDepthStencilState* Device::OSGetDepthStencilState ()
   return output_stage.GetDepthStencilState ();
 }
 
-size_t Device::OSGetStencilReference ()
+unsigned int Device::OSGetStencilReference ()
 {
   return output_stage.GetStencilReference ();
 }
@@ -517,7 +517,7 @@ size_t Device::OSGetStencilReference ()
     ”правление менеджером целевых буферов отрисовки
 */
 
-ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
+ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, unsigned int buffer_index)
 {
   try
   {
@@ -556,17 +556,17 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
   }
 }
 
-void Device::OSSetRenderTargets (size_t count, IView** render_target_views, IView* depth_stencil_view)
+void Device::OSSetRenderTargets (unsigned int count, IView** render_target_views, IView* depth_stencil_view)
 {
   try
   {
     if (!render_target_views && count)
       throw xtl::make_null_argument_exception ("", "render_target_views");
 
-    for (size_t i=0; i<count; i++)
+    for (unsigned int i=0; i<count; i++)
       render_target_manager.SetRenderTargetView (i, render_target_views [i]);
 
-    for (size_t i=count; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+    for (unsigned int i=count; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
       render_target_manager.SetRenderTargetView (i, 0);
 
     render_target_manager.SetDepthStencilView (depth_stencil_view);
@@ -578,7 +578,7 @@ void Device::OSSetRenderTargets (size_t count, IView** render_target_views, IVie
   }
 }
 
-void Device::OSSetRenderTargetView (size_t render_target_slot, IView* render_target_view)
+void Device::OSSetRenderTargetView (unsigned int render_target_slot, IView* render_target_view)
 {
   render_target_manager.SetRenderTargetView (render_target_slot, render_target_view);
 }
@@ -588,7 +588,7 @@ void Device::OSSetDepthStencilView (IView* depth_stencil_view)
   render_target_manager.SetDepthStencilView (depth_stencil_view);
 }
 
-IView* Device::OSGetRenderTargetView (size_t render_target_slot)
+IView* Device::OSGetRenderTargetView (unsigned int render_target_slot)
 {
   return render_target_manager.GetRenderTargetView (render_target_slot);
 }
@@ -598,17 +598,17 @@ IView* Device::OSGetDepthStencilView ()
   return render_target_manager.GetDepthStencilView ();
 }
 
-void Device::ClearRenderTargetView (size_t view_index, const Color4f& color)
+void Device::ClearRenderTargetView (unsigned int view_index, const Color4f& color)
 {
   render_target_manager.ClearRenderTargetView (view_index, color);
 }
 
-void Device::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
+void Device::ClearDepthStencilView (unsigned int clear_flags, float depth, unsigned char stencil)
 {
   render_target_manager.ClearDepthStencilView (clear_flags, depth, stencil);
 }
 
-void Device::ClearViews (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil)
+void Device::ClearViews (unsigned int clear_flags, unsigned int views_count, const unsigned int* view_indices, const Color4f* colors, float depth, unsigned char stencil)
 {
   render_target_manager.ClearViews (clear_flags, views_count, view_indices, colors, depth, stencil);
 }
@@ -689,7 +689,7 @@ void Device::ExecuteCommandList (ICommandList* list, bool restore_state)
     ”становка состо€ни€ устройства в контекст OpenGL
 */
 
-void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)
+void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLayout* out_indices_layout)
 {
   try
   {
@@ -806,7 +806,7 @@ GLenum get_mode (PrimitiveType type, const char* source)
 
 }
 
-void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count)
+void Device::Draw (PrimitiveType primitive_type, unsigned int first_vertex, unsigned int vertices_count)
 {
   try
   {
@@ -838,7 +838,7 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
   }
 }
 
-void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex)
+void Device::DrawIndexed (PrimitiveType primitive_type, unsigned int first_index, unsigned int indices_count, unsigned int base_vertex)
 {
   try
   {
@@ -872,12 +872,12 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
   }
 }
 
-void Device::DrawInstanced (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location)
+void Device::DrawInstanced (PrimitiveType primitive_type, unsigned int vertex_count_per_instance, unsigned int instance_count, unsigned int first_vertex, unsigned int first_instance_location)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawInstanced");
 }
 
-void Device::DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location)
+void Device::DrawIndexedInstanced (PrimitiveType primitive_type, unsigned int index_count_per_instance, unsigned int instance_count, unsigned int first_index, unsigned int base_vertex, unsigned int first_instance_location)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawIndexedInstanced");
 }

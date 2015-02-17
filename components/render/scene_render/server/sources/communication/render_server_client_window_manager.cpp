@@ -67,7 +67,7 @@ struct ClientWindow: public xtl::reference_counter, public manager::INativeWindo
   }
 
 /// События окна
-  void OnSizeChanged (size_t width, size_t height)
+  void OnSizeChanged (unsigned int width, unsigned int height)
   {
     try
     {

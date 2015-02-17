@@ -36,7 +36,7 @@ class InputStageState: public IStageState
     }
 
       //установка вершинного буфера
-    void SetVertexBuffer (size_t slot, Buffer* buffer)
+    void SetVertexBuffer (unsigned int slot, Buffer* buffer)
     {
       if (buffer == vertex_buffers [slot])
         return;
@@ -47,7 +47,7 @@ class InputStageState: public IStageState
     }
     
       //получение вершинного буфера
-    Buffer* GetVertexBuffer (size_t slot) const
+    Buffer* GetVertexBuffer (unsigned int slot) const
     {
       return vertex_buffers [slot].get ();
     }
@@ -96,7 +96,7 @@ class InputStageState: public IStageState
       if (mask.is_layout)
         SetInputLayout (source.GetInputLayout ());
 
-      for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
         if (mask.is_vertex_buffers [i])
           SetVertexBuffer (i, source.GetVertexBuffer (i));
 
@@ -239,7 +239,7 @@ struct InputStage::Impl: public ContextObject
         Установка / получение вершинного буфера
     */
     
-    void SetVertexBuffer (size_t slot, IBuffer* in_buffer)
+    void SetVertexBuffer (unsigned int slot, IBuffer* in_buffer)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::SetVertexBuffer";
       
@@ -254,7 +254,7 @@ struct InputStage::Impl: public ContextObject
       state.SetVertexBuffer (slot, buffer);
     }  
 
-    IBuffer* GetVertexBuffer (size_t slot)
+    IBuffer* GetVertexBuffer (unsigned int slot)
     {
       if (slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
         throw xtl::make_range_exception ("render::low_level::opengl::InputStage::Impl::GetVertexBuffer", "slot", slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
@@ -284,7 +284,7 @@ struct InputStage::Impl: public ContextObject
         Установка состояния уровня в контекст OpenGL
     */
       
-    void Bind (size_t base_vertex, size_t base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)  
+    void Bind (unsigned int base_vertex, unsigned int base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
     {
       try
       {
@@ -308,7 +308,7 @@ struct InputStage::Impl: public ContextObject
   private:
     InputStageState state;                   //состояние уровня
     InputLayoutPtr  default_layout;          //состояние расположения геометрии по умолчанию  
-    size_t          ffp_texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно для FFP
+    unsigned int    ffp_texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно для FFP
 };
 
 /*
@@ -415,7 +415,7 @@ IInputLayout* InputStage::GetInputLayout () const
     Управление вершинными буферами
 */
 
-void InputStage::SetVertexBuffer (size_t slot, IBuffer* buffer)
+void InputStage::SetVertexBuffer (unsigned int slot, IBuffer* buffer)
 {
   try
   {
@@ -428,7 +428,7 @@ void InputStage::SetVertexBuffer (size_t slot, IBuffer* buffer)
   }
 }
 
-IBuffer* InputStage::GetVertexBuffer (size_t slot) const
+IBuffer* InputStage::GetVertexBuffer (unsigned int slot) const
 {
   try
   {
@@ -467,7 +467,7 @@ IBuffer* InputStage::GetIndexBuffer () const
     Установка состояния уровня в контекст OpenGL
 */
 
-void InputStage::Bind (size_t base_vertex, size_t base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
+void InputStage::Bind (unsigned int base_vertex, unsigned int base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
 {
   try
   {

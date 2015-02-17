@@ -184,7 +184,7 @@ void dump_stack (lua_State* state, stl::string& buffer)
 }
 
 //проверка возможности поместить в стек count аргументов 
-void check_stack (lua_State* state, size_t count)
+void check_stack (lua_State* state, unsigned int count)
 {
   if (!lua_checkstack (state, count))
     throw xtl::format_exception<StackException> ("script::lua::check_stack", "Not enough stack space."
@@ -195,9 +195,9 @@ namespace
 {
 
 //проверка наличия элемента в стеке
-void check_item_index (lua_State* state, size_t index, const char* function_name)
+void check_item_index (lua_State* state, unsigned int index, const char* function_name)
 {
-  size_t stack_size = lua_gettop (state) + 1; 
+  unsigned int stack_size = lua_gettop (state) + 1;
 
   if (index >= stack_size)
     throw xtl::format_exception<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
@@ -206,7 +206,7 @@ void check_item_index (lua_State* state, size_t index, const char* function_name
 }
 
 //проверка корректности типа элемента, извлекаемого из стека
-void check_item (lua_State* state, size_t index, int expected_type, const char* function_name)
+void check_item (lua_State* state, unsigned int index, int expected_type, const char* function_name)
 {
     //проверка корректности индекса элемента
 

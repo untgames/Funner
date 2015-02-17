@@ -26,7 +26,7 @@ try
     depth_render_target_name = common::get<const char*> (node, "depth_render_target");
     local_texture_name       = common::get<const char*> (node, "framemap");
 
-    size_t layers_count = depth_map.Depth ();
+    unsigned int layers_count = depth_map.Depth ();
 
     if (layers_count > 1)
       throw xtl::format_operation_exception ("", "More than one depth render target not implemented");
@@ -36,7 +36,7 @@ try
 
     manager::Frame& frame = Frame ();
 
-    for (size_t i=0; i<layers_count; i++)
+    for (unsigned int i=0; i<layers_count; i++)
     {
       manager::RenderTarget color_target = color_map.RenderTarget (i, 0),
                             depth_target = depth_map.RenderTarget (i, 0);

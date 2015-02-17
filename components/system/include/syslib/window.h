@@ -18,7 +18,7 @@ class Screen;
 struct window_handle;
 typedef window_handle* window_t;
 
-const size_t MAX_TOUCHES_COUNT = 16;
+const unsigned int MAX_TOUCHES_COUNT = 16;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—тиль окна
@@ -88,10 +88,10 @@ enum WindowEvent
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Point
 {
-  size_t x, y;
+  unsigned int x, y;
 
   Point ();
-  Point (size_t x, size_t y);
+  Point (unsigned int x, unsigned int y);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,10 +99,10 @@ struct Point
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Rect
 {
-  size_t left, top, right, bottom;
+  unsigned int left, top, right, bottom;
   
   Rect ();
-  Rect (size_t left, size_t top, size_t right, size_t bottom);
+  Rect (unsigned int left, unsigned int top, unsigned int right, unsigned int bottom);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ struct WindowEventContext
   float         mouse_vertical_wheel_delta;      //изменение положени€ вертикального колеса мыши (в строках)
   float         mouse_horisontal_wheel_delta;    //изменение положени€ горизонтального колеса мыши (в строках)
   Touch         touches [MAX_TOUCHES_COUNT];     //сработавшие касани€
-  size_t        touches_count;                   //количество касаний в массиве touches
+  unsigned int  touches_count;                   //количество касаний в массиве touches
   Key           key;                             //клавиша клавиатуры
   ScanCode      key_scan_code;                   //скэн-код клавиши клавиатуры
   wchar_t       char_code;                       //код символа
@@ -205,14 +205,14 @@ class Window: public xtl::dynamic_cast_root //убрать!!
     Window  (window_t handle);
     Window  (const char* init_string = ""); //создаЄтс€ закрытое окно
     Window  (WindowStyle style, const char* init_string = "");
-    Window  (WindowStyle style, size_t width, size_t height, const char* init_string = "");
+    Window  (WindowStyle style, unsigned int width, unsigned int height, const char* init_string = "");
     ~Window ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Init (WindowStyle style);
-    void Init (WindowStyle style, size_t width, size_t height);
+    void Init (WindowStyle style, unsigned int width, unsigned int height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«акрытие окна
@@ -240,16 +240,16 @@ class Window: public xtl::dynamic_cast_root //убрать!!
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–азмеры окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width           () const;
-    size_t Height          () const;
-    size_t ClientWidth     () const;
-    size_t ClientHeight    () const;
-    void   SetWidth        (size_t width);
-    void   SetHeight       (size_t height);
-    void   SetSize         (size_t width, size_t height);
-    void   SetClientWidth  (size_t width);
-    void   SetClientHeight (size_t height);
-    void   SetClientSize   (size_t width, size_t height);
+    unsigned int Width           () const;
+    unsigned int Height          () const;
+    unsigned int ClientWidth     () const;
+    unsigned int ClientHeight    () const;
+    void         SetWidth        (unsigned int width);
+    void         SetHeight       (unsigned int height);
+    void         SetSize         (unsigned int width, unsigned int height);
+    void         SetClientWidth  (unsigned int width);
+    void         SetClientHeight (unsigned int height);
+    void         SetClientSize   (unsigned int width, unsigned int height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбласть окна / клиентска€ область
@@ -276,14 +276,14 @@ class Window: public xtl::dynamic_cast_root //убрать!!
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Point Position    () const;
     void  SetPosition (const Point& position);
-    void  SetPosition (size_t x, size_t y);
+    void  SetPosition (unsigned int x, unsigned int y);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕоложение курсора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Point CursorPosition    () const;    
     void  SetCursorPosition (const Point&);
-    void  SetCursorPosition (size_t x, size_t y);
+    void  SetCursorPosition (unsigned int x, unsigned int y);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬идимость курсора

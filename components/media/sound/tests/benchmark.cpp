@@ -64,17 +64,17 @@ int main ()
 	  //test file decode speed
       SoundSample sample (file_name);
 
-      double total_duration = sample.Duration () * DECODE_FILE_COUNT;
-      size_t total_samples  = sample.SamplesCount (),
-             buffer_samples = sample.SecondsToSamples (10),
-             buffer_size    = sample.SamplesToBytes (1) * buffer_samples;
-      char   *data_buffer   = new char [buffer_size];
+      double       total_duration = sample.Duration () * DECODE_FILE_COUNT;
+      unsigned int total_samples  = sample.SamplesCount (),
+                   buffer_samples = sample.SecondsToSamples (10),
+                   buffer_size    = sample.SamplesToBytes (1) * buffer_samples;
+      char         *data_buffer   = new char [buffer_size];
 
 	  start_time = common::milliseconds ();
 
       for (size_t j = 0; j < DECODE_FILE_COUNT; j++)
       {
-        for (size_t k = 0; k < total_samples;)
+        for (unsigned int k = 0; k < total_samples;)
           k += sample.Read (k, buffer_samples, data_buffer);
       }
 

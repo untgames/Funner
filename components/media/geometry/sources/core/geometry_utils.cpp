@@ -13,7 +13,7 @@ namespace geometry
 {
 
 //размер типа атрибута вершин в байтах
-size_t get_type_size (VertexAttributeType type)
+unsigned short get_type_size (VertexAttributeType type)
 {
   switch (type)
   {
@@ -32,7 +32,7 @@ size_t get_type_size (VertexAttributeType type)
 }
 
 //количество компонентов
-size_t get_components_count (VertexAttributeType type)
+unsigned char get_components_count (VertexAttributeType type)
 {
   switch (type)
   {
@@ -247,7 +247,7 @@ const char* get_index_type_name (IndexType type)
   }
 }
 
-size_t get_index_type_size (IndexType type)
+unsigned char get_index_type_size (IndexType type)
 {
   switch (type)
   {

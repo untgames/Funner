@@ -242,16 +242,16 @@ bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, int
     {
       case InternalCommandId_OnWindowAttached:
       {
-        size_t      id           = read (stream, xtl::type<uint32> ());
-        const char  *name        = read (stream, xtl::type<const char*> ()),
-                    *init_string = read (stream, xtl::type<const char*> ());
-        void*       handle       = read (stream, xtl::type<void*> ());
-        size_t      width        = read (stream, xtl::type<uint32> ()),
-                    height       = read (stream, xtl::type<uint32> ()),
-                    left         = read (stream, xtl::type<uint32> ()),
-                    top          = read (stream, xtl::type<uint32> ()),
-                    right        = read (stream, xtl::type<uint32> ()),
-                    bottom       = read (stream, xtl::type<uint32> ());
+        size_t       id           = read (stream, xtl::type<uint32> ());
+        const char   *name        = read (stream, xtl::type<const char*> ()),
+                     *init_string = read (stream, xtl::type<const char*> ());
+        void*        handle       = read (stream, xtl::type<void*> ());
+        unsigned int width        = read (stream, xtl::type<uint32> ()),
+                     height       = read (stream, xtl::type<uint32> ()),
+                     left         = read (stream, xtl::type<uint32> ()),
+                     top          = read (stream, xtl::type<uint32> ()),
+                     right        = read (stream, xtl::type<uint32> ()),
+                     bottom       = read (stream, xtl::type<uint32> ());
 
         state.OnWindowAttached (id, name, init_string, handle, width, height, left, top, right, bottom);
 
@@ -267,7 +267,7 @@ bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, int
       }
       case InternalCommandId_OnWindowSizeChanged:
       {
-        size_t id     = read (stream, xtl::type<uint32> ()),
+        uint32 id     = read (stream, xtl::type<uint32> ()),
                width  = read (stream, xtl::type<uint32> ()), 
                height = read (stream, xtl::type<uint32> ());
 
@@ -277,7 +277,7 @@ bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, int
       }
       case InternalCommandId_OnWindowViewportChanged:
       {
-        size_t id     = read (stream, xtl::type<uint32> ()),
+        uint32 id     = read (stream, xtl::type<uint32> ()),
                left   = read (stream, xtl::type<uint32> ()), 
                top    = read (stream, xtl::type<uint32> ()),
                right  = read (stream, xtl::type<uint32> ()),

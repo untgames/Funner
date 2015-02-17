@@ -16,7 +16,7 @@ ConstantBuffer::ConstantBuffer (const ContextManager& context_manager, const Buf
     Установка данных после отсечения
 */
 
-void ConstantBuffer::SetDataCore (size_t offset, size_t size, const void* data)
+void ConstantBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
 {
   SystemMemoryBuffer::SetDataCore (offset, size, data);
 

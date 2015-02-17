@@ -3,7 +3,7 @@
 */
 
 template <class T>
-inline RawArray<T>::RawArray (const T* in_data, size_t in_size)
+inline RawArray<T>::RawArray (const T* in_data, uint32 in_size)
   : size (in_size)
   , data (in_data)
 {
@@ -108,7 +108,7 @@ inline void OutputStream::EndCommand ()
 {
   Command* command = reinterpret_cast<Command*> (command_start);
 
-  command->command_size = pos - command_start;
+  command->command_size = (unsigned int)(pos - command_start);
 }
 
 /*
@@ -386,7 +386,7 @@ inline void write (OutputStream& s, const char* str)
   if (!str)
     str = "";
 
-  int32 length = strlen (str);
+  int32 length = (int32)strlen (str);
 
   write (s, length);
 

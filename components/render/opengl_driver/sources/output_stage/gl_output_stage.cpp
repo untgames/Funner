@@ -56,7 +56,7 @@ class OutputStageState: public IStageState
     DepthStencilState* GetDepthStencilState () const { return depth_stencil_state.get (); }
     
       //установка значения ссылки трафарета
-    void SetStencilReference (size_t reference)
+    void SetStencilReference (unsigned int reference)
     {
       stencil_reference = reference;
 
@@ -64,7 +64,7 @@ class OutputStageState: public IStageState
     }
 
       //получение значения ссылки трафарета
-    size_t GetStencilReference () const { return stencil_reference; }
+    unsigned int GetStencilReference () const { return stencil_reference; }
 
       //установка состояние растеризатора
     void SetRasterizerState (RasterizerState* state)
@@ -141,7 +141,7 @@ class OutputStageState: public IStageState
     OutputStageStatePtr  main_state;          //основное состояние уровня
     BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
     DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
-    size_t               stencil_reference;   //текущее значение трафарета
+    unsigned int         stencil_reference;   //текущее значение трафарета
     RasterizerStatePtr   rasterizer_state;    //состояние уровня растеризации
 };
 
@@ -370,7 +370,7 @@ void OutputStage::SetDepthStencilState (IDepthStencilState* state)
   impl->SetDepthStencilState (depth_stencil_state);
 }
 
-void OutputStage::SetStencilReference (size_t reference)
+void OutputStage::SetStencilReference (unsigned int reference)
 {
   impl->SetStencilReference (reference);
 }
@@ -380,7 +380,7 @@ IDepthStencilState* OutputStage::GetDepthStencilState () const
   return impl->GetDepthStencilState ();
 }
 
-size_t OutputStage::GetStencilReference () const
+unsigned int OutputStage::GetStencilReference () const
 {
   return impl->GetStencilReference ();
 }

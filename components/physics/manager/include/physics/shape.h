@@ -73,19 +73,19 @@ class ShapeList
     void Add    (const Shape&, const physics::Transform&);
     void Add    (const Shape&, const math::vec3f& position = math::vec3f (), const math::quatf& orientation = math::quatf ());
     void Add    (const Shape&, const math::quatf& orientation);
-    void Remove (size_t index);
+    void Remove (unsigned int index);
     void Clear  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size () const;
+    unsigned int Size () const;
     
-          Shape& operator [] (size_t index);
-    const Shape& operator [] (size_t index) const;
+          Shape& operator [] (unsigned int index);
+    const Shape& operator [] (unsigned int index) const;
 
-          physics::Transform& Transform (size_t index);
-    const physics::Transform& Transform (size_t index) const;
+          physics::Transform& Transform (unsigned int index);
+    const physics::Transform& Transform (unsigned int index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

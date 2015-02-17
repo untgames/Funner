@@ -23,7 +23,7 @@ void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& v
   if (components.Size () != Size)
     raise_parser_exception (*iter, "Invalid vector format");
 
-  for (size_t i = 0; i < Size; i++)
+  for (unsigned int i = 0; i < Size; i++)
     value [i] = (float)atof (components [i]);
 }
 
@@ -35,8 +35,8 @@ void read (Parser::Iterator iter, const char* str, math::matrix <float, Size>& v
   if (components.Size () != Size * Size)
     raise_parser_exception (*iter, "Invalid matrix format");
 
-  for (size_t i = 0; i < Size; i++)
-    for (size_t j = 0; j < Size; j++)
+  for (unsigned int i = 0; i < Size; i++)
+    for (unsigned int j = 0; j < Size; j++)
       value [i][j] = (float)atof (components [i * Size + j]);
 }
 

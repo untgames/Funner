@@ -8,10 +8,10 @@ const size_t IMAGE_DATA_BUFFER_SIZE = TEST_IMAGE_DIMENSION * TEST_IMAGE_DIMENSIO
 
 struct Rect
 {
-  size_t x;
-  size_t y;
-  size_t width;
-  size_t height;
+  unsigned int x;
+  unsigned int y;
+  unsigned int width;
+  unsigned int height;
 };
 
 void print (const Rect& rect)

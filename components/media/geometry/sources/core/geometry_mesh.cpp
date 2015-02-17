@@ -132,7 +132,7 @@ void Mesh::Rename (const char* name)
 //количество вершинных буферов
 uint32_t Mesh::VertexBuffersCount () const
 {
-  return impl->vertex_buffers.size ();
+  return (uint32_t)impl->vertex_buffers.size ();
 }
 
 const media::geometry::VertexBuffer& Mesh::VertexBuffer (uint32_t index) const
@@ -170,7 +170,7 @@ uint32_t Mesh::Attach (media::geometry::VertexBuffer& vb)
 
   impl->vertex_buffers.push_back (vb);
 
-  return impl->vertex_buffers.size () - 1;
+  return (uint32_t)impl->vertex_buffers.size () - 1;
 }
 
 void Mesh::Attach (media::geometry::IndexBuffer& ib)
@@ -208,7 +208,7 @@ void Mesh::DetachAllBuffers ()
 
 uint32_t Mesh::PrimitivesCount () const
 {
-  return impl->primitives.size ();
+  return (uint32_t)impl->primitives.size ();
 }
 
 const Primitive& Mesh::Primitive (uint32_t index) const
@@ -264,7 +264,7 @@ uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_
 
     impl->need_material_names_update = true;
 
-    return impl->primitives.size () - 1;
+    return (uint32_t)impl->primitives.size () - 1;
   }
   catch (...)
   {
@@ -387,7 +387,7 @@ PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type)
     Получение количества точек
 */
 
-size_t get_points_count (PrimitiveType type, size_t primitives_count)
+unsigned int get_points_count (PrimitiveType type, unsigned int primitives_count)
 {
   switch (type)
   {
@@ -406,7 +406,7 @@ size_t get_points_count (PrimitiveType type, size_t primitives_count)
     Определение количества примитивов
 */
 
-size_t get_primitives_count (PrimitiveType type, size_t points_count)
+unsigned int get_primitives_count (PrimitiveType type, unsigned int points_count)
 {
   switch (type)
   {

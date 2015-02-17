@@ -12,8 +12,8 @@ int main ()
 
     media::Image src_image ("data/pic2.tga", media::PixelFormat_RGB8);
 
-    size_t tex_width  = src_image.Width (),
-           tex_height = src_image.Height ();
+    unsigned int tex_width  = src_image.Width (),
+                 tex_height = src_image.Height ();
 
     TextureDesc desc;
 
@@ -45,9 +45,9 @@ int main ()
     
     char *src = (char*)src_image.Bitmap (), *dst = (char*)dst_image.Bitmap (), *diff = (char*)diff_image.Bitmap ();
     
-    for (size_t i=0; i<tex_height; i++)
-      for (size_t j=0; j<tex_width; j++)
-        for (size_t k=0; k<3; k++, src++, dst++, diff++)
+    for (unsigned int i=0; i<tex_height; i++)
+      for (unsigned int j=0; j<tex_width; j++)
+        for (unsigned int k=0; k<3; k++, src++, dst++, diff++)
           *diff = *dst - *src;
 
     diff_image.Save ("diff.tga");

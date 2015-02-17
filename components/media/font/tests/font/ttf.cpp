@@ -21,7 +21,6 @@ int main ()
   {
     common::LogFilter filter ("media.*", log_handler);
 
-//    CharsetManager::RegisterCharset (CHARSET_NAME, "ҐґЄєІіЇїАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя „“”«»¡!#$£€¥%'()*+,-–./0123456789:;=?¿@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~©ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿıŒœŠšŸŽžğƒˆˇ˘˙˚˛αδεπστφΑAΒBΓGΔDΕEΖZΗHΘQΙIΚKΛLΜMΝNΞCΟOΠPΡRΣSΤTΥUΦFΧXΨYΩWαaβbγgδdεeζzηhθqιiκkλlμmνnξcοoπpρrσsςjVτtυuφfχxψyωwŞşİª’ Ğğ…º&");
     CharsetManager::RegisterCharset (CHARSET_NAME, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     FontLibrary library;
@@ -68,7 +67,7 @@ int main ()
 
       common::FileSystem::Mkdir ("results");
 
-      for (size_t i = 0; i < rasterized_font.ImagesCount (); i++)
+      for (unsigned int i = 0; i < rasterized_font.ImagesCount (); i++)
       {
         Image image;
 

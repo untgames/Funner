@@ -30,7 +30,7 @@ class RenderTargetManagerState: public IStageState
     }
 
 ///Установка текущего отображения буфера цвета
-    void SetRenderTargetView (size_t view_index, View* view)
+    void SetRenderTargetView (unsigned int view_index, View* view)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetRenderTargetView");
     
@@ -43,7 +43,7 @@ class RenderTargetManagerState: public IStageState
     }
     
 ///Получение текущего отображения буфера цвета
-    View* GetRenderTargetView (size_t view_index)
+    View* GetRenderTargetView (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetRenderTargetView");
 
@@ -52,14 +52,14 @@ class RenderTargetManagerState: public IStageState
 
     void GetRenderTargetViews (View* views [DEVICE_RENDER_TARGET_SLOTS_COUNT])
     {
-      for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         views [i] = render_targets [i].view.get ();
     }
 
 ///Получение состояния буферов цвета
     void HasRenderTargetViews (bool state [DEVICE_RENDER_TARGET_SLOTS_COUNT])
     {
-      for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         state [i] = render_targets [i].view.get () != 0;
     }
     
@@ -78,7 +78,7 @@ class RenderTargetManagerState: public IStageState
     View* GetDepthStencilView () { return depth_stencil_view.get (); }    
 
 ///Установка текущей области вывода
-    void SetViewport (size_t view_index, const Viewport& in_viewport)
+    void SetViewport (unsigned int view_index, const Viewport& in_viewport)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetViewport");
 
@@ -89,7 +89,7 @@ class RenderTargetManagerState: public IStageState
     }
     
 ///Получение текущей области вывода
-    const Viewport& GetViewport (size_t view_index)
+    const Viewport& GetViewport (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetViewport");
 
@@ -97,7 +97,7 @@ class RenderTargetManagerState: public IStageState
     }
     
 ///Установка текущей области отсечения
-    void SetScissor (size_t view_index, const Rect& in_scissor)
+    void SetScissor (unsigned int view_index, const Rect& in_scissor)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetScissor");
 
@@ -108,7 +108,7 @@ class RenderTargetManagerState: public IStageState
     }
 
 ///Получение текущей области отсечения
-    const Rect& GetScissor (size_t view_index)
+    const Rect& GetScissor (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetScissor");
 
@@ -116,7 +116,7 @@ class RenderTargetManagerState: public IStageState
     }
 
 ///Получение хэша области вывода
-    size_t GetViewportHash (size_t view_index)
+    size_t GetViewportHash (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetViewportHash");
 
@@ -130,7 +130,7 @@ class RenderTargetManagerState: public IStageState
       return render_target.viewport_hash;
     }
 
-    size_t GetViewportRectHash (size_t view_index)
+    size_t GetViewportRectHash (unsigned int view_index)
     {
       GetViewportHash (view_index); //for update
 
@@ -138,7 +138,7 @@ class RenderTargetManagerState: public IStageState
     }
 
 ///Получение хэша области отсечения
-    size_t GetScissorHash (size_t view_index)
+    size_t GetScissorHash (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetScissorHash");
 
@@ -171,7 +171,7 @@ class RenderTargetManagerState: public IStageState
     {
       if (mask.os_render_target_views || mask.rs_viewports || mask.rs_scissors)
       {
-        for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+        for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         {
           if (mask.os_render_target_views) SetRenderTargetView (i, source.GetRenderTargetView (i));
           if (mask.rs_viewports)           SetViewport (i, source.GetViewport (i));
@@ -198,7 +198,7 @@ class RenderTargetManagerState: public IStageState
 ///Получение буфера цвета
     struct RenderTargetDesc;
 
-    RenderTargetDesc& GetRenderTarget (size_t view_index, const char* source)
+    RenderTargetDesc& GetRenderTarget (unsigned int view_index, const char* source)
     {
       if (view_index >= DEVICE_RENDER_TARGET_SLOTS_COUNT)
         throw xtl::make_range_exception (source, "render_target_slot", view_index, DEVICE_RENDER_TARGET_SLOTS_COUNT);
@@ -313,7 +313,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       
         //инициализация области отсечения
       
-      for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         SetViewport (i, default_viewport);      
       
       Rect default_scissor;      
@@ -323,7 +323,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       default_scissor.width  = swap_chain_desc.frame_buffer.width;
       default_scissor.height = swap_chain_desc.frame_buffer.height;        
 
-      for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         SetScissor (i, default_scissor);
     }
     
@@ -343,7 +343,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     }
     
 ///Установка текущих отображений
-    void SetRenderTargetView (size_t render_target_slot, IView* in_render_target_view)
+    void SetRenderTargetView (unsigned int render_target_slot, IView* in_render_target_view)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::RenderTargetManager::Impl::SetRenderTargetView";
       
@@ -413,7 +413,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     }
 
 ///Установка областей вывода и отсечения
-    void UpdateViewportAndScissor (size_t render_target_slot)
+    void UpdateViewportAndScissor (unsigned int render_target_slot)
     {
       try
       {
@@ -459,7 +459,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     }
 
 ///Очистка буферов цвета и глубина-трафарет
-    void ClearViews (size_t clear_flags, size_t views_count, const size_t* render_target_indices, const Color4f* colors, float depth, unsigned char stencil)
+    void ClearViews (unsigned int clear_flags, unsigned int views_count, const unsigned int* render_target_indices, const Color4f* colors, float depth, unsigned char stencil)
     {
       //TODO: MRT support
 
@@ -627,7 +627,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
         if (need_restore_stencil_write_mask)
         {
-          glStencilMask (GetContextCacheValue (CacheEntry_StencilWriteMask));
+          glStencilMask ((unsigned int)GetContextCacheValue (CacheEntry_StencilWriteMask));
         }
 
         if (need_restore_scissor_test)
@@ -669,7 +669,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
       GetRenderTargetViews (render_target_views);
 
-      for (size_t i=1; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      for (unsigned int i=1; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         if (render_target_views [i])
           throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderTargetManager::GetCurrentFrameBuffer", "MRT is not yet supported");
 
@@ -697,7 +697,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     FrameBufferPtr       updatable_frame_buffer;     //обновляемый буфера кадра
     ViewPtr              default_render_target_view; //отображение буфера цвета по умолчанию
     ViewPtr              default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию
-    size_t               clear_views_mask;           //маска буферов, которые можно очищать (необходима для работы с Direct3D wrapper)
+    unsigned int         clear_views_mask;           //маска буферов, которые можно очищать (необходима для работы с Direct3D wrapper)
 };
 
 /*
@@ -740,7 +740,7 @@ ITexture* RenderTargetManager::CreateTexture (const TextureDesc& desc)
   }
 }
 
-ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
+ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* swap_chain, unsigned int buffer_index)
 {
   try
   {
@@ -790,7 +790,7 @@ IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc& desc)
     Выбор целевых отображений
 */
 
-void RenderTargetManager::SetRenderTargetView (size_t render_target_slot, IView* render_target_view)
+void RenderTargetManager::SetRenderTargetView (unsigned int render_target_slot, IView* render_target_view)
 {
   try
   {
@@ -816,7 +816,7 @@ void RenderTargetManager::SetDepthStencilView (IView* depth_stencil_view)
   }
 }
 
-IView* RenderTargetManager::GetRenderTargetView (size_t render_target_slot) const
+IView* RenderTargetManager::GetRenderTargetView (unsigned int render_target_slot) const
 {
   return impl->GetRenderTargetView (render_target_slot);
 }
@@ -835,22 +835,22 @@ void RenderTargetManager::HasRenderTargetViews (bool states [DEVICE_RENDER_TARGE
     Настройка областей вывода и отсечения
 */
 
-void RenderTargetManager::SetViewport (size_t render_target_slot, const Viewport& viewport)
+void RenderTargetManager::SetViewport (unsigned int render_target_slot, const Viewport& viewport)
 {
   impl->SetViewport (render_target_slot, viewport);
 }
 
-void RenderTargetManager::SetScissor (size_t render_target_slot, const Rect& scissor_rect)
+void RenderTargetManager::SetScissor (unsigned int render_target_slot, const Rect& scissor_rect)
 {
   impl->SetScissor (render_target_slot, scissor_rect);
 }
 
-const Viewport& RenderTargetManager::GetViewport (size_t render_target_slot) const
+const Viewport& RenderTargetManager::GetViewport (unsigned int render_target_slot) const
 {
   return impl->GetViewport (render_target_slot);
 }
 
-const Rect& RenderTargetManager::GetScissor (size_t render_target_slot) const
+const Rect& RenderTargetManager::GetScissor (unsigned int render_target_slot) const
 {
   return impl->GetScissor (render_target_slot);
 }
@@ -860,20 +860,20 @@ const Rect& RenderTargetManager::GetScissor (size_t render_target_slot) const
     Очистка буферов отрисовки
 */
 
-void RenderTargetManager::ClearRenderTargetView (size_t render_target_slot, const Color4f& color)
+void RenderTargetManager::ClearRenderTargetView (unsigned int render_target_slot, const Color4f& color)
 {  
   impl->ClearViews (ClearFlag_RenderTarget, 1, &render_target_slot, &color, 0.0f, 0);
 }
 
-void RenderTargetManager::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
+void RenderTargetManager::ClearDepthStencilView (unsigned int clear_flags, float depth, unsigned char stencil)
 {
-  size_t  view_index = 0;
-  Color4f clear_color;
+  unsigned int view_index = 0;
+  Color4f      clear_color;
 
   impl->ClearViews (ClearFlag_Depth | ClearFlag_Stencil, 0, &view_index, &clear_color, depth, stencil);
 }
 
-void RenderTargetManager::ClearViews (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil)
+void RenderTargetManager::ClearViews (unsigned int clear_flags, unsigned int views_count, const unsigned int* view_indices, const Color4f* colors, float depth, unsigned char stencil)
 {
   impl->ClearViews (clear_flags, views_count, view_indices, colors, depth, stencil);
 }

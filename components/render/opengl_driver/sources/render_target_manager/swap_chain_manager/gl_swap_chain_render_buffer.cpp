@@ -98,7 +98,7 @@ void SwapChainRenderBuffer::SetFrameBuffer (GLenum buffer_type)
 SwapChainColorBuffer::SwapChainColorBuffer
  (const FrameBufferManagerPtr& manager,
   ISwapChain*                  swap_chain,
-  size_t                       in_buffer_index)
+  unsigned int                 in_buffer_index)
   : SwapChainRenderBuffer (manager, RenderTargetType_Color, swap_chain),
     buffer_index (in_buffer_index),
     is_shadow (false)
@@ -300,7 +300,7 @@ SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer (const ContextM
     case AccessFlag_ReadWrite:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.access_flags=%s (incompatible with pbuffer emulation mode)", get_name ((AccessFlag)desc.access_flags));
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", (size_t)desc.access_flags);
   }
   
   switch (desc.usage_mode)  
@@ -347,13 +347,13 @@ void SwapChainFakeDepthStencilBuffer::GetDesc (TextureDesc& out_desc)
     Работа с данными
 */
 
-void SwapChainFakeDepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext*)
+void SwapChainFakeDepthStencilBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext*)
 {
   throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::SetData",
     "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
 }
 
-void SwapChainFakeDepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext*)
+void SwapChainFakeDepthStencilBuffer::GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext*)
 {
   throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::GetData",
     "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");

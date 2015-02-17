@@ -110,7 +110,7 @@ void ConnectionState::SynchronizeProperties ()
     Команды клиента: окна
 */
 
-void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
+void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)
 {
   try
   {
@@ -136,7 +136,7 @@ void ConnectionState::OnWindowDetached (size_t id)
   }
 }
 
-void ConnectionState::OnWindowSizeChanged (size_t id, size_t width, size_t height)
+void ConnectionState::OnWindowSizeChanged (size_t id, unsigned int width, unsigned int height)
 {
   try
   {
@@ -149,7 +149,7 @@ void ConnectionState::OnWindowSizeChanged (size_t id, size_t width, size_t heigh
   }
 }
 
-void ConnectionState::OnWindowViewportChanged (size_t id, size_t left, size_t top, size_t right, size_t bottom)
+void ConnectionState::OnWindowViewportChanged (size_t id, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)
 {
   try
   {

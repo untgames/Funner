@@ -103,10 +103,10 @@ class ConnectionState: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnWindowAttached        (size_t window_id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowAttached        (size_t window_id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom);
     void OnWindowDetached        (size_t window_id);
-    void OnWindowSizeChanged     (size_t window_id, size_t width, size_t height);
-    void OnWindowViewportChanged (size_t window_id, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowSizeChanged     (size_t window_id, unsigned int width, unsigned int height);
+    void OnWindowViewportChanged (size_t window_id, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom);
     void OnWindowHandleChanged   (size_t window_id, void* handle);
     void OnWindowPaint           (size_t window_id);
 

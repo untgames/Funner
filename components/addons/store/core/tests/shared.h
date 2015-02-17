@@ -17,8 +17,7 @@ using namespace store;
 
 void dump (const PropertyMap& properties)
 {
-  printf ("    map has %u properties (hash=%08x, layout_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.LayoutHash ());
+  printf ("    map has %u properties:\n", properties.Size ());
 
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {
@@ -35,7 +34,7 @@ void dump (const Product& product)
   printf ("Product:\n");
   printf ("  description '%s'\n", product.Description ());
   printf ("  id          '%s'\n", product.Id ());
-  printf ("  handle       %d\n",  product.Handle ());
+  printf ("  handle       %d\n",  (int)product.Handle ());
   printf ("  properties:\n");
   dump (product.Properties ());
 }
@@ -61,7 +60,7 @@ void dump (const Transaction& transaction)
   printf ("  product id  '%s'\n", transaction.ProductId ());
   printf ("  quantity     %d\n", transaction.Quantity ());
   printf ("  receipt     '%s'\n", transaction.ReceiptBase64 ());
-  printf ("  handle       %d\n",  transaction.Handle ());
+  printf ("  handle       %d\n",  (int)transaction.Handle ());
   printf ("  properties:\n");
   dump (transaction.Properties ());
 }

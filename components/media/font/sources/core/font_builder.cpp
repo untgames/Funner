@@ -115,12 +115,12 @@ void FontBuilder::SetStyleName (const char* new_style_name)
    Получение/изменение размера таблицы глифов
 */
 
-void FontBuilder::SetGlyphsCount (size_t new_glyphs_count)
+void FontBuilder::SetGlyphsCount (unsigned int new_glyphs_count)
 {
   impl->font_impl->SetGlyphsCount (new_glyphs_count);
 }
 
-size_t FontBuilder::GlyphsCount () const
+unsigned int FontBuilder::GlyphsCount () const
 {
   return impl->font_impl->GlyphsCount ();
 }
@@ -129,12 +129,12 @@ size_t FontBuilder::GlyphsCount () const
    Получение/изменение кода первого глифа
 */
 
-void FontBuilder::SetFirstGlyphCode (size_t new_first_glyph_code)
+void FontBuilder::SetFirstGlyphCode (unsigned int new_first_glyph_code)
 {
   impl->font_impl->SetFirstGlyphCode (new_first_glyph_code);
 }
 
-size_t FontBuilder::FirstGlyphCode () const
+unsigned int FontBuilder::FirstGlyphCode () const
 {
   return impl->font_impl->FirstGlyphCode ();
 }
@@ -143,12 +143,12 @@ size_t FontBuilder::FirstGlyphCode () const
    Получение/изменение размера шрифта
 */
 
-void FontBuilder::SetFontSize (size_t new_font_size)
+void FontBuilder::SetFontSize (unsigned int new_font_size)
 {
   impl->font_impl->SetFontSize (new_font_size);
 }
 
-size_t FontBuilder::FontSize () const
+unsigned int FontBuilder::FontSize () const
 {
   return impl->font_impl->FontSize ();
 }
@@ -171,12 +171,12 @@ GlyphInfo* FontBuilder::Glyphs ()
    Добавление/получение/удаление информации о кёрнингах
 */
 
-void FontBuilder::InsertKerning (size_t left_glyph_index, size_t right_glyph_index, const KerningInfo& kerning_info)
+void FontBuilder::InsertKerning (unsigned int left_glyph_index, unsigned int right_glyph_index, const KerningInfo& kerning_info)
 {
   impl->font_impl->InsertKerning (left_glyph_index, right_glyph_index, kerning_info);
 }
 
-void FontBuilder::RemoveKerning (size_t left_glyph_index, size_t right_glyph_index)
+void FontBuilder::RemoveKerning (unsigned int left_glyph_index, unsigned int right_glyph_index)
 {
   impl->font_impl->RemoveKerning (left_glyph_index, right_glyph_index);
 }
@@ -186,12 +186,12 @@ void FontBuilder::RemoveAllKernings ()
   impl->font_impl->RemoveAllKernings ();
 }
 
-KerningInfo FontBuilder::Kerning (size_t left_glyph_index, size_t right_glyph_index) const
+KerningInfo FontBuilder::Kerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   return impl->font_impl->Kerning (left_glyph_index, right_glyph_index);
 }
 
-bool FontBuilder::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
+bool FontBuilder::HasKerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   return impl->font_impl->HasKerning (left_glyph_index, right_glyph_index);
 }

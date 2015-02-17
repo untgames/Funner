@@ -152,12 +152,12 @@ void SoundSample::Rename (const char* new_name)
    Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
 */
 
-size_t SoundSample::SamplesToBytes (size_t sample_count) const
+unsigned int SoundSample::SamplesToBytes (unsigned int sample_count) const
 {
   return impl->info.bits_per_sample / 8 * sample_count * impl->info.channels;
 }
 
-size_t SoundSample::BytesToSamples (size_t byte_count) const
+unsigned int SoundSample::BytesToSamples (unsigned int byte_count) const
 {
   if (!impl->info.bits_per_sample || !impl->info.channels)
     return 0;
@@ -165,7 +165,7 @@ size_t SoundSample::BytesToSamples (size_t byte_count) const
   return byte_count / (impl->info.bits_per_sample / 8 * impl->info.channels);
 }
 
-double SoundSample::SamplesToSeconds (size_t sample_count) const
+double SoundSample::SamplesToSeconds (unsigned int sample_count) const
 {
   if (!impl->info.frequency)
     return 0;
@@ -173,36 +173,36 @@ double SoundSample::SamplesToSeconds (size_t sample_count) const
   return (double)sample_count / (double)impl->info.frequency;
 }
 
-size_t SoundSample::SecondsToSamples (double second_count) const
+unsigned int SoundSample::SecondsToSamples (double second_count) const
 {
-  return size_t(impl->info.frequency * second_count);
+  return unsigned int(impl->info.frequency * second_count);
 }
 
 /*
    Характеристики
 */
 
-size_t SoundSample::SamplesCount () const
+unsigned int SoundSample::SamplesCount () const
 {
   return impl->info.samples_count;
 }
 
-size_t SoundSample::SizeInBytes () const
+unsigned int SoundSample::SizeInBytes () const
 {
   return impl->info.samples_count * impl->info.bits_per_sample / 8 * impl->info.channels;
 }
 
-size_t SoundSample::Frequency () const
+unsigned int SoundSample::Frequency () const
 {
   return impl->info.frequency;
 }
 
-size_t SoundSample::Channels () const
+unsigned short SoundSample::Channels () const
 {
   return impl->info.channels;
 }
 
-size_t SoundSample::BitsPerSample () const
+unsigned char SoundSample::BitsPerSample () const
 {
   return impl->info.bits_per_sample;
 }
@@ -211,7 +211,7 @@ size_t SoundSample::BitsPerSample () const
    Работа с данными
 */
 
-size_t SoundSample::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int SoundSample::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   if (first_sample >= impl->info.samples_count)
     return 0;

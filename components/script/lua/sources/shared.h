@@ -100,24 +100,24 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество аргументов в стеке
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size ();
+    unsigned int Size ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    float       GetFloat   (size_t index);
-    int         GetInteger (size_t index);
-    bool        GetBoolean (size_t index);
-    void*       GetPointer (size_t index);
-    const char* GetString  (size_t index);
-    ISymbol*    GetSymbol  (size_t index);
-    xtl::any&   GetVariant (size_t index);
+    float       GetFloat   (unsigned int index);
+    ptrdiff_t   GetInteger (unsigned int index);
+    bool        GetBoolean (unsigned int index);
+    void*       GetPointer (unsigned int index);
+    const char* GetString  (unsigned int index);
+    ISymbol*    GetSymbol  (unsigned int index);
+    xtl::any&   GetVariant (unsigned int index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение аргументов в стек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Push       (float value);
-    void Push       (int value);
+    void Push       (ptrdiff_t value);
     void Push       (bool value);
     void Push       (void* pointer);
     void Push       (const char* string);
@@ -128,7 +128,7 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Pop (size_t arguments_count);    
+    void Pop (unsigned int arguments_count);
 
   private:
     lua_State*        state;
@@ -249,7 +249,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вызов функции луа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Invoke (size_t arguments_count, size_t results_count);
+    void Invoke (unsigned int arguments_count, unsigned int results_count);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -280,9 +280,9 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     void        StartProfiling    ();
     void        StopProfiling     ();
     void        UpdateProfileInfo ();
-    void        CleanProfileInfo ();
-    const char* ProfileTreeState  (size_t max_lines);
-    const char* ProfileFlatState  (size_t max_lines);
+    void        CleanProfileInfo  ();
+    const char* ProfileTreeState  (unsigned int max_lines);
+    const char* ProfileFlatState  (unsigned int max_lines);
 
   private:
     //Информация для профилирования lua-функций
@@ -318,8 +318,8 @@ int  variant_destroy  (lua_State*); //удаление объекта вариантного типа данных
 int  variant_tostring (lua_State*); //печать в строку состояния объекта пользовательского типа данных
 int  safe_call        (lua_State*, int (*f)(lua_State*)); //безопасный вызов шлюза
 void dump_stack       (lua_State*, stl::string& buffer); //печать состояния стека
-void check_stack      (lua_State* state, size_t count = 1); //проверка возможности поместить в стек count аргументов
-void check_item       (lua_State* state, size_t index, int expected_type, const char* function_name); //проверка корректности типа элемента, извлекаемого из стека
+void check_stack      (lua_State* state, unsigned int count = 1); //проверка возможности поместить в стек count аргументов
+void check_item       (lua_State* state, unsigned int index, int expected_type, const char* function_name); //проверка корректности типа элемента, извлекаемого из стека
 void raise_error      (lua_State* state, const char* source); //получение сообщения об ошибке
 
 //получение строки с местом вызова

@@ -49,9 +49,9 @@ struct KerningInfo
 //////////////////////////////////////////////////////////////////////////////////////////////////
 struct RasterizedFontCreationParams
 {
-  size_t             max_image_size;  //максимальный размер стороны картинки
+  unsigned int       max_image_size;  //максимальный размер стороны картинки
   bool               pot;             //должен ли размер стороны картинки иметь степень двойки
-  size_t             glyph_margin;    //отступ между символами в картинке
+  unsigned int       glyph_margin;    //отступ между символами в картинке
   media::PixelFormat image_format;    //формат картинки
 };
 
@@ -94,17 +94,17 @@ class Font
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размер таблицы глифов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GlyphsCount () const;
+    unsigned int GlyphsCount () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Код первого глифа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t FirstGlyphCode () const;
+    unsigned int FirstGlyphCode () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размер шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t FontSize () const;
+    unsigned int FontSize () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Доступ к данным о глифах
@@ -114,8 +114,8 @@ class Font
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о кёрнингах
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    KerningInfo Kerning    (size_t left_glyph_index, size_t right_glyph_index) const;
-    bool        HasKerning (size_t left_glyph_index, size_t right_glyph_index) const;
+    KerningInfo Kerning    (unsigned int left_glyph_index, unsigned int right_glyph_index) const;
+    bool        HasKerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание растеризованного шрифта
@@ -189,20 +189,20 @@ class FontBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение/изменение размера таблицы глифов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetGlyphsCount (size_t new_glyphs_count);
-    size_t GlyphsCount    () const;
+    void         SetGlyphsCount (unsigned int new_glyphs_count);
+    unsigned int GlyphsCount    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение/изменение кода первого глифа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetFirstGlyphCode (size_t new_first_glyph_code);
-    size_t FirstGlyphCode    () const;
+    void         SetFirstGlyphCode (unsigned int new_first_glyph_code);
+    unsigned int FirstGlyphCode    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение/изменение размера шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetFontSize (size_t new_font_size);
-    size_t FontSize    () const;
+    void         SetFontSize (unsigned int new_font_size);
+    unsigned int FontSize    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Доступ к данным о глифах
@@ -213,11 +213,11 @@ class FontBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/получение/удаление информации о кёрнингах
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        InsertKerning     (size_t left_glyph_index, size_t right_glyph_index, const KerningInfo& kerning_info);
-    void        RemoveKerning     (size_t left_glyph_index, size_t right_glyph_index);
+    void        InsertKerning     (unsigned int left_glyph_index, unsigned int right_glyph_index, const KerningInfo& kerning_info);
+    void        RemoveKerning     (unsigned int left_glyph_index, unsigned int right_glyph_index);
     void        RemoveAllKernings ();
-    KerningInfo Kerning           (size_t left_glyph_index, size_t right_glyph_index) const;
-    bool        HasKerning        (size_t left_glyph_index, size_t right_glyph_index) const;
+    KerningInfo Kerning           (unsigned int left_glyph_index, unsigned int right_glyph_index) const;
+    bool        HasKerning        (unsigned int left_glyph_index, unsigned int right_glyph_index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка растеризатора

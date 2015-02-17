@@ -43,7 +43,7 @@ struct NativeWindow::Impl: public xtl::trackable
 
   void OnResize ()
   {
-    size_t width = Window ().ClientWidth (), height = Window ().ClientHeight ();
+    unsigned int width = Window ().ClientWidth (), height = Window ().ClientHeight ();
 
     for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
       (*iter)->OnSizeChanged (width, height);
@@ -116,7 +116,7 @@ void NativeWindow::Release ()
     Размеры окна
 */
 
-size_t NativeWindow::GetWidth ()
+unsigned int NativeWindow::GetWidth ()
 {
   try
   {
@@ -129,7 +129,7 @@ size_t NativeWindow::GetWidth ()
   }
 }
 
-size_t NativeWindow::GetHeight ()
+unsigned int NativeWindow::GetHeight ()
 {
   try
   {

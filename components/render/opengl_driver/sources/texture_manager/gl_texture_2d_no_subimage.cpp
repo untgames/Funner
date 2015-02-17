@@ -20,15 +20,15 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
 */
 
 void Texture2DNoSubimage::SetUncompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  GLenum      type,
-  const void* buffer)    
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  GLenum       type,
+  const void*  buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture2DNoSubimage::SetUncompressedData";
   
@@ -45,15 +45,15 @@ void Texture2DNoSubimage::SetUncompressedData
 }
 
 void Texture2DNoSubimage::SetCompressedData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  GLenum      format,
-  size_t      buffer_size,
-  const void* buffer)
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  GLenum       format,
+  unsigned int buffer_size,
+  const void*  buffer)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture2DNoSubimage::SetCompressedData",
     "Compression not supported in texture emulation mode");

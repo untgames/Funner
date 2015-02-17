@@ -97,19 +97,19 @@ class FreetypeFontDesc : public IFontDesc, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество шрифтов в наборе
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t FontsCount ();
+    unsigned int FontsCount ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя гарнитуры / имя семейства / имя стиля
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* FamilyName (size_t index);
-    const char* StyleName (size_t index);
+    const char* FamilyName (unsigned int index);
+    const char* StyleName (unsigned int index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Font CreateFont    (size_t index, const FontCreationParams& params);
-    bool CanCreateFont (size_t index, const FontCreationParams& params);
+    Font CreateFont    (unsigned int index, const FontCreationParams& params);
+    bool CanCreateFont (unsigned int index, const FontCreationParams& params);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчет ссылок
@@ -131,7 +131,7 @@ class FreetypeFace : public common::Lockable, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FreetypeFace (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, size_t face_index);
+    FreetypeFace (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, unsigned int face_index);
     ~FreetypeFace ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,12 +142,12 @@ class FreetypeFace : public common::Lockable, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetNearestFontSize (size_t size, size_t size_eps);
+    unsigned int GetNearestFontSize (unsigned int size, unsigned int size_eps);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка размера шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetSize (size_t size, size_t horizontal_dpi, size_t vertical_dpi);
+    void SetSize (unsigned int size, unsigned int horizontal_dpi, unsigned int vertical_dpi);
 
   private:
     FreetypeFace (const FreetypeFace&);             //no impl
@@ -168,7 +168,7 @@ struct RasterizedFontParams : public xtl::reference_counter
   CharCodesBuffer                     utf32_charset;   //список символов
   xtl::uninitialized_storage<FT_UInt> ft_char_indices; //freetype индексы символов
   FontCreationParams                  font_params;     //параметры шрифта
-  size_t                              choosen_size;    //выбранный размер шрифта
+  unsigned int                        choosen_size;    //выбранный размер шрифта
   FreetypeFacePtr                     face;            //шрифт
   FreetypeLibrary                     library;         //freetype библиотека
 };
@@ -193,12 +193,12 @@ class FreetypeRasterizedFont
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение количества символов шрифта
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GlyphsCount () const;
+    unsigned int GlyphsCount () const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение растеризованных глифов
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                UniqueGlyphsCount () const;  //количество глифов с уникальными битмапами
+    unsigned int          UniqueGlyphsCount () const;  //количество глифов с уникальными битмапами
     const unsigned int*   GlyphsMap         () const;  //соответствие глифа уникальному глифу (количество - GlyphsCount)
     const math::vec2ui*   GlyphsSizes       () const;  //размеры глифов (количество - UniqueGlyphsCount)
     const unsigned char** GlyphsBitmaps     () const;  //битовые карты глифов (8 битные монохромные) (количество - UniqueGlyphsCount)
@@ -238,8 +238,8 @@ class FreetypeFontRasterizer : public IFontRasterizer, public xtl::reference_cou
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Построение картинок
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ImagesCount ();
-    void   BuildImage  (size_t image_index, media::Image& out_image);
+    unsigned int ImagesCount ();
+    void         BuildImage  (unsigned int image_index, media::Image& out_image);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчет ссылок

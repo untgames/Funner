@@ -221,7 +221,7 @@ class TextModel: public VisualModel
 
           //определение базового индекса блока
 
-        size_t base_index = 0, free_slots_count = 0;
+        uint32 base_index = 0, free_slots_count = 0;
 
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (), end=font_text_blocks.end (); iter!=end;)
         {
@@ -239,8 +239,8 @@ class TextModel: public VisualModel
 
           if (slots_count > free_slots_count)
           {
-            free_slots_count = slots_count;
-            base_index       = base_iter - font_text_blocks.begin ();
+            free_slots_count = (uint32)slots_count;
+            base_index       = (uint32)(base_iter - font_text_blocks.begin ());
           }
         }
 
@@ -250,7 +250,7 @@ class TextModel: public VisualModel
         {
             //если свободного места не достаточно - выделяем дополнительную область в конце
  
-          base_index = font_text_blocks.size ();
+          base_index = (uint32)font_text_blocks.size ();
 
           font_text_blocks.resize (font_text_blocks.size () + derived_materials_count);
         }
@@ -275,7 +275,7 @@ class TextModel: public VisualModel
 
           object_id_t id = Id ();
 
-          for (size_t i=0; i<derived_materials_count; i++)
+          for (uint32 i=0; i<derived_materials_count; i++)
           {
             context.CreateSpriteList      (id, base_index + i, interchange::SpriteMode_Oriented, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.0f, 0), DEFAULT_BATCH_NAME);
             context.SetSpriteListMaterial (id, base_index + i, font_material->MaterialName (i));
@@ -305,7 +305,7 @@ class TextModel: public VisualModel
 
       for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++iter)
         if (*iter)
-          context.RemoveSpriteList (id, iter - font_text_blocks.begin ());
+          context.RemoveSpriteList (id, (uint32)(iter - font_text_blocks.begin ()));
 
       font_text_blocks.clear ();
     }
@@ -359,7 +359,7 @@ class TextModel: public VisualModel
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end ();)
           if (*iter && !(*iter)->used)
           {
-            context.RemoveSpriteList (Id (), iter - font_text_blocks.begin ());
+            context.RemoveSpriteList (Id (), (uint32)(iter - font_text_blocks.begin ()));
 
             font_text_blocks.erase (iter);
           }
@@ -445,7 +445,7 @@ class TextModel: public VisualModel
           if (!*iter || (*iter)->used)
             continue;
 
-          context.SetSpriteListBuffer (Id (), iter - font_text_blocks.begin (), 0, (*iter)->reserved_sprites_count);          
+          context.SetSpriteListBuffer (Id (), (uint32)(iter - font_text_blocks.begin ()), 0, (uint32)(*iter)->reserved_sprites_count);
         }
       }
       catch (xtl::exception& e)
@@ -525,12 +525,12 @@ class TextModel: public VisualModel
 
       interchange::object_id_t id = Id ();
 
-      context.SetSpriteListBuffer (id, uint32 (subid), count, text_block.reserved_sprites_count);
+      context.SetSpriteListBuffer (id, uint32 (subid), (uint32)count, (uint32)text_block.reserved_sprites_count);
 
         //обновление списка спрайтов
 
       if (count)
-        context.SetSpriteListDescs (id, uint32 (subid), 0, interchange::RawArray<interchange::SpriteDesc> (sprites.data (), count));
+        context.SetSpriteListDescs (id, uint32 (subid), 0, interchange::RawArray<interchange::SpriteDesc> (sprites.data (), (uint32)count));
 
       text_block.used = true;
     }

@@ -36,7 +36,7 @@ class SysTempFile
       
       dir_name.fast_resize (MAX_PATH);
       
-      DWORD dir_len = GetTempPathW (dir_name.size (), &dir_name [0]);
+      DWORD dir_len = GetTempPathW ((DWORD)dir_name.size (), &dir_name [0]);
       
       if (!dir_len || dir_len > MAX_PATH)
         raise_error ("::GetTempPath");
@@ -245,7 +245,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
     //получение указателя на пользовательские данные
 
-  WindowImpl* impl          = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+  WindowImpl* impl          = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
   window_t    window_handle = (window_t)wnd;
 
     //если указатель на пользовательские данные не установлен - делаем попытку его установить
@@ -263,7 +263,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
         //устанавливаем указатель на пользовательские данные
 
-      SetWindowLong (wnd, GWL_USERDATA, (LONG)impl);
+      SetWindowLongPtr (wnd, GWLP_USERDATA, (LONG_PTR)impl);
 
         //оповещаем окно об изменении низкоуровневого дескриптора
 
@@ -297,7 +297,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       delete impl;
 
-      SetWindowLong (wnd, GWL_USERDATA, 0);
+      SetWindowLongPtr (wnd, GWLP_USERDATA, 0);
 
       return 0;
     case WM_CLOSE: //попытка закрытия окна
@@ -818,7 +818,7 @@ void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, 
     
     tmp_buffer.fast_resize (buffer_size);
 
-    if (!GetWindowTextW (wnd, (LPWSTR)&tmp_buffer [0], tmp_buffer.size ())) //very strange behaviour: GetWindowTextA have to be called
+    if (!GetWindowTextW (wnd, (LPWSTR)&tmp_buffer [0], (int)tmp_buffer.size ())) //very strange behaviour: GetWindowTextA have to be called
       raise_error ("::GetWindowTextW");      
 
     memcpy (buffer, common::towstring (tmp_buffer.c_str ()).c_str (), tmp_buffer.size () * sizeof (wchar_t));
@@ -1222,7 +1222,7 @@ void WindowsWindowManager::SetCursorVisible (window_t handle, bool state)
   try
   {
     HWND        wnd  = (HWND)handle;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
 
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1251,7 +1251,7 @@ bool WindowsWindowManager::GetCursorVisible (window_t handle)
   try
   {
     HWND        wnd  = (HWND)handle;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
 
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1325,7 +1325,7 @@ void WindowsWindowManager::SetCursor (window_t window, cursor_t cursor)
       throw xtl::make_null_argument_exception ("", "window");
 
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
 
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");    
@@ -1361,7 +1361,7 @@ void WindowsWindowManager::SetMultitouchEnabled (window_t window, bool state)
       throw xtl::make_null_argument_exception ("", "window");
 
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
 
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1383,7 +1383,7 @@ bool WindowsWindowManager::IsMultitouchEnabled (window_t window)
       throw xtl::make_null_argument_exception ("", "window");
 
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
 
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1409,7 +1409,7 @@ void WindowsWindowManager::SetBackgroundColor (window_t window, const Color& col
       throw xtl::make_null_argument_exception ("", "window");
       
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
     
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1442,7 +1442,7 @@ void WindowsWindowManager::SetBackgroundState (window_t window, bool state)
       throw xtl::make_null_argument_exception ("", "window");
       
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
     
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1464,7 +1464,7 @@ Color WindowsWindowManager::GetBackgroundColor (window_t window)
       throw xtl::make_null_argument_exception ("", "window");
       
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
     
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
@@ -1486,7 +1486,7 @@ bool WindowsWindowManager::GetBackgroundState (window_t window)
       throw xtl::make_null_argument_exception ("", "window");
       
     HWND        wnd  = (HWND)window;
-    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
     
     if (!impl)
       throw xtl::format_operation_exception ("", "Null GWL_USERDATA");

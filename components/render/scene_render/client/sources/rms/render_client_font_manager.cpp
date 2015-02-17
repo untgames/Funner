@@ -345,7 +345,7 @@ void FontManager::LoadFont (const char* init_string)
 
     creation_params.font_size     = (size_t)get_int (properties, "font_size");
     creation_params.font_size_eps = (size_t)get_int (properties, "font_size_eps", 0);
-    creation_params.weight        = (size_t)get_int (properties, "weight", 0);
+    creation_params.weight        = (unsigned short)get_int (properties, "weight", 0);
     creation_params.escapement    = (size_t)get_int (properties, "escapement", 0);
     creation_params.bold          = get_int (properties, "bold", 0) != 0;
     creation_params.italic        = get_int (properties, "italic", 0) != 0;

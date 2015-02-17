@@ -122,7 +122,7 @@ endef
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
 $(if $(filter %.c,$1)$(filter %.cpp,$1),&& $(if $(analyze),$(call tools.pvs-studio,$1,$2,$3,$4,$5,$6,$7,$8,$9) && ) "$(MSVC_BIN_PATH)/cl" $(call tools.msvc-commandline,$1,$2,$3,$4,$5,$6,$7,$8,$9)) \
-$(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/ml" -nologo -c -Fo"$4\\" $(patsubst %,-I"%",$2) $6 $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.asm,$1))
+$(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/$(ML_NAME)" -nologo -c -Fo"$4\\" $(patsubst %,-I"%",$2) $6 $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.asm,$1))
 endef
 
 ###################################################################################################

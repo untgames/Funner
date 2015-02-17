@@ -82,7 +82,7 @@ struct StringNode::Impl
     {
       if (value_length < (attribute_offsets [index + 1] - attribute_offsets [index]))
       {
-        xtl::xstrncpy (&attributes [attribute_offsets [index]], value, value_length);
+        xtl::xstrncpy (&attributes [attribute_offsets [index]], value, (int)value_length);
         attributes [value_length] = 0;
 
         return;

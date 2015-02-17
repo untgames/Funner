@@ -91,7 +91,7 @@ void PrimitiveBuffers::RemoveAll ()
     –езервирование вспомогательных примитивов
 */
 
-void PrimitiveBuffers::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
+void PrimitiveBuffers::ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
 {
   if (!vertices_count && !indices_count)
     return;
@@ -99,12 +99,12 @@ void PrimitiveBuffers::ReserveDynamicBuffers (size_t vertices_count, size_t indi
   impl->BatchingManager ().ReserveDynamicBuffers (vertices_count, indices_count);
 }
 
-size_t PrimitiveBuffers::DynamicVerticesCount () const
+unsigned int PrimitiveBuffers::DynamicVerticesCount () const
 {
   return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicVerticesCount () : 0;
 }
 
-size_t PrimitiveBuffers::DynamicIndicesCount () const
+unsigned int PrimitiveBuffers::DynamicIndicesCount () const
 {
   return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicIndicesCount () : 0;
 }

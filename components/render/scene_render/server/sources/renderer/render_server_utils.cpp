@@ -28,11 +28,11 @@ struct ParseNodeConverter
       case 3:
       case 4:
       {
-        size_t tokens = iter.available ();
+        unsigned int tokens = (unsigned int)iter.available ();
         
         math::vec4f value;
         
-        for (size_t i=0; i<tokens; i++, ++iter)
+        for (unsigned int i=0; i<tokens; i++, ++iter)
         {
           const char* token = *iter;
 
@@ -47,8 +47,8 @@ struct ParseNodeConverter
       {
         math::mat4f value;
         
-        for (size_t i=0; i<4; i++)
-          for (size_t j=0; j<4; j++, ++iter)
+        for (unsigned char i=0; i<4; i++)
+          for (unsigned char j=0; j<4; j++, ++iter)
           {
             const char* token = *iter;
 

@@ -14,15 +14,15 @@ class WavInputStream : public media::ISoundInputStream, public xtl::reference_co
   public:
     WavInputStream (const char* file_name, media::SoundSampleInfo& sound_sample_info);
 
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
     void AddRef () { addref (this); }  
     void Release () { release (this); }
  
     common::InputFile file;
-    size_t            data_chunk_pos;
-    size_t            sample_size;
-    size_t            chunk_samples;
+    unsigned int      data_chunk_pos;
+    unsigned int      sample_size;
+    unsigned int      chunk_samples;
 };
 
 int SeekToWAVChunk (StdFile& file, const char* chunk_name)
@@ -89,11 +89,11 @@ WavInputStream::WavInputStream (const char* file_name, SoundSampleInfo& sound_sa
   sound_sample_info.samples_count = chunk_samples = chunk_size / sample_size;
 }
 
-size_t WavInputStream::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int WavInputStream::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   file.Seek ((filepos_t)data_chunk_pos + (filepos_t)(sample_size * first_sample));
 
-  return file.Read (data, (size_t)(stl::min(chunk_samples - first_sample, samples_count) * sample_size)) / sample_size;
+  return (unsigned int)file.Read (data, (unsigned int)(stl::min(chunk_samples - first_sample, samples_count) * sample_size)) / sample_size;
 }
 
 ISoundInputStream* default_wav_loader (const char* file_name, SoundSampleInfo& sound_sample_info)

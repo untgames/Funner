@@ -61,9 +61,9 @@ void xatlas_load (const char* file_name, Atlas& atlas)
     
   for (Parser::NamesakeIterator i = iter->First ("Image"); i; ++i)
   {
-    const char* image_name   = common::get<const char*> (*i, "Name");
-    size_t      image_width  = common::get<size_t> (*i, "Width", 0u);
-    size_t      image_height = common::get<size_t> (*i, "Height", 0u);
+    const char*  image_name   = common::get<const char*>  (*i, "Name");
+    unsigned int image_width  = common::get<unsigned int> (*i, "Width", 0u);
+    unsigned int image_height = common::get<unsigned int> (*i, "Height", 0u);
 
     for (Parser::NamesakeIterator j = i->First ("Tile"); j; ++j)
     {
@@ -76,7 +76,7 @@ void xatlas_load (const char* file_name, Atlas& atlas)
       size.x   = common::get<unsigned int> (*j, "Width");
       size.y   = common::get<unsigned int> (*j, "Height");
 
-      size_t tag = common::get<unsigned int> (*j, "Tag", 0);
+      unsigned int tag = common::get<unsigned int> (*j, "Tag", 0);
 
       new_atlas.Insert (tile_name, image_name, origin, size, tag);
     }

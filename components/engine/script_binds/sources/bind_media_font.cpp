@@ -60,30 +60,30 @@ struct FontCreationParams: public media::FontCreationParams
     return xtl::shared_ptr<FontCreationParams> (new FontCreationParams);
   }
 
-  size_t      FontSize         () const            { return font_size; }
-  void        SetFontSize      (size_t value)      { font_size = value; }
-  size_t      FontSizeEps      () const            { return font_size_eps; }
-  void        SetFontSizeEps   (size_t value)      { font_size_eps = value; }
-  size_t      Weight           () const            { return weight; }
-  void        SetWeight        (size_t value)      { weight = value; }
-  int         Escapement       () const            { return escapement; }
-  void        SetEscapement    (int value)         { escapement = value; }
-  bool        Bold             () const            { return bold; }
-  void        SetBold          (bool value)        { bold = value; }
-  bool        Italic           () const            { return italic; }
-  void        SetItalic        (bool value)        { italic = value; }
-  bool        Underlined       () const            { return underlined; }
-  void        SetUnderlined    (bool value)        { underlined = value; }
-  bool        Striked          () const            { return striked; }
-  void        SetStriked       (bool value)        { striked = value; }
-  size_t      StrokeSize       () const            { return stroke_size; }
-  void        SetStrokeSize    (size_t value)      { stroke_size = value; }
-  size_t      HorizontalDpi    () const            { return horizontal_dpi; }
-  void        SetHorizontalDpi (size_t value)      { horizontal_dpi = value; }
-  size_t      VerticalDpi      () const            { return vertical_dpi; }
-  void        SetVerticalDpi   (size_t value)      { vertical_dpi = value; }
-  const char* CharsetName      () const            { return charset_name; }
-  void        SetCharsetName   (const char* value) { charset_name_string = value ? value : ""; charset_name = charset_name_string.c_str (); }
+  unsigned int   FontSize         () const               { return font_size; }
+  void           SetFontSize      (unsigned int value)   { font_size = value; }
+  unsigned int   FontSizeEps      () const               { return font_size_eps; }
+  void           SetFontSizeEps   (unsigned int value)   { font_size_eps = value; }
+  unsigned short Weight           () const               { return weight; }
+  void           SetWeight        (unsigned short value) { weight = value; }
+  int            Escapement       () const               { return escapement; }
+  void           SetEscapement    (int value)            { escapement = value; }
+  bool           Bold             () const               { return bold; }
+  void           SetBold          (bool value)           { bold = value; }
+  bool           Italic           () const               { return italic; }
+  void           SetItalic        (bool value)           { italic = value; }
+  bool           Underlined       () const               { return underlined; }
+  void           SetUnderlined    (bool value)           { underlined = value; }
+  bool           Striked          () const               { return striked; }
+  void           SetStriked       (bool value)           { striked = value; }
+  unsigned int   StrokeSize       () const               { return stroke_size; }
+  void           SetStrokeSize    (unsigned int value)   { stroke_size = value; }
+  unsigned short HorizontalDpi    () const               { return horizontal_dpi; }
+  void           SetHorizontalDpi (unsigned short value) { horizontal_dpi = value; }
+  unsigned short VerticalDpi      () const               { return vertical_dpi; }
+  void           SetVerticalDpi   (unsigned short value) { vertical_dpi = value; }
+  const char*    CharsetName      () const               { return charset_name; }
+  void           SetCharsetName   (const char* value)    { charset_name_string = value ? value : ""; charset_name = charset_name_string.c_str (); }
 };
 
 void bind_font_creation_params_library (Environment& environment)

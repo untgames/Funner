@@ -130,12 +130,12 @@ Shape ShapeImplProvider::CreateShape (physics::low_level::IDriver* driver, const
   if (!driver)
     throw xtl::make_null_argument_exception ("physics::ShapeImplProvider::CreateShape (physics::low_level::IDriver*, const ShapeList&)", "driver");
 
-  size_t shapes_count = shape_list.Size ();
+  unsigned int shapes_count = shape_list.Size ();
 
   xtl::uninitialized_storage<physics::low_level::IShape*>   shapes (shapes_count);
   xtl::uninitialized_storage<physics::low_level::Transform> transforms (shapes_count);
 
-  for (size_t i = 0; i < shapes_count; i++)
+  for (unsigned int i = 0; i < shapes_count; i++)
   {
     const physics::Transform&     transform           = shape_list.Transform (i);
     physics::low_level::Transform low_level_transform = { transform.position, transform.orientation };
@@ -188,7 +188,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
 
       xtl::uninitialized_storage<math::vec3f> scaled_vertices;
 
-      size_t vertices_count = shape_data.VerticesCount ();
+      unsigned int vertices_count = shape_data.VerticesCount ();
 
       if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
       {

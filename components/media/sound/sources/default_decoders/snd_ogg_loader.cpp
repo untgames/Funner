@@ -22,14 +22,14 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
     OggInputStream  (const char* file_name, media::SoundSampleInfo& sound_sample_info);
     ~OggInputStream () {ov_clear (&vf);}
 
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
     void AddRef () { addref (this); }
     void Release () { release (this); }
 
     common::InputFile file;
     OggVorbis_File    vf;
-    size_t            channels_count;
+    unsigned short    channels_count;
 };
 
 /*
@@ -193,19 +193,24 @@ OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sa
   }
 }
 
-size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int OggInputStream::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   static const char* METHOD_NAME = "media::sound::OggInputStream::Read";
 
-  size_t ret_value, readed_bytes, decoded_bytes = 0, buffer_size = samples_count * 2 * channels_count;
-  int    current_section;
+  long         readed_bytes;
+  unsigned int ret_value, decoded_bytes = 0;
+  size_t       buffer_size = samples_count * 2 * channels_count;
+  int          current_section;
+
+  if (buffer_size > INT_MAX)
+    throw xtl::format_operation_exception (METHOD_NAME, "Samples count read limit exceeded");
 
   if (first_sample != ov_pcm_tell (&vf))
     check_vorbis_file_error (ov_pcm_seek (&vf, first_sample), METHOD_NAME, "Can't seek in vorbis file, error at ::ov_pcm_seek");
 
   while (1)
   {
-    readed_bytes = ov_read (&vf, (char*)data + decoded_bytes, buffer_size - decoded_bytes, 0, 2, 1, &current_section);
+    readed_bytes = ov_read (&vf, (char*)data + decoded_bytes, (int)(buffer_size - decoded_bytes), 0, 2, 1, &current_section);
     if (readed_bytes > 0)
     {
       decoded_bytes += readed_bytes;
@@ -223,7 +228,7 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
   {
     short* samples = (short*)data;
 
-    for (size_t current_sample = 0; current_sample < (buffer_size >> 1); current_sample += 6)
+    for (unsigned int current_sample = 0; current_sample < (buffer_size >> 1); current_sample += 6)
     {
       // WAVEFORMATEXTENSIBLE Order : FL, FR, FC, LFE, RL, RR
       // OggVorbis Order            : FL, FC, FR,  RL, RR, LFE

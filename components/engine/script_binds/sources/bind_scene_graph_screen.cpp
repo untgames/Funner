@@ -27,16 +27,16 @@ const char* RENDER_SCREEN_LIBRARY   = "Scene.Screen";
 */
 
 ///Получение параметров области экрана и области вывода
-int    get_rect_left   (const Rect& rect)         { return rect.x; }
-int    get_rect_top    (const Rect& rect)         { return rect.y; }
-size_t get_rect_width  (const Rect& rect)         { return rect.width; }
-size_t get_rect_height (const Rect& rect)         { return rect.height; }
-int    get_rect_right  (const Rect& rect)         { return rect.right (); }
-int    get_rect_bottom (const Rect& rect)         { return rect.bottom (); }
-void   set_rect_left   (Rect& rect, int param)    { rect.x      = param; }
-void   set_rect_top    (Rect& rect, int param)    { rect.y      = param; }
-void   set_rect_width  (Rect& rect, size_t param) { rect.width  = param; }
-void   set_rect_height (Rect& rect, size_t param) { rect.height = param; }
+int          get_rect_left   (const Rect& rect)               { return rect.x; }
+int          get_rect_top    (const Rect& rect)               { return rect.y; }
+unsigned int get_rect_width  (const Rect& rect)               { return rect.width; }
+unsigned int get_rect_height (const Rect& rect)               { return rect.height; }
+int          get_rect_right  (const Rect& rect)               { return rect.right (); }
+int          get_rect_bottom (const Rect& rect)               { return rect.bottom (); }
+void         set_rect_left   (Rect& rect, int param)          { rect.x      = param; }
+void         set_rect_top    (Rect& rect, int param)          { rect.y      = param; }
+void         set_rect_width  (Rect& rect, unsigned int param) { rect.width  = param; }
+void         set_rect_height (Rect& rect, unsigned int param) { rect.height = param; }
 
 ///Создание прямоугольной области
 Rect create_empty_rect ()
@@ -44,7 +44,7 @@ Rect create_empty_rect ()
   return Rect ();
 }
 
-Rect create_rect (int left, int top, size_t width, size_t height)
+Rect create_rect (int left, int top, unsigned int width, unsigned int height)
 {
   return Rect (left, top, width, height);
 }

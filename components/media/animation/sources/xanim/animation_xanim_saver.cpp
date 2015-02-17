@@ -30,7 +30,7 @@ class XmlAnimationLibrarySaver
 
       XmlWriter::Scope scope (writer, "event_track");
 
-      for (size_t i = 0, count = track.Size (); i < count; i++)
+      for (unsigned int i = 0, count = track.Size (); i < count; i++)
       {
         XmlWriter::Scope scope (writer, "event");
 
@@ -216,11 +216,11 @@ class XmlAnimationLibrarySaver
       {
         XmlWriter::Scope scope (writer, "channels");
 
-        for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+        for (unsigned int i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
         {
           const char* target_name = animation.TargetName (i);
 
-          for (size_t j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
+          for (unsigned int j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
             SaveAnimationChannel (animation.Channel (i, j), target_name);
         }
       }

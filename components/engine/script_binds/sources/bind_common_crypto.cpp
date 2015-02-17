@@ -11,10 +11,6 @@ using namespace xtl;
 namespace
 {
 
-/*
-    Константы (имена библиотек)
-*/
-
 const char* COMMON_CRYPTO_LIBRARY = "Common.Crypto";
 const char* COMMON_BASE64_LIBRARY = "Common.Base64";
 
@@ -22,10 +18,6 @@ const char* COMMON_BASE64_LIBRARY = "Common.Base64";
 
 namespace engine
 {
-
-/*
-    Регистрация библиотек
-*/
 
 namespace
 {
@@ -99,7 +91,7 @@ stl::string crypto_encoding (const char* string, const char* encoding, const cha
   if (!init_string)
     init_string = "";
     
-  CryptoContext context ((stl::string (encoding) + (encoding_direction ? ".encrypt" : ".decrypt")).c_str (), key, strlen (key) * 8, init_string);
+  CryptoContext context ((stl::string (encoding) + (encoding_direction ? ".encrypt" : ".decrypt")).c_str (), key, (unsigned short)strlen (key) * 8, init_string);
   
   stl::string result;
   

@@ -90,10 +90,10 @@ struct Params
   stl::string   layers_format;             //строка форматирования имён слоёв
   stl::string   crop_exclude;              //необрезаемые слои
   stl::string   dummy_materials_wildcard;  //маска имён слоев, для которых генерируются материалы-заглушки
-  size_t        crop_alpha;                //коэффициент обрезания по прозрачности
-  size_t        zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
-  size_t        blur_passes_count;         //количество проходов, используемое при блюре
-  size_t        max_image_size;            //максимальный размер выходного изображения  
+  unsigned int  crop_alpha;                //коэффициент обрезания по прозрачности
+  unsigned int  zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
+  unsigned int  blur_passes_count;         //количество проходов, используемое при блюре
+  unsigned int  max_image_size;            //максимальный размер выходного изображения
   bgra_t        zcolor_min;                //минимальный z-цвет, заменяемый на прозрачный
   bgra_t        zcolor_max;                //минимальный z-цвет, заменяемый на прозрачный
   bool          silent;                    //минимальное число сообщений
@@ -112,8 +112,8 @@ struct Params
 //прямоугольная область
 struct Rect
 {
-  int    x, y;
-  size_t width, height;
+  int          x, y;
+  unsigned int width, height;
 };
 
 //получение подсказки по программе
@@ -239,9 +239,9 @@ void command_line_zcolor_min (const char* value, Params& params)
   if (tokens.Size () != 3)
     error ("ZColor must contains 3 values from 0 to 255");
     
-  params.zcolor_min.red      = (size_t)atoi (tokens [0]);
-  params.zcolor_min.green    = (size_t)atoi (tokens [1]);
-  params.zcolor_min.blue     = (size_t)atoi (tokens [2]);
+  params.zcolor_min.red      = (unsigned char)atoi (tokens [0]);
+  params.zcolor_min.green    = (unsigned char)atoi (tokens [1]);
+  params.zcolor_min.blue     = (unsigned char)atoi (tokens [2]);
   params.need_replace_zcolor = true;
   params.has_zcolor_min      = true;
   
@@ -256,9 +256,9 @@ void command_line_zcolor_max (const char* value, Params& params)
   if (tokens.Size () != 3)
     error ("ZColor must contains 3 values from 0 to 255");
     
-  params.zcolor_max.red      = (size_t)atoi (tokens [0]);
-  params.zcolor_max.green    = (size_t)atoi (tokens [1]);
-  params.zcolor_max.blue     = (size_t)atoi (tokens [2]);
+  params.zcolor_max.red      = (unsigned char)atoi (tokens [0]);
+  params.zcolor_max.green    = (unsigned char)atoi (tokens [1]);
+  params.zcolor_max.blue     = (unsigned char)atoi (tokens [2]);
   params.need_replace_zcolor = true;
   params.has_zcolor_max      = true;
 
@@ -269,7 +269,7 @@ void command_line_zcolor_max (const char* value, Params& params)
 //установка заменяемого значения прозрачности для z-цвета
 void command_line_zalpha (const char* value, Params& params)
 {
-  params.zcolor_min.alpha    = (size_t)atoi (value);
+  params.zcolor_min.alpha    = (unsigned char)atoi (value);
   params.need_replace_zcolor = true; 
 }
 
@@ -458,18 +458,18 @@ void get_average_color (rgba_t* (&source_pixels) [source_count], rgba_t& result)
 }
 
 //исправление ошибки с цветом пикселей с нулевой альфой
-void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned char fix_alpha_value, size_t passes_count)
+void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitmap, unsigned char fix_alpha_value, size_t passes_count)
 {
   if (!width || !height)
     return;
 
     //первый проход - зануление цвета под полностью прозрачными пикселями (alpha = 0)
 
-  for (size_t i=0; i<height; i++)
+  for (unsigned int i=0; i<height; i++)
   {
     rgba_t* pixel = bitmap + width * i;
 
-    for (size_t j=0; j<width; j++, pixel++)
+    for (unsigned int j=0; j<width; j++, pixel++)
     {
       if (pixel->alpha <= fix_alpha_value)
       {
@@ -919,13 +919,13 @@ void export_data (Params& params)
 
       const Rect& cropped_rect = cropped_layers [image_index - 1];
 
-      size_t image_width  = cropped_rect.width,
-             image_height = cropped_rect.height;
+      unsigned int image_width  = cropped_rect.width,
+                   image_height = cropped_rect.height;
 
       if (params.need_pot_extent)
       {
-        image_width  = get_next_higher_power_of_two (image_width);
-        image_height = get_next_higher_power_of_two (image_height);
+        image_width  = (unsigned int)get_next_higher_power_of_two (image_width);
+        image_height = (unsigned int)get_next_higher_power_of_two (image_height);
       }
 
       media::Image image (image_width, image_height, 1, media::PixelFormat_RGBA8, 0);
@@ -947,7 +947,7 @@ void export_data (Params& params)
       {
         if (image.Width () > params.max_image_size || image.Height () > params.max_image_size)
         {
-          size_t new_image_width, new_image_height;
+          unsigned int new_image_width, new_image_height;
           
           if (image.Width () > image.Height ())
           {

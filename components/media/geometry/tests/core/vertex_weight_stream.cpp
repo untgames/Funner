@@ -18,7 +18,7 @@ int main ()
   {
     VertexWeightStream s1 (12), s2;  
     
-    for (size_t i=0; i<s1.Size (); i++)
+    for (uint32_t i=0; i<s1.Size (); i++)
       s1.Data ()[i] = VertexWeight (i, 0.5f);
  
     printf ("Dump s1\n");

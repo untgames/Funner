@@ -86,27 +86,27 @@ const RasterizedGlyphInfo* XFontFontRasterizer::RasterizedGlyphs ()
    Построение картинок
 */
 
-size_t XFontFontRasterizer::ImagesCount ()
+unsigned int XFontFontRasterizer::ImagesCount ()
 {
   return impl->font_params->images_count;
 }
 
-void XFontFontRasterizer::BuildImage (size_t image_index, media::Image& out_image)
+void XFontFontRasterizer::BuildImage (unsigned int image_index, media::Image& out_image)
 {
   try
   {
     out_image.Load (common::format (impl->font_params->image_name_format.c_str (), image_index).c_str ());
 
-    size_t image_width  = out_image.Width (),
-           image_height = out_image.Height ();
+    unsigned int image_width  = out_image.Width (),
+                 image_height = out_image.Height ();
 
     if (impl->params.pot)
     {
-      image_width  = get_next_higher_power_of_two (image_width);
-      image_height = get_next_higher_power_of_two (image_height);
+      image_width  = (unsigned int)get_next_higher_power_of_two (image_width);
+      image_height = (unsigned int)get_next_higher_power_of_two (image_height);
     }
 
-    size_t max_side = stl::max (image_width, image_height);
+    unsigned int max_side = stl::max (image_width, image_height);
 
     if (max_side > impl->params.max_image_size)
       throw xtl::format_operation_exception ("", "Can't build image, size %lu is larger than max size %lu", max_side, impl->params.max_image_size);
@@ -133,7 +133,7 @@ void XFontFontRasterizer::BuildImage (size_t image_index, media::Image& out_imag
       {
         unsigned char* current_pixel = (unsigned char*)out_image.Bitmap ();
 
-        for (size_t i = 0, pixels_count = image_width * image_height; i < pixels_count; current_pixel += 4, i++)
+        for (unsigned int i = 0, pixels_count = image_width * image_height; i < pixels_count; current_pixel += 4, i++)
         {
           if (*current_pixel)
           {

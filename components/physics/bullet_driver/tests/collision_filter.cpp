@@ -42,7 +42,7 @@ void collision_event_handler (const CollisionEvent& event)
 
   math::vec3f point = event.point;
 
-  for (size_t i = 0; i < 3; i++)
+  for (unsigned int i = 0; i < 3; i++)
     convert_float (point [i], 1000);
 
   printf ("  position is %.2f %.2f %.2f\n", point.x, point.y, point.z);

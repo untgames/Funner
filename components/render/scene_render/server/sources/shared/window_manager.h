@@ -29,7 +29,7 @@ class WindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление и удаление окон  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AttachWindow (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, const manager::Rect& rect);    
+    void AttachWindow (size_t id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, const manager::Rect& rect);
     void DetachWindow (size_t id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ class WindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetWindowSize     (size_t id, size_t width, size_t height);
+    void SetWindowSize     (size_t id, unsigned int width, unsigned int height);
     void SetWindowViewport (size_t id, const manager::Rect& rect);
     void SetWindowHandle   (size_t id, void* handle);
 

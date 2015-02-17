@@ -66,7 +66,7 @@ struct LineGenerator
     }
   }
 
-  static void Generate (size_t base_vertex, DynamicPrimitiveIndex* dst_indices)
+  static void Generate (unsigned int base_vertex, DynamicPrimitiveIndex* dst_indices)
   {
     dst_indices [0] = base_vertex;
     dst_indices [1] = base_vertex + 1;
@@ -104,7 +104,7 @@ struct SpriteGenerator
     dst_vertices [3].tex_coord = src_sprite.tex_offset + math::vec2f (0, src_sprite.tex_size.y);
   }
 
-  static void Generate (size_t base_vertex, DynamicPrimitiveIndex* dst_indices)
+  static void Generate (unsigned int base_vertex, DynamicPrimitiveIndex* dst_indices)
   {
     static const DynamicPrimitiveIndex indices [INDICES_PER_PRIMITIVE] = {0, 2, 3, 0, 1, 2};
 
@@ -233,7 +233,7 @@ class OrientedBillboardSpriteGenerator: public SpriteGenerator
 
 /// ѕрименение генератора к блоку спрайтов
 template <class Generator, class Item>
-inline void generate (Generator& generator, size_t items_count, const Item* item, size_t base_vertex, DynamicPrimitiveVertex* dst_vertex, DynamicPrimitiveIndex* dst_index)
+inline void generate (Generator& generator, unsigned int items_count, const Item* item, unsigned int base_vertex, DynamicPrimitiveVertex* dst_vertex, DynamicPrimitiveIndex* dst_index)
 {
   while (items_count--)
   {
@@ -249,7 +249,7 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
 }
 
 template <class Generator, class Item>
-inline void generate (Generator& generator, size_t items_count, const Item* item, DynamicPrimitiveVertex* dst_vertex)
+inline void generate (Generator& generator, unsigned int items_count, const Item* item, DynamicPrimitiveVertex* dst_vertex)
 {
   while (items_count--)
   {
@@ -262,7 +262,7 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
 }
 
 template <class Generator>
-inline void generate (Generator& generator, size_t items_count, size_t base_vertex, DynamicPrimitiveIndex* dst_index)
+inline void generate (Generator& generator, unsigned int items_count, unsigned int base_vertex, DynamicPrimitiveIndex* dst_index)
 {
   while (items_count--)
   {
@@ -274,7 +274,7 @@ inline void generate (Generator& generator, size_t items_count, size_t base_vert
 }
 
 template <class Generator>
-inline void generate (size_t items_count, size_t base_vertex, DynamicPrimitiveIndex* dst_index)
+inline void generate (unsigned int items_count, unsigned int base_vertex, DynamicPrimitiveIndex* dst_index)
 {
   while (items_count--)
   {
@@ -692,7 +692,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
     }
 
 /// ”даление примитивов
-    void Remove (size_t first, size_t count) 
+    void Remove (size_t first, size_t count)
     {
       if (first >= items.size ())
         return;
@@ -815,7 +815,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
     }
 
 ///«аполнение примитива
-    void UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex** out_vertices, DynamicPrimitiveIndex** out_indices, size_t* out_base_vertex)
+    void UpdatePrimitive (unsigned int verts_count, unsigned int inds_count, DynamicPrimitiveVertex** out_vertices, DynamicPrimitiveIndex** out_indices, unsigned int* out_base_vertex)
     {
       try
       {
@@ -832,7 +832,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 
             //формирование примитива
 
-        cached_primitive.first = *out_indices - *indices_base;
+        cached_primitive.first = (unsigned int)(*out_indices - *indices_base);
         cached_primitive.count = inds_count;
       }
       catch (xtl::exception& e)
@@ -942,12 +942,12 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
                base_vertex     = vb.Size (),
                base_index      = ib.Size ();
 
-        vb.Reserve (new_verts_count);
-        ib.Reserve (new_inds_count);
-        vb.Resize (new_verts_count);
-        ib.Resize (new_inds_count);
+        vb.Reserve ((unsigned int)new_verts_count);
+        ib.Reserve ((unsigned int)new_inds_count);
+        vb.Resize ((unsigned int)new_verts_count);
+        ib.Resize ((unsigned int)new_inds_count);
 
-        generate (static_cast<Generator&> (*this), count, items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
+        generate (static_cast<Generator&> (*this), (unsigned int)count, items, (unsigned int)base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
 
         need_update_buffers = true;
 
@@ -992,7 +992,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
         size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
                base_index  = first * INDICES_PER_PRIMITIVE;
 
-        generate (static_cast<Generator&> (*this), count, src_items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
+        generate (static_cast<Generator&> (*this), (unsigned int)count, src_items, (unsigned int)base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
 
         need_update_buffers = true;
 
@@ -1030,8 +1030,8 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
       memmove (vb.Data () + base_vertex, vb.Data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
       memmove (ib.Data () + base_index, ib.Data () + base_index + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
 
-      vb.Resize (vb.Size () - verts_count);
-      ib.Resize (ib.Size () - inds_count);
+      vb.Resize ((unsigned int)(vb.Size () - verts_count));
+      ib.Resize ((unsigned int)(ib.Size () - inds_count));
 
       need_update_buffers = true;
 
@@ -1064,8 +1064,8 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
 
         const size_t current_capacity = vb.Capacity () / VERTICES_PER_PRIMITIVE;
 
-        vb.Reserve (count * VERTICES_PER_PRIMITIVE);
-        ib.Reserve (count * INDICES_PER_PRIMITIVE);
+        vb.Reserve ((unsigned int)count * VERTICES_PER_PRIMITIVE);
+        ib.Reserve ((unsigned int)count * INDICES_PER_PRIMITIVE);
 
         if (current_capacity < count)
         {
@@ -1140,7 +1140,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
           {
             BatchingLineAndOrientedSpriteList& prototype = static_cast<BatchingLineAndOrientedSpriteList&> (Prototype ());
 
-            size_t verts_count = prototype.VerticesCount (), items_count = verts_count / VERTICES_PER_PRIMITIVE, inds_count = items_count * INDICES_PER_PRIMITIVE, base_vertex = 0;
+            unsigned int verts_count = (unsigned int)prototype.VerticesCount (), items_count = verts_count / VERTICES_PER_PRIMITIVE, inds_count = items_count * INDICES_PER_PRIMITIVE, base_vertex = 0;
 
             DynamicPrimitiveVertex* vertices = 0;
             DynamicPrimitiveIndex*  indices  = 0;
@@ -1222,7 +1222,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 
         vertices.resize (new_verts_count);
 
-        generate (static_cast<Generator&> (*this), count, items, vertices.data () + base_vertex);
+        generate (static_cast<Generator&> (*this), (unsigned int)count, items, vertices.data () + base_vertex);
 
         return base_vertex / VERTICES_PER_PRIMITIVE;
       }
@@ -1257,7 +1257,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 
         size_t base_vertex = first * VERTICES_PER_PRIMITIVE;
 
-        generate (static_cast<Generator&> (*this), count, src_items, vertices.data () + base_vertex);
+        generate (static_cast<Generator&> (*this), (unsigned int)count, src_items, vertices.data () + base_vertex);
       }
       catch (xtl::exception& e)
       {
@@ -1407,7 +1407,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
         Generator generator (entity, view_up, context.InverseViewProjectionMatrix ());
 //        Generator generator (entity, view_up, mvp_matrix);
 
-        generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
+        generate (generator, (unsigned int)Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
 
         SyncBuffers ();
       }
@@ -1423,7 +1423,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     {      
       try
       {
-        size_t sprites_count = Base::Size ();
+        unsigned int sprites_count = (unsigned int)Base::Size ();
 
         VertexBuffer ().Clear ();
         IndexBuffer ().Clear ();
@@ -1475,9 +1475,9 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
           {
             BatchingBillboardSpriteList& prototype = static_cast<BatchingBillboardSpriteList&> (Prototype ());
 
-            size_t items_count = prototype.BatchingBillboardSpriteList::Size (),
-                   verts_count = items_count * VERTICES_PER_PRIMITIVE,
-                   inds_count  = items_count * INDICES_PER_PRIMITIVE;
+            unsigned int items_count = (unsigned int)prototype.BatchingBillboardSpriteList::Size (),
+                         verts_count = items_count * VERTICES_PER_PRIMITIVE,
+                         inds_count  = items_count * INDICES_PER_PRIMITIVE;
 
             DynamicPrimitiveIndex* indices = 0;
 
@@ -1505,7 +1505,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
           {
             BatchingBillboardSpriteList& prototype = static_cast<BatchingBillboardSpriteList&> (Prototype ());
 
-            size_t items_count = prototype.BatchingBillboardSpriteList::Size (), verts_count = items_count * VERTICES_PER_PRIMITIVE, base_vertex = 0;
+            unsigned int items_count = (unsigned int)prototype.BatchingBillboardSpriteList::Size (), verts_count = items_count * VERTICES_PER_PRIMITIVE, base_vertex = 0;
 
             DynamicPrimitiveVertex* vertices = BatchingManager ().AllocateDynamicVertices (verts_count, &base_vertex);
 

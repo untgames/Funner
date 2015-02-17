@@ -51,15 +51,15 @@ class OpenALContextManagerImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t DEVICE_BUFFERS_POOL_SIZE        = 32;     //размер пула буферов
-const size_t MAX_SOUND_SAMPLE_RATE           = 176400; //максимальная частота дискретизации (Generic устройства проигрывают 192000 некорректно)
+const unsigned char DEVICE_BUFFERS_POOL_SIZE = 32;     //размер пула буферов
+const unsigned int MAX_SOUND_SAMPLE_RATE     = 176400; //максимальная частота дискретизации (Generic устройства проигрывают 192000 некорректно)
 
 #ifdef IPHONE
-  const size_t SOURCE_BUFFERS_COUNT            = 4;      //количество буферов проигрывания на источник
-  const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 10;     //частота обновления буферов
+  const unsigned char SOURCE_BUFFERS_COUNT            = 4;      //количество буферов проигрывания на источник
+  const unsigned char SOURCE_BUFFERS_UPDATE_FREQUENCY = 10;     //частота обновления буферов
 #else
-  const size_t SOURCE_BUFFERS_COUNT            = 8;      //количество буферов проигрывания на источник
-  const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 30;     //частота обновления буферов
+  const unsigned char SOURCE_BUFFERS_COUNT            = 8;      //количество буферов проигрывания на источник
+  const unsigned char SOURCE_BUFFERS_UPDATE_FREQUENCY = 30;     //частота обновления буферов
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ class ISampleDecoder
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t Read (size_t first_sample, size_t samples_count, void* data) = 0;
+    virtual unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data) = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Клонирование
@@ -229,7 +229,7 @@ class FunctionSampleDecoder : public ISampleDecoder, public xtl::reference_count
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Клонирование
@@ -270,7 +270,7 @@ class MediaSampleDecoder : public ISampleDecoder, public xtl::reference_counter
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Клонирование
@@ -310,7 +310,7 @@ class BufferedSampleDecoder : public ISampleDecoder, public xtl::reference_count
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Read (size_t first_sample, size_t samples_count, void* data);
+    unsigned int Read (unsigned int first_sample, unsigned int samples_count, void* data);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Клонирование
@@ -362,18 +362,18 @@ class OpenALSample : public ISample, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SamplesToBytes   (size_t sample_count);   //перевод количества сэмплов в размер в байтах
-    size_t BytesToSamples   (size_t byte_count);     //перевод количества байт в размер в сэмплах
-    double SamplesToSeconds (size_t sample_count);   //перевод количества сэмплов в размер в секундах
-    size_t SecondsToSamples (double second_count);   //переводколичества секунд в размер в сэмплах
+    unsigned int SamplesToBytes   (unsigned int sample_count);   //перевод количества сэмплов в размер в байтах
+    unsigned int BytesToSamples   (unsigned int byte_count);     //перевод количества байт в размер в сэмплах
+    double       SamplesToSeconds (unsigned int sample_count);   //перевод количества сэмплов в размер в секундах
+    unsigned int SecondsToSamples (double second_count);         //переводколичества секунд в размер в сэмплах
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Channels     ();
-    size_t Frequency    ();
-    size_t SamplesCount ();
-    double Duration     ();
+    unsigned short Channels     ();
+    unsigned int   Frequency    ();
+    unsigned int   SamplesCount ();
+    double         Duration     ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание декодера
@@ -420,7 +420,7 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество микшируемых каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ChannelsCount ();
+    unsigned short ChannelsCount ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сэмпла для проигрывания
@@ -431,29 +431,29 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего проигрываемого звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void     SetSample (size_t channel, ISample* sample);
-    ISample* GetSample (size_t channel);
+    void     SetSample (unsigned short channel, ISample* sample);
+    ISample* GetSample (unsigned short channel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка цикличности проигрывания канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool IsLooped (size_t channel);
+    bool IsLooped (unsigned short channel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetSource (size_t channel, const Source&);
-    void GetSource (size_t channel, Source&);
+    void SetSource (unsigned short channel, const Source&);
+    void GetSource (unsigned short channel, Source&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление проигрыванием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  Play  (size_t channel, bool looping = false);
-    void  Pause (size_t channel);
-    void  Stop  (size_t channel);
-    void  Seek  (size_t channel, float time_in_seconds, SeekMode seek_mode);
-    float Tell  (size_t channel);
-    bool  IsPlaying (size_t channel);
+    void  Play  (unsigned short channel, bool looping = false);
+    void  Pause (unsigned short channel);
+    void  Stop  (unsigned short channel);
+    void  Seek  (unsigned short channel, float time_in_seconds, SeekMode seek_mode);
+    float Tell  (unsigned short channel);
+    bool  IsPlaying (unsigned short channel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка уровня громкости для устройства
@@ -488,9 +488,9 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер сэмплирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* GetSampleBuffer     () const;
-          void* GetSampleBuffer     ();
-    size_t      GetSampleBufferSize () const;
+    const void*  GetSampleBuffer     () const;
+          void*  GetSampleBuffer     ();
+    unsigned int GetSampleBufferSize () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление распределением буферов проигрывания
@@ -546,12 +546,12 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
     float                         gain;                                       //коэффициент усиления
     bool                          is_muted;                                   //флг блокировки проигрывания
     ChannelsArray                 channels;                                   //каналы проигрывания
-    volatile size_t               buffer_update_frequency;                    //частота обновления буффера
-    size_t                        source_properties_update_frequency;         //частота обновления свойств источника
-    size_t                        listener_properties_update_frequency;       //частота обновления свойств слушателя
+    volatile unsigned int         buffer_update_frequency;                    //частота обновления буффера
+    unsigned int                  source_properties_update_frequency;         //частота обновления свойств источника
+    unsigned int                  listener_properties_update_frequency;       //частота обновления свойств слушателя
     OpenALSource*                 first_active_source;                        //первый активный источник
     ALuint                        al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
-    size_t                        al_buffers_pool_size;                       //размер пула буферов
+    unsigned int                  al_buffers_pool_size;                       //размер пула буферов
     stl::auto_ptr<syslib::Thread> buffers_update_thread;                      //нить обновления буферов
     volatile bool                 buffers_update_thread_stop_request;         //запрос остановки нити обновления буферов
 };
@@ -608,13 +608,13 @@ class OpenALSource
     OpenALSource* NextActive () const { return next_active; }
 
   private:
-    void   FillBuffer (ALuint al_buffer);
-    void   FillBuffers ();
-    void   UpdateSourceNotify ();
-    void   UpdateSampleNotify ();
-    size_t TellInMilliseconds () const;
-    void   Activate ();
-    void   Deactivate ();
+    void         FillBuffer (ALuint al_buffer);
+    void         FillBuffers ();
+    void         UpdateSourceNotify ();
+    void         UpdateSampleNotify ();
+    unsigned int TellInMilliseconds () const;
+    void         Activate ();
+    void         Deactivate ();
 
   private:
     OpenALSource (const OpenALSource&); //no impl
@@ -635,9 +635,9 @@ class OpenALSource
     bool             is_playing;                        //проигрывается ли звук
     bool             is_active;                         //является ли источник активным
     size_t           play_time_start;                   //время начала проигрывания
-    size_t           play_time_offset;                  //смещение при проигрывании
+    unsigned int     play_time_offset;                  //смещение при проигрывании
     size_t           last_buffers_fill_time;            //время последнего обновления буферов
-    size_t           play_sample_position;              //позиция проигрывания
+    unsigned int     play_sample_position;              //позиция проигрывания
     ALuint           al_source;                         //имя источника в OpenAL
     ALuint           al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
     OpenALSource     *prev_active, *next_active;        //список активных источников (проигрываемых)

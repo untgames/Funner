@@ -4,7 +4,7 @@
     Получение размера пикселя
 */
 
-size_t get_pixel_size (PixelFormat format)
+unsigned int get_pixel_size (PixelFormat format)
 {
   switch (format)
   {
@@ -22,7 +22,7 @@ size_t get_pixel_size (PixelFormat format)
   }
 }
 
-size_t get_pixel_used_size (PixelFormat format)
+unsigned int get_pixel_used_size (PixelFormat format)
 {
   switch (format)
   {
@@ -42,58 +42,58 @@ int myrand ()
   return ((holdrand = holdrand * 214013L + 2531011L) >> 16) & 0x7fff;
 }
 
-void init_line (size_t width, size_t pixel_size, size_t pixel_used_size, unsigned char* data)
+void init_line (unsigned int width, unsigned int pixel_size, unsigned int pixel_used_size, unsigned char* data)
 {
   unsigned char* pixel = data;
 
-  for (size_t i=0; i<width; i++, pixel += pixel_size)
+  for (unsigned int i=0; i<width; i++, pixel += pixel_size)
   {
-    size_t j;
+    unsigned int j;
     
     for (j=0; j<pixel_used_size; j++) pixel [j] = myrand () & 63;
     for (;j<pixel_size; j++)          pixel [j] = 0;
   }    
 }
 
-void print_line (size_t width, size_t pixel_size, size_t pixel_used_size, const unsigned char* data)
+void print_line (unsigned int width, unsigned int pixel_size, unsigned int pixel_used_size, const unsigned char* data)
 {
   const unsigned char* pixel = data;
 
-  for (size_t i=0; i<width; i++, pixel += pixel_size)
+  for (unsigned int i=0; i<width; i++, pixel += pixel_size)
   {
-    for (size_t j=0; j<pixel_used_size; j++)
+    for (unsigned int j=0; j<pixel_used_size; j++)
       printf ("%02x", pixel [pixel_size-j-1]);
 
     printf (" ");
   }
 }
 
-void print_line_diff (size_t width, size_t pixel_size, size_t pixel_used_size, const unsigned char* line1, const unsigned char* line2)
+void print_line_diff (unsigned int width, unsigned int pixel_size, unsigned int pixel_used_size, const unsigned char* line1, const unsigned char* line2)
 {
   const unsigned char *pixel1 = line1, *pixel2 = line2;
 
-  for (size_t i=0; i<width; i++, pixel1 += pixel_size, pixel2 += pixel_size)
+  for (unsigned int i=0; i<width; i++, pixel1 += pixel_size, pixel2 += pixel_size)
   {
-    for (size_t j=0; j<pixel_size; j++)
+    for (unsigned int j=0; j<pixel_size; j++)
       printf ("%02x", (unsigned char)(pixel2 [pixel_size-j-1] - pixel1 [pixel_size-j-1]));
 
     printf (" ");
   }
 }
 
-void init_buffer (size_t width, size_t height, size_t pixel_size, size_t pixel_used_size, void* data)
+void init_buffer (unsigned int width, unsigned int height, unsigned int pixel_size, unsigned int pixel_used_size, void* data)
 {
   unsigned char* line = reinterpret_cast<unsigned char*> (data);
   
-  for (size_t i=0, line_size=width*pixel_size; i<height; i++, line += line_size)
+  for (unsigned int i=0, line_size=width*pixel_size; i<height; i++, line += line_size)
     init_line (width, pixel_size, pixel_used_size, line);
 }
 
-void print_buffer (size_t width, size_t height, size_t pixel_size, size_t pixel_used_size, const void* data)
+void print_buffer (unsigned int width, unsigned int height, unsigned int pixel_size, unsigned int pixel_used_size, const void* data)
 {
   const unsigned char* line = reinterpret_cast<const unsigned char*> (data);
   
-  for (size_t i=0, line_size=width*pixel_size; i<height; i++, line += line_size)
+  for (unsigned int i=0, line_size=width*pixel_size; i<height; i++, line += line_size)
   {
     printf ("    ");
     print_line (width, pixel_size, pixel_used_size, line);
@@ -101,12 +101,12 @@ void print_buffer (size_t width, size_t height, size_t pixel_size, size_t pixel_
   }
 }
 
-void print_buffer_diff (size_t width, size_t height, size_t pixel_size, size_t pixel_used_size, const void* buffer1, const void* buffer2)
+void print_buffer_diff (unsigned int width, unsigned int height, unsigned int pixel_size, unsigned int pixel_used_size, const void* buffer1, const void* buffer2)
 {
   const unsigned char* line1 = reinterpret_cast<const unsigned char*> (buffer1);
   const unsigned char* line2 = reinterpret_cast<const unsigned char*> (buffer2);
   
-  for (size_t i=0, line_size=width*pixel_size; i<height; i++, line1 += line_size, line2 += line_size)
+  for (unsigned int i=0, line_size=width*pixel_size; i<height; i++, line1 += line_size, line2 += line_size)
   {
     printf ("    ");
     print_line (width, pixel_size, pixel_used_size, line1);
@@ -122,10 +122,10 @@ void print_buffer_diff (size_t width, size_t height, size_t pixel_size, size_t p
     Тестирование операции установки / чтения данных для буфера указанного формата
 */
 
-void test_buffer (ITexture& render_buffer, size_t x, size_t y, size_t width, size_t height, PixelFormat format)
+void test_buffer (ITexture& render_buffer, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat format)
 {
-  size_t pixel_size      = get_pixel_size (format),
-         pixel_used_size = get_pixel_used_size (format);
+  unsigned int pixel_size      = get_pixel_size (format),
+               pixel_used_size = get_pixel_used_size (format);
          
   if (!pixel_size || !pixel_used_size || pixel_size < pixel_used_size)
   {
@@ -164,7 +164,7 @@ void test_buffer (ITexture& render_buffer, size_t x, size_t y, size_t width, siz
 
 void test_buffer (ITexture& render_buffer)
 {
-  static const size_t width = 4, height = 4, x = 20, y = 10;
+  static const unsigned int width = 4, height = 4, x = 20, y = 10;
 
   for (int i=0; i<PixelFormat_Num; i++)
   {
@@ -189,7 +189,7 @@ int main ()
     clear_color.blue  = 3.0f / 255.0f;
     clear_color.alpha = 4.0f / 255.0f;
 
-    size_t rt_index = 0;
+    unsigned int rt_index = 0;
 
     test.device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 0, 0);
 

@@ -42,11 +42,11 @@ typedef CacheMap<OptionsCacheCombinationKey, ProgramPtr, RemovePred>  ProgramMap
 struct DefaultSamplerHolder: public xtl::reference_counter, public CacheSource
 {
   SamplerProxy            sampler;        //сэмплер текстуры
-  size_t                  channel;        //номер канала
+  unsigned int            channel;        //номер канала
   LowLevelSamplerStatePtr cached_sampler; //закэшированный сэмплер
 
 /// Конструктор
-  DefaultSamplerHolder (CacheHolder& owner, const TextureManagerPtr& texture_manager, const char* name, size_t in_channel)
+  DefaultSamplerHolder (CacheHolder& owner, const TextureManagerPtr& texture_manager, const char* name, unsigned int in_channel)
     : sampler (texture_manager->GetSamplerProxy (name))
     , channel (in_channel)
   {
@@ -359,9 +359,9 @@ void Program::DetachAllShaders ()
   impl->common_data->shaders.clear ();
 }
 
-size_t Program::ShadersCount ()
+unsigned int Program::ShadersCount ()
 {
-  return impl->common_data->shaders.size ();
+  return (unsigned int)impl->common_data->shaders.size ();
 }
 
 /*
@@ -382,9 +382,9 @@ const char* Program::DynamicOptions ()
     Отображение семантики текстурной карты на номер канала и имя параметра
 */
 
-size_t Program::TexmapsCount ()
+unsigned int Program::TexmapsCount ()
 {
-  return impl->common_data->texmaps.size ();
+  return (unsigned int)impl->common_data->texmaps.size ();
 }
 
 bool Program::HasFramemaps ()
@@ -410,7 +410,7 @@ const TexmapDesc* Program::Texmaps ()
   return &impl->common_data->texmaps [0];
 }
 
-const TexmapDesc& Program::Texmap (size_t index)
+const TexmapDesc& Program::Texmap (unsigned int index)
 {
   if (index >= impl->common_data->texmaps.size ())
     throw xtl::make_range_exception ("render::manager::Program::Texmap", "index", index, impl->common_data->texmaps.size ());
@@ -437,7 +437,7 @@ const TexmapDesc* Program::FindTexmapBySemantic (const char* semantic)
   return FindTexmapBySemantic (common::strhash (semantic));
 }
 
-void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
+void Program::SetTexmap (unsigned int index, unsigned int channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
 {
   static const char* METHOD_NAME = "render::manager::Program::SetTexmap";
 
@@ -490,11 +490,11 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
   impl->common_data->InvalidateCache ();
 }
 
-size_t Program::AddTexmap (size_t channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
+unsigned int Program::AddTexmap (unsigned int channel, const char* semantic, const char* param_name, const char* default_sampler, bool is_framemap)
 {
   impl->common_data->texmaps.push_back ();
 
-  size_t index = impl->common_data->texmaps.size () - 1;
+  unsigned int index = (unsigned int)impl->common_data->texmaps.size () - 1;
   
   try
   {
@@ -509,12 +509,12 @@ size_t Program::AddTexmap (size_t channel, const char* semantic, const char* par
   }
 }
 
-void Program::RemoveTexmap (size_t index)
+void Program::RemoveTexmap (unsigned int index)
 {
   if (index >= impl->common_data->texmaps.size ())
     return;
 
-  size_t channel = impl->common_data->texmaps [index].channel;
+  unsigned int channel = impl->common_data->texmaps [index].channel;
 
   for (DefaultSamplerHolderArray::iterator iter=impl->common_data->default_samplers.begin (), end=impl->common_data->default_samplers.end (); iter!=end; ++iter)
     if (channel == (*iter)->channel)
@@ -607,9 +607,9 @@ struct ShaderCompilerLog
       "Fragment shader(s) linked, vertex shader(s) linked."
     };
     
-    static const size_t IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
+    static const unsigned int IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
     
-    for (size_t i=0; i<IGNORE_MESSAGES_COUNT; i++)
+    for (unsigned int i=0; i<IGNORE_MESSAGES_COUNT; i++)
       if (common::wcimatch (message, IGNORE_MESSAGES [i]))
         return;
       
@@ -643,7 +643,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
       
     stl::string options = impl->common_data->static_options + " " + impl->options.options;
       
-    static const size_t SHADERS_RESERVE_COUNT = 4;
+    static const unsigned int SHADERS_RESERVE_COUNT = 4;
 
     stl::vector<render::low_level::ShaderDesc> shaders;
     
@@ -659,7 +659,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
       
       desc.name             = shader.Name ();  
       desc.profile          = shader.Profile ();
-      desc.source_code_size = shader.SourceCodeSize ();
+      desc.source_code_size = (unsigned int)shader.SourceCodeSize ();
       desc.source_code      = shader.SourceCode ();
       desc.options          = options.c_str ();      
       
@@ -671,7 +671,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
       
     impl->common_data->log.Printf ("Build program '%s'...", impl->common_data->name.c_str ());
 
-    LowLevelProgramPtr program (device.CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (*impl->common_data)), false);
+    LowLevelProgramPtr program (device.CreateProgram ((unsigned int)shaders.size (), &shaders [0], ShaderCompilerLog (*impl->common_data)), false);
     
     impl->common_data->log.Printf ("...program '%s' successfully built", impl->common_data->name.c_str ());
       

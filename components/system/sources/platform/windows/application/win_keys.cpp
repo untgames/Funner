@@ -24,6 +24,6 @@ size_t WindowsWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size,
   if (!buffer_size)
     return 0;
 
-  return ::GetKeyNameTextA (size_t (scan_code) << 16, buffer, buffer_size);
+  return ::GetKeyNameTextA ((unsigned int)scan_code << 16, buffer, (int)buffer_size);
 #endif
 }

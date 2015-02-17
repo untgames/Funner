@@ -2,7 +2,7 @@
 
 #define TEST(X) try { X; }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
-void dump_dynamic_properties (const VisualModel& node)
+void dump_dynamic_properties (const VisualModel& node, size_t correct_properties_hash, size_t correct_layout_hash)
 {
   if (!node.DynamicShaderProperties ())
   {
@@ -12,8 +12,8 @@ void dump_dynamic_properties (const VisualModel& node)
 
   const common::PropertyMap& properties = *node.DynamicShaderProperties ();  
   
-  printf ("node has %u dynamic shader properties (hash=%08x, structure_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.LayoutHash ());    
+  printf ("node has %u dynamic shader properties (hash_correct=%d, structure_hash_correct=%d):\n",
+    properties.Size (), properties.Hash () == correct_properties_hash, properties.LayoutHash () == correct_layout_hash);
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
@@ -25,7 +25,7 @@ void dump_dynamic_properties (const VisualModel& node)
   }
 }
 
-void dump_static_properties (const VisualModel& node)
+void dump_static_properties (const VisualModel& node, size_t correct_properties_hash, size_t correct_layout_hash)
 {
   if (!node.StaticShaderProperties ())
   {
@@ -35,8 +35,8 @@ void dump_static_properties (const VisualModel& node)
 
   const common::PropertyMap& properties = *node.StaticShaderProperties ();  
   
-  printf ("node has %u static shader properties (hash=%08x, structure_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.LayoutHash ());    
+  printf ("node has %u static shader properties (hash_correct=%d, structure_hash_correct=%d):\n",
+    properties.Size (), properties.Hash () == correct_properties_hash, properties.LayoutHash () == correct_layout_hash);
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
@@ -48,10 +48,10 @@ void dump_static_properties (const VisualModel& node)
   }
 }
 
-void dump_properties (const VisualModel& node)
+void dump_properties (const VisualModel& node, size_t correct_properties_hash_static, size_t correct_layout_hash_static, size_t correct_properties_hash_dynamic, size_t correct_layout_hash_dynamic)
 {
-  dump_static_properties (node);
-  dump_dynamic_properties (node);
+  dump_static_properties (node, correct_properties_hash_static, correct_layout_hash_static);
+  dump_dynamic_properties (node, correct_properties_hash_dynamic, correct_layout_hash_dynamic);
 }
 
 int main ()
@@ -62,13 +62,13 @@ int main ()
   {
     TestVisualModel::Pointer node (TestVisualModel::Create ());
     
-    dump_properties (*node);
+    dump_properties (*node, 0, 0, 0, 0);
     
     printf ("create properties\n");
     
     node->SetDynamicShaderProperties (common::PropertyMap ());
     
-    dump_properties (*node);
+    dump_properties (*node, 0, 0, 0xffffffff, 0xffffffff);
     
     printf ("add dynamic properties\n");
     
@@ -76,7 +76,7 @@ int main ()
 
     properties1.SetProperty ("X", "1");
     
-    dump_properties (*node);        
+    dump_properties (*node, 0, 0, sizeof (void*) == 4 ? 0x54a83a00 : 0x612d49c0, sizeof (void*) == 4 ? 0x7d77abc3 : 0x139eaa9d);
 
     printf ("add static properties\n");
 
@@ -86,7 +86,7 @@ int main ()
 
     properties2.SetProperty ("Y", "2");
     
-    dump_properties (*node);        
+    dump_properties (*node, sizeof (void*) == 4 ? 0xb789e995 : 0x145d5345, sizeof (void*) == 4 ? 0x7e869928 : 0xa7cac198, sizeof (void*) == 4 ? 0x54a83a00 : 0x612d49c0, sizeof (void*) == 4 ? 0x7d77abc3 : 0x139eaa9d);
   }
   catch (std::exception& e)
   {

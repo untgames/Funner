@@ -34,13 +34,13 @@ typedef stl::auto_ptr<IVideoDecoder>     DecoderPtr;
 class DefaultDecoder: public IVideoDecoder
 {
   public:
-    float  GetFramesPerSecond  () { return 1.f; }
-    size_t GetWidth            () { return 0; }
-    size_t GetHeight           () { return 0; }
-    size_t GetFramesCount      () { return 0; }
-    float  GetPixelAspectRatio () { return 1.0f; }
+    float        GetFramesPerSecond  () { return 1.f; }
+    unsigned int GetWidth            () { return 0; }
+    unsigned int GetHeight           () { return 0; }
+    unsigned int GetFramesCount      () { return 0; }
+    float        GetPixelAspectRatio () { return 1.0f; }
     
-    void Decode (size_t frame, Pixel* data_buffer)
+    void Decode (unsigned int frame, Pixel* data_buffer)
     {
       throw xtl::format_operation_exception ("media::DefaultDecoder::Decode", "Can't decode video from default decoder");
     }
@@ -63,10 +63,10 @@ struct VideoStream::Impl
   stl::string  file_name;          //имя файла (для возможности копирования видео)
   stl::string  name;               //имя видео потока
   VideoQuality quality;            //качество декодирования видео
-  size_t       frames_count;       //количество кадров
+  unsigned int frames_count;       //количество кадров
   float        frames_per_second;  //количество кадров в секунду
-  size_t       width;              //ширина кадра
-  size_t       height;             //высота кадра
+  unsigned int width;              //ширина кадра
+  unsigned int height;             //высота кадра
   float        pixel_aspect_ratio; //соотношение сторон кадра
   TempBuffer   temp_decode_buffer; //временный буфер декодирования
   
@@ -200,7 +200,7 @@ VideoQuality VideoStream::Quality () const
   return impl->quality;
 }
 
-size_t VideoStream::FramesCount () const
+unsigned int VideoStream::FramesCount () const
 {
   return impl->frames_count;
 }
@@ -210,12 +210,12 @@ float VideoStream::FramesPerSecond  () const
   return impl->frames_per_second;
 }
 
-size_t VideoStream::Width () const
+unsigned int VideoStream::Width () const
 {
   return impl->width;
 }
 
-size_t VideoStream::Height () const
+unsigned int VideoStream::Height () const
 {
   return impl->height;
 }
@@ -230,7 +230,7 @@ float VideoStream::Duration () const
   return impl->frames_count / (float)impl->frames_per_second;
 }
 
-size_t VideoStream::FrameSize () const
+unsigned int VideoStream::FrameSize () const
 {
   try
   {
@@ -247,7 +247,7 @@ size_t VideoStream::FrameSize () const
     Получение декодированного кадра
 */
 
-void VideoStream::Decode (size_t frame_number, Image& image, size_t image_offset_x, size_t image_offset_y, size_t image_offset_z)
+void VideoStream::Decode (unsigned int frame_number, Image& image, unsigned int image_offset_x, unsigned int image_offset_y, unsigned int image_offset_z)
 {
   try
   {
@@ -274,12 +274,12 @@ void VideoStream::Decode (size_t frame_number, Image& image, size_t image_offset
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::VideoStream::Decode(size_t,Image&,size_t,size_t)");
+    e.touch ("media::VideoStream::Decode(unsigned int,Image&,unsigned int,unsigned int)");
     throw;
   }
 }
 
-void VideoStream::Decode (size_t frame_number, Pixel* frame_buffer)
+void VideoStream::Decode (unsigned int frame_number, Pixel* frame_buffer)
 {
   try
   {
@@ -293,7 +293,7 @@ void VideoStream::Decode (size_t frame_number, Pixel* frame_buffer)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::VideoStream::Decode(size_t,Pixel*)");
+    e.touch ("media::VideoStream::Decode(unsigned int,Pixel*)");
     throw;
   }
 }

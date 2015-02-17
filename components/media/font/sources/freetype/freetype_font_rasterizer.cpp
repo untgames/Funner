@@ -38,30 +38,30 @@ struct FreetypeFontRasterizer::Impl
     atlas_builder.SetMargin       (params.glyph_margin);
     atlas_builder.SetMaxImageSize (params.max_image_size);
 
-    size_t pack_flags = AtlasPackFlag_Fast;
+    unsigned int pack_flags = AtlasPackFlag_Fast;
 
     if (params.pot)
       pack_flags |= AtlasPackFlag_PowerOfTwoEdges;
 
     atlas_builder.SetPackFlags (pack_flags);
 
-    size_t unique_glyphs_count = rasterized_font.UniqueGlyphsCount ();
+    unsigned int unique_glyphs_count = rasterized_font.UniqueGlyphsCount ();
 
     const math::vec2ui*   current_glyph_size   = rasterized_font.GlyphsSizes ();
     const unsigned char** current_glyph_bitmap = rasterized_font.GlyphsBitmaps ();
 
-    for (size_t i = 0; i < unique_glyphs_count; i++, current_glyph_size++, current_glyph_bitmap++)
+    for (unsigned int i = 0; i < unique_glyphs_count; i++, current_glyph_size++, current_glyph_bitmap++)
       atlas_builder.Insert (current_glyph_size->x, current_glyph_size->y, media::PixelFormat_L8, *current_glyph_bitmap, false, "", i);
 
     RasterizedGlyphsBuffer unique_glyphs (unique_glyphs_count);
 
-    for (size_t i = 0, count = atlas_builder.AtlasesCount (); i < count; i++)
+    for (unsigned int i = 0, count = atlas_builder.AtlasesCount (); i < count; i++)
     {
       Atlas atlas;
 
       atlas_builder.BuildAtlas (i, "", atlas);
 
-      for (size_t j = 0, tiles_count = atlas.TilesCount (); j < tiles_count; j++)
+      for (unsigned int j = 0, tiles_count = atlas.TilesCount (); j < tiles_count; j++)
       {
         const media::Tile&   tile  = atlas.Tile (j);
         RasterizedGlyphInfo& glyph = unique_glyphs.data () [tile.tag];
@@ -77,7 +77,7 @@ struct FreetypeFontRasterizer::Impl
     const unsigned int*  current_mapping = rasterized_font.GlyphsMap ();
     RasterizedGlyphInfo* current_glyph   = glyphs.data ();
 
-    for (size_t i = 0, count = rasterized_font.GlyphsCount (); i < count; i++, current_mapping++, current_glyph++)
+    for (unsigned int i = 0, count = rasterized_font.GlyphsCount (); i < count; i++, current_mapping++, current_glyph++)
       memcpy (current_glyph, unique_glyphs.data () + *current_mapping, sizeof (RasterizedGlyphInfo));
   }
 };
@@ -112,12 +112,12 @@ const RasterizedGlyphInfo* FreetypeFontRasterizer::RasterizedGlyphs ()
    Построение картинок
 */
 
-size_t FreetypeFontRasterizer::ImagesCount ()
+unsigned int FreetypeFontRasterizer::ImagesCount ()
 {
   return impl->atlas_builder.AtlasesCount ();
 }
 
-void FreetypeFontRasterizer::BuildImage (size_t image_index, media::Image& out_image)
+void FreetypeFontRasterizer::BuildImage (unsigned int image_index, media::Image& out_image)
 {
   try
   {

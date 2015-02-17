@@ -51,7 +51,7 @@ class XmlFontSaver
       writer.WriteAttribute ("FontFile", image_name_format);
       writer.WriteAttribute ("ImagesCount", rasterized_font.ImagesCount ());
 
-      for (size_t i = 0, count = rasterized_font.ImagesCount (); i < count; i++)
+      for (unsigned int i = 0, count = rasterized_font.ImagesCount (); i < count; i++)
       {
         media::Image image;
 
@@ -75,7 +75,7 @@ class XmlFontSaver
       const GlyphInfo*           current_glyph            = font.Glyphs ();
       const RasterizedGlyphInfo* current_rasterized_glyph = rasterized_font.RasterizedGlyphs ();
 
-      for (size_t i = 0, count = font.GlyphsCount (); i < count; i++, current_glyph++, current_rasterized_glyph++)
+      for (unsigned int i = 0, count = font.GlyphsCount (); i < count; i++, current_glyph++, current_rasterized_glyph++)
         SaveGlyph (*current_glyph, *current_rasterized_glyph);
     }
 
@@ -102,13 +102,13 @@ class XmlFontSaver
     {
       XmlWriter::Scope scope (writer, "Kernings");
       
-      for (size_t i = 0, count = font.GlyphsCount (); i < count; i++)
-        for (size_t j = 0; j < count; j++)
+      for (unsigned int i = 0, count = font.GlyphsCount (); i < count; i++)
+        for (unsigned int j = 0; j < count; j++)
           if (font.HasKerning (i, j))
             SaveKerning (font, i, j);
     }
 
-    void SaveKerning (const Font& font, size_t left_glyph_index, size_t right_glyph_index)
+    void SaveKerning (const Font& font, unsigned int left_glyph_index, unsigned int right_glyph_index)
     {
       XmlWriter::Scope scope (writer, "Kerning");
       KerningInfo      kerning_info (font.Kerning (left_glyph_index, right_glyph_index));

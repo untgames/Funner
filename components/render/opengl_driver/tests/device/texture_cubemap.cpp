@@ -2,7 +2,7 @@
 
 using namespace common;
 
-const size_t image_data_size = 512 * 512 * 6 * 4;
+const unsigned int image_data_size = 512 * 512 * 6 * 4;
 
 int main ()
 {
@@ -28,7 +28,7 @@ int main ()
 
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
 
-    for (size_t i=0; i<6; i++)
+    for (unsigned int i=0; i<6; i++)
     {
       memset (image_data, 17 + i, image_data_size);
 
@@ -53,7 +53,7 @@ int main ()
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
 
-    for (size_t i=0; i<6; i++)
+    for (unsigned int i=0; i<6; i++)
     {
       texture2->SetData (i, 0, 0, 0, 512, 512, PixelFormat_RGBA8, image_data + desc.width * desc.height * i * 4);
 

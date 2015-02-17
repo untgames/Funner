@@ -9,5 +9,5 @@ using namespace syslib;
 void WindowsApplicationManager::Sleep (size_t miliseconds)
 {
   SetLastError (0);
-  ::Sleep (miliseconds);
+  ::Sleep ((DWORD)miliseconds);
 }

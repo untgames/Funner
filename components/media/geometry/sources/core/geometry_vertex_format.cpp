@@ -124,7 +124,7 @@ VertexFormat VertexFormat::Clone () const
 
 uint32_t VertexFormat::AttributesCount () const
 {
-  return impl->attributes.size ();
+  return (uint32_t)impl->attributes.size ();
 }
 
 /*
@@ -140,7 +140,7 @@ void VertexFormat::ReserveAttributes (uint32_t count, uint32_t name_buffer_size)
 
 uint32_t VertexFormat::ReservedAttributesCount () const
 {
-  return impl->attributes.capacity ();
+  return (uint32_t)impl->attributes.capacity ();
 }
 
 /*
@@ -293,7 +293,7 @@ uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic s
     throw;
   }
   
-  return impl->attributes.size () - 1;
+  return (uint32_t)impl->attributes.size () - 1;
 }
 
 uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeType type, uint32_t offset)
@@ -331,7 +331,7 @@ uint32_t VertexFormat::AddAttributes (const VertexFormat& format)
     AddAttribute (attribute.name, attribute.semantic, attribute.type, attribute.offset);
   }
 
-  return impl->attributes.size () - 1;
+  return (uint32_t)impl->attributes.size () - 1;
 }
 
 /*
@@ -360,7 +360,7 @@ void VertexFormat::RemoveAttribute (const char* name)
   if (!attribute)
     return;
     
-  RemoveAttribute (attribute - &impl->attributes [0]);
+  RemoveAttribute ((uint32_t)(attribute - &impl->attributes [0]));
 }
 
 void VertexFormat::RemoveAttributes (VertexAttributeSemantic semantic)
@@ -374,7 +374,7 @@ void VertexFormat::RemoveAttributes (VertexAttributeSemantic semantic)
     if (!attribute)
       return;
     
-    RemoveAttribute (attribute - &impl->attributes [0]);
+    RemoveAttribute ((uint32_t)(attribute - &impl->attributes [0]));
   }
 }
 
@@ -387,7 +387,7 @@ void VertexFormat::RemoveAttributes (const VertexFormat& format)
     if (*attribute.name)
     {
       if (const VertexAttribute* iter = FindAttribute (attribute.name))
-        RemoveAttribute (iter - &impl->attributes [0]);
+        RemoveAttribute ((uint32_t)(iter - &impl->attributes [0]));
     }
     else
     {

@@ -20,11 +20,11 @@ namespace
 /// √руппа пакетировани€
 struct BatchGroup: public xtl::reference_counter
 {
-  stl::string wildcard;       //маска имени
-  size_t      vertices_count; //количество вершин
-  size_t      indices_count;  //количество индексов
+  stl::string  wildcard;       //маска имени
+  unsigned int vertices_count; //количество вершин
+  unsigned int indices_count;  //количество индексов
 
-  BatchGroup (const char* in_wildcard, size_t in_vertices_count, size_t in_indices_count)
+  BatchGroup (const char* in_wildcard, unsigned int in_vertices_count, unsigned int in_indices_count)
     : wildcard (in_wildcard)
     , vertices_count (in_vertices_count)
     , indices_count (in_indices_count)
@@ -70,7 +70,7 @@ BatchingManager::~BatchingManager ()
     ƒобавление групп пакетировани€
 */
 
-void BatchingManager::AddBatchGroup (const char* group_wildcard, size_t vertices_count, size_t indices_count)
+void BatchingManager::AddBatchGroup (const char* group_wildcard, unsigned int vertices_count, unsigned int indices_count)
 {
   try
   {
@@ -175,9 +175,9 @@ void BatchingManager::ReloadConfiguration (const common::ParseNode& node)
     {
       common::Parser::AttributeIterator attr_iter = make_attribute_iterator (*iter);
 
-      const char* wildcard    = xtl::io::get<const char*> (attr_iter);
-      size_t      verts_count = xtl::io::get<size_t> (attr_iter, DEFAULT_BATCH_VERTICES_COUNT),
-                  inds_count  = xtl::io::get<size_t> (attr_iter, DEFAULT_BATCH_INDICES_COUNT);
+      const char*  wildcard    = xtl::io::get<const char*> (attr_iter);
+      unsigned int verts_count = xtl::io::get<unsigned int> (attr_iter, DEFAULT_BATCH_VERTICES_COUNT),
+                   inds_count  = xtl::io::get<unsigned int> (attr_iter, DEFAULT_BATCH_INDICES_COUNT);
 
       AddBatchGroup (wildcard, verts_count, inds_count);
     }

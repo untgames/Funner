@@ -11,7 +11,7 @@ Queue queue (MAX_QUEUE_SIZE, SPIN_TIME);
 
 int producer ()
 {
-  for (size_t i=0; i<LOOPS_COUNT; i++)
+  for (int i=0; i<LOOPS_COUNT; i++)
     queue.Push (i);
  
   return 0;

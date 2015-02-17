@@ -20,14 +20,14 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текущий размер буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size   () const;
-    void   Resize (size_t size);
+    unsigned int Size   () const;
+    void         Resize (unsigned int size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Максимальный размер буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Capacity () const;
-    void   Reserve  (size_t size);
+    unsigned int Capacity () const;
+    void         Reserve  (unsigned int size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
@@ -43,7 +43,7 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SyncBuffers (low_level::IDevice& device, size_t first = 0, bool sync_data = true);
+    void SyncBuffers (low_level::IDevice& device, unsigned int first = 0, bool sync_data = true);
 
   private:
     typedef xtl::uninitialized_storage<Item> ItemBuffer;
@@ -51,7 +51,7 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
   private:
     ItemBuffer           src_buffer;
     LowLevelBufferPtr    dst_buffer;
-    size_t               dst_buffer_size;
+    unsigned int         dst_buffer_size;
     low_level::UsageMode usage_mode;
     low_level::BindFlag  bind_flags;
 };
@@ -59,8 +59,8 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, size_t offset, const void* src_data, size_t src_data_size, 
-  size_t buffer_capacity, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, unsigned int offset, const void* src_data, unsigned int src_data_size,
+  unsigned int buffer_capacity, unsigned int& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
 
 /*
     Реализация
@@ -81,25 +81,25 @@ inline const LowLevelBufferPtr& DynamicPrimitiveBuffer<T>::LowLevelBuffer () con
 }
 
 template <class T> 
-inline size_t DynamicPrimitiveBuffer<T>::Size () const
+inline unsigned int DynamicPrimitiveBuffer<T>::Size () const
 {
-  return src_buffer.size ();
+  return (unsigned int)src_buffer.size ();
 }
 
 template <class T>
-inline void DynamicPrimitiveBuffer<T>::Resize (size_t size)
+inline void DynamicPrimitiveBuffer<T>::Resize (unsigned int size)
 {
   src_buffer.resize (size);
 }
 
 template <class T>
-inline size_t DynamicPrimitiveBuffer<T>::Capacity () const
+inline unsigned int DynamicPrimitiveBuffer<T>::Capacity () const
 {
-  return src_buffer.capacity ();
+  return (unsigned int)src_buffer.capacity ();
 }
 
 template <class T>
-inline void DynamicPrimitiveBuffer<T>::Reserve (size_t count)
+inline void DynamicPrimitiveBuffer<T>::Reserve (unsigned int count)
 {
   src_buffer.reserve (count);
 }
@@ -123,10 +123,10 @@ inline void DynamicPrimitiveBuffer<T>::Clear ()
 }
 
 template <class T>
-inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device, size_t first, bool sync_data)
+inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device, unsigned int first, bool sync_data)
 {
-  size_t offset = first * sizeof (Item);
+  unsigned int offset = first * sizeof (Item);
 
-  sync_buffers (device, usage_mode, bind_flags, offset, sync_data ? src_buffer.data () + offset : (Item*)0, src_buffer.size () * sizeof (Item) - offset, src_buffer.capacity () * sizeof (Item),
+  sync_buffers (device, usage_mode, bind_flags, offset, sync_data ? src_buffer.data () + offset : (Item*)0, (unsigned int)(src_buffer.size () * sizeof (Item) - offset), (unsigned int)(src_buffer.capacity () * sizeof (Item)),
     dst_buffer_size, dst_buffer);
 }

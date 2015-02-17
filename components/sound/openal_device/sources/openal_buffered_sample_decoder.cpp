@@ -11,11 +11,11 @@ typedef xtl::uninitialized_storage<char> ByteBuffer;
 
 struct BufferedSampleDecoder::Impl : public xtl::reference_counter
 {
-  ByteBuffer decoded_sound_buffer;
-  size_t     sample_size;
-  size_t     samples_count;
+  ByteBuffer   decoded_sound_buffer;
+  unsigned int sample_size;
+  unsigned int samples_count;
 
-  Impl (size_t buffer_size, size_t in_sample_size, size_t in_samples_count)
+  Impl (unsigned int buffer_size, unsigned int in_sample_size, unsigned int in_samples_count)
     : decoded_sound_buffer (buffer_size)
     , sample_size (in_sample_size)
     , samples_count (in_samples_count)
@@ -32,11 +32,11 @@ BufferedSampleDecoder::BufferedSampleDecoder (const char* name)
   {
     media::SoundSample sample (name);
 
-    size_t sample_size = sample.SamplesToBytes (1);
+    unsigned int sample_size = sample.SamplesToBytes (1);
 
     stl::auto_ptr<Impl> impl_holder (new Impl (sample.SamplesToBytes (sample.SamplesCount ()), sample_size, sample.SamplesCount ()));
 
-    for (size_t current_sample = 0, samples_count = sample.SamplesCount (); current_sample < samples_count;)
+    for (unsigned int current_sample = 0, samples_count = sample.SamplesCount (); current_sample < samples_count;)
       current_sample += sample.Read (current_sample, samples_count - current_sample, impl_holder->decoded_sound_buffer.data () + sample_size * current_sample);
 
     impl = impl_holder.release ();
@@ -52,11 +52,11 @@ BufferedSampleDecoder::BufferedSampleDecoder (const SampleDesc& desc, const IDev
 {
   try
   {
-    size_t sample_size = desc.bits_per_sample / 8 * desc.channels;
+    unsigned int sample_size = desc.bits_per_sample / 8 * desc.channels;
 
     stl::auto_ptr<Impl> impl_holder (new Impl (desc.samples_count * sample_size, sample_size, desc.samples_count));
 
-    for (size_t current_sample = 0, samples_count = desc.samples_count; current_sample < samples_count;)
+    for (unsigned int current_sample = 0, samples_count = desc.samples_count; current_sample < samples_count;)
       current_sample += fn (current_sample, samples_count - current_sample, impl_holder->decoded_sound_buffer.data () + sample_size * current_sample);
 
     impl = impl_holder.release ();
@@ -83,14 +83,14 @@ BufferedSampleDecoder::~BufferedSampleDecoder ()
    Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
 */
 
-size_t BufferedSampleDecoder::Read (size_t first_sample, size_t samples_count, void* data)
+unsigned int BufferedSampleDecoder::Read (unsigned int first_sample, unsigned int samples_count, void* data)
 {
   try
   {
     if (first_sample >= impl->samples_count)
       return 0;
 
-    size_t copied_samples_count = stl::min (samples_count, impl->samples_count - first_sample);
+    unsigned int copied_samples_count = stl::min (samples_count, impl->samples_count - first_sample);
 
     memcpy (data, impl->decoded_sound_buffer.data () + first_sample * impl->sample_size, copied_samples_count * impl->sample_size);
 

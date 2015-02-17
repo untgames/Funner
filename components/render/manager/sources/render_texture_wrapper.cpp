@@ -35,22 +35,22 @@ PixelFormat Texture::Format () const
   return impl->Format ();
 }
 
-size_t Texture::Width () const
+unsigned int Texture::Width () const
 {
   return impl->Width ();
 }
 
-size_t Texture::Height () const
+unsigned int Texture::Height () const
 {
   return impl->Height ();
 }
 
-size_t Texture::Depth () const
+unsigned int Texture::Depth () const
 {
   return impl->Depth ();
 }
 
-RenderTarget Texture::RenderTarget (size_t layer, size_t mip_level) const
+RenderTarget Texture::RenderTarget (unsigned int layer, unsigned int mip_level) const
 {
   return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTarget (layer, mip_level));
 }
@@ -60,12 +60,12 @@ void Texture::Update (const media::Image& image)
   impl->Update (image);
 }
 
-void Texture::Capture (size_t layer, size_t mip_level, media::Image& image)
+void Texture::Capture (unsigned int layer, unsigned int mip_level, media::Image& image)
 {
   impl->Capture (layer, mip_level, image);
 }
 
-void Texture::Capture (size_t mip_level, media::Image& image)
+void Texture::Capture (unsigned int mip_level, media::Image& image)
 {
   impl->Capture (mip_level, image);
 }

@@ -33,7 +33,7 @@ class PlatformManagerImpl
 
         win_dir.fast_resize (GetWindowsDirectory (&win_dir [0], 0));            
 
-        if (GetWindowsDirectory (&win_dir [0], win_dir.size ()))
+        if (GetWindowsDirectory (&win_dir [0], (unsigned int)win_dir.size ()))
         {      
           win_dir.pop_back ();
           

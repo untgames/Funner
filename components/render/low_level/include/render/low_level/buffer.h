@@ -18,10 +18,10 @@ class IDeviceContext;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct BufferDesc
 {
-  size_t    size;         //размер буфера
-  UsageMode usage_mode;   //режим использования буфера
-  size_t    bind_flags;   //флаги биндинга буфера
-  size_t    access_flags; //флаги доступа к буферу
+  unsigned int size;         //размер буфера
+  UsageMode    usage_mode;   //режим использования буфера
+  unsigned int bind_flags;   //флаги биндинга буфера
+  unsigned int access_flags; //флаги доступа к буферу
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,8 +38,8 @@ class IBuffer: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись из буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetData (size_t offset, size_t size, const void* data, IDeviceContext* context = 0) = 0;
-    virtual void GetData (size_t offset, size_t size, void* data, IDeviceContext* context = 0) = 0;
+    virtual void SetData (unsigned int offset, unsigned int size, const void* data, IDeviceContext* context = 0) = 0;
+    virtual void GetData (unsigned int offset, unsigned int size, void* data, IDeviceContext* context = 0) = 0;
 };
 
 }

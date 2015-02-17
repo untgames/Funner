@@ -52,7 +52,7 @@ class ShaderStageState: public IStageState
     }
 
       //установка константного буффера
-    void SetConstantBuffer (size_t buffer_slot, IBindableBuffer* buffer)
+    void SetConstantBuffer (unsigned int buffer_slot, IBindableBuffer* buffer)
     {
       if (buffer == constant_buffers [buffer_slot])
         return;
@@ -63,7 +63,7 @@ class ShaderStageState: public IStageState
     }
 
       //получение константного буффера
-    IBindableBuffer* GetConstantBuffer (size_t buffer_slot) const
+    IBindableBuffer* GetConstantBuffer (unsigned int buffer_slot) const
     {
       return constant_buffers [buffer_slot].get ();
     }
@@ -115,7 +115,7 @@ class ShaderStageState: public IStageState
       if (mask.ss_program_parameters_layout)
         SetProgramParametersLayout (source.GetProgramParametersLayout ());
 
-      for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+      for (unsigned int i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
         if (mask.ss_constant_buffers [i])
           SetConstantBuffer (i, source.GetConstantBuffer (i));
     }
@@ -227,8 +227,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 #endif
 
             ShaderDesc shader_descs [] = {
-              {"Default shader-stage pixel shader", strlen (PIXEL_SHADER), PIXEL_SHADER, "glsl.ps", ""},
-              {"Default shader-stage vertex shader", strlen (VERTEX_SHADER), VERTEX_SHADER, "glsl.vs", ""}
+              {"Default shader-stage pixel shader", (unsigned int)xtl::xstrlen (PIXEL_SHADER), PIXEL_SHADER, "glsl.ps", ""},
+              {"Default shader-stage vertex shader", (unsigned int)xtl::xstrlen (VERTEX_SHADER), VERTEX_SHADER, "glsl.vs", ""}
             };
 
             default_program = ProgramPtr (CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);
@@ -290,7 +290,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
 
 ///Создание программы
-    ICompiledProgram* CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+    ICompiledProgram* CreateProgram (unsigned int shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
     {
       try
       {
@@ -304,7 +304,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         IShaderManager* manager = 0;
 
-        for (size_t i=0; i<shaders_count; i++)
+        for (unsigned int i=0; i<shaders_count; i++)
         {
           const ShaderDesc& desc = shader_descs [i];
 
@@ -342,7 +342,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         program_shaders.reserve (shaders_count);
 
-        for (size_t i=0; i<shaders_count; i++)
+        for (unsigned int i=0; i<shaders_count; i++)
         {
             //корректировка описания шейдера
 
@@ -354,8 +354,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           if (!desc.options)
             desc.options = "";
 
-          if (desc.source_code_size == size_t (~0))
-            desc.source_code_size = strlen (desc.source_code);
+          if (desc.source_code_size == unsigned int (~0))
+            desc.source_code_size = (unsigned int)strlen (desc.source_code);
 
             //добавление скомпилированного шейдера к шейдерам программы
 
@@ -373,7 +373,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
           //создание программы шейдинга
 
-        return manager->CreateProgram (program_shader_pointers.size (), &program_shader_pointers [0], error_log);
+        return manager->CreateProgram ((unsigned int)program_shader_pointers.size (), &program_shader_pointers [0], error_log);
       }
       catch (xtl::exception& exception)
       {
@@ -659,7 +659,7 @@ IProgramParametersLayout* ShaderStage::CreateProgramParametersLayout (const Prog
   }
 }
 
-IProgram* ShaderStage::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
+IProgram* ShaderStage::CreateProgram (unsigned int shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
   return impl->CreateProgram (shaders_count, shader_descs, error_log);
 }
@@ -695,7 +695,7 @@ void ShaderStage::SetProgramParametersLayout (IProgramParametersLayout* paramete
   impl->SetProgramParametersLayout (cast_object<ProgramParametersLayout> (*impl, parameters_layout, "render::low_level::opengl::ShaderStage::SetProgramParametersLayout", "parameters_layout"));
 }
 
-void ShaderStage::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
+void ShaderStage::SetConstantBuffer (unsigned int buffer_slot, IBuffer* buffer)
 {
   try
   {
@@ -741,7 +741,7 @@ IVertexAttributeDictionary* ShaderStage::GetVertexAttributeDictionary () const
   return &impl->GetVertexAttributeDictionary ();
 }
 
-IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
+IBuffer* ShaderStage::GetConstantBuffer (unsigned int buffer_slot) const
 {
   if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
     throw xtl::make_range_exception ("render::low_level::opengl::ShaderStage::GetConstantBuffer", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);

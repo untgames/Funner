@@ -12,43 +12,43 @@ namespace detail
 //общая версия
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }  
+  static T get (IStack& stack, unsigned int index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
 };
 
 //извлечение enum-типов
 template <class T> struct common_argument_selector<T, true>
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }  
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение целочисленного аргумента
 template <class T> struct int_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение вещественного аргумента
 template <class T> struct float_argument_selector
 {
-  static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetFloat (index)); }
+  static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetFloat (index)); }
 };
 
 //извлечение void-указателей
 struct raw_pointer_argument_selector
 {
-  static void* get (IStack& stack, size_t index) { return stack.GetPointer (index); }
+  static void* get (IStack& stack, unsigned int index) { return stack.GetPointer (index); }
 };
 
 //извлечение строк
 struct string_argument_selector
 {
-  static const char* get (IStack& stack, size_t index) { return stack.GetString (index); }
+  static const char* get (IStack& stack, unsigned int index) { return stack.GetString (index); }
 };
 
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
-  static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
+  static xtl::any& get (IStack& stack, unsigned int index) { return stack.GetVariant (index); }
 };
 
 //диспетчеризация взятия аргумента для различных типов данных
@@ -71,6 +71,8 @@ template <> struct argument_selector<int>:                      public int_argum
 template <> struct argument_selector<unsigned int>:             public int_argument_selector<unsigned int> {};
 template <> struct argument_selector<long>:                     public int_argument_selector<long> {};
 template <> struct argument_selector<unsigned long>:            public int_argument_selector<unsigned long> {};
+template <> struct argument_selector<long long>:                public int_argument_selector<long long> {};
+template <> struct argument_selector<unsigned long long>:       public int_argument_selector<unsigned long long> {};
 template <> struct argument_selector<float>:                    public float_argument_selector<float> {};
 template <> struct argument_selector<double>:                   public float_argument_selector<double> {};
 template <> struct argument_selector<long double>:              public float_argument_selector<long double> {};
@@ -82,7 +84,7 @@ template <> struct argument_selector<const volatile char*>:     public string_ar
 
 template <> struct argument_selector<bool>
 {
-  static bool get (IStack& stack, size_t index) { return stack.GetBoolean (index); }
+  static bool get (IStack& stack, unsigned int index) { return stack.GetBoolean (index); }
 };
 
 template <class Traits, class Allocator>
@@ -106,11 +108,11 @@ struct argument_invoker_helper: public argument_invoker<T> {};
 template <class T>
 struct argument_invoker_helper<T, true>
 {
-    //enum-типы приводятся к int
+    //enum-типы приводятся к ptrdiff_t
 
-  typedef int type;
+  typedef ptrdiff_t type;
 
-  static int make (const T& value) { return static_cast<int> (value); }
+  static ptrdiff_t make (const T& value) { return static_cast<ptrdiff_t> (value); }
 };
 
 template <class T>
@@ -121,15 +123,19 @@ inline typename argument_invoker_helper<T>::type make_invoker_argument (const T&
 
 inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
 inline bool        make_invoker_argument (bool value)               { return value; }
-inline int         make_invoker_argument (char value)               { return value; }
-inline int         make_invoker_argument (signed char value)        { return value; }
-inline int         make_invoker_argument (unsigned char value)      { return value; }
-inline int         make_invoker_argument (short value)              { return value; }
-inline int         make_invoker_argument (unsigned short value)     { return value; }
-inline int         make_invoker_argument (int value)                { return value; }
-inline int         make_invoker_argument (unsigned int value)       { return value; }
-inline int         make_invoker_argument (long value)               { return value; }
-inline int         make_invoker_argument (unsigned long value)      { return value; }
+inline ptrdiff_t   make_invoker_argument (char value)               { return value; }
+inline ptrdiff_t   make_invoker_argument (signed char value)        { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned char value)      { return value; }
+inline ptrdiff_t   make_invoker_argument (short value)              { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned short value)     { return value; }
+inline ptrdiff_t   make_invoker_argument (int value)                { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned int value)       { return value; }
+inline ptrdiff_t   make_invoker_argument (long value)               { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned long value)      { return value; }
+#if defined (_M_X64) || defined (__x86_64__)
+inline ptrdiff_t   make_invoker_argument (long long value)          { return value; }
+inline ptrdiff_t   make_invoker_argument (unsigned long long value) { return value; }
+#endif
 inline float       make_invoker_argument (float value)              { return value; }
 inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
 inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
@@ -157,7 +163,7 @@ inline const char* make_invoker_argument (stl::basic_string<char, Traits, Alloca
 
 //взятие аргумента из стека
 template <class T>
-T get_argument (IStack& stack, size_t index)
+T get_argument (IStack& stack, unsigned int index)
 {
   try
   {

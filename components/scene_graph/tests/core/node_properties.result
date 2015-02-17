@@ -1,23 +1,23 @@
 Results of node_properties_test:
 node has no properties
 create properties
-node has 0 properties (hash=ffffffff, structure_hash=ffffffff):
+node has 0 properties (hash_correct=1, structure_hash_correct=1):
 add properties
-node has 3 properties (hash=490df002, structure_hash=f790e824):
+node has 3 properties (hash_correct=1, structure_hash_correct=1):
  #0: name='X', type=string, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='Z', type=string, value='hello world'
 remove properties
-node has 2 properties (hash=f09537d6, structure_hash=ba565b70):
+node has 2 properties (hash_correct=1, structure_hash_correct=1):
  #0: name='X', type=string, value='1'
  #1: name='Z', type=string, value='hello world'
 clear
-node has 0 properties (hash=ffffffff, structure_hash=ffffffff):
+node has 0 properties (hash_correct=1, structure_hash_correct=1):
 change property name
 exception: Invalid argument <property_name>='UnknownProperty'. There is no property with this name
     at common::PropertyLayout::SetPropertyName(const char*,const char*)
     at common::PropertyMap::SetPropertyName(const char*,const char*)
-node has 3 properties (hash=88c76d7c, structure_hash=50dbace6):
+node has 3 properties (hash_correct=1, structure_hash_correct=1):
  #0: name='X', type=string, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'
@@ -26,12 +26,12 @@ exception: Could not convert property 'NewZ' from string='hello world' to vector
     at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
     at common::PropertyMap::SetPropertyType(size_t,PropertyType)
     at common::PropertyMap::SetPropertyType(const char*,PropertyType)
-node has 3 properties (hash=fcdacd2a, structure_hash=1dea3343):
+node has 3 properties (hash_correct=1, structure_hash_correct=1):
  #0: name='X', type=float, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'
 clone
-node has 3 properties (hash=fcdacd2a, structure_hash=1dea3343):
+node has 3 properties (hash_correct=1, structure_hash_correct=1):
  #0: name='X', type=float, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'

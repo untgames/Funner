@@ -27,7 +27,7 @@ class ObjectImpl: virtual public IObject, public xtl::reference_counter, public 
   
     void AddRef () { addref (this); }  
     void Release () { release (this); }
-    unsigned int UseCount () { return use_count (); }
+    unsigned int UseCount () { return (unsigned int)use_count (); }
     
     xtl::trackable& GetTrackable () { return *this; }
     

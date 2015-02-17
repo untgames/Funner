@@ -12,10 +12,10 @@ namespace media
 struct FontDesc::Impl : public xtl::reference_counter
 {
   stl::string             source; //имя файла
-  size_t                  index;  //индекс используемого шрифта
+  unsigned int            index;  //индекс используемого шрифта
   xtl::com_ptr<IFontDesc> desc;   //шрифт
 
-  Impl (const char* in_source, IFontDesc* in_desc, size_t in_index)
+  Impl (const char* in_source, IFontDesc* in_desc, unsigned int in_index)
     : source (in_source)
     , index (in_index)
     , desc (in_desc)
@@ -28,7 +28,7 @@ struct FontDesc::Impl : public xtl::reference_counter
    Конструктор / деструктор / присваивание
 */
 
-FontDesc::FontDesc (const char* source, IFontDesc* desc, size_t index)
+FontDesc::FontDesc (const char* source, IFontDesc* desc, unsigned int index)
   : impl (new Impl (source, desc, index))
 {
 }

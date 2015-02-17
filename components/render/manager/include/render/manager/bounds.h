@@ -16,16 +16,16 @@ class BoxAreaImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Rect
 {
-  int    x;      //абсцисса левого верхнего угла области
-  int    y;      //ордината левого верхнего угла области
-  size_t width;  //ширина области
-  size_t height; //высота области
+  int          x;      //абсцисса левого верхнего угла области
+  int          y;      //ордината левого верхнего угла области
+  unsigned int width;  //ширина области
+  unsigned int height; //высота области
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   Rect ();
-  Rect (int x, int y, size_t width, size_t height);
+  Rect (int x, int y, unsigned int width, unsigned int height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—равнение
@@ -55,12 +55,12 @@ class RectArea
 ///–азмеры области
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                 SetRect (const manager::Rect& rect);
-    void                 SetRect (int x, int y, size_t width, size_t height);
+    void                 SetRect (int x, int y, unsigned int width, unsigned int height);
     const manager::Rect& Rect    () const;
     int                  X       () const;
     int                  Y       () const;
-    size_t               Width   () const;
-    size_t               Height  () const;
+    unsigned int         Width   () const;
+    unsigned int         Height  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбмен

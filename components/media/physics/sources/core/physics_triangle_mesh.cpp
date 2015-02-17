@@ -106,12 +106,12 @@ void TriangleMesh::SetConvex (bool convex)
    Работа с вершинами
 */
 
-size_t TriangleMesh::VerticesCount () const
+unsigned int TriangleMesh::VerticesCount () const
 {
-  return impl->vertices.size ();
+  return (unsigned int)impl->vertices.size ();
 }
 
-void TriangleMesh::SetVerticesCount (size_t count)
+void TriangleMesh::SetVerticesCount (unsigned int count)
 {
   impl->vertices.resize (count);
 }
@@ -130,12 +130,12 @@ math::vec3f* TriangleMesh::Vertices ()
    Работа с индексами
 */
 
-size_t TriangleMesh::TrianglesCount () const
+unsigned int TriangleMesh::TrianglesCount () const
 {
-  return impl->triangles.size ();
+  return (unsigned int)impl->triangles.size ();
 }
 
-void TriangleMesh::SetTrianglesCount (size_t count)
+void TriangleMesh::SetTrianglesCount (unsigned int count)
 {
   impl->triangles.resize (count);
 }

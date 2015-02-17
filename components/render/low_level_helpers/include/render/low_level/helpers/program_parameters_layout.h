@@ -19,8 +19,8 @@ namespace helpers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ProgramParameterGroup
 {
-  size_t                  slot;       //индекс константного буфера
-  size_t                  count;      //количество параметров в группе
+  unsigned int            slot;       //индекс константного буфера
+  unsigned int            count;      //количество параметров в группе
   const ProgramParameter* parameters; //указатель на начало области с параметрами группы
 };
 

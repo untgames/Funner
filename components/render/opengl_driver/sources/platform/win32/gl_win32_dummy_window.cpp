@@ -20,7 +20,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 {
     //получение указателя на первичную цепочку обмена
 
-  IWindowListener* listener = reinterpret_cast<IWindowListener*> (GetWindowLong (wnd, GWL_USERDATA));
+  IWindowListener* listener = reinterpret_cast<IWindowListener*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
   
     //если указатель на пользовательские данные не установлен - делаем попытку его установить
     
@@ -37,7 +37,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
         //устанавливаем указатель на пользовательские данные
 
-      SetWindowLong (wnd, GWL_USERDATA, (LONG)listener);
+      SetWindowLongPtr (wnd, GWLP_USERDATA, (LONG_PTR)listener);
 
       return 0;
     }

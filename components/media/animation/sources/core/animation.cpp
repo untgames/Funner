@@ -171,12 +171,12 @@ void Animation::Rename (const char* name)
    Перебор анимируемых объектов
 */
 
-size_t Animation::TargetsCount () const
+unsigned int Animation::TargetsCount () const
 {
-  return impl->channel_groups.size ();
+  return (unsigned int)impl->channel_groups.size ();
 }
 
-const char* Animation::TargetName (size_t target_index) const
+const char* Animation::TargetName (unsigned int target_index) const
 {
   if (target_index >= impl->channel_groups.size ())
     throw xtl::make_range_exception ("media::animation::Animation::TargetName", "target_index", target_index, 0u, impl->channel_groups.size ());
@@ -189,7 +189,7 @@ int Animation::FindTarget (const char* target_name) const
   if (!target_name)
     throw xtl::make_null_argument_exception ("media::animation::Animation::FindTarget", "target_name");
 
-  for (size_t i = 0, count = impl->channel_groups.size (); i < count; i++)
+  for (int i = 0, count = (int)impl->channel_groups.size (); i < count; i++)
     if (impl->channel_groups [i]->target_name == target_name)
       return i;
 
@@ -200,19 +200,19 @@ int Animation::FindTarget (const char* target_name) const
    Количество каналов
 */
 
-size_t Animation::ChannelsCount (size_t target_index) const
+unsigned int Animation::ChannelsCount (unsigned int target_index) const
 {
   if (target_index >= impl->channel_groups.size ())
     throw xtl::make_range_exception ("media::animation::Animation::ChannelsCount", "target_index", target_index, 0u, impl->channel_groups.size ());
 
-  return impl->channel_groups [target_index]->channels.size ();
+  return (unsigned int)impl->channel_groups [target_index]->channels.size ();
 }
 
 /*
    Перебор каналов
 */
 
-const animation::Channel& Animation::Channel (size_t target_index, size_t channel_index) const
+const animation::Channel& Animation::Channel (unsigned int target_index, unsigned int channel_index) const
 {
   static const char* METHOD_NAME = "media::animation::Animation::ChannelsCount";
 
@@ -227,7 +227,7 @@ const animation::Channel& Animation::Channel (size_t target_index, size_t channe
   return group->channels [channel_index];
 }
 
-animation::Channel& Animation::Channel (size_t target_index, size_t channel_index)
+animation::Channel& Animation::Channel (unsigned int target_index, unsigned int channel_index)
 {
   return const_cast<animation::Channel&> (const_cast<const Animation&> (*this).Channel (target_index, channel_index));
 }
@@ -236,7 +236,7 @@ animation::Channel& Animation::Channel (size_t target_index, size_t channel_inde
    Добавление/удаление каналов
 */
 
-void Animation::AddChannel (size_t target_index, const animation::Channel& channel)
+void Animation::AddChannel (unsigned int target_index, const animation::Channel& channel)
 {
   if (target_index >= impl->channel_groups.size ())
     throw xtl::make_range_exception ("media::animation::Animation::AddChannel", "target_index", target_index, 0u, impl->channel_groups.size ());
@@ -258,6 +258,10 @@ void Animation::AddChannel (const char* target_name, const animation::Channel& c
   if (target_index < 0)
   {
     group = ChannelGroupPtr (new ChannelGroup (target_name), false);
+
+    if (impl->channel_groups.size () >= INT_MAX)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't add channel, channel groups count limit exceeded");
+
     impl->channel_groups.push_back (group);
   }
   else
@@ -266,7 +270,7 @@ void Animation::AddChannel (const char* target_name, const animation::Channel& c
   group->channels.push_back (channel);
 }
 
-void Animation::RemoveChannel (size_t target_index, size_t channel_index)
+void Animation::RemoveChannel (unsigned int target_index, unsigned int channel_index)
 {
   if (target_index >= impl->channel_groups.size ())
     return;
@@ -282,7 +286,7 @@ void Animation::RemoveChannel (size_t target_index, size_t channel_index)
     impl->channel_groups.erase (impl->channel_groups.begin () + target_index);
 }
 
-void Animation::RemoveAllChannels (size_t target_index)
+void Animation::RemoveAllChannels (unsigned int target_index)
 {
   if (target_index >= impl->channel_groups.size ())
     return;

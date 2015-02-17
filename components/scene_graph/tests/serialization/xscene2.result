@@ -3,7 +3,6 @@ node 'scene1':
   parent: ''
   bindings:
     string Name='scene1'
-    integer UseCount='1'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -28,7 +27,6 @@ node 'node1':
   parent: 'scene1'
   bindings:
     string Name='node1'
-    integer UseCount='2'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -53,7 +51,6 @@ node 'node2':
   parent: 'node1'
   bindings:
     string Name='node2'
-    integer UseCount='2'
     vector Position='1 2 3 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -78,7 +75,6 @@ node 'node4':
   parent: 'node2'
   bindings:
     string Name='node4'
-    integer UseCount='2'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -103,7 +99,6 @@ node 'node5':
   parent: 'node2'
   bindings:
     string Name='node5'
-    integer UseCount='2'
     vector Position='9 18 27 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -128,7 +123,6 @@ node 'node2':
   parent: 'scene1'
   bindings:
     string Name='node2'
-    integer UseCount='2'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -155,7 +149,6 @@ node 'node3':
     integer A='4'
   bindings:
     string Name='node3'
-    integer UseCount='2'
     vector Position='1 2 3 0'
     vector Orientation='0.0130987 0.192666 0.361453 0.912173'
     vector Rotation='10 20 45 0'
@@ -180,7 +173,6 @@ node 'node6':
   parent: 'scene1'
   bindings:
     string Name='node6'
-    integer UseCount='2'
     vector Position='10 20 30 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -205,7 +197,6 @@ node 'node7':
   parent: 'scene1'
   bindings:
     string Name='node7'
-    integer UseCount='2'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0.707107 0.707107'
     vector Rotation='0 0 90 0'
@@ -230,7 +221,6 @@ node 'node7_test':
   parent: 'node7'
   bindings:
     string Name='node7_test'
-    integer UseCount='2'
     vector Position='0 0 0 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'
@@ -255,7 +245,6 @@ node 'node8':
   parent: 'scene1'
   bindings:
     string Name='node8'
-    integer UseCount='2'
     vector Position='0 0 -1 0'
     vector Orientation='0 0 0 1'
     vector Rotation='0 0 0 0'

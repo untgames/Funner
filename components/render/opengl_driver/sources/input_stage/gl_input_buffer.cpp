@@ -36,7 +36,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
     case AccessFlag_Read | AccessFlag_Write:
       break;
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", (size_t)desc.access_flags);
   }
 }
 
@@ -53,7 +53,7 @@ void Buffer::GetDesc (BufferDesc& out_desc)
     Работа с данными буфера
 */
 
-void Buffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
+void Buffer::SetData (unsigned int offset, unsigned int size, const void* data, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Buffer::SetData";
 
@@ -86,7 +86,7 @@ void Buffer::SetData (size_t offset, size_t size, const void* data, IDeviceConte
   SetDataCore (offset, size, data);
 }
 
-void Buffer::GetData (size_t offset, size_t size, void* data, IDeviceContext* context)
+void Buffer::GetData (unsigned int offset, unsigned int size, void* data, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Buffer::GetData";
 

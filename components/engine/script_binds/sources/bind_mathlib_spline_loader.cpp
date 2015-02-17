@@ -105,7 +105,7 @@ basic_spline<spline_linear_key<vector<T, Size> > > load_linear_spline_vector_key
       {
         math::vector <float, Size> v;
 
-        for (size_t i = 0; i < Size; i++)
+        for (unsigned char i = 0; i < Size; i++)
           if (!xtl::io::read (tokens [i], v [i]))
             throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
 

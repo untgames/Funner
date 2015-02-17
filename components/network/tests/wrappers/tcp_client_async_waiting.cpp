@@ -65,7 +65,7 @@ int server ()
     printf ("Server: received '%s'\n", buffer.c_str ());
     fflush (stdout);
 
-    client_socket.Send (MESSAGE2, strlen (MESSAGE2));
+    client_socket.Send (MESSAGE2, (unsigned int)strlen (MESSAGE2));
 
     while (!client_joined) syslib::Application::Sleep (1000);
   }

@@ -52,7 +52,7 @@ struct MediaPlayer::Impl : public common::Lockable
   StreamPtr                               current_stream;                 //текущий проигрываемый поток
   StreamPlayerManager::StreamEventHandler callback_handler;               //обработчик изменени€ состо€ни€ проигрываемых потоков
   int                                     current_track;                  //текущий трек
-  size_t                                  next_track;                     //следующий трек
+  unsigned int                            next_track;                     //следующий трек
   MediaPlayerState                        current_track_state;            //состо€ние текущего трека
   bool                                    is_muted;                       //выключен ли звук
   bool                                    play_state_lock;                //предотвращение двойного вызова функции изменени€ состо€ни€ проигрывател€ (play / pause / stop)
@@ -84,7 +84,7 @@ struct MediaPlayer::Impl : public common::Lockable
   ///Update looping state for current playing track
   void UpdateCurrentTrackLooping ()
   {
-    if (!current_stream || (size_t)current_track >= streams.size ())
+    if (!current_stream || (unsigned int)current_track >= streams.size ())
       return;
 
     current_stream->SetLooping (current_track == streams.size () - 1 && repeat_mode == MediaPlayerRepeatMode_Last && current_stream == streams [current_track]);
@@ -106,7 +106,7 @@ struct MediaPlayer::Impl : public common::Lockable
 
         new_streams.reserve (new_play_list.Size ());
 
-        for (size_t i=0, count=new_play_list.Size (); i<count; i++)
+        for (unsigned int i=0, count=new_play_list.Size (); i<count; i++)
         {
           StreamPtr stream (create_stream_player (target_name.c_str (), new_play_list.Item (i), callback_handler));
 
@@ -117,7 +117,7 @@ struct MediaPlayer::Impl : public common::Lockable
           new_streams.push_back (stream);
         }
 
-        if ((size_t)current_track >= list.Size () || (size_t)current_track >= new_play_list.Size () || xtl::xstrcmp (list.Item (current_track), new_play_list.Item (current_track)))
+        if ((unsigned int)current_track >= list.Size () || (unsigned int)current_track >= new_play_list.Size () || xtl::xstrcmp (list.Item (current_track), new_play_list.Item (current_track)))
         {
           if (new_play_list.IsEmpty ())
           {
@@ -171,7 +171,7 @@ struct MediaPlayer::Impl : public common::Lockable
 /// орректен ли текущий поток
   bool IsCurrentTrackValid ()
   {
-    return (size_t)current_track < streams.size ();
+    return (unsigned int)current_track < streams.size ();
   }
 
 ///“екущий медиа-поток
@@ -267,7 +267,7 @@ struct MediaPlayer::Impl : public common::Lockable
 ///ќповещени€ о возникновении событий
   void Notify (MediaPlayerEvent event)
   {
-    for (int i = notify_actions.size () - 1; i >= 0; i--)
+    for (int i = (int)notify_actions.size () - 1; i >= 0; i--)
     {
       if (notify_actions [i].IsCompleted ())
         notify_actions.erase (notify_actions.begin () + i);
@@ -557,7 +557,7 @@ const media::players::Playlist& MediaPlayer::Playlist () const
      оличество треков
 */
 
-size_t MediaPlayer::TracksCount () const
+unsigned int MediaPlayer::TracksCount () const
 {
   return impl->list.Size ();
 }
@@ -592,7 +592,7 @@ MediaPlayerRepeatMode MediaPlayer::RepeatMode () const
 */
 
 //установка текущего трека
-void MediaPlayer::SetTrack (size_t track)
+void MediaPlayer::SetTrack (unsigned int track)
 {
   common::Lock lock (*impl);
 
@@ -628,7 +628,7 @@ void MediaPlayer::SetTrack (size_t track)
   }
 }
 
-void MediaPlayer::SetNextPlayTrack (size_t track)
+void MediaPlayer::SetNextPlayTrack (unsigned int track)
 {
   common::Lock lock (*impl);
 
@@ -654,7 +654,7 @@ int MediaPlayer::Track () const
   return impl->current_track;
 }
 
-size_t MediaPlayer::NextPlayTrack () const
+unsigned int MediaPlayer::NextPlayTrack () const
 {
   common::Lock lock (*impl);
 
@@ -662,7 +662,7 @@ size_t MediaPlayer::NextPlayTrack () const
 }
 
 //им€ трека
-const char* MediaPlayer::Source (size_t track) const
+const char* MediaPlayer::Source (unsigned int track) const
 {
   try
   {
@@ -670,7 +670,7 @@ const char* MediaPlayer::Source (size_t track) const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::MediaPlayer::Source(size_t)");
+    e.touch ("media::players::MediaPlayer::Source(unsigned int)");
     throw;
   }
 }
@@ -682,7 +682,7 @@ const char* MediaPlayer::Source () const
 }
 
 //длительность трека
-float MediaPlayer::Duration (size_t track) const
+float MediaPlayer::Duration (unsigned int track) const
 {  
   try
   {
@@ -719,7 +719,7 @@ void MediaPlayer::NextTrack ()
 
   try
   {
-    size_t new_track = impl->current_track + 1;
+    unsigned int new_track = impl->current_track + 1;
 
     if (new_track == impl->list.Size ())
       new_track = 0;
@@ -739,7 +739,7 @@ void MediaPlayer::PrevTrack ()
 
   try
   {
-    size_t new_track = impl->current_track - 1;
+    unsigned int new_track = impl->current_track - 1;
   
     if (new_track >= impl->list.Size ())
       new_track = impl->list.Size () ? impl->list.Size () - 1 : 0;

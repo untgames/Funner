@@ -20,7 +20,7 @@ struct State
     program_parameters_layout = device.GetImmediateContext ()->SSGetProgramParametersLayout ();
     program                   = device.GetImmediateContext ()->SSGetProgram ();
 
-    for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       buffers [i] = device.GetImmediateContext ()->SSGetConstantBuffer (i);
   }  
 
@@ -29,7 +29,7 @@ struct State
     printf ("SSGetProgramParametersLayout: %d\n", program_parameters_layout == src.program_parameters_layout);
     printf ("SSGetProgram: %d\n", program == src.program);    
       
-    for (size_t i=0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       printf ("SSGetConstantBuffer(%u): %d\n", i, buffers [i] == src.buffers [i]);      
   }
 };
@@ -74,7 +74,7 @@ int main ()
     test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
     test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
     
-    for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       test.device->GetImmediateContext ()->SSSetConstantBuffer (i, buffer.get ());
 
     State src_state;
@@ -85,7 +85,7 @@ int main ()
 
     mask.Set (StateBlockGroup_ShaderStage);
     
-    for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
     {
       mask.ss_samplers [i] = false;
       mask.ss_textures [i] = false;
@@ -98,7 +98,7 @@ int main ()
     test.device->GetImmediateContext ()->SSSetProgram (0);
     test.device->GetImmediateContext ()->SSSetProgramParametersLayout (0);
 
-    for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       test.device->GetImmediateContext ()->SSSetConstantBuffer (i, 0);    
 
     printf ("after reset\n");

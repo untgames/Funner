@@ -7,7 +7,7 @@ namespace
 
 struct KerningsMapKey
 {
-  KerningsMapKey (size_t in_left_glyph_index, size_t in_right_glyph_index)
+  KerningsMapKey (unsigned int in_left_glyph_index, unsigned int in_right_glyph_index)
     : left_glyph_index (in_left_glyph_index), right_glyph_index (in_right_glyph_index)
     {}
 
@@ -16,13 +16,13 @@ struct KerningsMapKey
     return (left_glyph_index == right.left_glyph_index) && (right_glyph_index == right.right_glyph_index);
   }
 
-  size_t left_glyph_index;
-  size_t right_glyph_index;
+  unsigned int left_glyph_index;
+  unsigned int right_glyph_index;
 };
 
 size_t hash (const KerningsMapKey& key)
 {
-  size_t data_to_hash [2] = {key.left_glyph_index, key.right_glyph_index};
+  unsigned int data_to_hash [2] = {key.left_glyph_index, key.right_glyph_index};
 
   return common::crc32 (data_to_hash, sizeof (data_to_hash));
 }
@@ -45,8 +45,8 @@ struct FontImpl::Impl
   typedef xtl::uninitialized_storage<GlyphInfo>      GlyphsArray;
   typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
 
-  size_t                         first_glyph_code;  //char-код первого глифа
-  size_t                         font_size;         //размер шрифта
+  unsigned int                   first_glyph_code;  //char-код первоunsigned intфа
+  unsigned int                   font_size;         //размер шрифта
   stl::string                    file_name;         //имя исходного файла
   stl::string                    name;              //имя гарнитуры
   stl::string                    family_name;       //имя семейства гарнитуры
@@ -135,26 +135,26 @@ void FontImpl::SetStyleName (const char* new_style_name)
    Получение/изменение размера таблицы глифов
 */
 
-void FontImpl::SetGlyphsCount (size_t new_glyphs_count)
+void FontImpl::SetGlyphsCount (unsigned int new_glyphs_count)
 {
   impl->glyphs.resize (new_glyphs_count);
 }
 
-size_t FontImpl::GlyphsCount () const
+unsigned int FontImpl::GlyphsCount () const
 {
-  return impl->glyphs.size ();
+  return (unsigned int)impl->glyphs.size ();
 }
 
 /*
    Получение/изменение кода первого глифа
 */
 
-void FontImpl::SetFirstGlyphCode (size_t new_first_glyph_code)
+void FontImpl::SetFirstGlyphCode (unsigned int new_first_glyph_code)
 {
   impl->first_glyph_code = new_first_glyph_code;
 }
 
-size_t FontImpl::FirstGlyphCode () const
+unsigned int FontImpl::FirstGlyphCode () const
 {
   return impl->first_glyph_code;
 }
@@ -163,12 +163,12 @@ size_t FontImpl::FirstGlyphCode () const
    Получение/изменение размера шрифта
 */
 
-void FontImpl::SetFontSize (size_t new_font_size)
+void FontImpl::SetFontSize (unsigned int new_font_size)
 {
   impl->font_size = new_font_size;
 }
 
-size_t FontImpl::FontSize () const
+unsigned int FontImpl::FontSize () const
 {
   return impl->font_size;
 }
@@ -191,12 +191,12 @@ GlyphInfo* FontImpl::Glyphs ()
    Добавление/получение/удаление информации о кёрнингах
 */
 
-void FontImpl::InsertKerning (size_t left_glyph_index, size_t right_glyph_index, const KerningInfo& kerning_info)
+void FontImpl::InsertKerning (unsigned int left_glyph_index, unsigned int right_glyph_index, const KerningInfo& kerning_info)
 {
   impl->kernings[KerningsMapKey (left_glyph_index, right_glyph_index)] = kerning_info;
 }
 
-void FontImpl::RemoveKerning (size_t left_glyph_index, size_t right_glyph_index)
+void FontImpl::RemoveKerning (unsigned int left_glyph_index, unsigned int right_glyph_index)
 {
   impl->kernings.erase (KerningsMapKey (left_glyph_index, right_glyph_index));
 }
@@ -206,7 +206,7 @@ void FontImpl::RemoveAllKernings ()
   impl->kernings.clear ();
 }
 
-KerningInfo FontImpl::Kerning (size_t left_glyph_index, size_t right_glyph_index) const
+KerningInfo FontImpl::Kerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   Impl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
 
@@ -220,7 +220,7 @@ KerningInfo FontImpl::Kerning (size_t left_glyph_index, size_t right_glyph_index
   return iter->second;
 }
 
-bool FontImpl::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
+bool FontImpl::HasKerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
 {
   Impl::KerningsMap::iterator iter = impl->kernings.find (KerningsMapKey (left_glyph_index, right_glyph_index));
 

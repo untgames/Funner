@@ -80,10 +80,10 @@ struct VertexAttribute
   const char*      semantic;                //семантика вершинного атрибута
   InputDataFormat  format;                  //формат данных
   InputDataType    type;                    //тип элементов
-  size_t           slot;                    //номер слота с вершинным буфером
-  size_t           offset;                  //смещение от начала вершинного буфера
-  size_t           stride;                  //шаг в вершинном буфере
-  size_t           instance_data_step_rate; //количество отрисованных инстансов после которого произойдет смещение на 1
+  unsigned int     slot;                    //номер слота с вершинным буфером
+  unsigned int     offset;                  //смещение от начала вершинного буфера
+  unsigned int     stride;                  //шаг в вершинном буфере
+  unsigned int     instance_data_step_rate; //количество отрисованных инстансов после которого произойдет смещение на 1
   bool             is_per_instance;         //является ли атрибут инстанцируемым
 };
 
@@ -92,10 +92,10 @@ struct VertexAttribute
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct InputLayoutDesc
 {
-  size_t                 vertex_attributes_count; //количество вершинных атрибутов
+  unsigned int           vertex_attributes_count; //количество вершинных атрибутов
   const VertexAttribute* vertex_attributes;       //вершинные атрибуты
   InputDataType          index_type;              //тип индексов в вершинном буфере
-  size_t                 index_buffer_offset;     //смещение в индексном буфере
+  unsigned int           index_buffer_offset;     //смещение в индексном буфере
 };
 
 /*
@@ -131,9 +131,9 @@ struct ProgramParameter
 {
   const char*          name;   //имя константы
   ProgramParameterType type;   //тип константы
-  size_t               slot;   //номер слота с константым буфером
-  size_t               count;  //количество элементов массива
-  size_t               offset; //смещение относительно начала константного буфера
+  unsigned int         slot;   //номер слота с константым буфером
+  unsigned int         count;  //количество элементов массива
+  unsigned int         offset; //смещение относительно начала константного буфера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@ struct ProgramParameter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ProgramParametersLayoutDesc
 {
-  size_t                  parameters_count; //количество параметров шейдера
+  unsigned int            parameters_count; //количество параметров шейдера
   const ProgramParameter* parameters;       //параметры шейдера
 };
 
@@ -205,7 +205,7 @@ struct SamplerDesc
   float        mip_lod_bias;         //смещение от вычисленного mip-уровня
   float        min_lod;              //минимальный mip-уровень
   float        max_lod;              //максимальный mip-уровень
-  size_t       max_anisotropy;       //максимальный уровень анизотропии
+  unsigned int max_anisotropy;       //максимальный уровень анизотропии
   float        border_color [4];     //цвет бордюра
 };
 

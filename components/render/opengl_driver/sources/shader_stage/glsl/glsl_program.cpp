@@ -8,7 +8,7 @@ using namespace render::low_level::opengl;
     Конструктор
 */
 
-GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, IShader** in_shaders, const LogFunction& error_log)
+GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_count, IShader** in_shaders, const LogFunction& error_log)
   : ContextObject (manager),
     handle (0),
     last_bindable_program_id (0)
@@ -41,7 +41,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
     shaders.reserve (shaders_count);
 
-    for (size_t i=0; i<shaders_count; i++)
+    for (unsigned int i=0; i<shaders_count; i++)
     {
       ShaderPtr shader = cast_object<GlslShader> (*this, in_shaders [i], METHOD_NAME, "shaders");
 
@@ -129,15 +129,15 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       
       if (glGetActiveUniform)
       {
-        glGetActiveUniform (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+        glGetActiveUniform (handle, location, (unsigned int)parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
       }
       else
       {
-        glGetActiveUniformARB (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+        glGetActiveUniformARB (handle, location, (unsigned int)parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
       }
       
       if ((size_t)name_length > parameter_name.size ())
-        name_length = parameter_name.size ();
+        name_length = (unsigned int)parameter_name.size ();
         
       if (name_length < 0)
         name_length = 0;
@@ -151,7 +151,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       
       parameter.name           = parameter_name;
       parameter.name_hash      = common::strhash (parameter.name.c_str ());
-      parameter.elements_count = (size_t)elements_count;      
+      parameter.elements_count = (unsigned int)elements_count;
       
       switch (type)
       {
@@ -225,15 +225,15 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       
       if (glGetActiveAttrib)
       {
-        glGetActiveAttrib (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+        glGetActiveAttrib (handle, location, (unsigned int)attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
       }
       else
       {
-        glGetActiveAttribARB (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+        glGetActiveAttribARB (handle, location, (unsigned int)attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
       }
       
       if ((size_t)name_length > attribute_name.size ())
-        name_length = attribute_name.size ();
+        name_length = (unsigned int)attribute_name.size ();
         
       if (name_length < 0)
         name_length = 0;
@@ -451,9 +451,9 @@ int GlslProgram::FindAttribute (const char* name)
     Получение параметров программы
 */
 
-size_t GlslProgram::GetParametersCount ()
+unsigned int GlslProgram::GetParametersCount ()
 {
-  return parameters.size ();
+  return (unsigned int)parameters.size ();
 }
 
 const GlslProgram::Parameter* GlslProgram::GetParameters ()

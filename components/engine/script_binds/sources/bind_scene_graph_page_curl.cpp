@@ -124,7 +124,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("PageMaterial",         make_invoker (&PageCurl::PageMaterial));
   lib.Register ("SetPageColor",         make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float, float, float)> (&PageCurl::SetPageColor)));
   lib.Register ("SetSize",              make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetSize)));
-  lib.Register ("SetGridSize",          make_invoker (xtl::implicit_cast<void (PageCurl::*) (size_t, size_t)> (&PageCurl::SetGridSize)));
+  lib.Register ("SetGridSize",          make_invoker (xtl::implicit_cast<void (PageCurl::*) (unsigned int, unsigned int)> (&PageCurl::SetGridSize)));
 
     //регистрация типов данных
 

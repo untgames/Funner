@@ -174,7 +174,7 @@ template <class T> struct RawArray
   uint32   size; //количество элементов
   const T* data; //данные
 
-  RawArray (const T* data, size_t size);
+  RawArray (const T* data, uint32 size);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

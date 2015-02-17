@@ -23,10 +23,10 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct OutputModeDesc
 {
-  size_t width;        //ширина фрейм-буфера
-  size_t height;       //высота фрейм-буфера
-  size_t color_bits;   //количество бит на цвет
-  size_t refresh_rate; //частота обновления монитора (0-default)
+  unsigned int width;        //ширина фрейм-буфера
+  unsigned int height;       //высота фрейм-буфера
+  unsigned int color_bits;   //количество бит на цвет
+  unsigned int refresh_rate; //частота обновления монитора (0-default)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,12 +96,12 @@ enum SwapMethod
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FrameBufferDesc
 {
-  size_t width;        //ширина буферов
-  size_t height;       //высота буферов
-  size_t color_bits;   //количество бит на цвет
-  size_t alpha_bits;   //количество бит на альфу
-  size_t depth_bits;   //количество бит на глубину
-  size_t stencil_bits; //количество бит на шаблон
+  unsigned int width;        //ширина буферов
+  unsigned int height;       //высота буферов
+  unsigned int color_bits;   //количество бит на цвет
+  unsigned int alpha_bits;   //количество бит на альфу
+  unsigned int depth_bits;   //количество бит на глубину
+  unsigned int stencil_bits; //количество бит на шаблон
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +110,8 @@ struct FrameBufferDesc
 struct SwapChainDesc
 {
   FrameBufferDesc frame_buffer;  //дескриптор буфера кадра
-  size_t          samples_count; //количество sample'ов (0=multisample off)
-  size_t          buffers_count; //количество буферов в цепочке обмена (0=default 2 buffers)
+  unsigned int    samples_count; //количество sample'ов (0=multisample off)
+  unsigned int    buffers_count; //количество буферов в цепочке обмена (0=default 2 buffers)
   SwapMethod      swap_method;   //метод обмена заднего и переднего буферов  
   bool            vsync;         //необходимо ли использовать VSync
   bool            fullscreen;    //необходимо ли переводить устройство в FullScreen mode

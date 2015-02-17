@@ -44,28 +44,28 @@ class Animation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор анимируемых объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t      TargetsCount () const;
-    const char* TargetName   (size_t target_index) const; 
-    int         FindTarget   (const char* target_name) const; //nothrow
+    unsigned int TargetsCount () const;
+    const char*  TargetName   (unsigned int target_index) const;
+    int          FindTarget   (const char* target_name) const; //nothrow
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ChannelsCount (size_t target_index) const;
+    unsigned int ChannelsCount (unsigned int target_index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const animation::Channel& Channel (size_t target_index, size_t channel_index) const;
-          animation::Channel& Channel (size_t target_index, size_t channel_index);
+    const animation::Channel& Channel (unsigned int target_index, unsigned int channel_index) const;
+          animation::Channel& Channel (unsigned int target_index, unsigned int channel_index);
           
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddChannel        (size_t target_index, const animation::Channel& channel);
+    void AddChannel        (unsigned int target_index, const animation::Channel& channel);
     void AddChannel        (const char* target_name, const animation::Channel& channel);
-    void RemoveChannel     (size_t target_index, size_t channel_index);
-    void RemoveAllChannels (size_t target_index);
+    void RemoveChannel     (unsigned int target_index, unsigned int channel_index);
+    void RemoveAllChannels (unsigned int target_index);
     void RemoveAllChannels ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

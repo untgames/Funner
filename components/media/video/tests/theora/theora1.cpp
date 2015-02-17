@@ -64,7 +64,7 @@ int main ()
 
       size_t image_size = image.Width () * image.Height () * get_bytes_per_pixel (image.Format ());
 
-      for (size_t j = 0; j < stream.FramesCount (); j++)
+      for (unsigned int j = 0; j < stream.FramesCount (); j++)
       {
         stream.Decode (j, image);
 

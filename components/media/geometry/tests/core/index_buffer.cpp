@@ -31,7 +31,7 @@ int main ()
   {
     IndexBuffer ib1 (12), ib2;  
     
-    for (size_t i=0; i<ib1.Size (); i++)
+    for (uint32_t i=0; i<ib1.Size (); i++)
       ib1.Data<unsigned int> ()[i] = i;
 
     printf ("Dump ib1\n");

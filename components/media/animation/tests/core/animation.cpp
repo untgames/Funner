@@ -8,7 +8,7 @@ void print (const Animation& animation)
   printf ("Events count is %u\n", animation.Events ().Size ());
   printf ("Targets count is '%u'\n", animation.TargetsCount ());
 
-  for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+  for (unsigned int i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
     printf ("Target %u name is '%s', channels count is %u\n", i, animation.TargetName (i), animation.ChannelsCount (i));
 }
 

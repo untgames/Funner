@@ -10,7 +10,7 @@ namespace
      онстанты
 */
 
-const size_t WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
+const unsigned int WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
 
 }
 
@@ -309,7 +309,7 @@ WindowPtr RenderManagerImpl::Window (size_t index)
     —оздание целей рендеринга
 */
 
-RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (size_t width, size_t height, render::manager::PixelFormat format)
+RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (unsigned int width, unsigned int height, render::manager::PixelFormat format)
 {
   try
   {
@@ -357,7 +357,7 @@ RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (size_t width, size_t heig
   }
 }
 
-RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_t height)
+RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (unsigned int width, unsigned int height)
 {
   try
   {

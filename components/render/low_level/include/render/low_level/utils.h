@@ -43,16 +43,16 @@ const char* get_name (QueryType);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //получение размеров несжатого текселя и размера изображения в указанном формате
-size_t get_texel_size (PixelFormat format);
-size_t get_image_size (size_t width, PixelFormat format);
-size_t get_image_size (size_t width, size_t height, PixelFormat format);
-size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format);
+unsigned int get_texel_size (PixelFormat format);
+unsigned int get_image_size (unsigned int width, PixelFormat format);
+unsigned int get_image_size (unsigned int width, unsigned int height, PixelFormat format);
+unsigned int get_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format);
 
 //получение размеров распакованного текселя и размера изображения после распаковки
-size_t get_uncompressed_texel_size (PixelFormat format);
-size_t get_uncompressed_image_size (size_t width, PixelFormat format);
-size_t get_uncompressed_image_size (size_t width, size_t height, PixelFormat format);
-size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, PixelFormat format);
+unsigned int get_uncompressed_texel_size (PixelFormat format);
+unsigned int get_uncompressed_image_size (unsigned int width, PixelFormat format);
+unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, PixelFormat format);
+unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format);
 
 bool is_compressed    (PixelFormat); //является ли формат сжатым
 bool is_uncompressed  (PixelFormat); //является ли формат несжатым
@@ -64,9 +64,9 @@ PixelFormat get_uncompressed_format (PixelFormat); //возвращает распакованный эк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение количества mip-уровней
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t get_mips_count (size_t size);
-size_t get_mips_count (size_t width, size_t height);
-size_t get_mips_count (size_t width, size_t height, size_t depth);
+unsigned int get_mips_count (unsigned int size);
+unsigned int get_mips_count (unsigned int width, unsigned int height);
+unsigned int get_mips_count (unsigned int width, unsigned int height, unsigned int depth);
 
 }
 

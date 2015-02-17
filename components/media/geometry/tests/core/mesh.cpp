@@ -5,14 +5,14 @@ void dump (const Mesh& mesh)
   printf ("Mesh '%s' (%u vertex_buffers, %u indices, %u primitives)\n", mesh.Name (), mesh.VertexBuffersCount (),
           mesh.IndexBuffer ().Size (), mesh.PrimitivesCount ());
           
-  for (size_t i=0; i<mesh.VertexBuffersCount (); i++)
+  for (uint32_t i=0; i<mesh.VertexBuffersCount (); i++)
   {
     const VertexBuffer& vb = mesh.VertexBuffer (i);
     
     printf ("  vb#%u: vertices_count=%u, weights_count=%u\n", i, vb.VerticesCount (), vb.Weights ().Size ());
   }
 
-  for (size_t i=0; i<mesh.PrimitivesCount (); i++)
+  for (uint32_t i=0; i<mesh.PrimitivesCount (); i++)
   {
     const Primitive& p = mesh.Primitive (i);
     

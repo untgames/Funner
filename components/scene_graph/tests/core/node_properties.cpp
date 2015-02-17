@@ -2,7 +2,7 @@
 
 #define TEST(X) try { X; }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
-void dump_properties (const Node& node)
+void dump_properties (const Node& node, size_t correct_properties_hash, size_t correct_layout_hash)
 {
   if (!node.Properties ())
   {
@@ -12,8 +12,8 @@ void dump_properties (const Node& node)
 
   const common::PropertyMap& properties = *node.Properties ();  
   
-  printf ("node has %u properties (hash=%08x, structure_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.LayoutHash ());    
+  printf ("node has %u properties (hash_correct=%d, structure_hash_correct=%d):\n",
+    properties.Size (), properties.Hash () == correct_properties_hash, properties.LayoutHash () == correct_layout_hash);
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
@@ -33,13 +33,13 @@ int main ()
   {
     Node::Pointer node (Node::Create ());
     
-    dump_properties (*node);
+    dump_properties (*node, 0xffffffff, 0xffffffff);
     
     printf ("create properties\n");
     
     node->SetProperties (common::PropertyMap ());
     
-    dump_properties (*node);
+    dump_properties (*node, 0xffffffff, 0xffffffff);
     
     printf ("add properties\n");
     
@@ -49,19 +49,19 @@ int main ()
     properties1.SetProperty ("Y", "3.14");
     properties1.SetProperty ("Z", "hello world");
     
-    dump_properties (*node);    
+    dump_properties (*node, sizeof (void*) == 4 ? 0x490df002 : 0x66fa8797, sizeof (void*) == 4 ? 0xf790e824 : 0x7df2b619);
     
     printf ("remove properties\n");
     
     properties1.RemoveProperty ("Y");
 
-    dump_properties (*node);
+    dump_properties (*node, sizeof (void*) == 4 ? 0xf09537d6 : 0xeca9b434, sizeof (void*) == 4 ? 0xba565b70 : 0x74687881);
     
     printf ("clear\n");
     
     properties1.Clear ();
     
-    dump_properties (*node);
+    dump_properties (*node, 0xffffffff, 0xffffffff);
     
     printf ("change property name\n");
     
@@ -73,14 +73,14 @@ int main ()
     
     TEST (properties1.SetPropertyName ("UnknownProperty", "NewName"));    
     
-    dump_properties (*node);
+    dump_properties (*node, sizeof (void*) == 4 ? 0x88c76d7c : 0x18807abf, sizeof (void*) == 4 ? 0x50dbace6 : 0xf52e246e);
     
     printf ("change type\n");
     
     TEST (properties1.SetPropertyType ("X", common::PropertyType_Float));
     TEST (properties1.SetPropertyType ("NewZ", common::PropertyType_Vector));
     
-    dump_properties (*node);
+    dump_properties (*node, sizeof (void*) == 4 ? 0xfcdacd2a : 0x1ad6122a, sizeof (void*) == 4 ? 0x1dea3343 : 0x93e44cba);
     
     printf ("clone\n");
     
@@ -89,7 +89,7 @@ int main ()
     node->SetProperties (0);
     node->SetProperties (properties2);
     
-    dump_properties (*node);
+    dump_properties (*node, sizeof (void*) == 4 ? 0xfcdacd2a : 0x1ad6122a, sizeof (void*) == 4 ? 0x1dea3343 : 0x93e44cba);
     
     printf ("is_present\n");
     

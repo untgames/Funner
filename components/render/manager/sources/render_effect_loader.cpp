@@ -93,9 +93,9 @@ class EffectLoader
         {"inv_dst_alpha",  BlendArgument_InverseDestinationAlpha},        
       };
       
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
       
@@ -176,7 +176,7 @@ class EffectLoader
 	{
           Parser::AttributeIterator attr_iter = make_attribute_iterator (*rt_iter);
 
-          size_t index = xtl::io::get<size_t> (attr_iter);
+          unsigned int index = xtl::io::get<unsigned int> (attr_iter);
 
           if (index >= DEVICE_RENDER_TARGET_SLOTS_COUNT)
             raise_parser_exception (*rt_iter, "Unexpected blend render target index %u", index);
@@ -226,9 +226,9 @@ class EffectLoader
         {"great_erequal", CompareMode_GreaterEqual},        
       };
       
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
 
@@ -265,9 +265,9 @@ class EffectLoader
         {"invert",    StencilOperation_Invert},
       };
       
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
 
@@ -289,13 +289,13 @@ class EffectLoader
       desc.depth_write_enable  = xtl::xstrcmp (get<const char*> (*iter, "depth_write",  "true"), "true") == 0;
       desc.stencil_test_enable = xtl::xstrcmp (get<const char*> (*iter, "stencil_test", "false"), "true") == 0;
       desc.depth_compare_mode  = iter->First ("depth_compare_mode") ? ParseCompareMode (iter->First ("depth_compare_mode")) : CompareMode_Less;
-      desc.stencil_read_mask   = get<size_t> (*iter, "stencil_read_mask", 0u);
-      desc.stencil_write_mask  = get<size_t> (*iter, "stencil_write_mask", 0u);
+      desc.stencil_read_mask   = get<unsigned int> (*iter, "stencil_read_mask", 0u);
+      desc.stencil_write_mask  = get<unsigned int> (*iter, "stencil_write_mask", 0u);
       
       for (Parser::NamesakeIterator stencil_iter=iter->First ("Stencil"); stencil_iter; ++stencil_iter)
       {
-        const char* face       = get<const char*> (*stencil_iter, "");        
-        size_t      face_index = 0;
+        const char*  face       = get<const char*> (*stencil_iter, "");
+        unsigned int face_index = 0;
         
         if      (!xtl::xstrcmp (face, "front") || !xtl::xstrcmp (face, "front_and_back")) face_index = FaceMode_Front;
         else if (!xtl::xstrcmp (face, "back"))                                            face_index = FaceMode_Back;
@@ -416,9 +416,9 @@ class EffectLoader
         {"linear_mip_linear",  TexMinFilter_LinearMipLinear}
       };
 
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
 
@@ -485,11 +485,11 @@ class EffectLoader
       desc.mip_lod_bias         = ParseSamplerLod (*iter, "mip_lod_bias");
       desc.min_lod              = ParseSamplerLod (*iter, "min_lod");
       desc.max_lod              = ParseSamplerLod (*iter, "max_lod");
-      desc.max_anisotropy       = get<size_t> (*iter, "max_anisotropy", 1u);
+      desc.max_anisotropy       = get<unsigned int> (*iter, "max_anisotropy", 1u);
       
       math::vec4f border_color = get<math::vec4f> (*iter, "border_color", math::vec4f (0.0f));
       
-      for (size_t i=0; i<4; i++)
+      for (unsigned int i=0; i<4; i++)
         desc.border_color [i] = border_color [i];
 
       try
@@ -541,9 +541,9 @@ class EffectLoader
         {"s8",              low_level::PixelFormat_S8},
       };
 
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
 
@@ -569,9 +569,9 @@ class EffectLoader
         {"cubemap",   low_level::TextureDimension_Cubemap},
       };
 
-      static const size_t values_count = sizeof (values) / sizeof (*values);
+      static const unsigned int values_count = sizeof (values) / sizeof (*values);
       
-      for (size_t i=0; i<values_count; i++)
+      for (unsigned int i=0; i<values_count; i++)
         if (!strcmp (values [i].tag, value))
           return values [i].value;
 
@@ -584,18 +584,18 @@ class EffectLoader
     static math::vec3ui ParseTextureSize (const ParseNode& node)
     {
       math::vec3ui result = 1;
-      size_t       index = 0;
+      unsigned int       index = 0;
 
       for (Parser::AttributeIterator params_iter = make_attribute_iterator (node); params_iter && index < 3; ++params_iter, ++index)
-        result [index] = xtl::io::get<size_t> (*params_iter);
+        result [index] = xtl::io::get<unsigned int> (*params_iter);
 
       return result;
     }
     
 ///Разбор флагов биндинга
-    static size_t ParseBindFlags (const ParseNode& node)
+    static unsigned int ParseBindFlags (const ParseNode& node)
     {
-      size_t flags = 0;
+      unsigned int flags = 0;
       
       for (Parser::AttributeIterator params_iter = make_attribute_iterator (node); params_iter; ++params_iter)
       {
@@ -729,7 +729,7 @@ class EffectLoader
       if (!program->ShadersCount ())
         raise_parser_exception (*iter, "No shaders found for shading");
 
-      size_t channel = 0;
+      unsigned int channel = 0;
         
       for (Parser::Iterator texmap_iter=iter->First (); texmap_iter; ++texmap_iter)
       {
@@ -802,7 +802,7 @@ class EffectLoader
     
     static render::manager::ClearFlag ParseClearFlags (const ParseNode& node, const char* node_name)
     {
-      size_t flags = render::manager::ClearFlag_ViewportOnly;
+      unsigned int flags = render::manager::ClearFlag_ViewportOnly;
       
       for (Parser::AttributeIterator params_iter = make_attribute_iterator (node.First (node_name)); params_iter; ++params_iter)      
       {

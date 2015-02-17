@@ -35,7 +35,7 @@ class XmlAtlasSaver
     {
       XmlWriter::Scope scope (writer, "Atlas");
 
-      for (size_t image_index=0, images_count=atlas.ImagesCount (); image_index<images_count; image_index++)
+      for (unsigned int image_index=0, images_count=atlas.ImagesCount (); image_index<images_count; image_index++)
       {
         XmlWriter::Scope scope (writer, "Image");
         
@@ -45,7 +45,7 @@ class XmlAtlasSaver
         writer.WriteAttribute ("Width",  size.x);
         writer.WriteAttribute ("Height", size.y);
 
-        for (size_t tile_index=0, tiles_count=atlas.ImageTilesCount (image_index); tile_index<tiles_count; tile_index++)
+        for (unsigned int tile_index=0, tiles_count=atlas.ImageTilesCount (image_index); tile_index<tiles_count; tile_index++)
           SaveTile (atlas.ImageTile (image_index, tile_index));
       }
     }

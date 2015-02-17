@@ -52,7 +52,7 @@ bool WindowsThreadManager::LockMutex (mutex_t handle, size_t wait_in_millisecond
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    DWORD status = WaitForSingleObject (handle->mutex, wait_in_milliseconds);
+    DWORD status = WaitForSingleObject (handle->mutex, (DWORD)wait_in_milliseconds);
     
     if (status == WAIT_TIMEOUT)
       return false;

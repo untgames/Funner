@@ -11,7 +11,7 @@ namespace
     Константы
 */
 
-const size_t DXT_EDGE_SIZE  = 4;  //размер стороны блока DXT-сжатия
+const unsigned int DXT_EDGE_SIZE  = 4;  //размер стороны блока DXT-сжатия
 
 }
 
@@ -23,7 +23,7 @@ Texture::Texture
  (const ContextManager& in_context_manager,
   const TextureDesc&    in_desc,
   GLenum                in_target,
-  size_t                in_mips_count)
+  unsigned int          in_mips_count)
     : BindableTexture (in_context_manager),
       desc (in_desc),
       target (in_target),
@@ -103,7 +103,7 @@ Texture::Texture
     case AccessFlag_Read | AccessFlag_Write:
       break;
     default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", (size_t)desc.access_flags);
   }
 
     //выделение нового OpenGL-идентификатора текстуры
@@ -212,9 +212,9 @@ void Texture::Bind ()
 {
     //получение кэш-переменных
 
-  size_t current_active_slot     = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
-         &current_texture_id     = GetContextCache () [CacheEntry_TextureId0 + current_active_slot],
-         &current_texture_target = GetContextCache () [CacheEntry_TextureTarget0 + current_active_slot];
+  unsigned int current_active_slot     = (unsigned int)GetContextCacheValue (CacheEntry_ActiveTextureSlot);
+  size_t       &current_texture_target = GetContextCache () [CacheEntry_TextureTarget0 + current_active_slot],
+               &current_texture_id     = GetContextCache () [CacheEntry_TextureId0 + current_active_slot];
 
     //проверка необходимости биндинга текстуры
 
@@ -247,10 +247,10 @@ void Texture::Bind ()
     Получение дескриптора mip-уровня текстуры
 */
 
-void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
+void Texture::GetMipLevelDesc (unsigned int mip_level, MipLevelDesc& out_desc)
 {
-  size_t level_width  = desc.width >> mip_level,
-         level_height = desc.height >> mip_level;
+  unsigned int level_width  = desc.width >> mip_level,
+               level_height = desc.height >> mip_level;
   
   if (!level_width)  level_width  = 1;
   if (!level_height) level_height = 1;
@@ -263,7 +263,7 @@ void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
     Получение дескриптора слоя текстуры
 */
 
-void Texture::GetLayerDesc (size_t layer, LayerDesc& desc)
+void Texture::GetLayerDesc (unsigned int layer, LayerDesc& desc)
 {
   desc.target    = target;
   desc.new_index = layer;
@@ -276,7 +276,7 @@ void Texture::GetLayerDesc (size_t layer, LayerDesc& desc)
 namespace
 {
 
-size_t get_next_mip_size (size_t size)
+unsigned int get_next_mip_size (unsigned int size)
 {
   switch (size)
   {
@@ -289,19 +289,19 @@ size_t get_next_mip_size (size_t size)
 }
 
 void Texture::BuildMipmaps
- (size_t       x,
-  size_t       y,
-  size_t       z,
-  size_t       width,
-  size_t       unclamped_width,
-  size_t       height,
+ (unsigned int x,
+  unsigned int y,
+  unsigned int z,
+  unsigned int width,
+  unsigned int unclamped_width,
+  unsigned int height,
   PixelFormat  format,
   const void*  data)
 {
   GLenum gl_format = get_gl_format (format),
          gl_type   = get_gl_type (format);
 
-  const size_t buffer_size = get_image_size (get_next_mip_size (width), get_next_mip_size (height), format);
+  const unsigned int buffer_size = get_image_size (get_next_mip_size (width), get_next_mip_size (height), format);
 
   xtl::uninitialized_storage<char> dst_buffer (buffer_size),
                                    src_buffer (buffer_size / 2); //на 4 делить не нужно! (необходимо для прямоугольных текстур с длиной стороны 1)
@@ -309,7 +309,7 @@ void Texture::BuildMipmaps
   const char* src = reinterpret_cast<const char*> (data);
   char*       dst = dst_buffer.data ();
     
-  for (size_t mip_level=1; width > 1 || height > 1; mip_level++)
+  for (unsigned int mip_level=1; width > 1 || height > 1; mip_level++)
   {
     scale_image_2x_down (format, width, height, src, dst);
 
@@ -341,12 +341,12 @@ void Texture::BuildMipmaps
     Установка данных
 */
 
-void Texture::SetUncompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, GLenum, const void*)
+void Texture::SetUncompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, GLenum, const void*)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Texture::SetUncompressedData");
 }
 
-void Texture::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, size_t, const void*)
+void Texture::SetCompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, unsigned int, const void*)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Texture::SetCompressedData");
 }
@@ -356,12 +356,12 @@ void Texture::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t,
 */
 
 void Texture::SetData
- (size_t          layer,
-  size_t          mip_level,
-  size_t          x,
-  size_t          y,
-  size_t          width,
-  size_t          height,
+ (unsigned int    layer,
+  unsigned int    mip_level,
+  unsigned int    x,
+  unsigned int    y,
+  unsigned int    width,
+  unsigned int    height,
   PixelFormat     source_format,
   const void*     buffer, 
   IDeviceContext* context)
@@ -386,8 +386,8 @@ void Texture::SetData
 
     //сохранение неотсеченных размеров
 
-  size_t unclamped_width  = width,
-         unclamped_height = height;    
+  unsigned int unclamped_width  = width,
+               unclamped_height = height;
 
     //получение дескриптора mip-уровня и информации о слое текстуры
 
@@ -475,7 +475,7 @@ void Texture::SetData
 
         if (GetCaps ().has_ext_texture_compression_s3tc && source_format == desc.format)
         {
-          size_t buffer_size = get_image_size (width, height, source_format);
+          unsigned int buffer_size = get_image_size (width, height, source_format);
 
           SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
         }
@@ -501,7 +501,7 @@ void Texture::SetData
       case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
       case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       {
-        size_t buffer_size = get_image_size (width, height, source_format);
+        unsigned int buffer_size = get_image_size (width, height, source_format);
 
         SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
 
@@ -517,7 +517,7 @@ void Texture::SetData
 
       //преобразование данных буфера глубины
 
-    xtl::uninitialized_storage<size_t> tmp_buffer;
+    xtl::uninitialized_storage<unsigned int> tmp_buffer;
 
     switch (source_format)
     {
@@ -526,11 +526,11 @@ void Texture::SetData
       {
         tmp_buffer.resize (unclamped_width * unclamped_height);
 
-        size_t*               dst_pixel = tmp_buffer.data ();
+        unsigned int*         dst_pixel = tmp_buffer.data ();
         const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
 
-        for (size_t count=tmp_buffer.size (); count--; src_pixel++, dst_pixel++)
-          *dst_pixel = size_t (*src_pixel) << 16;
+        for (size_t count = tmp_buffer.size (); count--; src_pixel++, dst_pixel++)
+          *dst_pixel = unsigned int (*src_pixel) << 16;
 
         buffer  = tmp_buffer.data ();
         gl_type = GL_UNSIGNED_INT;
@@ -545,10 +545,10 @@ void Texture::SetData
       {
         tmp_buffer.resize (unclamped_width * unclamped_height);        
 
-        size_t*       dst_pixel = tmp_buffer.data ();
-        const size_t* src_pixel = static_cast<const size_t*> (buffer);
+        unsigned int*       dst_pixel = tmp_buffer.data ();
+        const unsigned int* src_pixel = static_cast<const unsigned int*> (buffer);
 
-        for (size_t count=tmp_buffer.size (); count--; src_pixel++, dst_pixel++)
+        for (size_t count = tmp_buffer.size (); count--; src_pixel++, dst_pixel++)
           *dst_pixel = *src_pixel << 8;
 
         buffer = tmp_buffer.data ();
@@ -576,12 +576,12 @@ void Texture::SetData
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 void Texture::GetData
- (size_t          layer,
-  size_t          mip_level,
-  size_t          x,
-  size_t          y,
-  size_t          width,
-  size_t          height,
+ (unsigned int    layer,
+  unsigned int    mip_level,
+  unsigned int    x,
+  unsigned int    y,
+  unsigned int    width,
+  unsigned int    height,
   PixelFormat     target_format,
   void*           buffer,
   IDeviceContext* context)
@@ -614,8 +614,8 @@ void Texture::GetData
 
     //отсечение
     
-  size_t unclamped_width  = width,
-         unclamped_height = height;
+  unsigned int unclamped_width  = width,
+               unclamped_height = height;
 
   if (x >= level_desc.width || y >= level_desc.height)
     return;    
@@ -721,8 +721,8 @@ void Texture::GetData
 
             //копирование полного образа во временный буфер
 
-          size_t layer_size = get_image_size (level_desc.width, level_desc.height, target_format),
-                 quad_size  = get_image_size (DXT_EDGE_SIZE, DXT_EDGE_SIZE, target_format);
+          unsigned int layer_size = get_image_size (level_desc.width, level_desc.height, target_format),
+                       quad_size  = get_image_size (DXT_EDGE_SIZE, DXT_EDGE_SIZE, target_format);
 
           xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
 
@@ -730,15 +730,15 @@ void Texture::GetData
 
             //копирование части образа в пользовательский буфер
 
-          size_t src_line_size    = stl::max (level_desc.width / DXT_EDGE_SIZE, DXT_EDGE_SIZE) * quad_size,
-                 src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
-                 block_size       = width * quad_size,
-                 dst_line_size    = unclamped_width * quad_size;
+          unsigned int src_line_size    = stl::max (level_desc.width / DXT_EDGE_SIZE, DXT_EDGE_SIZE) * quad_size,
+                       src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
+                       block_size       = width * quad_size,
+                       dst_line_size    = unclamped_width * quad_size;
 
           const char* src = temp_buffer.data () + src_start_offset;
           char*       dst = reinterpret_cast<char*> (buffer);
 
-          for (size_t i=0; i<height; i++, src += src_line_size, dst += dst_line_size)
+          for (unsigned int i=0; i<height; i++, src += src_line_size, dst += dst_line_size)
             memcpy (dst, src, block_size);
             
           break;
@@ -766,9 +766,9 @@ void Texture::GetData
       {
         case PixelFormat_D24X8:
         {
-          size_t* pixel = static_cast<size_t*> (buffer);
+          unsigned int* pixel = static_cast<unsigned int*> (buffer);
 
-          for (size_t count=width*height; count--; pixel++)
+          for (unsigned int count=width*height; count--; pixel++)
             *pixel >>= 8;
 
           break;
@@ -781,7 +781,7 @@ void Texture::GetData
     {
         //копирование полного образа текстуры во временный буфер
 
-      size_t texel_size = get_texel_size (target_format);
+      unsigned int texel_size = get_texel_size (target_format);
 
       xtl::uninitialized_storage<char> temp_buffer (get_image_size (level_desc.width, level_desc.height, desc.layers, target_format));
 
@@ -789,11 +789,11 @@ void Texture::GetData
 
         //копирование части образа в пользовательсий буфер
 
-      size_t src_line_size    = level_desc.width * texel_size,
-             src_layer_size   = src_line_size * level_desc.height,
-             src_start_offset = layer_desc.new_index * src_layer_size + y * src_line_size + x * texel_size,
-             block_size       = width * texel_size,
-             dst_line_size    = unclamped_width * texel_size;
+      unsigned int src_line_size    = level_desc.width * texel_size,
+                   src_layer_size   = src_line_size * level_desc.height,
+                   src_start_offset = layer_desc.new_index * src_layer_size + y * src_line_size + x * texel_size,
+                   block_size       = width * texel_size,
+                   dst_line_size    = unclamped_width * texel_size;
 
       switch (target_format)
       {
@@ -802,7 +802,7 @@ void Texture::GetData
           const char* src = temp_buffer.data () + src_start_offset;
           char*       dst = reinterpret_cast<char*> (buffer);
 
-          for (size_t i=0; i<height; i++, src += src_line_size, dst += block_size)
+          for (unsigned int i=0; i<height; i++, src += src_line_size, dst += block_size)
             memcpy (dst, src, block_size);
 
           break;          
@@ -811,19 +811,19 @@ void Texture::GetData
         {
             //преобразование данных буфера глубины
 
-          const size_t* src = reinterpret_cast<const size_t*> (temp_buffer.data () + src_start_offset);
-          size_t*       dst = reinterpret_cast<size_t*> (buffer);
+          const unsigned int* src = reinterpret_cast<const unsigned int*> (temp_buffer.data () + src_start_offset);
+          unsigned int*       dst = reinterpret_cast<unsigned int*> (buffer);
 
-          block_size    /= sizeof (size_t);
-          src_line_size /= sizeof (size_t);
-          dst_line_size /= sizeof (size_t);
+          block_size    /= sizeof (unsigned int);
+          src_line_size /= sizeof (unsigned int);
+          dst_line_size /= sizeof (unsigned int);
           
-          size_t src_skip_size = src_line_size - block_size,
-                 dst_skip_size = dst_line_size - block_size;
+          unsigned int src_skip_size = src_line_size - block_size,
+                       dst_skip_size = dst_line_size - block_size;
 
-          for (size_t i=0; i<height; i++, src += src_skip_size, dst += dst_skip_size)
+          for (unsigned int i=0; i<height; i++, src += src_skip_size, dst += dst_skip_size)
           {
-            for (size_t j=0; j<block_size; j++, src++, dst++)
+            for (unsigned int j=0; j<block_size; j++, src++, dst++)
               *dst = *src >> 8;
           }
 
@@ -841,14 +841,14 @@ void Texture::GetData
 #else
 
 void Texture::GetData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  PixelFormat target_format,
-  void*       buffer,
+ (unsigned int layer,
+  unsigned int mip_level,
+  unsigned int x,
+  unsigned int y,
+  unsigned int width,
+  unsigned int height,
+  PixelFormat  target_format,
+  void*        buffer,
   IDeviceContext*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture::GetData", "Get texture image data not supported");

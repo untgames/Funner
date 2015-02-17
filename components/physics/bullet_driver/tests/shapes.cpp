@@ -15,10 +15,10 @@ int main ()
 
     scene->SetSimulationStep (1.f / 16.f);
 
-    math::vec3f mesh_vertices []        = { math::vec3f (0, -1.5, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
-    size_t      triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
-    size_t      mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
-    size_t      triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
+    math::vec3f  mesh_vertices []        = { math::vec3f (0, -1.5, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
+    unsigned int triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
+    unsigned int mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
+    unsigned int triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
 
     ShapePtr box_shape           (bullet_driver->CreateBoxShape          (1.f), false),
              sphere_shape        (bullet_driver->CreateSphereShape       (0.5f), false),
@@ -29,8 +29,8 @@ int main ()
 
     triangle_mesh_shape->SetMargin (1.5f);
 
-    IShape* compounding_shapes [] = { box_shape.get (), sphere_shape.get () };
-    size_t  compounding_shapes_count = sizeof (compounding_shapes) / sizeof (*compounding_shapes);
+    IShape*      compounding_shapes [] = { box_shape.get (), sphere_shape.get () };
+    unsigned int compounding_shapes_count = sizeof (compounding_shapes) / sizeof (*compounding_shapes);
 
     Transform compounding_shapes_transforms [2];
 

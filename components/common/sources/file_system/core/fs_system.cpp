@@ -1758,7 +1758,7 @@ void FileSystem::SetCryptoParameters
   const char* read_crypto_method,
   const char* write_crypto_method,
   const void* key,
-  size_t      key_bits)
+  unsigned short key_bits)
 {
   SetCryptoParameters (path, FileCryptoParameters (read_crypto_method, write_crypto_method, key, key_bits));
 }

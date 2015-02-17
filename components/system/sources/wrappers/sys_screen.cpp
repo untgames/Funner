@@ -107,7 +107,7 @@ const char* Screen::Name () const
     Размеры экрана
 */
 
-size_t Screen::Width () const
+unsigned int Screen::Width () const
 {
   try
   {
@@ -126,7 +126,7 @@ size_t Screen::Width () const
   }
 }
 
-size_t Screen::Height () const
+unsigned int Screen::Height () const
 {
   try
   {
@@ -149,7 +149,7 @@ size_t Screen::Height () const
     Количество бит на пиксель
 */
 
-size_t Screen::ColorBits () const
+unsigned short Screen::ColorBits () const
 {
   try
   {
@@ -172,7 +172,7 @@ size_t Screen::ColorBits () const
     Частота обновления
 */
 
-size_t Screen::RefreshRate () const
+unsigned short Screen::RefreshRate () const
 {
   try
   {
@@ -195,7 +195,7 @@ size_t Screen::RefreshRate () const
    Плотность пикселей на дюйм
 */
 
-size_t Screen::Xdpi () const
+unsigned short Screen::Xdpi () const
 {
   try
   {
@@ -214,7 +214,7 @@ size_t Screen::Xdpi () const
   }
 }
 
-size_t Screen::Ydpi () const
+unsigned short Screen::Ydpi () const
 {
   try
   {

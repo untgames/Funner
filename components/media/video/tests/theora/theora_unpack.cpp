@@ -385,7 +385,7 @@ int main (int argc, const char *argv[])
 
     Image image (stream.Width (), stream.Height (), 1, PixelFormat_RGBA8);
 
-    for (size_t i = 0, count = stream.FramesCount (); i < count; i++)
+    for (unsigned int i = 0, count = stream.FramesCount (); i < count; i++)
     {
       stream.Decode (i, image);
 

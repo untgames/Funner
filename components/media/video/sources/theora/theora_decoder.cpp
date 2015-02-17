@@ -27,7 +27,7 @@ unsigned char clamp_to_unsigned_char (int x)
     return x < 0x00 ? 0x00 : (x > 0xff ? 0xff : (unsigned char)x);
 }
 
-void YCbCr2RGBA (size_t yuv_pixel, IVideoDecoder::Pixel& result)
+void YCbCr2RGBA (unsigned int yuv_pixel, IVideoDecoder::Pixel& result)
 {
     unsigned char *yuv = (unsigned char*)&yuv_pixel;
 
@@ -43,7 +43,7 @@ void YCbCr2RGBA (size_t yuv_pixel, IVideoDecoder::Pixel& result)
 
 void process_theora_YCbCr (void *ret_frame, const th_ycbcr_buffer ycbcr_buffer, int width, int height)
 {
-  size_t *write_ptr = (size_t*)ret_frame;
+  unsigned int *write_ptr = (unsigned int*)ret_frame;
 
   for (int y = 0; y < height; y++)
   {
@@ -159,17 +159,17 @@ class TheoraDecoderImpl : public IVideoDecoder
       return th_data_info.fps_numerator / (float)th_data_info.fps_denominator;;
     }
 
-    size_t GetWidth ()
+    unsigned int GetWidth ()
     {
       return th_data_info.pic_width;
     }
 
-    size_t GetHeight ()
+    unsigned int GetHeight ()
     {
       return th_data_info.pic_height;
     }
 
-    size_t GetFramesCount ()
+    unsigned int GetFramesCount ()
     {
       return total_frames_count;
     }
@@ -182,7 +182,7 @@ class TheoraDecoderImpl : public IVideoDecoder
       return th_data_info.aspect_numerator / (float)th_data_info.aspect_denominator;
     }
     
-    void Decode (size_t frame, Pixel* data_buffer)
+    void Decode (unsigned int frame, Pixel* data_buffer)
     {
       static const char* METHOD_NAME = "media::TheoraDecoderImpl::Decode";
 
@@ -262,13 +262,13 @@ class TheoraDecoderImpl : public IVideoDecoder
       if (buffer_frame_number != (int)frame)
         log.Printf ("Can't decode frame %u, returning data of frame %d instead", frame, buffer_frame_number);
 
-      size_t *ycbcr_data = ycbcr_buffer.data ();
+      unsigned int *ycbcr_data = ycbcr_buffer.data ();
 
       for (int y = th_data_info.frame_height - 1; y >= 0; y--)
       {
         Pixel *current_pixel = data_buffer + y * th_data_info.frame_width;
 
-        for (size_t x = 0; x < th_data_info.frame_width; x++, current_pixel++, ycbcr_data++)
+        for (unsigned int x = 0; x < th_data_info.frame_width; x++, current_pixel++, ycbcr_data++)
           YCbCr2RGBA (*ycbcr_data, *current_pixel);
       }
     }
@@ -339,7 +339,7 @@ class TheoraDecoderImpl : public IVideoDecoder
 
       GetLastOggPacket ();
 
-      total_frames_count = (size_t)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos) + 1;
+      total_frames_count = (unsigned int)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos) + 1;
 
       GetOggPacket (first_video_packet_index);
 
@@ -359,7 +359,7 @@ class TheoraDecoderImpl : public IVideoDecoder
 
       char* buffer = ogg_sync_buffer (&ogg_data_sync_state, OGG_BUFFER_SIZE);
 
-      size_t readed_bytes = video_file.Read (buffer, OGG_BUFFER_SIZE);
+      unsigned int readed_bytes = (unsigned int)video_file.Read (buffer, OGG_BUFFER_SIZE);
 
       if (ogg_sync_wrote (&ogg_data_sync_state, readed_bytes))
         throw xtl::format_operation_exception (METHOD_NAME, "ogg_sync_wrote error");
@@ -512,7 +512,7 @@ class TheoraDecoderImpl : public IVideoDecoder
     }
 
   private:
-    typedef xtl::uninitialized_storage <size_t> YCbCrBuffer;
+    typedef xtl::uninitialized_storage <unsigned int> YCbCrBuffer;
 
   private:
     common::Log       log;
@@ -528,7 +528,7 @@ class TheoraDecoderImpl : public IVideoDecoder
     th_dec_ctx        *th_decoding_context;
     th_ycbcr_buffer   th_decoded_buffer;
     size_t            first_video_packet_index;
-    size_t            total_frames_count;
+    unsigned int      total_frames_count;
     int               buffer_frame_number;
     int               decoded_frame_number;
 };

@@ -18,7 +18,7 @@ int main ()
     if (!FileSystem::IsDir (results_dir))
       FileSystem::Mkdir (results_dir);
     
-    for (size_t i=0; i<image.Depth (); i++)
+    for (unsigned int i=0; i<image.Depth (); i++)
     {
       unsigned char hash [16];
       

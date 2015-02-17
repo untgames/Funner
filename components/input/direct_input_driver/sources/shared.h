@@ -97,8 +97,8 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterObject (const char* name, size_t offset, ObjectType type);
-    void RegisterObject (const wchar_t* name, size_t offset, ObjectType type);
+    void RegisterObject (const char* name, unsigned int offset, ObjectType type);
+    void RegisterObject (const wchar_t* name, unsigned int offset, ObjectType type);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,11 +119,11 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     struct ObjectPropertyMapElement
     {
       float              value;
-      size_t             object_offset;
+      unsigned int       object_offset;
       ObjectPropertyType property_type;
 
       ObjectPropertyMapElement ();
-      ObjectPropertyMapElement (float in_value, size_t in_object_offset, ObjectPropertyType in_property_type) 
+      ObjectPropertyMapElement (float in_value, unsigned int in_object_offset, ObjectPropertyType in_property_type)
         : value (in_value), object_offset (in_object_offset), property_type (in_property_type)
         {}
     };
@@ -134,7 +134,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     {
       stl::string                 name;
       stl::wstring                unicode_name;
-      size_t                      offset;
+      unsigned int                offset;
       ObjectType                  type;
       int                         min_value;                          //минимальное значение (для объектов типа ось)
       int                         max_value;                          //максимальное значение (для объектов типа ось)
@@ -143,7 +143,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
       DWORD                       last_value;                         //последнее значение
 
       ObjectData () {}
-      ObjectData (const char* in_name, const wchar_t* in_unicode_name, size_t in_offset, ObjectType in_type) 
+      ObjectData (const char* in_name, const wchar_t* in_unicode_name, unsigned int in_offset, ObjectType in_type)
         : name (in_name), unicode_name (in_unicode_name), offset (in_offset), type (in_type), min_value (-65536), max_value (65535), bad_object (0)
         {}
     };
@@ -206,15 +206,15 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
     ObjectPropertyMap             objects_properties_map;
     stl::string                   properties;
     DebugLogHandler               debug_log_handler;
-    size_t                        events_buffer_size;     //размер буфера событий (если 0 - используется опрос мгновенного состояния)
+    unsigned int                  events_buffer_size;     //размер буфера событий (если 0 - используется опрос мгновенного состояния)
     EventsBuffer                  events_buffer;
     DeviceDataBuffer              last_device_data;
     DeviceDataBuffer              current_device_data;
     EventStringBuffer             event_string_buffer;
-    size_t                        current_axis;
-    size_t                        current_button;
-    size_t                        current_pov;
-    size_t                        current_unknown;
+    unsigned int                  current_axis;
+    unsigned int                  current_button;
+    unsigned int                  current_pov;
+    unsigned int                  current_unknown;
 };
 
 const char* get_direct_input_error_name (HRESULT error);

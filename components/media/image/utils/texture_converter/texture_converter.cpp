@@ -109,12 +109,12 @@ void error (const char* format, ...)
   exit (1);
 }
 
-size_t get_mips_count (size_t size)
+unsigned int get_mips_count (unsigned int size)
 {
-  return (size_t)(log ((double)size) / log (2.0)) + 1;
+  return (unsigned int)(log ((double)size) / log (2.0)) + 1;
 }
 
-size_t get_mips_count (size_t width, size_t height)
+unsigned int get_mips_count (unsigned int width, unsigned int height)
 {
   return get_mips_count (stl::max (width, height));
 }
@@ -230,7 +230,7 @@ void validate (Params& params)
 }
 
 //сохранение данных в DDS-файл
-void save_compressed_dds (const char* file_name, size_t width, size_t height, uint32 fourcc, size_t mips_count, const unsigned char** mips_data, const size_t* mips_data_sizes)
+void save_compressed_dds (const char* file_name, unsigned int width, unsigned int height, uint32 fourcc, unsigned int mips_count, const unsigned char** mips_data, const unsigned int* mips_data_sizes)
 {
   common::OutputFile file (file_name);
 
@@ -358,11 +358,11 @@ void qualcomm_texture_compress (const Params& params)
   source.nDataSize = source.nWidth * source.nHeight * media::get_bytes_per_pixel (source_image.Format ());
   source.pData     = (unsigned char*)source_image.Bitmap ();
 
-  size_t mips_count = get_mips_count (source.nWidth, source.nHeight);
+  unsigned int mips_count = get_mips_count (source.nWidth, source.nHeight);
 
   xtl::uninitialized_storage<TQonvertImage>  mips_images (mips_count);
   xtl::uninitialized_storage<unsigned char*> mips_data (mips_count);
-  xtl::uninitialized_storage<size_t>         mips_sizes (mips_count);
+  xtl::uninitialized_storage<unsigned int>   mips_sizes (mips_count);
 
   memset (mips_images.data (), 0, sizeof (TQonvertImage) * mips_count);
 

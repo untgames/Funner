@@ -38,7 +38,7 @@ struct InvokeDispatch
 
     try
     {
-      size_t results_count = invoker (interpreter.Interpreter::Stack ());
+      unsigned int results_count = (unsigned int)invoker (interpreter.Interpreter::Stack ());
       
       return results_count;
     }

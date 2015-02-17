@@ -104,7 +104,7 @@ class MediaPlayer : public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество треков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t TracksCount () const;
+    unsigned int TracksCount () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим повторения источников
@@ -115,14 +115,14 @@ class MediaPlayer : public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Номер проигрываемого трека / имя потока / его длительность
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetTrack         (size_t track);       //установка текущего трека
-    void        SetNextPlayTrack (size_t track);       //установка следующего трека
-    int         Track            () const;             //текущий трек
-    size_t      NextPlayTrack    () const;             //следующий трек
-    const char* Source           (size_t track) const; //имя трека
-    const char* Source           () const;             //имя прогрываемого трека
-    float       Duration         (size_t tack) const;  //длительность трека
-    float       Duration         () const;             //длительность проигрываемого трека
+    void         SetTrack         (unsigned int track);       //установка текущего трека
+    void         SetNextPlayTrack (unsigned int track);       //установка следующего трека
+    int          Track            () const;                   //текущий трек
+    unsigned int NextPlayTrack    () const;                   //следующий трек
+    const char*  Source           (unsigned int track) const; //имя трека
+    const char*  Source           () const;                   //имя прогрываемого трека
+    float        Duration         (unsigned int tack) const;  //длительность трека
+    float        Duration         () const;                   //длительность проигрываемого трека
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переключение треков

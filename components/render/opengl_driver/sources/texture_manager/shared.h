@@ -53,8 +53,8 @@ enum TextureManagerCacheEntry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct LayerDesc
 {
-  GLenum target;    //тип текстуры
-  size_t new_index; //индекс слоя в образе получаемом посредством glGetTexImage
+  GLenum       target;    //тип текстуры
+  unsigned int new_index; //индекс слоя в образе получаемом посредством glGetTexImage
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,8 @@ struct LayerDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct BindableTextureDesc
 {
-  size_t target; //целевой тип текстуры
-  size_t id;     //идентификатор текстуры
+  unsigned int target; //целевой тип текстуры
+  unsigned int id;     //идентификатор текстуры
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,8 +71,8 @@ struct BindableTextureDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TextureLevelData
 {
-  size_t      size; //размер буфера
-  const void* data; //буфер с данными
+  unsigned int size; //размер буфера
+  const void*  data; //буфер с данными
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ class TextureDataSelector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool GetLevelData (size_t width, size_t height, size_t depth, TextureLevelData&);
+    bool GetLevelData (unsigned int width, unsigned int height, unsigned int depth, TextureLevelData&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переход к следующему блоку
@@ -99,10 +99,10 @@ class TextureDataSelector
   private:
     PixelFormat        format;
     const TextureData* data;
-    size_t             data_size;
-    size_t             index;
-    size_t             images_count;
-    size_t             offset;
+    unsigned int       data_size;
+    unsigned int       index;
+    unsigned int       images_count;
+    unsigned int       offset;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,15 +154,15 @@ class Texture: public BindableTexture
     void GetDesc         (TextureDesc&);
     void GetDesc         (RenderTargetTextureDesc&);
     void GetDesc         (BindableTextureDesc&); 
-    void GetMipLevelDesc (size_t level, MipLevelDesc& desc);
+    void GetMipLevelDesc (unsigned int level, MipLevelDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о текстуре
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    GLenum      GetTarget    () { return target; }      //получение типа текстуры
-    GLuint      GetTextureId () { return texture_id; }  //получение идентификатора текстуры
-    size_t      GetMipsCount () { return mips_count; }  //получение количества mip-уровней
-    PixelFormat GetFormat    () { return desc.format; } //получение формата текстуры
+    GLenum       GetTarget    () { return target; }      //получение типа текстуры
+    GLuint       GetTextureId () { return texture_id; }  //получение идентификатора текстуры
+    unsigned int GetMipsCount () { return mips_count; }  //получение количества mip-уровней
+    PixelFormat  GetFormat    () { return desc.format; } //получение формата текстуры
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение хэша дескриптора прикрепленного сэмплера
@@ -178,14 +178,14 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* = 0);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* = 0);
+    void SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* = 0);
+    void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* = 0);
     
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture  (const ContextManager&, const TextureDesc& desc, GLenum target, size_t mips_count);
+    Texture  (const ContextManager&, const TextureDesc& desc, GLenum target, unsigned int mips_count);
     ~Texture ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,26 +197,26 @@ class Texture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора слоя текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void GetLayerDesc (size_t layer, LayerDesc& desc);
+    virtual void GetLayerDesc (unsigned int layer, LayerDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    virtual void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                                       GLenum format, GLenum type, const void* buffer) = 0;
-    virtual void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                                    GLenum format, size_t buffer_size, const void* buffer) = 0;
+    virtual void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                                    GLenum format, unsigned int buffer_size, const void* buffer) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация mip-уровней
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t unclamped_width, size_t height, PixelFormat format, const void* data);
+    void BuildMipmaps (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int unclamped_width, unsigned int height, PixelFormat format, const void* data);
     
   private:
     TextureDesc   desc;                //дескриптор текстуры
     GLenum        target;              //тип текстуры
     GLuint        texture_id;          //идентификатор текстуры
-    size_t        mips_count;          //количество мип-уровней
+    unsigned int  mips_count;          //количество мип-уровней
     size_t        binded_sampler_hash; //хэш дескриптора прикрепленного сэмплера
 };
 
@@ -235,10 +235,10 @@ class Texture1D: public Texture, public xtl::instance_counter<Texture1D>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,10 +256,10 @@ class Texture1DNoSubimage: public Texture1D, public xtl::instance_counter<Textur
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 
   private:
     GLenum gl_internal_format;
@@ -280,10 +280,10 @@ class Texture2D: public Texture, public xtl::instance_counter<Texture2D>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,10 +301,10 @@ class Texture2DNoSubimage: public Texture2D, public xtl::instance_counter<Textur
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 
   private:
     GLenum gl_internal_format;
@@ -325,10 +325,10 @@ class TextureNpot: public Texture, public xtl::instance_counter<TextureNpot>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);    
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,16 +345,16 @@ class Texture3D : public Texture, public xtl::instance_counter<Texture3D>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context);
+    void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* context);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,15 +372,15 @@ class TextureCubemap : public Texture, public xtl::instance_counter<TextureCubem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора слоя текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetLayerDesc (size_t layer, LayerDesc& desc);
+    void GetLayerDesc (unsigned int layer, LayerDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetUncompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
+    void SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
                               GLenum format, GLenum type, const void* buffer);
-    void SetCompressedData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height,
-                            GLenum format, size_t buffer_size, const void* buffer);
+    void SetCompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height,
+                            GLenum format, unsigned int buffer_size, const void* buffer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ class ScaledTexture: public BindableTexture, public xtl::instance_counter<Scaled
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ScaledTexture (const ContextManager&, TextureManager&, const TextureDesc& original_desc, const TextureData* data, size_t scaled_width=0, size_t scaled_height=0);
+    ScaledTexture (const ContextManager&, TextureManager&, const TextureDesc& original_desc, const TextureData* data, unsigned int scaled_width=0, unsigned int scaled_height=0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
@@ -400,7 +400,7 @@ class ScaledTexture: public BindableTexture, public xtl::instance_counter<Scaled
     void        GetDesc         (TextureDesc&);
     void        GetDesc         (RenderTargetTextureDesc&);
     void        GetDesc         (BindableTextureDesc&);
-    void        GetMipLevelDesc (size_t level, MipLevelDesc& desc);
+    void        GetMipLevelDesc (unsigned int level, MipLevelDesc& desc);
     PixelFormat GetFormat       ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -417,19 +417,19 @@ class ScaledTexture: public BindableTexture, public xtl::instance_counter<Scaled
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* = 0);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* = 0);
+    void SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext* = 0);
+    void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext* = 0);
     
   private:
     typedef xtl::com_ptr<BindableTexture>    TexturePtr;    
     typedef xtl::uninitialized_storage<char> Buffer;
 
-    void ScaleImage (size_t width, size_t height, PixelFormat source_format, const void* src_buffer, Buffer& scaled_buffer, PixelFormat& scaled_format);
+    void ScaleImage (unsigned int width, unsigned int height, PixelFormat source_format, const void* src_buffer, Buffer& scaled_buffer, PixelFormat& scaled_format);
 
   private:
     TexturePtr    shadow_texture;   //теневая текстура, со сторонами кратными степени двойки
-    size_t        original_width;   //ширина оригинальной текстуры
-    size_t        original_height;  //высота оригинальной текстуры
+    unsigned int  original_width;   //ширина оригинальной текстуры
+    unsigned int  original_height;  //высота оригинальной текстуры
     float         horisontal_scale; //коэффициент растяжения по горизонтали
     float         vertical_scale;   //коэффициент растяжения по вертикали
 };
@@ -470,31 +470,31 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t      get_image_size                      (PixelFormat format, size_t width, size_t height, size_t depth); //получение размера битового образа
-size_t      get_next_higher_power_of_two        (size_t size);        //получение ближайшей сверху степени двойки
-GLint       get_gl_internal_format              (PixelFormat format); //внутренний формат OpenGL
-GLenum      get_gl_format                       (PixelFormat format); //формат OpenGL
-GLenum      get_gl_type                         (PixelFormat format); //тип OpenGL
-GLenum      get_uncompressed_gl_internal_format (PixelFormat format); //распакованный внутренний формат OpenGL
-GLenum      get_uncompressed_gl_format          (PixelFormat format); //распакованный формат OpenGL
-GLenum      get_uncompressed_gl_type            (PixelFormat format); //распакованный тип OpenGL
-PixelFormat get_pixel_format                    (GLenum gl_format);   //эквивалент внутреннего формата OpenGL
+unsigned int get_image_size                      (PixelFormat format, unsigned int width, unsigned int height, unsigned int depth); //получение размера битового образа
+unsigned int get_next_higher_power_of_two        (unsigned int size);        //получение ближайшей сверху степени двойки
+GLint        get_gl_internal_format              (PixelFormat format); //внутренний формат OpenGL
+GLenum       get_gl_format                       (PixelFormat format); //формат OpenGL
+GLenum       get_gl_type                         (PixelFormat format); //тип OpenGL
+GLenum       get_uncompressed_gl_internal_format (PixelFormat format); //распакованный внутренний формат OpenGL
+GLenum       get_uncompressed_gl_format          (PixelFormat format); //распакованный формат OpenGL
+GLenum       get_uncompressed_gl_type            (PixelFormat format); //распакованный тип OpenGL
+PixelFormat  get_pixel_format                    (GLenum gl_format);   //эквивалент внутреннего формата OpenGL
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Масштабирование текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const void* src, void* dest);
-void scale_image         (PixelFormat format, size_t width, size_t height, size_t new_width, size_t new_height, const void* src, void* dest);
+void scale_image_2x_down (PixelFormat format, unsigned int width, unsigned int height, const void* src, void* dest);
+void scale_image         (PixelFormat format, unsigned int width, unsigned int height, unsigned int new_width, unsigned int new_height, const void* src, void* dest);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с DXT форматом при остутствии аппаратной поддержки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data);
+void unpack_dxt (PixelFormat format, unsigned int width, unsigned int height, const void* dxt_data, void* unpacked_data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование изображений различных форматов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void copy_image (size_t pixels_count, PixelFormat src_format, const void* src_buffer, PixelFormat dst_format, void* dst_buffer);
+void copy_image (unsigned int pixels_count, PixelFormat src_format, const void* src_buffer, PixelFormat dst_format, void* dst_buffer);
 
 }
 

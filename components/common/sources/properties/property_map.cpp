@@ -108,7 +108,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     for (size_t i=0, count=layout.Size (); i<count; i++, desc++)
     {
       if (desc->type == PropertyType_String)
-        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = strings.Add ("");
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = (unsigned int)strings.Add ("");
     }
     
     Update ();
@@ -191,7 +191,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
         {
           unsigned int& string_index = *reinterpret_cast<unsigned int*> (buffer.data () + old_buffer_size);
           
-          string_index = strings.Add ("");
+          string_index = (unsigned int)strings.Add ("");
         }
         else
         {
@@ -1052,7 +1052,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
         //добавление строки в случае необходимости
 
       if (type == PropertyType_String)
-        *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset) = strings.Add ("");
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset) = (unsigned int)strings.Add ("");
 
         //изменение типа в лэйауте
         
@@ -1874,7 +1874,7 @@ void PropertyMap::Reset (const PropertyLayout& in_layout)
     for (size_t i=0, count=layout.Size (); i<count; i++, desc++)
     {
       if (desc->type == PropertyType_String)
-        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = strings.Add ("");
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = (unsigned int)strings.Add ("");
     }    
 
     impl->layout      = layout;

@@ -68,17 +68,17 @@ class VertexIndexMap: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–азмер массива индексов / изменение размера массива индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   size_t Size () const { return indices.size (); }
-   void   Resize (size_t new_size) { indices.resize (new_size); }
+   unsigned int Size () const { return (unsigned int)indices.size (); }
+   void         Resize (unsigned int new_size) { indices.resize (new_size); }
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћассив индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          size_t* Indices ()       { return &indices [0]; }
-    const size_t* Indices () const { return &indices [0]; }
+          unsigned int* Indices ()       { return &indices [0]; }
+    const unsigned int* Indices () const { return &indices [0]; }
 
   private:
-    typedef stl::vector<size_t> IndexArray;
+    typedef stl::vector<unsigned int> IndexArray;
 
     IndexArray indices;
 };

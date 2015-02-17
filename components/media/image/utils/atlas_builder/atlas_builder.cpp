@@ -73,8 +73,8 @@ struct Params
   stl::string   layout_atlas_file_format; //имя результирующего изображения в атласе
   stl::string   layout_file_name;         //имя файла разметки
   stl::string   isolated_images_wildcard; //маска имён изолированных изображений не входящих в общий атлас
-  size_t        max_image_size;           //максимальный размер одного изображения
-  size_t        margin;                   //отступ между картинками в атласе
+  unsigned int  max_image_size;           //максимальный размер одного изображения
+  unsigned int  margin;                   //отступ между картинками в атласе
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
   bool          need_layout;              //нужно генерировать файл разметки
@@ -261,7 +261,7 @@ void save_builder_results (Params& params, bool is_single_atlas, media::AtlasBui
 {
   stl::string atlas_file_name, layout_atlas_file_name;
 
-  for (size_t i = 0, count = builder.AtlasesCount (); i < count; i++, atlas_index++)
+  for (unsigned int i = 0, count = builder.AtlasesCount (); i < count; i++, atlas_index++)
   {
     format_atlas_names (params, atlas_index, is_single_atlas, atlas_file_name, layout_atlas_file_name);
 
@@ -274,7 +274,7 @@ void save_builder_results (Params& params, bool is_single_atlas, media::AtlasBui
     if (!params.silent)
       printf ("Build atlas %ux%u\n", atlas_image.Width (), atlas_image.Height ());
 
-    for (size_t j = 0, tiles_count = atlas.TilesCount (); j < tiles_count; j++)
+    for (unsigned int j = 0, tiles_count = atlas.TilesCount (); j < tiles_count; j++)
       result_atlas.Insert (atlas.Tile (j));
 
     result_atlas.SetImageSize (layout_atlas_file_name.c_str (), atlas.ImageSize (layout_atlas_file_name.c_str ()));
@@ -332,7 +332,7 @@ void build (Params& params)
     
       //построение атласов
 
-    size_t pack_flags = 0;
+    unsigned int pack_flags = 0;
 
     if (params.need_pot_rescale)      pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
     if (params.invert_x)              pack_flags |= media::AtlasPackFlag_InvertTilesX;

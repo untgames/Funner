@@ -14,8 +14,8 @@ struct ContextSettings::Impl
   Version      max_version;                               //максимальная необходимая версия OpenGL
   bool         need_check_errors;                         //нужно ли проверять ошибки
   bool         need_validate_programs;                    //нужно ли валидировать программы
-  size_t       int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
-  bool         is_ffp_allowed;                          //поддерживается ли ffp
+  unsigned int int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
+  bool         is_ffp_allowed;                            //поддерживается ли ffp
   
 ///Конструктор
   Impl (const char* init_string)
@@ -204,7 +204,7 @@ const Version& ContextSettings::MaxVersion () const
     Получение целочисленных настроек контекста
 */
 
-size_t ContextSettings::GetInteger (ContextSettingsInteger tag) const
+unsigned int ContextSettings::GetInteger (ContextSettingsInteger tag) const
 {
   if (tag < 0 || tag >= ContextSettingsInteger_Num)
     throw xtl::make_argument_exception ("render::low_level::opengl::ContextSettings::GetInteger", "tag", tag);

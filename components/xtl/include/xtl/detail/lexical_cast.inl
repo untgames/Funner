@@ -73,13 +73,13 @@ inline void to_string (stl::string& buffer, const unsigned char* value)
 namespace detail
 {
 
-inline void integer_to_string (stl::string& buffer, long value, bool sign)
+inline void integer_to_string (stl::string& buffer, long long value, bool sign)
 {
   const size_t MAX_INTEGER_STRING_SIZE = 16; //максимальное количество знаков для символьного представления целого числа 
 
   char char_buffer [MAX_INTEGER_STRING_SIZE];
 
-  xsnprintf (char_buffer, sizeof (char_buffer), sign ? "%d" : "%u", value);
+  xsnprintf (char_buffer, sizeof (char_buffer), sign ? "%lld" : "%llu", value);
 
   buffer = char_buffer;
 }
@@ -138,6 +138,16 @@ inline void to_string (stl::string& buffer, long value)
 }
 
 inline void to_string (stl::string& buffer, unsigned long value)
+{
+  detail::integer_to_string (buffer, value, false);
+}
+
+inline void to_string (stl::string& buffer, long long value)
+{
+  detail::integer_to_string (buffer, value, true);
+}
+
+inline void to_string (stl::string& buffer, unsigned long long value)
 {
   detail::integer_to_string (buffer, value, false);
 }
@@ -251,6 +261,16 @@ inline void to_value (const stl::string& buffer, long& value)
 }
 
 inline void to_value (const stl::string& buffer, unsigned long& value)
+{
+  detail::to_value (buffer, value);
+}
+
+inline void to_value (const stl::string& buffer, long long& value)
+{
+  detail::to_value (buffer, value);
+}
+
+inline void to_value (const stl::string& buffer, unsigned long long& value)
 {
   detail::to_value (buffer, value);
 }

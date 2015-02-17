@@ -87,7 +87,7 @@ class XmlMeshLibraryLoader
 
       VertexAttributeSemantic semantic         = get_vertex_attribute_semantic (semantic_string);
       VertexAttributeType     type             = get_vertex_attribute_type (type_string);
-      size_t                  offset           = get<size_t> (*channel_iter, "offset");
+      unsigned int            offset           = get<unsigned int> (*channel_iter, "offset");
 
       if (semantic == VertexAttributeSemantic_Num)
         throw xtl::make_argument_exception (METHOD_NAME, "semantic", semantic_string);
@@ -113,8 +113,8 @@ class XmlMeshLibraryLoader
 
         //определение числа вершин и размера вершины
       
-      size_t vertices_count = get<size_t> (*vs_iter, "vertices_count"),
-             vertex_size    = get<size_t> (*vs_iter, "vertex_size");
+      unsigned int vertices_count = get<unsigned int> (*vs_iter, "vertices_count"),
+                   vertex_size    = get<unsigned int> (*vs_iter, "vertex_size");
 
       VertexFormat vertex_format;
 
@@ -130,7 +130,7 @@ class XmlMeshLibraryLoader
         
       Parser::NamesakeIterator channel_iter = vs_iter->First ("channel");
         
-      for (size_t i=0, channel_count=vertex_format.AttributesCount (); i<channel_count; i++, ++channel_iter)
+      for (uint32_t i=0, channel_count=vertex_format.AttributesCount (); i<channel_count; i++, ++channel_iter)
       {
         const VertexAttribute& attribute = vertex_format.Attribute (i);
 
@@ -180,8 +180,8 @@ class XmlMeshLibraryLoader
     {
         //чтение идентификатора потока
 
-      const char* id            = get<const char*> (*vws_iter, "id");
-      size_t      weights_count = get<size_t> (*vws_iter, "weights_count");
+      const char*  id            = get<const char*> (*vws_iter, "id");
+      unsigned int weights_count = get<unsigned int> (*vws_iter, "weights_count");
 
         //создание потока
 
@@ -252,7 +252,7 @@ class XmlMeshLibraryLoader
       const char* id   = get<const char*> (*ib_iter, "id");
       const char* type = get<const char*> (*ib_iter, "type", "uint32");
 
-      size_t indices_count = get<size_t> (*ib_iter, "indices_count");
+      unsigned int indices_count = get<unsigned int> (*ib_iter, "indices_count");
       
       if (!strcmp (type, "uint32"))
       {
@@ -292,19 +292,19 @@ class XmlMeshLibraryLoader
       const char*   type_string         = get<const char*> (*primitive_iter, "type");
       PrimitiveType type                = get_primitive_type (type_string);
       const char*   material            = get<const char*> (*primitive_iter, "material", "");
-      size_t        vertex_buffer_index = get<size_t> (*primitive_iter, "vertex_buffer"),
-                    first               = get<size_t> (*primitive_iter, "first"),
-                    count               = get<size_t> (*primitive_iter, "count"),
-                    base_vertex         = get<size_t> (*primitive_iter, "base_vertex", 0u);
+      unsigned int  vertex_buffer_index = get<unsigned int> (*primitive_iter, "vertex_buffer"),
+                    first               = get<unsigned int> (*primitive_iter, "first"),
+                    count               = get<unsigned int> (*primitive_iter, "count"),
+                    base_vertex         = get<unsigned int> (*primitive_iter, "base_vertex", 0u);
 
       if (type >= PrimitiveType_Num)
         throw xtl::make_argument_exception (METHOD_NAME, "type", type_string);
 
       if (vertex_buffer_index >= mesh.VertexBuffersCount ())
-        throw xtl::make_range_exception (METHOD_NAME, "vertex_buffer", vertex_buffer_index, (size_t)mesh.VertexBuffersCount ());
+        throw xtl::make_range_exception (METHOD_NAME, "vertex_buffer", vertex_buffer_index, mesh.VertexBuffersCount ());
 
       const VertexBuffer& vertex_buffer  = mesh.VertexBuffer (vertex_buffer_index);
-      size_t              vertices_count = vertex_buffer.VerticesCount (),
+      unsigned int        vertices_count = vertex_buffer.VerticesCount (),
                           indices_count  = mesh.IndexBuffer ().Size (),
                           max_primitives_count = 0,
                           max_count      = indices_count ? indices_count : vertices_count;                          

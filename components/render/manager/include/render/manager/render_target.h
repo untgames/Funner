@@ -44,8 +44,8 @@ class RenderTarget
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width  () const;
-    size_t Height () const;
+    unsigned int Width  () const;
+    unsigned int Height () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Захват изображения
@@ -89,13 +89,13 @@ class Viewport
 ///Размеры области
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                 SetRect (const manager::Rect& rect);
-    void                 SetRect (int x, int y, size_t width, size_t height);
+    void                 SetRect (int x, int y, unsigned int width, unsigned int height);
     RectArea             Area    () const;
     const manager::Rect& Rect    () const;
     int                  X       () const;
     int                  Y       () const;
-    size_t               Width   () const;
-    size_t               Height  () const;
+    unsigned int         Width   () const;
+    unsigned int         Height  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Диапазон глубины для области вывода

@@ -9,9 +9,9 @@ class TextureImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TextureImpl  (const DeviceManagerPtr& manager,
                   TextureDimension        dimension,
-                  size_t                  width,
-                  size_t                  height,
-                  size_t                  depth,
+                  unsigned int            width,
+                  unsigned int            height,
+                  unsigned int            depth,
                   PixelFormat             format,
                   bool                    generate_mipmaps,
                   const char*             name = "");
@@ -43,15 +43,15 @@ class TextureImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Формат и размеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PixelFormat Format ();
-    size_t      Width  ();
-    size_t      Height ();
-    size_t      Depth  ();
+    PixelFormat  Format ();
+    unsigned int Width  ();
+    unsigned int Height ();
+    unsigned int Depth  ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTargetPtr RenderTarget (size_t layer, size_t mip_level);
+    RenderTargetPtr RenderTarget (unsigned int layer, unsigned int mip_level);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление образа
@@ -61,8 +61,8 @@ class TextureImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Захват образа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Capture (size_t layer, size_t mip_level, media::Image& image);
-    void Capture (size_t mip_level, media::Image& image);
+    void Capture (unsigned int layer, unsigned int mip_level, media::Image& image);
+    void Capture (unsigned int mip_level, media::Image& image);
     
   private:
     struct Impl;

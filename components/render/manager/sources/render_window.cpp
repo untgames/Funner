@@ -21,8 +21,8 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   LowLevelAdapterPtr       adapter;                   //адаптер отрисовки
   RenderTargetPtr          color_buffer;              //буфер цвета окна
   RenderTargetPtr          depth_stencil_buffer;      //буфер глубины окна
-  size_t                   width;                     //ширина окна
-  size_t                   height;                    //высота окна
+  unsigned int             width;                     //ширина окна
+  unsigned int             height;                    //высота окна
   WindowSignal             signals [WindowEvent_Num]; //сигналы окна
   Log                      log;                       //протокол
   SettingsPtr              settings;                  //настройки рендеринга
@@ -148,7 +148,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   }
   
 ///Обновление размеров окна
-  void UpdateSizes (size_t in_width, size_t in_height)
+  void UpdateSizes (unsigned int in_width, unsigned int in_height)
   {
     width  = in_width;
     height = in_height;
@@ -177,7 +177,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   }
 
 ///Обработка события изменения размеров окна
-  void OnSizeChanged (size_t width, size_t height)
+  void OnSizeChanged (unsigned int width, unsigned int height)
   {
     try
     {
@@ -281,12 +281,12 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 namespace
 {
 
-size_t get_uint_property (const common::PropertyMap& properties, const char* name, size_t default_value)
+unsigned int get_uint_property (const common::PropertyMap& properties, const char* name, unsigned int default_value)
 {
   if (!properties.IsPresent (name))
     return default_value;
     
-  return (size_t)properties.GetInteger (name);
+  return (unsigned int)properties.GetInteger (name);
 }
 
 const char* get_string_property (const common::PropertyMap& properties, const char* name, const char* default_value)
@@ -461,12 +461,12 @@ const RenderTargetPtr& WindowImpl::DepthStencilBuffer ()
     Размеры целей рендеринга
 */
 
-size_t WindowImpl::Width ()
+unsigned int WindowImpl::Width ()
 {
   return impl->width;
 }
 
-size_t WindowImpl::Height ()
+unsigned int WindowImpl::Height ()
 {
   return impl->height;
 }

@@ -9,7 +9,7 @@ int main ()
   
   CustomVertex* verts = vs1.Data<CustomVertex> ();
   
-  for (size_t i=0; i<vs1.Size (); i++)
+  for (uint32_t i=0; i<vs1.Size (); i++)
   {
     verts [i].position  = float (i);
     verts [i].normal    = vec3f (1, 0, 0);

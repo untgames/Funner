@@ -414,17 +414,17 @@ struct XmlSceneParser::Impl
 
     font_decl->face_name = get<const char*> (decl, "face");
 
-    font_decl->creation_params.font_size      = get<size_t> (decl, "size");
-    font_decl->creation_params.font_size_eps  = get<size_t> (decl, "size_eps", 0);
-    font_decl->creation_params.weight         = get<size_t> (decl, "weight", 0);
+    font_decl->creation_params.font_size      = get<unsigned int> (decl, "size");
+    font_decl->creation_params.font_size_eps  = get<unsigned int> (decl, "size_eps", 0);
+    font_decl->creation_params.weight         = get<unsigned short> (decl, "weight", 0);
     font_decl->creation_params.escapement     = get<int> (decl, "escapement", 0);
     font_decl->creation_params.bold           = xtl::xstrcmp (get<const char*> (decl, "bold", "false"), "true") == 0;
     font_decl->creation_params.italic         = xtl::xstrcmp (get<const char*> (decl, "italic", "false"), "true") == 0;
     font_decl->creation_params.underlined     = xtl::xstrcmp (get<const char*> (decl, "underlined", "false"), "true") == 0;
     font_decl->creation_params.striked        = xtl::xstrcmp (get<const char*> (decl, "striked", "false"), "true") == 0;
-    font_decl->creation_params.stroke_size    = get<size_t> (decl, "stroke_size", 0);
-    font_decl->creation_params.vertical_dpi   = get<size_t> (decl, "vertical_dpi", 0);
-    font_decl->creation_params.horizontal_dpi = get<size_t> (decl, "horizontal_dpi", 0);
+    font_decl->creation_params.stroke_size    = get<unsigned int> (decl, "stroke_size", 0);
+    font_decl->creation_params.vertical_dpi   = get<unsigned short> (decl, "vertical_dpi", 0);
+    font_decl->creation_params.horizontal_dpi = get<unsigned short> (decl, "horizontal_dpi", 0);
     font_decl->creation_params.charset_name   = get<const char*> (decl, "charset_name");
 
     fonts_decls [get<const char*> (decl, "id")] = font_decl;
@@ -1499,17 +1499,17 @@ void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent,
     }
 
       //load font params overrides
-    font_creation_params.font_size      = get<size_t> (decl, "font_size", font_creation_params.font_size);
-    font_creation_params.font_size_eps  = get<size_t> (decl, "font_size_eps", font_creation_params.font_size_eps);
-    font_creation_params.weight         = get<size_t> (decl, "font_weight", font_creation_params.weight);
+    font_creation_params.font_size      = get<unsigned int> (decl, "font_size", font_creation_params.font_size);
+    font_creation_params.font_size_eps  = get<unsigned int> (decl, "font_size_eps", font_creation_params.font_size_eps);
+    font_creation_params.weight         = get<unsigned short> (decl, "font_weight", font_creation_params.weight);
     font_creation_params.escapement     = get<int> (decl, "font_escapement", font_creation_params.escapement);
     font_creation_params.bold           = xtl::xstrcmp (get<const char*> (decl, "font_bold", font_creation_params.bold ? "true" : "false"), "true") == 0;
     font_creation_params.italic         = xtl::xstrcmp (get<const char*> (decl, "font_italic", font_creation_params.italic ? "true" : "false"), "true") == 0;
     font_creation_params.underlined     = xtl::xstrcmp (get<const char*> (decl, "font_underlined", font_creation_params.underlined ? "true" : "false"), "true") == 0;
     font_creation_params.striked        = xtl::xstrcmp (get<const char*> (decl, "font_striked", font_creation_params.striked ? "true" : "false"), "true") == 0;
-    font_creation_params.stroke_size    = get<size_t> (decl, "font_stroke_size", font_creation_params.stroke_size);
-    font_creation_params.vertical_dpi   = get<size_t> (decl, "font_vertical_dpi", font_creation_params.vertical_dpi);
-    font_creation_params.horizontal_dpi = get<size_t> (decl, "font_horizontal_dpi", font_creation_params.horizontal_dpi);
+    font_creation_params.stroke_size    = get<unsigned int> (decl, "font_stroke_size", font_creation_params.stroke_size);
+    font_creation_params.vertical_dpi   = get<unsigned short> (decl, "font_vertical_dpi", font_creation_params.vertical_dpi);
+    font_creation_params.horizontal_dpi = get<unsigned short> (decl, "font_horizontal_dpi", font_creation_params.horizontal_dpi);
     font_creation_params.charset_name   = get<const char*> (decl, "font_charset_name", font_creation_params.charset_name);
 
     node.SetFontCreationParams (font_creation_params);

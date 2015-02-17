@@ -225,9 +225,9 @@ TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, r
 
 TexturePtr TextureManager::CreateTexture
  (render::manager::TextureDimension dimension,
-  size_t                            width,
-  size_t                            height,
-  size_t                            depth,
+  unsigned int                      width,
+  unsigned int                      height,
+  unsigned int                      depth,
   render::manager::PixelFormat      format,
   bool                              generate_mips_enable,
   const char*                       name)
@@ -238,7 +238,7 @@ TexturePtr TextureManager::CreateTexture
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::TextureManager::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
+    e.touch ("render::manager::TextureManager::CreateTexture(TextureDimension,unsigned int,unsigned int,unsigned int,PixelFormat,bool)");
     throw;
   }
 }

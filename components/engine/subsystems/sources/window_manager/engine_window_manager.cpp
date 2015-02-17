@@ -381,19 +381,19 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       if (!maximized && !minimized)
       {
-        size_t width       = get<size_t> (node, "Width"),
-               height      = get<size_t> (node, "Height");
-        bool   client_size = get<bool> (node, "ClientSize", true);
+        unsigned int width       = get<unsigned int> (node, "Width"),
+                     height      = get<unsigned int> (node, "Height");
+        bool         client_size = get<bool> (node, "ClientSize", true);
 
         if (client_size)
           window.SetClientSize (width, height);
         else
-          window.SetSize (width, height);        
+          window.SetSize (width, height);
         
         syslib::Point position = window.Position ();
 
-        position.x = get<size_t> (node, "XPosition", position.x);
-        position.y = get<size_t> (node, "YPosition", position.y);
+        position.x = get<unsigned int> (node, "XPosition", position.x);
+        position.y = get<unsigned int> (node, "YPosition", position.y);
 
         window.SetPosition (position);
         
@@ -680,26 +680,26 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Обновление области вывода окна
     void UpdateViewport (syslib::Rect& viewport)
     {
-      size_t window_width  = window.ClientWidth (),
-             window_height = window.ClientHeight ();             
+      unsigned int window_width  = window.ClientWidth (),
+                   window_height = window.ClientHeight ();
                    
       double window_aspect_ratio = double (window_width) / double (window_height);
 
-      size_t viewport_width = 0, viewport_height = 0;
+      unsigned int viewport_width = 0, viewport_height = 0;
 
       if (window_aspect_ratio / aspect_ratio < 1.0)
       {
           //полосы по вертикали
 
         viewport_width  = window_width;
-        viewport_height = size_t (viewport_width / aspect_ratio);
+        viewport_height = (unsigned int)(viewport_width / aspect_ratio);
       }
       else
       {
           //полосы по горизонтали
           
         viewport_height = window_height;
-        viewport_width  = size_t (viewport_height * aspect_ratio);
+        viewport_width  = (unsigned int)(viewport_height * aspect_ratio);
       }
 
       viewport.left   = (window_width - viewport_width) / 2;

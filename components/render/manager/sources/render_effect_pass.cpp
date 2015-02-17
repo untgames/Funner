@@ -22,7 +22,7 @@ struct EffectPass::Impl
   LowLevelStateBlockPtr        scissor_on_state_block;   //блок состояний с включенным тестом отсечения
   ProgramPtr                   program;                  //программа
   bool                         state_block_need_update;  //блок состояний требует обновления
-  size_t                       clear_flags;              //флаги очистки
+  unsigned int                 clear_flags;              //флаги очистки
   common::StringArray          tags;                     //тэги прохода
   TagHashArray                 tag_hashes;               //хэши тэгов
   
@@ -276,12 +276,12 @@ SortMode EffectPass::SortMode ()
     Флаги очистки
 */
 
-void EffectPass::SetClearFlags (size_t clear_flags)
+void EffectPass::SetClearFlags (unsigned int clear_flags)
 {
   impl->clear_flags = clear_flags;
 }
 
-size_t EffectPass::ClearFlags ()
+unsigned int EffectPass::ClearFlags ()
 {
   return impl->clear_flags;
 }

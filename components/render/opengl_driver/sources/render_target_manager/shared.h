@@ -81,7 +81,7 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetDesc (TextureDesc&);
+    void               GetDesc (TextureDesc&);
     const TextureDesc& GetDesc () const { return desc; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,8 +92,8 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext*);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext*);
+    void SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext*);
+    void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext*);
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ class RenderBuffer: virtual public ITexture, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение размеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetSize (size_t width, size_t height);
+    void SetSize (unsigned int width, unsigned int height);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +138,8 @@ class View: virtual public IView, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора / флагов биндинга текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   GetDesc (ViewDesc&);
-    size_t GetBindFlags () const { return bind_flags; }
+    void         GetDesc      (ViewDesc&);
+    unsigned int GetBindFlags () const { return bind_flags; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение строкового имени типа текстуры
@@ -153,7 +153,7 @@ class View: virtual public IView, public ContextObject
     TexturePtr            texture;    //указатель на текстуру
     const std::type_info& type;       //тип отображения
     ViewDesc              desc;       //дескриптор отображения
-    size_t                bind_flags; //флаги биндинга
+    unsigned int          bind_flags; //флаги биндинга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,8 +175,8 @@ class IFrameBuffer: public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отрисовке в целевые буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void InvalidateRenderTargets (size_t render_target_slot, const Rect& update_rect) = 0;
-    virtual void InvalidateRenderTargets (size_t render_target_slot) = 0;
+    virtual void InvalidateRenderTargets (unsigned int render_target_slot, const Rect& update_rect) = 0;
+    virtual void InvalidateRenderTargets (unsigned int render_target_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых буферов отрисовки
@@ -190,7 +190,7 @@ class IFrameBuffer: public xtl::trackable
 typedef xtl::function<IFrameBuffer* (View* render_target_view, View* depth_stencil_view)> FrameBufferCreater;
 typedef xtl::function<bool (View* render_target_view, View* depth_stencil_view)>          FrameBufferChecker;
 typedef xtl::function<ITexture* (const TextureDesc&)>                                     RenderBufferCreater;
-typedef xtl::function<ITexture* (ISwapChain*, size_t)>                                    ColorBufferCreater;
+typedef xtl::function<ITexture* (ISwapChain*, unsigned int)>                              ColorBufferCreater;
 typedef xtl::function<ITexture* (ISwapChain*)>                                            DepthStencilBufferCreater;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ class RenderTargetRegistry
 ///Создание буферов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ITexture* CreateRenderBuffer       (const TextureDesc& desc);
-    ITexture* CreateColorBuffer        (ISwapChain* swap_chain, size_t index);
+    ITexture* CreateColorBuffer        (ISwapChain* swap_chain, unsigned int index);
     ITexture* CreateDepthStencilBuffer (ISwapChain* swap_chain);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -25,12 +25,12 @@ struct FreetypeFace::Impl
   DataBufferPtr   data;                    //данные файла шрифта
   FreetypeLibrary library;                 //библиотека
   FT_Face         face;                    //шрифт
-  size_t          current_size;            //текущий установленный размер шрифта
-  size_t          current_horizontal_dpi;  //текущее установленное разрешение целевого устройства вывода
-  size_t          current_vertical_dpi;    //текущее установленное разрешение целевого устройства вывода
+  unsigned int    current_size;            //текущий установленный размер шрифта
+  unsigned int    current_horizontal_dpi;  //текущее установленное разрешение целевого устройства вывода
+  unsigned int    current_vertical_dpi;    //текущее установленное разрешение целевого устройства вывода
 
   ///Конструктор / деструктор
-  Impl (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, size_t face_index)
+  Impl (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, unsigned int face_index)
     : data (in_data)
     , library (in_library)
     , face (0)
@@ -38,7 +38,7 @@ struct FreetypeFace::Impl
     , current_horizontal_dpi (0)
     , current_vertical_dpi (0)
   {
-    library.FT_New_Memory_Face ((const FT_Byte*)data->data (), data->size (), face_index, &face);
+    library.FT_New_Memory_Face ((const FT_Byte*)data->data (), (FT_Long)data->size (), face_index, &face);
     library.FT_Select_Charmap (face, FT_ENCODING_UNICODE);
   }
 
@@ -58,7 +58,7 @@ struct FreetypeFace::Impl
   }
 
   ///Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
-  size_t GetNearestFontSize (size_t size, size_t size_eps)
+  unsigned int GetNearestFontSize (unsigned int size, unsigned int size_eps)
   {
     if (face->face_flags & FT_FACE_FLAG_SCALABLE)
       return size;
@@ -66,25 +66,25 @@ struct FreetypeFace::Impl
     if (!face->num_fixed_sizes)
       return 0;
 
-    size_t min_size = size > size_eps ? size - size_eps : 1;
-    size_t max_size = size + size_eps;
+    unsigned int min_size = size > size_eps ? size - size_eps : 1;
+    unsigned int max_size = size + size_eps;
 
     if (max_size < size)
-      max_size = (size_t)-1;
+      max_size = (unsigned int)-1;
 
-    size_t best_size;
-    size_t size_diff  = (size_t)-1;
-    bool   size_found = false;
+    unsigned int best_size;
+    unsigned int size_diff  = (unsigned int)-1;
+    bool         size_found = false;
 
     for (int i = 0; i < face->num_fixed_sizes; i++)
     {
-      size_t current_size = face->available_sizes [i].width;
+      unsigned int current_size = face->available_sizes [i].width;
 
       if (current_size >= min_size && current_size <= max_size)
       {
         size_found = true;
 
-        size_t current_size_diff = size > current_size ? size - current_size : current_size - size;
+        unsigned int current_size_diff = size > current_size ? size - current_size : current_size - size;
 
         if (!current_size_diff)
           return size;
@@ -101,14 +101,14 @@ struct FreetypeFace::Impl
   }
 
   ///Установка размера шрифта
-  void SetSize (size_t size, size_t horizontal_dpi, size_t vertical_dpi)
+  void SetSize (unsigned int size, unsigned int horizontal_dpi, unsigned int vertical_dpi)
   {
     if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
       return;
 
     for (int i = 0; i < face->num_fixed_sizes; i++)
     {
-      size_t current_fixed_size = face->available_sizes [i].width;
+      unsigned int current_fixed_size = face->available_sizes [i].width;
 
       if (size == current_fixed_size)
       {
@@ -138,7 +138,7 @@ struct FreetypeFace::Impl
    Конструктор / деструктор
 */
 
-FreetypeFace::FreetypeFace (const DataBufferPtr& data, const FreetypeLibrary& library, size_t face_index)
+FreetypeFace::FreetypeFace (const DataBufferPtr& data, const FreetypeLibrary& library, unsigned int face_index)
   : impl (new Impl (data, library, face_index))
   {}
 
@@ -159,7 +159,7 @@ FT_Face FreetypeFace::FaceHandle ()
 /*
    Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
 */
-size_t FreetypeFace::GetNearestFontSize (size_t size, size_t size_eps)
+unsigned int FreetypeFace::GetNearestFontSize (unsigned int size, unsigned int size_eps)
 {
   return impl->GetNearestFontSize (size, size_eps);
 }
@@ -168,7 +168,7 @@ size_t FreetypeFace::GetNearestFontSize (size_t size, size_t size_eps)
    Установка размера шрифта
 */
 
-void FreetypeFace::SetSize (size_t size, size_t horizontal_dpi, size_t vertical_dpi)
+void FreetypeFace::SetSize (unsigned int size, unsigned int horizontal_dpi, unsigned int vertical_dpi)
 {
   impl->SetSize (size, horizontal_dpi, vertical_dpi);
 }

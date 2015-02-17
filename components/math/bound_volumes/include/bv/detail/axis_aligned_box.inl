@@ -113,9 +113,9 @@ inline T axis_aligned_box<T>::radius () const
 template <class T>
 inline bool axis_aligned_box<T>::empty () const
 {
-  size_t counter = 0;
+  unsigned short counter = 0;
 
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
     if (min_extent [i] >= max_extent [i])
       counter++;
 
@@ -163,7 +163,7 @@ inline void axis_aligned_box<T>::get_corners (vec_type corners [8]) const
 template <class T>
 inline axis_aligned_box<T>& axis_aligned_box<T>::operator += (const vec_type& v)
 {
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
   {
     if (v [i] < min_extent [i]) min_extent [i] = v [i];
     if (v [i] > max_extent [i]) max_extent [i] = v [i];
@@ -310,7 +310,7 @@ inline bool intersects (const axis_aligned_box<T>& box1, const axis_aligned_box<
   if (box1.empty () || box2.empty ())
     return false;
 
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
     if (box1.maximum ()[i] < box2.minimum ()[i] || box1.minimum ()[i] > box2.maximum ()[i])
       return false;
 
@@ -339,7 +339,7 @@ inline bool contains (const axis_aligned_box<T>& box, const math::vector<T, 3>& 
   if (box.empty ())
     return false;
 
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
     if (p [i] < box.minimum ()[i] || p [i] > box.maximum ()[i])
       return false;
       
@@ -376,7 +376,7 @@ inline axis_aligned_box<T> intersection (const axis_aligned_box<T>& a, const axi
 {
   typename axis_aligned_box<T>::vec_type vmin = a.minimum (), vmax = a.maximum ();
   
-  for (size_t i=0; i<3; i++)
+  for (unsigned short i=0; i<3; i++)
   {
     if (b.minimum () [i] > vmin [i]) vmin [i] = b.minimum () [i];
     if (b.maximum () [i] < vmax [i]) vmax [i] = b.maximum () [i];

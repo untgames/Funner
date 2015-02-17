@@ -38,7 +38,7 @@ class SwapChainFrameBufferManager: public ContextObject
 ///Создание целевых буферов вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ITexture* CreateRenderBuffer       (const TextureDesc&);
-    ITexture* CreateColorBuffer        (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture* CreateColorBuffer        (ISwapChain* swap_chain, unsigned int buffer_index);
     ITexture* CreateDepthStencilBuffer (ISwapChain* swap_chain);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ class SwapChainFrameBufferManager: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка активного буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, size_t frame_buffer_id, size_t cache_id);
+    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, unsigned int frame_buffer_id, size_t cache_id);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +88,9 @@ class SwapChainRenderBuffer: public RenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цепочка обмена / идентификатор буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* GetSwapChain          () const { return swap_chain.get (); }
-    size_t      GetFrameBufferId      () const { return frame_buffer_id; }
-    size_t      GetFrameBufferCacheId () const { return frame_buffer_cache_id; }
+    ISwapChain*  GetSwapChain          () const { return swap_chain.get (); }
+    unsigned int GetFrameBufferId      () const { return frame_buffer_id; }
+    size_t       GetFrameBufferCacheId () const { return frame_buffer_cache_id; }
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ class SwapChainRenderBuffer: public RenderBuffer
   private:
     FrameBufferManagerPtr frame_buffer_manager;  //менеджер буферов кадра
     SwapChainPtr          swap_chain;            //цепочка обмена    
-    size_t                frame_buffer_id;       //буфер кадра
+    unsigned int          frame_buffer_id;       //буфер кадра
     size_t                frame_buffer_cache_id; //идентификатор цепочки обмена
 };
 
@@ -123,14 +123,14 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SwapChainColorBuffer (const FrameBufferManagerPtr&, ISwapChain* swap_chain, size_t buffer_index);
+    SwapChainColorBuffer (const FrameBufferManagerPtr&, ISwapChain* swap_chain, unsigned int buffer_index);
     SwapChainColorBuffer (const FrameBufferManagerPtr&, ISwapChain* swap_chain, const TextureDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Номер буфера / тип буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetBufferIndex () const { return buffer_index; }
-    GLenum GetBufferType  () const { return buffer_type; }    
+    unsigned int GetBufferIndex () const { return buffer_index; }
+    GLenum       GetBufferType  () const { return buffer_type; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Является ли буфер теневым
@@ -141,9 +141,9 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
     void Bind ();
 
   private:
-    size_t buffer_index; //индекс буфера обмена в цепочке обмена
-    GLenum buffer_type;  //тип буфера
-    bool   is_shadow;    //является ли буфер теневым
+    unsigned int buffer_index; //индекс буфера обмена в цепочке обмена
+    GLenum       buffer_type;  //тип буфера
+    bool         is_shadow;    //является ли буфер теневым
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,8 +183,8 @@ class SwapChainFakeDepthStencilBuffer: virtual public ITexture, public ContextOb
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext*);
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext*);
+    void SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext*);
+    void GetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat target_format, void* buffer, IDeviceContext*);
 
   private:
     TextureDesc desc; //дескриптор текстуры
@@ -209,8 +209,8 @@ class SwapChainFrameBuffer: public IFrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отрисовке в целевые буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void InvalidateRenderTargets (size_t render_target_slot, const Rect& update_rect);
-    void InvalidateRenderTargets (size_t render_target_slot);
+    void InvalidateRenderTargets (unsigned int render_target_slot, const Rect& update_rect);
+    void InvalidateRenderTargets (unsigned int render_target_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых текстур
@@ -269,8 +269,8 @@ class SwapChainNullFrameBuffer: public IFrameBuffer, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отрисовке в целевые буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void InvalidateRenderTargets (size_t, const Rect&) {}
-    void InvalidateRenderTargets (size_t) {}
+    void InvalidateRenderTargets (unsigned int, const Rect&) {}
+    void InvalidateRenderTargets (unsigned int) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых текстур

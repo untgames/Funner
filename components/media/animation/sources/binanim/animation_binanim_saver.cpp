@@ -37,7 +37,7 @@ void file_write (OutputFile& file, const void* data, size_t size)
 
 void file_write (OutputFile& file, const char* string)
 {
-  unsigned int string_length = xtl::xstrlen (string);
+  unsigned int string_length = (unsigned int)xtl::xstrlen (string);
 
   file_write (file, &string_length, sizeof (string_length));
   file_write (file, string, string_length);
@@ -53,11 +53,11 @@ class BinAnimationLibrarySaver
     //сохранение трека событий
     void SaveEventTrack (const EventTrack& track)
     {
-      unsigned int  events_count = track.Size ();
+      unsigned int events_count = track.Size ();
 
       file_write (result_file, &events_count, sizeof (events_count));
 
-      for (size_t i = 0; i < events_count; i++)
+      for (unsigned int i = 0; i < events_count; i++)
       {
         file_write (result_file, track.GetEvent (i));
 
@@ -109,7 +109,7 @@ class BinAnimationLibrarySaver
 
       file_write (result_file, spline_id);
 
-      unsigned int keys_count = spline->keys_count ();
+      unsigned int keys_count = (unsigned int)spline->keys_count ();
 
       file_write (result_file, &keys_count, sizeof (keys_count));
 
@@ -185,16 +185,16 @@ class BinAnimationLibrarySaver
 
       unsigned int channels_count = 0;
 
-      for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+      for (unsigned int i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
         channels_count += animation.ChannelsCount (i);
 
       file_write (result_file, &channels_count, sizeof (channels_count));
 
-      for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+      for (unsigned int i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
       {
         const char* target_name = animation.TargetName (i);
 
-        for (size_t j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
+        for (unsigned int j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
           SaveAnimationChannel (animation.Channel (i, j), target_name);
       }
     }

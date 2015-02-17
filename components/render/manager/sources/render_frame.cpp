@@ -160,9 +160,9 @@ struct FrameImpl::Impl: public CacheHolder
   }
   
 ///Получение номера уровня детализации по расстоянию
-  size_t GetLod (double distance)
+  unsigned int GetLod (double distance)
   {
-    return size_t (log (distance));
+    return unsigned int (log (distance));
   }
   
 ///Работа с кэшем
@@ -629,7 +629,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       
       //вызов обработчика      
 
-    size_t eye_distance = 0, lod = 0;
+    unsigned int eye_distance = 0, lod = 0;
       
     if (has_entity_draw_handler)
     {
@@ -643,7 +643,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       double      normalized_distance = (stl::max (stl::min (mvp_lod_point.z / mvp_lod_point.w, 1.0f), -1.0f) + 1.0f) * 0.5f,
                   distance            = normalized_distance * ~0u;
       
-      eye_distance = size_t (distance);
+      eye_distance = (unsigned int)distance;
       lod          = impl->GetLod (distance);
     }    
 

@@ -46,13 +46,13 @@ class IVideoDecoder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Операции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual        ~IVideoDecoder      () {}    //деструктор
-    virtual float  GetFramesPerSecond  () = 0;  //количество кадров в секунду
-    virtual size_t GetWidth            () = 0;  //ширина изображения декодированного видео
-    virtual size_t GetHeight           () = 0;  //высота изображения декодированного видео
-    virtual size_t GetFramesCount      () = 0;  //количество кадров в видео
-    virtual float  GetPixelAspectRatio () = 0;  //соотношение сторон для каждого пикселя (x / y)
-    virtual void   Decode              (size_t frame, Pixel* data_buffer) = 0; //декодирование указанного кадра
+    virtual              ~IVideoDecoder      () {}    //деструктор
+    virtual float        GetFramesPerSecond  () = 0;  //количество кадров в секунду
+    virtual unsigned int GetWidth            () = 0;  //ширина изображения декодированного видео
+    virtual unsigned int GetHeight           () = 0;  //высота изображения декодированного видео
+    virtual unsigned int GetFramesCount      () = 0;  //количество кадров в видео
+    virtual float        GetPixelAspectRatio () = 0;  //соотношение сторон для каждого пикселя (x / y)
+    virtual void         Decode              (unsigned int frame, Pixel* data_buffer) = 0; //декодирование указанного кадра
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,19 +83,19 @@ class VideoStream
 ///Получение параметров видео
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VideoQuality Quality          () const; //качество декодирования видео
-    size_t       FramesCount      () const; //количество кадров
+    unsigned int FramesCount      () const; //количество кадров
     float        FramesPerSecond  () const; //количество кадров в секунду
-    size_t       Width            () const; //ширина кадра
-    size_t       Height           () const; //высота кадра
+    unsigned int Width            () const; //ширина кадра
+    unsigned int Height           () const; //высота кадра
     float        PixelAspectRatio () const; //соотношение сторон для каждого пикселя (x / y)
     float        Duration         () const; //длительность видео в секундах
-    size_t       FrameSize        () const; //размер кадра в байтах
+    unsigned int FrameSize        () const; //размер кадра в байтах
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение декодированного кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Decode (size_t frame_number, Image& image, size_t image_offset_x = 0, size_t image_offset_y = 0, size_t image_offset_z = 0);
-    void Decode (size_t frame_number, Pixel* frame_buffer);
+    void Decode (unsigned int frame_number, Image& image, unsigned int image_offset_x = 0, unsigned int image_offset_y = 0, unsigned int image_offset_z = 0);
+    void Decode (unsigned int frame_number, Pixel* frame_buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка видео

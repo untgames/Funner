@@ -123,7 +123,7 @@ void Socket::Bind (const SocketAddress& address)
   impl->CheckedHandle ()->Bind (address);
 }
 
-void Socket::Connect (const SocketAddress& address, size_t timeout)
+void Socket::Connect (const SocketAddress& address, unsigned int timeout)
 {
   impl->CheckedHandle ()->Connect (address, timeout);
 }
@@ -219,22 +219,22 @@ void Socket::SetTcpNoDelay (bool state)
     Параметры сокета
 */
 
-void Socket::SetReceiveBufferSize (size_t size)
+void Socket::SetReceiveBufferSize (unsigned int size)
 {
   impl->CheckedHandle ()->SetReceiveBufferSize (size);
 }
 
-void Socket::SetSendBufferSize (size_t size)
+void Socket::SetSendBufferSize (unsigned int size)
 {
   impl->CheckedHandle ()->SetSendBufferSize (size);
 }
 
-size_t Socket::ReceiveBufferSize () const
+unsigned int Socket::ReceiveBufferSize () const
 {
   return impl->CheckedHandle ()->ReceiveBufferSize ();
 }
 
-size_t Socket::SendBufferSize () const
+unsigned int Socket::SendBufferSize () const
 {
   return impl->CheckedHandle ()->SendBufferSize ();
 }
@@ -243,12 +243,12 @@ size_t Socket::SendBufferSize () const
     Чтение / запись данных
 */
 
-size_t Socket::Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+unsigned int Socket::Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
 {
   return impl->CheckedHandle ()->Receive (buffer, size, timeout_in_milliseconds);
 }
 
-size_t Socket::Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
+unsigned int Socket::Send (const void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
 {
   return impl->CheckedHandle ()->Send (buffer, size, timeout_in_milliseconds);
 }
@@ -257,7 +257,7 @@ size_t Socket::Send (const void* buffer, size_t size, size_t timeout_in_millisec
     Количество байт доступных для чтения без блокировки
 */
 
-size_t Socket::ReceiveAvailable () const
+unsigned int Socket::ReceiveAvailable () const
 {
   return impl->CheckedHandle ()->ReceiveAvailable ();
 }

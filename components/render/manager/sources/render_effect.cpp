@@ -9,7 +9,7 @@ namespace
     Константы
 */
 
-const size_t RESERVE_OPERATIONS_COUNT = 16;
+const unsigned int RESERVE_OPERATIONS_COUNT = 16;
 
 /*
     Операция эффекта
@@ -127,12 +127,12 @@ const size_t* Effect::TagHashes ()
     Проходы рендеринга / вложенные эффекты
 */
 
-size_t Effect::OperationsCount ()
+unsigned int Effect::OperationsCount ()
 {
-  return impl->operations.size ();
+  return (unsigned int)impl->operations.size ();
 }
 
-EffectPassPtr Effect::OperationPass (size_t order_number)
+EffectPassPtr Effect::OperationPass (unsigned int order_number)
 {
   if (order_number >= impl->operations.size ())
     throw xtl::make_range_exception ("render::manager::Effect::OperationPass", "order_number", order_number, impl->operations.size ());
@@ -145,7 +145,7 @@ EffectPassPtr Effect::OperationPass (size_t order_number)
   return operation->pass;
 }
 
-InstantiatedEffectPtr Effect::OperationEffect (size_t order_number)
+InstantiatedEffectPtr Effect::OperationEffect (unsigned int order_number)
 {
   if (order_number >= impl->operations.size ())
     throw xtl::make_range_exception ("render::manager::Effect::OperationEffect", "order_number", order_number, impl->operations.size ());
@@ -158,21 +158,21 @@ InstantiatedEffectPtr Effect::OperationEffect (size_t order_number)
   return operation->effect;
 }
 
-size_t Effect::AddOperation (const EffectPassPtr& pass)
+unsigned int Effect::AddOperation (const EffectPassPtr& pass)
 {
   impl->operations.push_back (EffectOperationPtr (new EffectOperation (pass), false));
   
-  return impl->operations.size () - 1;
+  return (unsigned int)impl->operations.size () - 1;
 }
 
-size_t Effect::AddOperation (const InstantiatedEffectPtr& effect)
+unsigned int Effect::AddOperation (const InstantiatedEffectPtr& effect)
 {
   impl->operations.push_back (EffectOperationPtr (new EffectOperation (effect), false));
 
-  return impl->operations.size () - 1;
+  return (unsigned int)impl->operations.size () - 1;
 }
 
-void Effect::RemoveOperation (size_t order_number)
+void Effect::RemoveOperation (unsigned int order_number)
 {
   if (order_number >= impl->operations.size ())
     return;

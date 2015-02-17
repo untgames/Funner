@@ -29,8 +29,8 @@ class RenderManagerImpl: public Object, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTargetPtr CreateRenderBuffer       (size_t width, size_t height, PixelFormat format);
-    RenderTargetPtr CreateDepthStencilBuffer (size_t width, size_t height);
+    RenderTargetPtr CreateRenderBuffer       (unsigned int width, unsigned int height, PixelFormat format);
+    RenderTargetPtr CreateDepthStencilBuffer (unsigned int width, unsigned int height);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджеры ресурсов

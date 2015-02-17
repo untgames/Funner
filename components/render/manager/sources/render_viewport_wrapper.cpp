@@ -40,7 +40,7 @@ void Viewport::SetRect (const render::manager::Rect& rect)
   impl->Area ().SetRect (rect);
 }
 
-void Viewport::SetRect (int x, int y, size_t width, size_t height)
+void Viewport::SetRect (int x, int y, unsigned int width, unsigned int height)
 {
   SetRect (render::manager::Rect (x, y, width, height));
 }
@@ -60,12 +60,12 @@ int Viewport::Y () const
   return impl->Area ().Rect ().y;
 }
 
-size_t Viewport::Width () const
+unsigned int Viewport::Width () const
 {
   return impl->Area ().Rect ().width;
 }
 
-size_t Viewport::Height () const
+unsigned int Viewport::Height () const
 {
   return impl->Area ().Rect ().height;
 }

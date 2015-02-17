@@ -5,7 +5,7 @@ void dump (VertexBuffer& vb)
   printf ("Vertex buffer (%u streams, %u vertices, %u weights, vertex_size=%u)\n", vb.StreamsCount (),
           vb.VerticesCount (), vb.Weights ().Size (), vb.VertexSize ());
           
-  for (size_t i=0; i<vb.StreamsCount (); i++)
+  for (uint32_t i=0; i<vb.StreamsCount (); i++)
   {
     printf (" stream #%u: vertices_count=%u\n", i, vb.Stream (i).Size ());
     dump (vb.Stream (i).Format ());
