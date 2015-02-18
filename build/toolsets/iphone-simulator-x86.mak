@@ -2,7 +2,7 @@
 #—борка под iPhone Simulator 4.3 g++
 ###################################################################################################
 
-PROFILES += x86
+PROFILES += x86 iosx86
 
 COMMON_CFLAGS     += -arch i386
 COMMON_LINK_FLAGS += -arch i386
