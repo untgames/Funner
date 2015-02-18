@@ -16,15 +16,12 @@
  * SOFTWARE.
  */
 
-#include "setup.h"
+#include "curl_setup.h"
 
 #ifndef HAVE_INET_PTON
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
 #endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -32,8 +29,6 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#include <string.h>
-#include <errno.h>
 
 #include "inet_pton.h"
 
@@ -223,7 +218,7 @@ inet_pton6(const char *src, unsigned char *dst)
 
     if(tp == endp)
       return (0);
-    for (i = 1; i <= n; i++) {
+    for(i = 1; i <= n; i++) {
       *(endp - i) = *(colonp + n - i);
       *(colonp + n - i) = 0;
     }

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,24 +19,22 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "setup.h"
+
+#include "curl_setup.h"
 
 #ifdef USE_WINDOWS_SSPI
 
-#ifndef CURL_DISABLE_HTTP
-/* -- WIN32 approved -- */
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <ctype.h>
+#if !defined(CURL_DISABLE_HTTP) && defined(USE_SPNEGO)
 
 #include "urldata.h"
 #include "sendf.h"
 #include "rawstr.h"
+#include "warnless.h"
 #include "curl_base64.h"
+#include "curl_sasl.h"
 #include "http_negotiate.h"
 #include "curl_memory.h"
+#include "curl_multibyte.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
@@ -44,82 +42,46 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
-static int
-get_gss_name(struct connectdata *conn, bool proxy, char *server)
-{
-  struct negotiatedata *neg_ctx = proxy?&conn->data->state.proxyneg:
-    &conn->data->state.negotiate;
-  const char* service;
-  size_t length;
-
-  /* GSSAPI implementation by Globus (known as GSI) requires the name to be
-     of form "<service>/<fqdn>" instead of <service>@<fqdn> (ie. slash instead
-     of at-sign). Also GSI servers are often identified as 'host' not 'khttp'.
-     Change following lines if you want to use GSI */
-
-  /* IIS uses the <service>@<fqdn> form but uses 'http' as the service name,
-     and SSPI then generates an NTLM token. When using <service>/<fqdn> a
-     Kerberos token is generated. */
-
-  if(neg_ctx->gss)
-    service = "KHTTP";
-  else
-    service = "HTTP";
-
-  length = strlen(service) + 1 + strlen(proxy ? conn->proxy.name :
-                                        conn->host.name) + 1;
-  if(length + 1 > sizeof(neg_ctx->server_name))
-    return EMSGSIZE;
-
-  snprintf(server, sizeof(neg_ctx->server_name), "%s/%s",
-           service, proxy ? conn->proxy.name : conn->host.name);
-
-  return 0;
-}
-
 /* returning zero (0) means success, everything else is treated as "failure"
    with no care exactly what the failure was */
 int Curl_input_negotiate(struct connectdata *conn, bool proxy,
                          const char *header)
 {
-  struct negotiatedata *neg_ctx = proxy?&conn->data->state.proxyneg:
-    &conn->data->state.negotiate;
-  BYTE                          *input_token = 0;
+  BYTE              *input_token = NULL;
   SecBufferDesc     out_buff_desc;
   SecBuffer         out_sec_buff;
   SecBufferDesc     in_buff_desc;
   SecBuffer         in_sec_buff;
-  ULONG             context_attributes;
-  TimeStamp         lifetime;
-
+  unsigned long     context_attributes;
+  TimeStamp         expiry;
   int ret;
   size_t len = 0, input_token_len = 0;
-  bool gss = FALSE;
-  const char* protocol;
+  CURLcode error;
 
-  while(*header && ISSPACE(*header))
-    header++;
+  /* Point to the username and password */
+  const char *userp;
+  const char *passwdp;
 
-  if(checkprefix("GSS-Negotiate", header)) {
-    protocol = "GSS-Negotiate";
-    gss = TRUE;
-  }
-  else if(checkprefix("Negotiate", header)) {
-    protocol = "Negotiate";
-    gss = FALSE;
-  }
-  else
-    return -1;
+  /* Point to the correct struct with this */
+  struct negotiatedata *neg_ctx;
 
-  if(neg_ctx->context) {
-    if(neg_ctx->gss != gss) {
-      return -1;
-    }
+  if(proxy) {
+    userp = conn->proxyuser;
+    passwdp = conn->proxypasswd;
+    neg_ctx = &conn->data->state.proxyneg;
   }
   else {
-    neg_ctx->protocol = protocol;
-    neg_ctx->gss = gss;
+    userp = conn->user;
+    passwdp = conn->passwd;
+    neg_ctx = &conn->data->state.negotiate;
   }
+
+  /* Not set means empty */
+  if(!userp)
+    userp = "";
+
+  if(!passwdp)
+    passwdp = "";
 
   if(neg_ctx->context && neg_ctx->status == SEC_E_OK) {
     /* We finished successfully our part of authentication, but server
@@ -129,102 +91,128 @@ int Curl_input_negotiate(struct connectdata *conn, bool proxy,
     return -1;
   }
 
-  if(strlen(neg_ctx->server_name) == 0 &&
-     (ret = get_gss_name(conn, proxy, neg_ctx->server_name)))
-    return ret;
+  if(!neg_ctx->server_name) {
+    /* Check proxy auth requested but no given proxy name */
+    if(proxy && !conn->proxy.name)
+      return -1;
 
-  if (!neg_ctx->max_token_length) {
+    /* Generate our SPN */
+    neg_ctx->server_name = Curl_sasl_build_spn("HTTP",
+                                                proxy ? conn->proxy.name :
+                                                        conn->host.name);
+    if(!neg_ctx->server_name)
+      return -1;
+  }
+
+  if(!neg_ctx->output_token) {
     PSecPkgInfo SecurityPackage;
-    ret = s_pSecFn->QuerySecurityPackageInfo((SEC_CHAR *)"Negotiate",
+    ret = s_pSecFn->QuerySecurityPackageInfo((TCHAR *) TEXT(SP_NAME_NEGOTIATE),
                                              &SecurityPackage);
-    if (ret != SEC_E_OK)
+    if(ret != SEC_E_OK)
       return -1;
 
     /* Allocate input and output buffers according to the max token size
        as indicated by the security package */
-    neg_ctx->max_token_length = SecurityPackage->cbMaxToken;
-    neg_ctx->output_token = (BYTE *)malloc(neg_ctx->max_token_length);
+    neg_ctx->token_max = SecurityPackage->cbMaxToken;
+    neg_ctx->output_token = malloc(neg_ctx->token_max);
     s_pSecFn->FreeContextBuffer(SecurityPackage);
   }
 
   /* Obtain the input token, if any */
-  header += strlen(neg_ctx->protocol);
+  header += strlen("Negotiate");
   while(*header && ISSPACE(*header))
     header++;
 
   len = strlen(header);
-  if(len > 0) {
-    input_token = malloc(neg_ctx->max_token_length);
-    if(!input_token)
+  if(!len) {
+    /* Is this the first call in a new negotiation? */
+    if(neg_ctx->context) {
+      /* The server rejected our authentication and hasn't suppled any more
+         negotiation mechanisms */
+      return -1;
+    }
+
+    /* We have to acquire credentials and allocate memory for the context */
+    neg_ctx->credentials = malloc(sizeof(CredHandle));
+    neg_ctx->context = malloc(sizeof(CtxtHandle));
+
+    if(!neg_ctx->credentials || !neg_ctx->context)
       return -1;
 
-    input_token_len = Curl_base64_decode(header,
-                                         (unsigned char **)&input_token);
-    if(input_token_len == 0)
-      return -1;
-  }
+    if(userp && *userp) {
+      /* Populate our identity structure */
+      error = Curl_create_sspi_identity(userp, passwdp, &neg_ctx->identity);
+      if(error)
+        return -1;
 
-  if ( !input_token ) {
-    /* first call in a new negotiation, we have to require credentials,
-       and allocate memory for the context */
+      /* Allow proper cleanup of the identity structure */
+      neg_ctx->p_identity = &neg_ctx->identity;
+    }
+    else
+      /* Use the current Windows user */
+      neg_ctx->p_identity = NULL;
 
-    neg_ctx->credentials = (CredHandle *)malloc(sizeof(CredHandle));
-    neg_ctx->context = (CtxtHandle *)malloc(sizeof(CtxtHandle));
-
-    if ( !neg_ctx->credentials || !neg_ctx->context)
-      return -1;
-
+    /* Acquire our credientials handle */
     neg_ctx->status =
-      s_pSecFn->AcquireCredentialsHandle(NULL, (SEC_CHAR *)"Negotiate",
-                                         SECPKG_CRED_OUTBOUND, NULL, NULL,
-                                         NULL, NULL, neg_ctx->credentials,
-                                         &lifetime);
-    if ( neg_ctx->status != SEC_E_OK )
+      s_pSecFn->AcquireCredentialsHandle(NULL,
+                                         (TCHAR *) TEXT(SP_NAME_NEGOTIATE),
+                                         SECPKG_CRED_OUTBOUND, NULL,
+                                         neg_ctx->p_identity, NULL, NULL,
+                                         neg_ctx->credentials, &expiry);
+    if(neg_ctx->status != SEC_E_OK)
+      return -1;
+  }
+  else {
+    error = Curl_base64_decode(header,
+                               (unsigned char **)&input_token,
+                               &input_token_len);
+    if(error || !input_token_len)
       return -1;
   }
 
-  /* prepare the output buffers, and input buffers if present */
-  out_buff_desc.ulVersion = 0;
+  /* Setup the "output" security buffer */
+  out_buff_desc.ulVersion = SECBUFFER_VERSION;
   out_buff_desc.cBuffers  = 1;
   out_buff_desc.pBuffers  = &out_sec_buff;
-
-  out_sec_buff.cbBuffer   = neg_ctx->max_token_length;
   out_sec_buff.BufferType = SECBUFFER_TOKEN;
   out_sec_buff.pvBuffer   = neg_ctx->output_token;
+  out_sec_buff.cbBuffer   = curlx_uztoul(neg_ctx->token_max);
 
-
-  if (input_token) {
-    in_buff_desc.ulVersion = 0;
+  /* Setup the "input" security buffer if present */
+  if(input_token) {
+    in_buff_desc.ulVersion = SECBUFFER_VERSION;
     in_buff_desc.cBuffers  = 1;
-    in_buff_desc.pBuffers  = &out_sec_buff;
-
-    in_sec_buff.cbBuffer   = input_token_len;
+    in_buff_desc.pBuffers  = &in_sec_buff;
     in_sec_buff.BufferType = SECBUFFER_TOKEN;
     in_sec_buff.pvBuffer   = input_token;
+    in_sec_buff.cbBuffer   = curlx_uztoul(input_token_len);
   }
 
+  /* Generate our message */
   neg_ctx->status = s_pSecFn->InitializeSecurityContext(
     neg_ctx->credentials,
-    input_token ? neg_ctx->context : 0,
+    input_token ? neg_ctx->context : NULL,
     neg_ctx->server_name,
     ISC_REQ_CONFIDENTIALITY,
     0,
     SECURITY_NATIVE_DREP,
-    input_token ? &in_buff_desc : 0,
+    input_token ? &in_buff_desc : NULL,
     0,
     neg_ctx->context,
     &out_buff_desc,
     &context_attributes,
-    &lifetime);
+    &expiry);
 
-  if ( GSS_ERROR(neg_ctx->status) )
+  Curl_safefree(input_token);
+
+  if(GSS_ERROR(neg_ctx->status))
     return -1;
 
-  if ( neg_ctx->status == SEC_I_COMPLETE_NEEDED ||
-       neg_ctx->status == SEC_I_COMPLETE_AND_CONTINUE ) {
+  if(neg_ctx->status == SEC_I_COMPLETE_NEEDED ||
+     neg_ctx->status == SEC_I_COMPLETE_AND_CONTINUE) {
     neg_ctx->status = s_pSecFn->CompleteAuthToken(neg_ctx->context,
                                                   &out_buff_desc);
-    if ( GSS_ERROR(neg_ctx->status) )
+    if(GSS_ERROR(neg_ctx->status))
       return -1;
   }
 
@@ -239,47 +227,61 @@ CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
   struct negotiatedata *neg_ctx = proxy?&conn->data->state.proxyneg:
     &conn->data->state.negotiate;
   char *encoded = NULL;
-  size_t len;
+  size_t len = 0;
   char *userp;
+  CURLcode error;
 
-  len = Curl_base64_encode(conn->data,
-                           (const char*)neg_ctx->output_token,
-                           neg_ctx->output_token_length,
-                           &encoded);
+  error = Curl_base64_encode(conn->data,
+                             (const char*)neg_ctx->output_token,
+                             neg_ctx->output_token_length,
+                             &encoded, &len);
+  if(error)
+    return error;
 
-  if(len == 0)
-    return CURLE_OUT_OF_MEMORY;
+  if(!len)
+    return CURLE_REMOTE_ACCESS_DENIED;
 
-  userp = aprintf("%sAuthorization: %s %s\r\n", proxy ? "Proxy-" : "",
-                  neg_ctx->protocol, encoded);
+  userp = aprintf("%sAuthorization: Negotiate %s\r\n", proxy ? "Proxy-" : "",
+                  encoded);
 
-  if(proxy)
+  if(proxy) {
+    Curl_safefree(conn->allocptr.proxyuserpwd);
     conn->allocptr.proxyuserpwd = userp;
-  else
+  }
+  else {
+    Curl_safefree(conn->allocptr.userpwd);
     conn->allocptr.userpwd = userp;
+  }
   free(encoded);
-  Curl_cleanup_negotiate (conn->data);
   return (userp == NULL) ? CURLE_OUT_OF_MEMORY : CURLE_OK;
 }
 
 static void cleanup(struct negotiatedata *neg_ctx)
 {
+  /* Free our security context */
   if(neg_ctx->context) {
     s_pSecFn->DeleteSecurityContext(neg_ctx->context);
     free(neg_ctx->context);
-    neg_ctx->context = 0;
+    neg_ctx->context = NULL;
   }
 
+  /* Free our credentials handle */
   if(neg_ctx->credentials) {
     s_pSecFn->FreeCredentialsHandle(neg_ctx->credentials);
     free(neg_ctx->credentials);
-    neg_ctx->credentials = 0;
+    neg_ctx->credentials = NULL;
   }
 
-  if(neg_ctx->output_token) {
-    free(neg_ctx->output_token);
-    neg_ctx->output_token = 0;
-  }
+  /* Free our identity */
+  Curl_sspi_free_identity(neg_ctx->p_identity);
+  neg_ctx->p_identity = NULL;
+
+  /* Free the SPN and output token */
+  Curl_safefree(neg_ctx->server_name);
+  Curl_safefree(neg_ctx->output_token);
+
+  /* Reset any variables */
+  neg_ctx->token_max = 0;
 }
 
 void Curl_cleanup_negotiate(struct SessionHandle *data)
@@ -288,6 +290,6 @@ void Curl_cleanup_negotiate(struct SessionHandle *data)
   cleanup(&data->state.proxyneg);
 }
 
+#endif /* !CURL_DISABLE_HTTP && USE_SPNEGO */
 
-#endif
-#endif
+#endif /* USE_WINDOWS_SSPI */

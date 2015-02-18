@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,13 +20,8 @@
  *
  ***************************************************************************/
 
-#include "setup.h"
+#include "curl_setup.h"
 
-#include <string.h>
-
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -36,16 +31,9 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>     /* required for free() prototypes */
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>     /* for the close() proto */
-#endif
 #ifdef __VMS
 #include <in.h>
 #include <inet.h>
-#include <stdlib.h>
 #endif
 
 #ifdef HAVE_PROCESS_H
@@ -70,7 +58,7 @@
 #include "memdebug.h"
 
 /***********************************************************************
- * Only for ipv6-enabled builds
+ * Only for IPv6-enabled builds
  **********************************************************************/
 #ifdef CURLRES_IPV6
 
@@ -109,7 +97,7 @@ int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
 #endif /* defined(CURLDEBUG) && defined(HAVE_GETNAMEINFO) */
 
 /*
- * Curl_ipv6works() returns TRUE if ipv6 seems to work.
+ * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
 bool Curl_ipv6works(void)
 {
@@ -121,11 +109,11 @@ bool Curl_ipv6works(void)
     /* probe to see if we have a working IPv6 stack */
     curl_socket_t s = socket(PF_INET6, SOCK_DGRAM, 0);
     if(s == CURL_SOCKET_BAD)
-      /* an ipv6 address was requested but we can't get/use one */
+      /* an IPv6 address was requested but we can't get/use one */
       ipv6_works = 0;
     else {
       ipv6_works = 1;
-      sclose(s);
+      Curl_closesocket(NULL, s);
     }
   }
   return (ipv6_works>0)?TRUE:FALSE;
@@ -148,7 +136,7 @@ bool Curl_ipvalid(struct connectdata *conn)
 static void dump_addrinfo(struct connectdata *conn, const Curl_addrinfo *ai)
 {
   printf("dump_addrinfo:\n");
-  for ( ; ai; ai = ai->ai_next) {
+  for(; ai; ai = ai->ai_next) {
     char  buf[INET6_ADDRSTRLEN];
 
     printf("    fam %2d, CNAME %s, ",
@@ -160,11 +148,11 @@ static void dump_addrinfo(struct connectdata *conn, const Curl_addrinfo *ai)
   }
 }
 #else
-#define dump_addrinfo(x,y)
+#define dump_addrinfo(x,y) Curl_nop_stmt
 #endif
 
 /*
- * Curl_getaddrinfo() when built ipv6-enabled (non-threading and
+ * Curl_getaddrinfo() when built IPv6-enabled (non-threading and
  * non-ares version).
  *
  * Returns name information about the given hostname and port number. If
@@ -180,7 +168,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
   struct addrinfo hints;
   Curl_addrinfo *res;
   int error;
-  char sbuf[NI_MAXSERV];
+  char sbuf[12];
   char *sbufptr = NULL;
   char addrbuf[128];
   int pf;
@@ -204,7 +192,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
   }
 
   if((pf != PF_INET) && !Curl_ipv6works())
-    /* the stack seems to be a non-ipv6 one */
+    /* The stack seems to be a non-IPv6 one */
     pf = PF_INET;
 
   memset(&hints, 0, sizeof(hints));

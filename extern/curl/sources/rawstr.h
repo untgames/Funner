@@ -1,5 +1,5 @@
-#ifndef __RAWSTR_H
-#define __RAWSTR_H
+#ifndef HEADER_CURL_RAWSTR_H
+#define HEADER_CURL_RAWSTR_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -29,7 +29,8 @@
  * to be locale independent and only compare strings we know are safe for
  * this.
  *
- * The function is capable of comparing a-z case insensitively even for non-ascii.
+ * The function is capable of comparing a-z case insensitively even for
+ * non-ascii.
  */
 int Curl_raw_equal(const char *first, const char *second);
 int Curl_raw_nequal(const char *first, const char *second, size_t max);
@@ -41,4 +42,6 @@ char Curl_raw_toupper(char in);
 #define checkprefix(a,b)    Curl_raw_nequal(a,b,strlen(a))
 
 void Curl_strntoupper(char *dest, const char *src, size_t n);
-#endif
+
+#endif /* HEADER_CURL_RAWSTR_H */
+
