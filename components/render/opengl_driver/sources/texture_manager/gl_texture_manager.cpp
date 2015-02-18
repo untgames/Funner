@@ -190,7 +190,7 @@ struct TextureManager::Impl: public ContextObject
                    *current_texture_target   = GetContextCache () + CacheEntry_TextureTarget0,
                    &current_enabled_textures = GetContextCache () [CacheEntry_EnabledTextures],
                    &current_active_slot      = GetContextCache () [CacheEntry_ActiveTextureSlot];
-      unsigned int enabled_textures          = 0,
+      unsigned int enabled_textures          = 0;
 
         //выбор текущего контекста
 
