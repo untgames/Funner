@@ -132,7 +132,7 @@ inline ptrdiff_t   make_invoker_argument (int value)                { return val
 inline ptrdiff_t   make_invoker_argument (unsigned int value)       { return value; }
 inline ptrdiff_t   make_invoker_argument (long value)               { return value; }
 inline ptrdiff_t   make_invoker_argument (unsigned long value)      { return value; }
-#if defined (_M_X64) || defined (__x86_64__)
+#if defined (_M_X64) || defined (__LP64__)
 inline ptrdiff_t   make_invoker_argument (long long value)          { return value; }
 inline ptrdiff_t   make_invoker_argument (unsigned long long value) { return value; }
 #endif
