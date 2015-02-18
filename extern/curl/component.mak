@@ -10,6 +10,8 @@ EXTERN.CURL.SOURCES.macx86.INCLUDE_DIRS      := addons/macosx-i386
 EXTERN.CURL.SOURCES.macx86-64.INCLUDE_DIRS   := addons/macosx-x86-64
 EXTERN.CURL.SOURCES.iosx86.INCLUDE_DIRS      := addons/ios-i386
 EXTERN.CURL.SOURCES.iosx86-64.INCLUDE_DIRS   := addons/ios-x86-64
+EXTERN.CURL.SOURCES.iosarm32.INCLUDE_DIRS    := addons/ios-arm32
+EXTERN.CURL.SOURCES.iosarm64.INCLUDE_DIRS    := addons/ios-arm64
 EXTERN.CURL.SOURCES.IMPORTS                  := compile.extern.zlib compile.extern.openssl
 
 EXTERN.CURL.TESTS.TYPE                     := test-suite
@@ -21,5 +23,7 @@ EXTERN.CURL.TESTS.macx86.INCLUDE_DIRS      := addons/macosx-i386
 EXTERN.CURL.TESTS.macx86-64.INCLUDE_DIRS   := addons/macosx-x86-64
 EXTERN.CURL.TESTS.iosx86.INCLUDE_DIRS      := addons/ios-i386
 EXTERN.CURL.TESTS.iosx86-64.INCLUDE_DIRS   := addons/ios-x86-64
+EXTERN.CURL.TESTS.iosarm32.INCLUDE_DIRS    := addons/ios-arm32
+EXTERN.CURL.TESTS.iosarm64.INCLUDE_DIRS    := addons/ios-arm64
 EXTERN.CURL.TESTS.IMPORTS                  := compile.extern.curl link.extern.curl
 EXTERN.CURL.TESTS.vcx86-64.COMPILER_CFLAGS := -wd4244

@@ -2,6 +2,8 @@
 #—борка под iPhone Device g++ armv7s (iPhone 5/5C, iPad 4)
 ###################################################################################################
 
+PROFILES += iosarm32
+
 IPHONEOS_DEPLOYMENT_TARGET := 6.0
 
 COMMON_CFLAGS     += -arch armv7s
