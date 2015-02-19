@@ -1,8 +1,8 @@
 ###################################################################################################
-#—борка под iPhone Device 4.3 g++
+#Build for iPhone Device 5.1.1
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET ?= 4.3
+IPHONEOS_DEPLOYMENT_TARGET ?= 5.1.1
 
 export IPHONEOS_DEPLOYMENT_TARGET
 

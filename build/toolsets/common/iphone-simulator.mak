@@ -1,12 +1,16 @@
 ###################################################################################################
-#—борка под iPhone Simulator 4.3 g++
+#Build for iPhone Simulator 5.1.1 g++
 ###################################################################################################
 
 PROFILES += clang
 
+IPHONEOS_DEPLOYMENT_TARGET ?= 5.1.1
+
+export IPHONEOS_DEPLOYMENT_TARGET
+
 COMMON_MMFLAGS    += -fobjc-abi-version=2 -fobjc-legacy-dispatch
-COMMON_CFLAGS     += -mmacosx-version-min=10.6 -D__IPHONE_OS_VERSION_MIN_REQUIRED=40300 -Wno-unused-function
-COMMON_LINK_FLAGS += -Xlinker -objc_abi_version -Xlinker 2 -mios-simulator-version-min=4.3
+COMMON_CFLAGS     += -mios-simulator-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -Wno-unused-function
+COMMON_LINK_FLAGS += -Xlinker -objc_abi_version -Xlinker 2 -mios-simulator-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 
 COMPILER_GCC := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
 LINKER_GCC   := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++

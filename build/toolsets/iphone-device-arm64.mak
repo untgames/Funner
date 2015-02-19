@@ -1,5 +1,5 @@
 ###################################################################################################
-#Build for iPhone Device g++ armv64 (iPhone 5S/6/6+, iPad Air/Air2/Mini2/Mini3)
+#Build for iPhone Device armv64 (iPhone 5S/6/6+, iPad Air/Air2/Mini2/Mini3)
 ###################################################################################################
 
 PROFILES += iosarm64
