@@ -282,9 +282,6 @@ class IOsPlatformImpl : public ILoginResultListener
   private:
     bool CanLogin ()
     {
-      if ([[[UIDevice currentDevice] systemVersion] compare:@"5.0" options:NSNumericSearch] == NSOrderedAscending) //facebook SDK doesn't support iOS versions prior to 5.0
-        return false;
-
 /*      NSString* resources_version = NSLocalizedString (RESOURCES_VERSION_KEY_NAME, @"");
 
       if ([resources_version isEqualToString:RESOURCES_VERSION_KEY_NAME] || [resources_version isEqualToString:@""])

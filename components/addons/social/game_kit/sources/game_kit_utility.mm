@@ -9,10 +9,6 @@ using namespace social::game_kit;
 
 UtilityImpl::UtilityImpl ()
 {
-  NSString* system_version = [[UIDevice currentDevice] systemVersion];
-
-  system_version_5_0_available = [system_version compare:@"5.0" options:NSNumericSearch] != NSOrderedAscending;
-
   date_formatter = [[NSDateFormatter alloc] init];
 
   [date_formatter setDateFormat:@"dd-MM-YYYY HH:mm:ss"];
@@ -37,17 +33,14 @@ void UtilityImpl::FillUser (GKPlayer* player, User& user)
 
 void UtilityImpl::FillScore (GKScore* ns_score, Score& score)
 {
-  if (system_version_5_0_available)
-  {
-    char user_data_buffer [22];
+  char user_data_buffer [22];
 
-    memset (user_data_buffer, 0, sizeof (user_data_buffer));
+  memset (user_data_buffer, 0, sizeof (user_data_buffer));
 
-    if (snprintf (user_data_buffer, sizeof (user_data_buffer), "%llu", ns_score.context) == sizeof (user_data_buffer))
-      throw xtl::format_operation_exception ("social::game_kit::UtilityImpl::FillScore", "Can't format user data from score context %llu", ns_score.context);
+  if (snprintf (user_data_buffer, sizeof (user_data_buffer), "%llu", ns_score.context) == sizeof (user_data_buffer))
+    throw xtl::format_operation_exception ("social::game_kit::UtilityImpl::FillScore", "Can't format user data from score context %llu", ns_score.context);
 
-    score.SetUserData (user_data_buffer);
-  }
+  score.SetUserData (user_data_buffer);
 
   score.SetUserId         ([ns_score.playerID UTF8String]);
   score.SetLeaderboardId  ([ns_score.category UTF8String]);

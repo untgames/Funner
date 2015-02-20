@@ -27,8 +27,7 @@ class GameKitComponent
   public:
     GameKitComponent ()
     {
-      if (GameKitSessionImpl::IsApiAvailable ())
-        SessionManager::RegisterSession (SESSION_ID, SESSION_NAME_MASK, xtl::bind (&GameKitComponent::CreateSession, this, _1, _2));
+      SessionManager::RegisterSession (SESSION_ID, SESSION_NAME_MASK, xtl::bind (&GameKitComponent::CreateSession, this, _1, _2));
     }
 
   private:

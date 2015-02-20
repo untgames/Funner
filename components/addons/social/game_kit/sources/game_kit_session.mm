@@ -88,10 +88,6 @@ GameKitSessionImpl::GameKitSessionImpl ()
   {
     on_authentificated (METHOD_NAME, error, log, current_user);
   }];
-
-  NSString* system_version = [[UIDevice currentDevice] systemVersion];
-
-  system_version_5_0_available = [system_version compare:@"5.0" options:NSNumericSearch] != NSOrderedAscending;
 }
 
 GameKitSessionImpl::~GameKitSessionImpl ()
@@ -211,23 +207,6 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
 bool GameKitSessionImpl::IsUserLoggedIn ()
 {
   return [GKLocalPlayer localPlayer].authenticated;
-}
-
-/*
-   Проверка наличия поддержки Game Kit API
-*/
-
-bool GameKitSessionImpl::IsApiAvailable ()
-{
-  // Check for presence of GKLocalPlayer class.
-  if (!NSClassFromString (@"GKLocalPlayer"))
-    return false;
-
-  // The device must be running iOS 4.1 or later.
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.1" options:NSNumericSearch] == NSOrderedAscending)
-    return false;
-
-  return true;
 }
 
 /*

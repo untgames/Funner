@@ -45,11 +45,6 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
     ~GameKitSessionImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка наличия поддержки Game Kit API
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool IsApiAvailable ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия в PropertyMap неизвестных полей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void CheckUnknownProperties (const char* source, const common::PropertyMap& properties,
@@ -134,7 +129,6 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
   private:
     common::Log log;
     User        current_user;
-    bool        system_version_5_0_available;
 };
 
 class UtilityImpl
@@ -161,7 +155,6 @@ class UtilityImpl
 
   private:
     NSDateFormatter* date_formatter;
-    bool             system_version_5_0_available;
 };
 
 typedef common::Singleton <UtilityImpl> Utility;
