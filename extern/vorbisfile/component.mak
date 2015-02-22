@@ -1,9 +1,5 @@
-###################################################################################################
-#Список целей
-###################################################################################################
 TARGETS := EXTERN.VORBISFILE_STATIC
 
-#Цель №1 - VORBISFILE_STATIC
 EXTERN.VORBISFILE_STATIC.TYPE                     := static-lib
 EXTERN.VORBISFILE_STATIC.NAME                     := funner.extern.vorbisfile_static
 EXTERN.VORBISFILE_STATIC.IMPORTS                  := compile.extern.vorbisfile

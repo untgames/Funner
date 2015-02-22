@@ -13,7 +13,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os.h 16227 2009-07-08 06:58:46Z xiphmont $
+ last mod: $Id: os.h 19031 2013-12-03 19:20:50Z tterribe $
 
  ********************************************************************/
 
@@ -81,7 +81,7 @@ void *_alloca(size_t size);
 
 
 /* Special i386 GCC implementation */
-#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__) && !defined(__llvm__) // LLVM has no this bug
+#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__)
 #  define VORBIS_FPU_CONTROL
 /* both GCC and MSVC are kinda stupid about rounding/casting to int.
    Because of encapsulation constraints (GCC can't see inside the asm
@@ -120,7 +120,7 @@ static inline int vorbis_ftoi(double f){  /* yes, double!  Otherwise,
 
 /* MSVC inline assembly. 32 bit only; inline ASM isn't implemented in the
  * 64 bit compiler */
-#if defined(_MSC_VER) && !defined(_WIN64) && !defined(_WIN32_WCE) && !defined(WP8)
+#if defined(_MSC_VER) && !defined(_WIN64) && !defined(_WIN32_WCE)
 #  define VORBIS_FPU_CONTROL
 
 typedef ogg_int16_t vorbis_fpu_control;
@@ -135,9 +135,11 @@ static __inline int vorbis_ftoi(double f){
 }
 
 static __inline void vorbis_fpu_setround(vorbis_fpu_control *fpu){
+  (void)fpu;
 }
 
 static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
+  (void)fpu;
 }
 
 #endif /* Special MSVC 32 bit implementation */
@@ -156,9 +158,11 @@ static __inline int vorbis_ftoi(double f){
 }
 
 static __inline void vorbis_fpu_setround(vorbis_fpu_control *fpu){
+  (void)fpu;
 }
 
 static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
+  (void)fpu;
 }
 
 #endif /* Special MSVC x64 implementation */
