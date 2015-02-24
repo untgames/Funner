@@ -313,7 +313,7 @@ void RenderBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned
   if (!GetCaps ().has_arb_window_pos)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
 
-    //установка позиции растра    
+    //установка позиции растра
 
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
@@ -352,7 +352,7 @@ void RenderBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned
           const unsigned short* src_pixel = static_cast<const unsigned short*> (buffer);
 
           for (unsigned int count=width*height; count--; src_pixel++, dst_pixel++)
-            *dst_pixel = unsigned int (*src_pixel) << 16;
+            *dst_pixel = (unsigned int) (*src_pixel) << 16;
 
           glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, depth_buffer.data ());
 
