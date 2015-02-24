@@ -905,8 +905,8 @@ struct RenderOperationsExecutor
       const Rect& viewport_rect = render_target_context.viewport_rects [i];
       Rect        operation_scissor_rect;
 
-      operation_scissor_rect.x      = int (operation_scissor->x * viewport_rect.width);
-      operation_scissor_rect.y      = int (operation_scissor->y * viewport_rect.height);
+      operation_scissor_rect.x      = int (viewport_rect.x + operation_scissor->x * viewport_rect.width);
+      operation_scissor_rect.y      = int (viewport_rect.y + operation_scissor->y * viewport_rect.height);
       operation_scissor_rect.width  = (unsigned int) (operation_scissor->width * viewport_rect.width);
       operation_scissor_rect.height = (unsigned int) (operation_scissor->height * viewport_rect.height);
 
