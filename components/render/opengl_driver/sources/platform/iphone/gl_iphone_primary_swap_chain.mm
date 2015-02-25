@@ -197,7 +197,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
                                        kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
 
       if (![eagl_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:eagl_layer])
-        throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::SetContext", "Can't set context");
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't set context");
 
       log.Printf ("...attaching renderbuffer");
 
