@@ -24,7 +24,9 @@ struct Window::Impl: public xtl::trackable
     {
       if (!in_init_string)
         throw xtl::make_null_argument_exception ("syslib::Window::Window::Impl", "init_string");
-           
+
+      init_string = in_init_string;
+
       memset (title, 0, sizeof title);
       memset (title_unicode, 0, sizeof title_unicode);
     }

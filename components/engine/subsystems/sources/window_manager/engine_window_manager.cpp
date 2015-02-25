@@ -309,7 +309,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     Window (ParseNode& node, WindowManagerSubsystem& in_manager)
       : log (LOG_NAME),
         manager (in_manager),
-        window (get_window_style (node)),
+        window (get_window_style (node), get<const char*> (node, "InitString", "")),
         cursor (0),
         aspect_ratio (0)
     {

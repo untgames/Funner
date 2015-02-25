@@ -221,8 +221,6 @@ struct WindowImpl
 {
   self.view = [[UIViewWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
   [self.view release];
-
-  self.view.contentScaleFactor = [UIScreen mainScreen].scale;
 }
 
 -(void)viewDidUnload
@@ -410,8 +408,8 @@ struct WindowImpl
     CGPoint current_location = [iter locationInView:view];
 
     touch_description->touch_id   = (size_t)iter;
-    touch_description->position.x = current_location.x * [self contentScaleFactor];
-    touch_description->position.y = current_location.y * [self contentScaleFactor];
+    touch_description->position.x = current_location.x * view.contentScaleFactor;
+    touch_description->position.y = current_location.y * view.contentScaleFactor;
   }
 
   return return_value;
@@ -532,10 +530,18 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
-  new_window.contentScaleFactor = [UIScreen mainScreen].scale;
+  CGFloat content_scale_factor = [UIScreen mainScreen].scale;
+
+  common::PropertyMap init_params = common::parse_init_string (init_string);
+
+  if (init_params.IsPresent ("content_scale_factor"))
+    content_scale_factor = init_params.GetFloat ("content_scale_factor");
+
+  new_window.contentScaleFactor = content_scale_factor;
 
   new_window.rootViewController.view.clearsContextBeforeDrawing = NO;
   new_window.rootViewController.view.multipleTouchEnabled       = YES;
+  new_window.rootViewController.view.contentScaleFactor         = content_scale_factor;
 
   WindowImpl* window_impl = new WindowImpl (handler, user_data, new_window);
 
@@ -638,7 +644,7 @@ void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
   else
     window = view.window;
 
-  float scale_factor = [UIScreen mainScreen].scale;
+  float scale_factor = view.contentScaleFactor;
 
   CGRect frame;
 
@@ -677,7 +683,7 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
   if ([view isKindOfClass:[UIWindowWrapper class]])
     view = ((UIWindow*)view).rootViewController.view;
 
-  float scale_factor = [UIScreen mainScreen].scale;
+  float scale_factor = view.contentScaleFactor;
 
   CGRect frame = view.frame;
 
