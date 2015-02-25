@@ -1,5 +1,5 @@
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
 
 #include "shared.h"
 
@@ -179,13 +179,13 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     {
       log.Printf ("...creating framebuffer");
 
-      glGenFramebuffersOES (1, &frame_buffer);
-      glBindFramebufferOES (GL_FRAMEBUFFER_OES, frame_buffer);
+      glGenFramebuffers (1, &frame_buffer);
+      glBindFramebuffer (GL_FRAMEBUFFER, frame_buffer);
 
       log.Printf ("...creating renderbuffer");
 
-      glGenRenderbuffersOES (1, &render_buffer);
-      glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
+      glGenRenderbuffers (1, &render_buffer);
+      glBindRenderbuffer (GL_RENDERBUFFER, render_buffer);
 
       CheckErrors (METHOD_NAME);
 
@@ -196,17 +196,17 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
       eagl_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
                                        kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
 
-      if (![eagl_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:eagl_layer])
+      if (![eagl_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:eagl_layer])
         throw xtl::format_operation_exception (METHOD_NAME, "Can't set context");
 
       log.Printf ("...attaching renderbuffer");
 
-      glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, render_buffer);
+      glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buffer);
 
       GLint renderbuffer_width, renderbuffer_height;
 
-      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &renderbuffer_width);
-      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &renderbuffer_height);
+      glGetRenderbufferParameteriv (GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &renderbuffer_width);
+      glGetRenderbufferParameteriv (GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &renderbuffer_height);
 
       desc.frame_buffer.width  = renderbuffer_width;
       desc.frame_buffer.height = renderbuffer_height;
@@ -215,18 +215,18 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 
       if (desc.frame_buffer.depth_bits)
       {
-        glGenRenderbuffersOES (1, &depth_buffer);
-        glBindRenderbufferOES (GL_RENDERBUFFER_OES, depth_buffer);
-        glRenderbufferStorageOES (GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, desc.frame_buffer.width, desc.frame_buffer.height);
-        glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depth_buffer);
+        glGenRenderbuffers (1, &depth_buffer);
+        glBindRenderbuffer (GL_RENDERBUFFER, depth_buffer);
+        glRenderbufferStorage (GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, desc.frame_buffer.width, desc.frame_buffer.height);
+        glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
       }
 
       if (desc.frame_buffer.stencil_bits)
       {
-        glGenRenderbuffersOES (1, &stencil_buffer);
-        glBindRenderbufferOES (GL_RENDERBUFFER_OES, stencil_buffer);
-        glRenderbufferStorageOES (GL_RENDERBUFFER_OES, GL_STENCIL_INDEX8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
-        glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES, GL_RENDERBUFFER_OES, stencil_buffer);
+        glGenRenderbuffers (1, &stencil_buffer);
+        glBindRenderbuffer (GL_RENDERBUFFER, stencil_buffer);
+        glRenderbufferStorage (GL_RENDERBUFFER, GL_STENCIL_INDEX8, desc.frame_buffer.width, desc.frame_buffer.height);
+        glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencil_buffer);
       }
 
       size_t samples_count = desc.samples_count;
@@ -242,28 +242,28 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 
       if (samples_count > 1)
       {
-        glGenFramebuffersOES (1, &sample_frame_buffer);
-        glBindFramebufferOES (GL_FRAMEBUFFER_OES, sample_frame_buffer);
+        glGenFramebuffers (1, &sample_frame_buffer);
+        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
 
-        glGenRenderbuffersOES (1, &sample_render_buffer);
-        glBindRenderbufferOES (GL_RENDERBUFFER_OES, sample_render_buffer);
-        glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER_OES, samples_count, GL_RGBA8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
-        glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, sample_render_buffer);
+        glGenRenderbuffers (1, &sample_render_buffer);
+        glBindRenderbuffer (GL_RENDERBUFFER, sample_render_buffer);
+        glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_RGBA8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
+        glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sample_render_buffer);
 
         if (desc.frame_buffer.depth_bits)
         {
-          glGenRenderbuffersOES (1, &sample_depth_buffer);
-          glBindRenderbufferOES (GL_RENDERBUFFER_OES, sample_depth_buffer);
-          glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER_OES, samples_count, GL_DEPTH_COMPONENT16_OES, desc.frame_buffer.width, desc.frame_buffer.height);
-          glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, sample_depth_buffer);
+          glGenRenderbuffers (1, &sample_depth_buffer);
+          glBindRenderbuffer (GL_RENDERBUFFER, sample_depth_buffer);
+          glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_DEPTH_COMPONENT16, desc.frame_buffer.width, desc.frame_buffer.height);
+          glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sample_depth_buffer);
         }
       }
 
-      GLenum status = glCheckFramebufferStatusOES (GL_FRAMEBUFFER_OES);
+      GLenum status = glCheckFramebufferStatus (GL_FRAMEBUFFER);
 
       CheckErrors (METHOD_NAME);
 
-      if (status != GL_FRAMEBUFFER_COMPLETE_OES)
+      if (status != GL_FRAMEBUFFER_COMPLETE)
         throw xtl::format_operation_exception (METHOD_NAME, "Failed to make complete framebuffer object");
 
       log.Printf ("...swap chain initialized");
@@ -286,23 +286,23 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     context      = 0;
     eagl_context = 0;
 
-    glDeleteFramebuffersOES  (1, &frame_buffer);
-    glDeleteRenderbuffersOES (1, &render_buffer);
+    glDeleteFramebuffers  (1, &frame_buffer);
+    glDeleteRenderbuffers (1, &render_buffer);
 
     if (sample_frame_buffer)
-      glDeleteFramebuffersOES  (1, &sample_frame_buffer);
+      glDeleteFramebuffers  (1, &sample_frame_buffer);
 
     if (sample_render_buffer)
-      glDeleteRenderbuffersOES  (1, &sample_render_buffer);
+      glDeleteRenderbuffers  (1, &sample_render_buffer);
 
     if (desc.frame_buffer.depth_bits)
-      glDeleteRenderbuffersOES (1, &depth_buffer);
+      glDeleteRenderbuffers (1, &depth_buffer);
 
     if (sample_depth_buffer)
-      glDeleteRenderbuffersOES  (1, &sample_depth_buffer);
+      glDeleteRenderbuffers  (1, &sample_depth_buffer);
 
     if (desc.frame_buffer.stencil_bits)
-      glDeleteRenderbuffersOES (1, &stencil_buffer);
+      glDeleteRenderbuffers (1, &stencil_buffer);
 
     frame_buffer         = 0;
     render_buffer        = 0;
@@ -327,13 +327,13 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 
     GLuint current_render_buffer;
 
-    glGetIntegerv (GL_RENDERBUFFER_BINDING_OES, (GLint*)&current_render_buffer);
+    glGetIntegerv (GL_RENDERBUFFER_BINDING, (GLint*)&current_render_buffer);
 
     CheckErrors (METHOD_NAME);
 
     if (current_render_buffer != render_buffer)
     {
-      glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
+      glBindRenderbuffer (GL_RENDERBUFFER, render_buffer);
 
       CheckErrors (METHOD_NAME);
     }
@@ -342,19 +342,19 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     {
       if (sample_frame_buffer)
       {
-        glBindFramebufferOES (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
-        glBindFramebufferOES (GL_READ_FRAMEBUFFER_APPLE, sample_frame_buffer);
+        glBindFramebuffer (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
+        glBindFramebuffer (GL_READ_FRAMEBUFFER_APPLE, sample_frame_buffer);
         glResolveMultisampleFramebufferAPPLE ();
 
         CheckErrors (METHOD_NAME);
       }
 
-      if (![eagl_context presentRenderbuffer:GL_RENDERBUFFER_OES])
+      if (![eagl_context presentRenderbuffer:GL_RENDERBUFFER])
         throw xtl::format_operation_exception (METHOD_NAME, "Failed to swap renderbuffer");
 
       if (sample_frame_buffer)
       {
-        glBindFramebufferOES (GL_FRAMEBUFFER_OES, sample_frame_buffer);
+        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
 
         CheckErrors (METHOD_NAME);
       }
@@ -363,7 +363,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     {
       if (current_render_buffer != render_buffer)
       {
-        glBindRenderbufferOES (GL_RENDERBUFFER_OES, current_render_buffer);
+        glBindRenderbuffer (GL_RENDERBUFFER, current_render_buffer);
         CheckErrors (METHOD_NAME);
       }
 
@@ -404,10 +404,6 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
           throw xtl::format_operation_exception (source, "OpenGL error: invalid value");
         case GL_INVALID_OPERATION:
           throw xtl::format_operation_exception (source, "OpenGL error: invalid operation");
-        case GL_STACK_OVERFLOW:
-          throw xtl::format_operation_exception (source, "OpenGL error: stack overflow");
-        case GL_STACK_UNDERFLOW:
-          throw xtl::format_operation_exception (source, "OpenGL error: stack underflow");
         case GL_OUT_OF_MEMORY:
           throw xtl::format_operation_exception (source, "OpenGL error: out of memory");
         default:
@@ -540,8 +536,8 @@ void PrimarySwapChain::DoneForContext ()
 
 unsigned int PrimarySwapChain::GetFrameBufferId ()
 {
-  if (!impl->frame_buffer)
+  if (!impl->frame_buffer && !impl->sample_frame_buffer)
     throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::GetFrameBufferId", "Can't get frame buffer before initializing swap chain");
 
-  return impl->frame_buffer;
+  return impl->sample_frame_buffer ? impl->sample_frame_buffer : impl->frame_buffer;
 }
