@@ -34,6 +34,7 @@ class ForwardShading: public Technique
     ForwardShading (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
       , shadow_map_renderer (in_manager, node.First ("shadow_map"))
+      , shadows_enabled (true)
     {
         //чтение конфигурации
 
@@ -53,7 +54,10 @@ class ForwardShading: public Technique
     void UpdatePropertiesCore () {}
 
 ///Связывание свойств техники с методами техники
-    void BindProperties (common::PropertyBindingMap&) {}
+    void BindProperties (common::PropertyBindingMap& bindings)
+    {
+      bindings.AddProperty ("ShadowsEnabled", xtl::bind (&ForwardShading::ShadowsEnabled, this), xtl::bind (&ForwardShading::SetShadowsEnabled, this, _1));
+    }
 
   private:
     struct LightContext: public xtl::reference_counter
@@ -133,7 +137,8 @@ class ForwardShading: public Technique
 
       RenderingContext shadow_context (context, light_context.renderer->Frame ());   //TODO this for debug
 
-      shadow_map_renderer.UpdateShadowMap (shadow_context, light);   //TODO this for debug too 
+      if (shadows_enabled)
+        shadow_map_renderer.UpdateShadowMap (shadow_context, light);   //TODO this for debug too
 //      UpdateShadowMap (context, light);   //TODO this commented for debug
 
         //установка параметров источника
@@ -210,6 +215,17 @@ class ForwardShading: public Technique
       return *light_context;
     }
 
+///Работа со свойствам
+    bool ShadowsEnabled ()
+    {
+      return shadows_enabled;
+    }
+
+    void SetShadowsEnabled (bool new_value)
+    {
+      shadows_enabled = new_value;
+    }
+
   private:
     RenderManager     manager;                        //менеджер рендеринга
     stl::string       lighting_effect;                //эффект отрисовки с источником света
@@ -218,6 +234,7 @@ class ForwardShading: public Technique
     stl::string       direct_light_shader_light_type; //настройки шейдера для цилиндрического источника света
     stl::string       point_light_shader_light_type;  //настройки шейдера для точечного источника света
     ShadowMapRenderer shadow_map_renderer;            //рендер карты теней
+    bool              shadows_enabled;                //включена ли генерация теней
 };
 
 }
