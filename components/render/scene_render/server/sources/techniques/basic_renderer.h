@@ -4,7 +4,7 @@ class BasicRenderer: public xtl::reference_counter, public xtl::noncopyable
   public:
 ///Конструктор / деструктор
     BasicRenderer  (server::RenderManager& manager, const char* effect_name);
-    ~BasicRenderer ();
+    virtual ~BasicRenderer ();
 
 ///Доступ к полям
     server::RenderManager&  RenderManager   () { return manager; } 
