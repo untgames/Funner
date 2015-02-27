@@ -342,6 +342,10 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     {
       const GLenum all_discards [] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
 
+      const GLenum depth_discards [] = { GL_DEPTH_ATTACHMENT };
+
+      glDiscardFramebufferEXT (GL_FRAMEBUFFER, 1, depth_discards);
+
       if (sample_frame_buffer)
       {
         glBindFramebuffer (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
@@ -353,22 +357,14 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
         CheckErrors (METHOD_NAME);
       }
 
-      const GLenum depth_discards [] = { GL_DEPTH_ATTACHMENT };
-
-      glDiscardFramebufferEXT (GL_DRAW_FRAMEBUFFER_APPLE, 1, depth_discards);
-
       if (![eagl_context presentRenderbuffer:GL_RENDERBUFFER])
         throw xtl::format_operation_exception (METHOD_NAME, "Failed to swap renderbuffer");
 
-      glBindFramebuffer (GL_FRAMEBUFFER, frame_buffer);
-
-      glDiscardFramebufferEXT (GL_FRAMEBUFFER, 2, all_discards);
+      glDiscardFramebufferEXT (GL_DRAW_FRAMEBUFFER_APPLE, 2, all_discards);
 
       if (sample_frame_buffer)
       {
         glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
-
-        glDiscardFramebufferEXT (GL_FRAMEBUFFER, 2, all_discards);
 
         CheckErrors (METHOD_NAME);
       }
