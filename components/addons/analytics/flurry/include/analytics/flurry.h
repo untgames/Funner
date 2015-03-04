@@ -58,7 +58,6 @@ class Flurry
     static void SetUserId   (const char* user_id);
     static void SetAge      (size_t age);
     static void SetGender   (Gender gender);
-    static void SetUseHttps (bool use_https);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Трекинг событий

@@ -23,7 +23,6 @@ struct FlurryImpl::Impl
   jmethodID           set_user_id_method;           //метод установки идентификатора пользователя
   jmethodID           set_age_method;               //метод установки возраста пользователя
   jmethodID           set_gender_method;            //метод установки пола пользователя
-  jmethodID           set_use_https_method;         //метод установки необходимости использовать https для отправки аналитики
   jmethodID           log_event_method;             //метод протоколирования события приложения
   jmethodID           end_timed_event_method;       //метод протоколирования окончания события приложения
   jmethodID           log_page_view_method;         //метод протоколирования просмотра страницы
@@ -126,14 +125,13 @@ struct FlurryImpl::Impl
     flurry_init_method   = find_method (env, flurry_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
     start_session_method = find_method (env, flurry_class, "startSession", "()V");
     end_session_method   = find_method (env, flurry_class, "endSession", "()V");
+    log_event_method     = find_static_method (env, flurry_class, "logEvent", "(Ljava/lang/String;Ljava/util/Map;Z)V");
 
     //flurry agent methods
     get_release_version_method   = find_static_method (env, flurry_agent_class, "getReleaseVersion", "()Ljava/lang/String;");
     set_user_id_method           = find_static_method (env, flurry_agent_class, "setUserId", "(Ljava/lang/String;)V");
     set_age_method               = find_static_method (env, flurry_agent_class, "setAge", "(I)V");
     set_gender_method            = find_static_method (env, flurry_agent_class, "setGender", "(B)V");
-    set_use_https_method         = find_static_method (env, flurry_agent_class, "setUseHttps", "(Z)V");
-    log_event_method             = find_static_method (env, flurry_agent_class, "logEvent", "(Ljava/lang/String;Ljava/util/Map;Z)V");
     end_timed_event_method       = find_static_method (env, flurry_agent_class, "endTimedEvent", "(Ljava/lang/String;Ljava/util/Map;)V");
     log_page_view_method         = find_static_method (env, flurry_agent_class, "onPageView", "()V");
     set_debug_log_enabled_method = find_static_method (env, flurry_agent_class, "setLogEnabled", "(Z)V");
@@ -258,21 +256,6 @@ struct FlurryImpl::Impl
     catch (xtl::exception& e)
     {
       e.touch ("analytics::flurry::android::FlurryImpl::SetGender");
-      throw;
-    }
-  }
-
-  void SetUseHttps (bool use_https)
-  {
-    try
-    {
-      CheckIsSupported ();
-
-      get_env ().CallStaticVoidMethod (flurry_agent_class, set_use_https_method, use_https);
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("analytics::flurry::android::FlurryImpl::SetUseHttps");
       throw;
     }
   }
@@ -471,11 +454,6 @@ void FlurryImpl::SetAge (size_t age)
 void FlurryImpl::SetGender (Gender gender)
 {
   impl->SetGender (gender);
-}
-
-void FlurryImpl::SetUseHttps (bool use_https)
-{
-  impl->SetUseHttps (use_https);
 }
 
 /*

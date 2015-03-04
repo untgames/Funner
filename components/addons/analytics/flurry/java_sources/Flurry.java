@@ -1,5 +1,7 @@
 package com.untgames.funner.analytics;
 
+import java.util.Map;
+
 import android.util.Log;
 
 import com.untgames.funner.application.EngineActivity;
@@ -42,7 +44,8 @@ public class Flurry implements EngineActivity.EngineActivityEventListener
 		if (sessionStarted)
 			return;
 
-  	FlurryAgent.onStartSession (activity, apiKey);
+		FlurryAgent.init (activity, apiKey);
+  	FlurryAgent.onStartSession (activity);
 		
 		sessionStarted = true;
 	}
@@ -55,5 +58,29 @@ public class Flurry implements EngineActivity.EngineActivityEventListener
 		FlurryAgent.onEndSession (activity);
 		
 		sessionStarted = false;
+	}
+	
+	private static void logEvent (String eventId, Map< String, String > parameters,	boolean timed)
+	{
+		switch (FlurryAgent.logEvent (eventId, parameters, timed))
+		{
+		  case kFlurryEventFailed:
+		  	Log.d (TAG, "Log event '" + eventId + "' failed");
+		  	break;
+		  case kFlurryEventRecorded:
+		  	break;
+		  case kFlurryEventUniqueCountExceeded:
+		  	Log.d (TAG, "Log event '" + eventId + "' failed, unique count exceeded");
+		  	break;
+		  case kFlurryEventParamsCountExceeded:
+		  	Log.d (TAG, "Log event '" + eventId + "' failed, params count exceeded");
+		  	break;
+		  case kFlurryEventLogCountExceeded:
+		  	Log.d (TAG, "Log event '" + eventId + "' failed, log count exceeded");
+		  	break;
+		  case kFlurryEventLoggingDelayed:
+		  	Log.d (TAG, "Log event '" + eventId + "' logging delayed");
+		  	break;
+		}
 	}
 }
