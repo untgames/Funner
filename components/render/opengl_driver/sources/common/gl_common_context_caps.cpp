@@ -269,11 +269,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_arb_vertex_buffer_object       = true;
   has_ext_packed_depth_stencil       = ext.Get (OES_packed_depth_stencil);
   has_ext_texture_compression_s3tc   = ext.Get (EXT_texture_compression_s3tc);
-#ifdef __APPLE__
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
-#else
-  has_ext_texture_filter_anisotropic = false; //ext.Get (EXT_texture_filter_anisotropic);   //supported on Qualcomm Adreno 205 but generates error
-#endif
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);
 
