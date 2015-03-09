@@ -386,36 +386,26 @@ public class EngineActivity extends Activity
     if (uuid != null)
       return uuid;
     
-    String buildString = null;
-    
     String androidID = Secure.getString (getContentResolver(), Secure.ANDROID_ID);    
     
     if (androidID == null || androidID.equals ("9774d56d682e549c")) //magick android id - http://code.google.com/p/android/issues/detail?id=10603
     {
-      buildString = UUID.randomUUID ().toString ();
-    }
-    else
-    {
-      buildString = androidID;
+      androidID = UUID.randomUUID ().toString ();
     }
 
     try
     {
-      MessageDigest md = MessageDigest.getInstance ("SHA-1");
-      
-      uuid = byteArray2Hex (md.digest (buildString.getBytes ()));
-      
       SharedPreferences.Editor prefsEditor = prefs.edit ();
       
-      prefsEditor.putString ("UUID", uuid);
+      prefsEditor.putString ("UUID", androidID);
       
       prefsEditor.commit ();
       
-      return uuid;
+      return androidID;
     }
     catch (Exception e)
     {
-      return buildString;
+      return androidID;
     }
   }
   
