@@ -152,6 +152,16 @@ const char* get_devil_type_name (ILenum type)
 }
 
 /*
+  Singleton for locking DevIL
+*/
+
+struct DevILLock
+{
+};
+
+typedef common::Singleton<DevILLock> DevILLockSingleton;
+
+/*
     DevILImageImpl
 */
 
@@ -162,6 +172,8 @@ const char* get_devil_type_name (ILenum type)
 DevILImageImpl::DevILImageImpl ()
   : width (0), height (0), depth (0), format (PixelFormat_Default)
 {
+  DevILLockSingleton::Instance instance;
+
   LoadComponent ();
 
   ilGenImages        (1, &il_image);
@@ -175,6 +187,8 @@ DevILImageImpl::DevILImageImpl (const DevILImageImpl& source)
   , depth (source.depth)
   , format (source.format)
 {
+  DevILLockSingleton::Instance instance;
+
   LoadComponent ();
 
   ilGenImages        (1, &il_image);
@@ -202,6 +216,8 @@ DevILImageImpl::DevILImageImpl (const DevILImageImpl& source)
 DevILImageImpl::DevILImageImpl (const char* file_name)
   : width (0), height (0), depth (0), format (PixelFormat_Default)
 {
+  DevILLockSingleton::Instance instance;
+
   LoadComponent ();
 
   ilGenImages        (1, &il_image);
@@ -286,6 +302,8 @@ DevILImageImpl::DevILImageImpl (unsigned int in_width, unsigned int in_height, u
 {
   static const char* METHOD_NAME = "media::DevILImageImpl::DevILImageImpl(unsigned int,unsigned int,unsigned int,PixelFormat,const void*)";
 
+  DevILLockSingleton::Instance instance;
+
   LoadComponent ();
 
   ilGenImages (1, &il_image);
@@ -322,6 +340,8 @@ DevILImageImpl::DevILImageImpl (unsigned int in_width, unsigned int in_height, u
 
 DevILImageImpl::~DevILImageImpl ()
 {
+  DevILLockSingleton::Instance instance;
+
   ilDeleteImages (1, &il_image);
 }
 
@@ -340,6 +360,8 @@ ImageImpl* DevILImageImpl::Clone ()
 
 void DevILImageImpl::Convert (PixelFormat new_format)
 {
+  DevILLockSingleton::Instance instance;
+
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Convert", "ilBindImage");
 
@@ -362,6 +384,8 @@ void DevILImageImpl::Convert (PixelFormat new_format)
 
 void DevILImageImpl::Resize (unsigned int in_width, unsigned int in_height, unsigned int in_depth)
 {
+  DevILLockSingleton::Instance instance;
+
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Resize", "ilBindImage");
   iluScale           (in_width, in_height, in_depth);
@@ -383,6 +407,8 @@ void DevILImageImpl::Resize (unsigned int in_width, unsigned int in_height, unsi
 
 void* DevILImageImpl::Bitmap (unsigned int z)
 {
+  DevILLockSingleton::Instance instance;
+
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Bitmap", "ilBindImage");
 
@@ -396,6 +422,8 @@ void* DevILImageImpl::Bitmap (unsigned int z)
 
 void DevILImageImpl::PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data)
 {
+  DevILLockSingleton::Instance instance;
+
   if (format == PixelFormat_Default)
     format = this->format;
 
@@ -410,6 +438,8 @@ void DevILImageImpl::PutImage (unsigned int x, unsigned int y, unsigned int z, u
 
 void DevILImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data)
 {
+  DevILLockSingleton::Instance instance;
+
   if (format == PixelFormat_Default)
     format = this->format;
 
@@ -428,6 +458,8 @@ void DevILImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int z, u
 
 void DevILImageImpl::Save (const char* file_name)
 {
+  DevILLockSingleton::Instance instance;
+
   ilBindImage        (il_image);
   check_devil_errors ("media::DevILImageImpl::Save", "ilBindImage");
   ilSaveImage        (const_cast<ILstring> (file_name));
