@@ -1,0 +1,8 @@
+Results of condition_timed_wait_test:
+create mutex & condition
+create thread
+sleep
+wait started
+wait finished in time 'true', result = 'false'
+wake
+exit

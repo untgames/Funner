@@ -87,12 +87,19 @@ bool PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle, si
     timespec end_time;
     
 #ifdef __APPLE__
-    struct timeval current_time;
+    clock_serv_t    clock_service;
+    mach_timespec_t mach_time_spec;
 
-    gettimeofday (&current_time, 0);
+    if (host_get_clock_service (mach_host_self (), CALENDAR_CLOCK, &clock_service))  //create/deallocate cclock takes 0 ms according to common::milliseconds
+      throw xtl::format_operation_exception ("::host_get_clock_service", "Can't get calendar clock");
 
-    end_time.tv_sec  = current_time.tv_sec;
-    end_time.tv_nsec = 0;
+    if (clock_get_time (clock_service, &mach_time_spec))
+      throw xtl::format_operation_exception ("::clock_get_time", "Can't get calendar clock time");
+
+    mach_port_deallocate (mach_task_self (), clock_service);
+
+    end_time.tv_sec  = mach_time_spec.tv_sec;
+    end_time.tv_nsec = mach_time_spec.tv_nsec;
 #elif _WIN32_WCE
     FILETIME fileTime;
     GetCurrentFT (&fileTime);

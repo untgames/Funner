@@ -53,7 +53,7 @@ void* thread_run (void* data)
     Создание / удаление нити
 */
 
-thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
+syslib::thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {

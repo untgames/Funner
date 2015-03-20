@@ -1,5 +1,6 @@
 #ifdef __APPLE__
-  #include <sys/time.h>
+  #include <mach/clock.h>
+  #include <mach/mach.h>
 #endif
 
 #include <limits.h>
