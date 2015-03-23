@@ -2,7 +2,6 @@
 
 
 Semaphore* volatile semaphore = 0;
-volatile   bool flag          = false;
 
 int run ()
 {
@@ -17,8 +16,6 @@ int run ()
 //  printf ("wait time = %u\n", wait_time);
 
   printf ("sem wait finished in time '%s', result = '%s'\n", wait_time > 99 && wait_time < 150 ? "true" : "false", result ? "true" : "false");
-  
-  flag = true;
 
   return 0;
 }
@@ -37,7 +34,7 @@ int main ()
     
     Thread thread (&run);        
     
-    while (!flag);
+    Application::Sleep (500);
             
     thread.Join ();
   }
