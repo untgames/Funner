@@ -31,6 +31,9 @@ int main ()
   
   InputZone::Pointer zone (InputZone::Create ());
 
+  zone->SetPlaneState (NodeOrt_X, true);
+  zone->SetPlaneState (NodeOrt_Y, true);
+
   MyVisitor visitor;
 
   zone->VisitEach (visitor, NodeTraverseMode_TopToBottom);  
