@@ -168,7 +168,7 @@ struct TouchTraverser: public INodeTraverser
     float       ray_intersection_distance = 0.0f;
     math::vec2f intersection_point;
     math::vec3f ray_to_zone_offset;
-    size_t      zone_index = 0;
+    size_t      zone_index = ~0u;
 
     bool zone_intersection = zone->IsIntersected (NodeTransformSpace_World, touch_world_position, touch_world_position + touch_world_direction, zone_index, 
       ray_intersection_distance, ray_to_zone_offset, intersection_point);                      
@@ -193,6 +193,9 @@ struct TouchTraverser: public INodeTraverser
     }
     else if (!intersected)
     {
+      if (zone_index == ~0u)
+        return;
+
       if (ray_intersection_distance < 0.0f || ray_intersection_distance > 1.0f) //check for z distance
         return;        
       
@@ -231,7 +234,7 @@ void InputScene::FindTouch (InputPort& input_port, const math::vec3f& touch_worl
     if (touch_context.touch_catched)
       return;
    
-      //поиск зоны, пересекаемой областью луча      
+      //поиск зоны, пересекаемой областью луча
 
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
   
@@ -277,7 +280,7 @@ void InputScene::OnTouch (InputPort& input_port, const math::vec3f& touch_world_
 
       if (entity)
       {          
-          //передача события соответствующему объекту      
+          //передача события соответствующему объекту
 
         entity->OnTouch (input_port, touch_context.event, touch_world_position, touch_context.input_zone_index, touch_context.intersection_point);
       }

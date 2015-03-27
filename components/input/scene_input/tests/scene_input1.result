@@ -1,5 +1,5 @@
 Results of scene_input1_test:
-OnScreenTouchMove: touch=-1, button=-1, world_position=[50.000, 12.500, 0.000] local_position=[0.000, 0.000]
+OnScreenTouchMove: touch=-1, button=-1, world_position=[0.000, 0.000, 0.000] local_position=[0.000, 0.000]
 OnTouchEnter: touch=-1, button=-1, world_position=[50.000, -50.000, 0.000] local_position=[0.000, 0.000]
 OnScreenTouchMove: touch=-1, button=-1, world_position=[50.000, -50.000, 0.000] local_position=[0.000, 0.000]
 OnTouchEnter: touch=-1, button=0, world_position=[50.000, -50.000, 0.000] local_position=[0.000, 0.000]
