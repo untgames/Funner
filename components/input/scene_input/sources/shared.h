@@ -150,7 +150,6 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     math::mat4f              screen_tm;              //матрица преобразования координат (из мировой системы в систему координат экрана)
     math::mat4f              position_tm;            //матрица преобразования координат (в мировую систему координат)
     math::mat4f              view_proj_tm;           //матрица преобразования координат (proj * inv(view))
-    math::mat4f              inv_view_proj_tm;       //матрица обратного преобразования координат (inv (proj * inv(view)))
     frustum                  touch_frustum;          //пирамида тача
 };
 
