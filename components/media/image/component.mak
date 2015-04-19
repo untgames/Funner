@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES  \
-           MEDIA.DDS_LOADER.SOURCES MEDIA.IMAGE.ANI_CURSORS MEDIA.IMAGE.TESTS \
+           MEDIA.DDS_LOADER.SOURCES MEDIA.KTX_LOADER.SOURCES MEDIA.IMAGE.ANI_CURSORS MEDIA.IMAGE.TESTS \
            MEDIA.IMAGE.PSD_EXPORTER.SOURCES MEDIA.IMAGE.PSD_EXPORTER.TESTS \
            MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS \
            MEDIA.INTERLACER.SOURCES MEDIA.INTERLACER.TESTS
@@ -44,6 +44,12 @@ MEDIA.DDS_LOADER.SOURCES.NAME         := funner.media.image.dds_loader
 MEDIA.DDS_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/dds
 MEDIA.DDS_LOADER.SOURCES.IMPORTS      := compile.media.image
 
+#Цель - KTX loader
+MEDIA.KTX_LOADER.SOURCES.TYPE         := static-lib
+MEDIA.KTX_LOADER.SOURCES.NAME         := funner.media.image.ktx_loader
+MEDIA.KTX_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/ktx
+MEDIA.KTX_LOADER.SOURCES.IMPORTS      := compile.media.image
+
 #Цель - ANI cursors
 MEDIA.IMAGE.ANI_CURSORS.TYPE        := static-lib
 MEDIA.IMAGE.ANI_CURSORS.NAME        := funner.media.image.ani_cursors
@@ -56,7 +62,7 @@ MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas \
                                   link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr link.media.image.dds \
-                                  link.media.image.ani_cursor_loader
+                                  link.media.image.ani_cursor_loader link.media.image.ktx
 
 #Цель - PSD exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.TYPE        := application
