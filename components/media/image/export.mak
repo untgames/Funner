@@ -27,6 +27,11 @@ export.link.media.image.dds.LIBS          := funner.media.image.dds_loader
 export.link.media.image.dds.LINK_INCLUDES := DdsLoader
 export.link.media.image.dds.IMPORTS       := link.media.image
 
+# DDS loader exports
+export.link.media.image.ktx.LIBS          := funner.media.image.ktx_loader
+export.link.media.image.ktx.LINK_INCLUDES := KtxLoader
+export.link.media.image.ktx.IMPORTS       := link.media.image
+
 # ANI cursors exports
 export.link.media.image.ani_cursor_loader.LIBS          := funner.media.image.ani_cursors
 export.link.media.image.ani_cursor_loader.LINK_INCLUDES := AniCursorLoader

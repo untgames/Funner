@@ -101,19 +101,6 @@ class FlurrySessionImpl
       }
     }
 
-    void SetUseHttps (bool use_https)
-    {
-      try
-      {
-        Platform::SetUseHttps (use_https);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("analytics::flurry::SetUseHttps");
-        throw;
-      }
-    }
-
     ///Трекинг событий
     void LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
     {
@@ -253,11 +240,6 @@ void Flurry::SetAge (size_t age)
 void Flurry::SetGender (Gender gender)
 {
   FlurrySessionSingleton::Instance ()->SetGender (gender);
-}
-
-void Flurry::SetUseHttps (bool use_https)
-{
-  FlurrySessionSingleton::Instance ()->SetUseHttps (use_https);
 }
 
 /*

@@ -134,9 +134,8 @@ void InputPort::Update ()
                 viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);
                 
     view_proj_tm           = camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
-    inv_view_proj_tm       = math::inverse (view_proj_tm);
     normalized_position_tm = math::scale (math::vec3f (1.0f, -1.0f, 1.0f)) * math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
-    position_tm            = inv_view_proj_tm * normalized_position_tm;
+    position_tm            = math::inverse (view_proj_tm) * normalized_position_tm;
     screen_tm              = math::inverse (normalized_position_tm) * view_proj_tm;
     
     switch (touch_size_space)
@@ -199,22 +198,23 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
 
       //перевод координаты в мировую систему координат
 
-    math::vec4f source_position (touch_context.event.position.x, touch_context.event.position.y, 0.0f, 1.0f),
-                world_position = position_tm * source_position;
+    math::vec4f source_position_z_near (touch_context.event.position.x, touch_context.event.position.y, 0.0f, 1.0f),
+                source_position_z_far (touch_context.event.position.x, touch_context.event.position.y, 1.0f, 1.0f),
+                world_position_z_near = position_tm * source_position_z_near,
+                world_position_z_far  = position_tm * source_position_z_far;
 
-    world_position /= world_position.w;    
+    world_position_z_near /= world_position_z_near.w;
+    world_position_z_far  /= world_position_z_far.w;
 
       //получение пирамиды тача
       
-    math::vec4f normalized_position = normalized_position_tm * source_position, normalized_direction (0.0f, 0.0f, 2.0f, 0.0f);
-
-    normalized_position /= normalized_position.w;
+    math::vec4f normalized_position = normalized_position_tm * source_position_z_near;
 
     if (fabs (normalized_position.x) > 1.0f || fabs (normalized_position.y) > 1.0f)
       return;
     
-    math::vec4f world_direction = inv_view_proj_tm * normalized_direction;
-    
+    math::vec3f world_direction = world_position_z_far - world_position_z_near;
+
     math::mat4f touch_tm = math::scale (touch_scale) * math::translate (math::vec3f (-normalized_position.x, -normalized_position.y)) * view_proj_tm;
 
     touch_frustum.clear ();
@@ -223,7 +223,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
 
       //поиск зоны
       
-    out_touch_world_position = math::vec3f (world_position);
+    out_touch_world_position = math::vec3f (world_position_z_near);
 
     input_scene->FindTouch (*this, out_touch_world_position, math::vec3f (world_direction), touch_frustum, screen_tm, touch_context);        
   }

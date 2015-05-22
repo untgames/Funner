@@ -51,7 +51,6 @@ class FlurryImpl
     void SetUserId   (const char* user_id);
     void SetAge      (size_t age);
     void SetGender   (Gender gender);
-    void SetUseHttps (bool use_https);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Трекинг событий

@@ -21,7 +21,6 @@ EXTERN.OPENALLIB.INCLUDE_DIRS               := include sources sources/openal32 
 EXTERN.OPENALLIB.SOURCE_DIRS                := sources/openal32 sources/alc
 EXTERN.OPENALLIB.g++.COMPILER_DEFINES       := AL_ALEXT_PROTOTYPES _GNU_SOURCE=1 AL_BUILD_LIBRARY HAVE_GCC_VISIBILITY
 EXTERN.OPENALLIB.msvc.COMPILER_DEFINES      := AL_ALEXT_PROTOTYPES AL_BUILD_LIBRARY snprintf=_snprintf isfinite=_finite strcasecmp=_stricmp strncasecmp=_strnicmp
-EXTERN.OPENALLIB.android.COMPILER_DEFINES   := HAVE_STDINT_H HAVE_GCC_DESTRUCTOR
 EXTERN.OPENALLIB.linux.COMPILER_CFLAGS      := -pthread --no-warn
 EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt
 EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread

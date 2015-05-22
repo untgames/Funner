@@ -19,8 +19,8 @@ struct RenderThread::Impl: public xtl::reference_counter
   stl::string            manager_name;           //им€ менеджера соединени€
   CommandQueue           command_queue;          //очередь команд
   volatile bool          stop_request;           //флаг запроса остановки нити
-  syslib::Thread         thread;                 //нить
   IRenderThreadListener* listener;               //слушатель событий нити
+  syslib::Thread         thread;                 //нить
 
 ///  онструктор
   Impl (const char* in_name, size_t render_queue_size, IRenderThreadListener* in_listener)
@@ -28,8 +28,8 @@ struct RenderThread::Impl: public xtl::reference_counter
     , log (name.c_str ())
     , command_queue (render_queue_size)
     , stop_request ()
-    , thread (name.c_str (), xtl::bind (&Impl::Run, this))
     , listener (in_listener)
+    , thread (name.c_str (), xtl::bind (&Impl::Run, this))
   {
   }
 

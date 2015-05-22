@@ -15,7 +15,7 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
   
   Impl ()
   {
-    plane_mask = (1 << NodeOrt_X) | (1 << NodeOrt_Y) | (1 << NodeOrt_Z);    
+    plane_mask = 1 << NodeOrt_Z;
 
     UpdatePlanes ();
   }

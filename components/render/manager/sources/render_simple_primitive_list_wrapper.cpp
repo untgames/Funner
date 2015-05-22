@@ -10,6 +10,7 @@ template <class T>
 SimplePrimitiveList<T>::SimplePrimitiveList (Impl* in_impl)
   : impl (in_impl)
 {
+  addref (impl);
 }
 
 template <class T>

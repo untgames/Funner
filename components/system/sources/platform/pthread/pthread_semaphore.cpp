@@ -71,7 +71,37 @@ void PThreadManager::WaitSemaphore (semaphore_t handle)
 //ожидание следующей задачи с таймаутом
 bool PThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::PThreadManager::WaitSemaphore(semaphore_t, size_t)");
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+
+    timespec end_time;
+
+    clock_gettime (CLOCK_REALTIME, &end_time);
+
+    unsigned long long nsec = (wait_in_milliseconds % 1000) * 1000000 + (unsigned long long)end_time.tv_nsec;
+
+    end_time.tv_nsec  = nsec % 1000000000;
+    end_time.tv_sec   = end_time.tv_sec + (time_t)(wait_in_milliseconds / 1000 + nsec / 1000000000);
+
+    int status = sem_timedwait (&handle->semaphore, &end_time);
+
+    if (status)
+    {
+      if (errno == ETIMEDOUT)
+        return false;
+
+      pthread_raise_error ("::sem_timedwait", errno);
+    }
+
+    return true;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadManager::WaitSemaphore(semaphore_t,size_t)");
+    throw;
+  }
 }
 
 //попытка ожидания следующей задачи

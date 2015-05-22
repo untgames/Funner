@@ -1,0 +1,3 @@
+Results of semaphore_timed_wait test:
+sem wait started
+sem wait finished in time 'true', result = 'false'

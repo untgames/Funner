@@ -45,7 +45,6 @@ void bind_flurry_library (Environment& environment)
   lib.Register ("set_UserId",          make_invoker (&Flurry::SetUserId));
   lib.Register ("set_Age",             make_invoker (&Flurry::SetAge));
   lib.Register ("set_Gender",          make_invoker (&Flurry::SetGender));
-  lib.Register ("set_UseHttps",        make_invoker (&Flurry::SetUseHttps));
   lib.Register ("set_DebugLogEnabled", make_invoker (&Flurry::SetDebugLogEnabled));
   lib.Register ("set_LogLevel",        make_invoker (&Flurry::SetLogLevel));
   lib.Register ("StartSession",        make_invoker (&Flurry::StartSession));

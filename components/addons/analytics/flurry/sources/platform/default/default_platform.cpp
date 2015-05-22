@@ -52,11 +52,6 @@ void DefaultPlatform::SetGender (Gender gender)
   throw xtl::make_not_implemented_exception ("analytics::flurry::DefaultPlatform::SetGender");
 }
 
-void DefaultPlatform::SetUseHttps (bool use_https)
-{
-  throw xtl::make_not_implemented_exception ("analytics::flurry::DefaultPlatform::SetUseHttps");
-}
-
 /*
    Трекинг событий
 */

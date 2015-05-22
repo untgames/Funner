@@ -50,9 +50,6 @@ const char* SCENE_TEXT_MODEL_LIBRARY                      = "Scene.TextModel";
 const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
 const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
-const char* SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY = "Scene.InputZoneNotificationContext";
-const char* SCENE_INPUT_ZONE_MODEL_LIBRARY                = "Scene.InputZoneModel";
-const char* SCENE_INPUT_ZONE_LIBRARY                      = "Scene.InputZone";
 const char* BINDER_NAME                                   = "SceneGraph";
 const char* COMPONENT_NAME                                = "script.binds.SceneGraph";
 

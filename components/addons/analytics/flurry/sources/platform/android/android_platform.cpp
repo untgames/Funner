@@ -53,11 +53,6 @@ void AndroidPlatform::SetGender (Gender gender)
   FlurrySingleton::Instance ()->SetGender (gender);
 }
 
-void AndroidPlatform::SetUseHttps (bool use_https)
-{
-  FlurrySingleton::Instance ()->SetUseHttps (use_https);
-}
-
 /*
    Трекинг событий
 */

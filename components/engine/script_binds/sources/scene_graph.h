@@ -119,9 +119,6 @@ extern const char* SCENE_TEXT_MODEL_LIBRARY;
 extern const char* SCENE_TEXT_LINE_LIBRARY;
 extern const char* SCENE_STATIC_MESH_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
-extern const char* SCENE_INPUT_ZONE_MODEL_LIBRARY;
-extern const char* SCENE_INPUT_ZONE_LIBRARY;
-extern const char* SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY;
 
 /*
     Функции биндинга библиотек

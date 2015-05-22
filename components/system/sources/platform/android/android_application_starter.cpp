@@ -286,6 +286,9 @@ JNIEnv& get_env ()
 
   jint status = application_context.vm->GetEnv ((void**)&env, JNI_VERSION_1_4);
   
+  if (status == JNI_EDETACHED)
+    status = application_context.vm->AttachCurrentThread (&env, 0);
+
   if (status || !env)
     throw xtl::format_operation_exception ("syslib::android::get_env", "JavaVM::GetEnv failed (status=%d)", status);
     
