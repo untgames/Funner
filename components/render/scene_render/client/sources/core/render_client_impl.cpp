@@ -11,6 +11,8 @@ typedef xtl::array<render::scene::interchange::object_id_t, ObjectType_Num> IdAr
 namespace
 {
 
+const size_t FENCE_WAITERS_RESERVE_SIZE = 128;
+
 /// Хрнилище менеджеров
 struct ManagersHolder
 {
@@ -26,6 +28,19 @@ struct ManagersHolder
   }
 };
 
+//Слушатель событий синхронизации
+struct FenceWaiter
+{
+  uint32          tag;
+  IFenceListener* listener;
+
+  FenceWaiter (uint32 in_tag, IFenceListener* in_listener)
+    : tag (in_tag), listener (in_listener)
+    {}
+};
+
+typedef stl::vector<FenceWaiter> FenceWaiterArray;
+
 }
 
 struct ClientImpl::Impl
@@ -35,12 +50,15 @@ struct ClientImpl::Impl
   interchange::PropertyMapAutoWriter  properties_writer;  //синхронизатор свойств (запись на сервер)
   interchange::PropertyMapReader      properties_reader;  //синхронизатор свойств (чтение с сервера)
   stl::auto_ptr<ManagersHolder>       managers;           //менеджеры
+  FenceWaiterArray                    fence_waiters;      //слушатели событий синхронизации
 
 /// Конструктор
   Impl ()
     : context ()
   {
     id_pool.assign (0);
+
+    fence_waiters.reserve (FENCE_WAITERS_RESERVE_SIZE);
   }
 
 /// Получение контекста
@@ -175,6 +193,27 @@ common::PropertyMap ClientImpl::GetServerProperties (object_id_t id)
     Обработчики ответов сервера
 */
 
+void ClientImpl::FenceResponse (object_id_t tag)
+{
+  try
+  {
+    for (FenceWaiterArray::iterator iter = impl->fence_waiters.begin (), end = impl->fence_waiters.end (); iter != end; ++iter)
+    {
+      if (iter->tag == tag)
+      {
+        iter->listener->OnFenceTriggered (tag);
+        impl->fence_waiters.erase (iter);
+        break;
+      }
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::ClientImpl::FenceResponse");
+    throw;
+  }
+}
+
 void ClientImpl::RemovePropertyMap (object_id_t id)
 {
   impl->properties_reader.RemoveProperties (id);
@@ -195,6 +234,30 @@ void ClientImpl::UpdatePropertyMap (render::scene::interchange::InputStream& str
   {
     e.touch ("render::scene::client::ClientImpl::UpdatePropertyMap");
     throw;
+  }
+}
+
+/*
+   Синхронизация
+*/
+
+void ClientImpl::RegisterFenceListener (object_id_t tag, IFenceListener* listener)
+{
+  if (!listener)
+    throw xtl::make_null_argument_exception ("render::scene::client::ClientImpl::RegisterFenceListener", "listener");
+
+  impl->fence_waiters.push_back (FenceWaiter (tag, listener));
+}
+
+void ClientImpl::UnregisterFenceListener (object_id_t tag, IFenceListener* listener)
+{
+  for (FenceWaiterArray::reverse_iterator iter = impl->fence_waiters.rbegin (), end = impl->fence_waiters.rend (); iter != end; ++iter)
+  {
+    if (iter->tag == tag && iter->listener == listener)
+    {
+      impl->fence_waiters.erase (iter.base () - 1);
+      break;
+    }
   }
 }
 

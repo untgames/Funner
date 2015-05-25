@@ -273,6 +273,8 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       resource_server->DisableNotifications ();
 
       idle_connection.disconnect ();
+
+      client.Finish ();
     }
 
       //восстановление приложения

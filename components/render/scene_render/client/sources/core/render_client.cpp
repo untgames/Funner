@@ -226,6 +226,85 @@ void Client::DetachAllFontLibraries ()
 }
 
 /*
+   Ожидание незавершенных операций
+*/
+
+void Client::Finish ()
+{
+  TryFinish (size_t (-1));
+}
+
+void Client::Finish (size_t timeout_ms)
+{
+  if (!TryFinish (timeout_ms))
+    throw xtl::format_operation_exception ("render::scene::client::Client::Finish", "Can't finish queued tasks for %u ms", timeout_ms);
+}
+
+namespace
+{
+
+struct FinishFence : public IFenceListener
+{
+  ClientImpl& client;
+  bool        triggered;
+  object_id_t tag;
+
+  FinishFence (ClientImpl& in_client)
+    : client (in_client)
+    , triggered (false)
+    , tag (client.AllocateId (ObjectType_Fence))
+  {
+    try
+    {
+      client.RegisterFenceListener (tag, this);
+    }
+    catch (...)
+    {
+      client.DeallocateId (ObjectType_Fence, tag);
+      throw;
+    }
+  }
+
+  ~FinishFence ()
+  {
+    if (!triggered)
+      client.UnregisterFenceListener (tag, this);
+
+    client.DeallocateId (ObjectType_Fence, tag);
+  }
+
+  void OnFenceTriggered (object_id_t)
+  {
+    triggered = true;
+  }
+};
+
+}
+
+bool Client::TryFinish (size_t timeout_ms)
+{
+  const size_t timeout = stl::min (timeout_ms, (size_t)1000);
+
+  FinishFence fence (impl->connection->Client ());
+
+  const size_t start_time = common::milliseconds ();
+
+  impl->connection->Context ().FenceRequest (fence.tag);
+  impl->connection->Context ().Flush ();
+
+  for (;;)
+  {
+    impl->connection->TryWaitServerFeedback (timeout);
+
+    if (fence.triggered)
+      return true;
+
+    if (common::milliseconds () - start_time > timeout_ms)
+      return false;
+  }
+}
+
+/*
     Обмен
 */
 

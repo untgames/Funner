@@ -125,6 +125,9 @@ inline void Context<Serializer, Deserializer>::Flush ()
 {
   try
   {
+    if (this->IsEmpty ())
+      return;
+
     if (!connection)
       throw xtl::format_operation_exception ("", "Can't send rendering commands. No counterparty");
 

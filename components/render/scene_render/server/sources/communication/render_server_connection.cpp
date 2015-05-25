@@ -71,7 +71,7 @@ typedef xtl::intrusive_ptr<ConnectionInternalState> StatePtr;
 
 struct Connection::Impl: public xtl::trackable
 {
-  StatePtr state; //внутреннее состояние соединения  
+  StatePtr state; //внутреннее состояние соединения
 
 /// Конструктор
   Impl (ServerImpl& server, const char* init_string)
@@ -134,6 +134,7 @@ void Connection::ProcessCommands (const interchange::CommandBuffer& commands)
       throw xtl::format_operation_exception ("", "Server is lost");
 
     impl->state->context.ProcessCommands (commands);
+    impl->state->context.Flush ();
   }
   catch (xtl::exception& e)
   {

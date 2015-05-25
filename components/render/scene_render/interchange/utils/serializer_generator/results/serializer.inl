@@ -2,6 +2,7 @@ inline stl::string get_command_name(CommandId command_id)
 {
   switch (command_id)
   {
+    case CommandId_FenceRequest: return "FenceRequest";
     case CommandId_LoadResource: return "LoadResource";
     case CommandId_UnloadResource: return "UnloadResource";
     case CommandId_SetMaxDrawDepth: return "SetMaxDrawDepth";
@@ -61,6 +62,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetLineListMaterial: return "SetLineListMaterial";
     case CommandId_SetLineListBuffer: return "SetLineListBuffer";
     case CommandId_SetLineListDescs: return "SetLineListDescs";
+    case CommandId_FenceResponse: return "FenceResponse";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -68,6 +70,23 @@ inline stl::string get_command_name(CommandId command_id)
 /*
     Client to server
 */
+
+inline void ClientToServerSerializer::FenceRequest(object_id_t tag)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_FenceRequest);
+    write(*this, tag);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
 
 inline void ClientToServerSerializer::LoadResource(const char* name)
 {
@@ -1153,6 +1172,14 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 {
   switch (id)
   {
+    case CommandId_FenceRequest:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+
+      dispatcher.FenceRequest(arg1);
+
+      return true;
+    }
     case CommandId_LoadResource:
     {
       const char* arg1 = read(*this, xtl::type<const char* > ());
@@ -1711,6 +1738,23 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 */
 
 
+inline void ServerToClientSerializer::FenceResponse(object_id_t tag)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_FenceResponse);
+    write(*this, tag);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline OutputStream& ServerToClientSerializer::UpdatePropertyMap()
 {
   size_t saved_position = Position ();
@@ -1765,6 +1809,14 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
 {
   switch (id)
   {
+    case CommandId_FenceResponse:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+
+      dispatcher.FenceResponse(arg1);
+
+      return true;
+    }
     case CommandId_UpdatePropertyMap:
     {
       dispatcher.UpdatePropertyMap(*this);

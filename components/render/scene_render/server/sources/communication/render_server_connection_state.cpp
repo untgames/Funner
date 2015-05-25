@@ -232,6 +232,26 @@ void ConnectionState::RemovePropertyLayout (object_id_t id)
 }
 
 /*
+    Команды клиента
+*/
+
+void ConnectionState::FenceRequest (object_id_t tag)
+{
+  try
+  {
+    if (!impl->context)
+      throw xtl::format_operation_exception ("", "No context");
+
+    impl->context->FenceResponse (tag);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::FenceRequest");
+    throw;
+  }
+}
+
+/*
     Команды клиента: работа с ресурсами
 */
 

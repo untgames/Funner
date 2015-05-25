@@ -180,6 +180,15 @@ inline void OutputStream::Skip (size_t size)
 }
 
 /*
+   Проверка наличия данных
+*/
+
+inline bool OutputStream::IsEmpty () const
+{
+  return pos - buffer_start == 0;
+}
+
+/*
     Позиция потока
 */
 

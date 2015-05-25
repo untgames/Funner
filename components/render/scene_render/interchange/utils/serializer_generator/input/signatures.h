@@ -1,5 +1,7 @@
 #section ClientToServer
 
+void FenceRequest (object_id_t tag);
+
 void LoadResource (const char* name);
 void UnloadResource (const char* name);
 
@@ -76,6 +78,8 @@ void SetLineListBuffer (object_id_t id, uint32 count, uint32 reserve_count);
 void SetLineListDescs (object_id_t id, uint32 first, RawArray<LineDesc> descs);
 
 #section ServerToClient
+
+void FenceResponse (object_id_t tag);
 
 void UpdatePropertyMap (...);
 void RemovePropertyMap (object_id_t id);

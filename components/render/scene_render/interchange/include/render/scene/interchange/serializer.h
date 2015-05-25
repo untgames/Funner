@@ -19,6 +19,7 @@ namespace interchange
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum CommandId
 {
+  CommandId_FenceRequest,
   CommandId_LoadResource,
   CommandId_UnloadResource,
   CommandId_SetMaxDrawDepth,
@@ -78,6 +79,7 @@ enum CommandId
   CommandId_SetLineListMaterial,
   CommandId_SetLineListBuffer,
   CommandId_SetLineListDescs,
+  CommandId_FenceResponse,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -93,6 +95,7 @@ class ClientToServerSerializer: public OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒоступные команды сериализации (кодогенераци€)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void FenceRequest(object_id_t tag);
     void LoadResource(const char* name);
     void UnloadResource(const char* name);
     void SetMaxDrawDepth(uint32 depth);
@@ -201,6 +204,7 @@ class ServerToClientSerializer: public OutputStream
 ///ƒоступные команды сериализации (кодогенераци€)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+    void FenceResponse(object_id_t tag);
     OutputStream& UpdatePropertyMap();
     void RemovePropertyMap(object_id_t id);
     void RemovePropertyLayout(object_id_t id);
