@@ -38,6 +38,7 @@ enum PixelFormat
   PixelFormat_D24S8,       //depth:24, stencil:8
   PixelFormat_D32,         //depth:32
   PixelFormat_S8,          //stencil:8
+  PixelFormat_ETC1,        //red, green, blue - compressed
 
   PixelFormat_Num,
 };

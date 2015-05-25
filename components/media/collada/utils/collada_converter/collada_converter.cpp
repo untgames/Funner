@@ -1004,8 +1004,10 @@ void add_texmap (const Params& params, const Effect& effect, TextureMap map, Ima
       semantic                 = "specular";
       texture_channel_property = "SpecularTextureChannel";
       break;
-    case TextureMap_Transparent:  //ignore transparency textures
-      return;
+    case TextureMap_Transparent:
+      semantic                 = "transparent";
+      texture_channel_property = "TransparentTextureChannel";
+      break;
     case TextureMap_Emission:
       semantic                 = "emission";
       texture_channel_property = "EmissionTextureChannel";

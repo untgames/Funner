@@ -50,6 +50,7 @@ enum PixelFormat
   PixelFormat_D24S8,
   PixelFormat_D32,
   PixelFormat_S8,
+  PixelFormat_ETC1,
 
   PixelFormat_Num
 };

@@ -41,7 +41,7 @@ SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_ROOT                  := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
-ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/21.1.1
+ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/22.0.1
 ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
 GCC_TOOLS_DIR              := $(ABI_DIR)/bin
 COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-gcc
@@ -294,7 +294,7 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE) $$($1.JAR_CLASSES_FLAG)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR))))'
+		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) -encoding UTF8 $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR))))'
 		@touch $$@
 
   $$($1.JAR_CLASSES_FLAG): $$($1.JARS)
@@ -394,7 +394,7 @@ define process_target.android-jar
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@$(RM) -r $$($1.CLASSES_DIR)
 		@mkdir -p $$($1.CLASSES_DIR)
-		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst $(PATH_SEPARATOR) ,$(PATH_SEPARATOR),$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR)))))'
+		@$(JAVA_CC) -encoding UTF8 $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst $(PATH_SEPARATOR) ,$(PATH_SEPARATOR),$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR)))))'
 		@touch $$@
 
   $$($1.TARGET): $$($1.CLASSES_FLAG)

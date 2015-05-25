@@ -149,6 +149,7 @@ const char* get_name (PixelFormat param)
     case PixelFormat_D24S8:       return "PixelFormat_D24S8";
     case PixelFormat_D32:         return "PixelFormat_D32";
     case PixelFormat_S8:          return "PixelFormat_S8";
+    case PixelFormat_ETC1:        return "PixelFormat_ETC1";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(PixelFormat)", "param", param);
   }
@@ -463,6 +464,7 @@ unsigned int get_texel_size (PixelFormat format)
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+    case PixelFormat_ETC1:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
     default:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format");
@@ -504,6 +506,11 @@ unsigned int get_image_size (unsigned int width, unsigned int height, unsigned i
       if (height < 8) height = 8;
       
       return (width * height * depth * 4 + 7) / 8;
+    case PixelFormat_ETC1:
+      if (width < 4) width  = 4;
+      if (height < 4) height = 4;
+
+      return (width * height * depth * 8) / 16; //one etc1 block has 16 pixels and has size of 8 bytes
     default:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format");
   }
@@ -534,6 +541,7 @@ bool is_compressed (PixelFormat format)
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+    case PixelFormat_ETC1:
       return true;
     case PixelFormat_L8:    
     case PixelFormat_A8:    
@@ -577,6 +585,7 @@ bool is_depth_stencil (PixelFormat format)
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+    case PixelFormat_ETC1:
     case PixelFormat_L8:
     case PixelFormat_A8:
     case PixelFormat_LA8:   
@@ -611,6 +620,7 @@ PixelFormat get_uncompressed_format (PixelFormat format)
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:    
+    case PixelFormat_ETC1:
     case PixelFormat_DXT1:        return PixelFormat_RGB8;
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:

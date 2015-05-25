@@ -539,6 +539,7 @@ class EffectLoader
         {"d24s8",           low_level::PixelFormat_D24S8},
         {"d32",             low_level::PixelFormat_D32},
         {"s8",              low_level::PixelFormat_S8},
+        {"etc1",            low_level::PixelFormat_ETC1},
       };
 
       static const unsigned int values_count = sizeof (values) / sizeof (*values);

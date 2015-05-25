@@ -39,6 +39,7 @@ render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
   else if (!strcmp (name, "dxt1"))        return render::low_level::PixelFormat_DXT1;
   else if (!strcmp (name, "dxt3"))        return render::low_level::PixelFormat_DXT3;
   else if (!strcmp (name, "dxt5"))        return render::low_level::PixelFormat_DXT5;
+  else if (!strcmp (name, "etc1"))        return render::low_level::PixelFormat_ETC1;
 
   throw xtl::format_not_supported_exception ("render::manager::get_pixel_format", "Unsupported compression format '%s'", name);
 }
@@ -355,6 +356,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::manage
       case render::low_level::PixelFormat_RGB_PVRTC4:                      format = PixelFormat_RGB_PVRTC4; break;
       case render::low_level::PixelFormat_RGBA_PVRTC2:                     format = PixelFormat_RGBA_PVRTC2; break;
       case render::low_level::PixelFormat_RGBA_PVRTC4:                     format = PixelFormat_RGBA_PVRTC4; break;
+      case render::low_level::PixelFormat_ETC1:                            format = PixelFormat_ETC1; break;
       default:
         throw xtl::format_operation_exception ("", "Wrong compressed image pixel format %s", get_name (target_format));
     }    

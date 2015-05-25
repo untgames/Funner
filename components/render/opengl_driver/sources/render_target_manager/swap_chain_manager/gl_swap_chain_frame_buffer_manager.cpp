@@ -186,6 +186,7 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+    case PixelFormat_ETC1:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create render-target texture with format=%s", get_name (desc.format));
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);

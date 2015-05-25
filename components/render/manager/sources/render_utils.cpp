@@ -36,6 +36,7 @@ const char* get_name (PixelFormat format)
     case PixelFormat_D24S8:       return "d24s8";
     case PixelFormat_D32:         return "d32";
     case PixelFormat_S8:          return "s8";    
+    case PixelFormat_ETC1:        return "etc1";
     default:
       throw xtl::make_argument_exception ("render::manager::get_name(render::manager::PixelFormat)", "format", format);
   }
