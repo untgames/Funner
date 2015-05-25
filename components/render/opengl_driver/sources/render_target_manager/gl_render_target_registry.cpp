@@ -226,6 +226,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
         case PixelFormat_D24S8:
         case PixelFormat_D32:
         case PixelFormat_S8:
+        case PixelFormat_ETC1:
           throw xtl::format_not_supported_exception ("", "Unsupported render-target view texture format=%s", get_name (desc.format));
         default:
           throw xtl::make_argument_exception ("", "texture_desc.format", desc.format);
@@ -262,6 +263,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
         case PixelFormat_ATC_RGB_AMD:
         case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
         case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+        case PixelFormat_ETC1:
           throw xtl::format_not_supported_exception ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
         case PixelFormat_D16:
         case PixelFormat_D24X8:

@@ -190,6 +190,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_texture_edge_clamp        = ext.Get (SGIS_texture_edge_clamp);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
   has_amd_compressed_atc_texture     = false;
+  has_compressed_etc1_rgb8_texture   = false;
 
   if (has_arb_texture_rectangle)
     glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
@@ -258,12 +259,13 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 #else
   ExtensionSet ext = available_extension_set;
 
-  static Extension OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
-                   EXT_texture_compression_s3tc   = "GL_EXT_texture_compression_s3tc",
-                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
-                   IMG_texture_compression_pvrtc  = "GL_IMG_texture_compression_pvrtc",
-                   AMD_compressed_ATC_texture     = "GL_AMD_compressed_ATC_texture",
-                   ATI_texture_compression_atitc  = "GL_ATI_texture_compression_atitc";
+  static Extension OES_packed_depth_stencil         = "GL_OES_packed_depth_stencil",
+                   EXT_texture_compression_s3tc     = "GL_EXT_texture_compression_s3tc",
+                   EXT_texture_filter_anisotropic   = "GL_EXT_texture_filter_anisotropic",
+                   IMG_texture_compression_pvrtc    = "GL_IMG_texture_compression_pvrtc",
+                   AMD_compressed_ATC_texture       = "GL_AMD_compressed_ATC_texture",
+                   ATI_texture_compression_atitc    = "GL_ATI_texture_compression_atitc",
+                   OES_compressed_ETC1_RGB8_texture = "GL_OES_compressed_ETC1_RGB8_texture";
 
   has_arb_multitexture               = true;
   has_arb_vertex_buffer_object       = true;
@@ -272,6 +274,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);
+  has_compressed_etc1_rgb8_texture   = ext.Get (OES_compressed_ETC1_RGB8_texture);
 
 #ifdef OPENGL_ES_SUPPORT
   static Extension OES_blend_equation_separate = "GL_OES_blend_equation_separate",

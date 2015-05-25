@@ -47,6 +47,8 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC textures not supported");
+    case PixelFormat_ETC1:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "ETC1 textures not supported");
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -82,6 +84,8 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC textures not supported");
+    case PixelFormat_ETC1:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "ETC1 textures not supported");
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -116,6 +120,8 @@ GLenum get_gl_type (PixelFormat format)
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC textures not supported");
+    case PixelFormat_ETC1:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "ETC1 textures not supported");
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -181,6 +187,7 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_D24S8:                           return GL_DEPTH_STENCIL_OES;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported.");
+    case PixelFormat_ETC1:                            return GL_ETC1_RGB8_OES;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -214,6 +221,7 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_RGBA_PVRTC4: return 0;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported");
+    case PixelFormat_ETC1:        return GL_ETC1_RGB8_OES;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -271,7 +279,8 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_ATC_RGB_AMD:                      return PixelFormat_ATC_RGB_AMD;
     case GL_ATC_RGBA_EXPLICIT_ALPHA_AMD:      return PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD;
     case GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD:  return PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
-   default:
+    case GL_ETC1_RGB8_OES:                    return PixelFormat_ETC1;
+    default:
       throw xtl::format_not_supported_exception ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
   }
 }

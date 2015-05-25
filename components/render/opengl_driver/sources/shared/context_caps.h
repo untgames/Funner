@@ -65,6 +65,7 @@ struct ContextCaps
   bool has_sgis_generate_mipmap;           //GL_SGIS_generate_mipmap
   bool has_sgis_texture_edge_clamp;        //GL_SGIS_texture_edge_clamp
   bool has_sgis_texture_lod;               //GL_SGIS_texture_lod
+  bool has_compressed_etc1_rgb8_texture;   //GL_OES_compressed_ETC1_RGB8_texture
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Максимальные возможности аппаратуры

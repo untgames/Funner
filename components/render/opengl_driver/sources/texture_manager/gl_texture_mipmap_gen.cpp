@@ -194,6 +194,7 @@ void scale_image_2x_down (PixelFormat format, unsigned int width, unsigned int h
     case PixelFormat_ATC_RGB_AMD:
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+    case PixelFormat_ETC1:
     default:
       throw xtl::format_not_supported_exception ("render::low_level::opengl::scale_image_2x_down", "Compressed image scaling not supported (format=%s)", get_name (format));
   }

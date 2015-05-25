@@ -104,6 +104,13 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
           supports_compressed = true;
 
           break;
+        case PixelFormat_ETC1:
+          if (!GetCaps ().has_compressed_etc1_rgb8_texture)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC texture compression not supported");
+
+          supports_compressed = true;
+
+          break;
         default:
           throw xtl::format_operation_exception (METHOD_NAME, "Unknown compressed texture format %d", tex_desc.format);
       }
