@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#include <xtl/custom_cast_builtin.h>
+
 struct A: public dynamic_cast_root
 {
   virtual const char* name () const { return "class A"; }
