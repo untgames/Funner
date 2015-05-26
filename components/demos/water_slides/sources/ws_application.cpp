@@ -312,7 +312,7 @@ struct MyApplication::Impl
         clear_color.blue  = 0.7f;
         clear_color.alpha = 0;
 
-        size_t rt_index = 0;
+        unsigned int rt_index = 0;
 
         device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 1.0f, 0);                
 
@@ -341,8 +341,8 @@ struct MyApplication::Impl
       {
         syslib::Rect client_rect = window.ClientRect ();
 
-        int cursor_x = (context.cursor_position.x - client_rect.left) * current_view->Width () / (client_rect.right - client_rect.left),
-            cursor_y = (context.cursor_position.y - client_rect.top) * current_view->Height () / (client_rect.bottom - client_rect.top);
+        int cursor_x = int((context.cursor_position.x - client_rect.left) * current_view->Width () / (client_rect.right - client_rect.left)),
+            cursor_y = int((context.cursor_position.y - client_rect.top) * current_view->Height () / (client_rect.bottom - client_rect.top));
 
         current_view->OnMouse (event, cursor_x, cursor_y);
 
