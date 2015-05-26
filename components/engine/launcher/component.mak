@@ -47,10 +47,12 @@ ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 i
 ifneq (,$(filter android,$(PROFILES)))
 ENGINE.LAUNCHER.SOURCES.NAME                    := funner
 ENGINE.LAUNCHER.SOURCES.TYPE                    := dynamic-lib
-else
-ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
-ENGINE.LAUNCHER.SOURCES.TYPE                    := application
 endif
+ifneq (,$(filter iphone,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.TYPE                    := ignore
+endif
+ENGINE.LAUNCHER.SOURCES.NAME                    ?= launcher
+ENGINE.LAUNCHER.SOURCES.TYPE                    ?= application
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
 ENGINE.LAUNCHER.SOURCES.LINK_INCLUDES           :=
