@@ -670,10 +670,12 @@ endef
 
 #Проверка группы тестов (исходный каталог, каталог с результатами, имена файлов)
 define check_all_tests_in_dir
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$(patsubst $(ROOT)/%,%,$1)']";) \
+$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/;) \
+$(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 export ERROR=0; \
 $(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); if [ $$? -ne 0 ]; then ERROR=$$?; fi); \
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$(patsubst $(ROOT)/%,%,$1)']")
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']")
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
