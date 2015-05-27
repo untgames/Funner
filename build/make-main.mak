@@ -673,9 +673,10 @@ define check_all_tests_in_dir
 $(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/;) \
 $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
-export ERROR=0; \
-$(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); if [ $$? -ne 0 ]; then ERROR=$$?; fi); \
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']")
+ERROR=0 && \
+$(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']"); \
+exit $$ERROR
 endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
@@ -709,18 +710,22 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
-		@echo "##teamcity[testSuiteStarted name='$$($2.SOURCE_DIR:$(ROOT)/%=%)']"
-		@echo "##teamcity[testStarted name='$$(notdir $$<)' captureStandardOutput='true']"
+		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteStarted name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
+		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$$(notdir $$@)' captureStandardOutput='true']")
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > "$(CURDIR)/$$@"
-		@echo "##teamcity[testFinished name='$$(notdir $$<)']"
-		@echo "##teamcity[testSuiteFinished name='$$($2.SOURCE_DIR:$(ROOT)/%=%)']"
+		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
+		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
   
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
+		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteStarted name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
+		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$$(notdir $$@)' captureStandardOutput='true']")
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $(CURDIR)/$$@
+		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
+		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 
 #Правило запуска тестов
   $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))      
@@ -728,7 +733,7 @@ define process_tests_source_dir
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results for '$$($2.SOURCE_DIR:$(ROOT)/%=%)'...
-		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$(patsubst %,$(ROOT)/%,$$^))))
+		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(patsubst ./%,%,$$(files:%=$$($2.TMP_DIR)/%.result)),$$(patsubst ./%,%,$$^))))
 
 endef
 
