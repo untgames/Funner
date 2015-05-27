@@ -659,6 +659,23 @@ define process_tests_source_dir_run_test
 
 endef
 
+#Проверка одного теста (имя директории ожидаемого результата, имя директории полученного результата, имя файла результата)
+define check_test
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$3' captureStandardOutput='true']";) \
+diff --strip-trailing-cr --context=1 $1/$3 $2/$3; \
+RET=$$?; \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
+exit $$RET
+endef
+
+#Проверка группы тестов (исходный каталог, каталог с результатами, имена файлов)
+define check_all_tests_in_dir
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$(patsubst $(ROOT)/%,%,$1)']";) \
+export ERROR=0; \
+$(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); if [ $$? -ne 0 ]; then ERROR=$$?; fi); \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$(patsubst $(ROOT)/%,%,$1)']")
+endef
+
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
   ifeq (,$$($1.TARGET_DIR))
@@ -690,7 +707,11 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
+		@echo "##teamcity[testSuiteStarted name='$$($2.SOURCE_DIR:$(ROOT)/%=%)']"
+		@echo "##teamcity[testStarted name='$$(notdir $$<)' captureStandardOutput='true']"
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > "$(CURDIR)/$$@"
+		@echo "##teamcity[testFinished name='$$(notdir $$<)']"
+		@echo "##teamcity[testSuiteFinished name='$$($2.SOURCE_DIR:$(ROOT)/%=%)']"
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
@@ -704,8 +725,9 @@ define process_tests_source_dir
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
-		@echo Checking results of module '$2'...
-		@$$(call for_each_file,file,$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$^)),diff --strip-trailing-cr --context=1 $$($2.SOURCE_DIR)/$$$$file $$($2.TMP_DIR)/$$$$file)
+		@echo Checking results for '$$($2.SOURCE_DIR:$(ROOT)/%=%)'...
+		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(files:%=$$($2.TMP_DIR)/%.result),$$(patsubst %,$(ROOT)/%,$$^))))
+
 endef
 
 #Обработка цели test-suite (имя цели)
