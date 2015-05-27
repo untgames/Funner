@@ -9,7 +9,7 @@ EXE_SUFFIX    :=
 DLL_SUFFIX    := .so
 DLL_PREFIX    := lib
 DLL_PATH      := LD_LIBRARY_PATH
-COMMON_CFLAGS += -DLINUX
+COMMON_CFLAGS += -DLINUX -fPIC
 LIB_GCC       := ar
 
 PROFILES += linux unistd x11 glx haswchar pthread_static_library has_windows x86-64 g++x86-64
