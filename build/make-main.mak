@@ -1136,7 +1136,7 @@ check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist build-deps
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export dist build-deps
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -1194,9 +1194,9 @@ $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
 endif
 
 #Создание архива с дистрибутивом
-tar-dist: dist
-	@echo Create $(basename $(DIST_DIR)).tar...
-	@tar -cf $(basename $(DIST_DIR)).tar $(DIST_DIR)
+dist: export
+	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
+	@cd $(EXPORT_DIR)/.. && tar -czf $(basename $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
 
 #Обновление лицензии разработчика
 .PHONY: update-developer-license remove-developer-license
