@@ -489,7 +489,7 @@ run: build
 check: build
 force:
 
-.PHONY: build rebuild clean fullyclean run check help force dump info
+.PHONY: build rebuild clean fullyclean run check help force dump info export
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -512,3 +512,6 @@ fullyclean: clean
 
 install:
 	@echo Installation not supported...
+
+export:
+	@echo Export is skipped by now...
