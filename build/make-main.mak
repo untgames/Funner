@@ -675,7 +675,7 @@ $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 ERROR=0 && \
 $(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']"); \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 exit $$ERROR
 endef
 
