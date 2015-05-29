@@ -88,7 +88,7 @@ struct PrimarySwapChain::Impl
 ///Получение устройства вывода с максимальным размером области перекрытия
   IOutput* GetContainingOutput ()
   {
-    return adapter->GetOutput (window).get ();
+    return adapter->GetOutputForWindow (window).get ();
   }
   
   void SetFullscreenState (bool state)
@@ -98,7 +98,7 @@ struct PrimarySwapChain::Impl
     if (GetFullscreenState () == state)
       return;
       
-    OutputPtr output = adapter->GetOutput (window);
+    OutputPtr output = adapter->GetOutputForWindow (window);
     
     if (!output)
       return;
@@ -133,7 +133,7 @@ struct PrimarySwapChain::Impl
   {
     static const char* METHOD_NAME = "render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState";
     
-    OutputPtr output = adapter->GetOutput (window);
+    OutputPtr output = adapter->GetOutputForWindow (window);
 
     if (!output)
       return false;
