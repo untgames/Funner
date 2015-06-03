@@ -1205,7 +1205,7 @@ endif
 #Создание архива с дистрибутивом
 dist: export
 	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
-	cd $(EXPORT_DIR)/.. && tar -czf $(basename $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
+	cd $(EXPORT_DIR)/.. && tar -czf $(notdir $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
 
 #Обновление лицензии разработчика
 .PHONY: update-developer-license remove-developer-license
