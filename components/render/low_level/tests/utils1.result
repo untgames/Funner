@@ -19,3 +19,4 @@ Results of utils1_test:
 104@PixelFormat_D24S8: size=256 uncompressed_size=256
 104@PixelFormat_D32: size=256 uncompressed_size=256
 104@PixelFormat_S8: size=64 uncompressed_size=64
+104@PixelFormat_ETC1: size=32 uncompressed_size=192

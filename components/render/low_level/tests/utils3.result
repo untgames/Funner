@@ -19,3 +19,4 @@ get_uncompressed_format(PixelFormat_D24X8)=PixelFormat_D24X8
 get_uncompressed_format(PixelFormat_D24S8)=PixelFormat_D24S8
 get_uncompressed_format(PixelFormat_D32)=PixelFormat_D32
 get_uncompressed_format(PixelFormat_S8)=PixelFormat_S8
+get_uncompressed_format(PixelFormat_ETC1)=PixelFormat_RGB8

@@ -675,8 +675,8 @@ $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 ERROR=0 && \
 $(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
-$(if $(TEAMCITY_PROJECT_NAME),$(call for_each_file,file,$4,echo "##teamcity[testIgnored name='$$file' message='']")); \
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']"); \
+$(if $(TEAMCITY_PROJECT_NAME),$(call for_each_file,file,$4,echo "##teamcity[testIgnored name='$$file' message='']");) \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 exit $$ERROR
 endef
 
@@ -1205,7 +1205,7 @@ endif
 #Создание архива с дистрибутивом
 dist: export
 	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
-	@cd $(EXPORT_DIR)/.. && tar -czf $(basename $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
+	cd $(EXPORT_DIR)/.. && tar -czf $(basename $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
 
 #Обновление лицензии разработчика
 .PHONY: update-developer-license remove-developer-license
