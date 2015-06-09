@@ -36,6 +36,17 @@ void thread_done (void*)
   pthread_win32_thread_detach_np ();
 }
 
+#elif defined (ANDROID)
+
+void thread_init ()
+{
+}
+
+void thread_done (void*)
+{
+  syslib::android::get_vm ()->DetachCurrentThread ();
+}
+
 #endif
 
 }

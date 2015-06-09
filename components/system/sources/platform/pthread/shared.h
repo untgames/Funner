@@ -21,6 +21,8 @@
 
 #include <syslib/thread.h>
 
+#include <syslib/platform/android.h>
+
 #include <shared/platform.h>
 
 namespace syslib
@@ -34,7 +36,7 @@ struct mutex_handle
 //генерация исключения с кодом ошибки
 void pthread_raise_error (const char* source, int status);
 
-#ifdef _WIN32
+#if defined (_WIN32) || defined (ANDROID)
 
 void thread_init ();      //функция инициализации библиотеки
 void thread_done (void*); //функция деинициализации библиотеки
