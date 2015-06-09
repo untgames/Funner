@@ -1145,7 +1145,7 @@ check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export dist build-deps
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export dist upload-dist build-deps
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -1205,7 +1205,13 @@ endif
 #Создание архива с дистрибутивом
 dist: export
 	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
-	cd $(EXPORT_DIR)/.. && tar -czf $(notdir $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
+	@cd $(EXPORT_DIR)/.. && tar -czf $(notdir $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
+
+upload-dist: dist
+	@echo Uploading $(if $(DIST_UPLOAD_PACKAGE_NAME),$(DIST_UPLOAD_PACKAGE_NAME).tar.gz,$(basename $(EXPORT_DIR)).tar.gz)...
+	@$(if $(DIST_UPLOAD_PASSWORD),,echo DIST_UPLOAD_PASSWORD environment variable is not found && exit 1)
+	@$(if $(DIST_UPLOAD_LOCATION),,echo DIST_UPLOAD_LOCATION environment variable is not found && exit 1)
+	@$(call ssh_copy,$(EXPORT_DIR)/../$(notdir $(EXPORT_DIR)).tar.gz,$(subst :/,://,$(DIST_UPLOAD_LOCATION))$(if $(DIST_UPLOAD_PACKAGE_NAME),/$(DIST_UPLOAD_PACKAGE_NAME).tar.gz),$(DIST_UPLOAD_PASSWORD))
 
 #Обновление лицензии разработчика
 .PHONY: update-developer-license remove-developer-license
