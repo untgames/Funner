@@ -481,7 +481,7 @@ const char* AdapterLibrary::GetExtensionsString (Display *dpy, int screen)
     Получение адреса точки входа
 */
 
-void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
+void* AdapterLibrary::GetProcAddress (const char* name, unsigned int search_flags)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::glx::AdapterLibrary::GetProcAddress";
 
@@ -493,7 +493,7 @@ void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
   }
 
-  const void* address = 0;
+  void* address = 0;
 
   if (!address && (search_flags & EntrySearch_Context))
     address = (void*)impl->fglXGetProcAddress (name);
@@ -502,7 +502,7 @@ void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
     return address;
     
   if (search_flags & EntrySearch_Library)
-    address = impl->dll->GetSymbol (name);
+    address = (void*)impl->dll->GetSymbol (name);
 
   if (address)
     return address;

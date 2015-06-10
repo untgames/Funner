@@ -668,14 +668,15 @@ $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
 exit $$RET
 endef
 
-#Проверка группы тестов (исходный каталог, каталог с результатами, имена файлов)
+#Проверка группы тестов (исходный каталог, каталог с результатами, имена файлов, имена игнорируемых файлов)
 define check_all_tests_in_dir
 $(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/;) \
 $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 ERROR=0 && \
 $(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
-$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']"); \
+$(if $(TEAMCITY_PROJECT_NAME),$(call for_each_file,file,$4,echo "##teamcity[testIgnored name='$$file' message='']");) \
+$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 exit $$ERROR
 endef
 
@@ -694,10 +695,19 @@ define process_tests_source_dir
   $2.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
   $2.RUN_FILES          := $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$($2.TEST_EXE_FILES))
 
+ifneq (,$(TEAMCITY_PROJECT_NAME))
+  IGNORED_TESTS :=
+
+  -include $$($2.SOURCE_DIR)/teamcity.mak
+
+  $2.TEAMCITY_IGNORED_TESTS := $$(addsuffix .result,$$(basename $$(IGNORED_TESTS:%=$$($2.TMP_DIR)/%)))
+  $2.TEST_RESULT_FILES      := $$(filter-out $$($2.TEAMCITY_IGNORED_TESTS),$$($2.TEST_RESULT_FILES))
+endif
+
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
   check: CHECK_MODULE.$2
-  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2  
+  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
 #Инсталляция
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$($2.TEST_EXE_FILES)
@@ -733,8 +743,7 @@ define process_tests_source_dir
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results for '$$($2.SOURCE_DIR:$(ROOT)/%=%)'...
-		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(patsubst ./%,%,$$(files:%=$$($2.TMP_DIR)/%.result)),$$(patsubst ./%,%,$$^))))
-
+		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(patsubst ./%,%,$$(files:%=$$($2.TMP_DIR)/%.result)),$$(patsubst ./%,%,$$^))),$$(notdir $$($2.TEAMCITY_IGNORED_TESTS)))
 endef
 
 #Обработка цели test-suite (имя цели)
@@ -1136,7 +1145,7 @@ check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist build-deps
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export dist upload-dist build-deps
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -1194,9 +1203,15 @@ $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
 endif
 
 #Создание архива с дистрибутивом
-tar-dist: dist
-	@echo Create $(basename $(DIST_DIR)).tar...
-	@tar -cf $(basename $(DIST_DIR)).tar $(DIST_DIR)
+dist: export
+	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
+	@cd $(EXPORT_DIR)/.. && tar -czf $(notdir $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
+
+upload-dist: dist
+	@echo Uploading $(if $(DIST_UPLOAD_PACKAGE_NAME),$(DIST_UPLOAD_PACKAGE_NAME).tar.gz,$(basename $(EXPORT_DIR)).tar.gz)...
+	@$(if $(DIST_UPLOAD_PASSWORD),,echo DIST_UPLOAD_PASSWORD environment variable is not found && exit 1)
+	@$(if $(DIST_UPLOAD_LOCATION),,echo DIST_UPLOAD_LOCATION environment variable is not found && exit 1)
+	@$(call ssh_copy,$(EXPORT_DIR)/../$(notdir $(EXPORT_DIR)).tar.gz,$(subst :/,://,$(DIST_UPLOAD_LOCATION))$(if $(DIST_UPLOAD_PACKAGE_NAME),/$(DIST_UPLOAD_PACKAGE_NAME).tar.gz),$(DIST_UPLOAD_PASSWORD))
 
 #Обновление лицензии разработчика
 .PHONY: update-developer-license remove-developer-license

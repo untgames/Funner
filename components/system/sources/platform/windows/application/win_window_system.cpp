@@ -1048,7 +1048,7 @@ bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
        if (active_wnd == 0)
          return false;
 #else
-        check_errors ("::GetActiveWindow");
+//        check_errors ("::GetActiveWindow");
 #endif
         return active_wnd == wnd;
       }

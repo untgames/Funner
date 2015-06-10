@@ -6,7 +6,7 @@ TARGETS += SDKS.FUNNER.CPP.BUILD
                                        
 SDKS.FUNNER.CPP.TYPE                       := sdk
 SDKS.FUNNER.CPP.NAME                       := funner
-SDKS.FUNNER.CPP.LIB_EXCLUDE_FILTER         := gdi32 ole32 uuid user32 shell32 wsock32 ws2_32 wldap32 openal32
+SDKS.FUNNER.CPP.LIB_EXCLUDE_FILTER         := gdi32 ole32 uuid user32 shell32 wsock32 ws2_32 wldap32 openal32 wtsapi32 advapi32 crypt32 WbemUuid
 SDKS.FUNNER.CPP.macosx.LIB_EXCLUDE_FILTER  := funner.extern.devil funner.extern.ilu pthread ldap ssl crypto
 SDKS.FUNNER.CPP.android.LIB_EXCLUDE_FILTER := EGL GLESv1_CM funner.extern.openal32 dl log
 SDKS.FUNNER.CPP.LIBS                       :=

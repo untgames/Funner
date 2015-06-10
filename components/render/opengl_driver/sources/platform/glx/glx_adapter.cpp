@@ -45,7 +45,6 @@ struct Adapter::Impl
     : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
   {
-	  printf ("H!Y!H!Y!H!Y!HY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     glx_entries.Init (*library);
   }  
 };
@@ -131,7 +130,7 @@ IOutput* Adapter::GetOutput (size_t index)
     Запрос устройства вывода
 */
 
-Output::Pointer Adapter::GetOutput (Window window)
+Output::Pointer Adapter::GetOutputForWindow (Window window)
 {
   return impl->output_manager.FindContainingOutput (window);
 }
