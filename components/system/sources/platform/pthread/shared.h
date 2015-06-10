@@ -21,7 +21,9 @@
 
 #include <syslib/thread.h>
 
+#ifdef ANDROID
 #include <syslib/platform/android.h>
+#endif
 
 #include <shared/platform.h>
 
