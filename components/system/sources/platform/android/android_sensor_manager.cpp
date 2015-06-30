@@ -6,6 +6,13 @@ using namespace syslib::android;
 namespace syslib
 {
 
+struct sensor_handle;
+
+}
+
+namespace syslib
+{
+
 /// ƒескриптор сенсора
 struct sensor_handle
 {
@@ -13,43 +20,10 @@ struct sensor_handle
   global_ref<jobject>   event_listener;
   ISensorEventListener* app_listener;
   jmethodID             reset_reference_method;
-  
-  sensor_handle (const global_ref<jobject>& in_sensor) : sensor (in_sensor), app_listener ()
-  {
-    try
-    {
-        //получение методов создани€ и удалени€ слушател€
+  float                 value_multiplier;
 
-      jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(JLandroid/content/Context;)V");
-
-      reset_reference_method = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
-
-        //создание слушател€
-
-      event_listener = local_ref<jobject> (get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ()), false);
-
-      if (!event_listener)
-        throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");      
-    }    
-    catch (xtl::exception& e)
-    {
-      e.touch ("syslib::android::sensor_handle::sensor_handle");
-      throw;
-    }
-  }
-    
-  ~sensor_handle ()
-  {
-    try
-    {
-        //сброс ссылки
-
-      get_env ().CallVoidMethod (event_listener.get (), reset_reference_method);
-    }
-    catch (...)
-    {
-    }
-  }  
+  sensor_handle (const global_ref<jobject>& in_sensor);
+  ~sensor_handle ();
 };
 
 }
@@ -227,7 +201,8 @@ class JniSensorManager
         if (!src_buf)
           throw xtl::format_operation_exception ("", "JNIEnv::GetPrimitiveArrayCritical failed");
 
-        memcpy (event.data, src_buf, array_length * sizeof (float));        
+        for (jint i = 0; i < array_length; i++)
+          event.data [i] = src_buf [i] * handle.value_multiplier;
         
         if (array_length == 3)
         {
@@ -394,6 +369,52 @@ void JNICALL on_sensor_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint a
 }
 
 }
+
+sensor_handle::sensor_handle (const global_ref<jobject>& in_sensor)
+  : sensor (in_sensor)
+  , app_listener ()
+  , value_multiplier (1.f)
+{
+  try
+  {
+    int type = JniSensorManagerSingleton::Instance ()->SensorType (sensor);
+
+    if (type == SENSOR_TYPE_ACCELEROMETER)
+      value_multiplier = 1.f / 9.8f;
+
+      //получение методов создани€ и удалени€ слушател€
+
+    jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(JLandroid/content/Context;)V");
+
+    reset_reference_method = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
+
+      //создание слушател€
+
+    event_listener = local_ref<jobject> (get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ()), false);
+
+    if (!event_listener)
+      throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::sensor_handle::sensor_handle");
+    throw;
+  }
+}
+
+sensor_handle::~sensor_handle ()
+{
+  try
+  {
+      //сброс ссылки
+
+    get_env ().CallVoidMethod (event_listener.get (), reset_reference_method);
+  }
+  catch (...)
+  {
+  }
+}
+
 
 /*
      оличество сенсоров
