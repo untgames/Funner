@@ -1,42 +1,42 @@
 ###################################################################################################
-#Цель сборки "по умолчанию"
+#Default build target
 ###################################################################################################
 default: build
 
 .PHONY: default
 
 ###################################################################################################
-#Константы сборки
+#Build constants
 ###################################################################################################
-COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak #Базовое имя файла конфигурации компонента
-EXPORT_FILE_SHORT_NAME                  ?= export.mak    #Базовое имя файла экспорта
-PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak    #Базовое имя файла конфигурации обработки директории
-TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами
-DEFAULT_INSTALLATION_FILES              ?= data/* *.sh   #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
-DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
-PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
-DEVELOPER_LICENSE                       ?= $(ROOT)/license/funner-developer.xml #Имя лицензии разработчика
-SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
-TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с конфигурациями toolset-ов
-DOXYGEN_TEMPLATE_DIR_SHORT_NAME         := doxygen       #Базовое имя каталога с шаблонами doxygen
-DOXYGEN_DEFAULT_TOPIC_SHORT_NAME        := default_topic.html #Базовое имя страницы по умолчанию doxygen
-DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME    := template.cfg  #Имя шаблонного файла с конфигурацией doxygen
-DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS #Имя каталога с тэгами документации
-EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
-BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-PACKAGE_COMMANDS                        := build clean test check run install export info #Команды, делегируемые компонентам пакета
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk ignore #Допустимые типы целей
-COMPILE_TOOL                            := tools.c++compile     #Имя макроса утилиты компиляции C++ файлов
-LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
-LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
-INSTALL_TOOL                            := tools.install        #Имя макроса утилиты установки файлов на устройство
-RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
-DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
+COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak                                                                 #Component configuration file base name
+EXPORT_FILE_SHORT_NAME                  ?= export.mak                                                                    #Export file base name
+PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak                                                                    #Directory processing configuration file base name
+TMP_DIR_SHORT_NAME                      ?= tmp                                                                           #Temporary files directory base name
+DEFAULT_INSTALLATION_FILES              ?= data/* *.sh                                                                   #List of files, folders and wildcards installed by default
+DIST_DIR_SHORT_NAME                     ?= dist                                                                          #Build results directory base name
+PCH_SHORT_NAME                          ?= pch.h                                                                         #PCH file base name
+DEVELOPER_LICENSE                       ?= $(ROOT)/license/funner-developer.xml                                          #Developer's license name
+SOURCE_FILES_SUFFIXES                   := c cpp                                                                         #Source files extensions
+TOOLSETS_DIR_SHORT_NAME                 := toolsets                                                                      #Toolsets configurations directory base name
+DOXYGEN_TEMPLATE_DIR_SHORT_NAME         := doxygen                                                                       #Doxygen templates directory base name
+DOXYGEN_DEFAULT_TOPIC_SHORT_NAME        := default_topic.html                                                            #Doxygen default page base name
+DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME    := template.cfg                                                                  #Doxygen template configuration file name
+DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS                                                                 #Documentation tags directory name
+EXPORT_VAR_PREFIX                       := export                                                                        #Prefix of variable for component's settings export
+BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag                                                                    #Batch compile flag file base name
+PACKAGE_COMMANDS                        := build clean test check run install export info                                #Commands which can be delegated to package components
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk ignore #Allowed target types
+COMPILE_TOOL                            := tools.c++compile                                                              #C++ files compilation utility macros name
+LINK_TOOL                               := tools.link                                                                    #Link utility macros name
+LIB_TOOL                                := tools.lib                                                                     #Object files archive utility macros name
+INSTALL_TOOL                            := tools.install                                                                 #Install to device utility macros name
+RUN_TOOL                                := tools.run                                                                     #Application launch utility macros name
+DLL_PATH                                := PATH                                                                          #Environment variable for dll files path name
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
-INSTALLATION_FLAG_SUFFIX                := .installation-flag #Суффикс флага инсталляции
+INSTALLATION_FLAG_SUFFIX                := .installation-flag                                                            #Installation file flag suffix
 
 ###################################################################################################
-#Подключение настроек пользователя
+#Include user settings
 ###################################################################################################
 BUILD_DIR  := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 USER       ?= $(USERNAME)
@@ -44,7 +44,7 @@ USER       ?= $(USERNAME)
 -include $(ROOT)/$(USER).settings.mak
 
 ###################################################################################################
-#Производные пути и переменные
+#Derived paths and variables
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := $(strip $(COMPONENT_CONFIGURATION_FILE_SHORT_NAME))
 EXPORT_FILE_SHORT_NAME                  := $(strip $(EXPORT_FILE_SHORT_NAME))
@@ -99,35 +99,35 @@ INSTALLATION_FILES                      :=
 INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/.installation-flag
 
 ###################################################################################################
-#Если не указан фильтры - обрабатываем все доступные
+#Process all available if no filters specified
 ###################################################################################################
 files ?= %
 targets ?= %
 
 ###################################################################################################
-#Преобразование Windows-путей
+#Process Windows-paths
 ###################################################################################################
 define convert_path
 $(subst ; ,;,$(subst \,/,$1))
 endef
 
 ###################################################################################################
-#Перебор списка файлов (имя переменной с именем файла, список файлов, действие)
+#Process files list (var name with file name, files list, handler)
 ###################################################################################################
 define for_each_file
 $(if $2,for $1 in $2; do $3; if [ "$$?" -ne "0" ]; then exit 1; fi; done,true)
 endef
 
 ###################################################################################################
-#Рекурсивная обработка дерева файлов
+#Recursive processing files tree
 ###################################################################################################
 
-#Обработка вложенных директорий (пользовательский параметр, имя исходной директории, имя результирующей директории, макрос с целью для каждого каталога)
+#Process sub directories (user param, source dir name, target dir name, target macros for each directory)
 define process_subdir
   $$(eval $$(call process_files,$1,$2,*,$3,$4))
 endef
 
-#Обработка файла(ов) (пользовательский параметр, имя модуля, имя исходной директории, имя/маска файлов, имя результирующей директории, макрос с целью для каждого каталога)
+#Process file(s) (user param, module name, source dir, file name/wildcard, target dir, target macros for each directory)
 define process_files_impl
   $2.CONFIG_FILE := $3/$(PROCESS_DIR_CONFIG_FILE_SHORT_NAME)
   
@@ -136,7 +136,7 @@ define process_files_impl
   -include $$($2.CONFIG_FILE)  
 
   ifneq (,$$(filter %*,$4))
-    #Обработка файловых масок
+    #Process files wildcards
 
     $2.SOURCE_INSTALLATION_DIRS := $$(patsubst %/,%,$$(filter %/,$$(wildcard $3$4/)))
 
@@ -148,12 +148,12 @@ define process_files_impl
   else
 #    ifneq (,$$(filter $3$4/,$$(wildcard $3$4/)))
     ifneq (,$$(wildcard $3$4/*))
-      #Обработка директорий
+      #Process directories
       $2.SOURCE_INSTALLATION_DIRS  := $3$4
       $2.SOURCE_INSTALLATION_FILES :=
     else
       $2.SOURCE_INSTALLATION_DIRS :=
-      #Обработка файлов
+      #Process files
       ifeq (,$$(FILE_LIST))
         $2.SOURCE_INSTALLATION_FILES := $3$4
       else
@@ -162,16 +162,16 @@ define process_files_impl
     endif
   endif      
 
-#Обработка вложений
+#Process includes
   $$(foreach dir,$$($2.SOURCE_INSTALLATION_DIRS),$$(eval $$(call process_subdir,$1,$$(dir),$5/$$(dir:$3%=%),$6)))
   
-  #Генерация правил сборки в текущей директории
+  #Making build rules in current directory
   ifneq (,$$($2.SOURCE_INSTALLATION_FILES))
     $$(eval $$(call $6,$1,$$($2.SOURCE_INSTALLATION_FILES),$5))
   endif
 endef
 
-#Обработка файла(ов) (пользовательский параметр, имя исходной директории, имя/маска файлов, имя результирующей директории, макрос с целью для каждого каталога)
+#Process file(s) (user param, source dir, file name/wildcard, target dir, target macros for each directory)
 define process_files
 
 ifneq (,$5)
@@ -183,10 +183,10 @@ endif
 endef
 
 ###################################################################################################
-#Копирование файлов
+#Copying files
 ###################################################################################################
 
-#Копирование файла (исходный файл, целевой файл)
+#Copy file (source file, target file)
 define copy_file
   ifeq (,$$(filter $2,$$(FILES_FOR_COPY)))
 
@@ -197,7 +197,7 @@ define copy_file
   endif
 endef
 
-#Копирование файлов между папками (имя цели, список файлов, целевой каталог)
+#Copy files between directories (target name, files list, target dir)
 define copy_files
   $1.COPY_FILES := $$(addprefix $3/,$$(notdir $2))
 
@@ -208,7 +208,7 @@ define copy_files
   $$(foreach file,$2,$$(eval $$(call copy_file,$$(file),$3/$$(notdir $$(file)))))
 endef
 
-#Обработчик копирования файлов (имя файла, результирующий каталог, имя цели)
+#Copy files handler (file name, target dir, target name)
 define process_copy_files
   ifneq (,$$(filter %/,$$(wildcard $1/)))
     $$(eval $$(call process_files,$3,$1,*,$2,copy_files))
@@ -224,28 +224,28 @@ define process_copy_files
 endef
 
 ###################################################################################################
-#Выполнение удаленной команды / копирование файла
+#Execute remote command / files copying
 ###################################################################################################
 ifneq (,$(filter Win%,$(OS)))
 
-#Выполнение удаленной команды (команда, хост@пользователь, пароль, порт, ключ)
+#Execute remote command (command, host@user, password, port, key)
 define ssh_run
 plink $(if $4,-P $4) $2 $(if $3,-pw $3,-pw "") $(if $5,-i $5) $1
 endef
 
-#Копирование файла на удаленную машину (источник, приёмник, пароль, порт, ключ)
+#Copy files to remote host (source, target, password, port, key)
 define ssh_copy
 pscp -r -scp -batch $(if $4,-P $4) $(if $3,-pw $3,-pw "") $(if $5,-i $5) $1 $2
 endef
 
 else
 
-#Выполнение удаленной команды (команда, хост@пользователь, пароль, порт, ключ)
+#Execute remote command (command, host@user, password, port, key)
 define ssh_run
 sshpass -p $3 ssh $(if $4,-P $4) $(if $5,-i $5) $2 $1
 endef
 
-#Копирование файла на удаленную машину (источник, приёмник, пароль, порт, ключ)
+#Copy files to remote host (source, target, password, port, key)
 define ssh_copy
 sshpass -p $3 scp -r $(if $4,-P $4) $(if $5,-i $5) $1 $2
 endef
@@ -253,7 +253,7 @@ endef
 endif
 
 ###################################################################################################
-#Подключение файла конфигурации утилит сборки
+#Include configuration file with build utilities
 ###################################################################################################
 ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
   $(error Unknown toolset '$(CURRENT_TOOLSET)'. Use one of available toolsets '$(TOOLSETS)')
@@ -264,13 +264,13 @@ include $(TOOLSET_FILE)
 PROFILES := $(sort $(PROFILES))
 
 ###################################################################################################
-#Константы, зависящие от утилит сборки
+#Constants depending from build utilities
 ###################################################################################################
 DOXYGEN_TAGS_DIR := $(strip $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$(DOXYGEN_TAGS_DIR_SHORT_NAME))
 TMP_DIRS         += $(DOXYGEN_TAGS_DIR)
 
 ###################################################################################################
-#Проверка наличия констант
+#Check constants setted up
 ###################################################################################################
 define check_toolset_constant
   $(if $(filter $1, $(.VARIABLES)),,$(warning Build variable '$1' not defined (check file '$(TOOLSET_FILE)')))
@@ -283,7 +283,7 @@ $(call check_toolset_constant,EXE_SUFFIX)
 $(call check_toolset_constant,DLL_PREFIX)
 
 ###################################################################################################
-#Подключение файлов конфигурации компонента и файлов экспорта
+#Include component configuration and export files
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE := $(firstword $(wildcard $(filter %$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME)))))
 EXPORT_FILES                 := $(wildcard $(filter %$(EXPORT_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(EXPORT_FILE_SHORT_NAME))))
@@ -296,26 +296,26 @@ endif
 include $(COMPONENT_CONFIGURATION_FILE)
 
 ###################################################################################################
-#Загрузка экспортируемых настроек (файл настроек)
+#Load exported settings (settings file)
 ###################################################################################################
 define load_exports
-#Проверка наличия файла
+#Check file existence
 ifeq (,$$(wildcard $1))
   $$(error Export file '$1' not found)
 endif
 
-#Очистка переменных $(EXPORT_VAR_PREFIX).*
+#Variables cleanup $(EXPORT_VAR_PREFIX).*
   OLD_VARIABLES  := $$(filter $(EXPORT_VAR_PREFIX).%,$$(.VARIABLES))
   COMPONENT_DIRS :=
 
-#Подключение файла зависимости
+#Include dependency file
   include $1
 
-#Изменение настроек
+#Change settings
   EXPORT_VARIABLES       := $$(filter-out $$(OLD_VARIABLES),$$(filter $(EXPORT_VAR_PREFIX).%,$$(.VARIABLES)))
   EXPORT_COMPONENT_NAMES := $$(patsubst $(EXPORT_VAR_PREFIX).%,%,$$(foreach var,$$(EXPORT_VARIABLES),$$(var:%.$$(word $$(words $$(subst .,$(SPACE),$$(var))),$$(subst .,$(SPACE),$$(var)))=%)))
 
-# Сохранение путей к компонентам
+#Save pathes to components
   $$(foreach name,$$(EXPORT_COMPONENT_NAMES),$$(eval paths.$$(name) := $$(dir $1)))
 
   $$(foreach dir,$$(COMPONENT_DIRS),$$(eval $$(call load_exports,$$(dir $1)$$(dir)/$(EXPORT_FILE_SHORT_NAME))))
@@ -326,14 +326,14 @@ $(foreach file,$(EXPORT_FILES),$(eval $(call load_exports,$(file))))
 #$(foreach path,$(sort $(filter paths.%,$(.VARIABLES))),$(warning $(path)=$($(path))))
 
 ###################################################################################################
-#Специализация пути
+#Path specialization
 ###################################################################################################
 define specialize_paths
 $(foreach dir,$(strip $1),$(if $(filter /%,$(dir)),$(dir),$(COMPONENT_DIR)$(dir)))
 endef
 
 ###################################################################################################
-#Преобразование путей make к системным путям (имя пути)
+#Transofrm make's pathes to system pathes (path name)
 ###################################################################################################
 ifneq (,$(filter Win%,$(OS)))
 
@@ -350,7 +350,7 @@ endef
 endif
 
 ###################################################################################################
-#Подготовка к запуску приложения (каталог запуска приложения, список каталогов с динамическими библиотеками)
+#Prepare for application launch (launch folder, dlls folder path)
 ###################################################################################################
 define prepare_to_execute
 export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$$PATH))" \
@@ -360,28 +360,28 @@ BIN_DIR=$(DIST_BIN_DIR) \
 endef
 
 ###################################################################################################
-#Получение полного списка файлов каталога
+#Get directory's full files list
 ###################################################################################################
 define get_dir_files
 $(foreach file,$1,$(if $(wildcard $(file)/*),$(call get_dir_files,$(wildcard $(file)/*)),$(file)))
 endef
 
 ###################################################################################################
-#Обработка целей компонента
+#Process component targets
 ###################################################################################################
 
-#Создание зависимости объектного файла от флаг-файла пакетной компиляции (имя исходного файла, временный каталог, флаг-файл)
+#Create dependency of object file from batch compile flag file (source file name, temp directory, flag file)
 define create_object_file_dependency
 $2/$$(notdir $$(basename $1))$(OBJ_SUFFIX): $1 $3
 	@
 endef
 
-#Тестирование времени изменения исходных файлов и соотв. им объектных (список исходных файлов, временный каталог)
+#Check time of change of source files and corresponding object files (source files list, temp directory)
 define test_source_and_object_files
 $(foreach src,$1,if [ $(src) -nt $2/$(notdir $(basename $(src)))$(OBJ_SUFFIX) ]; then echo $(src); fi &&) true 
 endef
 
-#Правила пакетной компиляции (имя цели, имя модуля)
+#Batch compilation rules (target name, module name)
 define batch-compile
   $2.FLAG_FILE        := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
   $1.FLAG_FILES       := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
@@ -401,7 +401,7 @@ define batch-compile
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
-  else  #В случае если сборка была не завершена
+  else  #In case of build was not completed
   
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
@@ -419,7 +419,7 @@ define batch-compile
   $$(foreach source,$$($2.SOURCE_FILES),$$(eval $$(call create_object_file_dependency,$$(source),$$($2.TMP_DIR),$$($2.FLAG_FILE))))
 endef
 
-#Обработка каталога с исходными файлами (имя цели, путь к каталогу с исходными файлами, список применяемых макросов)
+#Process directory with source files (target name, source files directory, list of applied macroses)
 define process_source_dir
   ifeq (,$$(wildcard $2))
     $$(error Source dir '$2' not found at build target '$1' component-dir='$(COMPONENT_DIR)')
@@ -450,7 +450,7 @@ define process_source_dir
   $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)  
   $1.INSTALLATION_FILES      := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $2/$$(file)))  
   
-#Компиляция  
+#Compilation
  
   $$(foreach macros,$(SOURCE_PROCESS_MACROSES),$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))  
 
@@ -465,7 +465,7 @@ define process_source_dir
   $$(foreach macros,$3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))    
 endef
 
-#Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
+#Making dependency for copying remote files (remote file name, search directory)
 define create_extern_file_dependency
   ifeq (,$$(filter $1,$$(EXTERNAL_FILES)))
     DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)))
@@ -486,24 +486,24 @@ define create_extern_file_dependency
   endif  
 endef
 
-#Получение списка файлов с каталогами (список файлов)
+#Get files and folders list (files list)
 define get_file_list_with_dirs
 $(foreach file,$1,$(if $(filter ./,$(dir $(file))),./$(file),$(file)))
 endef
 
-#Получение списка файлов для указанного каталога (список файлов, каталог)
+#Get directory's list of files (files list, directory)
 define select_files_for_dir
 $(foreach file,$(call get_file_list_with_dirs,$1),$(if $(filter $2,$(dir $(file))),$(file) ))
 endef
 
-#Построение команды инсталляции (список файлов)
+#Make installation command (files list)
 define build_installation_command
 $(foreach dir,$(sort $(dir $(call get_file_list_with_dirs,$1))),$(call $(INSTALL_TOOL),$(call select_files_for_dir,$1,$(dir)),$(dir)) && ) true
 endef
 
-#Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
+#Commong for targets with source files (target name, list of macroses for processing source files' directories)
 define process_target_with_sources
-#Исключение библиотек по умолчанию
+#Exclude default libraries
   $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))  
 
   $1.TMP_DIR             := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
@@ -534,7 +534,7 @@ endif
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
   
-#Инсталляция 
+#Installation 
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
   $1.INSTALLATION_FILES := $$(call get_dir_files,$$($1.INSTALLATION_FILES))
   $1.INSTALLATION_FLAG  := $$($1.TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)  
@@ -546,11 +546,11 @@ endif
 		@touch $$@
 endef
 
-#Игнорирование цели
+#Ignore target
 define process_target.ignore
 endef
 
-#Обработка цели static-lib (имя цели)
+#Process target static-lib (target name)
 define process_target.static-lib
   $1.NAME := $$(strip $$($1.NAME))
   
@@ -571,7 +571,7 @@ define process_target.static-lib
 		@$$(call $$(if $$($1.LIB_TOOL),$$($1.LIB_TOOL),$(LIB_TOOL)),$$@,$$($1.OBJECT_FILES))
 endef
 
-#Обработка цели dynamic-lib (имя цели)
+#Process target dynamic-lib (target name)
 define process_target.dynamic-lib
   $1.NAME := $$(strip $$($1.NAME))
   
@@ -604,7 +604,7 @@ define process_target.dynamic-lib
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
 
-#Обработка цели application (имя цели)
+#Process target application (target name)
 define process_target.application
   $1.NAME := $$(strip $$($1.NAME))
   
@@ -652,14 +652,14 @@ endif
   endif
 endef
 
-#Вызов теста (имя цели, имя модуля, имя теста)
+#Call test (target name, module name, test name)
 define process_tests_source_dir_run_test
   TEST_MODULE.$2:: $$($1.DEVELOPER_LICENSE)
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS))
 
 endef
 
-#Проверка одного теста (имя директории ожидаемого результата, имя директории полученного результата, имя файла результата)
+#Check one test (directory name with expected result, directory name with actual result, result file name)
 define check_test
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$3' captureStandardOutput='true']";) \
 diff --strip-trailing-cr --context=1 $1/$3 $2/$3; \
@@ -668,7 +668,7 @@ $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
 exit $$RET
 endef
 
-#Проверка группы тестов (исходный каталог, каталог с результатами, имена файлов, имена игнорируемых файлов)
+#Check group of tests (source dir, results dir, files names, ignored files names)
 define check_all_tests_in_dir
 $(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/;) \
 $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
@@ -680,7 +680,7 @@ $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_
 exit $$ERROR
 endef
 
-#Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
+#Process directory with tests sources (target name, module name)
 define process_tests_source_dir
   ifeq (,$$($1.TARGET_DIR))
     $2.TARGET_DIR := $$($2.TMP_DIR)
@@ -709,15 +709,15 @@ endif
   check: CHECK_MODULE.$2
   .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
-#Инсталляция
+#Installation
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$($2.TEST_EXE_FILES)
   
-#Правило сборки теста
+#Test build rules
   $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
 		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),,,$$($1.FRAMEWORK_DIRS))
 
-#Правило получения файла-результата тестирования
+#Test result file build rule
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteStarted name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
@@ -726,7 +726,7 @@ endif
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 		
-#Правило получения файла-результата тестирования по shell-файлу
+#Test result file for shell-file build rule
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
   
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS) $$($1.DEVELOPER_LICENSE)
@@ -737,16 +737,16 @@ endif
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 
-#Правило запуска тестов
+#Tests launch rule
   $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))      
 
-#Правило проверки результатов тестирования
+#Test results rule
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
 		@echo Checking results for '$$($2.SOURCE_DIR:$(ROOT)/%=%)'...
 		@$$(call check_all_tests_in_dir,$$($2.SOURCE_DIR),$$($2.TMP_DIR),$$(notdir $$(filter $$(patsubst ./%,%,$$(files:%=$$($2.TMP_DIR)/%.result)),$$(patsubst ./%,%,$$^))),$$(notdir $$($2.TEAMCITY_IGNORED_TESTS)))
 endef
 
-#Обработка цели test-suite (имя цели)
+#Process target test-suite (target name)
 define process_target.test-suite
   $$(eval $$(call process_target_with_sources,$1,process_tests_source_dir))
   
@@ -761,7 +761,7 @@ endif
   build: $$($1.FLAG_FILES)
 endef
 
-#Обработка компонентов пакета (имя пакета, команда make)
+#Process package components (packet name, make command)
 define process_package_components
   $2: PACKAGE_$2.$1
 
@@ -771,7 +771,7 @@ define process_package_components
 		@$$(foreach component,$$($1.COMPONENTS),$(MAKE) -r -C $$(subst :, ,$(COMPONENT_DIR)/$$(component)) $2 && ) true
 endef
 
-#Обработка цели package (имя цели)
+#Process target package (target name)
 define process_target.package
   ifneq (,$$($1.COMPONENTS))
     $$(foreach command,$(PACKAGE_COMMANDS),$$(eval $$(call process_package_components,$1,$$(command))))
@@ -780,7 +780,7 @@ define process_target.package
   endif  
 endef
 
-#Обработка цели объединенния документации(имя цели)
+#Process target of building documentation (target name)
 define process_target.doxygen-info 
   $1.TMP_DIR               := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.SOURCE_DIRS           := $$(call specialize_paths,$$($1.SOURCE_DIRS))
@@ -800,7 +800,7 @@ define process_target.doxygen-info
 
 ifneq (,$$($1.SOURCE_DIRS))  
 
-  #Проверка наличия переменной с путём к утилите документирования кода
+  #Check existence of variable with path to documentation utility
 
   ifneq (,$$(filter info,$$(MAKECMDGOALS)))
     ifeq (,$(DOXYGEN_DIR))
@@ -891,7 +891,7 @@ endif
   
 endef
 
-#Сборка SDK (имя цели)
+#SDK build (target name)
 define process_target.sdk
   $1.EXPORT.LIBS               := $$($1.LIBS)
   $1.EXPORT.LIB_DIRS           := $$($1.LIB_DIRS) $$(DIST_LIB_DIR)
@@ -931,7 +931,7 @@ endif
 
 endef
 
-#Сборка зависимых компонентов (зависящая цель, зависимость)
+#Build dependent components (dependent target, dependency)
 define build_deps
 
   $$(warning check $1 $2)
@@ -984,7 +984,7 @@ endif
 
 endef
 
-#Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
+#Import variables (source prefix, target prefix, relative path to used component)
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
 
@@ -1012,9 +1012,9 @@ define import_variables
   $2.JARS                 := $$($2.JARS) $$($1.JARS)
 endef
 
-#Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
+#Preimport of settings - build import list (dependency name, target name, variable name which contains list)
 define prepare_to_import_settings
-# Проверка циклического импорта
+#Check cyclic import
 ifneq (,$$(filter $1,$$($3)))
   ifneq (1,$$(strip $$($(EXPORT_VAR_PREFIX).$1.MULTI_IMPORTS)))
     $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
@@ -1023,41 +1023,41 @@ endif
 
   $3 := $$($3) $1
 
-#Проверка наличия компонента
+#Check component existence
 ifeq (,$$(paths.$1))
   ifeq (,$$(strip $$(foreach profile,$$(PROFILES),$$(paths.$1.$$(profile)))))
     $$(error Component '$1' not exported (unresolved import))
   endif
 endif
 
-#Импортирование вложенных зависимостей
+#Import nested dependencies
   DEPENDENCY_IMPORTS := $$($(EXPORT_VAR_PREFIX).$1.IMPORTS) $$(foreach profile,$(PROFILES),$$($(EXPORT_VAR_PREFIX).$1.$$(profile).IMPORTS))
 
   $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$2,$3)))
 endef
 
-#Импортирование настроек (имя зависимости, имя цели)
+#Import settings (Dependency name, target name)
 define import_settings
-#Изменение настроек  
+#Change settings
   $$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1,$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1))))
   $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1.$$(profile),$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1.$$(profile))))))
 endef
 
-#Импорт значений toolset-настроек (имя цели, имя профиля)
+#Import values of toolset-settings (target name, profile name)
 define import_toolset_settings
 $$(foreach var,$$(filter $1.$2.%,$$(.VARIABLES)),$$(eval $$(var:$1.$2.%=$1.%) = $$($$(var:$1.$2.%=$1.%)) $$($$(var))))
 endef
 
-#Обработка сборки цели (имя цели)
+#Process build target (target name)
 define process_target_common
   PROCESSED_IMPORTS :=
 
   $1.IMPORTS := $$($1.IMPORTS) $(COMMON_IMPORTS)
 
-    #Добавление toolset-настроек к общему списку настроек
+    #Add toolset-settings to common settings list
   $$(foreach profile,$$(PROFILES),$$(eval $1.IMPORTS := $$($1.IMPORTS) $$($1.$$(profile).IMPORTS)))  
 
-    #Импорт настроек
+    #Import settings
 
   $1.PROCESSED_IMPORTS :=
 
@@ -1068,7 +1068,7 @@ define process_target_common
 
   $$(foreach imp,$$($1.PROCESSED_IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
 
-    #Добавление toolset-настроек к общему списку настроек
+    #Add toolset-settings to common settings list
   $$(foreach profile,$$(PROFILES),$$(eval $$(call import_toolset_settings,$1,$$(profile))))  
 
   DUMP.$1:
@@ -1079,11 +1079,11 @@ define process_target_common
 
   .PHONY: DUMP.$1  
 
-#Обработка специфических правил для каждого типа целей
+#Process target type specific rules
 
   $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))
   
-#Обработка экспорта файлов
+#Process export files
 
   $1.EXPORT.COMPONENT_FILES := $$(call specialize_paths,$$($1.EXPORT.COMPONENT_FILES))  
   $1.EXPORT.OUT_DIR         := $$(if $$($1.EXPORT.OUT_DIR),$$(EXPORT_DIR)/$$($1.EXPORT.OUT_DIR),$$(EXPORT_DIR))
@@ -1109,7 +1109,7 @@ define process_target_common
 
   $$(foreach file,$$($1.EXPORT.DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 
-  #Построение дерева зависимостей
+  #Build dependencies tree
 
 ifneq (,$$(filter build-deps,$$(MAKECMDGOALS)))
   build-deps: BUILD_DEPS.$1
@@ -1124,7 +1124,7 @@ endif
 
 endef
 
-#Проверка корректности типа цели (тип цели)
+#Check target type correctness (target type)
 define test_target_type
   ifeq (,$$(findstring $$(strip $$($1.TYPE)),$(VALID_TARGET_TYPES)))
     $$(error Wrong target type '$$(strip $$($1.TYPE))' at build target '$1' component-dir='$(COMPONENT_DIR)')
@@ -1132,7 +1132,7 @@ define test_target_type
 endef
 
 ###################################################################################################
-#Правила сборки
+#Build rules
 ###################################################################################################
 all: build check
 run: build
@@ -1147,27 +1147,27 @@ force:
 
 .PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export dist upload-dist build-deps
 
-#Специализация списка целей (в зависимости от профиля)
+#Targets list specialization (dependent on profile)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
 
-#Обработка целей компонента
+#Process component targets
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call process_target_common,$(target))))
 
-#Создание каталогов
+#Make directories
 create-dirs: $(DIRS)
 
 $(sort $(DIRS)):
 	@mkdir -p $@
 
-#Очистка
+#Clean
 clean:
 	@$(if $(wildcard $(ROOT_TMP_DIR)),cd $(ROOT_TMP_DIR) && $(RM) -r $(TMP_CLEAN_DIRS:$(ROOT_TMP_DIR)/%=%))
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
 
-#Инсталляция	
+#Installation	
 ifneq (,$($(INSTALL_TOOL)))
 
 install: $(INSTALLATION_FLAG)
@@ -1175,12 +1175,12 @@ install: $(INSTALLATION_FLAG)
 uninstall:
 	@$(RM) -f $(INSTALLATION_FLAG)
 
-#Получение путей к файлам относительно корня проекта (список относительных путей)
+#Get pathes to files relative to project root (relative pathes list)
 define get_absolute_paths
 export ROOT_ABS_PATH=`cd $(ROOT) && pwd`/ && for file in $1; do export ABS_PATH=`cd \`dirname $$file\`; pwd`/`basename $$file` && echo $${ABS_PATH/#$$ROOT_ABS_PATH/}; done
 endef
 
-#Инсталляция (список обновленных файлов, список новых файлов, флаг-файл)
+#Installation (updated files list, new files list, flag-file)
 define do_installation
 echo Install $(words $(sort $1 $2)) files... && \
 $(call build_installation_command,$(sort $1 $2)) && \
@@ -1188,7 +1188,7 @@ echo Update installation registry... && \
 echo >> $@ && echo $(patsubst $(ROOT)/%,%,$2) >> $3
 endef
 
-#Получение списка новый файлов для инсталляции (список инсталлируемых файлов, список проинсталиированных файлов)
+#Get new files list for installation (files to install list, installed files list)
 define get_new_installation_files
 $(strip $(foreach file,$1,$(if $(filter $(file),$2),,$(ROOT)/$(file))))
 endef
@@ -1202,7 +1202,7 @@ $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
 
 endif
 
-#Создание архива с дистрибутивом
+#Make archive with distribution
 dist: export
 	@echo Create $(basename $(EXPORT_DIR)).tar.gz...
 	@cd $(EXPORT_DIR)/.. && tar -czf $(notdir $(EXPORT_DIR)).tar.gz $(notdir $(EXPORT_DIR))
@@ -1213,7 +1213,7 @@ upload-dist: dist
 	@$(if $(DIST_UPLOAD_LOCATION),,echo DIST_UPLOAD_LOCATION environment variable is not found && exit 1)
 	@$(call ssh_copy,$(EXPORT_DIR)/../$(notdir $(EXPORT_DIR)).tar.gz,$(subst :/,://,$(DIST_UPLOAD_LOCATION))$(if $(DIST_UPLOAD_PACKAGE_NAME),/$(DIST_UPLOAD_PACKAGE_NAME).tar.gz),$(DIST_UPLOAD_PASSWORD))
 
-#Обновление лицензии разработчика
+#Developer license update
 .PHONY: update-developer-license remove-developer-license
 
 update-developer-license: remove-developer-license $(DEVELOPER_LICENSE)
