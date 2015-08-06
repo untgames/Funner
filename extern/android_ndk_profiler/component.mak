@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Targets list
 ###################################################################################################
 TARGETS += EXTERN.PROFILER.SOURCES
 
-#Цель №1 - SOURCES
+#Target №1 - SOURCES
 EXTERN.PROFILER.SOURCES.TYPE         := static-lib
 EXTERN.PROFILER.SOURCES.NAME         := funner.extern.android_ndk_profiler
 EXTERN.PROFILER.SOURCES.INCLUDE_DIRS := include

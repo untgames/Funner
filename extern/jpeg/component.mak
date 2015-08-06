@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.JPEG
 
-#Цель - JPEG sources
+#Target - JPEG sources
 EXTERN.JPEG.TYPE                     := static-lib
 EXTERN.JPEG.NAME                     := funner.extern.jpeg
 EXTERN.JPEG.INCLUDE_DIRS             := include

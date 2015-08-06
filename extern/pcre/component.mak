@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.PCRE
 
-#Цель - PCRE
+#Target - PCRE
 EXTERN.PCRE.TYPE                     := static-lib
 EXTERN.PCRE.NAME                     := funner.extern.pcre
 EXTERN.PCRE.INCLUDE_DIRS             := include

@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.WCECOMPAT
 
-#Цель - WceCompat
+#Target - WceCompat
 EXTERN.WCECOMPAT.TYPE            := static-lib
 EXTERN.WCECOMPAT.NAME            := funner.extern.wcecompat
 EXTERN.WCECOMPAT.SOURCE_DIRS     := sources

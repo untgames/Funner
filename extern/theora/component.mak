@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.THEORA.SOURCES EXTERN.THEORA.TESTS
 
-#Цель - THEORA sources
+#Target - THEORA sources
 EXTERN.THEORA.SOURCES.TYPE                     := static-lib
 EXTERN.THEORA.SOURCES.NAME                     := funner.extern.theora
 EXTERN.THEORA.SOURCES.SOURCE_DIRS              := sources
@@ -20,7 +20,7 @@ else
   EXTERN.THEORA.SOURCES.x86.SOURCE_DIRS := sources/x86
 endif
 
-#Цель - THEORA tests
+#Target - THEORA tests
 EXTERN.THEORA.TESTS.TYPE                  := test-suite
 EXTERN.THEORA.TESTS.SOURCE_DIRS           := tests
 EXTERN.THEORA.TESTS.IMPORTS               := compile.extern.theora link.extern.theora

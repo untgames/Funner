@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := FUNNER_EXTERN_LIBS
 
-#Цель - external libraries
+#Target - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
 FUNNER_EXTERN_LIBS.COMPONENTS := 
 

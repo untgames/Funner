@@ -1,10 +1,10 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS += EXTERN.GEEKINFO.SOURCES
 TARGETS += EXTERN.GEEKINFO.TESTS
 
-#Цель - GeekInfo
+#Target - GeekInfo
 EXTERN.GEEKINFO.SOURCES.TYPE                      := static-lib
 EXTERN.GEEKINFO.SOURCES.NAME                      := funner.extern.geekinfo
 EXTERN.GEEKINFO.SOURCES.SOURCE_DIRS               := sources/common
@@ -26,7 +26,7 @@ EXTERN.GEEKINFO.SOURCES.mingw.INCLUDE_DIRS        := sources/intel/mingw-x86
 EXTERN.GEEKINFO.SOURCES.mingw.COMPILER_DEFINES    := _WIN32_WINNT=0x600
 EXTERN.GEEKINFO.SOURCES.IMPORTS                   := compile.extern.geekinfo
 
-#Цель - GeekInfo tests
+#Target - GeekInfo tests
 EXTERN.GEEKINFO.TESTS.TYPE         := test-suite
 EXTERN.GEEKINFO.TESTS.SOURCE_DIRS  := tests
 EXTERN.GEEKINFO.TESTS.IMPORTS      := compile.extern.geekinfo link.extern.geekinfo

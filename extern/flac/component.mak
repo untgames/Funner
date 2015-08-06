@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.FLAC_STATIC
 
-#Цель №1 - FLAC_STATIC
+#Target - FLAC_STATIC
 EXTERN.FLAC_STATIC.TYPE                     := static-lib
 EXTERN.FLAC_STATIC.NAME                     := funner.extern.flac_static
 EXTERN.FLAC_STATIC.IMPORTS                  := compile.extern.flac

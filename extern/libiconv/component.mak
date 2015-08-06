@@ -1,11 +1,11 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS += EXTERN.LIBICONV
 TARGETS += EXTERN.ICONV.SOURCES
 TARGETS += EXTERN.ICONV.TESTS
 
-#Цель №1 - ICONV library
+#Target - ICONV library
 EXTERN.LIBICONV.TYPE                     := static-lib
 EXTERN.LIBICONV.NAME                     := funner.extern.iconv
 EXTERN.LIBICONV.INCLUDE_DIRS             := include sources sources/srclib
@@ -17,7 +17,7 @@ EXTERN.LIBICONV.g++.COMPILER_CFLAGS      := --no-warn
 EXTERN.LIBICONV.clang.COMPILER_CFLAGS    := -w
 EXTERN.LIBICONV.has_iconv.TYPE           := ignore
 
-#Цель №2 - ICONV utility
+#Target - ICONV utility
 EXTERN.ICONV.SOURCES.TYPE                  := application
 EXTERN.ICONV.SOURCES.NAME                  := iconv
 EXTERN.ICONV.SOURCES.INCLUDE_DIRS          := include sources sources/srclib sources/wrappers
@@ -29,7 +29,7 @@ EXTERN.ICONV.SOURCES.g++.COMPILER_CFLAGS   := --no-warn
 EXTERN.ICONV.SOURCES.clang.COMPILER_CFLAGS := -w
 EXTERN.ICONV.SOURCES.has_iconv.TYPE        := ignore
 
-#Цель №3 - ICONV tests
+#Target - ICONV tests
 EXTERN.ICONV.TESTS.TYPE              := test-suite
 EXTERN.ICONV.TESTS.SOURCE_DIRS       := tests
 EXTERN.ICONV.TESTS.USED_APPLICATIONS := $(if $(filter has_iconv,$(PROFILES)),,iconv)

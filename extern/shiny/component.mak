@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.SHINY
 
-#Цель №1 - SHINY
+#Target 1 - SHINY
 EXTERN.SHINY.TYPE                := static-lib
 EXTERN.SHINY.NAME                := funner.extern.shiny
 EXTERN.SHINY.INCLUDE_DIRS        := include

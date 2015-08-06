@@ -1,11 +1,11 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.LUAJIT_LIB EXTERN.LUAJIT_UTILITY EXTERN.LUAJIT_TESTS
 
 LUAJIT_BUILD_INTERNALS_DIR := $(COMPONENT_DIR)../../$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/EXTERN.LUAJIT_BUILDVM/build-internals
 
-#Цель - build luajit
+#Target - build luajit
 EXTERN.LUAJIT_LIB.TYPE                   := static-lib
 EXTERN.LUAJIT_LIB.NAME                   := funner.extern.luajit
 EXTERN.LUAJIT_LIB.SOURCE_DIRS            := sources/ljit
@@ -17,7 +17,7 @@ EXTERN.LUAJIT_LIB.msvc.OBJECT_FILES      := $(LUAJIT_BUILD_INTERNALS_DIR)/lj_vm.
 #EXTERN.LUAJIT_LIB.msvc.COMPILER_DEFINES  := LJ_UNWIND_EXT=1
 #EXTERN.LUAJIT_LIB.mingw.COMPILER_DEFINES  := LUAJIT_UNWIND_EXTERNAL
 
-#Цель - build luajit
+#Target - build luajit
 EXTERN.LUAJIT_UTILITY.TYPE                   := test-suite
 EXTERN.LUAJIT_UTILITY.SOURCE_DIRS            := utils
 EXTERN.LUAJIT_UTILITY.INCLUDE_DIRS           := include sources/ljit
@@ -26,11 +26,11 @@ EXTERN.LUAJIT_UTILITY.g++.COMPILER_CFLAGS    := -fomit-frame-pointer -D_FILE_OFF
 EXTERN.LUAJIT_UTILITY.g++x86.COMPILER_CFLAGS := -march=i686
 EXTERN.LUAJIT_UTILITY.TARGET_DIR              = $(DIST_BIN_DIR)
 
-#Цель - tests
+#Target - tests
 EXTERN.LUAJIT_TESTS.TYPE         := test-suite
 EXTERN.LUAJIT_TESTS.SOURCE_DIRS  := tests
 
-#Генерация кода для виртуальной машины
+#Generation code for VM
 LUAJIT_SOURCES         := $(wildcard $(COMPONENT_DIR)sources/ljit/*.c)
 LUAJIT_GENERATED_FILES := lj_bcdef.h lj_ffdef.h lj_folddef.h lj_recdef.h lj_libdef.h vmdef.lua
 

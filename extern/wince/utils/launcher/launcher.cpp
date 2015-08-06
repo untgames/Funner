@@ -3,13 +3,13 @@
 #include <winsock2.h> 
 
 /*
-    Константы
+    Constants
 */
 
-const int SHELL_PORT = 1663; //порт, на который соединяется telnet
+const int SHELL_PORT = 1663; //port, to connect with telnet
 
 /*
-    Типы
+    Types
 */
 
 enum ProtocolMsgId
@@ -25,7 +25,7 @@ typedef BOOL (WINAPI *SetStdioPathWFunc)(DWORD id,PWSTR pwszPath);
 typedef BOOL (WINAPI *SetCurrentDirWFunc)(PWSTR pwszPath);
 
 /*
-    Функции
+    Functions
 */
 
 void sock_send (int socket, const char* buffer, size_t length)
@@ -64,10 +64,10 @@ void sock_printf (int socket, const char* format, ...)
   sock_send (socket, buffer, length);
 }
 
-//точка входа
+//entry point
 int wmain (int argc, wchar_t* argv [])
 {
-    //проверка повторного запуска
+    //Check duplicate launch
   printf("launch app\n");fflush(stdout);
   
   HANDLE duplicate_launch_event = CreateEventW (0, FALSE, FALSE, L"console_already_initialized");
@@ -78,7 +78,7 @@ int wmain (int argc, wchar_t* argv [])
     return -1;
   }    
 
-    //разбор параметров командной строки
+    //parse launch arguments
     
   if (argc < 4)
   {
@@ -136,7 +136,7 @@ printf("currentdir_file=%S\n",filename);
 //exe_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe";
 //log_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe.stdout";
 //current_dir=L"\\funner\\tests\\stl";
-    //инициализация telnet
+    //telnet initialization
     
   HINSTANCE core_dll = LoadLibraryW (L"Coredll.dll");
  
@@ -171,7 +171,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }
   
-    //установка текущей директории
+    //set current directory
   if (!SetCurrentDirectoryW (current_dir))
   {
     printf ("Can't set current dirrectory to '%S'\n", current_dir);
@@ -181,7 +181,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }
 */
-    //перенаправление ввода / вывода
+    //redirect input / output
 
   DeleteFileW (log_to_start);
   
@@ -195,7 +195,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }
   
-    //инициализация сокетов
+    //initialize sockets
 
   WSADATA wsa_data;
   
@@ -211,7 +211,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }      
     
-    //ожидание соединения    
+    //wait for connection
 
   SOCKET listen_socket = WSASocketW (AF_INET, SOCK_STREAM, 0, 0, 0, 0);
   
@@ -282,7 +282,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }
   
-    //настройка тайм-аута
+    //setup time-out
     
   timeval timeout;
 
@@ -302,7 +302,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }*/
   
-    //пропуск настроек (сделать поддержку сессии)
+    //skip settings (todo session support)
   
   char skip_buffer [100];
 
@@ -317,7 +317,7 @@ printf("currentdir_file=%S\n",filename);
       break;
   }  
   
-    //запуск процесса
+    //launch process
   
   PROCESS_INFORMATION process_information;
 
@@ -336,7 +336,7 @@ printf("currentdir_file=%S\n",filename);
     return -1;
   }  
   
-    //ожидание завершения процесса - перенаправление вывода в сокет
+    //wait for process complete - redirect output to socket
      
  /* int err=GetLastError();
   while (file==INVALID_HANDLE_VALUE)
@@ -387,7 +387,7 @@ printf("currentdir_file=%S\n",filename);
       break;
   }
 
-    //освобождение ресурсов
+    //free resources
        
   closesocket (sendrecv_socket);
   closesocket (listen_socket);

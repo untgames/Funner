@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.TIFF
 
-#Цель - TIFF sources
+#Target - TIFF sources
 EXTERN.TIFF.TYPE                     := static-lib
 EXTERN.TIFF.NAME                     := funner.extern.tiff
 EXTERN.TIFF.INCLUDE_DIRS             := include ../jpeg/include ../zlib/include

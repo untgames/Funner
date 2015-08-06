@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.DEVIL EXTERN.ILU
 
-#Цель - DevILDLL sources
+#Target - DevILDLL sources
 ifeq (,$(filter no_dll,$(PROFILES)))
 EXTERN.DEVIL.TYPE                       := dynamic-lib
 else
@@ -24,7 +24,7 @@ EXTERN.DEVIL.bada_simulator.COMPILER_DEFINES := XMD_H
 EXTERN.DEVIL.bada_simulator.IMPORTS          := link.extern.bada_addons
 EXTERN.DEVIL.wince.IMPORTS                   := link.extern.wcecompat
 
-#Цель - ILUDLL sources
+#Target - ILUDLL sources
 ifeq (,$(filter no_dll,$(PROFILES)))
 EXTERN.ILU.TYPE                  := dynamic-lib
 else

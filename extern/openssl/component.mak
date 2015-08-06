@@ -1,9 +1,9 @@
 ###################################################################################################
-#Список целей
+#Defines and constants
 ###################################################################################################
 TARGETS := EXTERN.OPENSSL
 
-#Цель №1 - OpenSSL
+#Target - OpenSSL
 EXTERN.OPENSSL.TYPE                       := static-lib
 EXTERN.OPENSSL.NAME                       := funner.extern.openssl
 EXTERN.OPENSSL.IMPORTS                    := compile.extern.openssl
