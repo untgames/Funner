@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под WindowsRT
+#Build for WindowsRT
 ###################################################################################################
 
 #Links
@@ -9,7 +9,7 @@
 #http://msdn.microsoft.com/en-us/library/windows/apps/jj552945.aspx
 
 ###################################################################################################
-#Выбор конфигурации MSVC
+#Choose MSVC configuration
 ###################################################################################################
 ifneq (,$(VS110COMNTOOLS))
   MSVC_PATH         ?= $(VS110COMNTOOLS)../../vc
@@ -45,7 +45,7 @@ COMMON_LINK_FLAGS  += -DYNAMICBASE
 COMMON_IMPORTS     += link.extern.win8_compat
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 LIB_SUFFIX     := .lib
 OBJ_SUFFIX     := .obj
@@ -58,7 +58,7 @@ SOURCE_FILES_SUFFIXES += asm
 VALID_TARGET_TYPES += win8-appx
 
 ###################################################################################################
-#Конфигурация переменных расположения библиотек
+#Configuration of libraries location variables
 ###################################################################################################
 INCLUDE := $(ROOT)/extern/win8_compat/include/stdio;$(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
 LIB     := $(WINRT_SDK)/lib/win8/um/$(CPU_ARCH);$(MSVC_PATH)/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(MSVC_PATH)/atlmfc/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(LIB)
@@ -67,8 +67,8 @@ export INCLUDE
 export LIB
 
 ###################################################################################################
-#Компиляция исходников (список исходников, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
+#Sources compilaton (sources list, include directories list, include files list, object files directory,
+#defines list, compilation flags, pch file, dlls directories list)
 ###################################################################################################
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
@@ -77,8 +77,8 @@ $(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/ml" -nologo -c -Fo"$4\\" $(patsubst
 endef
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, def файл)
+#Linking files (output file name, files list, static libraries directories list,
+#include link symbols list, link flags, def file)
 ###################################################################################################
 define tools.link
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
@@ -89,7 +89,7 @@ $(call tools.link,$1,$2,$3,$4,$5) -dll
 endef
 
 ###################################################################################################
-#Сборка библиотеки (имя выходного файла, список файлов)
+#Build library (output file name, files list)
 ###################################################################################################
 define tools.lib.generic
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -ignore:4264 -nologo -out:$1 $2
@@ -99,7 +99,7 @@ define tools.lib
 export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for file in $2; do export FILE_COUNTER=$$(($$FILE_COUNTER + 1)) && FILE_LIST="$$FILE_LIST $$file"; if [ $$FILE_COUNTER -eq 256 ]; then $(call tools.lib.generic,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9); export FILE_COUNTER=0 FILE_LIST="$1"; fi; done && $(call tools.lib.generic,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9)
 endef
 
-#Обработка цели win8-msbuild-appx (имя цели)
+#Process target win8-msbuild-appx (target name)
 define process_target.win8-appx
   $1.TMP_DIR                 := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.OUT_DIR                 := $$(if $$($1.OUT_DIR),$$(COMPONENT_DIR)/$$($1.OUT_DIR),$$(DIST_LIB_DIR))

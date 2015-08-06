@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под Alchemy
+#Build for Alchemy
 ###################################################################################################
 ifeq ($(strip $(ALCHEMY_HOME)),)
   $(error "Please set ALCHEMY_HOME variable in your environment")
@@ -14,7 +14,7 @@ ifeq ($(strip $(CYGHOME)),)
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 CYGWIN_BIN        := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
 ALCHEMY_SDK       := /$(subst :,,$(call convert_path,$(ALCHEMY_HOME)))
@@ -40,15 +40,15 @@ export ADL
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#Переопределения вызовов утилит
+#Override utilities calls
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(CYGWIN_BIN)/sh -c 'export ALCHEMY_SDK=/$(ALCHEMY_SDK) && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)'
 endef
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, def-файл, файл ошибок)
+#Linking files (output file name, files list, static libraries directories list,
+#included link symbols list, link flags, def-file, errors file)
 ###################################################################################################
 define tools.link
 export PATH=$(BUILD_PATHS):$$PATH && $(CYGWIN_BIN)/sh -c 'export ALCHEMY_SDK=/$(ALCHEMY_SDK) && $(call tools.g++.link,$1,$2,$3,$4,$5,$6,$1.stderr,$8,$9); if [ $$? -ne 0 ]; then echo $1.stderr; exit 1; fi'
@@ -59,7 +59,7 @@ export PATH=$(BUILD_PATHS):$$PATH && $(CYGWIN_BIN)/sh -c '$(call tools.g++.lib,$
 endef
 
 ###################################################################################################
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Commands execution (command, launch directory, additional libraries and applications search paths)
 ###################################################################################################
 define tools.run
 $(call prepare_to_execute,$2,$3) && export PATH=$(BUILD_PATHS):$$PATH && swfbridge "$(CURDIR)/$(firstword $1)"

@@ -1,9 +1,9 @@
 ###################################################################################################
-#Сборка под MSVC
+#Build for MSVC
 ###################################################################################################
 
 ###################################################################################################
-#Выбор конфигурации MSVC
+#Choose MSVC configuration
 ###################################################################################################
 ifneq (,$(VS90COMNTOOLS))
   MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc/ce
@@ -42,7 +42,7 @@ RAPISTART          := $(WINCE_POWERTOYS)/RAPI_Start/rapistart
 WINCE_LAUNCHER     := "$(REMOTE_INSTALL_DIR)/dist/winmobile6/bin/wince-launcher.exe"
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 LIB_SUFFIX              := .lib
 OBJ_SUFFIX              := .obj
@@ -54,7 +54,7 @@ PROFILES                += msvc wince win32 has_windows arm gles egl
 COMMON_LINK_FLAGS       += -subsystem:windowsce
 
 ###################################################################################################
-#Конфигурация переменных расположения библиотек
+#Configuration of libraries location variables
 ###################################################################################################
 INCLUDE := $(MSVC_PATH)/include
 LIB     := $(MSVC_PATH)/lib/$(CPU_ARCH)
@@ -71,8 +71,8 @@ export INCLUDE
 export LIB
 
 ###################################################################################################
-#Компиляция исходников (список исходников, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
+#Sources compilaton (sources list, include directories list, include files list, object files directory,
+#defines list, compilation flags, pch file, dlls directories list)
 ###################################################################################################
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
@@ -80,28 +80,28 @@ export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
 endef
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, def файл)
+#Files linking (output file, files list, static libraries directories list,
+#include link symbols list, link flags, def file)
 ###################################################################################################
 define tools.link
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
-#Сборка библиотеки (имя выходного файла, список файлов)
+#Build library (output file, files list)
 ###################################################################################################
 define tools.lib
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2
 endef
 
-#Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
+#Copy file to device (local files name, remote directory name)
 define tools.install
   export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
   for file in $(subst /,\\,$1); do "$(CECOPY)" //s //is $$file "dev:$(REMOTE_INSTALL_DIR)\\$$(echo $$SUBST_RESULT | sed 's/\//\\/g')\\$$(basename $$file)"; done
 endef
 
 ###################################################################################################
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Execute command (command, execution directory, libraries and executables additional search paths)
 ###################################################################################################
 define tools.run
    export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \

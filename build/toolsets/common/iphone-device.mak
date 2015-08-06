@@ -8,7 +8,7 @@ export IPHONEOS_DEPLOYMENT_TARGET
 
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
 PROFILES          += arm clang
-COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) #-gdwarf-2 #флаг gdwarf-2 - необходим для профилирования
+COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) #-gdwarf-2 #flag gdwarf-2 - needed for profiling
 COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
@@ -18,10 +18,10 @@ IPHONE_SDK_PATH   := /Applications/Xcode.app/Contents/Developer/Platforms/iPhone
 include $(TOOLSETS_DIR)/common/iphone.mak
 
 ###################################################################################################
-#Отладка на устройстве
+#Debug on device
 ###################################################################################################
 
-#Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
+#Copy files to devices (local files name, remote directory name)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 $(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(IPHONE_USER)@$(IPHONE_HOST),$(IPHONE_PASSWORD)) && \
@@ -29,7 +29,7 @@ $(call ssh_copy,$1,$(IPHONE_USER)@$(IPHONE_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$S
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(IPHONE_USER)@$(IPHONE_HOST),$(IPHONE_PASSWORD))
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Execute command (command, launch directory, additional search paths for libraries and executables)
 define tools.run
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \

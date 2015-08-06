@@ -1,9 +1,9 @@
 ###################################################################################################
-#Сборка под MSVC
+#Build for MSVC
 ###################################################################################################
 
 ###################################################################################################
-#Выбор конфигурации MSVC
+#Choose MSVC configuration
 ###################################################################################################
 ifneq (,$(VS120COMNTOOLS))
   MSVC_PATH         ?= $(VS120COMNTOOLS)../../vc
@@ -79,7 +79,7 @@ FRAMEWORK_DIR      := ${SYSTEMROOT}/Microsoft.NET/Framework/v2.0.50727
 VALID_TARGET_TYPES += cs-dynamic-lib cs-application
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 LIB_SUFFIX     := .lib
 OBJ_SUFFIX     := .obj
@@ -94,7 +94,7 @@ SOURCE_FILES_SUFFIXES   += asm
 IGNORE_PVS_ERROR        += V126 V122 V201
 
 ###################################################################################################
-#Конфигурация переменных расположения библиотек
+#Configuration of libraries location variables
 ###################################################################################################
 INCLUDE := $(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
 
@@ -107,8 +107,8 @@ INCLUDE := $(PLATFORM_SDK_PATH)/include;$(INCLUDE)
 export INCLUDE
 
 ###################################################################################################
-#Компиляция исходников (список исходников, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
+#Sources compilation (sources list, include directories list, include files list, object files directory,
+#defines list, compilation flags, pch file, dlls directories list)
 ###################################################################################################
 define tools.msvc-commandline
 -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(if $(filter -W%,$6),$(filter-out -W%,$(COMMON_CFLAGS)),$(COMMON_CFLAGS)) $(strip $6) $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
@@ -126,29 +126,29 @@ $(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/$(ML_NAME)" -nologo -c -Fo"$4\\" $(
 endef
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, def файл)
+#Linking files (output file name, files list, static libraries directories list,
+#include link symbols list, link flags, def file)
 ###################################################################################################
 define tools.link
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"$(LINK_INCLUDE_PREFIX)%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
-#Сборка библиотеки (имя выходного файла, список файлов)
+#Library building (output file name, files list)
 ###################################################################################################
 define tools.lib
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && echo -nologo -out:$1 $2 > $1.commandline && "$(MSVC_BIN_PATH)/lib" @$1.commandline && $(dir $(SHELL))/$(RM) $1.commandline
 endef
 
 ###################################################################################################
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Execute command (command, execution directory, libraries and executables additional search paths)
 ###################################################################################################
 define tools.run
 $(call prepare_to_execute,$2,$3) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)"
 endef
 
 ###################################################################################################
-#Обработка IDL-файлов (цель, имя модуля)
+#Process IDL-files (target, module name)
 ###################################################################################################
 define process_idl
   $2.IDL_SOURCE_LIST := $$(wildcard $$($2.SOURCE_DIR)/*.idl)
@@ -162,7 +162,7 @@ define process_idl
 endef
 
 ###################################################################################################
-#Обработка RC-файлов (цель, имя модуля)
+#Process RC-files (target, module name)
 ###################################################################################################
 define process_rc
   $2.RC_SOURCE_LIST := $$(wildcard $$($2.SOURCE_DIR)/*.rc)
@@ -174,14 +174,14 @@ define process_rc
 endef
 
 ###################################################################################################
-#Компиляция исходников C# (имя выходного файла, список исходников, список необходимых длл, список подключаемых dll каталогов,
-#список дефайнов, флаги компиляции)
+#C# sources compilation (output file name, sources list, needed dlls list, included dlls directories list,
+#defines list, compilation flags)
 ###################################################################################################
 define tools.cscompile
 export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $6 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$4 $(DIST_BIN_DIR)) $(patsubst %,-reference:"%.dll",$3) $(if $(strip $5),-define:"$(strip $5)") $(subst /,\\,$2)
 endef
 
-#Обработка каталога с C# исходниками (имя цели, имя каталога)
+#Process directory with C# sources (target name, directory name)
 define process_cs_source_dir 
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
@@ -194,7 +194,7 @@ define process_cs_source_dir
   endif
 endef
 
-#Обработка цели cs-assembly (имя цели, расширение целевого файла)
+#Process target cs-assembly (target name, output file extension)
 define process_target_csassembly
   $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
 
@@ -220,12 +220,12 @@ define process_target_csassembly
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
-#Обработка цели cs-dynamic-lib (имя цели)
+#Process target cs-dynamic-lib (target name)
 define process_target.cs-dynamic-lib
   $$(eval $$(call process_target_csassembly,$1,$(DLL_SUFFIX)))
 endef
 
-#Обработка цели cs-application (имя цели)
+#Process target cs-application (target name)
 define process_target.cs-application
   $$(eval $$(call process_target_csassembly,$1,$(EXE_SUFFIX)))
    

@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под Android
+#Build for Android
 ###################################################################################################
 ifeq ($(strip $(ANDROID_NDK)),)
   $(error "Please set ANDROID_NDK variable in your environment")
@@ -26,7 +26,7 @@ ifeq ($(strip $(JAVA_SDK)),)
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 PROFILES                   += android no_dll unistd egl gles2 has_windows
 SDCARD_DIR                 := //mnt/sdcard
@@ -148,7 +148,7 @@ endef
 endif
 
 ###################################################################################################
-#Переопределения вызовов утилит
+#Override utilities calling
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -174,10 +174,10 @@ export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for f
 endef
 
 ###################################################################################################
-#Отладка на устройстве
+#Debug on device
 ###################################################################################################
 
-#Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
+#Copy file to device (local files name, remote directory name)
 define tools.install
  export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
  $(ADB) shell "$(call remount)" && \
@@ -185,7 +185,7 @@ define tools.install
  $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(BUSYBOX_PATH):\$\$$PATH && $(call sudo,$(BUSYBOX_PATH) chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT))" && ) true
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command (command, launch directory, additional search paths for libraries and applications, dlls list)
 define tools.run
  export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
  export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
@@ -195,7 +195,7 @@ define tools.run
  $(ADB) shell "$(call remount)" && $(ADB) shell "export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=$(BUSYBOX_PATH):\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && $(BUSYBOX_PATH) mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
 endef
 
-#Выполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command from package (command, launch directory, additional search paths for libraries and applications, dlls list)
 define tools.run.android_package
  export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
  export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
@@ -212,10 +212,10 @@ define tools.run.android_package
 endef
 
 ###################################################################################################
-#Сборка пакетов
+#Build package
 ###################################################################################################
 
-#Обработка каталога с java исходниками (имя цели, имя каталога)
+#Process directory with java sources (target name, directory name)
 define process_android_java_source_dir 
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
@@ -228,7 +228,7 @@ define process_android_java_source_dir
   endif
 endef
 
-#Генерация java файлов из aidl (source_file, out_file)
+#Generate java files from aidl (source_file, out_file)
 define aidl_gen
   $2: $1
 		@echo Generating $$(notdir $1)...
@@ -236,7 +236,7 @@ define aidl_gen
 		@$(AIDL) -p$(ANDROID_AIDL) $$< $$@
 endef
 
-#Обработка цели android-apk (имя цели)
+#Process target android-apk (target name)
 define process_target.android-pak
   $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
 
@@ -359,7 +359,7 @@ endif
 
 endef
 
-#Обработка цели android-jar (имя цели)
+#Process target android-jar (target name)
 define process_target.android-jar
   $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
 

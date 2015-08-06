@@ -1,12 +1,12 @@
 ###################################################################################################
-#—борка под NativeClient SDK
+#Build for NativeClient SDK
 ###################################################################################################
 ifeq ($(strip $(NATIVE_CLIENT_SDK)),)
   $(error "Please set NATIVE_CLIENT_SDK variable in your environment")
 endif
 
 ###################################################################################################
-# онстанты
+#Constants
 ###################################################################################################
 PROFILES          += unistd native_client x86 has_windows
 EXE_SUFFIX        := .nexe
@@ -24,7 +24,7 @@ CYGWIN            := nodosfilewarning
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#ѕереопределени€ вызовов утилит
+#Override utilities calling
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -42,7 +42,7 @@ define tools.link.dll
 -shared
 endef
 
-#¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command (command, execution directory, libraries and executables additional search paths, dlls list)
 define tools.run
 $(call prepare_to_execute,$2,$3) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)"
 endef

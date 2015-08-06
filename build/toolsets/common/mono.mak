@@ -2,14 +2,14 @@ MONO_CSC           := $(MONO)/bin/gmcs
 VALID_TARGET_TYPES += mono-cs-dynamic-lib mono-cs-application
 
 ###################################################################################################
-#Компиляция исходников C# (имя выходного файла, список исходников, список необходимых длл, список подключаемых dll каталогов,
-#список дефайнов, флаги компиляции)
+#Compile C# sources (output file name, source files list, needed dlls list, included dll directories list,
+#defines list, compilation flags)
 ###################################################################################################
 define tools.mono-cscompile
 "$(MONO_CSC)" $6 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$4 $(DIST_BIN_DIR)) $(patsubst %,-reference:"%.dll",$3) $(if $(strip $5),-define:"$(strip $5)") $(subst /,\\,$2)
 endef
 
-#Обработка каталога с C# исходниками (имя цели, имя каталога)
+#Process directory with C# sources (target name, directory name)
 define mono_process_cs_source_dir 
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
@@ -22,7 +22,7 @@ define mono_process_cs_source_dir
   endif
 endef
 
-#Обработка цели cs-assembly (имя цели, расширение целевого файла)
+#Process target cs-assembly (target name, output file extension)
 define process_target_mono_csassembly
   ifeq (,$$(MONO))
     $$(error 'Mono not found (set "MONO" environment variable)')
@@ -52,12 +52,12 @@ define process_target_mono_csassembly
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
-#Обработка цели cs-dynamic-lib (имя цели)
+#Process target cs-dynamic-lib (target name)
 define process_target.mono-cs-dynamic-lib
   $$(eval $$(call process_target_mono_csassembly,$1,.dll))
 endef
 
-#Обработка цели cs-application (имя цели)
+#Process target cs-application (target name)
 define process_target.mono-cs-application
   $$(eval $$(call process_target_mono_csassembly,$1,.exe))
    

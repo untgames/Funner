@@ -1,5 +1,5 @@
 ###################################################################################################
-#¬ыбор конфигурации MSVC
+#Choose MSVC configuration
 ###################################################################################################
 COMMON_CFLAGS      += -arch:IA32
 COMMON_LINK_FLAGS  += -machine:x86
@@ -14,20 +14,20 @@ APPX_APP_NAME              := $(APPX_LAUNCHER_PACKAGE_NAME)!App
 include $(TOOLSETS_DIR)/common/winrt.mak
 
 ###################################################################################################
-#¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Execute command (command, execution directory, libraries and executables additional search paths)
 ###################################################################################################
 define tools.run
 $(call prepare_to_execute,$2,$3) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)"
 endef
 
-# опирование файла на устройство (им€ локальных файлов, им€ удалЄнного каталога)
+#Copy file to device (local files name, remote directory name)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 mkdir -p $(APPX_REMOTE_DIR)/$$(echo $$SUBST_RESULT) && \
 cp -f $(strip $1) $(APPX_REMOTE_DIR)/$$(echo $$SUBST_RESULT)
 endef
 
-#¬ыполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command from package (command, execution directory, libraries and executables additional search paths, dlls list)
 define tools.run.winrt_x86_package
 CheckNetIsolation.exe LoopbackExempt \-a \-n=$(APPX_LAUNCHER_PACKAGE_NAME) > nul && \
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \

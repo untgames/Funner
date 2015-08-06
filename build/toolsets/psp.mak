@@ -1,12 +1,12 @@
 ###################################################################################################
-#Проверка наличия конфигурации
+#Check configuration existence
 ###################################################################################################
 ifeq ($(strip $(DEVKIT_PSP)),)
   $(error "Please set DEVKIT_PSP variable in your environment")
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 PROFILES          += psp has_windows haswchar no_dll
 PSP_BIN           := $(DEVKIT_PSP)/bin
@@ -25,6 +25,6 @@ COMMON_LINK_FLAGS += -specs=$(PSP_SDK)/lib/prxspecs -Wl,-q,-T$(PSP_SDK)/lib/link
 COMMON_LINK_FLAGS += -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lstdc++ -lm -lc -lpspnet -lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsputility -lpspuser -lpspkernel -lfunner.extern.psp_addons
 
 ###################################################################################################
-#Подключение родительского скрипта сборки
+#Include parent build script
 ###################################################################################################
 include $(TOOLSETS_DIR)/g++.mak

@@ -1,9 +1,9 @@
 ###################################################################################################
-#Сборка под WindowsPhone8
+#Build for WindowsPhone8
 ###################################################################################################
 
 ###################################################################################################
-#Выбор конфигурации MSVC
+#Choose MSVC configuration
 ###################################################################################################
 ifneq (,$(WP8_VC))
   MSVC_PATH ?= $(call convert_path,$(WP8_VC))
@@ -28,7 +28,7 @@ COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib funner.extern.win8_compa
 COMMON_IMPORTs     += link.extern.win8_compat
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 LIB_SUFFIX              := .lib
 OBJ_SUFFIX              := .obj
@@ -40,7 +40,7 @@ PROFILES                += msvc wp8 has_windows arm no_dll win8
 CPU_ARCH                := arm
 
 ###################################################################################################
-#Конфигурация переменных расположения библиотек
+#Configuration of libraries location variables
 ###################################################################################################
 INCLUDE := $(MSVC_PATH)/include
 LIB     := $(MSVC_PATH)/lib/$(CPU_ARCH)
@@ -52,8 +52,8 @@ export INCLUDE
 export LIB
 
 ###################################################################################################
-#Компиляция исходников (список исходников, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
-#список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
+#Sources compilation (sources list, include directories list, include files list, object files directory,
+#defines list, compilation flags, pch file, dlls directories list)
 ###################################################################################################
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
@@ -61,15 +61,15 @@ export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
 endef
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, def файл)
+#Files linking (output file name, files list, static libraries directories list,
+#include link symbols list, link flags, def file)
 ###################################################################################################
 define tools.link
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
-#Сборка библиотеки (имя выходного файла, список файлов)
+#Library build (output file name, files list)
 ###################################################################################################
 define tools.lib.generic
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2

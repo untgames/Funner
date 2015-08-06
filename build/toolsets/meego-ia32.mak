@@ -1,12 +1,12 @@
 ###################################################################################################
-#Сборка под MeeGo
+#Build for MeeGo
 ###################################################################################################
 ifeq ($(strip $(MEEGO_SDK)),)
   $(error "Please set MEEGO_SDK variable in your environment")
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 MEEGO_VERSION     := 1.1
 PROFILES          += unistd meego meego_ia32 x11 linux glx has_windows
@@ -32,7 +32,7 @@ MEEGO_DISPLAY     := $(strip $(MEEGO_DISPLAY))
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#Переопределения вызовов утилит
+#Override utilties calling
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -51,10 +51,10 @@ define tools.link.dll
 endef
 
 ###################################################################################################
-#Отладка на устройстве
+#Debug on device
 ###################################################################################################
 
-#Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
+#Copy files on device (local files name, remote directory name)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 $(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(MEEGO_USER)@$(MEEGO_HOST),$(MEEGO_PASSWORD),$(MEEGO_PORT)) && \
@@ -62,7 +62,7 @@ $(call ssh_copy,$(strip $1),$(MEEGO_USER)@$(MEEGO_HOST):$(REMOTE_DEBUG_DIR)/$$(e
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(MEEGO_USER)@$(MEEGO_HOST),$(MEEGO_PASSWORD),$(MEEGO_PORT))
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command (command, execution directory, libraries and executables additional search paths, dlls list)
 define tools.run
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \

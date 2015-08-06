@@ -1,5 +1,5 @@
 ###################################################################################################
-#—борка под Emscripten SDK
+#Build for Emscripten SDK
 ###################################################################################################
 ifeq ($(strip $(EMSCRIPTEN_SDK)),)
   $(error "Please set EMSCRIPTEN_SDK variable in your environment")
@@ -10,7 +10,7 @@ ifeq ($(strip $(PYTHON2_SDK)),)
 endif
 
 ###################################################################################################
-# онстанты
+#Constants
 ###################################################################################################
 PROFILES          += unistd emscripten has_windows no_dll no_threads
 EXE_SUFFIX        := .js
@@ -42,7 +42,7 @@ include $(TOOLSETS_DIR)/g++.mak
 PROFILES := $(filter-out g++,$(PROFILES))
 
 ###################################################################################################
-#ѕереопределени€ вызовов утилит
+#Override utilities calling
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -56,7 +56,7 @@ define tools.lib
 export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for file in $2; do export FILE_COUNTER=$$(($$FILE_COUNTER + 1)) && FILE_LIST="$$FILE_LIST $$file"; if [ $$FILE_COUNTER -eq 256 ]; then $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9); export FILE_COUNTER=0 FILE_LIST=""; fi; done && $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9)
 endef
 
-#¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute commands (command, launch directory, additional search paths for libraries and executables, dlls list)
 define tools.run
 $(call prepare_to_execute,$2,$3) && $(NODE_TOOL) $(CURDIR)/$(firstword $1)
 endef

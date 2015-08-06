@@ -1,5 +1,5 @@
 ###################################################################################################
-#—борка под BlackBerry TabletOS
+#Build for BlackBerry TabletOS
 ###################################################################################################
 ifeq ($(strip $(TABLETOS_NDK)),)
   $(error "Please set TABLETOS_NDK variable in your environment")
@@ -26,7 +26,7 @@ ifeq ($(strip $(TABLETOS_DEVHOST)),)
 endif
 
 ###################################################################################################
-# онстанты
+#Constants
 ###################################################################################################
 QNX_TARGET               := $(TABLETOS_NDK)/target/qnx6
 QNX_HOST                 := $(TABLETOS_NDK)/host/$(TABLETOS_DEVHOST)/$(TABLETOS_DEVARCHITECTURE)
@@ -75,7 +75,7 @@ export QNX_TARGET
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#ѕереопределени€ вызовов утилит
+#Override utilities calling
 ###################################################################################################
 define tools.c++compile
 $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -98,10 +98,10 @@ define tools.link.dll
 endef
 
 ###################################################################################################
-#ќтладка на устройстве
+#Debug on device
 ###################################################################################################
 
-# опирование файла на устройство (им€ локальных файлов, им€ удалЄнного каталога)
+#Copy file to device (local files name, remote directory name)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 $(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(TABLETOS_USER)@$(TABLETOS_HOST),,$(TABLETOS_PORT),$(TABLETOS_KEY)) && \
@@ -109,7 +109,7 @@ $(call ssh_copy,$(strip $1),$(TABLETOS_USER)@$(TABLETOS_HOST):$(REMOTE_DEBUG_DIR
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(TABLETOS_USER)@$(TABLETOS_HOST),,$(TABLETOS_PORT),$(TABLETOS_KEY))
 endef
 
-#¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command (command, execution directory, libraries and executables additional search paths, dlls list)
 define tools.run
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
@@ -119,7 +119,7 @@ export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstwor
 $(call ssh_run,"export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)",$(TABLETOS_USER)@$(TABLETOS_HOST),,$(TABLETOS_PORT),$(TABLETOS_KEY))
 endef
 
-#¬ыполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command from package (command, execution directory, libraries and executables additional search paths, dlls list)
 define tools.run.tabletos_package
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
@@ -131,10 +131,10 @@ echo "$$(echo $$SUBST_COMMAND) $$(echo $$SUBST_DIR_RESULT) $(args)" | plink -P 1
 endef
 
 ###################################################################################################
-#—борка приложени€
+#Building application
 ###################################################################################################
 
-#ќбработка цели tabletos-bar (им€ цели)
+#Process target tabletos-bar (target name)
 define process_target.tabletos-bar
   $1.NAME := $$(strip $$($1.NAME))
   

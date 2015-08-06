@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под BeagleBoard
+#Build for BeagleBoard
 ###################################################################################################
 ifeq ($(strip $(BEAGLEBOARD_SDK)),)
   $(error "Please set BEAGLEBOARD_SDK variable in your environment")
@@ -18,7 +18,7 @@ ifeq ($(strip $(BEAGLE_BOARD_HOST)),)
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 PROFILES          += unistd beagleboard x11 linux egl gles has_windows
 REMOTE_DEBUG_DIR  ?= //work/funner
@@ -36,7 +36,7 @@ COMMON_LINK_FLAGS += -fPIC -O2 -lm -lpthread -lstdc++ -lrt -Wl,-L,$(DIST_BIN_DIR
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#Переопределения вызовов утилит
+#Override utilities calling
 ###################################################################################################
 define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -55,10 +55,10 @@ define tools.link.dll
 endef
 
 ###################################################################################################
-#Отладка на устройстве
+#Debug on device
 ###################################################################################################
 
-#Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
+#Copy file to device (local files name, remote directory name)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 $(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST),$(BEAGLE_BOARD_PASSWORD)) && \
@@ -66,7 +66,7 @@ $(call ssh_copy,$1,$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST):$(REMOTE_DEBUG_DIR)
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST),$(BEAGLE_BOARD_PASSWORD))
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+#Execute command (command, launch directory, additional paths for libraries and executables, dlls list)
 define tools.run
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \

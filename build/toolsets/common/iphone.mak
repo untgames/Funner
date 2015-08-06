@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под iPhone
+#Build for iPhone
 ###################################################################################################
 
 ifndef IPHONE_SDK_PATH
@@ -7,7 +7,7 @@ ifndef IPHONE_SDK_PATH
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
@@ -24,10 +24,10 @@ include $(TOOLSETS_DIR)/g++.mak
 
 PROFILES := $(filter-out g++,$(PROFILES))
 
-SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
+SOURCE_FILES_SUFFIXES += mm         #Source files extension
 
 ###################################################################################################
-#Линковка shared-library (имя выходного файла)
+#Shared-library linking (output file name)
 ###################################################################################################
 define tools.link.dll
 -dynamiclib -Wl,-undefined -Wl,error -install_name @loader_path/$(notdir $(basename $1))$(DLL_SUFFIX)
@@ -38,22 +38,22 @@ $(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$
 endef
 
 ###################################################################################################
-#Сборка единой статической библиотеки
+#Build single static library
 ###################################################################################################
 VALID_TARGET_TYPES += fat-static-lib lipo-lib
 PACKAGE_COMMANDS   += lipo
 
-#Получение пути к библиотеке
+#Get path to library
 define get_full_library_path
 $(strip $(firstword $(wildcard $(patsubst %,%/$(notdir $(strip $1)),$2))))
 endef
 
-#Поиск библиотеки (имя библиотеки, пути поиска)
+#Search for library (library name, search paths)
 define find_library
 $(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$1)
 endef
 
-#Обработка цели объединения библиотек(имя цели)
+#Process target combining libraries (target name)
 define process_target.fat-static-lib
   $1.NAME := $$(strip $$($1.NAME))
   
@@ -78,7 +78,7 @@ define process_target.fat-static-lib
 		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS)) -arch_only $(FAT_LIB_ARCH_TYPE) 
 endef
 
-#Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)
+#Process target combining libraries built for different archs (target name)
 define process_target.lipo-lib
   $1.NAME := $$(strip $$($1.NAME))
   

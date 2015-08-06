@@ -20,13 +20,10 @@ COMMON_LINK_FLAGS                += -L$(BADA_SDK_HOME)/Model/$(BADA_LANGUAGE_PAC
 
 include $(TOOLSETS_DIR)/bada.mak
 
-#Инсталляция
-
 install: build INSTALL_SIMULATOR_PROJECT
 
 .PHONY: install INSTALL_SIMULATOR_PROJECT
 
-#Инсталляция файла в симулятор (имя локального файла, имя результирующего файла)
 define install_file_to_bada_simulator
   ifeq (,$$(filter $1/,$$(wildcard $1/)))
     INSTALL_SIMULATOR_FILES := $$(INSTALL_SIMULATOR_FILES) $2
@@ -39,7 +36,6 @@ define install_file_to_bada_simulator
   endif
 endef
 
-#Инсталляция файлов в симулятор (не используется, имена локальных файлов, результирующий каталог)
 define install_files_to_bada_simulator
   INSTALLATION_DIRS := $(INSTALLATION_DIRS) $3
   
@@ -50,20 +46,14 @@ $(eval $(call process_files,,$(SIMULATOR_TEMPLATE_PROJECT_DIR),$(SIMULATOR_TEMPL
 
 INSTALL_SIMULATOR_PROJECT: $(INSTALL_SIMULATOR_FILES)
 
-#Копирование файла на устройство (имя локального файла, имя удалённого файла)
 define tools.install
  echo Installing $(notdir $1)... && mkdir -p $(dir $(SIMULATOR_APP_DIR)/Bin/$2) && cp $1 $(SIMULATOR_APP_DIR)/Bin/$2
 endef
 
-#Деинсталляция (имя каталога)
 define tools.uninstall
 $(RM) -Rf $1
 endef
 
-#Запуск
-#$(call prepare_to_execute,$2,$4) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)" $(if $5, > "$(CURDIR)/$5")
-  
-#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений, файл результатов)
 define tools.run
 echo -n > $(firstword $1).stdout && \
 export BADA_STDOUT_FILE_NAME=$(CURDIR)/$(firstword $1).stdout && \

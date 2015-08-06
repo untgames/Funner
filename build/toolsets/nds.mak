@@ -1,5 +1,5 @@
 ###################################################################################################
-#Проверка наличия конфигурации
+#Check configuration existence
 ###################################################################################################
 ifeq ($(strip $(DEVKITARM)),)
   $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
@@ -10,7 +10,7 @@ ifeq ($(strip $(DEVKITPRO)),)
 endif
 
 ###################################################################################################
-#Константы сборки под NDS
+#Build for NDS constants
 ###################################################################################################
 ARCH              := -mthumb -mthumb-interwork
 LIBNDS            := $(DEVKITPRO)/libnds
@@ -28,8 +28,8 @@ PROFILES          += unistd no_windows haswchar
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
-#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки)
+#Files linking (output file name, files list, static libraries directories list,
+#include link symbols list, link flags)
 ###################################################################################################
 define tools.link
 $(RM) $(basename $1).arm9 $(basename $1).elf && \

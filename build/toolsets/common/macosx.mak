@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под MacOS X g++
+#Build for MacOS X g++
 ###################################################################################################
 
 ifndef MACOSX_VERSION
@@ -7,7 +7,7 @@ ifndef MACOSX_VERSION
 endif
 
 ###################################################################################################
-#Константы
+#Constants
 ###################################################################################################
 EXE_SUFFIX     :=
 DLL_PREFIX     := lib
@@ -33,10 +33,10 @@ include $(TOOLSETS_DIR)/g++.mak
 
 PROFILES := $(filter-out g++,$(PROFILES))
 
-SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
+SOURCE_FILES_SUFFIXES += mm         #Source files extension
 
 ###################################################################################################
-#Линковка shared-library (имя выходного файла)
+#Shared-library linking (output file name)
 ###################################################################################################
 define tools.link.dll
 -dynamiclib -Wl,-undefined -Wl,error -install_name @loader_path/$(notdir $(basename $1))$(DLL_SUFFIX)
