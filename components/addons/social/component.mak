@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := SOCIAL_COMPONENTS
 
-#Цель №1 - пакет
+#Target - package
 SOCIAL_COMPONENTS.TYPE              := package
 SOCIAL_COMPONENTS.COMPONENTS        := core facebook #local
 #SOCIAL_COMPONENTS.iphone.COMPONENTS := game_kit

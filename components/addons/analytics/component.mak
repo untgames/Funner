@@ -1,8 +1,8 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := ANALYTICS_COMPONENTS
 
-#Цель - пакет
+#Target - package
 ANALYTICS_COMPONENTS.TYPE       := package
 ANALYTICS_COMPONENTS.COMPONENTS := flurry

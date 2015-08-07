@@ -14,20 +14,20 @@ const char* LOG_NAME = "analytics.flurry.FlurrySessionImpl";
 class FlurrySessionImpl
 {
   public:
-    ///Конструктор
+    ///Constructor
     FlurrySessionImpl ()
       : started (false)
     {
       Platform::GetReleaseVersion (release_version); //this must be called before 'StartSession' according to flurry documentation
     }
 
-    ///Получение имени версии используемой библиотеки
+    ///Get version name of underlying library
     const char* GetReleaseVersion ()
     {
       return release_version.c_str ();
     }
 
-    ///Запуск аналитики
+    ///Start analytics
     void StartSession (const char* api_key)
     {
       try
@@ -49,7 +49,7 @@ class FlurrySessionImpl
       }
     }
 
-    ///Установка дополнительных параметров аналитики
+    ///Set analytics additional params
     void SetUserId (const char* user_id)
     {
       try
@@ -101,7 +101,7 @@ class FlurrySessionImpl
       }
     }
 
-    ///Трекинг событий
+    ///Events tracking
     void LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
     {
       try
@@ -156,7 +156,7 @@ class FlurrySessionImpl
       }
     }
 
-    ///Управление протоколированием
+    ///Logging management
     void SetDebugLogEnabled (bool state)
     {
       try
@@ -184,8 +184,8 @@ class FlurrySessionImpl
     }
 
   private:
-    bool        started;           //запущена ли сессия
-    stl::string release_version;   //версия используемой библиотеки flurry
+    bool        started;           //was session started
+    stl::string release_version;   //version name of flurry library
 };
 
 typedef common::Singleton<FlurrySessionImpl> FlurrySessionSingleton;
@@ -197,7 +197,7 @@ typedef common::Singleton<FlurrySessionImpl> FlurrySessionSingleton;
 */
 
 /*
-   Поддерживается ли аналитика на данной платформе
+   Is analytics supported on current platform
 */
 
 bool Flurry::IsSupported ()
@@ -206,7 +206,7 @@ bool Flurry::IsSupported ()
 }
 
 /*
-   Получение имени версии используемой библиотеки
+   Get version name of underlying library
 */
 
 const char* Flurry::GetReleaseVersion ()
@@ -215,7 +215,7 @@ const char* Flurry::GetReleaseVersion ()
 }
 
 /*
-   Запуск аналитики
+   Start analytics
 */
 
 void Flurry::StartSession (const char* api_key)
@@ -224,7 +224,7 @@ void Flurry::StartSession (const char* api_key)
 }
 
 /*
-   Установка дополнительных параметров аналитики
+   Set analytics additional params
 */
 
 void Flurry::SetUserId (const char* user_id)
@@ -243,7 +243,7 @@ void Flurry::SetGender (Gender gender)
 }
 
 /*
-   Трекинг событий
+   Events tracking
 */
 
 void Flurry::LogEvent (const char* event, bool timed)
@@ -272,7 +272,7 @@ void Flurry::LogPageView ()
 }
 
 /*
-   Управление протоколированием
+   Logging management
 */
 
 void Flurry::SetDebugLogEnabled (bool state)

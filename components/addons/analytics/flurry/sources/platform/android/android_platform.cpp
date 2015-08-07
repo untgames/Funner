@@ -4,11 +4,11 @@ using namespace analytics::flurry;
 using namespace analytics::flurry::android;
 
 /*
-   Платформа Android
+   Android platform
 */
 
 /*
-   Поддерживается ли аналитика на данной платформе
+   Is analytics supported on current platform
 */
 
 bool AndroidPlatform::IsSupported ()
@@ -17,7 +17,7 @@ bool AndroidPlatform::IsSupported ()
 }
 
 /*
-   Получение имени версии используемой библиотеки
+   Get version name of underlying library
 */
 
 void AndroidPlatform::GetReleaseVersion (stl::string& version)
@@ -26,7 +26,7 @@ void AndroidPlatform::GetReleaseVersion (stl::string& version)
 }
 
 /*
-   Запуск аналитики
+   Start analytics
 */
 
 void AndroidPlatform::StartSession (const char* api_key)
@@ -35,7 +35,7 @@ void AndroidPlatform::StartSession (const char* api_key)
 }
 
 /*
-   Установка дополнительных параметров аналитики
+   Set analytics additional params
 */
 
 void AndroidPlatform::SetUserId (const char* user_id)
@@ -54,7 +54,7 @@ void AndroidPlatform::SetGender (Gender gender)
 }
 
 /*
-   Трекинг событий
+   Events tracking
 */
 
 void AndroidPlatform::LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
@@ -73,7 +73,7 @@ void AndroidPlatform::LogPageView ()
 }
 
 /*
-   Управление протоколированием
+   Logging management
 */
 
 void AndroidPlatform::SetDebugLogEnabled (bool state)

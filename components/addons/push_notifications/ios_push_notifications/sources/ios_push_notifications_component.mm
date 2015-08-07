@@ -6,14 +6,14 @@ using namespace push_notifications::ios_push_notifications;
 namespace
 {
 
-const char* COMPONENT_NAME  = "push_notifications.centers.ios_center"; //им€ компонента
-const char* CENTER_ID        = "IOSCenter";                            //идентификатор центра обработки пуш-сообщений
-const char* CENTER_NAME_MASK = "IOSCenter";                            //маска имен центров обработки пуш-сообщений
+const char* COMPONENT_NAME  = "push_notifications.centers.ios_center"; //component name
+const char* CENTER_ID        = "IOSCenter";                            //push notifications processing center id
+const char* CENTER_NAME_MASK = "IOSCenter";                            //push notifications processing centers names wildcard
 
 }
 
 /*
-    омпонент центра обработки пуш-сообщений
+   Push notifications processing center component
 */
 
 namespace components

@@ -30,11 +30,11 @@ NSDictionary* property_map_to_ns_dictionary (const common::PropertyMap& paramete
 }
 
 /*
-   Платформа по умолчанию
+   iOS platform
 */
 
 /*
-   Поддерживается ли аналитика на данной платформе
+   Is analytics supported on current platform
 */
 
 bool IOsPlatform::IsSupported ()
@@ -43,7 +43,7 @@ bool IOsPlatform::IsSupported ()
 }
 
 /*
-   Получение имени версии используемой библиотеки
+   Get version name of underlying library
 */
 
 void IOsPlatform::GetReleaseVersion (stl::string& version)
@@ -52,7 +52,7 @@ void IOsPlatform::GetReleaseVersion (stl::string& version)
 }
 
 /*
-   Запуск аналитики
+   Start analytics
 */
 
 void IOsPlatform::StartSession (const char* api_key)
@@ -66,7 +66,7 @@ void IOsPlatform::StartSession (const char* api_key)
 }
 
 /*
-   Установка дополнительных параметров аналитики
+   Set analytics additional params
 */
 
 void IOsPlatform::SetUserId (const char* user_id)
@@ -99,7 +99,7 @@ void IOsPlatform::SetGender (Gender gender)
 }
 
 /*
-   Трекинг событий
+   Events tracking
 */
 
 void IOsPlatform::LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
@@ -137,7 +137,7 @@ void IOsPlatform::LogPageView ()
 }
 
 /*
-   Управление протоколированием
+   Logging management
 */
 
 void IOsPlatform::SetDebugLogEnabled (bool state)

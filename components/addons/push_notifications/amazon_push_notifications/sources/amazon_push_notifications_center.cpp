@@ -9,19 +9,19 @@ using namespace syslib::android;
 namespace
 {
 
-const char* LOG_NAME           = "push_notifications.amazon_push_notifications.AmazonCenter";  //имя протокола
-const char* CENTER_DESCRIPTION = "AmazonCenter";                                               //описание центра пуш-сообщений
+const char* LOG_NAME           = "push_notifications.amazon_push_notifications.AmazonCenter";  //log name
+const char* CENTER_DESCRIPTION = "AmazonCenter";                                               //push notifications center description
 
 //forward declarations
 void on_registered (JNIEnv& env, jobject, jstring reg_id);
 void on_message (JNIEnv& env, jobject, jstring message);
 void on_error (JNIEnv& env, jobject, jstring error);
 
-//Центр обработки пуш-сообщений
+//Push notifications processing center
 class AmazonCenter
 {
   public:
-    ///Конструктор/деструктор
+    ///Constructor/destructor
     AmazonCenter ()
       : log (LOG_NAME)
       , is_registering_for_notifications (false)
@@ -34,7 +34,7 @@ class AmazonCenter
         get_env ().DeleteGlobalRef (adm_manager_class);
     }
 
-    ///Регистрация на пуш-сообщения
+    ///Register for push notifications
     void RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
     {
       try
@@ -94,19 +94,19 @@ class AmazonCenter
       }
     }
 
-    ///Подписка на пуш-сообщения
+    ///Register push notifications handler
     xtl::connection RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)
     {
       return notifications_signal.connect (handler);
     }
 
-    ///Обработка пуш-сообщений
+    ///Handle push notification
     void OnNotificationReceived (const stl::string& notification)
     {
       notifications_signal (notification.c_str ());
     }
 
-    ///Обработка результата регистрации на пуш-сообщения
+    ///Handle result of registration for push notifications
     void OnRegisterForNotificationsSucceeded (const stl::string& token)
     {
       is_registering_for_notifications = false;
@@ -123,7 +123,7 @@ class AmazonCenter
       register_for_notifications_callback = PushNotificationsCenter::RegisterCallback ();
     }
 
-    ///Инициализация java-биндинга
+    ///Initialization of java-bindings
     void InitJavaBindings (JNIEnv* env)
     {
       static const char* METHOD_NAME = "push_notifications::amazon_push_notifications::AmazonCenter::InitJavaBindings";
@@ -208,10 +208,10 @@ class AmazonCenter
     typedef xtl::signal<void (const char*)> NotificationsSignal;
 
   private:
-    common::Log                               log;                                             //протокол
-    NotificationsSignal                       notifications_signal;                            //сигнал оповещения о новых сообщениях
-    bool                                      is_registering_for_notifications;                //активен ли в данный момент процесс регистрации на пуш-сообщения
-    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //колбек результата регистрации на пуш-сообщения
+    common::Log                               log;                                             //log
+    NotificationsSignal                       notifications_signal;                            //signal notifying about new push notifications
+    bool                                      is_registering_for_notifications;                //is waiting for result of registration for push notifications
+    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //registration for push notifications result callback
     jclass                                    adm_manager_class;                               //EngineADMManager class
 };
 
@@ -235,7 +235,7 @@ void on_message (JNIEnv& env, jobject, jstring message)
 }
 
 /*
-   Конструктор / деструктор
+   Constructor / destructor
 */
 
 PushNotificationsCenterImpl::PushNotificationsCenterImpl ()
@@ -249,7 +249,7 @@ PushNotificationsCenterImpl::~PushNotificationsCenterImpl ()
 }
 
 /*
-   Описание
+   Description
 */
 
 const char* PushNotificationsCenterImpl::Description ()
@@ -258,7 +258,7 @@ const char* PushNotificationsCenterImpl::Description ()
 }
 
 /*
-   Регистрация на пуш-сообщения
+   Registration for push notifications
 */
 
 void PushNotificationsCenterImpl::RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
@@ -272,7 +272,7 @@ void PushNotificationsCenterImpl::UnregisterForNotifications ()
 }
 
 /*
-   Подписка на пуш-сообщения
+   Subscription for push notifications
 */
 
 xtl::connection PushNotificationsCenterImpl::RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)
@@ -281,7 +281,7 @@ xtl::connection PushNotificationsCenterImpl::RegisterNotificationsHandler (const
 }
 
 /*
-   Инициализация java-биндинга
+   Initialization of java-bindings
 */
 
 void PushNotificationsCenterImpl::InitJavaBindings (JNIEnv* env)

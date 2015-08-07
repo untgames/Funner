@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := SOCIAL.GAME_KIT.SOURCES
 
-#Цель - sources
+#Target - sources
 SOCIAL.GAME_KIT.SOURCES.TYPE        := static-lib
 SOCIAL.GAME_KIT.SOURCES.NAME        := funner.social.game_kit
 SOCIAL.GAME_KIT.SOURCES.SOURCE_DIRS := sources

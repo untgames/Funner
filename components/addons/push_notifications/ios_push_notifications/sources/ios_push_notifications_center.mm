@@ -9,17 +9,17 @@ using namespace push_notifications::ios_push_notifications;
 namespace
 {
 
-const char* LOG_NAME                                    = "push_notifications.ios_push_notifications.IOSCenter"; //им€ протокола
-const char* CENTER_DESCRIPTION                          = "IOSCenter";                                           //им€ центра
-const char* NOTIFICATION_RECEIVED_PREFIX                = "PushNotificationReceived ";                           //префикс сообщени€ о новом пуш-сообщении
-const char* REGISTER_FOR_NOTIFICATIONS_SUCCEEDED_PREFIX = "RegisterForPushNotification Succeeded ";              //префикс сообщени€ о успешной регистрации на пуш-сообщени€
-const char* REGISTER_FOR_NOTIFICATIONS_FAILED_PREFIX    = "RegisterForPushNotification Failed ";                 //префикс сообщени€ о ошибке регистрации на пуш-сообщени€
+const char* LOG_NAME                                    = "push_notifications.ios_push_notifications.IOSCenter"; //log name
+const char* CENTER_DESCRIPTION                          = "IOSCenter";                                           //push notification processing center description
+const char* NOTIFICATION_RECEIVED_PREFIX                = "PushNotificationReceived ";                           //new push notification event prefix
+const char* REGISTER_FOR_NOTIFICATIONS_SUCCEEDED_PREFIX = "RegisterForPushNotification Succeeded ";              //registration for push notification success event prefix
+const char* REGISTER_FOR_NOTIFICATIONS_FAILED_PREFIX    = "RegisterForPushNotification Failed ";                 //registration for push notification faile event prefix
 
-//÷ентр обработки пуш-сообщений
+//Push notifications processing center
 class IOSCenter
 {
   public:
-    /// онструктор
+    ///Constructor
     IOSCenter ()
       : log (LOG_NAME)
       , is_registering_for_notifications (false)
@@ -40,7 +40,7 @@ class IOSCenter
       }
     }
 
-    ///–егистраци€ на пуш-сообщени€
+    ///Registration for push notifcations
     void RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
     {
       try
@@ -136,20 +136,20 @@ class IOSCenter
       [pool release];
     }
 
-    ///ѕодписка на пуш-сообщени€
+    ///Registration for new push notifications
     xtl::connection RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)
     {
       return notifications_signal.connect (handler);
     }
 
   private:
-    ///ќбработка пуш-сообщений
+    ///Handle new push notification
     void OnNotificationReceived (const char* notification)
     {
       notifications_signal (notification + xtl::xstrlen (NOTIFICATION_RECEIVED_PREFIX));
     }
 
-    ///ќбработка результата регистрации на пуш-сообщени€
+    ///Handle registration for push notifications result
     void OnRegisterForNotificationsSucceeded (const char* notification)
     {
       is_registering_for_notifications = false;
@@ -170,13 +170,13 @@ class IOSCenter
     typedef xtl::signal<void (const char*)> NotificationsSignal;
 
   private:
-    common::Log                               log;                                             //протокол
-    NotificationsSignal                       notifications_signal;                            //сигнал оповещени€ о новых сообщени€х
-    bool                                      is_registering_for_notifications;                //активен ли в данный момент процесс регистрации на пуш-сообщени€
-    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //колбек результата регистрации на пуш-сообщени€
-    xtl::auto_connection                      register_for_notifications_succeeded_connection; //соединение событи€ о успешной регистрации на пуш-сообщени€
-    xtl::auto_connection                      register_for_notifications_failed_connection;    //соединение событи€ о ошибке регистрации на пуш-сообщени€
-    xtl::auto_connection                      notification_received_connection;                //соединение событи€ о получении пуш-сообщени€
+    common::Log                               log;                                             //log
+    NotificationsSignal                       notifications_signal;                            //signal notifying about new push notifications
+    bool                                      is_registering_for_notifications;                //is waiting for registration for push notifications result
+    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //registration for push notifications result callback
+    xtl::auto_connection                      register_for_notifications_succeeded_connection; //successful registration for push notifications event connection
+    xtl::auto_connection                      register_for_notifications_failed_connection;    //failed registration for push notifications event connection
+    xtl::auto_connection                      notification_received_connection;                //new push notification event connection
 };
 
 typedef common::Singleton<IOSCenter> IOSCenterSingleton;
@@ -184,7 +184,7 @@ typedef common::Singleton<IOSCenter> IOSCenterSingleton;
 }
 
 /*
-    онструктор / деструктор
+   Constructor / destructor
 */
 
 PushNotificationsCenterImpl::PushNotificationsCenterImpl ()
@@ -196,7 +196,7 @@ PushNotificationsCenterImpl::~PushNotificationsCenterImpl ()
 }
 
 /*
-   ќписание
+   Description
 */
 
 const char* PushNotificationsCenterImpl::Description ()
@@ -205,7 +205,7 @@ const char* PushNotificationsCenterImpl::Description ()
 }
 
 /*
-   –егистраци€ на пуш-сообщени€
+   Registration for push notifications
 */
 
 void PushNotificationsCenterImpl::RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
@@ -219,7 +219,7 @@ void PushNotificationsCenterImpl::UnregisterForNotifications ()
 }
 
 /*
-   ѕодписка на пуш-сообщени€
+   Registration for new push notifications
 */
 
 xtl::connection PushNotificationsCenterImpl::RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)

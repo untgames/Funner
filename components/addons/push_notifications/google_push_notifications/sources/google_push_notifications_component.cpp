@@ -6,16 +6,16 @@ using namespace push_notifications::google_push_notifications;
 namespace
 {
 
-const char* COMPONENT_NAME              = "push_notifications.centers.google_center";                      //имя компонента
-const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.google_push_notifications"; //имя компонента обработчика загрузки приложения
-const char* LOAD_HANDLER_ID             = "GoogleCenter";                                                  //идентификатор обработчика загрузки приложения
-const char* CENTER_ID                   = "GoogleCenter";                                                  //идентификатор центра обработки пуш-сообщений
-const char* CENTER_NAME_MASK            = "GoogleCenter";                                                  //маска имен центров обработки пуш-сообщений
+const char* COMPONENT_NAME              = "push_notifications.centers.google_center";                      //component name
+const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.google_push_notifications"; //application load handler component name
+const char* LOAD_HANDLER_ID             = "GoogleCenter";                                                  //application load handler id
+const char* CENTER_ID                   = "GoogleCenter";                                                  //push notification processing center id
+const char* CENTER_NAME_MASK            = "GoogleCenter";                                                  //push notifications processing centers names wildcard
 
 }
 
 /*
-   Компонент центра обработки пуш-сообщений
+   Push notifications processing center component
 */
 
 namespace components

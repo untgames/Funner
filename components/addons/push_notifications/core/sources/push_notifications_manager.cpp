@@ -3,13 +3,13 @@
 using namespace push_notifications;
 
 /*
-   Реализация менеджера центров push-сообщений
+   Push notifications centers manager implementation
 */
 
 namespace
 {
 
-const char* COMPONENTS_MASK = "push_notifications.centers.*"; //маска имён компонентов центров push-сообщений
+const char* COMPONENTS_MASK = "push_notifications.centers.*"; //push notifications centers components names wildcard
 
 struct PushNotificationsCenterDesc
 {
@@ -30,7 +30,7 @@ struct PushNotificationsCentersManagerImpl::Impl
 
   PushNotificationsCenterDescMap center_creators;
 
-  ///Регистрация создателей центров пуш-сообщений
+  ///Registration of push notifications centers creators
   void RegisterCenter (const char* id, const char* center_name_mask, const PushNotificationsCentersManager::CreateCenterHandler& handler)
   {
     static const char* METHOD_NAME = "push_notifications::PushNotificationsCentersManager::RegisterCenter";
@@ -62,7 +62,7 @@ struct PushNotificationsCentersManagerImpl::Impl
     center_creators.clear ();
   }
 
-  ///Поиск центра пуш-сообщений
+  ///Search for push notifications center
   PushNotificationsCenterDescMap::iterator FindCenterDesc (const char* center_name)
   {
     for (PushNotificationsCenterDescMap::iterator iter = center_creators.begin (), end = center_creators.end (); iter != end; ++iter)
@@ -74,7 +74,7 @@ struct PushNotificationsCentersManagerImpl::Impl
     return center_creators.end ();
   }
 
-  ///Проверка наличия центра пуш-сообщений
+  ///Check push notifications center existence
   bool IsCenterRegistered (const char* center_name)
   {
     if (!center_name)
@@ -85,7 +85,7 @@ struct PushNotificationsCentersManagerImpl::Impl
     return FindCenterDesc (center_name) != center_creators.end ();
   }
 
-  ///Создание центра пуш-сообщений
+  ///Create push notifications center
   IPushNotificationsCenter* CreateCenter (const char* center_name)
   {
     static const char* METHOD_NAME = "push_notifications::PushNotificationsCentersManagerImpl::CreateCenter";
@@ -103,7 +103,7 @@ struct PushNotificationsCentersManagerImpl::Impl
     return iter->second.handler (center_name);
   }
 
-  ///Загрузка центров пуш-сообщений по умолчанию
+  ///Load default push notifications centers
   void LoadDefaultCenters ()
   {
     static common::ComponentLoader loader (COMPONENTS_MASK);
@@ -111,7 +111,7 @@ struct PushNotificationsCentersManagerImpl::Impl
 };
 
 /*
-   Конструктор / деструктор
+   Constructor / destructor
 */
 
 PushNotificationsCentersManagerImpl::PushNotificationsCentersManagerImpl ()
@@ -124,7 +124,7 @@ PushNotificationsCentersManagerImpl::~PushNotificationsCentersManagerImpl ()
 }
 
 /*
-   Регистрация создателей центров пуш-сообщений
+   Registration of push notifications centers creators
 */
 
 void PushNotificationsCentersManagerImpl::RegisterCenter (const char* id, const char* center_name_mask, const PushNotificationsCentersManager::CreateCenterHandler& handler)
@@ -143,7 +143,7 @@ void PushNotificationsCentersManagerImpl::UnregisterAllCenters ()
 }
 
 /*
-   Проверка наличия центра пуш-сообщений
+   Check push notifications center existence
 */
 
 bool PushNotificationsCentersManagerImpl::IsCenterRegistered (const char* center_name)
@@ -152,7 +152,7 @@ bool PushNotificationsCentersManagerImpl::IsCenterRegistered (const char* center
 }
 
 /*
-   Создание центра пуш-сообщений
+   Create push notifications center
 */
 
 IPushNotificationsCenter* PushNotificationsCentersManagerImpl::CreateCenter (const char* center_name)
@@ -161,7 +161,7 @@ IPushNotificationsCenter* PushNotificationsCentersManagerImpl::CreateCenter (con
 }
 
 /*
-   Регистрация создателей центров пуш-сообщений
+   Registration of push notifications centers creators
 */
 
 void PushNotificationsCentersManager::RegisterCenter (const char* id, const char* center_name_mask, const PushNotificationsCentersManager::CreateCenterHandler& handler)
@@ -180,7 +180,7 @@ void PushNotificationsCentersManager::UnregisterAllCenters ()
 }
 
 /*
-   Проверка наличия центра пуш-сообщений
+   Check push notifications center existence
 */
     
 bool PushNotificationsCentersManager::IsCenterRegistered (const char* center_name)

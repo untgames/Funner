@@ -5,13 +5,13 @@ using namespace analytics::flurry::android;
 namespace
 {
 
-const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.android_flurry_analytics"; //имя компонента обработчика загрузки приложения
-const char* LOAD_HANDLER_ID             = "AndroidFlurryAnalytics";                                       //идентификатор обработчика загрузки приложения
+const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.android_flurry_analytics"; //application launch handler component name
+const char* LOAD_HANDLER_ID             = "AndroidFlurryAnalytics";                                       //application launch handler id
 
 }
 
 /*
-   Компонент аналитики
+   Analytics component
 */
 
 namespace components

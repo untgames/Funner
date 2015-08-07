@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := STORE_COMPONENTS
 
-#Цель №1 - пакет
+#Target - package
 STORE_COMPONENTS.TYPE               := package
 STORE_COMPONENTS.COMPONENTS         := core
 STORE_COMPONENTS.android.COMPONENTS := android_store amazon_store

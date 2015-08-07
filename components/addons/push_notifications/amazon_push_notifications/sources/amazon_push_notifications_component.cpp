@@ -6,16 +6,16 @@ using namespace push_notifications::amazon_push_notifications;
 namespace
 {
 
-const char* COMPONENT_NAME              = "push_notifications.centers.amazon_center";                      //имя компонента
-const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.amazon_push_notifications"; //имя компонента обработчика загрузки приложения
-const char* LOAD_HANDLER_ID             = "AmazonCenter";                                                  //идентификатор обработчика загрузки приложения
-const char* CENTER_ID                   = "AmazonCenter";                                                  //идентификатор центра обработки пуш-сообщений
-const char* CENTER_NAME_MASK            = "AmazonCenter";                                                  //маска имен центров обработки пуш-сообщений
+const char* COMPONENT_NAME              = "push_notifications.centers.amazon_center";                      //component namt
+const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.amazon_push_notifications"; //application load handler component name
+const char* LOAD_HANDLER_ID             = "AmazonCenter";                                                  //application load handler id
+const char* CENTER_ID                   = "AmazonCenter";                                                  //push notifications processing center id
+const char* CENTER_NAME_MASK            = "AmazonCenter";                                                  //push notifications processing centers names wildcard
 
 }
 
 /*
-   Компонент центра обработки пуш-сообщений
+   Push notifications processing center component
 */
 
 namespace components

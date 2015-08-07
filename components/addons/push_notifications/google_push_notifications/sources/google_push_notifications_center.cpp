@@ -9,19 +9,19 @@ using namespace syslib::android;
 namespace
 {
 
-const char* LOG_NAME           = "push_notifications.google_push_notifications.GoogleCenter";  //имя протокола
-const char* CENTER_DESCRIPTION = "GoogleCenter";                                               //описание центра пуш-сообщений
+const char* LOG_NAME           = "push_notifications.google_push_notifications.GoogleCenter";  //log name
+const char* CENTER_DESCRIPTION = "GoogleCenter";                                               //push notifications center description
 
 //forward declarations
 void on_registered (JNIEnv& env, jobject, jstring reg_id);
 void on_message (JNIEnv& env, jobject, jstring message);
 void on_error (JNIEnv& env, jobject, jstring error);
 
-//Центр обработки пуш-сообщений
+//Push notifications processing center
 class GoogleCenter
 {
   public:
-    ///Конструктор/деструктор
+    ///Constructor/destructor
     GoogleCenter ()
       : log (LOG_NAME)
       , is_registering_for_notifications (false)
@@ -34,7 +34,7 @@ class GoogleCenter
         get_env ().DeleteGlobalRef (gcm_manager_class);
     }
 
-    ///Регистрация на пуш-сообщения
+    ///Registration for push notifications
     void RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
     {
       try
@@ -88,19 +88,19 @@ class GoogleCenter
       }
     }
 
-    ///Подписка на пуш-сообщения
+    ///Registration for new push notifications
     xtl::connection RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)
     {
       return notifications_signal.connect (handler);
     }
 
-    ///Обработка пуш-сообщений
+    ///Push notifications handling
     void OnNotificationReceived (const stl::string& notification)
     {
       notifications_signal (notification.c_str ());
     }
 
-    ///Обработка результата регистрации на пуш-сообщения
+    ///Handling of registration for push notifications result
     void OnRegisterForNotificationsSucceeded (const stl::string& token)
     {
       is_registering_for_notifications = false;
@@ -117,7 +117,7 @@ class GoogleCenter
       register_for_notifications_callback = PushNotificationsCenter::RegisterCallback ();
     }
 
-    ///Инициализация java-биндинга
+    ///Initialization of java-bindings
     void InitJavaBindings (JNIEnv* env)
     {
       static const char* METHOD_NAME = "push_notifications::google_push_notifications::GoogleCenter::InitJavaBindings";
@@ -197,10 +197,10 @@ class GoogleCenter
     typedef xtl::signal<void (const char*)> NotificationsSignal;
 
   private:
-    common::Log                               log;                                             //протокол
-    NotificationsSignal                       notifications_signal;                            //сигнал оповещения о новых сообщениях
-    bool                                      is_registering_for_notifications;                //активен ли в данный момент процесс регистрации на пуш-сообщения
-    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //колбек результата регистрации на пуш-сообщения
+    common::Log                               log;                                             //log
+    NotificationsSignal                       notifications_signal;                            //signal notifying about new push notifications
+    bool                                      is_registering_for_notifications;                //is waiting for registration for push notifications result
+    PushNotificationsCenter::RegisterCallback register_for_notifications_callback;             //registration for push notification result callback
     jclass                                    gcm_manager_class;                               //EngineGCMManager class
 };
 
@@ -224,7 +224,7 @@ void on_message (JNIEnv& env, jobject, jstring message)
 }
 
 /*
-   Конструктор / деструктор
+   Constructor / destructor
 */
 
 PushNotificationsCenterImpl::PushNotificationsCenterImpl ()
@@ -238,7 +238,7 @@ PushNotificationsCenterImpl::~PushNotificationsCenterImpl ()
 }
 
 /*
-   Описание
+   Description
 */
 
 const char* PushNotificationsCenterImpl::Description ()
@@ -247,7 +247,7 @@ const char* PushNotificationsCenterImpl::Description ()
 }
 
 /*
-   Регистрация на пуш-сообщения
+   Registration for push notifications
 */
 
 void PushNotificationsCenterImpl::RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties)
@@ -261,7 +261,7 @@ void PushNotificationsCenterImpl::UnregisterForNotifications ()
 }
 
 /*
-   Подписка на пуш-сообщения
+   Registration for new push notifications
 */
 
 xtl::connection PushNotificationsCenterImpl::RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler& handler)
@@ -270,7 +270,7 @@ xtl::connection PushNotificationsCenterImpl::RegisterNotificationsHandler (const
 }
 
 /*
-   Инициализация java-биндинга
+   Initialization of java-bindings
 */
 
 void PushNotificationsCenterImpl::InitJavaBindings (JNIEnv* env)

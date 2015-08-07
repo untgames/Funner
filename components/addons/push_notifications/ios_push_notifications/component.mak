@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#Defines and constants
 ###################################################################################################
 TARGETS := PUSH_NOTIFICATIONS.IOS_PUSH_NOTIFICATIONS.SOURCES
 
-#Цель - sources
+#Target - sources
 PUSH_NOTIFICATIONS.IOS_PUSH_NOTIFICATIONS.SOURCES.TYPE        := static-lib
 PUSH_NOTIFICATIONS.IOS_PUSH_NOTIFICATIONS.SOURCES.NAME        := funner.push_notifications.ios_push_notifications
 PUSH_NOTIFICATIONS.IOS_PUSH_NOTIFICATIONS.SOURCES.SOURCE_DIRS := sources

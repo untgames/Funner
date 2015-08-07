@@ -5,31 +5,31 @@ using namespace analytics::flurry::android;
 using namespace syslib::android;
 
 /*
-   ѕлатформа Android
+   Android platform
 */
 
 struct FlurryImpl::Impl
 {
-  bool                is_supported;                 //поддерживаетс€ ли аналитика в данной сборке приложени€
-  jclass              flurry_class;                 //класс Flurry
-  jclass              flurry_agent_class;           //класс FlurryAgent
-  jclass              constants_class;              //класс Constants
-  jclass              hash_map_class;               //класс HashMap
-  global_ref<jobject> flurry;                       //объект Flurry
-  jmethodID           flurry_init_method;           //конструктор Flurry
-  jmethodID           start_session_method;         //метод начала сессии
-  jmethodID           end_session_method;           //метод окончани€ сессии
-  jmethodID           get_release_version_method;   //метод получени€ имени релиза flurry
-  jmethodID           set_user_id_method;           //метод установки идентификатора пользовател€
-  jmethodID           set_age_method;               //метод установки возраста пользовател€
-  jmethodID           set_gender_method;            //метод установки пола пользовател€
-  jmethodID           log_event_method;             //метод протоколировани€ событи€ приложени€
-  jmethodID           end_timed_event_method;       //метод протоколировани€ окончани€ событи€ приложени€
-  jmethodID           log_page_view_method;         //метод протоколировани€ просмотра страницы
-  jmethodID           set_debug_log_enabled_method; //метод установки необходимости отладочного протоколировани€
-  jmethodID           set_log_level_method;         //метод установки уровн€ протоколировани€
-  jmethodID           hash_map_init_method;         //конструктор HashMap
-  jmethodID           hash_map_put_method;          //метод добавление объекта в карту
+  bool                is_supported;                 //is anayltics supported in current build
+  jclass              flurry_class;                 //Flurry class
+  jclass              flurry_agent_class;           //FlurryAgent class
+  jclass              constants_class;              //Constants class
+  jclass              hash_map_class;               //HashMap class
+  global_ref<jobject> flurry;                       //Flurry object
+  jmethodID           flurry_init_method;           //Flurry constructor
+  jmethodID           start_session_method;         //start session method
+  jmethodID           end_session_method;           //end session method
+  jmethodID           get_release_version_method;   //get flurry release version method
+  jmethodID           set_user_id_method;           //set user id method
+  jmethodID           set_age_method;               //set user age method
+  jmethodID           set_gender_method;            //set user gender method
+  jmethodID           log_event_method;             //log application event method
+  jmethodID           end_timed_event_method;       //log application event end method
+  jmethodID           log_page_view_method;         //log page view method
+  jmethodID           set_debug_log_enabled_method; //set debug log enabled method
+  jmethodID           set_log_level_method;         //set log level method
+  jmethodID           hash_map_init_method;         //HashMap constructor
+  jmethodID           hash_map_put_method;          //add object to HashMap method
 
   Impl ()
     : is_supported (false)
@@ -59,7 +59,7 @@ struct FlurryImpl::Impl
       env->DeleteGlobalRef (hash_map_class);
   }
 
-  ///»нициализаци€ java-биндинга
+  ///Initialize java-bindings
   void InitJavaBindings (JNIEnv* env)
   {
     static const char* METHOD_NAME = "analytics::flurry::android::FlurryImpl::InitJavaBindings";
@@ -144,7 +144,7 @@ struct FlurryImpl::Impl
     is_supported = true;
   }
 
-  ///ѕолучение имени версии используемой библиотеки
+  ///Get version name of underlying library
   void GetReleaseVersion (stl::string& version)
   {
     try
@@ -160,7 +160,7 @@ struct FlurryImpl::Impl
     }
   }
 
-  ///«апуск аналитики
+  ///Start analytics
   void StartSession (const char* api_key)
   {
     try
@@ -193,7 +193,7 @@ struct FlurryImpl::Impl
     }
   }
 
-  ///”становка дополнительных параметров аналитики
+  ///Set analytics additional params
   void SetUserId (const char* user_id)
   {
     try
@@ -260,7 +260,7 @@ struct FlurryImpl::Impl
     }
   }
 
-  ///‘ормирование Java HashMap
+  ///Build Java HashMap
   local_ref<jobject> ToHashMap (const common::PropertyMap& properties)
   {
     static const char* METHOD_NAME = "analytics::flurry::android::FlurryImpl::ToHashMap";
@@ -280,7 +280,7 @@ struct FlurryImpl::Impl
     return return_value;
   }
 
-  ///“рекинг событий
+  ///Track events
   void LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
   {
     try
@@ -326,7 +326,7 @@ struct FlurryImpl::Impl
     }
   }
 
-  ///”правление протоколированием
+  ///Logging management
   void SetDebugLogEnabled (bool state)
   {
     try
@@ -389,7 +389,7 @@ struct FlurryImpl::Impl
     }
   }
 
-  //ѕроверка поддерживаетс€ ли flurry
+  //Check if flurry supported
   void CheckIsSupported ()
   {
     if (!is_supported)
@@ -398,7 +398,7 @@ struct FlurryImpl::Impl
 };
 
 /*
-    онструктор / деструктор
+   Constructor / destructor
 */
 
 FlurryImpl::FlurryImpl ()
@@ -411,7 +411,7 @@ FlurryImpl::~FlurryImpl ()
 }
 
 /*
-   ѕоддерживаетс€ ли аналитика на данной платформе
+   Is analytics supported on current platform
 */
 
 bool FlurryImpl::IsSupported ()
@@ -420,7 +420,7 @@ bool FlurryImpl::IsSupported ()
 }
 
 /*
-   ѕолучение имени версии используемой библиотеки
+   Get version name of underlying library
 */
 
 void FlurryImpl::GetReleaseVersion (stl::string& version)
@@ -429,7 +429,7 @@ void FlurryImpl::GetReleaseVersion (stl::string& version)
 }
 
 /*
-   «апуск аналитики
+   Start analytics
 */
 
 void FlurryImpl::StartSession (const char* api_key)
@@ -438,7 +438,7 @@ void FlurryImpl::StartSession (const char* api_key)
 }
 
 /*
-   ”становка дополнительных параметров аналитики
+   Set analytics additional params
 */
 
 void FlurryImpl::SetUserId (const char* user_id)
@@ -457,7 +457,7 @@ void FlurryImpl::SetGender (Gender gender)
 }
 
 /*
-   “рекинг событий
+   Events tracking
 */
 
 void FlurryImpl::LogEvent (const char* event, const common::PropertyMap& parameters, bool timed)
@@ -476,7 +476,7 @@ void FlurryImpl::LogPageView ()
 }
 
 /*
-   ”правление протоколированием
+   Logging management
 */
 
 void FlurryImpl::SetDebugLogEnabled (bool state)
@@ -490,7 +490,7 @@ void FlurryImpl::SetLogLevel (LogLevel level)
 }
 
 /*
-   »нициализаци€ java-биндинга
+   Initialization of java-bindings
 */
 
 void FlurryImpl::InitJavaBindings (JNIEnv* env)

@@ -3,12 +3,12 @@
 using namespace push_notifications;
 
 /*
-   Реализация центра обработки пуш-сообщений
+   Push notifications processing center implementation
 */
 
 struct PushNotificationsCenter::Impl : public xtl::reference_counter
 {
-  IPushNotificationsCenter* center; //центр обработки пуш-сообщений
+  IPushNotificationsCenter* center; //push notifications processing center
 
   Impl (const char* center_name)
     : center (0)
@@ -34,7 +34,7 @@ struct PushNotificationsCenter::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   Constructor / destructor / copying
 */
 
 PushNotificationsCenter::PushNotificationsCenter (const char* center_name)
@@ -60,7 +60,7 @@ PushNotificationsCenter& PushNotificationsCenter::operator = (const PushNotifica
 }
 
 /*
-   Описание
+   Description
 */
 
 const char* PushNotificationsCenter::Description () const
@@ -69,7 +69,7 @@ const char* PushNotificationsCenter::Description () const
 }
 
 /*
-   Регистрация на пуш-сообщения
+   Registration for push notifications
 */
 
 void PushNotificationsCenter::RegisterForNotifications (const RegisterCallback& callback, const common::PropertyMap& properties)
@@ -83,7 +83,7 @@ void PushNotificationsCenter::UnregisterForNotifications ()
 }
 
 /*
-   Подписка на пуш-сообщения
+   Registration for new push notifications
 */
 
 xtl::connection PushNotificationsCenter::RegisterNotificationsHandler (const NotificationsHandler& handler)
@@ -92,7 +92,7 @@ xtl::connection PushNotificationsCenter::RegisterNotificationsHandler (const Not
 }
 
 /*
-   Обмен
+   Swap
 */
 
 void PushNotificationsCenter::Swap (PushNotificationsCenter& source)
@@ -104,7 +104,7 @@ namespace push_notifications
 {
 
 /*
-   Обмен
+   Swap
 */
 
 void swap (PushNotificationsCenter& center1, PushNotificationsCenter& center2)
