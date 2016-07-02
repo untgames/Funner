@@ -3,13 +3,14 @@
 #import <WebKit/CarbonUtils.h>
 #import <WebKit/HIWebView.h>
 #import <WebKit/WebFrame.h>
+#import <WebKit/WebFrameLoadDelegate.h>
 #import <WebKit/WebPolicyDelegate.h>
 #import <WebKit/WebView.h>
 
 using namespace syslib;
 using namespace syslib::macosx;
 
-@interface WebViewDelegate : NSObject
+@interface WebViewDelegate : NSObject<WebPolicyDelegate, WebFrameLoadDelegate>
 {
   @private
     IWebViewListener *listener;

@@ -21,7 +21,7 @@ MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
 
 export MACOSX_DEPLOYMENT_TARGET
 
-MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
+MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk
 
 COMMON_CFLAGS               += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -fvisibility=hidden -Wno-unused-function
 COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
