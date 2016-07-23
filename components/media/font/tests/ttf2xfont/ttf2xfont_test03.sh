@@ -3,6 +3,6 @@ echo Results of ttf2xfont_test03:
 mkdir -p results
 ttf2xfont data/a_damn_mess.ttf --image=results/a_damn_mess.png --out-font=results/a_damn_mess.xfont --glyph-size=32
 cat results/a_damn_mess.xfont
-md5sum -b results/a_damn_mess.png
+md5sum results/a_damn_mess.png
 rm -rf results
 

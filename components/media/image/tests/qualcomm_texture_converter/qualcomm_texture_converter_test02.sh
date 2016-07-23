@@ -11,5 +11,5 @@ texture-converter results/selection_atc_rgba_explicit_alpha.png --target-format=
 texture-converter results/selection_atc_rgba_interpolated_alpha.png --target-format=atitc_rgba_interpolated_alpha --target='results/selection_atc_rgba_interpolated_alpha.dds' && \
 texture-converter results/npot.png --target-format=atitc_rgba_explicit_alpha --target='results/npot.dds' && \
 texture-converter results/npot_non_square.png --target-format=atitc_rgba_explicit_alpha --target='results/npot_non_square.dds' || exit 0
-for file in results/*; do md5sum -b $file; done
+for file in results/*; do md5sum $file; done
 rm -rf results/* results

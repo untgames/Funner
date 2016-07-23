@@ -1,0 +1,3 @@
+#/bin/sh
+SED_ARG="s#"$1"#*"$1"#"
+md5 -r $1 | sed $SED_ARG
