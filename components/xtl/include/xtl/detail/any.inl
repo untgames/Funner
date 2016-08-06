@@ -40,9 +40,9 @@ struct any_holder: public reference_counter
   const bool            is_self_changable;
 
   template <class T>
-  any_holder (T& content, bool in_is_self_changable)
+  any_holder (T* content, bool in_is_self_changable)
     : caster (content)
-    , castable_type (&content ? &typeid (content) : &typeid (void))
+    , castable_type (content ? &typeid (*content) : &typeid (void))
     , is_self_changable (in_is_self_changable)
   {}
 
@@ -84,8 +84,8 @@ template <class T> struct any_impl: public any_content<T>, public any_holder
 
   void update_castable_value ()
   {
-    caster        = get_castable_value (content::value);
-    castable_type = &typeid (get_castable_value (content::value));
+    caster = get_castable_value (content::value);
+    castable_type = &typeid (*get_castable_value (content::value));
   }
 
   any_holder* clone () { return new any_impl<T> (*this); }
@@ -94,7 +94,7 @@ template <class T> struct any_impl: public any_content<T>, public any_holder
   {
     using adl_defaults::to_string;
 
-    to_string (buffer, get_castable_value (content::value));
+    to_string (buffer, *get_castable_value (content::value));
   }
 };
 
@@ -325,60 +325,65 @@ inline const T any_multicast (const any& a)
 */
 
 template <class T>
-inline T& get_castable_value (T& value)
+inline T* get_castable_value (T& value)
+{
+  return &value;
+}
+
+template <class T>
+inline T* get_castable_value (T* value)
 {
   return value;
 }
 
 template <class T>
-inline T& get_castable_value (T* value)
+inline T* get_castable_value (stl::auto_ptr<T>& ptr)
 {
-  return *value;
-}
-
-inline const char*& get_castable_value (const char*& value)
-{
-  return value;
+  return ptr.get();
 }
 
 template <class T>
-inline T& get_castable_value (stl::auto_ptr<T>& ptr)
+inline T* get_castable_value (shared_ptr<T>& ptr)
 {
-  return *ptr;
+  return ptr.get();
 }
 
 template <class T>
-inline T& get_castable_value (shared_ptr<T>& ptr)
+inline T* get_castable_value (weak_ptr<T>& ptr)
 {
-  return *ptr;
-}
-
-template <class T>
-inline T& get_castable_value (weak_ptr<T>& ptr)
-{
-  return *ptr;
+  return ptr.get();
 }
 
 template <class T, template <class > class Strategy>
-inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
+inline T* get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
-  return *ptr;
+  return ptr.get();
 }
 
 template <class T>
-inline T& get_castable_value (com_ptr<T>& ptr)
+inline T* get_castable_value (com_ptr<T>& ptr)
 {
-  return *ptr;
+  return ptr.get();
 }
 
 template <class T>
-inline T& get_castable_value (reference_wrapper<T>& ref)
+inline T* get_castable_value (reference_wrapper<T>& ref)
 {
-  return ref.get ();
+  return &ref.get ();
 }
 
 template <class T>
-inline T& get_castable_value (trackable_ptr<T>& ptr)
+inline T* get_castable_value (trackable_ptr<T>& ptr)
 {
-  return *ptr;
+  return &*ptr;
+}
+
+inline void** get_castable_value (void*& ptr)
+{
+  return &ptr;
+}
+
+inline const char** get_castable_value (const char*& ptr)
+{
+  return &ptr;
 }

@@ -1,6 +1,15 @@
 Results of local_texture_test:
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UShort
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=aVertex, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=aNormal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=aTexCoord0, type=float2, slot=0, offset=24, stride=36
+render.manager: ......semantic=aColor, type=ubyte_norm4, slot=0, offset=32, stride=36
+render.manager: ...layout created (hash=2189d820)
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
@@ -19,7 +28,7 @@ render.manager: Effect texture sampler 'repeat' loaded
 render.manager: Effect auxilary texture description 'mirror' loaded
 render.manager: Effect auxilary texture description 'shadow_map' loaded
 render.manager: Effect auxilary texture description 'depth_stencil_render_buffer' loaded
-render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
+render.manager: Effect shaders library 'data/shaders/*' loaded (8 shaders loaded)
 render.manager: Program 'phong' common data created (id=2)
 render.manager: Program 'phong' created (id=1)
 render.manager: Effect program 'phong' loaded
@@ -36,7 +45,7 @@ render.manager: Texture 'shadow_map' created (id=7)
 Texture:
   width:  2048
   height: 2048
-  depth:  0
+  depth:  1
   format: d32
 render.manager: Texture 'shadow_map' destroyed (id=7)
 window removed

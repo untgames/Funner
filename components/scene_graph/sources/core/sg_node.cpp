@@ -344,7 +344,37 @@ struct Node::Impl: public xtl::instance_counter<Node>
     bind_lock = false;
     need_release_at_unbind = false;
   }
+
   
+  void BeforeDestroy ()
+  {
+      //оповещаем клиентов об удалении узла
+
+    Notify (NodeEvent_BeforeDestroy);
+
+      //разрываем иерархические связи
+
+    this_node->UnbindAllChildren ();
+    this_node->Unbind ();
+
+      //отсоединение всех контроллеров
+
+    this_node->DetachAllControllers ();
+
+    for (size_t i = 0; i < NodeEvent_Num; i++)
+    {
+      if (i == NodeEvent_AfterDestroy)
+        continue;
+
+      signals [i].disconnect_all ();
+    }
+
+    for (size_t i = 0; i < NodeSubTreeEvent_Num; i++)
+    {
+      subtree_signals [i].disconnect_all ();
+    }
+  }
+
   void UpdateIteratorsBeforeRemoveChild (Node* child)
   {    
     for (NodeIterator* i=first_node_iterator; i; i=i->NextIterator ())    
@@ -906,7 +936,10 @@ struct Node::Impl: public xtl::instance_counter<Node>
     
       //автоматическая блокировка на удаление во время оповещения
       
-    Pointer self_lock (this_node);
+    Pointer self_lock;
+
+    if (ref_count)
+      self_lock = this_node;
     
       //вызываем обработчики событий
 
@@ -1109,19 +1142,10 @@ Node::Node ()
 
 Node::~Node ()
 {
-    //разрываем иерархические связи
-
-  UnbindAllChildren ();
-  Unbind ();
-  
-    //отсоединение всех контроллеров
-
-  DetachAllControllers ();  
-  
     //оповещение об удалении узла
-    
+
   impl->Notify (NodeEvent_AfterDestroy);
-  
+
     //удаляем реализацию узла
 
   delete impl;
@@ -1321,24 +1345,24 @@ void Node::BindProperties (common::PropertyBindingMap& bindings)
 
 void Node::AddRef () const
 {
-  if (impl->ref_count)
-    impl->ref_count++;
+  impl->ref_count++;
 }
 
 void Node::Release () const
 {
-    //защита от повторного удаления в обработчике
-
-  if (impl->signal_process [NodeEvent_BeforeDestroy] || !impl->ref_count)
-    return;
-
   if (!--impl->ref_count)
   {
-      //оповещаем клиентов об удалении узла
+      //lock this node from double delete when ref_count increased and decreased inside BeforeDestroy
 
-    impl->Notify (NodeEvent_BeforeDestroy);
+    impl->ref_count++;
 
-    delete this;
+    impl->BeforeDestroy ();
+
+      //reference count may be increased in notification handlers
+    if (!--impl->ref_count)
+    {
+      delete this;
+    }
   }
 }
 

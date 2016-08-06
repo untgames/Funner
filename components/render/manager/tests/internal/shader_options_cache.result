@@ -1,18 +1,18 @@
 Results of shader_options_cache_test:
-List1 options: 'DefineA=1 DefineC=test' (hash=7618c134)
-List2 options: 'DefineA=1 DefineC=test' (hash=7618c134)
+List1 options: 'DefineA=1 DefineC=test' (hash=516013c3)
+List2 options: 'DefineA=1 DefineC=test' (hash=516013c3)
 Cached layouts count: 2
 List1 builders count: 1
 List2 builders count: 1
 change existring property
-List1 options: 'DefineA=2 DefineC=test' (hash=0a79e4ef)
-List2 options: 'DefineA=2 DefineC=test' (hash=0a79e4ef)
+List1 options: 'DefineA=2 DefineC=test' (hash=ad69ec09)
+List2 options: 'DefineA=2 DefineC=test' (hash=ad69ec09)
 Cached layouts count: 2
 List1 builders count: 1
 List2 builders count: 1
 add new property
-List1 options: 'DefineA=2 DefineB=3.14 DefineC=test' (hash=15685d0f)
-List2 options: 'DefineA=2 DefineC=test' (hash=0a79e4ef)
+List1 options: 'DefineA=2 DefineB=3.14 DefineC=test' (hash=4f30d70c)
+List2 options: 'DefineA=2 DefineC=test' (hash=ad69ec09)
 Cached layouts count: 2
 List1 builders count: 2
 List2 builders count: 2
@@ -23,7 +23,7 @@ List1 builders count: 0
 List2 builders count: 2
 remove all properties
 List1 options: '' (hash=ffffffff)
-List2 options: 'DefineA DefineC' (hash=73fccb45)
+List2 options: '' (hash=ffffffff)
 Cached layouts count: 2
 List1 builders count: 0
 List2 builders count: 2

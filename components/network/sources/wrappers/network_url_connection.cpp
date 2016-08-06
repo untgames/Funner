@@ -218,7 +218,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   {
     stream = stl::auto_ptr<IUrlStream> (UrlStreamManagerSingleton::Instance ()->CreateStream (url.ToString (), params, *this));
     
-    if (!&*stream)
+    if (!stream)
       throw xtl::format_operation_exception ("", "Internal error: Null stream returned by stream manager");
   }
   
@@ -290,7 +290,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       {
         syslib::Lock lock (mutex);
       
-        if (!&*stream)
+        if (!stream)
           throw xtl::format_operation_exception ("", "Can't receive data from closed URL stream");
       }
       
@@ -325,7 +325,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       {
         syslib::Lock lock (mutex);    
       
-        if (!&*stream)
+        if (!stream)
           throw xtl::format_operation_exception ("", "Can't send data to closed URL stream");
       }
 
@@ -409,7 +409,7 @@ bool UrlConnection::IsClosed () const
 {
   syslib::Lock lock (impl->mutex);
 
-  return &*impl->stream == 0;
+  return !impl->stream;
 }
 
 /*
@@ -493,7 +493,7 @@ const char* UrlConnection::Status () const
   {
     syslib::Lock lock (impl->mutex);
 
-    if (!&*impl->stream)
+    if (!impl->stream)
       return "Closed";
       
     impl->status = impl->stream->GetStatus ();

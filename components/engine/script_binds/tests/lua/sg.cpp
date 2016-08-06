@@ -10,7 +10,11 @@ void log_handler (const char* log_name, const char* event)
 int main ()
 {
   printf ("Results of sg_test:\n");
-  
+
+#ifdef _MSC_VER
+   _set_output_format (_TWO_DIGIT_EXPONENT);
+#endif
+
   try
   {
     common::LogFilter filter ("scene_graph.*", &log_handler);

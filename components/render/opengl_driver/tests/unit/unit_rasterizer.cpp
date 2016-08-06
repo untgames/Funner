@@ -3,9 +3,9 @@
 using namespace common;
 
 //печать дескриптора rasterizer-state
-inline void dump_desc (IRasterizerState& state)
+inline void dump_desc (IRasterizerState* state)
 {
-  if (!&state)
+  if (!state)
   {
     printf ("Null rasterizer state\n");
     
@@ -16,7 +16,7 @@ inline void dump_desc (IRasterizerState& state)
 
   RasterizerDesc desc;
   
-  state.GetDesc (desc);
+  state->GetDesc (desc);
   
   printf ("Rasterizer state:\n");
   printf ("  fill_mode:               %s\n", get_name (desc.fill_mode));
@@ -36,7 +36,7 @@ int main ()
   {
     Test test;
 
-    dump_desc (*test.device->GetImmediateContext ()->RSGetState ());    
+    dump_desc (test.device->GetImmediateContext ()->RSGetState ());
 
     RasterizerDesc desc;
     memset (&desc, 0, sizeof (desc));
@@ -65,7 +65,7 @@ int main ()
     test.device->GetImmediateContext ()->RSSetViewport (0, viewport);
     test.device->GetImmediateContext ()->RSSetScissor  (0, scissor);
 
-    dump_desc (*test.device->GetImmediateContext ()->RSGetState ());    
+    dump_desc (test.device->GetImmediateContext ()->RSGetState ());
 
     test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
   }

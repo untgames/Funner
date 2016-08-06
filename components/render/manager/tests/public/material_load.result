@@ -1,18 +1,27 @@
 Results of material_load_test:
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UShort
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=aVertex, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=aNormal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=aTexCoord0, type=float2, slot=0, offset=24, stride=36
+render.manager: ......semantic=aColor, type=ubyte_norm4, slot=0, offset=32, stride=36
+render.manager: ...layout created (hash=2189d820)
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
 window added
 render.manager: Loading material library 'data/test.xmtl' with 4 materials
 render.manager: ...loading material 'canyon.archway_1'
-render.manager: Material 'canyon.archway_1' created (id=1)
+render.manager: Material 'canyon.archway_1' has been created (id=1)
 render.manager: Program parameters layout created (id=2)
 render.manager: ...loading material 'canyon.stn_1'
-render.manager: Material 'canyon.stn_1' created (id=3)
+render.manager: Material 'canyon.stn_1' has been created (id=3)
 render.manager: Updating program parameters layout with 10 parameters (id=2):
-render.manager: ...slot[3]: hash=8f1555f7, parameters_count=10
+render.manager: ...slot[3]: hash=d4e8c8e6, parameters_count=10
 render.manager: ......name='Reflectivity', type=float, offset=0
 render.manager: ......name='Transparency', type=float, offset=4
 render.manager: ......name='Shininess', type=float, offset=8
@@ -23,15 +32,15 @@ render.manager: ......name='Emission', type=vector, offset=60
 render.manager: ......name='BumpAmount', type=float, offset=76
 render.manager: ......name='DiffuseTextureChannel', type=integer, offset=80
 render.manager: ......name='BumpTextureChannel', type=integer, offset=84
-render.manager: ...program parameters layout updated (hash=ad3bc2f1)
+render.manager: ...program parameters layout updated (hash=4e72ad80)
 render.manager: ...loading material 'canyon.stn_2'
-render.manager: Material 'canyon.stn_2' created (id=4)
+render.manager: Material 'canyon.stn_2' has been created (id=4)
 render.manager: ...loading material 'canyon.Material__195'
-render.manager: Material 'canyon.Material__195' created (id=5)
+render.manager: Material 'canyon.Material__195' has been created (id=5)
 Material library loaded
 window removed
-render.manager: Material 'canyon.Material__195' destroyed (id=5)
-render.manager: Material 'canyon.stn_2' destroyed (id=4)
-render.manager: Material 'canyon.stn_1' destroyed (id=3)
-render.manager: Material 'canyon.archway_1' destroyed (id=1)
+render.manager: Material 'canyon.Material__195' has been destroyed (id=5)
+render.manager: Material 'canyon.stn_2' has been destroyed (id=4)
+render.manager: Material 'canyon.stn_1' has been destroyed (id=3)
+render.manager: Material 'canyon.archway_1' has been destroyed (id=1)
 render.manager: Program parameters layout destroyed (id=2)

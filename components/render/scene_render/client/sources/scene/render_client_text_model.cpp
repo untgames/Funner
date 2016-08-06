@@ -495,9 +495,9 @@ class TextModel: public VisualModel
 
       for (;char_desc != last; ++char_desc)
       {
-        const RasterizedGlyphInfo& rasterized_glyph = *char_desc->rasterized_glyph;
+        const RasterizedGlyphInfo* rasterized_glyph = char_desc->rasterized_glyph;
 
-        if (!&rasterized_glyph)
+        if (!rasterized_glyph)
           continue;
 
         const scene_graph::CharDesc& sg_char_desc = *char_desc->desc;
@@ -505,8 +505,8 @@ class TextModel: public VisualModel
         sprite->position   = sg_char_desc.position;
         sprite->size       = sg_char_desc.size;
         sprite->color      = sg_char_desc.color;
-        sprite->tex_offset = rasterized_glyph.tex_offset;
-        sprite->tex_size   = rasterized_glyph.tex_size;
+        sprite->tex_offset = rasterized_glyph->tex_offset;
+        sprite->tex_size   = rasterized_glyph->tex_size;
         sprite->normal     = math::vec3f (0, 0, 1.0f);
         sprite->rotation   = math::anglef ();
 

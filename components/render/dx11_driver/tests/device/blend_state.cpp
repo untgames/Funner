@@ -8,7 +8,7 @@ int main ()
   {
     Test test (L"DX11 device test window (blend_state)");
     
-    dump_desc (*test.device->GetImmediateContext ()->OSGetBlendState ());
+    dump_desc (test.device->GetImmediateContext ()->OSGetBlendState ());
     
     BlendDesc desc;
     

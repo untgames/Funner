@@ -47,9 +47,8 @@ void bind_static_node_library (Environment& environment)
   node_ort_lib.Register             ("get_X",                 make_const (NodeOrt_X));
   node_ort_lib.Register             ("get_Y",                 make_const (NodeOrt_Y));
   node_ort_lib.Register             ("get_Z",                 make_const (NodeOrt_Z));
+  //no BeforeDestroy/AfterDestroy events here, because this events will result in crash by putting Node::Pointer into stack and releasing it after node is deleted
   node_event_lib.Register           ("get_AfterUpdate",       make_const (NodeEvent_AfterUpdate));
-  node_event_lib.Register           ("get_BeforeDestroy",     make_const (NodeEvent_BeforeDestroy));
-  node_event_lib.Register           ("get_AfterDestroy",      make_const (NodeEvent_AfterDestroy));
   node_event_lib.Register           ("get_AfterBind",         make_const (NodeEvent_AfterBind));
   node_event_lib.Register           ("get_BeforeUnbind",      make_const (NodeEvent_BeforeUnbind));
   node_event_lib.Register           ("get_AfterSceneAttach",  make_const (NodeEvent_AfterSceneAttach));

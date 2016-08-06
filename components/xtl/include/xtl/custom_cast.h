@@ -42,8 +42,7 @@ class custom_ref_caster
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
                           custom_ref_caster ();
-    template <class From> custom_ref_caster (From& value);
-    template <class From> custom_ref_caster (From*& value);
+    template <class From> custom_ref_caster (From* value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типа

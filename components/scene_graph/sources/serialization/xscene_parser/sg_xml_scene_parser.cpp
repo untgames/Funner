@@ -999,7 +999,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
       if (property_index != -1)
         offset = context.Properties ().GetVector (property_index);        
         
-      for (Node* search_base = &default_parent; search_base; search_base = &*search_base->Parent ())
+      for (Node* search_base = &default_parent; search_base; search_base = search_base->Parent ().get())
       {
         if (Node::Pointer before_node = search_base->FindChild (node_decl->before_node->c_str (), NodeSearchMode_OnAllSublevels))
         {
@@ -1014,7 +1014,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     
     if (node_decl->parent_name && !node_decl->parent_name->empty ())
     {
-      for (Node* search_base = &default_parent; (search_base = &*search_base->Parent ());)
+      for (Node* search_base = &default_parent; search_base; search_base = search_base->Parent ().get())
       {
         if (Node::Pointer node = search_base->FindChild (node_decl->parent_name->c_str (), NodeSearchMode_OnAllSublevels))
         {

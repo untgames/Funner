@@ -54,7 +54,7 @@ class Test: private xtl::trackable, private TestLogFilter
 ///Конструктор
     Test (const wchar_t* title, bool logging = true)
       : TestLogFilter (logging)
-      , window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
+      , window (syslib::WindowStyle_PopUp, WINDOW_WIDTH, WINDOW_HEIGHT)
       , render_window (CreateRenderWindow ())
     {    
       window.SetTitle (title);

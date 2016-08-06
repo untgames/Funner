@@ -114,11 +114,11 @@ struct Test
 };
 
 //печать дескриптора blend-state
-inline void dump_desc (IBlendState& state)
+inline void dump_desc (IBlendState* state)
 {
   //TODO: MRT
 
-  if (!&state)
+  if (!state)
   {
     printf ("Null blend state\n");
     
@@ -129,7 +129,7 @@ inline void dump_desc (IBlendState& state)
 
   BlendDesc desc;
   
-  state.GetDesc (desc);
+  state->GetDesc (desc);
   
   printf ("Blend state:\n");
   printf ("  blend_enable:                     %s\n", desc.render_target [0].blend_enable ? "true" : "false");
@@ -153,9 +153,9 @@ inline void dump_desc (const StencilDesc& desc)
 }
 
 //печать дескриптора depth-stencil-state
-inline void dump_desc (IDepthStencilState& state)
+inline void dump_desc (IDepthStencilState* state)
 {
-  if (!&state)
+  if (!state)
   {
     printf ("Null depth-stencil state\n");
   
@@ -166,7 +166,7 @@ inline void dump_desc (IDepthStencilState& state)
   
   DepthStencilDesc desc;
   
-  state.GetDesc (desc);
+  state->GetDesc (desc);
   
   printf ("Depth-stencil state:\n");
   printf ("  depth_test_enable:   %s\n", desc.depth_test_enable ? "true" : "false");

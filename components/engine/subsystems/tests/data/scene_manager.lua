@@ -38,7 +38,7 @@ function main ()
   animation:Play ()
   
   root:Update (0)
-  root:Update (1.04)    
+  root:Update (1.12)    
   
   print ("After animation")  
   

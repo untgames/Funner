@@ -86,8 +86,6 @@ Node 'Node1' event 'AfterSceneChange'
 Node 'Node1' event 'BeforeUnbind'
 Node 'Node2.Node1' subtree event 'BeforeUnbind'
 Node 'Node1' event 'AfterUpdate'
-Node 'Node1' event 'BeforeDestroy'
-Node 'Node1' event 'AfterDestroy'
 result: string='hello' int=1 float=3.140 vec=[1.000 2.000 3.000 4.000] det(matrix)=81.000
 is_present(Float)=false
 is_present(String)=true
@@ -126,18 +124,18 @@ IsInfiniteBounds = true
 WireColor = 0 0 0
 WireColor = 1 0 0
 WireColor = 0 0 1
-local bb minimum = -1e+008 -1e+008 -1e+008
-local bb maximum = 1e+008 1e+008 1e+008
-world bb minimum = -1e+008 -1e+008 -1e+008
-world bb maximum = 1e+008 1e+008 1e+008
-children bb minimum = -1e+008 -1e+008 -1e+008
-children bb maximum = 1e+008 1e+008 1e+008
-full bb minimum = -1e+008 -1e+008 -1e+008
-full bb maximum = 1e+008 1e+008 1e+008
-world children bb minimum = -1e+008 -1e+008 -1e+008
-world children bb maximum = 1e+008 1e+008 1e+008
-world full bb minimum = -1e+008 -1e+008 -1e+008
-world full bb maximum = 1e+008 1e+008 1e+008
+local bb minimum = -1e+08 -1e+08 -1e+08
+local bb maximum = 1e+08 1e+08 1e+08
+world bb minimum = -1e+08 -1e+08 -1e+08
+world bb maximum = 1e+08 1e+08 1e+08
+children bb minimum = -1e+08 -1e+08 -1e+08
+children bb maximum = 1e+08 1e+08 1e+08
+full bb minimum = -1e+08 -1e+08 -1e+08
+full bb maximum = 1e+08 1e+08 1e+08
+world children bb minimum = -1e+08 -1e+08 -1e+08
+world children bb maximum = 1e+08 1e+08 1e+08
+world full bb minimum = -1e+08 -1e+08 -1e+08
+world full bb maximum = 1e+08 1e+08 1e+08
 Intersections test
 entity1 has 2 intersections:
   entity2
@@ -341,7 +339,7 @@ node2 orientation is 0.186730 0.000000 0.000000 0.982411
 node2 orientation is 0.186730 0.000000 0.000000 0.982411
 Scene input test
 check camera name camera1
-viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=50 12.5 0 local_position=0 0
+viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=0 0 0 local_position=0 0
 viewport='viewport1' notification='OnTouchEnter' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnTouchEnter' touch=-1 button=0 world_position=50 -50 0 local_position=0 0

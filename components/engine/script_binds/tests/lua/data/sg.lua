@@ -236,8 +236,6 @@ function node_event_handler (node, event)
   local name = ""  
   
   if     event == Scene.NodeEvent.AfterUpdate       then name = "AfterUpdate"
-  elseif event == Scene.NodeEvent.BeforeDestroy     then name = "BeforeDestroy"
-  elseif event == Scene.NodeEvent.AfterDestroy      then name = "AfterDestroy"
   elseif event == Scene.NodeEvent.AfterBind         then name = "AfterBind"
   elseif event == Scene.NodeEvent.BeforeUnbind      then name = "BeforeUnbind"  
   elseif event == Scene.NodeEvent.AfterSceneAttach  then name = "AfterSceneAttach"
@@ -271,8 +269,6 @@ function test_events ()
   node2.Name = "Node2"
 
   node1:RegisterEventHandler (Scene.NodeEvent.AfterUpdate, handler1)
-  node1:RegisterEventHandler (Scene.NodeEvent.BeforeDestroy, handler1)
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterDestroy, handler1)
   node1:RegisterEventHandler (Scene.NodeEvent.AfterBind, handler1)
   node1:RegisterEventHandler (Scene.NodeEvent.BeforeUnbind, handler1)
   node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneAttach, handler1)

@@ -306,16 +306,9 @@ inline custom_ref_caster::custom_ref_caster ()
 }
 
 template <class From>
-inline custom_ref_caster::custom_ref_caster (From& value)
-  : source ((void*)&value)
+inline custom_ref_caster::custom_ref_caster (From* value)
+  : source (value ? (void*)value : (void*)0)
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance ())
-{
-}
-
-template <class From>
-inline custom_ref_caster::custom_ref_caster (From*& value)
-  : source (value ? (void*)&value : (void*)0)
-  , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From*>, false>::instance ())
 {
 }
 
@@ -357,7 +350,7 @@ inline const std::type_info& custom_ref_caster::type () const
 template <class From>
 inline custom_ref_caster make_custom_ref_caster (From& value)
 {
-  return custom_ref_caster (value);
+  return custom_ref_caster (&value);
 }
 
 /*

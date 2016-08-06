@@ -189,12 +189,12 @@ void BasicRenderer::Draw (RenderingContext& parent_context)
 
 void BasicRenderer::EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, void*, manager::EntityDrawParams& out_params)
 {
-  VisualModel& model = *reinterpret_cast<VisualModel*> (entity.UserData ());
+  VisualModel* model = reinterpret_cast<VisualModel*> (entity.UserData ());
 
-  if (!&model)
+  if (!model)
     return;
 
-  ConfigureEntity (frame, entity, model, out_params);
+  ConfigureEntity (frame, entity, *model, out_params);
 }
 
 void BasicRenderer::ConfigureEntity (manager::Frame& frame, manager::Entity& entity, VisualModel& model, manager::EntityDrawParams& out_params)

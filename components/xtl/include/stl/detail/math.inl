@@ -79,7 +79,7 @@ template <class T> inline T tanh  (T x)        { return ::tanh  (x); }
 
 template <> inline float       abs (float  x)        { return fabsf (x); }
 template <> inline double      abs (double x)        { return fabs  (x); }
-template <> inline long double abs (long double x)   { return fabs (x); }
+template <> inline long double abs (long double x)   { return fabsl (x); }
 template <> inline int         abs (int x)           { return ::abs (x); }
 template <> inline short       abs (short x)         { return (short)::abs ((int)x); }
 template <> inline signed char abs (signed char x)   { return (signed char)::abs ((int)x); }

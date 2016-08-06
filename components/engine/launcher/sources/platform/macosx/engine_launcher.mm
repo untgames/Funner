@@ -16,7 +16,7 @@ using namespace engine;
 namespace
 {
 
-const char* ENGINE_LIBRARY_NAME = "funner.dylib";
+const char* ENGINE_LIBRARY_NAME = "libfunner.dylib";
 
 }
 

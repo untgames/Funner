@@ -621,7 +621,7 @@ syslib::Sensor SensorManager::Sensor (size_t index)
 {
   try
   {
-    return Sensor (index);
+    return syslib::Sensor (index);
   }
   catch (xtl::exception& e)
   {

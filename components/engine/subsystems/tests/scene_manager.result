@@ -29,7 +29,7 @@ engine.lua:   ortx: 1.00 0.00 0.00
 engine.lua:   scale: 1.00 1.00 1.00
 engine.lua:   node 'vase_pieces.piece_09'
 engine.lua:   {
-engine.lua:     position: 224.34 336.50 0.00
+engine.lua:     position: 224.00 336.50 0.00
 engine.lua:     ortx: -0.87 0.50 0.00
 engine.lua:     scale: 1.00 1.00 1.00
 engine.lua:     node 'vase_pieces.piece_09.Layer 1'

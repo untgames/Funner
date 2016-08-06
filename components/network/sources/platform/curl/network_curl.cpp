@@ -114,7 +114,7 @@ class CurlStream: public IUrlStream
     {
       cancel_operation = true;
 
-      if (&*thread)
+      if (thread.get ())
         thread->Join ();
 
       mutex.Lock ();
