@@ -700,6 +700,8 @@ ifneq (,$(TEAMCITY_PROJECT_NAME))
 
   -include $$($2.SOURCE_DIR)/teamcity.mak
 
+  $$(foreach profile,$$(PROFILES),$$(eval IGNORED_TESTS := $$(IGNORED_TESTS) $$(IGNORED_TESTS.$$(profile))))  
+
   $2.TEAMCITY_IGNORED_TESTS := $$(addsuffix .result,$$(basename $$(IGNORED_TESTS:%=$$($2.TMP_DIR)/%)))
   $2.TEST_RESULT_FILES      := $$(filter-out $$($2.TEAMCITY_IGNORED_TESTS),$$($2.TEST_RESULT_FILES))
 endif
