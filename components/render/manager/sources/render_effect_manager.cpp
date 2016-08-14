@@ -114,7 +114,7 @@ struct EffectManager::Impl
   common::PropertyMap     settings;                  //настройки
   common::ParseNode       configuration;             //конфигурация рендеринга
   bool                    need_update_configuration; //конфигураци рендеринга должна быть обновлена
-  IEffectManagerListener* listener;                  //слушатель событий менеджера эффектов  
+  IEffectManagerListener* listener;                  //слушатель событий менеджера эффектов
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, IEffectManagerListener* in_listener)
@@ -153,10 +153,10 @@ struct EffectManager::Impl
     
     parse_effect_library (device_manager, texture_manager, entry->resolved_root_node, entry->resource_name.c_str (), library);
 
-    library.Effects ().ForEach       (xtl::bind (&EffectLibraryEntry::AddEffect, &*entry, _1, _2, xtl::ref (proxy_manager)));
-    library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, &*entry, _1, _2, xtl::ref (program_manager)));
-    library.SamplerStates ().ForEach (xtl::bind (&EffectLibraryEntry::AddSampler, &*entry, _1, _2, xtl::ref (texture_manager)));
-    library.TextureDescs ().ForEach  (xtl::bind (&EffectLibraryEntry::AddTextureDesc, &*entry, _1, _2, xtl::ref (texture_manager)));    
+    library.Effects ().ForEach       (xtl::bind (&EffectLibraryEntry::AddEffect, entry.get (), _1, _2, xtl::ref (proxy_manager)));
+    library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, entry.get (), _1, _2, xtl::ref (program_manager)));
+    library.SamplerStates ().ForEach (xtl::bind (&EffectLibraryEntry::AddSampler, entry.get (), _1, _2, xtl::ref (texture_manager)));
+    library.TextureDescs ().ForEach  (xtl::bind (&EffectLibraryEntry::AddTextureDesc, entry.get (), _1, _2, xtl::ref (texture_manager)));
   }  
 };
 

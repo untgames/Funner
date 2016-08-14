@@ -142,7 +142,7 @@ QueryManager::~QueryManager ()
 
 IStageState* QueryManager::CreateStageState ()
 {
-  return new QueryManagerState (static_cast<QueryManagerState*> (&*impl));
+  return new QueryManagerState (static_cast<QueryManagerState*> (impl.get ()));
 }
 
 /*

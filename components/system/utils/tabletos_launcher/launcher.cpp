@@ -304,7 +304,7 @@ int main (int argc, char** argv, char** env)
 //  printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());  
 //  fflush (stdout);
 
-    //запуск  
+    //запуск
     
   std::auto_ptr<LaunchInfo> info (new LaunchInfo);
   
@@ -319,8 +319,8 @@ int main (int argc, char** argv, char** env)
   
   pthread_t launch_thread, dump_thread;
   
-  pthread_create (&launch_thread, 0, &launch, &*info);
-  pthread_create (&dump_thread, 0, &dump, &*info);  
+  pthread_create (&launch_thread, 0, &launch, info.get ());
+  pthread_create (&dump_thread, 0, &dump, info.get ());
 
   pthread_join (launch_thread, 0);
   

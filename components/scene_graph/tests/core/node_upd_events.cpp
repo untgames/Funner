@@ -25,7 +25,7 @@ int main ()
   
   Node::Pointer node = Node::Create ();      
 
-  node->AttachController (MyUpdateHandler (&*node));
+  node->AttachController (MyUpdateHandler (node.get ()));
   node->RegisterEventHandler (NodeEvent_AfterUpdate, &on_update_event);
   
   node->Update (TimeValue (1, 2));

@@ -1117,7 +1117,7 @@ screen_keyboard_t AndroidScreenKeyboardManager::CreateScreenKeyboard (window_t w
 
     if (keyboard)
     {
-      addref (&*keyboard);
+      addref (keyboard.get ());
 
       return keyboard.get ();
     }

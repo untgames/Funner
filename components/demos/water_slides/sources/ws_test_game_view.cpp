@@ -174,7 +174,7 @@ class TestView: public IGameView
     void LoadResources (sound::ScenePlayer* player, IDevice& device)
     {
       if (player)
-        player->SetListener (&*(listener.get ()));        
+        player->SetListener (listener.get ());
 
       current_device = &device;
       

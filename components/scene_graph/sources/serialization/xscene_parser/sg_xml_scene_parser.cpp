@@ -500,20 +500,20 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     
       //регистрация парсеров
       
-    RegisterParser ("node", xtl::bind (&XmlSceneParser::CreateNode<Node>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareNode, &*impl, _1));
-    RegisterParser ("ortho_camera", xtl::bind (&XmlSceneParser::CreateNode<OrthoCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareOrthoCamera, &*impl, _1));
-    RegisterParser ("perspective_camera", xtl::bind (&XmlSceneParser::CreateNode<PerspectiveCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PreparePerspectiveCamera, &*impl, _1));
-    RegisterParser ("spot_light", xtl::bind (&XmlSceneParser::CreateNode<SpotLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
-    RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
-    RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
-    RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<StaticMesh>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareStaticMesh, &*impl, _1));
-    RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareTextLine, &*impl, _1));
-    RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSprite, &*impl, _1));
+    RegisterParser ("node", xtl::bind (&XmlSceneParser::CreateNode<Node>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareNode, impl.get (), _1));
+    RegisterParser ("ortho_camera", xtl::bind (&XmlSceneParser::CreateNode<OrthoCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareOrthoCamera, impl.get (), _1));
+    RegisterParser ("perspective_camera", xtl::bind (&XmlSceneParser::CreateNode<PerspectiveCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PreparePerspectiveCamera, impl.get (), _1));
+    RegisterParser ("spot_light", xtl::bind (&XmlSceneParser::CreateNode<SpotLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, impl.get (), _1));
+    RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, impl.get (), _1));
+    RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, impl.get (), _1));
+    RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<StaticMesh>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareStaticMesh, impl.get (), _1));
+    RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareTextLine, impl.get (), _1));
+    RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSprite, impl.get (), _1));
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
-    RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSoundEmitter, &*impl, _1));
-    RegisterParser ("include", xtl::bind (&XmlSceneParser::IncludeSubscene, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareIncludeNode, &*impl, _1));
-    RegisterParser ("font", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareFontNode, &*impl, _1));
-    RegisterParser ("resource", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareResourceNode, &*impl, _1));  
+    RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSoundEmitter, impl.get (), _1));
+    RegisterParser ("include", xtl::bind (&XmlSceneParser::IncludeSubscene, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareIncludeNode, impl.get (), _1));
+    RegisterParser ("font", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareFontNode, impl.get (), _1));
+    RegisterParser ("resource", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareResourceNode, impl.get (), _1));
   }
   catch (xtl::exception& e)
   {

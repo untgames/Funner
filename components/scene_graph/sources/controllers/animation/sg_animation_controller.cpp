@@ -281,7 +281,7 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
       }
       
       if (node)
-        target->BindNode (&*node);
+        target->BindNode (node.get ());
     }
     catch (std::exception& e)
     {
@@ -470,11 +470,11 @@ scene_graph::controllers::Animation AnimationController::CreateAnimation (const 
       
     xtl::intrusive_ptr<AnimationImpl> source (new AnimationImpl (impl->blender, animation), false);
     
-    source->connect_tracker (xtl::bind (&Impl::RemoveAnimation, &*impl, &*source), *impl);
+    source->connect_tracker (xtl::bind (&Impl::RemoveAnimation, impl.get (), source.get ()), *impl);
 
       //регистрация анимации
     
-    impl->animations.push_back (&*source);
+    impl->animations.push_back (source.get ());
     
     return scene_graph::controllers::Animation (*source);
   }

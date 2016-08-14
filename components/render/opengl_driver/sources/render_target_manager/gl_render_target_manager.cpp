@@ -719,7 +719,7 @@ RenderTargetManager::~RenderTargetManager ()
 
 IStageState* RenderTargetManager::CreateStageState ()
 {
-  return new RenderTargetManagerState (static_cast<RenderTargetManagerState*> (&*impl));
+  return new RenderTargetManagerState (static_cast<RenderTargetManagerState*> (impl.get ()));
 }
 
 /*

@@ -352,7 +352,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         {
           size_t hash = src_pass->TagHash (j);
           
-          impl->passes.insert_pair (hash, &*pass);
+          impl->passes.insert_pair (hash, pass.get ());
         }
         
           //кэширование общих параметров рендеринга для всего прохода
@@ -386,7 +386,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         {
           size_t hash = src_instantiated_effect->TagHash (j);
           
-          impl->effects.insert_pair (hash, &*instantiated_effect);
+          impl->effects.insert_pair (hash, instantiated_effect.get ());
         }
         
           //создание операции рендеринга
@@ -776,13 +776,13 @@ struct RenderOperationsExecutor
         continue;
       }
 
-      ViewportImpl*       viewport        = &*desc->viewport;
+      ViewportImpl*       viewport        = desc->viewport.get ();
       const math::vec2ui& viewport_offset = desc->render_target->ViewportOffset ();
       unsigned int        width           = desc->render_target->Width (),
                           height          = desc->render_target->Height ();
 
       render_target_views [i]            = &desc->render_target->View ();
-      render_target_context.scissors [i] = &*desc->scissor;      
+      render_target_context.scissors [i] = desc->scissor.get ();
 
       if (desc->scissor)
         render_target_context.has_scissors = true;
@@ -1197,7 +1197,7 @@ struct RenderOperationsExecutor
 
     ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (pass.parameters_layout.get (), operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
-    device_context.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
+    device_context.SSSetProgramParametersLayout (program_parameters_layout->DeviceLayout ().get ());
     device_context.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
 
       //рисование

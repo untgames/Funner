@@ -894,7 +894,7 @@ void TcpClient::SwitchToAsyncReceiving () const
     impl->recv_start = impl->recv_finish = impl->recv_buffer.data ();
   }
 
-  impl->async_receiver.reset (new AsyncReceiver (impl->socket, xtl::bind (&Impl::OnAsyncDataReceived, &*impl, _1, _2)));
+  impl->async_receiver.reset (new AsyncReceiver (impl->socket, xtl::bind (&Impl::OnAsyncDataReceived, impl, _1, _2)));
 }
 
 void TcpClient::SwitchToAsyncSending () const

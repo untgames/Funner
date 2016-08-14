@@ -106,7 +106,7 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
 
   if (scissor)
   {
-    on_destroy = scissor->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Impl::UnbindScissor, &*impl));
+    on_destroy = scissor->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Impl::UnbindScissor, impl.get ()));
   }
 
   if (impl->need_release_scissor)
@@ -247,5 +247,5 @@ void VisualModel::BindProperties (common::PropertyBindingMap& bindings)
 {
   Entity::BindProperties (bindings);
 
-  bindings.AddProperty ("Scissor", xtl::bind (&VisualModel::Impl::ScissorName, &*impl));
+  bindings.AddProperty ("Scissor", xtl::bind (&VisualModel::Impl::ScissorName, impl.get ()));
 }

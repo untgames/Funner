@@ -200,7 +200,7 @@ IAdapter* PrimarySwapChain::GetAdapter ()
 
 Adapter* PrimarySwapChain::GetAdapterImpl ()
 {
-  return &*impl->adapter;
+  return impl->adapter.get ();
 }
 
 /*

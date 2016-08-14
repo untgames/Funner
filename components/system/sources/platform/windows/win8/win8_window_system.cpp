@@ -165,9 +165,9 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
 
     xtl::intrusive_ptr<WindowImpl> impl (new WindowImpl (get_context ()->MainWindow (), handler, user_data), false);
 
-    addref (&*impl);
+    addref (impl.get ());
 
-    return (window_t)&*impl;
+    return (window_t)impl.get ();
   }
   catch (xtl::exception& e)
   {

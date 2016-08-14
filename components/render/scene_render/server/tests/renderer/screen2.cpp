@@ -60,7 +60,7 @@ int main ()
     vp.SetArea       (0, 0, 100, 100);
     vp.SetTechnique  ("default");
     vp.SetProperties (vp_properties);    
-    vp.SetCamera     (&*camera);
+    vp.SetCamera     (camera.get ());
     
     screen.Attach (vp);
 

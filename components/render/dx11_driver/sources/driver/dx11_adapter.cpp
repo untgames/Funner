@@ -168,14 +168,14 @@ IOutput* Adapter::GetOutput (size_t index)
   if (index >= outputs.size ())
     throw xtl::make_range_exception ("render::low_level::dx11::Adapter::GetOutput", "index", index, outputs.size ());
 
-  return &*outputs [index];
+  return outputs [index].get ();
 }
 
 Output* Adapter::FindOutput (IDXGIOutput* output)
 {
   for (OutputArray::iterator iter=outputs.begin (), end=outputs.end (); iter!=end; ++iter)
     if (&(*iter)->GetHandle () == output)
-      return &**iter;
+      return iter->get ();
 
   return 0;
 }

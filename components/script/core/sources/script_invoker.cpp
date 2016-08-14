@@ -132,7 +132,7 @@ IInvoker* Invoker::OverloadInvoker (size_t index) const
   if (index >= impl->overloads.size ())
     throw xtl::make_range_exception ("script::Invoker::OverloadInvoker", "index", index, impl->overloads.size ());
     
-  return &*impl->overloads [index]->invoker;
+  return impl->overloads [index]->invoker.get ();
 }
 
 /*
@@ -216,7 +216,7 @@ size_t Invoker::operator () (IStack& stack) const
         size_t arguments_count = stack.Size ();
 
         if (arguments_count)
-          arguments_count--; //удаление имени функции из стека        
+          arguments_count--; //удаление имени функции из стека
           
         stl::string overloads_string;
         

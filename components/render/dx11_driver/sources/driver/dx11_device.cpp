@@ -677,7 +677,7 @@ IDeviceContext* Device::CreateDeferredContext ()
 
 IDeviceContext* Device::GetImmediateContext ()
 {
-  return &*immediate_context;
+  return immediate_context.get ();
 }
 
 /*

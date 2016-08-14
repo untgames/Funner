@@ -260,7 +260,7 @@ class DriverManagerImpl
 ///Заполенение таблицы адаптеров
     void FillAdapters (IDriver& driver, const char* adapter_mask, AdapterArray& adapters)
     {
-        //поиск предпочтительных адаптеров            
+        //поиск предпочтительных адаптеров
 
       adapters.clear   ();
       adapters.reserve (driver.GetAdaptersCount ());
@@ -447,6 +447,6 @@ void DriverManager::CreateSwapChainAndDevice
   swap_chain->AddRef ();
   device->AddRef ();
 
-  out_swap_chain = &*swap_chain;
-  out_device     = &*device;
+  out_swap_chain = swap_chain.get ();
+  out_device     = device.get ();
 }

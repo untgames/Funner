@@ -152,19 +152,19 @@ TestApplication::TestApplication ()
 
     impl->window->Show ();
     
-      //настройка ввода      
+      //настройка ввода
       
     input::low_level::WindowDriver::RegisterDevice ("window1", *impl->window);
 
     impl->input_source.Connect ("*", "*");
     
-    impl->input_source.RegisterHandler (xtl::bind (&Impl::ProcessInputEvent, &*impl, _1));
+    impl->input_source.RegisterHandler (xtl::bind (&Impl::ProcessInputEvent, impl.get (), _1));
 
       //регистрация обработчиков событий окна
 
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));
-//    impl->window->RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&Impl::ChangeWindowStyle, &*impl));    
+    impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, impl.get ()));
+    impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, impl.get ()));
+//    impl->window->RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&Impl::ChangeWindowStyle, impl.get ()));
 
       //инициализация системы рендеринга
 

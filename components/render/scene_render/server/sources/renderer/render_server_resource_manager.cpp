@@ -36,7 +36,7 @@ namespace server
 /// Библиотека ресурсов
 struct ResourceLibrary: public xtl::reference_counter
 {
-  RenderManager render_manager; //менеджер рендеринга 
+  RenderManager render_manager; //менеджер рендеринга
   ResourceMap   resources;      //ресурсы
 
 /// Конструктор
@@ -143,7 +143,7 @@ ResourceClient& ResourceClient::operator = (const ResourceClient& client)
 }
 
 /*
-    Загрузка / выгрузка ресурсов  
+    Загрузка / выгрузка ресурсов
 */
 
 void ResourceClient::LoadResource (const char* name)
@@ -307,7 +307,7 @@ ResourceClient ResourceManager::CreateClient ()
 {
   try
   {
-    return ResourceClient (&*impl);
+    return ResourceClient (impl);
   }
   catch (xtl::exception& e)
   {

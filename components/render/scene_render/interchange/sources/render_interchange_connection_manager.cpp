@@ -87,7 +87,7 @@ class ConnectionManagerImpl
           iter->second->Lock ();
 
           result.creator  = iter->second->creator;
-          result.lockable = &*iter->second;
+          result.lockable = iter->second.get ();
 
           return;
         }

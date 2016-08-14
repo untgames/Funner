@@ -204,7 +204,7 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
     impl->groups.reserve (impl->primitives.size ());
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), &*iter->primitive));
+      impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), iter->primitive.get ()));
 
       //обновление зависимостей
 

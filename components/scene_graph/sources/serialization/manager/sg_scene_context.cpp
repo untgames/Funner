@@ -117,7 +117,7 @@ void SceneContext::AttachCore (ISceneAttachment* in_attachment)
   }
   else
   {
-    registry = &*iter->second;
+    registry = iter->second.get ();
   }
 
   registry->anonymous_attachment = attachment;
@@ -147,7 +147,7 @@ void SceneContext::AttachCore (const char* name, ISceneAttachment* in_attachment
   }
   else
   {
-    registry = &*iter->second;
+    registry = iter->second.get ();
   }
   
   AttachmentMap::iterator iter1 = registry->named_attachments.find (name);
@@ -190,7 +190,7 @@ ISceneAttachment* SceneContext::FindAttachmentCore (const std::type_info& type) 
     
   AttachmentRegistry& registry = *iter->second;
   
-  return &*registry.anonymous_attachment;
+  return registry.anonymous_attachment.get ();
 }
 
 ISceneAttachment* SceneContext::FindAttachmentCore (const char* name, const std::type_info& type) const
@@ -210,7 +210,7 @@ ISceneAttachment* SceneContext::FindAttachmentCore (const char* name, const std:
   if (iter1 == registry.named_attachments.end ())
     return 0;    
   
-  return &*iter1->second;
+  return iter1->second.get ();
 }
 
 /*

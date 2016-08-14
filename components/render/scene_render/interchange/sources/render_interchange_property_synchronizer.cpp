@@ -281,7 +281,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
 
     if (need_add_new_map)
     {
-      properties.Trackable ().connect_tracker (xtl::bind (&Impl::RemovePropertyMap, &*impl, properties.Id ()), *impl);
+      properties.Trackable ().connect_tracker (xtl::bind (&Impl::RemovePropertyMap, impl.get (), properties.Id ()), *impl);
 
       impl->property_maps.insert_pair (properties.Id (), map_desc);
     }
@@ -328,7 +328,7 @@ struct PropertyMapReader::Impl
   {
     object_id_t            source_id;      //идентификатор исходного лэйаута
     common::PropertyLayout layout;         //расположение свойств
-    IndexArray             string_indices; //индексы строк в лэйауте    
+    IndexArray             string_indices; //индексы строк в лэйауте
   };
 
   typedef xtl::intrusive_ptr<LayoutDesc>             LayoutDescPtr;
@@ -414,7 +414,7 @@ struct PropertyMapReader::Impl
           desc->string_indices.push_back (i);
       }      
 
-        //добавление лэйаута в карту лэйаутов      
+        //добавление лэйаута в карту лэйаутов
 
       desc->source_id = layout_id;
 

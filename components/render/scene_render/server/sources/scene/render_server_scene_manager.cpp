@@ -122,7 +122,7 @@ Node& SceneManager::GetNode (interchange::object_id_t id) const
     throw xtl::format_operation_exception ("render::scene::server::SceneManager::GetNode", "Node with id %llu has not been added", id);
 
   impl->cached_node_id = id;
-  impl->cached_node    = &*iter->second;
+  impl->cached_node    = iter->second.get ();
 
   return *impl->cached_node;
 }

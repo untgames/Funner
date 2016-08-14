@@ -263,7 +263,7 @@ ResourceGroup SceneManager::Resources () const
     {
       FactoryDesc& desc = **iter;
       
-      enumerator.factory = &*desc.factory;
+      enumerator.factory = desc.factory.get ();
       
       desc.factory->EnumScenes (enum_handler);
     }
@@ -335,7 +335,7 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
       
     Node::Pointer root = Node::Create ();
     
-      //поиск сцены      
+      //поиск сцены
 
     for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)      
     {

@@ -161,7 +161,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
       
     ShaderOptionsCacheEntryPtr entry (new ShaderOptionsCacheEntry, false);
     
-    xtl::connection on_deleted_connection = layout.GetTrackable ().connect_tracker (xtl::bind (&Impl::OnLayoutDeleted, &*impl, &layout), *impl);
+    xtl::connection on_deleted_connection = layout.GetTrackable ().connect_tracker (xtl::bind (&Impl::OnLayoutDeleted, impl.get (), &layout), *impl);
     
     try
     {

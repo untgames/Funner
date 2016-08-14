@@ -115,7 +115,7 @@ screen_t XlibScreenManager::CreateScreen (size_t screen_index)
     
   ScreenDescPtr screen = instance->screens [screen_index];
   
-  addref (&*screen);
+  addref (screen.get ());
 
   return (screen_t)screen.get ();
 }
@@ -127,7 +127,7 @@ void XlibScreenManager::DestroyScreen (screen_t handle)
     
   ScreenDescPtr screen ((ScreenDesc*)handle);
   
-  release (&*screen);
+  release (screen.get ());
 }
 
 /*

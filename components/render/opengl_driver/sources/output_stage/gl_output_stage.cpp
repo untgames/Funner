@@ -213,9 +213,9 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
       
         //установка состояния по умолчанию
 
-      SetBlendState        (&*default_blend_state);
-      SetDepthStencilState (&*default_depth_stencil_state);
-      SetRasterizerState   (&*default_rasterizer_state);
+      SetBlendState        (default_blend_state.get ());
+      SetDepthStencilState (default_depth_stencil_state.get ());
+      SetRasterizerState   (default_rasterizer_state.get ());
     }
     
 ///Установка состояния уровня в контекст OpenGL
@@ -225,7 +225,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
       {      
           //TODO: MRT
 
-          //установка состояния подуровня смешивания цветов        
+          //установка состояния подуровня смешивания цветов
 
         BlendState* blend_state = GetBlendState ();        
 
@@ -295,7 +295,7 @@ OutputStage::~OutputStage ()
 
 IStageState* OutputStage::CreateStageState ()
 {
-  return new OutputStageState (static_cast<OutputStageState*> (&*impl));
+  return new OutputStageState (static_cast<OutputStageState*> (impl.get ()));
 }
 
 /*

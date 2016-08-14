@@ -224,7 +224,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       {
         ProgramParametersLayoutPtr old_layout = cached_properties_layout;
         
-        cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
+        cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (material_properties_layout.get (), cached_program->ParametersLayout ().get (), 0);
         need_invalidate_deps     = need_invalidate_deps || old_layout != cached_properties_layout;
       }
       else throw xtl::format_operation_exception ("", "Null program '%s' for material '%s' (id=%u)", program.Name (), name.c_str (), Id ());
@@ -285,7 +285,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
           {
             if ((*iter)->semantic_hash == program_texmap->semantic_hash)
             {
-              texmap = &**iter;
+              texmap = iter->get ();
               break;
             }
           }

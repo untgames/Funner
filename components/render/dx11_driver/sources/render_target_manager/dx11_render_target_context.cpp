@@ -187,12 +187,12 @@ void RenderTargetContextState::SetDepthStencilView (IView* depth_stencil_view)
 
 IView* RenderTargetContextState::GetRenderTargetView (size_t view_index) const
 {
-  return &*impl->GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::GetRenderTargetView").view;
+  return impl->GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::GetRenderTargetView").view.get ();
 }
 
 IView* RenderTargetContextState::GetDepthStencilView () const
 {
-  return &*impl->depth_stencil_view;
+  return impl->depth_stencil_view.get ();
 }
 
 void RenderTargetContextState::HasRenderTargetViews (bool states [DEVICE_RENDER_TARGET_SLOTS_COUNT]) const

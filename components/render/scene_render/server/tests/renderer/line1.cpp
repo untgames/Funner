@@ -120,7 +120,7 @@ int main ()
     scene_graph::Viewport vp;
     
     vp.SetArea       (0, 0, 100, 100);
-    vp.SetCamera     (&*camera);
+    vp.SetCamera     (camera.get ());
     vp.SetTechnique  ("default");
     
     screen.Attach (vp);

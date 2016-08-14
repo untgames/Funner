@@ -297,7 +297,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
 
         impl->frame_buffers.insert_pair (RenderTargetViews (render_target_view, depth_stencil_view), holder);
 
-        return &*holder->frame_buffer;
+        return holder->frame_buffer.get ();
       }
       catch (xtl::exception& exception)
       {

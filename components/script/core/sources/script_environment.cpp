@@ -279,7 +279,7 @@ Environment::Type* Environment::FindType (const std::type_info& type) const
   if (iter == impl->types.end ())
     return 0;
     
-  return &*iter->second;
+  return iter->second.get ();
 }
 
 /*

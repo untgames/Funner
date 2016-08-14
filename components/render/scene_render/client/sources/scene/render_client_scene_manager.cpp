@@ -121,13 +121,13 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene)
 
     ScenePtr new_scene (new Scene (scene, *this, id + 1), false);
 
-    xtl::trackable::function_type destroy_handler (xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
+    xtl::trackable::function_type destroy_handler (xtl::bind (&Impl::OnDestroyScene, impl.get (), &scene));
 
     iter = impl->scenes.insert_pair (&scene, SceneDesc (new_scene.get ())).first;
 
     try
     {
-      iter->second.on_destroy_source_scene = scene.Root ().RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
+      iter->second.on_destroy_source_scene = scene.Root ().RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyScene, impl.get (), &scene));
       iter->second.on_destroy_target_scene = new_scene->connect_tracker (destroy_handler);
 
       ++id;
@@ -208,7 +208,7 @@ NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
     {
       try
       {
-        iter->second.on_destroy_source_node = src_node.RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyNode, &*impl, &src_node));
+        iter->second.on_destroy_source_node = src_node.RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyNode, impl.get (), &src_node));
       }
       catch (...)
       {

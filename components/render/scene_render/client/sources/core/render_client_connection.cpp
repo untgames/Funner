@@ -199,9 +199,9 @@ Connection::Connection (const char* connection_name, const char* init_string, si
     impl->client.reset (new ClientImpl);
     impl->context.reset (new ContextImpl (*impl->client));    
 
-    impl->context->SetCounterparty (&*impl->client_to_server_connection);
+    impl->context->SetCounterparty (impl->client_to_server_connection.get ());
 
-    impl->client->SetContext (&*impl->context);
+    impl->client->SetContext (impl->context.get ());
   }
   catch (xtl::exception& e)
   {

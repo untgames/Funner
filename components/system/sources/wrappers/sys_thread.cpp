@@ -288,7 +288,7 @@ Thread Thread::GetCurrent ()
 {
   try
   {
-    return Thread (&*ThreadManagerSingleton::Instance ()->GetThread (Platform::GetCurrentThreadId ()));
+    return Thread (ThreadManagerSingleton::Instance ()->GetThread (Platform::GetCurrentThreadId ()).get ());
   }
   catch (xtl::exception& exception)
   {

@@ -33,11 +33,11 @@ int main ()
   
   child1->AttachController (&my_updater<1>);
   child2->AttachController (&my_updater<2>);  
-  child2->AttachController (xtl::bind (unbinder, &*child2));
-  child2->AttachController (xtl::bind (unbinder, &*child3));  
+  child2->AttachController (xtl::bind (unbinder, child2.get ()));
+  child2->AttachController (xtl::bind (unbinder, child3.get ()));
   child3->AttachController (&my_updater<3>);  
   child4->AttachController (&my_updater<4>);
-  child4->AttachController (xtl::bind (binder, &*parent));  
+  child4->AttachController (xtl::bind (binder, parent.get ()));
 
   child1->BindToParent (*parent);
   child2->BindToParent (*parent);  

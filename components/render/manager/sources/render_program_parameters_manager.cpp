@@ -132,7 +132,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
 
     result_layout->SetSlot (slot, layout);
 
-    result_layout->connect_tracker (xtl::bind (&Impl::RemoveLayout, &*impl, layout.Hash (), &*result_layout), *impl);
+    result_layout->connect_tracker (xtl::bind (&Impl::RemoveLayout, impl.get (), layout.Hash (), result_layout.get ()), *impl);
     
     impl->layouts.insert_pair (layout.Hash (), result_layout.get ());
 

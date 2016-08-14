@@ -129,13 +129,13 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
     
       //регистрация адаптера в драйвере
 
-    RegisterAdapter (&*adapter);
+    RegisterAdapter (adapter.get ());
 
       //возвращение адаптера
       
     adapter->AddRef ();
 
-    return &*adapter;
+    return adapter.get ();
   }
   catch (xtl::exception& exception)
   {

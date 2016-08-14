@@ -195,7 +195,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       //установка текущего контекста
 
-    impl->adapter->GetLibrary ().MakeCurrent (impl->device_context, impl->context, &*impl);
+    impl->adapter->GetLibrary ().MakeCurrent (impl->device_context, impl->context, impl.get ());
 
       //установка вертикальной синхронизации
 

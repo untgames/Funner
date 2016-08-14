@@ -66,7 +66,7 @@ int main ()
     
     Viewport viewport;
     
-    viewport.SetCamera (&*camera);
+    viewport.SetCamera (camera.get ());
     viewport.SetArea (100, 100, 800, 800);
     
     screen.SetArea (0, 0, 1000, 1000);

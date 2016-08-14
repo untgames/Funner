@@ -247,7 +247,7 @@ EffectManager& RenderManagerImpl::EffectManager ()
   try
   {
     if (!impl->effects)
-      impl->effects = EffectManagerPtr (new render::manager::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), &*impl), false);
+      impl->effects = EffectManagerPtr (new render::manager::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), impl.get ()), false);
 
     return *impl->effects;
   }
@@ -268,9 +268,9 @@ WindowPtr RenderManagerImpl::CreateWindow (INativeWindow* native_window, common:
   {
     WindowPtr window (new WindowImpl (impl->device_manager, *native_window, properties, impl->settings, impl->cache_manager), false);
     
-    window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, &*impl, &*window), *impl);
+    window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, impl.get (), window.get ()), *impl);
 
-    impl->windows.push_back (&*window);
+    impl->windows.push_back (window.get ());
     
     if (!impl->device_manager)
       impl->device_manager = window->DeviceManager ();
@@ -348,7 +348,7 @@ RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (unsigned int width, unsig
     
     LowLevelTexturePtr texture (impl->DeviceManager ().Device ().CreateTexture (texture_desc), false);
     
-    return RenderTargetPtr (new RenderTargetImpl (&impl->DeviceManager (), &*texture), false);
+    return RenderTargetPtr (new RenderTargetImpl (&impl->DeviceManager (), texture.get ()), false);
   }
   catch (xtl::exception& e)
   {
@@ -376,7 +376,7 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (unsigned int width,
     
     LowLevelTexturePtr texture (impl->DeviceManager ().Device ().CreateTexture (texture_desc), false);
  
-    return RenderTargetPtr (new RenderTargetImpl (&impl->DeviceManager (), &*texture), false);
+    return RenderTargetPtr (new RenderTargetImpl (&impl->DeviceManager (), texture.get ()), false);
   }
   catch (xtl::exception& e)
   {

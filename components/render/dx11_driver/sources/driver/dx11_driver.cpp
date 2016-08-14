@@ -15,7 +15,7 @@ const size_t ADAPTERS_RESERVE_SIZE = 8;
 }
 
 /*
-    Конструктор / деструктор  
+    Конструктор / деструктор
 */
 
 Driver::Driver ()
@@ -46,7 +46,7 @@ Driver::Driver ()
     { 
       AdapterPtr adapter (new Adapter (DxAdapterPtr (dx_adapter)), false);
 
-      RegisterAdapter (&*adapter);
+      RegisterAdapter (adapter.get ());
 
       adapters.push_back (adapter);
     }
@@ -145,13 +145,13 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
     
       //регистрация адаптера в драйвере
 
-    RegisterAdapter (&*adapter);
+    RegisterAdapter (adapter.get ());
 
       //возвращение адаптера
       
     adapter->AddRef ();
 
-    return &*adapter;
+    return adapter.get ();
   }
   catch (xtl::exception& e)
   {

@@ -116,7 +116,7 @@ class EngineHolder
 
       instance = std::auto_ptr<engine::IEngine> (FunnerInit ());
 
-      if (!&*instance)
+      if (!instance.get ())
       {
         log ("Engine startup failed!");
         abort ();
@@ -235,7 +235,7 @@ struct FunnerEngine::Impl
   
   ~Impl ()
   {
-    if (&*thread)
+    if (thread.get ())
       thread->Terminate ();
   }
   
@@ -258,7 +258,7 @@ struct FunnerEngine::Impl
 
   bool CreateWindow (FB::PluginWindow *new_window)
   {
-    if (&*engine_window)
+    if (engine_window.get ())
       return false;
     
     if (!new_window)

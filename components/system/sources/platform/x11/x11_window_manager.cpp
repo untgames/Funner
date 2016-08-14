@@ -863,7 +863,7 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       
         //регистрация окна в менеджере соединения с дисплеем
 
-      DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, &*impl);
+      DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, impl.get ());
       
         //настройка получения событий
 

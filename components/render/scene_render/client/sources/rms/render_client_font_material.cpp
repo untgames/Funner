@@ -40,7 +40,7 @@ FontMaterial::FontMaterial (MaterialManager& material_manager, const FontPtr& fo
 
     for (size_t i=0; i<materials_count; i++)
     {
-      MaterialPtr material = material_manager.CreateMaterial (common::format ("font_material.%s(%s=%s.font%08u.image%02u)", material_name, semantic, font->Name (), &*font, i).c_str (),
+      MaterialPtr material = material_manager.CreateMaterial (common::format ("font_material.%s(%s=%s.font%08u.image%02u)", material_name, semantic, font->Name (), font.get (), i).c_str (),
         material_name);
 
       material->SetTexmapImage (semantic, font->TextureName (i));

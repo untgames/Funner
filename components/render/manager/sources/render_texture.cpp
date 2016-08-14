@@ -15,7 +15,7 @@ struct RenderTargetViewDesc
 {
   unsigned int    layer;         //номер слоя
   unsigned int    mip_level;     //номер мип-уровня
-  RenderTargetPtr render_target; //цель рендеринга 
+  RenderTargetPtr render_target; //цель рендеринга
   
   RenderTargetViewDesc (unsigned int in_layer, unsigned int in_mip_level, const RenderTargetPtr& in_render_target)
     : layer (in_layer)
@@ -100,7 +100,7 @@ struct TextureImpl::Impl: public DebugIdHolder
         
      //создание новой цели рендеринга
      
-   RenderTargetPtr render_target (new RenderTargetImpl (device_manager, &*texture, layer, mip_level), false);
+   RenderTargetPtr render_target (new RenderTargetImpl (device_manager, texture.get (), layer, mip_level), false);
    
    render_targets.push_back (RenderTargetViewDesc (layer, mip_level, render_target));
    

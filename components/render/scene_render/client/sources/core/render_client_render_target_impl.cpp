@@ -23,7 +23,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
   ViewList             views;                  //области вывода
   bool                 need_update;            //требуется обновление
   bool                 need_update_area;       //требуется обновление области вывода
-  bool                 need_update_background; //требуется обновление бэкграунда  
+  bool                 need_update_background; //требуется обновление бэкграунда
 
 /// Конструктор
   Impl (const ConnectionPtr& in_connection, const char* render_target_name, const char* init_string)
@@ -209,7 +209,7 @@ void RenderTargetImpl::SetScreen (scene_graph::Screen* screen)
     {
       impl->Destroy ();
 
-      impl->screen->DetachListener (&*impl);
+      impl->screen->DetachListener (impl.get ());
 
       impl->screen = 0;
     }
@@ -222,7 +222,7 @@ void RenderTargetImpl::SetScreen (scene_graph::Screen* screen)
       {      
         impl->Initialize ();
 
-        impl->screen->AttachListener (&*impl);
+        impl->screen->AttachListener (impl.get ());
       }
       catch (...)
       {

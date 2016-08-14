@@ -14,10 +14,10 @@ struct Node::Impl
   Scene*                scene;                         //текущая сцена
   interchange::NodeType node_type;                     //тип узла
   object_id_t           id;                            //идентификатор объекта
-  xtl::auto_connection  on_update_connection;          //оповещение об обновлении объекта  
+  xtl::auto_connection  on_update_connection;          //оповещение об обновлении объекта
   xtl::auto_connection  on_update_world_tm_connection; //оповещение об обновлении матрицы мировых преобразований
   xtl::auto_connection  on_scene_changed_connection;   //оповещение об изменении принадлежности сцене
-  size_t                name_hash;                     //хэш имени узла  
+  size_t                name_hash;                     //хэш имени узла
   bool                  need_update_world_tm;          //требуется обновление матрицы преобразований
   bool                  need_update_scene;             //требуется обновление сцены
 
@@ -105,8 +105,8 @@ Node::Node (scene_graph::Node& node, SceneManager& scene_manager, render::scene:
     impl.reset (new Impl (*this, node, scene_manager, node_type));
 
     impl->on_update_connection          = node.RegisterEventHandler (scene_graph::NodeEvent_AfterUpdate, xtl::bind (&Node::UpdateNotify, static_cast<SceneObject*> (this)));
-    impl->on_update_world_tm_connection = node.RegisterEventHandler (scene_graph::NodeEvent_AfterWorldTransformUpdate, xtl::bind (&Impl::UpdateWorldMatrixNotify, &*impl));
-    impl->on_scene_changed_connection   = node.RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&Impl::OnSceneChanged, &*impl));
+    impl->on_update_world_tm_connection = node.RegisterEventHandler (scene_graph::NodeEvent_AfterWorldTransformUpdate, xtl::bind (&Impl::UpdateWorldMatrixNotify, impl.get ()));
+    impl->on_scene_changed_connection   = node.RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&Impl::OnSceneChanged, impl.get ()));
   }
   catch (xtl::exception& e)
   {

@@ -29,7 +29,7 @@ class PlatformManagerImpl
 ///Перечисление адаптеров по умолчанию
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
-      handler (&*adapter);
+      handler (adapter.get ());
     }
 
 ///Создание цепочки обмена

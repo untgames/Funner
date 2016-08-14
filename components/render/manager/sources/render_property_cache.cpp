@@ -231,13 +231,13 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
         
         impl->pools.Add (corrected_buffer_size, new_pool);
 
-        impl->last_pool = &*new_pool;
+        impl->last_pool = new_pool.get ();
       }
 
       impl->last_buffer_size = corrected_buffer_size;
     }
     
-      //выделение буфера      
+      //выделение буфера
 
     LowLevelBufferPtr buffer = impl->last_pool->Allocate (impl->device_manager->Device ());
 

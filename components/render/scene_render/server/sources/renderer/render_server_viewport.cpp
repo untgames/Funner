@@ -86,7 +86,7 @@ struct ViewportDrawListNode
   virtual void Cleanup () = 0;
 };
 
-/// Кэш результата обхода сцены 
+/// Кэш результата обхода сцены
 struct CameraTraverseResult: public ITraverseResultCache
 {
   const bound_volumes::plane_listf& frustum;  //пирамида отсечения
@@ -271,7 +271,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
         return 0;
 
       if (current_frame_index < frames.size ())
-        return &*frames [current_frame_index];
+        return frames [current_frame_index].get ();
 
       FramePtr frame_desc (new Frame (render_manager.Manager ().CreateFrame ()), false);
 
@@ -283,7 +283,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 
       frames.push_back (frame_desc);
 
-      return &*frame_desc;      
+      return frame_desc.get ();
     }
     catch (xtl::exception& e)
     {

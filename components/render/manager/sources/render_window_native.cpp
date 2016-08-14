@@ -81,11 +81,11 @@ NativeWindow::NativeWindow (syslib::Window& window)
 {
   try
   {
-    window.Trackable ().connect_tracker (xtl::bind (&Impl::OnDestroy, &*impl), *impl);
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, &*impl)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&Impl::OnChangeHandle, &*impl)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnPaint, &*impl)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeViewport, xtl::bind (&Impl::OnChangeViewport, &*impl)));
+    window.Trackable ().connect_tracker (xtl::bind (&Impl::OnDestroy, impl.get ()), *impl);
+    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, impl.get ())));
+    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&Impl::OnChangeHandle, impl.get ())));
+    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnPaint, impl.get ())));
+    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeViewport, xtl::bind (&Impl::OnChangeViewport, impl.get ())));
   }
   catch (xtl::exception& e)
   {

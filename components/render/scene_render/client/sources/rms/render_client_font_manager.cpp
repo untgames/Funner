@@ -131,9 +131,9 @@ FontPtr FontManager::CreateFont (const media::Font& font)
 
     FontPtr new_font (new Font (impl->material_manager, font, rasterized_font_creation_params), false);
 
-    xtl::auto_connection on_destroy = new_font->connect_tracker (xtl::bind (&Impl::RemoveFont, &*impl, id));
+    xtl::auto_connection on_destroy = new_font->connect_tracker (xtl::bind (&Impl::RemoveFont, impl.get (), id));
 
-    iter = impl->fonts.insert_pair (id, &*new_font).first;
+    iter = impl->fonts.insert_pair (id, new_font.get ()).first;
 
     iter->second.on_destroy.swap (on_destroy);
 
@@ -179,9 +179,9 @@ FontMaterialPtr FontManager::CreateFontMaterial (const media::Font& font, const 
 
     FontMaterialPtr new_font_material (new FontMaterial (impl->material_manager, new_font, material, semantic), false);
 
-    xtl::auto_connection on_destroy = new_font_material->connect_tracker (xtl::bind (&Impl::RemoveFontMaterial, &*impl, hash));
+    xtl::auto_connection on_destroy = new_font_material->connect_tracker (xtl::bind (&Impl::RemoveFontMaterial, impl.get (), hash));
 
-    iter = impl->font_materials.insert_pair (hash, &*new_font_material).first;
+    iter = impl->font_materials.insert_pair (hash, new_font_material.get ()).first;
 
     iter->second.on_destroy.swap (on_destroy);
 

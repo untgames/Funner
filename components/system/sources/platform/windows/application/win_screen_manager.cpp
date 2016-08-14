@@ -250,7 +250,7 @@ screen_t WindowsScreenManager::CreateScreen (size_t screen_index)
     
   ScreenDescPtr screen = instance->screens [screen_index];
   
-  addref (&*screen);
+  addref (screen.get ());
 
   return (screen_t)screen.get ();
 }
@@ -262,7 +262,7 @@ void WindowsScreenManager::DestroyScreen (screen_t handle)
     
   ScreenDescPtr screen ((ScreenDesc*)handle);
   
-  release (&*screen);
+  release (screen.get ());
 }
 
 /*
@@ -564,7 +564,7 @@ screen_t WindowsScreenManager::FindContainingScreen (const void* native_window_h
     ReleaseDC (window, dc);
     
     if (searcher.containing_screen)
-      addref (&*searcher.containing_screen);
+      addref (searcher.containing_screen.get ());
 
     return (screen_t)searcher.containing_screen.get ();
   }

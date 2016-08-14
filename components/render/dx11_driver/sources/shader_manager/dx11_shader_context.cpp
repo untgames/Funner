@@ -370,7 +370,7 @@ void ShaderManagerContext::Bind ()
       if (!program)
         program = impl.default_program.get ();
 
-      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*program, &*impl.parameters_layout);
+      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*program, impl.parameters_layout.get ());
 
       impl.bindable_program = &bindable_program;     
     }

@@ -110,7 +110,7 @@ ISceneAttachment* SceneParserCache::FindValueCore (const common::ParseNode& decl
   
   for (;range.first != range.second; ++range.first)
     if (range.first->second->type == &type)
-      return &*range.first->second->attachment;
+      return range.first->second->attachment.get ();
 
   return 0;
 }

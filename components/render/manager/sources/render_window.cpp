@@ -15,7 +15,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   WindowImpl*              owner;                     //окно-владелец
   INativeWindowPtr         native_window;             //нативное окно
   stl::string              name;                      //имя окна
-  DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки  
+  DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки
   low_level::SwapChainDesc swap_chain_desc;           //параметры цепочки обмена
   LowLevelSwapChainPtr     swap_chain;                //цепочка обмена
   LowLevelAdapterPtr       adapter;                   //адаптер отрисовки
@@ -84,7 +84,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 
       swap_chain_desc.window_handle = handle;
       
-      low_level::IAdapter* adapter_ptr = &*adapter;
+      low_level::IAdapter* adapter_ptr = adapter.get ();
           
       swap_chain = device_manager->Driver ().CreateSwapChain (1, &adapter_ptr, swap_chain_desc);
 
@@ -108,13 +108,13 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
         
       log.Printf ("Initialize render targets for swap chain");
       
-      LowLevelTexturePtr color_texture (device_manager->Device ().CreateRenderTargetTexture (&*swap_chain, swap_chain_desc.buffers_count - 1), false),
-                         depth_stencil_texture (device_manager->Device ().CreateDepthStencilTexture (&*swap_chain), false);
+      LowLevelTexturePtr color_texture (device_manager->Device ().CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count - 1), false),
+                         depth_stencil_texture (device_manager->Device ().CreateDepthStencilTexture (swap_chain.get ()), false);
  
       if (!color_buffer)
       {
-        RenderTargetPtr new_color_buffer (new RenderTargetImpl (device_manager, &*color_texture), false),
-                        new_depth_stencil_buffer (new RenderTargetImpl (device_manager, &*depth_stencil_texture), false);
+        RenderTargetPtr new_color_buffer (new RenderTargetImpl (device_manager, color_texture.get ()), false),
+                        new_depth_stencil_buffer (new RenderTargetImpl (device_manager, depth_stencil_texture.get ()), false);
         
         color_buffer         = new_color_buffer;
         depth_stencil_buffer = new_depth_stencil_buffer;
@@ -123,8 +123,8 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       {
         try
         {
-          color_buffer->SetTarget (&*color_texture);
-          depth_stencil_buffer->SetTarget (&*depth_stencil_texture);
+          color_buffer->SetTarget (color_texture.get ());
+          depth_stencil_buffer->SetTarget (depth_stencil_texture.get ());
         }
         catch (...)
         {
@@ -394,7 +394,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
     
       //подписка на события окна
 
-    window.AttachListener (&*impl);
+    window.AttachListener (impl.get ());
     
       //создание целей рендеринга
       

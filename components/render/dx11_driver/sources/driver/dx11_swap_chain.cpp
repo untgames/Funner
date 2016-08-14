@@ -56,7 +56,7 @@ SwapChain::SwapChain (const DxFactoryPtr& factory, const AdapterPtr& in_adapter,
 
     IDXGISwapChain* dx_swap_chain = 0;
 
-    check_errors ("IDXGIFactory::CreateSwapChain", factory->CreateSwapChain (&*device, &dx_desc, &dx_swap_chain));
+    check_errors ("IDXGIFactory::CreateSwapChain", factory->CreateSwapChain (device.get (), &dx_desc, &dx_swap_chain));
 
     if (!dx_swap_chain)
       throw xtl::format_operation_exception ("", "IDXGIFactory::CreateSwapChain failed");
@@ -107,7 +107,7 @@ SwapChain::~SwapChain ()
 
 IAdapter* SwapChain::GetAdapter ()
 {
-  return &*adapter;
+  return adapter.get ();
 }
 
 /*

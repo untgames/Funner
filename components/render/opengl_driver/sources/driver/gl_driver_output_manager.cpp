@@ -317,7 +317,7 @@ Output* OutputManager::GetOutput (size_t index) const
     if (index >= impl->outputs.size ())
       throw xtl::make_range_exception ("", "index", index, impl->outputs.size ());
       
-    return &*impl->outputs [index];
+    return impl->outputs [index].get ();
   }
   catch (xtl::exception& e)
   {
@@ -338,7 +338,7 @@ Output* OutputManager::FindContainingOutput (const void* native_window_handle) c
     
     for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
       if ((*iter)->impl->screen == screen)
-        return &**iter;       
+        return iter->get ();
 
     throw xtl::format_operation_exception ("", "Can't find containing output for window %p", native_window_handle);
   }

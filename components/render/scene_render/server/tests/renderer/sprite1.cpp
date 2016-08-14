@@ -46,7 +46,7 @@ void idle (Test& test)
 
         scissor->BindToScene (*test.sprite.Scene (), scene_graph::NodeBindMode_AddRef);
 
-        test.sprite.SetScissor (&*scissor);
+        test.sprite.SetScissor (scissor.get ());
       }
 
       last_fps = common::milliseconds ();
@@ -134,7 +134,7 @@ int main ()
     scene_graph::Viewport vp;
     
     vp.SetArea       (0, 0, 100, 100);
-    vp.SetCamera     (&*camera);
+    vp.SetCamera     (camera.get ());
     vp.SetTechnique  ("default");
     
     screen.Attach (vp);

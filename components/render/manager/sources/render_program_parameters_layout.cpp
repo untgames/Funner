@@ -104,7 +104,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 
     new_parameters.reserve (parameters_count);
     
-      //построение списка      
+      //построение списка
       
     if (parameters_count)
     {
@@ -198,7 +198,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     }
     else
     {
-        //обработка частного случая отсутствия параметров      
+        //обработка частного случая отсутствия параметров
 
       desc.parameters_count = 0;
       desc.parameters       = &default_parameter;
@@ -318,7 +318,7 @@ void ProgramParametersLayout::AttachSlot (ProgramParametersSlot slot, const comm
   impl->slots [slot].layout      = map.Layout ();
   impl->slots [slot].layout_hash = map.Layout ().Hash ();
 
-  impl->slots [slot].update_connection = map.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&Impl::OnPropertiesUpdated, &*impl, slot, map));
+  impl->slots [slot].update_connection = map.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&Impl::OnPropertiesUpdated, impl.get (), slot, map));
 
   impl->need_rebuild = true;
 }

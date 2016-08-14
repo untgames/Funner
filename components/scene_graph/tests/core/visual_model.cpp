@@ -22,7 +22,7 @@ int main ()
   {
     Scissor::Pointer scissor (Scissor::Create ());
 
-    model->SetScissor (&*scissor, NodeBindMode_WeakRef);
+    model->SetScissor (scissor.get (), NodeBindMode_WeakRef);
 
     printf ("scissor is %s\n", model->Scissor () ? "not null" : "null");
   }
@@ -32,7 +32,7 @@ int main ()
   {
     Scissor::Pointer scissor (Scissor::Create ());
 
-    model->SetScissor (&*scissor, NodeBindMode_AddRef);
+    model->SetScissor (scissor.get (), NodeBindMode_AddRef);
   }
 
   printf ("scissor is %s\n", model->Scissor () ? "not null" : "null");

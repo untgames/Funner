@@ -89,7 +89,7 @@ MemFile::MemFile (void* buf,size_t size,filemode_t mode)
   
 void* MemFile::Buffer () const
 {
-  if (MemFileImpl* mem_file = dynamic_cast<MemFileImpl*> (&*GetImpl ()))
+  if (MemFileImpl* mem_file = dynamic_cast<MemFileImpl*> (GetImpl ().get ()))
     return mem_file->GetBuffer ();
 
   throw xtl::format_operation_exception ("common::MemFile::Buffer", "Wrong impementation of MemFile. No buffer");

@@ -630,7 +630,7 @@ ShaderStage::~ShaderStage ()
 
 IStageState* ShaderStage::CreateStageState ()
 {
-  return new ShaderStageState (static_cast<ShaderStageState*> (&*impl));
+  return new ShaderStageState (static_cast<ShaderStageState*> (impl.get ()));
 }
 
 /*

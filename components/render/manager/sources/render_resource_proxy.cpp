@@ -188,10 +188,10 @@ void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
   if (ptr != impl->resource)
   {
     if (ptr)
-      attach_cache_holder (&*ptr, &*impl);
+      attach_cache_holder (ptr.get (), impl);
 
     if (impl->resource)
-      detach_cache_holder (&*impl->resource, &*impl);
+      detach_cache_holder (impl->resource.get (), impl);
   }
 
   impl->resource   = ptr;

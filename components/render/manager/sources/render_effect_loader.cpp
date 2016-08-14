@@ -617,7 +617,7 @@ class EffectLoader
       
       LowLevelTextureDescPtr desc (new low_level::TextureDesc);
       
-      memset (&*desc, 0, sizeof (low_level::TextureDesc));
+      memset (desc.get (), 0, sizeof (low_level::TextureDesc));
       
       if (!iter->First ("size"))
         raise_parser_exception (*iter, "Texture must have size (use 'size' tag)");

@@ -73,8 +73,8 @@ struct NodeIntrusiveArray: public NodeArrayImpl
     void Remove (Node& node)
     {
       for (Array::iterator iter=items.begin (); iter!=items.end ();)
-        if (&**iter == &node) items.erase (iter);
-        else                    ++iter;
+        if (iter->get () == &node) items.erase (iter);
+        else                       ++iter;
     }
 
 ///Очистка массива

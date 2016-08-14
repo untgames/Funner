@@ -84,16 +84,16 @@ void Scene::AttachNode (Entity* node)
     if (!node)
       throw xtl::make_null_argument_exception ("", "node");
 
-    EntityMap::iterator map_iter = impl->entity_map.find (&*node);
+    EntityMap::iterator map_iter = impl->entity_map.find (node);
 
     if (map_iter != impl->entity_map.end ())
       throw xtl::make_argument_exception ("", "node", node->Name (), "This node has been already added to scene");
 
-    EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), &*node);
+    EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), node);
 
     try
     {
-      impl->entity_map.insert_pair (&*node, list_iter);
+      impl->entity_map.insert_pair (node, list_iter);
     }
     catch (...)
     {
@@ -113,7 +113,7 @@ void Scene::DetachNode (Entity* node)
   if (!node)
     return;
 
-  EntityMap::iterator iter = impl->entity_map.find (&*node);
+  EntityMap::iterator iter = impl->entity_map.find (node);
 
   if (iter == impl->entity_map.end ())
     return;

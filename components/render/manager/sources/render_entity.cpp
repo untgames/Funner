@@ -78,7 +78,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 ///Динамические текстуры
     DynamicTextureEntityStorage& DynamicTextures () { return dynamic_textures; }
     
-///Поиск состояния    
+///Поиск состояния
     struct MaterialStateDesc
     {
       low_level::IStateBlock*  state_block;
@@ -111,9 +111,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
         state.UpdateCache ();
 
-        out_desc.state_block       = &*state.state_block;
-        out_desc.program           = &*state.program;
-        out_desc.parameters_layout = &*state.parameters_layout;
+        out_desc.state_block       = state.state_block.get ();
+        out_desc.program           = state.program.get ();
+        out_desc.parameters_layout = state.parameters_layout.get ();
 
         return;
       }
@@ -123,8 +123,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       if (!properties.Properties ().Size () && !material->HasDynamicTextures () && !shader_options_cache.Properties ().Size ())
       {
         out_desc.state_block       = 0;
-        out_desc.parameters_layout = &*material->ParametersLayout ();
-        out_desc.program           = &*material->Program ();
+        out_desc.parameters_layout = material->ParametersLayout ().get ();
+        out_desc.program           = material->Program ().get ();
 
         return;
       }
@@ -137,9 +137,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       
       state->UpdateCache ();
 
-      out_desc.state_block       = &*state->state_block;
-      out_desc.program           = &*state->program;
-      out_desc.parameters_layout = &*state->parameters_layout;
+      out_desc.state_block       = state->state_block.get ();
+      out_desc.program           = state->program.get ();
+      out_desc.parameters_layout = state->parameters_layout.get ();
     }
         
 ///Кэш опций шейдера
@@ -742,7 +742,7 @@ void* EntityImpl::UserData ()
 
 /*
     Работа с костями (для скиннинга)
-      преобразования умножаются на матрицу EntityImpl::Transformation в случае если она не единична    
+      преобразования умножаются на матрицу EntityImpl::Transformation в случае если она не единична
 */
 
 void EntityImpl::SetJointsCount (size_t count)

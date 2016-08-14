@@ -226,7 +226,7 @@ DxInputLayoutPtr Program::GetInputLayout (ShaderLibrary& library, const InputLay
       if (!shaders [ShaderType_Vertex].holder)
         throw xtl::format_operation_exception ("", "Null vertex shader");
 
-      ShaderCode& code = const_cast<Shader*> (&*shaders [ShaderType_Vertex].holder)->GetShaderCode ();
+      ShaderCode& code = const_cast<Shader*> (shaders [ShaderType_Vertex].holder.get ())->GetShaderCode ();
 
       code.RegisterDestroyHandler (tracker, library.GetTrackable ());
 

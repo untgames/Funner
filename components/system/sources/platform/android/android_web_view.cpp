@@ -267,7 +267,7 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
 
     void* view_controller = 0;
 
-    view->window = AndroidPlatform::CreateWindow (WindowStyle_PopUp, &web_view_handle::WindowMessageHandler, 0, 0, (void*)&*view, AndroidWindowManager::WindowType_WebView, &view_controller);
+    view->window = AndroidPlatform::CreateWindow (WindowStyle_PopUp, &web_view_handle::WindowMessageHandler, 0, 0, (void*)view.get (), AndroidWindowManager::WindowType_WebView, &view_controller);
 
     if (!view->window || !view_controller)
       throw xtl::format_operation_exception ("", "AndroidPlatform::CreateWindow failed (null result)");
@@ -293,7 +293,7 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
     
     jmethodID set_web_view_ref = find_method (&env, controller_class.get (), "setWebViewRef", "(J)V");
     
-    env.CallVoidMethod (view->controller.get (), set_web_view_ref, (jlong)&*view);
+    env.CallVoidMethod (view->controller.get (), set_web_view_ref, (jlong)view.get ());
 
     check_errors ();    
 

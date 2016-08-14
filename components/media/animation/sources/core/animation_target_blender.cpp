@@ -87,7 +87,7 @@ template <class T, class PropertyType> struct SourceImpl: public Source
     return blender;
   }
 
-///ќбновление канала  
+///ќбновление канала
   void Update (common::PropertyMap& properties)
   {
     properties.SetProperty (property_index, property_cast (blender (), xtl::type<PropertyType> ()));
@@ -150,7 +150,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     if (!property_name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "property_name");
       
-      //определение типа свойства    
+      //определение типа свойства
       
     typedef SourcePtr (*SourceCreator)(size_t property_index);
 
@@ -226,7 +226,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
       {
         source = creator (property_index);
         
-        source->blender_on_remove_connection = source->Blender ().RegisterEventHandler (ChannelBlenderEvent_OnSourcesRemoved, xtl::bind (&Impl::OnChannelsRemoved, this, &*source));
+        source->blender_on_remove_connection = source->Blender ().RegisterEventHandler (ChannelBlenderEvent_OnSourcesRemoved, xtl::bind (&Impl::OnChannelsRemoved, this, source.get ()));
         source->blender_on_add_connection    = source->Blender ().RegisterEventHandler (ChannelBlenderEvent_OnSourcesAdded, xtl::bind (&Impl::OnChannelsAdded, this));
         
         source->connect_tracker (xtl::bind (&Impl::RemoveSourceByName, this, stl::hash_key<const char*> (property_name)));

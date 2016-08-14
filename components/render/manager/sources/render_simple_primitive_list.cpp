@@ -858,10 +858,10 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
         cached_primitive.material         = prototype->CachedMaterial ();
         cached_primitive.tags_count       = cached_primitive.material ? cached_primitive.material->TagsCount () : 0;
         cached_primitive.tags             = cached_primitive.material ? cached_primitive.material->Tags () : (const size_t*)0;
-        cached_primitive.state_block      = &*prototype->StateBlock ();
+        cached_primitive.state_block      = prototype->StateBlock ().get ();
         cached_primitive.indexed          = true;
         cached_primitive.dynamic_indices  = indices_base;
-        cached_primitive.batching_manager = &*batching_manager;
+        cached_primitive.batching_manager = batching_manager.get ();
         cached_primitive.batching_hash    = get_batching_hash (cached_primitive);
 
         InvalidateCacheDependencies ();
