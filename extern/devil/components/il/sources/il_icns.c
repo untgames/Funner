@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2001-2009 by Denton Woods
-// Last modified: 01/15/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_icns.c
 //
@@ -27,7 +27,7 @@
 			#ifndef _DEBUG
 				#pragma comment(lib, "libjasper.lib")
 			#else
-				#pragma comment(lib, "libjasper-d.lib")
+				#pragma comment(lib, "libjasper.lib")  //libjasper-d.lib
 			#endif
 		#endif
 	#endif
@@ -222,9 +222,7 @@ ILboolean iLoadIcnsInternal()
 		}
 	}
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 
 icns_error:
 	return IL_FALSE;

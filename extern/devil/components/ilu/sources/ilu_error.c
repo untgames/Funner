@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Utility Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/20/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/16/2009
 //
 // Filename: src-ILU/src/ilu_error.c
 //
@@ -15,41 +15,49 @@
 #include "ilu_error/ilu_err-arabic.h"
 #include "ilu_error/ilu_err-dutch.h"
 #include "ilu_error/ilu_err-english.h"
+#include "ilu_error/ilu_err-french.h"
+#include "ilu_error/ilu_err-german.h"
+#include "ilu_error/ilu_err-italian.h"
 #include "ilu_error/ilu_err-japanese.h"
 #include "ilu_error/ilu_err-spanish.h"
-#include "ilu_error/ilu_err-german.h"
 
 
 ILconst_string *iluErrors;
 ILconst_string *iluLibErrors;
 ILconst_string *iluMiscErrors;
-#define ILU_NUM_LANGUAGES 6
+#define ILU_NUM_LANGUAGES 8
 
 ILconst_string *iluErrorStrings[ILU_NUM_LANGUAGES] = {
 	iluErrorStringsEnglish,
 	iluErrorStringsArabic,
 	iluErrorStringsDutch,
+	iluErrorStringsFrench,
 	iluErrorStringsJapanese,
 	iluErrorStringsSpanish,
-	iluErrorStringsGerman
+	iluErrorStringsGerman,
+	iluErrorStringsItalian
 };
 
 ILconst_string *iluLibErrorStrings[ILU_NUM_LANGUAGES] = {
 	iluLibErrorStringsEnglish,
 	iluLibErrorStringsArabic,
 	iluLibErrorStringsDutch,
+	iluLibErrorStringsFrench,
 	iluLibErrorStringsJapanese,
 	iluLibErrorStringsSpanish,
-	iluLibErrorStringsGerman
+	iluLibErrorStringsGerman,
+	iluLibErrorStringsItalian
 };
 
 ILconst_string *iluMiscErrorStrings[ILU_NUM_LANGUAGES] = {
 	iluMiscErrorStringsEnglish,
 	iluMiscErrorStringsArabic,
 	iluMiscErrorStringsDutch,
+	iluMiscErrorStringsFrench,
 	iluMiscErrorStringsJapanese,
 	iluMiscErrorStringsSpanish,
-	iluMiscErrorStringsGerman
+	iluMiscErrorStringsGerman,
+	iluMiscErrorStringsItalian
 };
 
 
@@ -80,9 +88,11 @@ ILboolean ILAPIENTRY iluSetLanguage(ILenum Language)
 		case ILU_ENGLISH:
 		case ILU_ARABIC:
 		case ILU_DUTCH:
+		case ILU_FRENCH:
 		case ILU_JAPANESE:
 		case ILU_SPANISH:
 		case ILU_GERMAN:
+		case ILU_ITALIAN:
 			iluErrors = iluErrorStrings[Language - ILU_ENGLISH];
 			iluLibErrors = iluLibErrorStrings[Language - ILU_ENGLISH];
 			iluMiscErrors = iluMiscErrorStrings[Language - ILU_ENGLISH];
@@ -95,3 +105,5 @@ ILboolean ILAPIENTRY iluSetLanguage(ILenum Language)
 
 	return IL_TRUE;
 }
+
+ 	  	 

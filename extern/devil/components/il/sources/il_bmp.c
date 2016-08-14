@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2008 by Denton Woods
-// Last modified: 01/06/2009
+// Last modified: 02/09/2009
 //
 // Filename: src-IL/src/il_bmp.c
 //
@@ -15,7 +15,6 @@
 #include "il_internal.h"
 #ifndef IL_NO_BMP
 #include "il_bmp.h"
-#include "il_manip.h"
 #include "il_endian.h"
 #include <stdio.h>
 void GetShiftFromMask(const ILuint Mask, ILuint * CONST_RESTRICT ShiftLeft, ILuint * CONST_RESTRICT ShiftRight);
@@ -60,7 +59,7 @@ ILboolean ilIsValidBmpF(ILHANDLE File)
 
 
 //! Checks if Lump is a valid .bmp lump.
-ILboolean ilIsValidBmpL(const void * Lump, const ILuint Size)
+ILboolean ilIsValidBmpL(const void * Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iIsValidBmp();
@@ -204,7 +203,7 @@ ILboolean ilLoadBmpF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a .bmp
-ILboolean ilLoadBmpL(const void *Lump, const ILuint Size)
+ILboolean ilLoadBmpL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadBitmapInternal();
@@ -885,8 +884,9 @@ ILuint ilSaveBmpF(ILHANDLE File)
 //! Writes a Bmp to a memory "lump"
 ILuint ilSaveBmpL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveBitmapInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.

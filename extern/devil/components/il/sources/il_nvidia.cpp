@@ -13,7 +13,6 @@
 
 #include "il_internal.h"
 #include "il_dds.h"
-#include "il_manip.h"
 #include <limits.h>
 
 
@@ -224,4 +223,4 @@ ILAPI ILubyte* ILAPIENTRY ilNVidiaCompressDXT(ILubyte *Data, ILuint Width, ILuin
 	return NULL;
 }
 
-#endif//IL_NO_DXTC_NVIDIA
+#endif//IL_USE_DXTC_NVIDIA

@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Last modified: 01/20/2009
+// Last modified: 03/0/2009
 //
 // Filename: src-IL/src/il_iff.c
 //
@@ -88,15 +88,32 @@ ILboolean ilLoadIffF(ILHANDLE File)
 	bRet = iLoadIffInternal();
 	iseek(FirstPos, IL_SEEK_SET);
 
+	// Lbm files can have the .iff extension as well, so if Iff-loading failed,
+	//  try to load it as a Lbm.
+	if (bRet == IL_FALSE)
+		return ilLoadIlbmF(File);
+
 	return bRet;
 }
 
 
-//! Reads from a memory "lump" that contains a IFF
+//! Reads from a memory "lump" that contains an IFF
 ILboolean ilLoadIffL(const void *Lump, ILuint Size)
 {
+	ILuint		FirstPos;
+	ILboolean	bRet;
+
 	iSetInputLump(Lump, Size);
-	return iLoadIffInternal();
+	FirstPos = itell();
+	bRet = iLoadIffInternal();
+	iseek(FirstPos, IL_SEEK_SET);
+
+	// Lbm files can have the .iff extension as well, so if Iff-loading failed,
+	//  try to load it as a Lbm.
+	if (bRet == IL_FALSE)
+		return ilLoadIlbmL(Lump, Size);
+
+	return IL_TRUE;
 }
 
 ILboolean iLoadIffInternal(void)
@@ -118,7 +135,7 @@ ILboolean iLoadIffInternal(void)
 
 	// -- File should begin with a FOR4 chunk of type CIMG
 	chunkInfo = iff_begin_read_chunk();
-	if ( chunkInfo.chunkType != IFF_TAG_CIMG ) {
+	if (chunkInfo.chunkType != IFF_TAG_CIMG) {
 		ilSetError(IL_ILLEGAL_FILE_VALUE);
 		return IL_FALSE;
 	}
@@ -268,9 +285,8 @@ ILboolean iLoadIffInternal(void)
 
 		}
 	}
-	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-	ilFixImage();
-	return IL_TRUE;
+	//ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);  // Why was this here?
+	return ilFixImage();
 }
 
 /*

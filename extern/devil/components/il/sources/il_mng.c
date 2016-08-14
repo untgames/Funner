@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/09/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_mng.c
 //
@@ -24,14 +24,14 @@
 	#if defined(_MSC_VER) || defined(__BORLANDC__)
 		#ifndef _DEBUG
 			#pragma comment(lib, "libmng.lib")
-			#pragma comment(lib, "lcms.lib")
+			#pragma comment(lib, "lcms2.lib")
 			#pragma comment(lib, "libjpeg.lib")
-			#pragma comment(lib, "zlib.lib")
+			#pragma comment(lib, "zlibstatic.lib")
 		#else
-			#pragma comment(lib, "libmng-d.lib")
-			#pragma comment(lib, "lcms-d.lib")
-			#pragma comment(lib, "libjpeg-d.lib")
-			#pragma comment(lib, "zlib-d.lib")
+			#pragma comment(lib, "libmng.lib")
+			#pragma comment(lib, "lcms2.lib")
+			#pragma comment(lib, "libjpeg.lib")
+			#pragma comment(lib, "zlibstatic.lib")
 		#endif
 	#endif
 #endif
@@ -277,9 +277,7 @@ ILboolean iLoadMngInternal()
 	mng_read(mng);
 	mng_display(mng);
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 
@@ -327,8 +325,9 @@ ILuint ilSaveMngF(ILHANDLE File)
 //! Writes a Mng to a memory "lump"
 ILuint ilSaveMngL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveMngInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.
@@ -340,6 +339,7 @@ ILboolean iSaveMngInternal()
 {
 	//mng_handle mng;
 
+	// Not working yet, so just error out.
 	ilSetError(IL_INVALID_EXTENSION);
 	return IL_FALSE;
 

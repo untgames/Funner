@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/15/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_jp2.c
 //
@@ -21,7 +21,7 @@
 		#ifndef _DEBUG
 			#pragma comment(lib, "libjasper.lib")
 		#else
-			#pragma comment(lib, "libjasper-d.lib")
+			#pragma comment(lib, "libjasper.lib")  //libjasper-d.lib
 		#endif
 	#endif
 #endif
@@ -37,7 +37,8 @@ ILboolean ilIsValidJp2(ILconst_string FileName)
 	ILHANDLE	Jp2File;
 	ILboolean	bJp2 = IL_FALSE;
 
-	if (!iCheckExtension(FileName, IL_TEXT("jp2"))) {
+	if (!iCheckExtension(FileName, IL_TEXT("jp2")) && !iCheckExtension(FileName, IL_TEXT("jpx")) &&
+		!iCheckExtension(FileName, IL_TEXT("j2k")) && !iCheckExtension(FileName, IL_TEXT("j2c"))) {
 		ilSetError(IL_INVALID_EXTENSION);
 		return bJp2;
 	}
@@ -308,9 +309,7 @@ ILboolean iLoadJp2Internal(jas_stream_t	*Stream, ILimage *Image)
 
 	jas_image_destroy(Jp2Image);
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 
@@ -592,8 +591,9 @@ ILuint ilSaveJp2F(ILHANDLE File)
 //! Writes a Jp2 to a memory "lump"
 ILuint ilSaveJp2L(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveJp2Internal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.

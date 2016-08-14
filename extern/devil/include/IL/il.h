@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 02/05/2009
+// Last modified: 03/07/2009
 //
 // Filename: IL/il.h
 //
@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-//this define controls if floats and doubles are clampled to [0..1]
+//this define controls if floats and doubles are clamped to [0..1]
 //during conversion. It takes a little more time, but it is the correct
 //way of doing this. If you are sure your floats are always valid,
 //you can undefine this value...
@@ -161,8 +161,8 @@ typedef long long unsigned int ILuint64;
 // IL-specific #define's
 //
 
-#define IL_VERSION_1_7_7 1
-#define IL_VERSION       177
+#define IL_VERSION_1_7_8 1
+#define IL_VERSION       178
 
 
 // Attribute Bits
@@ -196,7 +196,7 @@ typedef long long unsigned int ILuint64;
 #define IL_ICO          0x0424  //!< Microsoft Windows Icons and Cursors - .ico and .cur extensions
 #define IL_JPG          0x0425  //!< JPEG - .jpg, .jpe and .jpeg extensions
 #define IL_JFIF         0x0425  //!<
-#define IL_LBM          0x0426  //!< Interlaced bitmap - .lbm extension
+#define IL_ILBM         0x0426  //!< Amiga IFF (FORM ILBM) - .iff, .ilbm, .lbm extensions
 #define IL_PCD          0x0427  //!< Kodak PhotoCD - .pcd extension
 #define IL_PCX          0x0428  //!< ZSoft PCX - .pcx extension
 #define IL_PIC          0x0429  //!< PIC - .pic extension
@@ -225,12 +225,23 @@ typedef long long unsigned int ILuint64;
 #define IL_ICNS			0x0440  //!< Macintosh Icon - .icns extension
 #define IL_JP2			0x0441  //!< Jpeg 2000 - .jp2 extension
 #define IL_EXR			0x0442  //!< OpenEXR - .exr extension
-#define IL_WDP			0x0443  //!< 
+#define IL_WDP			0x0443  //!< Microsoft HD Photo - .wdp and .hdp extension
 #define IL_VTF			0x0444  //!< Valve Texture Format - .vtf extension
 #define IL_WBMP			0x0445  //!< Wireless Bitmap - .wbmp extension
 #define IL_SUN			0x0446  //!< Sun Raster - .sun, .ras, .rs, .im1, .im8, .im24 and .im32 extensions
 #define IL_IFF			0x0447  //!< Interchange File Format - .iff extension
 #define IL_TPL			0x0448  //!< Gamecube Texture - .tpl extension
+#define IL_FITS			0x0449  //!< Flexible Image Transport System - .fit and .fits extensions
+#define IL_DICOM		0x044A  //!< Digital Imaging and Communications in Medicine (DICOM) - .dcm and .dicom extensions
+#define IL_IWI			0x044B  //!< Call of Duty Infinity Ward Image - .iwi extension
+#define IL_BLP			0x044C  //!< Blizzard Texture Format - .blp extension
+#define IL_FTX			0x044D  //!< Heavy Metal: FAKK2 Texture - .ftx extension
+#define IL_ROT			0x044E  //!< Homeworld 2 - Relic Texture - .rot extension
+#define IL_TEXTURE		0x044F  //!< Medieval II: Total War Texture - .texture extension
+#define IL_DPX			0x0450  //!< Digital Picture Exchange - .dpx extension
+#define IL_UTX			0x0451  //!< Unreal (and Unreal Tournament) Texture - .utx extension
+#define IL_MP3			0x0452  //!< MPEG-1 Audio Layer 3 - .mp3 extension
+#define IL_KTX			0x0453  //!< Khronos Texture - .ktx extension
 
 
 #define IL_JASC_PAL     0x0475  //!< PaintShop Pro Palette
@@ -364,9 +375,10 @@ typedef long long unsigned int ILuint64;
 #define IL_JPG_SAVE_FORMAT         0x0721
 #define IL_CHEAD_HEADER_STRING     0x0722
 #define IL_PCD_PICNUM              0x0723
+#define IL_PNG_ALPHA_INDEX 0x0724 // currently has no effect!
 #define IL_JPG_PROGRESSIVE         0x0725
+#define IL_VTF_COMP                0x0726
 
-#define IL_PNG_ALPHA_INDEX 0x0724 //XIX : ILint : the color in the palette at this index value (0-255) is considered transparent, -1 for no trasparent color
 
 // DXTC definitions
 #define IL_DXTC_FORMAT      0x0705
@@ -475,7 +487,7 @@ typedef long long unsigned int ILuint64;
 		#endif
 	#endif
 #elif defined(__APPLE__) && !defined(IPHONE)
-	#define ILAPI extern __attribute__ ((visibility ("default")))
+	#define ILAPI extern __attribute__ ((visibility ("default")))  //TODO change for support -fvisibility=hidden
 #else
 	#define ILAPI
 #endif
@@ -599,7 +611,7 @@ ILAPI ILuint    ILAPIENTRY ilSaveF(ILenum Type, ILHANDLE File);
 ILAPI ILboolean ILAPIENTRY ilSaveImage(ILconst_string FileName);
 ILAPI ILuint    ILAPIENTRY ilSaveL(ILenum Type, void *Lump, ILuint Size);
 ILAPI ILboolean ILAPIENTRY ilSavePal(ILconst_string FileName);
-ILAPI ILboolean ILAPIENTRY ilSetAlpha( ILdouble AlphaValue );
+ILAPI ILboolean ILAPIENTRY ilSetAlpha(ILdouble AlphaValue);
 ILAPI ILboolean ILAPIENTRY ilSetData(void *Data);
 ILAPI ILboolean ILAPIENTRY ilSetDuration(ILuint Duration);
 ILAPI void      ILAPIENTRY ilSetInteger(ILenum Mode, ILint Param);

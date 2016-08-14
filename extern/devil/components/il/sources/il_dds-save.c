@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/15/2009
+// Last modified: 02/09/2009
 //
 // Filename: src-IL/src/il_dds-save.c
 //
@@ -13,7 +13,6 @@
 
 #include "il_internal.h"
 #include "il_dds.h"
-#include "il_manip.h"
 #include <limits.h>
 
 
@@ -62,8 +61,9 @@ ILuint ilSaveDdsF(ILHANDLE File)
 //! Writes a Dds to a memory "lump"
 ILuint ilSaveDdsL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveDdsInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.
@@ -313,8 +313,7 @@ ILuint ILAPIENTRY ilGetDXTCData(void *Buffer, ILuint BufferSize, ILenum DXTCForm
 {
 	ILubyte	*CurData = NULL;
 	ILuint	retVal;
-
-	ILint BlockNum;
+	ILint	BlockNum;
 
 	if (Buffer == NULL) {  // Return the number that will be written with a subsequent call.
 		BlockNum = ((iCurImage->Width + 3)/4) * ((iCurImage->Height + 3)/4)
@@ -910,7 +909,7 @@ ILuint Compress(ILimage *Image, ILenum DXTCFormat)
 
 		ifree(Data);
 		ifree(Alpha);
-	} //else no 3dc
+	} //else no 3DC
 
 	return Count;  // Returns 0 if no compression was done.
 }

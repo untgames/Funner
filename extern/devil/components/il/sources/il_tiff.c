@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2008 by Denton Woods
-// Last modified: 01/24/2009
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_tiff.c
 //
@@ -17,7 +17,6 @@
 #include "tiffio.h"
 
 #include <time.h>
-#include "il_manip.h"
 
 #define MAGIC_HEADER1	0x4949
 #define MAGIC_HEADER2	0x4D4D
@@ -26,9 +25,10 @@
 #if (defined(_WIN32) || defined(_WIN64)) && defined(IL_USE_PRAGMA_LIBS)
 	#if defined(_MSC_VER) || defined(__BORLANDC__)
 		#ifndef _DEBUG
-			#pragma comment(lib, "libtiff.lib")
+			#pragma comment(lib, "tiff.lib")
 		#else
-			#pragma comment(lib, "libtiff-d.lib")
+			//#pragma comment(lib, "tiff-d.lib")
+			#pragma comment(lib, "tiff.lib")
 		#endif
 	#endif
 #endif
@@ -713,9 +713,7 @@ ILboolean iLoadTiffInternal()
 
 	TIFFClose(tif);
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 /*----------------------------------------------------------------------------*/

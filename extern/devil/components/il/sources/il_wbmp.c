@@ -2,11 +2,11 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/04/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_wbmp.c
 //
-// Description: Reads from a .wbmp file.  Specs available from
+// Description: Reads from a Wireless Bitmap (.wbmp) file.  Specs available from
 //				http://www.ibm.com/developerworks/wireless/library/wi-wbmp/
 //
 //-----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ ILboolean iLoadWbmpInternal(void)
 	BitPadding = (8 - (Width % 8)) % 8;  // Has to be aligned on a byte boundary.  The rest is padding.
 	File = bfile(iGetFile());
 	if (File == NULL)
-		return IL_FALSE;
+		return IL_FALSE;  //@TODO: Error?
 
 	//@TODO: Do this without bread?  Would be faster, since we would not have to do
 	//  the second loop.
@@ -201,8 +201,9 @@ ILuint ilSaveWbmpF(ILHANDLE File)
 //! Writes a .wbmp to a memory "lump"
 ILuint ilSaveWbmpL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveWbmpInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.
@@ -268,8 +269,6 @@ ILboolean iSaveWbmpInternal()
 
 	return IL_TRUE;
 }
-
-
 
 #endif//IL_NO_WBMP
 

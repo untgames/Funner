@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/04/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_targa.c
 //
@@ -16,7 +16,6 @@
 #include "il_targa.h"
 //#include <time.h>  // for ilMakeString()
 #include <string.h>
-#include "il_manip.h"
 #include "il_bits.h"
 
 #ifdef DJGPP
@@ -245,9 +244,7 @@ ILboolean iLoadTargaInternal()
 			break;
 	}
 	
-	ilFixImage();
-	
-	return bTarga;
+	return ilFixImage();
 }
 
 

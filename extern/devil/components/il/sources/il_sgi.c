@@ -1,8 +1,18 @@
+//-----------------------------------------------------------------------------
+//
+// ImageLib Sources
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
+//
+// Filename: src-IL/src/il_sgi.c
+//
+// Description: Reads and writes Silicon Graphics Inc. (.sgi) files.
+//
+//-----------------------------------------------------------------------------
 
 #include "il_internal.h"
 #ifndef IL_NO_SGI
 #include "il_sgi.h"
-#include "il_manip.h"
 #include <limits.h>
 
 static char *FName = NULL;
@@ -192,9 +202,9 @@ ILboolean iLoadSgiInternal()
 		bSgi = iReadNonRleSgi(&Header);
 	}
 
-	ilFixImage();
-
-	return bSgi;
+	if (!bSgi)
+		return IL_FALSE;
+	return ilFixImage();
 }
 
 /*----------------------------------------------------------------------------*/
@@ -525,8 +535,9 @@ ILuint ilSaveSgiF(ILHANDLE File)
 //! Writes a Sgi to a memory "lump"
 ILuint ilSaveSgiL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSaveSgiInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.

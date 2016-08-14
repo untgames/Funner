@@ -1,112 +1,38 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2008 by Denton Woods
-// Last modified: 12/14/2008
+// Last modified: 02/09/2009
 //
 // Filename: src-IL/src/il_wdp.c
 //
 // Description: Reads a Microsoft HD Photo (.wdp or .hdp)
+//   Based very much on the Microsoft HD Photo Device Porting Kit 1.0
+//   available at 
+//   http://www.microsoft.com/downloads/details.aspx?FamilyID=285eeffd-d86c-48c3-ab93-3abd5ee7f1ce&displaylang=en.
+//
+// Note: The license that the Device Porting Kit is under is not very clear.
+//   Commentary on the license can be found at http://en.wikipedia.org/wiki/HD_Photo.
+//   Lots of this code is taken from the examples in the DPK and from code
+//   within the DPK itself.  For this reason, this file is not under the LGPL
+//   license, unlike the rest of DevIL.
 //
 //-----------------------------------------------------------------------------
 
 
 #include "il_internal.h"
 #ifndef IL_NO_WDP
+#include <WMPGlue.h>
 #include "il_wdp.h"
 
-
-//! Checks if the file specified in FileName is a valid Wdp file.
-ILboolean ilIsValidWdp(ILconst_string FileName)
-{
-	ILHANDLE	WdpFile;
-	ILboolean	bWdp = IL_FALSE;
-	
-	if (!iCheckExtension(FileName, IL_TEXT("wdp")) &&
-		!iCheckExtension(FileName, IL_TEXT("hdp"))) {
-		ilSetError(IL_INVALID_EXTENSION);
-		return bWdp;
-	}
-	
-	WdpFile = iopenr(FileName);
-	if (WdpFile == NULL) {
-		ilSetError(IL_COULD_NOT_OPEN_FILE);
-		return bWdp;
-	}
-	
-	bWdp = ilIsValidWdpF(WdpFile);
-	icloser(WdpFile);
-	
-	return bWdp;
-}
-
-
-//! Checks if the ILHANDLE contains a valid Wdp file at the current position.
-ILboolean ilIsValidWdpF(ILHANDLE File)
-{
-	ILuint		FirstPos;
-	ILboolean	bRet;
-	
-	iSetInputFile(File);
-	FirstPos = itell();
-	bRet = iIsValidWdp();
-	iseek(FirstPos, IL_SEEK_SET);
-	
-	return bRet;
-}
-
-
-//! Checks if Lump is a valid Wdp lump.
-ILboolean ilIsValidWdpL(const void *Lump, ILuint Size)
-{
-	iSetInputLump(Lump, Size);
-	return iIsValidWdp();
-}
-
-
-// Internal function used to get the Wdp header from the current file.
-ILboolean iGetWdpHead(WDPHEAD *Header)
-{
-	// Must be "II"
-	Header->Encoding[0] = (ILubyte)igetc();
-	Header->Encoding[1] = (ILubyte)igetc();
-	// Must be 0xBC
-	Header->UniqueID = (ILubyte)igetc();
-	// Currently 1
-	Header->Version = (ILubyte)igetc();
-	// Offset from the beginning of the file
-	Header->Offset = GetLittleUInt();
-	
-	return IL_TRUE;
-}
-
-
-// Internal function to get the header and check it.
-ILboolean iIsValidWdp()
-{
-	WDPHEAD	Head;
-	
-	if (!iGetWdpHead(&Head))
-		return IL_FALSE;
-	iseek(-(ILint)sizeof(WDPHEAD), IL_SEEK_CUR);
-	
-	return iCheckWdp(&Head);
-}
-
-
-// Internal function used to check if the HEADER is a valid Wdp header.
-ILboolean iCheckWdp(WDPHEAD *Header)
-{
-	if (Header->Encoding[0] != 'I' || Header->Encoding[1] != 'I')
-		return IL_FALSE;
-	if (Header->UniqueID != 0xBC)
-		return IL_FALSE;
-	// Currently 1... 0 is prerelease.
-	if (Header->Version != 1)
-		return IL_FALSE;
-	
-	return IL_TRUE;
-}
+#if defined(_WIN32) && defined(IL_USE_PRAGMA_LIBS)
+	#if defined(_MSC_VER) || defined(__BORLANDC__)
+		#ifndef _DEBUG
+			#pragma comment(lib, "wmplib.lib")
+		#else
+			#pragma comment(lib, "wmplib-d.lib")
+		#endif
+	#endif
+#endif
 
 
 //! Reads a WDP file
@@ -114,7 +40,7 @@ ILboolean ilLoadWdp(ILconst_string FileName)
 {
 	ILHANDLE	WdpFile;
 	ILboolean	bWdp = IL_FALSE;
-
+	
 	WdpFile = iopenr(FileName);
 	if (WdpFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
@@ -133,314 +59,371 @@ ILboolean ilLoadWdpF(ILHANDLE File)
 {
 	ILuint		FirstPos;
 	ILboolean	bRet;
-
+	
 	iSetInputFile(File);
 	FirstPos = itell();
 	bRet = iLoadWdpInternal();
 	iseek(FirstPos, IL_SEEK_SET);
-
+	
 	return bRet;
 }
 
 
-//! Reads from a memory "lump" that contains a WDP image
+//! Reads from a memory "lump" that contains a WDP
 ILboolean ilLoadWdpL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadWdpInternal();
 }
 
-
-// Internal function used to load the Wdp.
-ILboolean iLoadWdpInternal()
+//@TODO: Put in ilPKImageEncode_WritePixels_DevIL?
+ERR WriteDevILHeader(PKImageEncode* pIE)
 {
-	WDPHEAD		Header;
-	WDPIFD		Dir;
-	WDPGUID		Guid;
-	ILushort	NumEntries;
-	WDPIMGHEAD	ImgHead;
-	WDPIMGPLANE	ImgPlane;
-	WDPDCQUANT	DcQuant;
-	WDPTILE		Tile;
-	ILuint		TempInt, TempInt1, i;
+    struct WMPStream* pS = pIE->pStream;
 
-	if (iCurImage == NULL) {
-		ilSetError(IL_ILLEGAL_OPERATION);
+	if (IsEqualGUID(&GUID_PKPixelFormat24bppRGB, &pIE->guidPixFormat) || IsEqualGUID(&GUID_PKPixelFormat24bppBGR, &pIE->guidPixFormat))
+    {
+        pIE->cbPixel = 3;
+    }
+    else if (IsEqualGUID(&GUID_PKPixelFormat32bppBGRA, &pIE->guidPixFormat) 
+        || IsEqualGUID(&GUID_PKPixelFormat32bppBGR, &pIE->guidPixFormat)
+        || IsEqualGUID(&GUID_PKPixelFormat32bppPBGRA, &pIE->guidPixFormat))
+    {
+        pIE->cbPixel = 4;
+    }
+    else if (IsEqualGUID(&GUID_PKPixelFormat8bppGray, &pIE->guidPixFormat))
+    {
+        pIE->cbPixel = 1;
+    }
+	else if (IsEqualGUID(&GUID_PKPixelFormat16bppGray, &pIE->guidPixFormat))
+    {
+        pIE->cbPixel = 2;
+    }
+	else if (IsEqualGUID(&GUID_PKPixelFormat128bppRGBAFloat, &pIE->guidPixFormat))
+    {
+        pIE->cbPixel = 16;//4;
+    }
+
+
+	pIE->offPixel = pIE->offStart;
+    pIE->fHeaderDone = !IL_FALSE;
+
+    return WMP_errSuccess;
+}
+
+ERR ilPKImageEncode_WritePixels_DevIL(PKImageEncode* pIE, U32 cLine, U8* pbPixel, U32 cbStride)
+{
+    ERR err = WMP_errSuccess;
+
+    struct WMPStream* pS = pIE->pStream;
+    size_t cbLineM = 0, cbLineS = 0;
+    I32 i = 0;
+    static U8 pPadding[4] = {0};
+
+    // header
+    if (!pIE->fHeaderDone)
+    {
+        // WriteBMPHeader() also inits this object
+        Call(WriteDevILHeader(pIE));
+    }
+
+    // body
+    // calculate line size in memory and in stream
+    cbLineM = pIE->cbPixel * pIE->uWidth;
+    cbLineS = (cbLineM + 3) / 4 * 4;
+
+    //FailIf(pRect->X < 0 || pID->uWidth <= pRect->X, WMP_errInvalidParameter);
+    //FailIf(pRect->Y < 0 || pID->uHeight <= pRect->Y, WMP_errInvalidParameter);
+    //FailIf(pRect->Width < 0 || pID->uWidth < pRect->X + pRect->Width, WMP_errInvalidParameter);
+    //FailIf(pRect->Height < 0 || pID->uHeight < pRect->Y + pRect->Height, WMP_errInvalidParameter);
+    FailIf(cbStride < cbLineM, WMP_errInvalidParameter);
+
+    for (i = cLine - 1; 0 <= i; --i)
+    {
+        size_t offM = cbStride * i;
+        size_t offS = cbLineS * (pIE->uHeight - (pIE->idxCurrentLine + i + 1));
+
+        Call(pS->SetPos(pS, pIE->offPixel + offS));
+        Call(pS->Write(pS, pbPixel + offM, cbLineM));
+    }
+    Call(pS->Write(pS, pPadding, (cbLineS - cbLineM)));
+    pIE->idxCurrentLine += cLine;
+
+Cleanup:
+    return err;
+}
+
+
+ERR PKImageEncode_Create_DevIL(
+    PKImageEncode** ppIE)
+{
+    ERR err = WMP_errSuccess;
+    PKImageEncode* pIE = NULL;
+
+    Call(PKImageEncode_Create(ppIE));
+
+    pIE = *ppIE;
+    pIE->WritePixels = ilPKImageEncode_WritePixels_DevIL;
+
+Cleanup:
+    return err;
+}
+
+
+ERR iWmpDecAppCreateEncoderFromExt(
+    PKCodecFactory* pCFactory,
+    const char* szExt,
+    PKImageEncode** ppIE)
+{
+    ERR err = WMP_errSuccess;
+    const PKIID* pIID = NULL;
+
+    // get encod PKIID
+    Call(GetImageEncodeIID(szExt, &pIID));
+
+    // Create encoder
+    //Call(PKCodecFactory_CreateCodec(pIID, ppIE));
+
+    Call(PKImageEncode_Create_DevIL(ppIE));
+
+Cleanup:
+    return err;
+}
+
+
+ERR iCloseWS_File(struct WMPStream** ppWS)
+{
+    ERR err = WMP_errSuccess;
+    /*struct WMPStream* pWS = *ppWS;
+
+    fclose(pWS->state.file.pFile);
+    Call(WMPFree((void**)ppWS));
+
+Cleanup:*/
+    return err;
+}
+
+Bool iEOSWS_File(struct WMPStream* pWS)
+{
+    //return feof(pWS->state.file.pFile);
+	return ieof();
+}
+
+ERR iReadWS_File(struct WMPStream* pWS, void* pv, size_t cb)
+{
+	// For some reason, the WDP images load just fine, but it tries to read too much,
+	//  so IL_FILE_READ_ERROR is set.  So we get rid of the error.
+	if (iread(pv, 1, (ILuint)cb) != cb)
+		ilGetError();
+    return WMP_errSuccess;
+}
+
+ERR iWriteWS_File(struct WMPStream* pWS, const void* pv, size_t cb)
+{
+    ERR err = WMP_errSuccess;
+
+    if (0 != cb) {
+		FailIf(1 != iwrite(pv, (ILuint)cb, 1), WMP_errFileIO);
+    }
+
+Cleanup:
+    return err;
+}
+
+ERR iSetPosWS_File(struct WMPStream* pWS, size_t offPos)
+{
+    ERR err = WMP_errSuccess;
+
+    //FailIf(0 != fseek(pWS->state.file.pFile, (long)offPos, SEEK_SET), WMP_errFileIO);
+	FailIf(0 != iseek((ILuint)offPos, IL_SEEK_SET), WMP_errFileIO);
+
+Cleanup:
+    return err;
+}
+
+ERR iGetPosWS_File(struct WMPStream* pWS, size_t* poffPos)
+{
+    ERR err = WMP_errSuccess;
+    long lOff = 0;
+
+    //FailIf(-1 == (lOff = ftell(pWS->state.file.pFile)), WMP_errFileIO);
+	lOff = itell();
+    *poffPos = (size_t)lOff;
+
+Cleanup:
+    return err;
+}
+
+ERR ilCreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* szMode)
+{
+    ERR err = WMP_errSuccess;
+    struct WMPStream* pWS = NULL;
+
+	*ppWS = icalloc(1, sizeof(**ppWS));
+	if (*ppWS == NULL)
+		return WMP_errOutOfMemory;
+    pWS = *ppWS;
+
+    pWS->Close = iCloseWS_File;
+    pWS->EOS = iEOSWS_File;
+
+    pWS->Read = iReadWS_File;
+    pWS->Write = iWriteWS_File;
+    //pWS->GetLine = GetLineWS_File;
+
+    pWS->SetPos = iSetPosWS_File;
+    pWS->GetPos = iGetPosWS_File;
+
+    //pWS->state.file.pFile = fopen(szFilename, szMode);
+	pWS->state.file.pFile = NULL;
+    //FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
+
+Cleanup:    
+    return err;
+}
+
+
+ERR ilPKCodecFactory_CreateDecoderFromFile(PKImageDecode** ppDecoder)
+{
+    ERR err = WMP_errSuccess;
+
+    char *pExt = ".wdp";  // We are loading a WDP file, so we have to tell the library that with this extension.
+    PKIID* pIID = NULL;
+
+    struct WMPStream* pStream = NULL;
+    PKImageDecode* pDecoder = NULL;
+
+    // get decode PKIID
+    Call(GetImageDecodeIID(pExt, &pIID));
+
+    // create stream
+    Call(ilCreateWS_File(&pStream, NULL, "rb"));
+
+    // Create decoder
+    Call(PKCodecFactory_CreateCodec(pIID, ppDecoder));
+    pDecoder = *ppDecoder;
+
+    // attach stream to decoder
+    Call(pDecoder->Initialize(pDecoder, pStream));
+    pDecoder->fStreamOwner = !0;
+
+Cleanup:
+    return err;
+}
+
+
+ERR ilPKCreateFactory(PKFactory** ppFactory, U32 uVersion)
+{
+    ERR err = WMP_errSuccess;
+    PKFactory* pFactory = NULL;
+
+    Call(PKAlloc(ppFactory, sizeof(**ppFactory)));
+    pFactory = *ppFactory;
+
+    pFactory->CreateStream = PKCreateFactory_CreateStream;
+
+    pFactory->CreateStreamFromFilename = ilCreateWS_File;
+    pFactory->CreateStreamFromMemory = CreateWS_Memory;
+    
+    pFactory->Release = PKCreateFactory_Release;
+
+Cleanup:
+    return err;
+}
+
+ILboolean iLoadWdpInternal(/*ILconst_string FileName*/)
+{
+	ERR err = WMP_errSuccess;
+	PKFactory* pFactory = NULL;
+	PKCodecFactory* pCodecFactory = NULL;
+	PKImageDecode* pDecoder = NULL;
+    PKPixelInfo PI;
+	PKPixelFormatGUID guidPixFormat;
+	PKFormatConverter* pConverter = NULL;
+    U32 cFrame = 0, i = 0;
+	PKRect Rect;
+    struct WMPStream* pEncodeStream = NULL;
+    PKImageEncode* pEncoder = NULL;
+
+	//Call(PKCreateFactory(&pFactory, PK_SDK_VERSION));
+	//Call(PKCreateCodecFactory(&pCodecFactory, WMP_SDK_VERSION));
+	//Call(pCodecFactory->CreateDecoderFromFile(FileName, &pDecoder));
+	Call(ilPKCreateFactory(&pFactory, PK_SDK_VERSION));
+	Call(PKCreateCodecFactory(&pCodecFactory, WMP_SDK_VERSION));
+	Call(ilPKCodecFactory_CreateDecoderFromFile(&pDecoder));
+
+	//guidPixFormat = GUID_PKPixelFormat24bppRGB;
+	guidPixFormat = GUID_PKPixelFormat32bppBGRA;
+	//guidPixFormat = GUID_PKPixelFormat8bppGray;
+	//guidPixFormat = GUID_PKPixelFormat16bppGray;
+
+    // Color transcoding
+    if (IsEqualGUID(&guidPixFormat, &GUID_PKPixelFormat8bppGray) || IsEqualGUID(&guidPixFormat, &GUID_PKPixelFormat16bppGray)){ // ** => Y transcoding
+        pDecoder->guidPixFormat = guidPixFormat;
+        pDecoder->WMP.wmiI.cfColorFormat = Y_ONLY;
+    }
+	else if(IsEqualGUID(&guidPixFormat, &GUID_PKPixelFormat24bppRGB) && pDecoder->WMP.wmiI.cfColorFormat == CMYK){ // CMYK = > RGB
+		pDecoder->WMP.wmiI.cfColorFormat = CF_RGB;
+		pDecoder->guidPixFormat = guidPixFormat;
+		pDecoder->WMP.wmiI.bRGB = 1; //RGB
+	}
+
+	PI.pGUIDPixFmt = &guidPixFormat;
+    PixelFormatLookup(&PI, LOOKUP_FORWARD);
+
+    pDecoder->WMP.wmiSCP.bfBitstreamFormat = 0;
+    pDecoder->WMP.wmiSCP.uAlphaMode = 0;
+    pDecoder->WMP.wmiSCP.sbSubband = SB_ALL;
+    pDecoder->WMP.bIgnoreOverlap = FALSE;
+
+    pDecoder->WMP.wmiI.cfColorFormat = PI.cfColorFormat;
+
+    pDecoder->WMP.wmiI.bdBitDepth = PI.bdBitDepth;
+    pDecoder->WMP.wmiI.cBitsPerUnit = PI.cbitUnit;
+
+	//==== Validate thumbnail decode parameters =====
+    pDecoder->WMP.wmiI.cThumbnailWidth = pDecoder->WMP.wmiI.cWidth;
+    pDecoder->WMP.wmiI.cThumbnailHeight = pDecoder->WMP.wmiI.cHeight;
+    pDecoder->WMP.wmiI.bSkipFlexbits = FALSE;
+
+	pCodecFactory->CreateFormatConverter(&pConverter);
+	pConverter->Initialize(pConverter, pDecoder, NULL, guidPixFormat);
+
+	// Right now, we are just assuming one frame.
+	// @TODO: Deal with multiple frames.
+    //pDecoder->GetFrameCount(pDecoder, &cFrame);
+	//pDecoder->SelectFrame(pDecoder, 1);
+
+	if (!ilTexImage(pDecoder->uWidth, pDecoder->uHeight, 1, 4, IL_BGRA, IL_UNSIGNED_BYTE, NULL))
+		goto Cleanup;
+	//ilTexImage(pDecoder->uWidth, pDecoder->uHeight, 1, 1, IL_LUMINANCE, IL_UNSIGNED_BYTE, Data);
+
+	pFactory->CreateStreamFromMemory(&pEncodeStream, iCurImage->Data, iCurImage->SizeOfData);
+    iWmpDecAppCreateEncoderFromExt(pCodecFactory, ".wdp", &pEncoder);
+	pEncoder->Initialize(pEncoder, pEncodeStream, ".wdp", 0);
+
+    pEncoder->pStream->GetPos(pEncoder->pStream, &pEncoder->offStart);
+
+	// Set the region that we want to be the whole image.
+	Rect.X = 0; Rect.Y = 0; Rect.Height = pDecoder->uHeight; Rect.Width = pDecoder->uWidth;
+	pEncoder->SetPixelFormat(pEncoder, guidPixFormat);
+    pEncoder->SetSize(pEncoder, Rect.Width, Rect.Height);
+	pEncoder->WriteSource = PKImageEncode_Transcode;
+    pEncoder->WriteSource(pEncoder, pConverter, &Rect);
+
+
+Cleanup:
+	// Release everything all at the end.
+	PKImageDecode_Release(&pDecoder);
+	if (pEncoder)
+		PKImageEncode_Release(&pEncoder);
+	PKCreateCodecFactory_Release(&pCodecFactory);
+	PKCreateFactory_Release(&pFactory);
+	PKFormatConverter_Release(&pConverter);
+
+	if (err != WMP_errSuccess)
 		return IL_FALSE;
-	}
-
-	if (!iGetWdpHead(&Header)) {
-		ilSetError(IL_INVALID_FILE_HEADER);
-		return IL_FALSE;
-	}
-	if (!iCheckWdp(&Header)) {
-		ilSetError(IL_INVALID_FILE_HEADER);
-		return IL_FALSE;
-	}
-
-	// Offset is from the beginning of the file.
-	iseek(Header.Offset, IL_SEEK_SET);
-
-	NumEntries = GetLittleUShort();
-
-	Dir.Tag = GetLittleUShort();
-	Dir.Type = GetLittleUShort();
-	Dir.Count = GetLittleUInt();
-	Dir.ValOff = GetLittleUInt();
-	Dir.NextOff = GetLittleUInt();
-
-	GetLittleUInt();
-
-	iseek(Dir.ValOff, IL_SEEK_SET);
-	if (Dir.Type == 1) {
-		//iseek(Dir.Count * 1, IL_SEEK_CUR);
-//@TODO: Take care of other types.
-
-		Guid.First = GetLittleUInt();
-		Guid.Second = GetLittleUShort();
-		Guid.Third = GetLittleUShort();
-		Guid.Fourth = GetLittleUInt();
-		Guid.Fifth = GetLittleUInt();
-	}
-
-	// Support other formats
-	if (Guid.First != 0x6fddc324 || Guid.Second != 0x4e03 || Guid.Third != 0x4bfe ||
-		Guid.Fourth != 0x773d85b1) {
-		ilSetError(IL_ILLEGAL_FILE_VALUE);
-		return IL_FALSE;
-	}
-
-	// Read the image header.
-	//@TODO: Take care of more formats
-	switch (Guid.Fifth)
-	{
-		// 8-bit RGB (24 bpp)
-		case 0x0cc98d76:
-			ImgHead.GDISignature[0] = GetLittleUInt();
-			ImgHead.GDISignature[1] = GetLittleUInt();
-			ImgHead.Codec    = (ILubyte)igetc();
-			ImgHead.Flags[0] = (ILubyte)igetc();
-			ImgHead.Flags[1] = (ILubyte)igetc();
-			ImgHead.Format   = (ILubyte)igetc();
-
-			// GUID is "WMPHOTO", and codec version is only 1 in the current spec (1.0).
-			if (ImgHead.GDISignature[0] != 0x48504D57 || ImgHead.GDISignature[1] != 0x004F544F ||
-				((ImgHead.Codec & WDP_CODEC) >> 4) != 1) {
-				ilSetError(IL_ILLEGAL_FILE_VALUE);
-				return IL_FALSE;
-			}
-
-			//@TODO: Take care of more formats.
-			if (!(ImgHead.Format & WDP_RGB)) {
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-			//@TODO: Take care of extra pixels.
-			if (ImgHead.Flags[1] & WDP_WINDOWING) {
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-			//@TODO: Alpha channel
-			if (ImgHead.Flags[1] & WDP_ALPHACHANNEL) {
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-
-			if (ImgHead.Flags[1] & WDP_SHORT_HEADER) {
-				ImgHead.Width  = GetBigUShort() + 1;
-				ImgHead.Height = GetBigUShort() + 1;
-			} else {
-				ImgHead.Width  = GetBigUInt() + 1;
-				ImgHead.Height = GetBigUInt() + 1;
-			}
-
-			if (ImgHead.Flags[0] & WDP_TILING_FLAG) {
-				ImgHead.VertTiles = (ILubyte)igetc();
-				TempInt = igetc();
-				ImgHead.VertTiles = ImgHead.VertTiles + ((TempInt & 0xF0) << 4);
-				UInt(&ImgHead.VertTiles);  // Take care of endianness
-
-				ImgHead.HorzTiles = (ILubyte)igetc() << 8;
-				ImgHead.HorzTiles = ImgHead.VertTiles + (TempInt & 0x0F);
-				UInt(&ImgHead.VertTiles);  // Take care of endianness
-
-				//@TODO:  Interpret tiles
-				return IL_FALSE;
-
-				for (i = 0; i < ImgHead.VertTiles; i++) {
-					if (ImgHead.Flags[1] & WDP_SHORT_HEADER) {
-						igetc();
-					}
-					else {
-						GetBigUShort();
-					}
-				}
-			}
-
-			//@TODO: Take orientation into account.
-
-			// Read the image plane header
-			ImgPlane.Flags1 = (ILubyte)igetc();
-			TempInt = (ImgPlane.Flags1 & WDP_CLR_FMT)>>5;
-			if ((TempInt == WDP_YUV_444) || (TempInt == WDP_N_CHANNEL)) {
-				//@TODO: Do anything with this for YUV_444?
-				ImgPlane.Color = (ILubyte)igetc();
-			}
-
-			if (TempInt == WDP_N_CHANNEL) {
-				ImgPlane.NumChannels = ((ImgPlane.Color & WDP_NUM_CHANS) >> 4) + 1;
-			}
-			else if (TempInt == WDP_Y_ONLY) {
-				ImgPlane.NumChannels = 1;
-			}
-			else if ((TempInt == WDP_YUV_420) || (TempInt == WDP_YUV_422) || (TempInt == WDP_YUV_444)) {
-				ImgPlane.NumChannels = 3;
-			}
-			else if ((TempInt == WDP_CMYK) || (TempInt == WDP_BAYER)) {
-				ImgPlane.NumChannels = 4;
-			}
-			else {  // The above if statements have all the possible values.
-				ilSetError(IL_ILLEGAL_FILE_VALUE);
-				return IL_FALSE;
-			}
-
-
-			//@TODO: Implement
-			//if ((ImgPlane.Flags1 & WDP_CLR_FMT)>>5 == WDP_YUV_444) {
-			//	ilSetError(IL_FORMAT_NOT_SUPPORTED);
-			//	return IL_FALSE;
-			//}
-			//@TODO: Implement
-			if ((ImgPlane.Flags1 & WDP_CLR_FMT)>>5 == WDP_BAYER) {
-				ImgPlane.Bayer = (ILubyte)igetc();
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-
-			TempInt = ImgHead.Format & WDP_BITDEPTH;
-			//@TODO: Implement
-			if (TempInt == WDP_BD_16 || TempInt == WDP_BD_16S || TempInt == WDP_BD_32 || TempInt == WDP_BD_32S) {
-				ImgPlane.ShiftBits = (ILubyte)igetc();
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-			//@TODO: Implement
-			if (TempInt == WDP_BD_32F) {
-				ImgPlane.Mantissa = (ILubyte)igetc();
-				ImgPlane.Expbias  = (ILubyte)igetc();
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-
-			// Read the second set of image plane header flags.
-			ImgPlane.Flags2 = (ILubyte)igetc();
-			//@TODO: Implement
-			if (ImgPlane.Flags2 & WDP_DC_FRAME) {
-				if (ImgPlane.NumChannels == 1) {
-					DcQuant.ChMode = WDP_CH_UNIFORM;
-				}
-				else {
-					DcQuant.ChMode = (ImgPlane.Flags2 & 0x60) >> 5;
-				}
-
-				if (DcQuant.ChMode == WDP_CH_UNIFORM) {
-					TempInt = igetc();
-					DcQuant.DcQuant = ((ImgPlane.Flags2 & 0x1F) << 3) + ((TempInt & 0xE0) >> 5);
-				}
-				else if (DcQuant.ChMode == WDP_CH_SEPARATE) {
-					TempInt1 = igetc();
-					TempInt = igetc();
-					DcQuant.DcQuantY = ((ImgPlane.Flags2 & 0x1F) << 3) + ((TempInt1 & 0xE0) >> 5);
-					DcQuant.DcQuantUV = ((TempInt1 & 0x1F) << 3) + ((TempInt & 0xE0) >> 5);
-				}
-				//@TODO: Implement
-				else if (DcQuant.ChMode == WDP_CH_INDEPENDENT) {
-					ilSetError(IL_FORMAT_NOT_SUPPORTED);
-					return IL_FALSE;
-				}
-				else {  // Not a valid channel mode
-					ilSetError(IL_ILLEGAL_FILE_VALUE);
-					return IL_FALSE;
-				}
-			}
-			else {
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-
-			// Bitstream is in spatial mode.
-			if ((ImgHead.Flags[0] & WDP_BITSTREAM_FMT) == 0) {
-//@TODO: Find out what exactly these are.
-				iseek(6, IL_SEEK_CUR);
-				Tile.StartCode = (igetc() << 16) + (igetc() << 8) + igetc();
-				UInt(&Tile.StartCode);
-				Tile.HashAndType = igetc();
-
-				if (Tile.StartCode != 1 && (Tile.HashAndType & WDP_TILE_TYPE) != WDP_FLEXBITS_TILE) {  // Invalid tile
-					ilSetError(IL_ILLEGAL_FILE_VALUE);
-					return IL_FALSE;
-				}
-
-				//@TODO: Implement
-				if (ImgHead.Flags[1] & WDP_TRIM_FLEXBITS) {
-					ilSetError(IL_FORMAT_NOT_SUPPORTED);
-					return IL_FALSE;
-				}
-
-				// Here's where TILE_SPATIAL goes.
-				//ImgPlane.Flags1 & WDP_BANDS_PRESENT  // No need to shift, since lower.
-			}
-			// Bitstream is in frequency mode.
-			//@TODO: Implement this.
-			else {
-				ilSetError(IL_FORMAT_NOT_SUPPORTED);
-				return IL_FALSE;
-			}
-
-
-
-			if (!ilTexImage(ImgHead.Width, ImgHead.Height, 1, 3, IL_RGB, IL_UNSIGNED_BYTE, NULL)) {
-				//@TODO: Free any memory from above.
-				return IL_FALSE;
-			}
-
-
-			break;
-
-		default:
-			ilSetError(IL_FORMAT_NOT_SUPPORTED);
-			return IL_FALSE;
-	}
-	
-
 	return IL_TRUE;
 }
-
-
-ILuint VLWESC()
-{
-	ILubyte	First, Second;
-	ILuint	Value;
-
-	First = (ILubyte)igetc();
-	if (First < 0xfb) {
-		Second = (ILubyte)igetc();
-		Value = First * 256 + Second;
-	}
-	else if (First == 0x0fb) {
-		Value = GetBigUInt();
-	}
-    //else if (First == 0x0fc) {
-    //    EIGHT_BYTES
-    //    Value = EIGHT_BYTES
-    //}
-	else { // FIRST_BYTE == 0xfd||0xfe||0xff 
-		Value = 0; // Escape Mode
-	}
-
-	return Value;
-}
-
-
 
 #endif//IL_NO_WDP

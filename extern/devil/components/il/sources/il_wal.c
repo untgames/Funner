@@ -2,7 +2,7 @@
 //
 // ImageLib Sources
 // Copyright (C) 2000-2009 by Denton Woods
-// Last modified: 01/30/2009
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_wal.c
 //
@@ -13,7 +13,6 @@
 
 #include "il_internal.h"
 #ifndef IL_NO_WAL
-#include "il_manip.h"
 #include "il_q2pal.h"
 
 
@@ -156,9 +155,7 @@ ILboolean iLoadWalInternal()
 	}
 
 	// Fixes all images, even mipmaps.
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 
 cleanup_error:
 	for (i = 0; i < 3; i++) {

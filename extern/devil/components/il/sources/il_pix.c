@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/26/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_pix.c
 //
@@ -13,7 +13,6 @@
 
 #include "il_internal.h"
 #ifndef IL_NO_PIX
-#include "il_manip.h"
 #include "il_endian.h"
 
 
@@ -153,9 +152,7 @@ ILboolean iLoadPixInternal()
 
 	iCurImage->Origin = IL_ORIGIN_UPPER_LEFT;
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 #endif//IL_NO_PIX

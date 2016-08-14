@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2008 by Denton Woods
-// Last modified: 08/10/2006
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_dcx.c
 //
@@ -14,7 +14,6 @@
 #include "il_internal.h"
 #ifndef IL_NO_DCX
 #include "il_dcx.h"
-#include "il_manip.h"
 
 
 //! Checks if the file specified in FileName is a valid .dcx file.
@@ -215,9 +214,7 @@ ILboolean iLoadDcxInternal()
 		}
 	}
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 

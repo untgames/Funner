@@ -124,6 +124,9 @@
 /* hdr support */
 #define IL_NO_HDR
 
+/* utx support */
+#define IL_NO_UTX
+
 /* icns support */
 #define IL_NO_ICNS
 
@@ -240,13 +243,13 @@
 #define PACKAGE_NAME "DevIL"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "DevIL 1.7.7"
+#define PACKAGE_STRING "DevIL 1.7.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.7.7"
+#define PACKAGE_VERSION "1.7.8"
 
 /* define if you have posix_memalign memory allocation */
 #undef POSIX_MEMALIGN
@@ -277,7 +280,7 @@
 #undef VECTORMEM
 
 /* Version number of package */
-#define VERSION "1.7.7"
+#define VERSION "1.7.8"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

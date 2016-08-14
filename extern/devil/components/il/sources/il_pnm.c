@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/21/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_pnm.c
 //
@@ -17,7 +17,6 @@
 #include "il_pnm.h"
 #include <limits.h>  // for maximum values
 #include <ctype.h>
-#include "il_manip.h"
 #include "il_bits.h"
 
 // According to the ppm specs, it's 70, but PSP
@@ -286,12 +285,9 @@ ILboolean iLoadPnmInternal()
 		PmImage->Format = IL_RGB;
 	PmImage->Origin = IL_ORIGIN_UPPER_LEFT;
 
-	ilFixImage();
-
 	if (PmImage == NULL)
 		return IL_FALSE;
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 
@@ -445,9 +441,9 @@ ILboolean iGetWord(ILboolean final)
 		}
 		if (Current == IL_EOF)
 			return IL_FALSE;
+		SmallBuff[WordPos] = 0; // 08-17-2008 - was NULL, changed to avoid warning
 		if (final == IL_TRUE)
 	        break;
-		SmallBuff[WordPos] = 0; // 08-17-2008 - was NULL, changed to avoid warning
 
 		if (!Looping)
 			break;
@@ -521,9 +517,10 @@ ILuint ilSavePnmF(ILHANDLE File)
 //! Writes a Pnm to a memory "lump"
 ILuint ilSavePnmL(void *Lump, ILuint Size)
 {
-	ILuint Pos = itellw();
+	ILuint Pos;
 	FName = NULL;
 	iSetOutputLump(Lump, Size);
+	Pos = itellw();
 	if (iSavePnmInternal() == IL_FALSE)
 		return 0;  // Error occurred
 	return itellw() - Pos;  // Return the number of bytes written.

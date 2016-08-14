@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/19/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 03/07/2009
 //
 // Filename: src-IL/src/il_pcd.c
 //
@@ -15,7 +15,6 @@
 
 #include "il_internal.h"
 #ifndef IL_NO_PCD
-#include "il_manip.h"
 
 
 ILboolean iLoadPcdInternal(void);
@@ -200,9 +199,7 @@ ILboolean iLoadPcdInternal()
 	else
 		iCurImage->Origin = IL_ORIGIN_UPPER_LEFT;
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 
