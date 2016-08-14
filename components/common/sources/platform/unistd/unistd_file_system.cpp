@@ -86,7 +86,7 @@ class UnistdFileSystem: public StdioFileSystem
 
       for (struct dirent* entry; (entry = readdir (dir)) != 0;)
       {
-        if (wcmatch (entry->d_name,mask.c_str ()))
+        if (strcmp (entry->d_name, ".") && strcmp (entry->d_name, "..") && wcmatch (entry->d_name,mask.c_str ()))
         {
           file_name = dir_name + entry->d_name;
 
