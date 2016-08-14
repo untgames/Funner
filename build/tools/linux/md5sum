@@ -1,0 +1,3 @@
+#/bin/bash
+SED_ARG="s#\s"$1"#*"$1"#"
+/usr/bin/md5sum $1 | sed $SED_ARG

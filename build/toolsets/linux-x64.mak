@@ -15,6 +15,8 @@ SHELL         := /bin/bash
 
 PROFILES += linux linuxx64 unistd x11 glx haswchar pthread_static_library has_windows x86-64 g++x86-64
 
+ADDITIONAL_PATHS=$$(pwd)/$(BUILD_DIR)tools/linux
+
 include $(TOOLSETS_DIR)/g++.mak
 
 ###################################################################################################
