@@ -19,9 +19,10 @@ export.link.extern.openal.wp8.LIBS              := funner.extern.openal32
 #export.link.extern.openal.win32.LIBS         := funner.extern.openal32
 
 # Run exports
-export.run.extern.openal.DLLS           :=
-export.run.extern.openal.win32.DLLS     := OpenAL32 wrap_oal
-export.run.extern.openal.win32.DLL_DIRS := bin
-export.run.extern.openal.linux.DLLS     := funner.extern.openal32
-export.run.extern.openal.android.DLLS   := funner.extern.openal32
-export.run.extern.openal.wp8.DLLS       := funner.extern.openal32
+export.run.extern.openal.DLLS                  :=
+export.run.extern.openal.win32.DLLS            := OpenAL32 wrap_oal
+export.run.extern.openal.x86_win32.DLL_DIRS    := bin/win32
+export.run.extern.openal.x86-64_win32.DLL_DIRS := bin/win64
+export.run.extern.openal.linux.DLLS            := funner.extern.openal32
+export.run.extern.openal.android.DLLS          := funner.extern.openal32
+export.run.extern.openal.wp8.DLLS              := funner.extern.openal32
