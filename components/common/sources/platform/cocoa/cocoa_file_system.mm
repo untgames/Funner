@@ -313,7 +313,7 @@ class CocoaFileSystem: public StdioFileSystem
 
         file_name = [ns_file_name UTF8String];
 
-        if (file_name.data () [0] != '.' && file_name.find ("/.") == stl::string::npos && wcmatch (file_name.c_str (), mask.c_str ()))
+        if (file_name.find ("/.") == stl::string::npos && wcmatch (file_name.c_str (), mask.c_str ()))
         {
           file_name = dir_name + file_name;
 

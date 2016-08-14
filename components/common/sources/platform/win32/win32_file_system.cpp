@@ -409,7 +409,7 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
 
   do
   {
-    if (wcscmp ( find_file_data.cFileName, L".") && wcscmp ( find_file_data.cFileName, L"..") && !(find_file_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+    if (wcscmp ( find_file_data.cFileName, L".") && wcscmp ( find_file_data.cFileName, L".."))
     {
       info.is_dir      = (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
       info.time_create = make_time (find_file_data.ftCreationTime);

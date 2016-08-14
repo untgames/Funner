@@ -380,7 +380,7 @@ void StdioFileSystem::Search (const char* mask,const FileSearchHandler& insert_h
 
   do
   {    
-    if (strcmp (find_data.name,".") && strcmp (find_data.name,"..") && !(find_data.attrib & _A_HIDDEN))
+    if (strcmp (find_data.name,".") && strcmp (find_data.name,".."))
     {
       info.size         = find_data.size;
       info.time_modify  = find_data.time_write;
