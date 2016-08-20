@@ -25,6 +25,7 @@ MessageQueue::Handler::Handler (const Handler&)
 */
 
 MessageQueue::MessageQueue ()
+  : was_empty_message_pushed (false)
 {
 }
 
@@ -121,6 +122,8 @@ void MessageQueue::PushEmptyMessage ()
     
     if (messages.empty ())
     {
+      was_empty_message_pushed = true;
+
       try
       {
         signals [MessageQueueEvent_OnNonEmpty]();
@@ -209,8 +212,10 @@ void MessageQueue::WaitMessage ()
   {
     Lock lock (mutex);
 
-    while (messages.empty ())
-      condition.Wait (mutex);    
+    while (messages.empty () && !was_empty_message_pushed)
+      condition.Wait (mutex);
+
+    was_empty_message_pushed = false;
   }
   catch (xtl::exception& e)
   {

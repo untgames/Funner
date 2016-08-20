@@ -119,6 +119,7 @@ class MessageQueue
     MessageQueueImpl messages;
     HandlerSet       handlers;
     EventSignal      signals [MessageQueueEvent_Num];
+    bool             was_empty_message_pushed;          //this flag is set to true if empty message was pushed to queue in order to tell WaitMessage method to return
 };
 
 typedef common::Singleton<MessageQueue> MessageQueueSingleton;
