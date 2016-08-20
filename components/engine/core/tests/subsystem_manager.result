@@ -7,11 +7,6 @@ engine.SubsystemManager1: Add subsystem 'Subsystem12'
 Starting subsystem 'Subsystem21', value='3'
 engine.SubsystemManager1: Add subsystem 'Subsystem01'
 engine.SubsystemManager1: Exception data/include.xml(8): node 'Include': File '3.xml' not found
-    at common::StdioFileSystem::FileOpen
-    at common::FileSystemImpl::OpenFile()
-    at common::FileSystem::LoadTextFile
-    at common::Parser::Parser(const char*, const char*)
-    at engine::StartupManagerImpl::IncludeHandler
 Starting subsystem 'Subsystem11', value='1'
 engine.SubsystemManager1: Add subsystem 'Subsystem11'
 engine.SubsystemManager1: Subsystems successfully started

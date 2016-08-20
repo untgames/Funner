@@ -10,6 +10,7 @@
 
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/strlib.h>
 
 #include <engine/subsystem_manager.h>
 
@@ -50,7 +51,13 @@ class EngineSubsystem : public ISubsystem, public xtl::reference_counter
 
 void log_handler (const char* log_name, const char* message)
 {
-  printf ("%s: %s\n", log_name, message);
+  stl::string processed_message = message;
+
+  if (common::wcmatch (message, "*common*FileOpen*"))
+    if (processed_message.find ("\n") != stl::string::npos)
+      processed_message.resize (processed_message.find ("\n"));  //cut callstack for this message, because it is system-specific and breaks unit test result
+
+  printf ("%s: %s\n", log_name, processed_message.c_str ());
 }
 
 void dump (const SubsystemManager& manager)
