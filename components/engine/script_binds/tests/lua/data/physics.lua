@@ -24,11 +24,11 @@ function collision_event_name (event)
 end
 
 function collision_callback (event, body1, body2, point)
-  print ("Collision callback called for event " .. collision_event_name (event) .. " at point " .. tostring (point))
+  print ("Collision callback called for event " .. collision_event_name (event) .. " at point " .. string.format ("[%.2f %.2f %.2f]", point.x, point.y, point.z))
 end
 
 function body_collision_callback (event, body1, body2, point)
-  print ("Body collision callback called for event " .. collision_event_name (event) .. " at point " .. tostring (point))
+  print ("Body collision callback called for event " .. collision_event_name (event) .. " at point " .. string.format ("[%.2f %.2f %.2f]", point.x, point.y, point.z))
 end
 
 function print_material (material)

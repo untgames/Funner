@@ -27,7 +27,7 @@ node 'vase_pieces'
   scale: 1.00 1.00 1.00
   node 'vase_pieces.piece_09'
   {
-    position: 224.33 336.50 0.00
+    position: 224.00 336.50 0.00
     ortx: -0.87 0.50 0.00
     scale: 1.00 1.00 1.00
     node 'vase_pieces.piece_09.Layer 1'
