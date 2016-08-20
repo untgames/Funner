@@ -94,6 +94,10 @@ int main ()
       {
         dependency.UpdateCache ();
       }
+      catch (std::bad_alloc& e)
+      {
+        printf ("std::bad_alloc\n"); //printf this exception this way for getting same output in unit test for all compilers
+      }
       catch (std::exception& e)
       {
         printf ("%s\n", e.what ());
