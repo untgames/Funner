@@ -115,9 +115,9 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
   {
     struct HashDesc
     {
-      size_t vertex_attributes_count;
-      int    index_type;
-      size_t index_buffer_offset;
+      unsigned int vertex_attributes_count;
+      int          index_type;
+      unsigned int index_buffer_offset;
     };
 
     HashDesc hash_desc;
