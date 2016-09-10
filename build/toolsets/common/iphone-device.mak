@@ -1,8 +1,8 @@
 ###################################################################################################
-#Build for iPhone Device 5.1.1
+#Build for iPhone Device 7.0
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET ?= 5.1.1
+IPHONEOS_DEPLOYMENT_TARGET ?= 7.0
 
 export IPHONEOS_DEPLOYMENT_TARGET
 

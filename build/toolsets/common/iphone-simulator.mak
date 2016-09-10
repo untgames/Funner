@@ -1,10 +1,10 @@
 ###################################################################################################
-#Build for iPhone Simulator 5.1.1 g++
+#Build for iPhone Simulator 7.0 g++
 ###################################################################################################
 
 PROFILES += clang
 
-IPHONEOS_DEPLOYMENT_TARGET ?= 5.1.1
+IPHONEOS_DEPLOYMENT_TARGET ?= 7.0
 
 export IPHONEOS_DEPLOYMENT_TARGET
 

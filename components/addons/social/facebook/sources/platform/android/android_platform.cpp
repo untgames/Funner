@@ -41,7 +41,7 @@ class AndroidPlatformImpl
     }
 
     //Login/cancel login
-    void Login (const char* app_id, const social::facebook::DefaultPlatform::PlatformLoginCallback& callback, const common::PropertyMap& properties)
+    void Login (const social::facebook::DefaultPlatform::PlatformLoginCallback& callback, const common::PropertyMap& properties)
     {
       try
       {
@@ -51,7 +51,7 @@ class AndroidPlatformImpl
           return;
         }
 
-        InitSession (app_id);
+        InitSession ();
 
         JNIEnv* env = &get_env ();
 
@@ -66,7 +66,12 @@ class AndroidPlatformImpl
         if (properties.IsPresent ("Permissions"))
           permissions = properties.GetString ("Permissions");
 
-        env->CallVoidMethod (session, login_method, tojstring (permissions.c_str ()).get ());
+        stl::string previous_token;
+
+        if (properties.IsPresent ("Token"))
+          previous_token = properties.GetString ("Token");
+
+        env->CallVoidMethod (session, login_method, tojstring (permissions.c_str ()).get (), tojstring (previous_token.c_str ()).get ());
 
         check_errors ();
 
@@ -94,9 +99,11 @@ class AndroidPlatformImpl
 
       try
       {
+        InitSession ();
+
         JNIEnv* env = &get_env ();
 
-        env->CallStaticVoidMethod (session_class, logout_method);
+        env->CallVoidMethod (session, logout_method);
       }
       catch (xtl::exception& e)
       {
@@ -125,7 +132,7 @@ class AndroidPlatformImpl
     }
 
     //Track app install
-    void PublishInstall (const char* app_id)
+    void PublishInstall ()
     {
       if (!IsFacebookSDKSupported ())
         return;
@@ -134,7 +141,7 @@ class AndroidPlatformImpl
       {
         log.Printf ("Publishing install app event");
 
-        InitSession (app_id);
+        InitSession ();
 
         JNIEnv* env = &get_env ();
 
@@ -173,10 +180,10 @@ class AndroidPlatformImpl
 
      env->DeleteLocalRef (session_class_ref);
 
-     session_init_method              = find_method (env, session_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
+     session_init_method              = find_method (env, session_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;)V");
      can_login_method                 = find_method (env, session_class, "canLogin", "()Z");
-     login_method                     = find_method (env, session_class, "login", "(Ljava/lang/String;)V");
-     logout_method                    = find_static_method (env, session_class, "logout", "()V");
+     login_method                     = find_method (env, session_class, "login", "(Ljava/lang/String;Ljava/lang/String;)V");
+     logout_method                    = find_method (env, session_class, "logout", "()V");
      publish_app_install_method       = find_method (env, session_class, "publishInstall", "()V");
      is_facebook_app_installed_method = find_static_method (env, session_class, "isFacebookAppInstalled", "(Landroid/content/Context;)Z");
 
@@ -227,15 +234,14 @@ class AndroidPlatformImpl
       return session_class;
     }
 
-  private:
-    void InitSession (const char* app_id)
+    void InitSession ()
     {
       if (session) //already initiated
         return;
 
       JNIEnv* env = &get_env ();
 
-      session = env->NewGlobalRef (env->NewObject (session_class, session_init_method, get_activity (), tojstring (app_id).get ()));
+      session = env->NewGlobalRef (env->NewObject (session_class, session_init_method, get_activity ()));
 
       if (!session)
         throw xtl::format_operation_exception ("social::facebook::AndroidPlatformImpl::InitSession", "Can't create session object");
@@ -283,7 +289,7 @@ void on_login_canceled (JNIEnv& env, jobject)
 
 void AndroidPlatform::Login (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties)
 {
-  AndroidPlatformSingleton::Instance ()->Login (app_id, callback, properties);
+  AndroidPlatformSingleton::Instance ()->Login (callback, properties);
 }
 
 void AndroidPlatform::CancelLogin ()
@@ -311,7 +317,16 @@ bool AndroidPlatform::IsFacebookAppInstalled ()
 
 void AndroidPlatform::PublishAppInstallEvent (const char* app_id)
 {
-  AndroidPlatformSingleton::Instance ()->PublishInstall (app_id);
+  AndroidPlatformSingleton::Instance ()->PublishInstall ();
+}
+
+/*
+   Handle component start, used for initializing facebook SDK before user logins
+*/
+
+void AndroidPlatform::OnComponentStart ()
+{
+  AndroidPlatformSingleton::Instance ()->InitSession ();
 }
 
 /*

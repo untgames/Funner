@@ -4,11 +4,11 @@ using namespace social;
 using namespace social::facebook;
 
 /*
-   Платформа по умолчанию
+   Default platform
 */
 
 /*
-   Логин (возвращает true, если началось выполнение специфичного для данной платформы логина)
+   Login (returns true, if platform-specific login flow was started)
 */
 
 void DefaultPlatform::Login (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties)
@@ -25,7 +25,7 @@ void DefaultPlatform::LogOut ()
 }
 
 /*
-   Проверка, установлено ли приложение facebook
+   Check if Facebook app is installed on device
 */
 
 bool DefaultPlatform::IsFacebookAppInstalled ()
@@ -34,9 +34,17 @@ bool DefaultPlatform::IsFacebookAppInstalled ()
 }
 
 /*
-   Публикация события установки приложения
+   Send app install event to Facebook
 */
 
 void DefaultPlatform::PublishAppInstallEvent (const char* app_id)
+{
+}
+
+/*
+   Handle component start, used for initializing facebook SDK before user logins
+*/
+
+void DefaultPlatform::OnComponentStart ()
 {
 }

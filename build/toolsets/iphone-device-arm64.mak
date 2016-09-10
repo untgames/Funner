@@ -4,8 +4,6 @@
 
 PROFILES += iosarm64
 
-IPHONEOS_DEPLOYMENT_TARGET := 7.0
-
 COMMON_CFLAGS     += -arch arm64
 COMMON_LINK_FLAGS += -arch arm64
 FAT_LIB_ARCH_TYPE := arm64

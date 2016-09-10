@@ -7,6 +7,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <syslib/application.h>
+#include <syslib/platform/iphone.h>
 
 #include <common/action_queue.h>
 #include <common/file.h>

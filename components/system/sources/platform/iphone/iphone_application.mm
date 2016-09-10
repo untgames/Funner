@@ -415,9 +415,18 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
   syslib::Application::PostNotification (notification.c_str ());
 
+  NSMutableDictionary* notification_user_info = [[NSMutableDictionary alloc] initWithCapacity:4];
+
+  [notification_user_info setValue:application       forKey:@"application"];
+  [notification_user_info setValue:url               forKey:@"URL"];
+  [notification_user_info setValue:sourceApplication forKey:@"sourceApplication"];
+  [notification_user_info setValue:annotation        forKey:@"annotation"];
+
   [[NSNotificationCenter defaultCenter] postNotificationName:@"ApplicationOpenURL"
                                                       object:self
-                                                    userInfo:@{ @"URL":url, @"sourceApplication":sourceApplication }];
+                                                    userInfo:notification_user_info];
+
+  [notification_user_info release];
 
   return YES;
 }
@@ -632,12 +641,10 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
 
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-  NSString* system_version = [[UIDevice currentDevice] systemVersion];
-
   properties.SetProperty ("Operating System", "iOS");
   properties.SetProperty ("Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "pad" : "phone");
   properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
-  properties.SetProperty ("OSVersion", [system_version UTF8String]);
+  properties.SetProperty ("OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
 
   NSBundle*     main_bundle         = [NSBundle mainBundle];
   NSDictionary* bundle_info         = [main_bundle infoDictionary];
@@ -668,23 +675,7 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   NSString* uuid = [defaults objectForKey:USER_DEFAULTS_UUID];
 
   if (!uuid)
-  {
-    if ([system_version compare:@"6.0" options:NSNumericSearch] != NSOrderedAscending)
-    {
-      uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    }
-    else
-    {
-      CFUUIDRef cf_uuid = CFUUIDCreate (0);
-
-      uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
-
-      CFRelease (cf_uuid);
-
-      [defaults setObject:uuid forKey:USER_DEFAULTS_UUID];
-      [defaults synchronize];
-    }
-  }
+    uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 
   properties.SetProperty ("UUID", [uuid UTF8String]);
 

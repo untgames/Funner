@@ -1,17 +1,15 @@
 #include "shared.h"
 
-#import <UIKit/UIPasteboard.h>
+#import <FBSDKCoreKit/FBSDKAccessToken.h>
+#import <FBSDKCoreKit/FBSDKAppEvents.h>
+#import <FBSDKCoreKit/FBSDKApplicationDelegate.h>
+#import <FBSDKCoreKit/FBSDKSettings.h>
 
-#import <FacebookSDK/FBAppCall.h>
-#import <FacebookSDK/FBAppEvents.h>
-#import <FacebookSDK/FBSession.h>
-#import <FacebookSDK/FBSettings.h>
-#import <FacebookSDK/FBErrorUtility.h>
+#import <FBSDKLoginKit/FBSDKLoginManager.h>
+#import <FBSDKLoginKit/FBSDKLoginManagerLoginResult.h>
 
 using namespace social;
 using namespace social::facebook;
-
-//static NSString* RESOURCES_VERSION_KEY_NAME = @"FacebookSdkResourcesVersion"; //key for facebook sdk resources version in localization file
 
 namespace
 {
@@ -57,13 +55,6 @@ bool is_publish_permission (NSString *permission)
 
 @synthesize listener;
 
--(void)dealloc
-{
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-  [super dealloc];
-}
-
 -(id)initWithListener:(ILoginResultListener*)in_listener
 {
   self = [super init];
@@ -78,15 +69,10 @@ bool is_publish_permission (NSString *permission)
 
 -(void)loginWithAppId:(const char*)app_id properties:(const common::PropertyMap&)properties
 {
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector (onOpenURL:)
-                                               name:@"ApplicationOpenURL"
-                                             object:[UIApplication sharedApplication].delegate];
-
-  [FBSettings setDefaultAppID:[NSString stringWithUTF8String:app_id]];
+  [FBSDKSettings setAppID:[NSString stringWithUTF8String:app_id]];
 
   if (properties.IsPresent ("UrlSchemeSuffix"))
-    [FBSettings setDefaultUrlSchemeSuffix:[NSString stringWithUTF8String:properties.GetString ("UrlSchemeSuffix")]];
+    [FBSDKSettings setAppURLSchemeSuffix:[NSString stringWithUTF8String:properties.GetString ("UrlSchemeSuffix")]];
 
   common::StringArray permissions;
 
@@ -112,26 +98,27 @@ bool is_publish_permission (NSString *permission)
     throw xtl::format_operation_exception ("social::facebook::ios_platform::loginWithAppId:properties:", "Publish permissions requesting is not implemented");
 
   // Open session with public_profile (required) and user_birthday read permissions
-  [FBSession openActiveSessionWithReadPermissions:read_permissions
-                                     allowLoginUI:YES
-                                completionHandler:
-       ^(FBSession *session, FBSessionState state, NSError *error)
-       {
-         if (error)
-         {
-           // If the user cancelled login
-           if ([FBErrorUtility errorCategoryForError:error] == FBErrorCategoryUserCancelled)
-           {
-             [self onLoginCanceled];
-             return;
-           }
+  FBSDKLoginManager* loginManager = [[FBSDKLoginManager alloc] init];
 
-           [self onLoginFailedWithError:[error description]];
+  [loginManager logInWithReadPermissions:read_permissions
+                      fromViewController:nil
+                                 handler:
+       ^(FBSDKLoginManagerLoginResult *result, NSError *error)
+       {
+         //TODO handle result.declinedPermissions
+         [loginManager autorelease];
+
+         if (result.isCancelled)
+         {
+           [self onLoginCanceled];
            return;
          }
 
-         if (state != FBSessionStateOpen)
+         if (error)
+         {
+           [self onLoginFailedWithError:[error description]];
            return;
+         }
 
          if (![publish_permissions count])
          {
@@ -148,7 +135,9 @@ bool is_publish_permission (NSString *permission)
   if (!listener)
     return;
 
-  listener->OnLoginResult (true, OperationStatus_Success, "", [[FBSession activeSession].accessTokenData.accessToken UTF8String]);
+  //TODO implement FBSDKAccessTokenDidChangeNotification
+
+  listener->OnLoginResult (true, OperationStatus_Success, "", [[FBSDKAccessToken currentAccessToken].tokenString UTF8String]);
 }
 
 -(void)onLoginCanceled
@@ -167,12 +156,47 @@ bool is_publish_permission (NSString *permission)
   listener->OnLoginResult (true, OperationStatus_Failure, [error UTF8String], "");
 }
 
+@end
+
+@interface FacebookOpenURLHandler: NSObject
+{
+}
+
+@end
+
+@implementation FacebookOpenURLHandler
+
+-(void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  [super dealloc];
+}
+
+-(id)init
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector (onOpenURL:)
+                                               name:@"ApplicationOpenURL"
+                                             object:[UIApplication sharedApplication].delegate];
+
+  return self;
+}
+
 //Handle url opening
 -(void)onOpenURL:(NSNotification*)notification
 {
-  [FBAppCall handleOpenURL:notification.userInfo [@"URL"] sourceApplication:notification.userInfo [@"sourceApplication"]];
+  [[FBSDKApplicationDelegate sharedInstance] application:notification.userInfo [@"application"]
+      openURL:notification.userInfo [@"URL"]
+      sourceApplication:notification.userInfo [@"sourceApplication"]
+      annotation:notification.userInfo [@"annotation"]
+    ];
 }
-
 
 @end
 
@@ -188,11 +212,19 @@ class IOsPlatformImpl : public ILoginResultListener
       : log (LOG_NAME)
       , on_activate_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&IOsPlatformImpl::OnApplicationActivated, this)))
       , facebook_loginer (0)
-      {}
+    {
+      NSDictionary* launch_options = syslib::iphone::ApplicationManager::GetLaunchOptions ();
+
+      [[FBSDKApplicationDelegate sharedInstance] application:[UIApplication sharedApplication] didFinishLaunchingWithOptions:launch_options];
+
+      facebook_open_url_handler = [[FacebookOpenURLHandler alloc] init];
+    }
 
     //Destructor
     ~IOsPlatformImpl ()
     {
+      [facebook_open_url_handler release];
+
       RemoveLoginHandler ();
     }
 
@@ -201,17 +233,46 @@ class IOsPlatformImpl : public ILoginResultListener
     {
       try
       {
-        if (!CanLogin ())
-        {
-          callback (false, OperationStatus_Failure, "", "");
-          return;
-        }
-
         if (facebook_loginer)
           throw xtl::format_operation_exception ("", "Login is already in progress");
 
-        if ([FBSession activeSession].isOpen)  //we called to refresh token, needs to reauthorize
+        FBSDKAccessToken* current_access_token = [FBSDKAccessToken currentAccessToken];
+
+        if (current_access_token)  //we are already logged in
+        {
+          if (properties.IsPresent ("Token") && !xtl::xstrcmp (properties.GetString("Token"), [current_access_token.tokenString UTF8String]))
+          {
+            bool needs_new_permissions = false;
+
+            common::StringArray permissions;
+
+            if (properties.IsPresent ("Permissions"))
+              permissions = common::split (properties.GetString ("Permissions"), ",");
+
+            permissions.Add ("public_profile");
+
+            for (size_t i = 0, count = permissions.Size (); i < count; i++)
+            {
+              if (![current_access_token hasGranted:[NSString stringWithUTF8String:permissions [i]]])
+              {
+                needs_new_permissions = true;
+                break;
+              }
+            }
+
+            if (!needs_new_permissions)
+            {
+              //we already have valid token with needed permissions set
+              login_handler = callback;
+
+              OnLoginResult (true, OperationStatus_Success, "", [current_access_token.tokenString UTF8String]);
+
+              return;
+            }
+          }
+
           LogOut ();
+        }
 
         on_activate_login_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&IOsPlatformImpl::OnApplicationLoginActivated, this));
 
@@ -237,7 +298,11 @@ class IOsPlatformImpl : public ILoginResultListener
     {
       RemoveLoginHandler ();
 
-      [[FBSession activeSession] closeAndClearTokenInformation];
+      FBSDKLoginManager* loginManager = [[FBSDKLoginManager alloc] init];
+
+      [loginManager logOut];
+
+      [loginManager release];
     }
 
     //Remove login handlers
@@ -263,7 +328,7 @@ class IOsPlatformImpl : public ILoginResultListener
       {
         log.Printf ("Track app activated event");
 
-        [FBAppEvents activateApp];
+        [FBSDKAppEvents activateApp];
       }
       catch (xtl::exception& e)
       {
@@ -280,24 +345,6 @@ class IOsPlatformImpl : public ILoginResultListener
     }
 
   private:
-    bool CanLogin ()
-    {
-/*      NSString* resources_version = NSLocalizedString (RESOURCES_VERSION_KEY_NAME, @"");
-
-      if ([resources_version isEqualToString:RESOURCES_VERSION_KEY_NAME] || [resources_version isEqualToString:@""])
-      {
-        log.Print ("Application has no Facebook SDK resources, sdk login unavailable");
-        return false;
-      }
-
-      log.Printf ("Check can login. SDK version = %s, resourcesVersion = %s", [[FBSettings sdkVersion] UTF8String], [resources_version UTF8String]);
-
-      if (![[FBSettings sdkVersion] isEqualToString:resources_version])
-        throw xtl::format_operation_exception ("social::facebook::IOsPlatformImpl::CanLogin", "Facebook SDK and Facebook SDK resources version mismatch");*/
-
-      return true;
-    }
-
     //Handle application activation during login
     void OnApplicationLoginActivated ()
     {
@@ -315,7 +362,6 @@ class IOsPlatformImpl : public ILoginResultListener
     //Handle app activation
     void OnApplicationActivated ()
     {
-      [FBAppCall handleDidBecomeActive];
       TrackActivateApp ();
     }
 
@@ -326,6 +372,7 @@ class IOsPlatformImpl : public ILoginResultListener
     common::Action                                           login_error_action;           //action for delayed notification about login error, in case of application was activated not from facebook redirect while waiting for login result
     social::facebook::DefaultPlatform::PlatformLoginCallback login_handler;                //login results handler
     FacebookLoginer*                                         facebook_loginer;             //object performing objective-C login operations
+    FacebookOpenURLHandler*                                  facebook_open_url_handler;    //object performing translation of open url event to Facebook SDK
 };
 
 typedef common::Singleton<IOsPlatformImpl> IOsPlatformSingleton;
@@ -361,7 +408,7 @@ void IOsPlatform::LogOut ()
 
 bool IOsPlatform::IsFacebookAppInstalled ()
 {
-  return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fbauth://"]];
+  return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fbauth2://"]];
 }
 
 /*
@@ -371,4 +418,13 @@ bool IOsPlatform::IsFacebookAppInstalled ()
 void IOsPlatform::PublishAppInstallEvent (const char*)
 {
   IOsPlatformSingleton::Instance ()->TrackActivateApp ();
+}
+
+/*
+   Handle component start, used for initializing facebook SDK before user logins
+*/
+
+void IOsPlatform::OnComponentStart ()
+{
+  IOsPlatformSingleton::Instance ();
 }

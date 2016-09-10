@@ -32,7 +32,7 @@ namespace social
 namespace facebook
 {
 
-const char* const PLATFORM_VERSION = "v2.1"; //API version
+const char* const PLATFORM_VERSION = "v2.7"; //API version
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Facebook сессия

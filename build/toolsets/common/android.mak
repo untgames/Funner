@@ -60,7 +60,7 @@ JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_BUILD_TOOLS_DIR)/zipalign
 BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
 
-COMMON_JAVA_FLAGS          += -g
+COMMON_JAVA_FLAGS          += -g -Xlint:deprecation
 COMMON_CPPFLAGS            += -fexceptions -frtti
 #COMMON_CFLAGS              += -g
 COMMON_CFLAGS              += -Os -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2

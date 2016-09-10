@@ -28,6 +28,7 @@ class FacebookComponent
     FacebookComponent ()
     {
       SessionManager::RegisterSession (SESSION_ID, SESSION_NAME_MASK, xtl::bind (&FacebookComponent::CreateSession, this, _1));
+      Platform::OnComponentStart ();
     }
 
   private:

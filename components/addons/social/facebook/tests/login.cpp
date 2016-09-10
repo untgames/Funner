@@ -2,7 +2,7 @@
 
 using namespace social;
 
-const char* APP_ID = "271022146306708";
+const char* APP_ID = "455369694638942";
 
 void log_print (const char* stream, const char* message)
 {
@@ -185,7 +185,7 @@ int main ()
     common::PropertyMap login_properties;
 
     login_properties.SetProperty ("AppId", APP_ID);
-    login_properties.SetProperty ("Permissions", "user_birthday");
+    login_properties.SetProperty ("Permissions", "user_friends");
 
     session.LogIn (xtl::bind (&login_callback, _1, _2, &session), login_properties);
 
