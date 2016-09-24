@@ -15,10 +15,10 @@
 #ifdef LINUX
 
 /* Define if we have the ALSA backend */
-//#define HAVE_ALSA
+#define HAVE_ALSA
 
 /* Define if we have the OSS backend */
-#define HAVE_OSS
+//#define HAVE_OSS
 
 /* Define if we have the Solaris backend */
 /* #undef HAVE_SOLARIS */
