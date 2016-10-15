@@ -123,6 +123,9 @@ void IOsPlatform::LogEvent (const char* event, const common::PropertyMap& parame
     case FlurryEventLoggingDelayed:
       common::Log (LOG_NAME).Printf ("Log event '%s' logging delayed", event);
       break;
+    case FlurryEventAnalyticsDisabled:
+      common::Log (LOG_NAME).Printf ("Log event '%s' ignored, logging disabled", event);
+      break;
   }
 }
 
@@ -139,11 +142,6 @@ void IOsPlatform::LogPageView ()
 /*
    Logging management
 */
-
-void IOsPlatform::SetDebugLogEnabled (bool state)
-{
-  [::Flurry setDebugLogEnabled:state];
-}
 
 void IOsPlatform::SetLogLevel (LogLevel level)
 {

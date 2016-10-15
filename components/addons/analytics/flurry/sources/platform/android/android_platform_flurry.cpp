@@ -26,7 +26,6 @@ struct FlurryImpl::Impl
   jmethodID           log_event_method;             //log application event method
   jmethodID           end_timed_event_method;       //log application event end method
   jmethodID           log_page_view_method;         //log page view method
-  jmethodID           set_debug_log_enabled_method; //set debug log enabled method
   jmethodID           set_log_level_method;         //set log level method
   jmethodID           hash_map_init_method;         //HashMap constructor
   jmethodID           hash_map_put_method;          //add object to HashMap method
@@ -128,14 +127,13 @@ struct FlurryImpl::Impl
     log_event_method     = find_static_method (env, flurry_class, "logEvent", "(Ljava/lang/String;Ljava/util/Map;Z)V");
 
     //flurry agent methods
-    get_release_version_method   = find_static_method (env, flurry_agent_class, "getReleaseVersion", "()Ljava/lang/String;");
-    set_user_id_method           = find_static_method (env, flurry_agent_class, "setUserId", "(Ljava/lang/String;)V");
-    set_age_method               = find_static_method (env, flurry_agent_class, "setAge", "(I)V");
-    set_gender_method            = find_static_method (env, flurry_agent_class, "setGender", "(B)V");
-    end_timed_event_method       = find_static_method (env, flurry_agent_class, "endTimedEvent", "(Ljava/lang/String;Ljava/util/Map;)V");
-    log_page_view_method         = find_static_method (env, flurry_agent_class, "onPageView", "()V");
-    set_debug_log_enabled_method = find_static_method (env, flurry_agent_class, "setLogEnabled", "(Z)V");
-    set_log_level_method         = find_static_method (env, flurry_agent_class, "setLogLevel", "(I)V");
+    get_release_version_method = find_static_method (env, flurry_agent_class, "getReleaseVersion", "()Ljava/lang/String;");
+    set_user_id_method         = find_static_method (env, flurry_agent_class, "setUserId", "(Ljava/lang/String;)V");
+    set_age_method             = find_static_method (env, flurry_agent_class, "setAge", "(I)V");
+    set_gender_method          = find_static_method (env, flurry_agent_class, "setGender", "(B)V");
+    end_timed_event_method     = find_static_method (env, flurry_agent_class, "endTimedEvent", "(Ljava/lang/String;Ljava/util/Map;)V");
+    log_page_view_method       = find_static_method (env, flurry_agent_class, "onPageView", "()V");
+    set_log_level_method       = find_static_method (env, flurry_agent_class, "setLogLevel", "(I)V");
 
     //hash map methods
     hash_map_init_method = find_method (env, hash_map_class, "<init>", "(I)V");
@@ -327,21 +325,6 @@ struct FlurryImpl::Impl
   }
 
   ///Logging management
-  void SetDebugLogEnabled (bool state)
-  {
-    try
-    {
-      CheckIsSupported ();
-
-      get_env ().CallStaticVoidMethod (flurry_agent_class, set_debug_log_enabled_method, state);
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("analytics::flurry::android::FlurryImpl::SetDebugLogEnabled");
-      throw;
-    }
-  }
-
   void SetLogLevel (LogLevel level)
   {
     try
@@ -478,11 +461,6 @@ void FlurryImpl::LogPageView ()
 /*
    Logging management
 */
-
-void FlurryImpl::SetDebugLogEnabled (bool state)
-{
-  impl->SetDebugLogEnabled (state);
-}
 
 void FlurryImpl::SetLogLevel (LogLevel level)
 {

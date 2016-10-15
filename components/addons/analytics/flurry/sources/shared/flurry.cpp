@@ -157,19 +157,6 @@ class FlurrySessionImpl
     }
 
     ///Logging management
-    void SetDebugLogEnabled (bool state)
-    {
-      try
-      {
-        Platform::SetDebugLogEnabled (state);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("analytics::flurry::SetDebugLogEnabled");
-        throw;
-      }
-    }
-
     void SetLogLevel (LogLevel level)
     {
       try
@@ -274,11 +261,6 @@ void Flurry::LogPageView ()
 /*
    Logging management
 */
-
-void Flurry::SetDebugLogEnabled (bool state)
-{
-  FlurrySessionSingleton::Instance ()->SetDebugLogEnabled (state);
-}
 
 void Flurry::SetLogLevel (LogLevel level)
 {

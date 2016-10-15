@@ -75,11 +75,6 @@ void DefaultPlatform::LogPageView ()
    Logging management
 */
 
-void DefaultPlatform::SetDebugLogEnabled (bool state)
-{
-  throw xtl::make_not_implemented_exception ("analytics::flurry::DefaultPlatform::SetDebugLogEnabled");
-}
-
 void DefaultPlatform::SetLogLevel (LogLevel level)
 {
   throw xtl::make_not_implemented_exception ("analytics::flurry::DefaultPlatform::SetLogLevel");

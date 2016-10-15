@@ -76,11 +76,6 @@ void AndroidPlatform::LogPageView ()
    Logging management
 */
 
-void AndroidPlatform::SetDebugLogEnabled (bool state)
-{
-  FlurrySingleton::Instance ()->SetDebugLogEnabled (state);
-}
-
 void AndroidPlatform::SetLogLevel (LogLevel level)
 {
   FlurrySingleton::Instance ()->SetLogLevel (level);
