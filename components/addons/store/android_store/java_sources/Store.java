@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.untgames.funner.application.EngineActivity;
 
+//TODO implement handling of IabBroadcastReceiver events
+
 public class Store implements EngineActivity.EngineActivityEventListener, EngineActivity.EngineActivityResultListener
 {
   private static final String TAG                   = "funner.Store";
@@ -84,7 +86,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
     
     if (helper != null)
     {
-      helper.dispose ();
+      helper.disposeWhenFinished ();
       helper = null;
     }
 	}
@@ -116,57 +118,64 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
   			}
   	  	
   			  //check if this item already bought
-  			helper.queryInventoryAsync (false, new IabHelper.QueryInventoryFinishedListener ()
-  			{
-          public void onQueryInventoryFinished(IabResult result, Inventory inv)
-          {
-          	try
-          	{
-          		Log.d(TAG, "Query inventory '" + inv + "' finished, result: " + result);
-
-          		if (result.isFailure())
-          		{
-          			onPurchaseFailedCallback (sku, result.getMessage ());
-            		processPurchaseQueue ();
-          		}
-          		else
-          		{
-                Purchase info = inv.getPurchase (sku);
-                
-                if (info != null)
-                {
-            			onPurchaseRestoredCallback (sku, info, info.getOriginalJson (), info.getSignature ());
+        try
+        {
+    			helper.queryInventoryAsync (new IabHelper.QueryInventoryFinishedListener ()
+    			{
+            public void onQueryInventoryFinished(IabResult result, Inventory inv)
+            {
+            	try
+            	{
+            		Log.d(TAG, "Query inventory '" + inv + "' finished, result: " + result);
+  
+            		if (result.isFailure())
+            		{
+            			onPurchaseFailedCallback (sku, result.getMessage ());
               		processPurchaseQueue ();
-                	return;
-                }
-          			
-          			helper.launchPurchaseFlow (activity, sku, PURCHASE_REQUEST_CODE, new IabHelper.OnIabPurchaseFinishedListener ()
-          			{
-                  public void onIabPurchaseFinished(IabResult result, Purchase info)
+            		}
+            		else
+            		{
+                  Purchase info = inv.getPurchase (sku);
+                  
+                  if (info != null)
                   {
-                  	try
-                  	{
-                  		Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
-
-                  		if (result.isFailure ()) 
-                  			onPurchaseFailedCallback (sku, result.getMessage ());
-                  		else
-                  			onPurchaseSucceededCallback (sku, info, info.getOriginalJson (), info.getSignature ());
-                  	}
-                  	finally
-                  	{
-                  		processPurchaseQueue ();
-                    }
+              			onPurchaseRestoredCallback (sku, info, info.getOriginalJson (), info.getSignature ());
+                		processPurchaseQueue ();
+                  	return;
                   }
-          			});
-          		}
-          	}
-          	catch (Throwable e) 
-          	{
-          		processPurchaseQueue ();
-          	}
-          }
-  			});
+            			
+            			helper.launchPurchaseFlow (activity, sku, PURCHASE_REQUEST_CODE, new IabHelper.OnIabPurchaseFinishedListener ()
+            			{
+                    public void onIabPurchaseFinished(IabResult result, Purchase info)
+                    {
+                    	try
+                    	{
+                    		Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
+  
+                    		if (result.isFailure ()) 
+                    			onPurchaseFailedCallback (sku, result.getMessage ());
+                    		else
+                    			onPurchaseSucceededCallback (sku, info, info.getOriginalJson (), info.getSignature ());
+                    	}
+                    	finally
+                    	{
+                    		processPurchaseQueue ();
+                      }
+                    }
+            			});
+            		}
+            	}
+            	catch (Throwable e) 
+            	{
+            		processPurchaseQueue ();
+            	}
+            }
+    			});
+        }
+        catch (Throwable e) 
+        {
+          processPurchaseQueue ();
+        }
   		}
   	};
 
