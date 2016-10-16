@@ -8,25 +8,25 @@ namespace
 {
 
 /*
-    Константы
+    Constants
 */
 
-const char*  OPENGL_LIB_PATH = "libGL.so";          //имя файла библиотеки OpenGL
-const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256; //резервируемое количество форматов пикселей
+const char*  OPENGL_LIB_PATH                 = "libGL.so.1"; //OpenGL library file name (according to OpenGL® Application Binary Interface for Linux https://www.opengl.org/registry/ABI/#3)
+const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256;          //reserved pixel formats count
 
 /*
-    Реализация менеджера платформы glx
+    Implementation of glx platform manager
 */
 
 class PlatformManagerImpl
 {
   public:
-///Конструктор
+///Constructor
     PlatformManagerImpl ()
     {
       try
       {
-          //загрузка адаптера "по умолчанию"
+          //load adapter "by default"
 
         LoadDefaultAdapter ("GLX", OPENGL_LIB_PATH);
       }
@@ -37,7 +37,7 @@ class PlatformManagerImpl
       }      
     }
 
-///Создание адаптера
+///Create adapter
     Adapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
       try
@@ -62,16 +62,16 @@ class PlatformManagerImpl
       }
     }
     
-///Попытка загрузки адаптера "по умолчанию"
+///Attempt to load default adapter
     void LoadDefaultAdapter (const char* name, const char* path, const char* init_string = "")
     {
       try
       {
-          //создание адаптера
+          //create adapter
 
         AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
 
-          //регистрация адаптера
+          //register adapter
 
         default_adapters.push_front (adapter);
       }
@@ -85,19 +85,19 @@ class PlatformManagerImpl
       }
     }
 
-///Перечисление адаптеров по умолчанию
+///Enumerate default adapters
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
       for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
         handler (get_pointer (*iter));
     }
 
-///Создание цепочки обмена
+///Create swap chain
     ISwapChain* CreateSwapChain (size_t adapters_count, IAdapter** adapters, const SwapChainDesc& desc)
     {
       try
       {
-          //проверка корректности аргументов
+          //check arguments correctness
 
         if (adapters_count && !adapters)
           throw xtl::make_null_argument_exception ("", "adapters");
@@ -112,7 +112,7 @@ class PlatformManagerImpl
 
         log.Printf ("Create primary swap chain...");
         
-          //перечисление достуных форматов пикселей
+          //enumerate available pixel formats
 
         Adapter::PixelFormatArray          pixel_formats;
         Adapter::GlxExtensionsEntriesArray glx_extensions_entries;
@@ -152,11 +152,11 @@ class PlatformManagerImpl
           }
         }
 
-          //выбор наиболее подходящего формата
+          //choose best match pixel format
 
         const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, visual_id);
         
-          //протоколирование выбранного формата
+          //log choosen pixel format
           
         stl::string flags;
         
@@ -187,7 +187,7 @@ class PlatformManagerImpl
           pixel_format.pixel_format_index, pixel_format.adapter->GetName (), pixel_format.color_bits,
           pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.visual_id, pixel_format.samples_count, flags.c_str ());
 
-          //создание цепочки обмена
+          //create swap chain
 
         return new PrimarySwapChain (desc, pixel_format);
       }
@@ -198,13 +198,13 @@ class PlatformManagerImpl
       }      
     }
 
-///Создание внеэкранного буфера
+///Create offscreen buffer
     ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc* pbuffer_desc)
     {
       throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PlatformManagerImpl::CreatePBuffer");
     }
 
-///Создание контекста
+///Create context
     render::low_level::opengl::IContext* CreateContext (ISwapChain* swap_chain)
     {
       try
@@ -218,7 +218,7 @@ class PlatformManagerImpl
       }
     }
     
-///Сравнение двух количественных показателей (0 - первый формат более подходит, 1 - второй формат более подходит)
+///Compare two numeric parameters (0 - first format matches better, 1 - second format matches better)
     static int CompareFormatCounts (size_t source1, size_t source2, size_t require)
     {
       if (source1 == require)
@@ -239,10 +239,10 @@ class PlatformManagerImpl
       }
     }
     
-///Сравнение двух форматов (0 - первый формат более подходит, 1 - второй формат более подходит)
+///Compare two formats (0 - first format matches better, 1 - second format matches better)
     static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
     {
-        //упорядочивание по отсутствию/наличию двойной буферизации
+        //sort by existing of double buffering
         
       if (fmt0.buffers_count != fmt1.buffers_count)
       {
@@ -264,32 +264,32 @@ class PlatformManagerImpl
         }
       }
 
-        //упорядочивание по количеству битов цвета
+        //sort by color bits count
         
       if (fmt0.color_bits != fmt1.color_bits)
         return CompareFormatCounts (fmt0.color_bits, fmt1.color_bits, swap_chain_desc.frame_buffer.color_bits);
         
-        //упорядочивание по количеству битов глубины
+        //sort by depth bits count
 
       if (fmt0.depth_bits != fmt1.depth_bits)
         return CompareFormatCounts (fmt0.depth_bits, fmt1.depth_bits, swap_chain_desc.frame_buffer.depth_bits);
 
-        //упорядочивание по количеству битов трафарета
+        //sort by stencil bits count
 
       if (fmt0.stencil_bits != fmt1.stencil_bits)
         return CompareFormatCounts (fmt0.stencil_bits, fmt1.stencil_bits, swap_chain_desc.frame_buffer.stencil_bits);
 
-        //упорядочивание по количеству сэмплов
+        //sort by samples count
 
       if (fmt0.samples_count != fmt1.samples_count)
         return CompareFormatCounts (fmt0.samples_count, fmt1.samples_count, swap_chain_desc.samples_count);
 
-        //упорядочивание по количеству битов альфы
+        //sort by alpha bits count
 
       if (fmt0.alpha_bits != fmt1.alpha_bits)
         return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);        
 
-        //упорядочивание по режиму обмена
+        //sort by swap method
         
       if (fmt0.swap_method != fmt1.swap_method)
       {
@@ -300,12 +300,12 @@ class PlatformManagerImpl
           return 1;
       }
 
-        //упорядочивание по количеству буферов обмена
+        //sort by buffers count
 
       if (fmt0.buffers_count != fmt1.buffers_count)
         return CompareFormatCounts (fmt0.buffers_count, fmt1.buffers_count, swap_chain_desc.buffers_count);
         
-        //упорядочивание по наличию поддержки PBuffer
+        //sort by PBuffer support
         
       if (fmt0.support_draw_to_pbuffer != fmt1.support_draw_to_pbuffer)
         return fmt1.support_draw_to_pbuffer;
@@ -313,25 +313,25 @@ class PlatformManagerImpl
       if (fmt0.support_draw_to_window != fmt1.support_draw_to_window)
         return fmt1.support_draw_to_window;
 
-        //упорядочивание по наличию стерео-режима
+        //sort by stereo mode support
         
       if (fmt0.support_stereo != fmt1.support_stereo)
         return fmt1.support_stereo;
 
-        //при прочих равных первый формат более подходит
+        //first format is better if all other params are equal
 
       return 1;
     }
     
-///Выбор формата пикселей
+///Choose pixel format
     const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int visual_id)
     {
-        //если не найдено ни одного подходящего формата - создание цепочки обмена невозможно
+        //if suitable pixel format not found - we can't create swap chain
 
       if (pixel_formats.empty ())
         throw xtl::format_operation_exception ("render::low_level::opengl::glx::PlatformManagerImpl::ChoosePixelFormat", "No pixel formats found");
 
-        //поиск формата
+        //find pixel format
 
       const PixelFormatDesc* best = &pixel_formats [0];
       
@@ -355,8 +355,8 @@ class PlatformManagerImpl
     typedef stl::list<AdapterPtr> AdapterList;
 
   private:
-    Log              log;              //протокол
-    AdapterList      default_adapters; //адаптеры "по умолчанию"
+    Log              log;              //log
+    AdapterList      default_adapters; //default adapters
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
@@ -364,7 +364,7 @@ typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
 }
 
 /*
-    Обёртки над менеджером платформы
+    Platfomr manager wrappers
 */
 
 IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path, const char* init_string)
