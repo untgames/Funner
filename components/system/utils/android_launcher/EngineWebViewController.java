@@ -67,12 +67,6 @@ public class EngineWebViewController extends EngineViewController
       
       controller.setLoading (false);
     }
-    
-    @Override
-    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error)
-    {
-      handler.proceed (); // Ignore SSL certificate errors
-    }
   }
 
   class EngineWebView extends WebView
