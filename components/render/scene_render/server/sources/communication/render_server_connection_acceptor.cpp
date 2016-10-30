@@ -4,26 +4,26 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Константы
+    Constants
 */
 
-const size_t RENDER_THREAD_SIZE = 4; //размер очереди команд рендеринга
+const size_t RENDER_THREAD_SIZE = 2; //rendering command queue size (usually one command is one frame)
 
 /*
-    Описание реализации acceptor
+    Acceptor implementation
 */
 
 struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
 {
-  stl::string                              name;                      //имя сервера
-  ServerThreadingModel                     threading_model;           //модель управления потоками
-  stl::auto_ptr<interchange::RenderThread> render_thread;             //нить рендеринга
-  size_t                                   owner_thread_id;           //индентификатор нити-владельца
-  xtl::shared_ptr<ServerImpl>              server;                    //сервер рендеринга
-  syslib::Semaphore                        server_creation_waiter;    //семафор ожидания создания сервера
-  stl::string                              server_creation_exception; //исключение создания сервера
+  stl::string                              name;                      //server name
+  ServerThreadingModel                     threading_model;           //threading management model
+  stl::auto_ptr<interchange::RenderThread> render_thread;             //rendering thread
+  size_t                                   owner_thread_id;           //owner thread id
+  xtl::shared_ptr<ServerImpl>              server;                    //rendering server
+  syslib::Semaphore                        server_creation_waiter;    //server creation waiter semaphore
+  stl::string                              server_creation_exception; //server creation exception
 
-/// Конструктор
+/// Constructor
   Impl (const char* in_name, ServerThreadingModel model)
     : name (in_name)
     , threading_model (model)
@@ -42,7 +42,7 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
         throw xtl::format_operation_exception ("", "Invalid threading model %d", threading_model);
     }
 
-      //ожидание создания сервера
+      //waiting for server creation
 
     server_creation_waiter.Wait ();
 
@@ -52,12 +52,12 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
     if (!server)
       throw xtl::format_operation_exception ("", "Internal error: server creation failed");
 
-      //регистрация приема соединений          
+      //registering connections acceptor
 
     interchange::ConnectionManager::RegisterConnection (name.c_str (), name.c_str (), xtl::bind (&Impl::CreateConnection, this, _2));
   }
 
-/// Деструктор
+/// Destructor
   ~Impl ()
   {
     try
@@ -73,7 +73,7 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
     }
   }
 
-/// Обработчики событий нити рендеринга
+/// Rendering thread events handlers
   void OnRenderThreadStarted () 
   {
     try
@@ -92,7 +92,7 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
     ShutdownServer ();
   }
 
-/// Создание сервера
+/// Server creation
   void InitServer ()
   {
     try
@@ -119,13 +119,13 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
     server_creation_waiter.Post ();
   }
 
-/// Уничтожение сервера
+/// Server destroying
   void ShutdownServer ()
   {
     server.reset ();
   }
 
-/// Создание соединения
+/// Connection creation
   interchange::IConnection* CreateConnection (const char* init_string)
   {
     try
@@ -162,7 +162,7 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
     }
   }
 
-/// Создание соединения из параллельной нити
+/// Creation of connection from other thread
   interchange::IConnection* CreateConnectionInRenderThread (stl::string& init_string)
   {
     try
@@ -178,7 +178,7 @@ struct ConnectionAcceptor::Impl: public interchange::IRenderThreadListener
 };
 
 /*
-    Конструктор / деструктор
+    Constructor / destructor
 */
 
 ConnectionAcceptor::ConnectionAcceptor (const char* name, ServerThreadingModel threading_model)
@@ -199,7 +199,7 @@ ConnectionAcceptor::~ConnectionAcceptor ()
 }
 
 /*
-    Ожидание незавершенных команд
+    Waiting for queued commands completion
 */
 
 bool ConnectionAcceptor::WaitQueuedCommands (size_t timeout_ms)

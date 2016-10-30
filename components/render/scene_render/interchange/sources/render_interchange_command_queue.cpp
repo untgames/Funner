@@ -3,23 +3,22 @@
 using namespace render::scene::interchange;
 
 /*
-    Константы
+    Constants
 */
 
-const size_t DESIRED_FPS       = 60;
-const size_t SPIN_WAIT_TIME_MS = 1000 / DESIRED_FPS;
+const size_t SPIN_WAIT_TIME_MS = 0; //do not use spin lock for this queue now, because in most cases (render or logic thread is significantly faster than vsync interval) we just consumes CPU time without performance gain
 
 /*
-    Описание реализации очереди команд
+   Command queue implementation
 */
 
 typedef syslib::SharedQueue<CommandQueueItem> Queue;
 
 struct CommandQueue::Impl: public xtl::reference_counter
 {
-  Queue queue; //очередь буферов
+  Queue queue; //buffers queue
 
-/// Конструктор
+/// Constructor
   Impl (size_t max_queue_size)
     : queue (max_queue_size, SPIN_WAIT_TIME_MS)
   {
@@ -29,7 +28,7 @@ struct CommandQueue::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    Constructor / destructor
 */
 
 CommandQueue::CommandQueue (size_t max_queue_size)
@@ -58,7 +57,7 @@ CommandQueue& CommandQueue::operator = (const CommandQueue& queue)
 }
 
 /*
-    Размер очереди / проверка на пустоту
+    Queue size / check for emptiness
 */
 
 size_t CommandQueue::Size () const
@@ -72,7 +71,7 @@ bool CommandQueue::IsEmpty () const
 }
 
 /*
-    Помещение элемента в очередь / извлечение из очереди
+    Push element to queue / pop from queue
 */
 
 void CommandQueue::Push (const CommandQueueItem& command)
