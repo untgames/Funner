@@ -14,7 +14,7 @@ COMMON_LINK_FLAGS += -Wl,-rpath -Wl,'$$ORIGIN'
 LIB_GCC           := ar
 SHELL             := /bin/bash
 
-PROFILES += linux linuxx64 unistd x11 glx haswchar pthread_static_library has_windows x86-64 g++x86-64
+PROFILES += linux linux-x64 unistd x11 glx haswchar pthread_static_library has_windows x86-64 g++x86-64
 
 ADDITIONAL_PATHS=$$(pwd)/$(BUILD_DIR)tools/linux
 

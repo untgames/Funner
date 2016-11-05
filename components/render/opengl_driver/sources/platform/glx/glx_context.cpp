@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
 /*
-    Описание реализации контекста
+    Context implementation
 */
 
 typedef stl::vector<IContextListener*> ListenerArray;
@@ -13,19 +13,19 @@ typedef xtl::com_ptr<Adapter>          AdapterPtr;
 
 struct Context::Impl
 {  
-  Log                         log;                   //протокол драйвера отрисовки
-  AdapterPtr                  adapter;               //целевой адаптер отрисовки
-  Display*                    display;               //устройство отображения для текущего контекста
-  Window                      window;                //окно отрисовки
-  GLXContext                  glx_context;           //контекст GLX-рендеринга
-  ListenerArray               listeners;             //слушатели событий контекста
-  xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
-  ISwapChainImpl*             swap_chain;            //текущая цепочка обмена
-  const GlxExtensionsEntries* glx_extensions;        //расширения GLX
-  bool                        vsync;                 //вертикальная синхронизация
-  static Impl*                current_context;       //текущий контекст
+  Log                         log;                   //render context log
+  AdapterPtr                  adapter;               //target rendering adapter
+  Display*                    display;               //display device for current context
+  Window                      window;                //render window
+  GLXContext                  glx_context;           //GLX-rendering context
+  ListenerArray               listeners;             //context events listeners
+  xtl::trackable::slot_type   on_destroy_swap_chain; //swap chain destroy handler
+  ISwapChainImpl*             swap_chain;            //current swap chain
+  const GlxExtensionsEntries* glx_extensions;        //GLX extensions
+  bool                        vsync;                 //vsync
+  static Impl*                current_context;       //current context
   
-///Конструктор
+///Constructor
   Impl ()
     : on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
     , swap_chain (0)
@@ -34,14 +34,14 @@ struct Context::Impl
   {    
   }
   
-///Установка вертикальной синхронизации
+///Set vsync mode
   void SetVSync ()
   {
     if (glx_extensions->SwapIntervalSGI)
       glx_extensions->SwapIntervalSGI (vsync);
   }  
   
-///Сброс текущего контекста
+///Reset current context
   void ResetContext ()
   {
     if (current_context != this)
@@ -56,7 +56,7 @@ struct Context::Impl
     current_context = 0;
   }
 
-///Обработчик удаления цепочки обмена
+///Swap chain destroy handler
   void OnDestroySwapChain ()
   {    
     if (current_context == this)
@@ -68,7 +68,7 @@ struct Context::Impl
     glx_extensions = 0;
   }
 
-///Оповещение о потере контекста
+///Context lost notification
   void LostCurrentNotify ()
   {
     try
@@ -78,11 +78,11 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //ignore all exceptions
     }
   }
 
-///Оповещение об установке текущего контекста
+///Current context setted notification
   void SetCurrentNotify ()
   {
     try
@@ -92,7 +92,7 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //ignore all exceptions
     }
   }
 };
@@ -100,21 +100,21 @@ struct Context::Impl
 Context::Impl* Context::Impl::current_context = 0;
 
 /*
-    Конструктор / деструктор
+    Constructor / destructor
 */
 
 Context::Context (ISwapChain* in_swap_chain)
 {
   try
   {
-      //проверка корректности аргументов
+      //check arguments correctness
       
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
     ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");    
 
-      //создание реализации
+      //create implementation
 
     impl = new Impl;    
 
@@ -124,18 +124,18 @@ Context::Context (ISwapChain* in_swap_chain)
     
     DisplayLock lock (impl->display);
 
-      //создание контекста
+      //create context
 
     impl->log.Printf ("Create context (id=%d)...", GetId ());
     
-    impl->glx_context = impl->adapter->GetLibrary ().CreateContext (swap_chain->GetDisplay (), 
+    impl->glx_context = impl->adapter->GetLibrary ().CreateContext (impl->display,
                                                                     swap_chain->GetFBConfig (),
                                                                     GLX_RGBA_TYPE, 0, True);
                                                                     
     if (!impl->glx_context)
       raise_error ("::glxCreateContext");
       
-      //оповещение о создании контекста
+      //log context created
     
     impl->log.Printf ("...context successfully created (handle=%08x)", impl->glx_context);
   }
@@ -152,27 +152,29 @@ Context::~Context ()
   {
     impl->log.Printf ("Delete context (id=%d)...", GetId ());
     
-      //отмена текущего контекста
+      //reset current context
 
     if (Impl::current_context == impl.get ())
       impl->ResetContext ();
 
-    DisplayLock lock (impl->display);
+    Display* display = impl->display ? impl->display : (Display*)DisplayManager::DisplayHandle ();  //impl->display may be null at this moment if swap chain was already destroyed
+
+    DisplayLock lock (display);
 
     impl->log.Printf ("...delete context (handle=%08X)", impl->glx_context);
 
-    impl->adapter->GetLibrary ().DestroyContext (impl->display, impl->glx_context);    
+    impl->adapter->GetLibrary ().DestroyContext (display, impl->glx_context);
 
     impl->log.Printf ("...context successfully destroyed");
   }
   catch (...)
   {
-    //подавление всех исключений
+    //ignore all exceptions
   }
 }
 
 /*
-    Установка текущего контектса
+    Set current context
 */
 
 void Context::MakeCurrent (ISwapChain* swap_chain)
@@ -184,11 +186,11 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
     if (swap_chain != impl->swap_chain)
     {
-        //изменение текущей цепочки обмена
+        //Change current swap chain
 
       ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
 
-        //подписка на событие удаления цепочки обмена
+        //Subscribe for swap chain destroy event
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
@@ -199,7 +201,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       impl->glx_extensions = &casted_swap_chain->GetGlxExtensionsEntries ();
     }
     
-      //оповещение о потере текущего контекста
+      //notify current context lost
     
     if (Impl::current_context)
     {
@@ -210,18 +212,18 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
     DisplayLock lock (impl->display);
     
-      //установка текущего контекста
+      //set current context
       
     if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->glx_context))
       raise_error ("::glxMakeContextCurrent");
       
     Impl::current_context = impl.get ();        
     
-      //установка вертикальной синхронизации
+      //set vsync
 
     impl->SetVSync ();    
 
-      //оповещение об установке текущего контекста
+      //notify current context set
 
     impl->SetCurrentNotify ();
   }
@@ -234,7 +236,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 }
 
 /*
-    Проверка совместимости цепочки обмена с контекстом
+    Check swap chain compatibility
 */
 
 bool Context::IsCompatible (ISwapChain* in_swap_chain)
@@ -243,7 +245,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
   {
     ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
 
-    return swap_chain->GetDisplay () == impl->display; //скорее всего не корректно!!!
+    return swap_chain->GetDisplay () == impl->display; //TODO most probably this is wrong, should be checked!!!
   }
   catch (xtl::exception& exception)
   {
@@ -253,7 +255,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
 }
 
 /*
-    Получение интерфейса библиотеки OpenGL
+    Get OpenGL library interface
 */
 
 AdapterLibrary& Context::GetLibrary ()
@@ -262,7 +264,7 @@ AdapterLibrary& Context::GetLibrary ()
 }
 
 /*
-    Подписка на события контекста
+    Subscribe for context events
 */
 
 void Context::AttachListener (IContextListener* listener)
