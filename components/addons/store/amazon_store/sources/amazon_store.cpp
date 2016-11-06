@@ -15,19 +15,19 @@ void finish_transaction_handler (const Transaction& transaction, const Transacti
 void on_initialized (JNIEnv& env, jobject, jboolean can_buy_products);
 void on_purchase_initiated (JNIEnv& env, jobject, jstring sku);
 void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error);
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token);
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token);
-void on_transaction_finish_failed (JNIEnv& env, jobject, jstring purchase_token, jstring error);
-void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring purchase_token);
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring receipt_id);
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring receipt_id);
+void on_transaction_finish_failed (JNIEnv& env, jobject, jstring receipt_id, jstring error);
+void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring receipt_id);
 
 /*
-   Реализация магазина
+   Store implementation
 */
 
 class AmazonStore
 {
   public:
-///Конструктор / деструктор
+///Constructor / destructor
     AmazonStore  ()
       : log (LOG_NAME)
       , initialized (false)
@@ -48,7 +48,7 @@ class AmazonStore
         env->DeleteGlobalRef (store_class);
     }
 
-///Удаление магазина
+///Delete store
     void DeleteStore (JNIEnv* env)
     {
       if (!store)
@@ -67,7 +67,7 @@ class AmazonStore
       store = 0;
     }
 
-///Инициализация
+///Initialization
     xtl::connection Initialize (const IStore::OnInitializedCallback& callback)
     {
       static const char* METHOD_NAME = "store::android_store::AndroidStore::Initialize";
@@ -127,14 +127,14 @@ class AmazonStore
       on_initialized_signal.disconnect_all ();
     }
 
-///Можно ли осуществлять покупки
+///Can make purchases
     bool CanBuyProducts ()
     {
       return can_buy_products;
     }
 
-///Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-///products ответа может содержать не все запрошенные продукты)
+///Load information about products (products_ids - space-separated list if product ids,
+///products response may contain not all requested products)
     void LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
     {
       try
@@ -156,7 +156,7 @@ class AmazonStore
       }
     }
 
-///Покупка / восстановление покупок
+///Purchase / restore purchases
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
     {
       TransactionsArray transactions = pending_transactions;
@@ -229,7 +229,7 @@ class AmazonStore
       }
     }
 
-///Инициализация java-биндинга
+///java-bindings initialization
    void InitJavaBindings (JNIEnv* env)
    {
      static const char* METHOD_NAME = "store::android_store::AmazonStore::InitJavaBindings";
@@ -289,7 +289,7 @@ class AmazonStore
      }
    }
 
-///Завершение транзакции
+///Finish transaction
    void FinishTransaction (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
    {
      try
@@ -306,7 +306,7 @@ class AmazonStore
            {
              transaction_desc.finish_callback = callback;
 
-             get_env ().CallVoidMethod (store, finish_transaction_method, tojstring (transaction_desc.purchase_token.c_str ()).get ());
+             get_env ().CallVoidMethod (store, finish_transaction_method, tojstring (transaction_desc.receipt_id.c_str ()).get ());
            }
            else
            {
@@ -327,7 +327,7 @@ class AmazonStore
      }
    }
 
-   void OnTransactionFinishFailed (const stl::string& purchase_token, const stl::string& error)
+   void OnTransactionFinishFailed (const stl::string& receipt_id, const stl::string& error)
    {
      try
      {
@@ -335,7 +335,7 @@ class AmazonStore
 
        for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
        {
-         if (purchase_token == (*iter)->purchase_token)
+         if (receipt_id == (*iter)->receipt_id)
          {
            (*iter)->finish_callback (false, error.c_str ());
            return;
@@ -349,7 +349,7 @@ class AmazonStore
      }
    }
 
-   void OnTransactionFinishSucceeded (const stl::string& purchase_token)
+   void OnTransactionFinishSucceeded (const stl::string& receipt_id)
    {
      try
      {
@@ -357,7 +357,7 @@ class AmazonStore
 
        for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
        {
-         if (purchase_token == (*iter)->purchase_token)
+         if (receipt_id == (*iter)->receipt_id)
          {
            Transaction::OnFinishedCallback finish_callback = (*iter)->finish_callback;
 
@@ -376,7 +376,7 @@ class AmazonStore
      }
    }
 
-///Обновление транзакций
+///Transactions updates
    void OnPurchaseInitiated (const stl::string& sku)
    {
      try
@@ -418,7 +418,7 @@ class AmazonStore
      }
    }
 
-   void OnPurchaseSucceeded (const stl::string& sku, const stl::string& user_id, const stl::string& purchase_token)
+   void OnPurchaseSucceeded (const stl::string& sku, const stl::string& user_id, const stl::string& receipt_id)
    {
      try
      {
@@ -426,10 +426,10 @@ class AmazonStore
 
        log.Printf ("Purchase succeeded for product '%s'", transaction_desc.transaction.ProductId ());
 
-       transaction_desc.completed      = true;
-       transaction_desc.purchase_token = purchase_token;
+       transaction_desc.completed  = true;
+       transaction_desc.receipt_id = receipt_id;
 
-       transaction_desc.transaction.SetReceipt (purchase_token.size (), purchase_token.data ());
+       transaction_desc.transaction.SetReceipt (receipt_id.size (), receipt_id.data ());
        transaction_desc.transaction.SetState (TransactionState_Purchased);
 
        transaction_desc.transaction.Properties ().SetProperty ("UserId", user_id.c_str ());
@@ -443,7 +443,7 @@ class AmazonStore
      }
    }
 
-   void OnPurchaseRestored (const stl::string& sku, const stl::string& user_id, const stl::string& purchase_token)
+   void OnPurchaseRestored (const stl::string& sku, const stl::string& user_id, const stl::string& receipt_id)
    {
      try
      {
@@ -451,10 +451,10 @@ class AmazonStore
 
        log.Printf ("Purchase restored for product '%s'", transaction_desc.transaction.ProductId ());
 
-       transaction_desc.completed      = true;
-       transaction_desc.purchase_token = purchase_token;
+       transaction_desc.completed  = true;
+       transaction_desc.receipt_id = receipt_id;
 
-       transaction_desc.transaction.SetReceipt (purchase_token.size (), purchase_token.data ());
+       transaction_desc.transaction.SetReceipt (receipt_id.size (), receipt_id.data ());
        transaction_desc.transaction.SetState (TransactionState_Restored);
 
        transaction_desc.transaction.Properties ().SetProperty ("UserId", user_id.c_str ());
@@ -473,7 +473,7 @@ class AmazonStore
     {
       Transaction                     transaction;
       bool                            completed;
-      stl::string                     purchase_token;
+      stl::string                     receipt_id;
       Transaction::OnFinishedCallback finish_callback;
 
       TransactionDesc (const char* product_id)
@@ -491,7 +491,7 @@ class AmazonStore
     };
 
   private:
-///Поиск первой незавершенной транзакции по sku
+///Find firs unfinished transaction by sku
    TransactionDesc& FindPendingTransaction (const char* sku)
    {
      static const char* METHOD_NAME = "store::android_store::AmazonStore::FindIncompleteTransaction";
@@ -515,18 +515,18 @@ class AmazonStore
     typedef stl::vector<TransactionDescPtr>        TransactionsArray;
 
   public:
-    common::Log         log;                       //протокол
-    bool                initialized;               //завершена ли инициализация магазина
-    bool                initialize_started;        //начата ли инициализация магазина
-    bool                can_buy_products;          //доступны ли покупки
-    StoreSignal         store_signal;              //соединение оповещения обновления транзакций
-    OnInitializedSignal on_initialized_signal;     //соединение оповещения завершения инициализации магазина
-    jclass              store_class;               //класс Store
-    jobject             store;                     //объект Store
-    jmethodID           buy_method;                //метод покупки
-    jmethodID           finish_transaction_method; //метод завершения транзакции
-    jmethodID           stop_processing_method;    //метод остановки обработки покупок
-    TransactionsArray   pending_transactions;      //текущие незавершенные транзакции
+    common::Log         log;                       //log
+    bool                initialized;               //is store initialized
+    bool                initialize_started;        //is store initialization started
+    bool                can_buy_products;          //is purchasing available
+    StoreSignal         store_signal;              //transactions updates notification signal
+    OnInitializedSignal on_initialized_signal;     //store initialization complete notification signal
+    jclass              store_class;               //Store class
+    jobject             store;                     //Store object
+    jmethodID           buy_method;                //purchase method
+    jmethodID           finish_transaction_method; //finish transaction method
+    jmethodID           stop_processing_method;    //stop store processing method
+    TransactionsArray   pending_transactions;      //current unfinished transactions
 };
 
 typedef common::Singleton<AmazonStore> StoreSingleton;
@@ -546,24 +546,24 @@ void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error)
   common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseFailed, &*StoreSingleton::Instance (), tostring (sku), tostring (error)), common::ActionThread_Main);
 }
 
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token)
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring receipt_id)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (purchase_token)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (receipt_id)), common::ActionThread_Main);
 }
 
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token)
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring receipt_id)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (purchase_token)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (receipt_id)), common::ActionThread_Main);
 }
 
-void on_transaction_finish_failed (JNIEnv& env, jobject, jstring purchase_token, jstring error)
+void on_transaction_finish_failed (JNIEnv& env, jobject, jstring receipt_id, jstring error)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishFailed, &*StoreSingleton::Instance (), tostring (purchase_token), tostring (error)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishFailed, &*StoreSingleton::Instance (), tostring (receipt_id), tostring (error)), common::ActionThread_Main);
 }
 
-void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring purchase_token)
+void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring receipt_id)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishSucceeded, &*StoreSingleton::Instance (), tostring (purchase_token)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishSucceeded, &*StoreSingleton::Instance (), tostring (receipt_id)), common::ActionThread_Main);
 }
 
 void finish_transaction_handler (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
@@ -574,7 +574,7 @@ void finish_transaction_handler (const Transaction& transaction, const Transacti
 }
 
 /*
-   Конструктор / деструктор
+   Constructor / destructor
 */
 
 StoreImpl::StoreImpl ()
@@ -586,7 +586,7 @@ StoreImpl::~StoreImpl ()
 }
 
 /*
-   Инициализация
+   Initialization
 */
 
 void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
@@ -595,7 +595,7 @@ void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 }
 
 /*
-   Описание магазина
+   Store description
 */
 
 const char* StoreImpl::Description ()
@@ -604,7 +604,7 @@ const char* StoreImpl::Description ()
 }
 
 /*
-   Можно ли осуществлять покупки
+   Is purchasing available
 */
 
 bool StoreImpl::CanBuyProducts ()
@@ -613,8 +613,8 @@ bool StoreImpl::CanBuyProducts ()
 }
 
 /*
-   Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-   products ответа может содержать не все запрошенные продукты)
+   Load information about products (products_ids - space-separated list if product ids,
+   products response may contain not all requested products)
 */
 
 void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
@@ -623,7 +623,7 @@ void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProducts
 }
 
 /*
-   Покупка / восстановление покупок
+   Purchase / restore purchases
 */
 
 xtl::connection StoreImpl::RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
@@ -642,7 +642,7 @@ Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const c
 }
 
 /*
-   Инициализация java-биндинга
+   Java-bindings initialization
 */
 
 void StoreImpl::InitJavaBindings (JNIEnv* env)
