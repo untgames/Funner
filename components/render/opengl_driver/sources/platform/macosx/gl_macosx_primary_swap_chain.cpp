@@ -14,43 +14,49 @@ using namespace render::low_level::opengl::macosx;
 namespace
 {
 
-const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //тег приложения
-const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //тег свойства полноэкранности
+const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //С‚РµРі РїСЂРёР»РѕР¶РµРЅРёСЏ
+const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //С‚РµРі СЃРІРѕР№СЃС‚РІР° РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕСЃС‚Рё
+
+static GLint global_context_buffer_name = 1;  //context buffer name to use for new context
+static void* current_swap_chain         = 0;  //current active agl swap chain
 
 }
 
 /*
-    Описание реализации PrimarySwapChain
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PrimarySwapChain
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log                       log;                       //протокол
-  AdapterPtr                adapter;                   //адаптер цепочки обмена
-  SwapChainDesc             desc;                      //дескриптор цепочки обмена
-  AGLPixelFormat            pixel_format;              //формат пикселей
-  OutputManager             output_manager;            //менеджер устройств вывода
-  AGLContext                context;                   //установленный контекст
-  Output*                   containing_output;         //дисплей, на котором производится рендеринг
-  EventHandlerRef           window_event_handler;      //обработчик событий окна
-  EventHandlerUPP           window_event_handler_proc; //обработчик событий окна
-  size_t                    window_width;              //ширина окна
-  size_t                    window_height;             //высота окна
-  xtl::trackable::slot_type on_destroy_context;        //обработчик удаления контекста
+  Log                       log;                       //РїСЂРѕС‚РѕРєРѕР»
+  AdapterPtr                adapter;                   //Р°РґР°РїС‚РµСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  SwapChainDesc             desc;                      //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  AGLPixelFormat            pixel_format;              //С„РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№
+  OutputManager             output_manager;            //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
+  AGLContext                context;                   //СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚
+  AGLContext                dummy_context;             //dummy context which is needed if we want to use same context for two windows, this allows us to preserve window state while drawing to other window (http://lists.apple.com/archives/Mac-opengl/2004/Mar/msg00210.html)
+  Output*                   containing_output;         //РґРёСЃРїР»РµР№, РЅР° РєРѕС‚РѕСЂРѕРј РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі
+  EventHandlerRef           window_event_handler;      //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
+  EventHandlerUPP           window_event_handler_proc; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
+  size_t                    window_width;              //С€РёСЂРёРЅР° РѕРєРЅР°
+  size_t                    window_height;             //РІС‹СЃРѕС‚Р° РѕРєРЅР°
+  xtl::trackable::slot_type on_destroy_context;        //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
+  GLint                     context_buffer_name;       //agl buffer name for this swap chain
 
-///Конструктор
+///Constructor
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter)
     : adapter (in_adapter), pixel_format (0), context (0), window_event_handler (0), window_event_handler_proc (0),
-      on_destroy_context (xtl::bind (&Impl::OnDestroyContext, this))
+      on_destroy_context (xtl::bind (&Impl::OnDestroyContext, this)),
+      context_buffer_name (global_context_buffer_name++)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!in_desc.window_handle)
       throw xtl::make_null_argument_exception ("", "in_desc.window_handle");
 
-      //подписка на событие изменения окна
+      //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ РёР·РјРµРЅРµРЅРёСЏ РѕРєРЅР°
 
     window_event_handler_proc = NewEventHandlerUPP (&PrimarySwapChain::Impl::window_message_handler);
 
@@ -62,11 +68,11 @@ struct PrimarySwapChain::Impl
       sizeof (handled_event_types) / sizeof (handled_event_types[0]), handled_event_types,
       this, &window_event_handler), "::InstallEventHandler", "Can't install window event handler");
 
-      //поиск дисплея, на котором производится рендеринг
+      //РїРѕРёСЃРє РґРёСЃРїР»РµСЏ, РЅР° РєРѕС‚РѕСЂРѕРј РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі
 
     containing_output = output_manager.FindContainingOutput ((WindowRef)in_desc.window_handle);
 
-      //выбор формата пикселей
+      //РІС‹Р±РѕСЂ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
     static const size_t MAX_ATTRIBUTES_COUNT = 64;
 
@@ -91,7 +97,7 @@ struct PrimarySwapChain::Impl
     if (in_desc.fullscreen && containing_output)
     {
       *attr++ = AGL_FULLSCREEN;
-#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 и старше
+#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 Рё СЃС‚Р°СЂС€Рµ
       *attr++ = AGL_DISPLAY_MASK;
       *attr++ = CGDisplayIDToOpenGLDisplayMask ((CGDirectDisplayID)containing_output->Handle ());
 #endif
@@ -110,7 +116,7 @@ struct PrimarySwapChain::Impl
 
     log.Printf ("...call aglChoosePixelFormat");
 
-#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 и старше
+#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 Рё СЃС‚Р°СЂС€Рµ
     pixel_format = aglChoosePixelFormat (0, 0, attributes);
 #else
     if (in_desc.fullscreen && containing_output)
@@ -129,7 +135,7 @@ struct PrimarySwapChain::Impl
     if (!pixel_format)
       raise_agl_error ("::aglChoosePixelFormat");
 
-      //получение параметров выбранного формата пикселей
+      //РїРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
     try
     {
@@ -176,7 +182,7 @@ struct PrimarySwapChain::Impl
 
 /*      if (desc.fullscreen)
       {
-          //установка режима устройства вывода
+          //СѓСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 
         containing_output->GetCurrentMode (default_output_mode);
 
@@ -197,6 +203,9 @@ struct PrimarySwapChain::Impl
         desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
         desc.frame_buffer.stencil_bits, desc.samples_count, flags.c_str ());
 
+      dummy_context = aglCreateContext (pixel_format, 0);                           // create a context to hold buffers for the window
+      aglSetInteger (dummy_context, AGL_BUFFER_NAME, &context_buffer_name);         // set buffer name for this window context
+      aglSetDrawable(dummy_context, GetWindowPort ((WindowRef)desc.window_handle)); // force creation of buffers for window
     }
     catch (...)
     {
@@ -213,14 +222,14 @@ struct PrimarySwapChain::Impl
     }
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     log.Printf ("...destroy pixel format");
 
 /*    if (desc.fullscreen)
     {
-        //восстановление начального режима устройства вывода
+        //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ СЂРµР¶РёРјР° СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 
       containing_output->SetCurrentMode (default_output_mode);
     }*/
@@ -233,13 +242,13 @@ struct PrimarySwapChain::Impl
     log.Printf ("...release resources");
   }
 
-  ///Обработчик удаления контекста
+  ///РћР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
   void OnDestroyContext ()
   {
     context = 0;
   }
 
-  ///Обмен текущего заднего буфера и переднего буфера
+  ///РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
   void Present ()
   {
     if (desc.buffers_count  < 2)
@@ -248,12 +257,15 @@ struct PrimarySwapChain::Impl
     if (!context)
       return;
 
+    if (current_swap_chain != this)
+      throw xtl::format_operation_exception("render::low_level::opengl::macosx::PrimarySwapChain::Impl::Present", "Can't present this swap chain now, it is not active");
+
     aglSwapBuffers (context);
 
     check_agl_error ("::aglSwapBuffers");
   }
 
-///Получение значений атрибутов
+///РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ Р°С‚СЂРёР±СѓС‚РѕРІ
   GLint GetPixelFormatValue (GLint attribute)
   {
     try
@@ -303,7 +315,7 @@ struct PrimarySwapChain::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& desc, Adapter* adapter)
@@ -339,12 +351,12 @@ PrimarySwapChain::~PrimarySwapChain ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* PrimarySwapChain::GetAdapter ()
@@ -353,7 +365,7 @@ IAdapter* PrimarySwapChain::GetAdapter ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -362,7 +374,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
@@ -371,7 +383,7 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PrimarySwapChain::Present ()
@@ -389,7 +401,7 @@ void PrimarySwapChain::Present ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PrimarySwapChain::SetFullscreenState (bool state)
@@ -404,30 +416,29 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-   Получение/установка контекста
+   РџРѕР»СѓС‡РµРЅРёРµ/СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void PrimarySwapChain::SetContext (Context* context)
 {
   AGLContext new_context = context->GetAGLContext ();
 
-  if (impl->context == new_context)
-    return;
-
   impl->context = new_context;
+
+  aglSetInteger (impl->context, AGL_BUFFER_NAME, &impl->context_buffer_name);          // set buffer name for this window context
 
   context->RegisterDestroyHandler (impl->on_destroy_context);
 
   try
   {
-      //установка vsync
+      //СѓСЃС‚Р°РЅРѕРІРєР° vsync
 
     GLint swap_interval = impl->desc.vsync ? 1 : 0;
 
     if (!aglSetInteger (new_context, AGL_SWAP_INTERVAL, &swap_interval))
       raise_agl_error ("::aglSetInteger");
 
-      //установка fullscreen
+      //СѓСЃС‚Р°РЅРѕРІРєР° fullscreen
 
     check_window_manager_error (SetWindowProperty ((WindowRef)impl->desc.window_handle, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
                                 sizeof (impl->desc.fullscreen), &impl->desc.fullscreen), "::SetWindowProperty");
@@ -449,6 +460,8 @@ void PrimarySwapChain::SetContext (Context* context)
 
       aglUpdateContext (new_context);
     }
+
+    current_swap_chain = impl.get ();
   }
   catch (xtl::exception& exception)
   {
