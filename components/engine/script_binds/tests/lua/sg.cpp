@@ -11,7 +11,7 @@ int main ()
 {
   printf ("Results of sg_test:\n");
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) && _MSC_VER < 1400
    _set_output_format (_TWO_DIGIT_EXPONENT);
 #endif
 
