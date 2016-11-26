@@ -3,12 +3,12 @@
 namespace
 {
 
-///Преобразователь
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ
 struct ParseNodeConverter
 {
-  common::PropertyMap result; //результирующая карта свойств
+  common::PropertyMap result; //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РєР°СЂС‚Р° СЃРІРѕР№СЃС‚РІ
   
-///Чтение свойства
+///Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР°
   void ReadValue (common::Parser::AttributeIterator iter, const char* name)
   {
     switch (iter.available ())
@@ -64,7 +64,7 @@ struct ParseNodeConverter
     }
   }
   
-///Преобразование
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
   void Convert (const common::ParseNode& node, const char* prefix = "")
   {
     stl::string name;  
@@ -95,7 +95,7 @@ namespace scene
 namespace server
 {
 
-///Преобразование узла конфигурации в карту свойств
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓР·Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РІ РєР°СЂС‚Сѓ СЃРІРѕР№СЃС‚РІ
 common::PropertyMap to_properties (const common::ParseNode& node)
 {
   ParseNodeConverter converter;

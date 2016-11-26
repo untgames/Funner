@@ -22,7 +22,7 @@ namespace
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY = "Scene.InputZoneNotificationContext";
@@ -31,7 +31,7 @@ const char* SCENE_INPUT_ZONE_LIBRARY                      = "Scene.InputZone";
 const char* SCENE_INPUT_ZONE_BOX_LIBRARY                  = "Scene.InputZoneBox";
 
 /*
-    Регистрация библиотеки InputZoneNotification
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё InputZoneNotification
 */
 
 void bind_input_zone_notification_library (script::Environment& env)
@@ -56,7 +56,7 @@ void bind_input_zone_notification_library (script::Environment& env)
 }
 
 /*
-    Регистрация библиотеки InputZoneNotificationContext
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё InputZoneNotificationContext
 */
 
 size_t              get_touch_id             (const InputZoneNotificationContext& context) { return context.touch_id; }
@@ -68,20 +68,20 @@ void bind_input_zone_notification_context_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY);
   
-    //регистрация функций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№
 
   lib.Register ("get_TouchId",            make_invoker (&get_touch_id));
   lib.Register ("get_Button",             make_invoker (&get_button));
   lib.Register ("get_TouchWorldPosition", make_invoker (&get_touch_world_position));
   lib.Register ("get_TouchLocalPosition", make_invoker (&get_touch_local_position));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   env.RegisterType<InputZoneNotificationContext> (SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки InputZoneModel
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё InputZoneModel
 */
 
 xtl::connection register_notification_handler (InputZoneModel& zone, InputZoneNotification notification, const xtl::function<void (const Viewport& viewport, InputZoneNotification notification, const InputZoneNotificationContext&)>& handler)
@@ -98,11 +98,11 @@ void bind_input_zone_model_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_INPUT_ZONE_MODEL_LIBRARY);
   
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (env, SCENE_VISUAL_MODEL_LIBRARY);  
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("get_ZonesCount",              make_invoker (&InputZoneModel::ZoneDescsCount));
   lib.Register ("get_BoundsAutoUpdate",        make_invoker (&InputZoneModel::BoundsAutoUpdate));
@@ -120,13 +120,13 @@ void bind_input_zone_model_library (script::Environment& env)
   
   lib.Register ("GetNotificationName", make_invoker (xtl::implicit_cast<const char* (*)(InputZoneNotification)> (&get_name)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   env.RegisterType<InputZoneModel> (SCENE_INPUT_ZONE_MODEL_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки InputZone
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё InputZone
 */
 
 InputZone::Pointer create_input_zone ()
@@ -138,22 +138,22 @@ void bind_input_zone_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_INPUT_ZONE_LIBRARY);
   
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (env, SCENE_INPUT_ZONE_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_input_zone));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("SetPlaneState",  make_invoker (&InputZone::SetPlaneState));
   lib.Register ("IsPlaneEnabled", make_invoker (&InputZone::IsPlaneEnabled));
   lib.Register ("EnablePlane",    make_invoker (&InputZone::EnablePlane));
   lib.Register ("DisablePlane",   make_invoker (&InputZone::DisablePlane));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   env.RegisterType<InputZone> (SCENE_INPUT_ZONE_LIBRARY);
 }
@@ -167,15 +167,15 @@ void bind_input_zone_box_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_INPUT_ZONE_BOX_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (env, SCENE_INPUT_ZONE_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_input_zone_box));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   env.RegisterType<InputZoneBox> (SCENE_INPUT_ZONE_BOX_LIBRARY);
 }
@@ -189,7 +189,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Регистрация библиотек взаимодействия с зонами ввода
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ Р·РѕРЅР°РјРё РІРІРѕРґР°
 */
 
 void bind_input_library (script::Environment& env)

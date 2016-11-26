@@ -25,16 +25,16 @@ const char* get_type_name (ShapeType type)
 }
 
 /*
-   Реализация геометрического тела
+   Р РµР°Р»РёР·Р°С†РёСЏ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
 */
 
 struct Shape::Impl : public xtl::reference_counter
 {
   typedef xtl::shared_ptr <Shape::IShapeData> ShapeDataPtr;
 
-  stl::string  name;   //имя тела
-  float        margin; //толщина полей
-  ShapeDataPtr data;   //данные тела
+  stl::string  name;   //РёРјСЏ С‚РµР»Р°
+  float        margin; //С‚РѕР»С‰РёРЅР° РїРѕР»РµР№
+  ShapeDataPtr data;   //РґР°РЅРЅС‹Рµ С‚РµР»Р°
 
   Impl ()
     : margin (DEFAULT_MARGIN)
@@ -102,7 +102,7 @@ struct Shape::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Shape::Shape ()
@@ -134,7 +134,7 @@ Shape& Shape::operator = (const Shape& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Shape Shape::Clone () const
@@ -143,7 +143,7 @@ Shape Shape::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Shape::Id () const
@@ -152,7 +152,7 @@ size_t Shape::Id () const
 }
 
 /*
-   Имя тела
+   РРјСЏ С‚РµР»Р°
 */
 
 const char* Shape::Name () const
@@ -169,7 +169,7 @@ void Shape::Rename (const char* name)
 }
     
 /*
-   Толщина полей
+   РўРѕР»С‰РёРЅР° РїРѕР»РµР№
 */
 
 float Shape::Margin () const
@@ -183,7 +183,7 @@ void Shape::SetMargin (float value)
 }
 
 /*
-   Получение типа
+   РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°
 */
 
 ShapeType Shape::Type () const
@@ -195,7 +195,7 @@ ShapeType Shape::Type () const
 }
 
 /*
-   Установка/получение описания
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ
 */
 
 void Shape::SetDataCore (IShapeData* data)
@@ -209,7 +209,7 @@ Shape::IShapeData* Shape::DataCore ()
 }
 
 /*
-   Выброс исключения
+   Р’С‹Р±СЂРѕСЃ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 void Shape::RaiseNullArgument (const char* source, const char* argument_name)
@@ -224,7 +224,7 @@ void Shape::RaiseWrongType (ShapeType source_type, ShapeType required_type)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Shape::Swap (Shape& source)
@@ -239,7 +239,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Shape& shape1, Shape& shape2)

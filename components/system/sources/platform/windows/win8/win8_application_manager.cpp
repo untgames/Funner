@@ -19,14 +19,14 @@ ref class ApplicationSource;
 ApplicationView^ app_view;
 ApplicationSource^ app_source;
 
-/// Слушатель событий приложения
+/// РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class IApplicationSourceListener
 {
   public:
     virtual void OnExit () = 0;
 };
 
-/// Основное окно приложения
+/// РћСЃРЅРѕРІРЅРѕРµ РѕРєРЅРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
 ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkView, public IApplicationContext
 {
   internal:
@@ -91,7 +91,7 @@ ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkVie
     Platform::Agile<CoreWindow>        main_window;
 };
 
-/// Фабрика создания основного окна приложения
+/// Р¤Р°Р±СЂРёРєР° СЃРѕР·РґР°РЅРёСЏ РѕСЃРЅРѕРІРЅРѕРіРѕ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 ref class ApplicationSource sealed: Windows::ApplicationModel::Core::IFrameworkViewSource
 {
   internal:
@@ -132,11 +132,11 @@ ref class ApplicationSource sealed: Windows::ApplicationModel::Core::IFrameworkV
     IApplicationSourceListener* listener;
 };
 
-/// Делегат приложения
+/// Р”РµР»РµРіР°С‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, private IApplicationSourceListener
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Win8ApplicationDelegate ()
     {
       idle_enabled    = false;
@@ -152,14 +152,14 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
         app_source->SetListener (this);
     }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Win8ApplicationDelegate ()
     {
       if (app_source)
         app_source->SetListener (0);
     }
 
-/// Главный цикл
+/// Р“Р»Р°РІРЅС‹Р№ С†РёРєР»
     void Run ()
     {
       try
@@ -173,7 +173,7 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
         {
           DoNextEvents ();
 
-           //если нет обработчиков OnIdle - приостанавливаем приложение
+           //РµСЃР»Рё РЅРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ OnIdle - РїСЂРёРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 
           if (!idle_enabled)
           {
@@ -194,13 +194,13 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       Windows::ApplicationModel::Core::CoreApplication::Exit ();
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
@@ -212,13 +212,13 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
       }
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -230,13 +230,13 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
     }
 
   private:
-/// Оповещение о выходе из цикла
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІС‹С…РѕРґРµ РёР· С†РёРєР»Р°
     void OnExit ()
     {
       is_exited = true;
     }
 
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvents ()
     {
       try
@@ -267,13 +267,13 @@ namespace syslib
 namespace win8
 {
 
-/// Получение контекста приложения
+/// РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 IApplicationContext^ get_context ()
 {
   return app_view;
 }
 
-/// Старт приложения
+/// РЎС‚Р°СЂС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
 void start_application ()
 {
   try
@@ -296,7 +296,7 @@ void start_application ()
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* WindowsApplicationManager::CreateDefaultApplicationDelegate ()
@@ -305,7 +305,7 @@ IApplicationDelegate* WindowsApplicationManager::CreateDefaultApplicationDelegat
 }
 
 /*
-   Открытие URL во внешнем браузере
+   РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void WindowsApplicationManager::OpenUrl (const char* url)
@@ -314,7 +314,7 @@ void WindowsApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-    Получение значения переменной среды
+    РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃСЂРµРґС‹
 */
 
 #undef GetEnvironmentVariable
@@ -325,7 +325,7 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
 }
 
 /*
-    Управление энергосбережением
+    РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void WindowsApplicationManager::SetScreenSaverState (bool state)

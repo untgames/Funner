@@ -17,12 +17,12 @@ namespace opengl
 class ILibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Òî÷êè âõîäà OpenGL
+///Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct GlEntries
 {
   /*
-      Òî÷êè âõîäà OpenGL ES 1.1  
+      Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° OpenGL ES 1.1  
   */
 
   void (GL_APIENTRY* AlphaFunc)(GLenum func, GLclampf ref);
@@ -175,7 +175,7 @@ struct GlEntries
   void (GL_APIENTRY* PointSizePointerOES)(GLenum type, GLsizei stride, const GLvoid *pointer);
   
   /*
-      Òî÷êè âõîäà ðàñøèðåíèé OpenGL
+      Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ð¹ OpenGL
   */
 
   PFNGLBLENDEQUATIONSEPARATEOESPROC BlendEquationSeparateOES;
@@ -283,18 +283,18 @@ struct GlEntries
   PFNGLDISABLEDRIVERCONTROLQCOMPROC DisableDriverControlQCOM;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Èíèöèàëèçàöèÿ òî÷åê âõîäà
+///Ð˜Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ Ñ‚Ð¾Ñ‡ÐµÐº Ð²Ñ…Ð¾Ð´Ð°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init (ILibrary&);  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Ïîëó÷åíèå òàáëèöû òî÷åê âõîäà äëÿ òåêóùåãî êîíòåêñòà
+///ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ Ñ‚Ð¾Ñ‡ÐµÐº Ð²Ñ…Ð¾Ð´Ð° Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ ÐºÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const GlEntries* get_gl_entries ();
 
 /*
-    Ïåðåîïðåäåëåíèÿ OpenGL ES 1.1
+    ÐŸÐµÑ€ÐµÐ¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ OpenGL ES 1.1
 */
 
 #define glAlphaFunc get_gl_entries ()->AlphaFunc
@@ -444,7 +444,7 @@ const GlEntries* get_gl_entries ();
 #define glPointSizePointerOES get_gl_entries ()->PointSizePointerOES
 
 /*
-    Ïåðåîïðåäåëåíèÿ ðàñøèðåíèé OpenGL
+    ÐŸÐµÑ€ÐµÐ¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ð¹ OpenGL
 */
 
 #define glBlendEquationSeparateOES get_gl_entries ()->BlendEquationSeparateOES

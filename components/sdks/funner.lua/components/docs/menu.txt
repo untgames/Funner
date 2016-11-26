@@ -3,7 +3,7 @@ Format: 1.5
 
 # You can add a title and sub-title to your menu like this:
 Title: Funner API
-SubTitle: Существующие расширения Lua для Funner Engine
+SubTitle: РЎСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ СЂР°СЃС€РёСЂРµРЅРёСЏ Lua РґР»СЏ Funner Engine
 
 # You can add a footer to your documentation like this:
 # Footer: [text]
@@ -48,7 +48,7 @@ SubTitle: Существующие расширения Lua для Funner Engine
 
 File: Funner Lua API  (funnerapi.txt)
 
-Group: Библиотека общего назначения  {
+Group: Р‘РёР±Р»РёРѕС‚РµРєР° РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ  {
 
    File: File  (common/common.file.lnd)
    File: StringNode  (common/common.string_node.lnd)
@@ -56,106 +56,106 @@ Group: Библиотека общего назначения  {
    File: ActionQueue  (common/common.action_queue.lnd)
    File: Timer  (common/common.timer.lnd)
    File: Callback  (common/common.callback.txt)
-   }  # Group: Библиотека общего назначения
+   }  # Group: Р‘РёР±Р»РёРѕС‚РµРєР° РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 
-Group: Ограничивающие объёмы  {
+Group: РћРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹  {
 
    File: AxisAlignedBox  (no auto-title, bound_volumes/bound_volumes.axis_aligned_box.lnd)
 
-   Group: Перечисления  {
+   Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ  {
 
       File: Corner  (no auto-title, bound_volumes/bound_volumes.corner.lnd)
-      }  # Group: Перечисления
+      }  # Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ
 
-   }  # Group: Ограничивающие объёмы
+   }  # Group: РћРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹
 
-Group: Математическая библиотека  {
+Group: РњР°С‚РµРјР°С‚РёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°  {
 
-   Group: Векторы  {
+   Group: Р’РµРєС‚РѕСЂС‹  {
 
       File: Vector2  (math/math.vector2.lnd)
       File: Vector3  (math/math.vector3.lnd)
       File: Vector4  (math/math.vector4.lnd)
-      }  # Group: Векторы
+      }  # Group: Р’РµРєС‚РѕСЂС‹
 
-   Group: Матрицы  {
+   Group: РњР°С‚СЂРёС†С‹  {
 
       File: Matrix2  (math/math.matrix2.lnd)
       File: Matrix3  (math/math.matrix3.lnd)
       File: Matrix4  (math/math.matrix4.lnd)
-      }  # Group: Матрицы
+      }  # Group: РњР°С‚СЂРёС†С‹
 
-   Group: Кватернионы  {
+   Group: РљРІР°С‚РµСЂРЅРёРѕРЅС‹  {
 
       File: Quaternion  (math/math.quaternion.lnd)
-      }  # Group: Кватернионы
+      }  # Group: РљРІР°С‚РµСЂРЅРёРѕРЅС‹
 
-   }  # Group: Математическая библиотека
+   }  # Group: РњР°С‚РµРјР°С‚РёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
 
-Group: Граф сцены  {
+Group: Р“СЂР°С„ СЃС†РµРЅС‹  {
 
-   Group: Сцена  {
+   Group: РЎС†РµРЅР°  {
 
       File: Scene  (scene/scene.scene.lnd)
-      }  # Group: Сцена
+      }  # Group: РЎС†РµРЅР°
 
-   Group: Узел  {
+   Group: РЈР·РµР»  {
 
       File: Node  (scene/scene.node.lnd)
-      }  # Group: Узел
+      }  # Group: РЈР·РµР»
 
-   Group: Массив узлов  {
+   Group: РњР°СЃСЃРёРІ СѓР·Р»РѕРІ  {
 
       File: NodeArray  (scene/scene.node_array.lnd)
-      }  # Group: Массив узлов
+      }  # Group: РњР°СЃСЃРёРІ СѓР·Р»РѕРІ
 
-   Group: Сущность  {
+   Group: РЎСѓС‰РЅРѕСЃС‚СЊ  {
 
       File: Entity  (scene/scene.entity.lnd)
 
-      Group: Источник света  {
+      Group: РСЃС‚РѕС‡РЅРёРє СЃРІРµС‚Р°  {
 
          File: Light  (scene/scene.light.lnd)
          File: DirectLight  (scene/scene.direct_light.lnd)
          File: PointLight  (scene/scene.point_light.lnd)
          File: SpotLight  (scene/scene.spot_light.lnd)
-         }  # Group: Источник света
+         }  # Group: РСЃС‚РѕС‡РЅРёРє СЃРІРµС‚Р°
 
-      Group: Спрайт  {
+      Group: РЎРїСЂР°Р№С‚  {
 
          File: Sprite  (scene/scene.sprite.lnd)
-         }  # Group: Спрайт
+         }  # Group: РЎРїСЂР°Р№С‚
 
-      Group: Линия текста  {
+      Group: Р›РёРЅРёСЏ С‚РµРєСЃС‚Р°  {
 
          File: TextLine  (scene/scene.text_line.lnd)
-         }  # Group: Линия текста
+         }  # Group: Р›РёРЅРёСЏ С‚РµРєСЃС‚Р°
 
-      Group: Отображаемая модель  {
+      Group: РћС‚РѕР±СЂР°Р¶Р°РµРјР°СЏ РјРѕРґРµР»СЊ  {
 
          File: VisualModel  (scene/scene.visual_model.lnd)
-         }  # Group: Отображаемая модель
+         }  # Group: РћС‚РѕР±СЂР°Р¶Р°РµРјР°СЏ РјРѕРґРµР»СЊ
 
-      Group: Вспомогательные объекты  {
+      Group: Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РѕР±СЉРµРєС‚С‹  {
 
          File: Box  (no auto-title, scene/scene.helpers.box.lnd)
-         }  # Group: Вспомогательные объекты
+         }  # Group: Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РѕР±СЉРµРєС‚С‹
 
-      Group: Камеры  {
+      Group: РљР°РјРµСЂС‹  {
 
          File: OrthoCamera  (scene/scene.ortho_camera.lnd)
          File: PerspectiveCamera  (scene/scene.perspective_camera.lnd)
-         }  # Group: Камеры
+         }  # Group: РљР°РјРµСЂС‹
 
-      Group: Звук  {
+      Group: Р—РІСѓРє  {
 
          File: Listener  (scene/scene.listener.lnd)
          File: SoundEmitter  (scene/scene.sound_emitter.lnd)
-         }  # Group: Звук
+         }  # Group: Р—РІСѓРє
 
-      }  # Group: Сущность
+      }  # Group: РЎСѓС‰РЅРѕСЃС‚СЊ
 
-   Group: Перечисления  {
+   Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ  {
 
       File: NodeArrayLinkMode  (scene/scene.node_array_link_mode.lnd)
       File: NodeBindMode  (scene/scene.node_bind_mode.lnd)
@@ -165,67 +165,67 @@ Group: Граф сцены  {
       File: NodeSubTreeEvent  (scene/scene.node_sub_tree_event.lnd)
       File: NodeTransformSpace  (scene/scene.node_transform_space.lnd)
       File: TextLineAlignment  (scene/scene.text_line_alignment.lnd)
-      }  # Group: Перечисления
+      }  # Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ
 
-   }  # Group: Граф сцены
+   }  # Group: Р“СЂР°С„ СЃС†РµРЅС‹
 
-Group: Рендер  {
+Group: Р РµРЅРґРµСЂ  {
 
    File: Rect  (render/render.rect.lnd)
    File: Screen  (render/render.screen.lnd)
    File: Viewport  (render/render.viewport.lnd)
-   }  # Group: Рендер
+   }  # Group: Р РµРЅРґРµСЂ
 
-Group: Системная библиотека  {
+Group: РЎРёСЃС‚РµРјРЅР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°  {
 
    File: Application  (system/system.application.lnd)
    File: ApplicationEvent  (system/system.application_event.lnd)
-   }  # Group: Системная библиотека
+   }  # Group: РЎРёСЃС‚РµРјРЅР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
 
-Group: Движок  {
+Group: Р”РІРёР¶РѕРє  {
 
-   Group: Точки привязки  {
+   Group: РўРѕС‡РєРё РїСЂРёРІСЏР·РєРё  {
 
       File: Screens  (engine/engine.screens.lnd)
       File: Listeners  (engine/engine.listeners.lnd)
       File: InputEventHandlers  (engine/engine.input_event_handlers.lnd)
       File: Cursors  (engine/engine.cursors.lnd)
       File: ResourceManagers  (engine/engine.resource_managers.lnd)
-      }  # Group: Точки привязки
+      }  # Group: РўРѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
-   Group: Управление ресурсами  {
+   Group: РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё  {
 
       File: ResourceManager  (engine/engine.resource_manager.lnd)
       File: ResourceManager.Binding  (engine/engine.resource_binding.lnd)
       File: ResourceManager.Group  (engine/engine.resource_group.lnd)
-      }  # Group: Управление ресурсами
+      }  # Group: РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
 
-   Group: Менеджер подсистем  {
+   Group: РњРµРЅРµРґР¶РµСЂ РїРѕРґСЃРёСЃС‚РµРј  {
 
       File: SubsystemManager  (engine/engine.subsystem_manager.lnd)
-      }  # Group: Менеджер подсистем
+      }  # Group: РњРµРЅРµРґР¶РµСЂ РїРѕРґСЃРёСЃС‚РµРј
 
-   }  # Group: Движок
+   }  # Group: Р”РІРёР¶РѕРє
 
-Group: Система ввода  {
+Group: РЎРёСЃС‚РµРјР° РІРІРѕРґР°  {
 
    File: Input  (input/input.lnd)
-   File: Основные события системы ввода  (input/input.events.txt)
-   }  # Group: Система ввода
+   File: РћСЃРЅРѕРІРЅС‹Рµ СЃРѕР±С‹С‚РёСЏ СЃРёСЃС‚РµРјС‹ РІРІРѕРґР°  (input/input.events.txt)
+   }  # Group: РЎРёСЃС‚РµРјР° РІРІРѕРґР°
 
-Group: Проигрывание медиа  {
+Group: РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ РјРµРґРёР°  {
 
    File: MediaPlayer  (media/media.media_player.lnd)
    File: Playlist  (media/media.playlist.lnd)
 
-   Group: Перечисления  {
+   Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ  {
 
       File: MediaPlayerEvent  (media/media.media_player_event.lnd)
       File: MediaPlayerRepeatMode  (media/media.media_player_repeat_mode.lnd)
       File: MediaPlayerState  (media/media.media_player_state.lnd)
-      }  # Group: Перечисления
+      }  # Group: РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ
 
-   }  # Group: Проигрывание медиа
+   }  # Group: РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ РјРµРґРёР°
 
 Group: Index  {
 

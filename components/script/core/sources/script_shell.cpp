@@ -6,13 +6,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* INTERPRETERS_COMPONENTS_MASK = "script.interpreters.*"; //маска имён компонентов интерпретаторов
+const char* INTERPRETERS_COMPONENTS_MASK = "script.interpreters.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂРѕРІ
 
 /*
-    Реализация менеджера интерпретаторов
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂРѕРІ
 */
 
 class InterpreterManagerImpl
@@ -20,7 +20,7 @@ class InterpreterManagerImpl
   public:
     typedef InterpreterManager::InterpreterCreater InterpreterCreater;
     
-      //регистрация интерпретатора
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
     void Register (const char* name, const InterpreterCreater& creater)
     {
       static const char* METHOD_NAME = "script::InterpreterManagerImpl::Register";
@@ -39,7 +39,7 @@ class InterpreterManagerImpl
       stl::pair<InterpreterCreaterMap::iterator, bool> insert_result = creaters.insert_pair (name, creater);
     }
     
-      //удаление интерпретатора
+      //СѓРґР°Р»РµРЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
     void Unregister (const char* name)
     {
       if (!name)
@@ -48,13 +48,13 @@ class InterpreterManagerImpl
       creaters.erase (name);
     }
     
-      //очистка карты интерпретаторов
+      //РѕС‡РёСЃС‚РєР° РєР°СЂС‚С‹ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂРѕРІ
     void UnregisterAll ()
     {
       creaters.clear ();
     }
     
-      //получение интерпретатора
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
     IInterpreter* CreateInterpreter (const char* name, const Environment& environment)
     {
       static const char* METHOD_NAME = "script::InterpreterManagerImpl::CreateInterpreter";
@@ -74,7 +74,7 @@ class InterpreterManagerImpl
     typedef stl::hash_map<stl::hash_key<const char*>, InterpreterCreater> InterpreterCreaterMap;
 
   private:
-    InterpreterCreaterMap creaters; //карта функторов создания командных интерпретаторов
+    InterpreterCreaterMap creaters; //РєР°СЂС‚Р° С„СѓРЅРєС‚РѕСЂРѕРІ СЃРѕР·РґР°РЅРёСЏ РєРѕРјР°РЅРґРЅС‹С… РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂРѕРІ
 };
 
 typedef common::Singleton<InterpreterManagerImpl> InterpreterManagerSingleton;
@@ -88,7 +88,7 @@ typedef common::Singleton<InterpreterManagerImpl> InterpreterManagerSingleton;
 */
 
 /*
-    Регистрация функторов создания
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС‚РѕСЂРѕРІ СЃРѕР·РґР°РЅРёСЏ
 */
 
 void InterpreterManager::RegisterInterpreter (const char* name, const InterpreterCreater& creater)
@@ -113,7 +113,7 @@ void InterpreterManager::UnregisterAllInterpreters ()
 */
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Shell::Shell ()
@@ -158,7 +158,7 @@ Shell& Shell::operator = (const Shell& shell)
 }
 
 /*
-    Получение имени интерптератора / получение интерпретатора
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РёРЅС‚РµСЂРїС‚РµСЂР°С‚РѕСЂР° / РїРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
 */
 
 const char* Shell::InterpreterName () const
@@ -172,7 +172,7 @@ Shell::InterpeterPtr Shell::Interpreter () const
 }
 
 /*
-    Изменение интерпретатора
+    РР·РјРµРЅРµРЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
 */
 
 void Shell::SetInterpreter (const char* interpreter_name, const Environment& environment)
@@ -186,7 +186,7 @@ void Shell::SetInterpreter (const InterpeterPtr& in_interpreter)
 }
 
 /*
-    Проверка наличия функции в контексте интерпретации
+    РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„СѓРЅРєС†РёРё РІ РєРѕРЅС‚РµРєСЃС‚Рµ РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёРё
 */
 
 bool Shell::HasFunction (const char* name) const
@@ -198,7 +198,7 @@ bool Shell::HasFunction (const char* name) const
 }
 
 /*
-    Выполнение команд
+    Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ
 */
 
 void Shell::ExecuteImpl (const char* buffer_name, const void* buffer, size_t buffer_size)
@@ -234,7 +234,7 @@ void Shell::Execute (const char* command)
 }
 
 /*
-    Выполнение команд, расположенных в файле / файлах
+    Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ, СЂР°СЃРїРѕР»РѕР¶РµРЅРЅС‹С… РІ С„Р°Р№Р»Рµ / С„Р°Р№Р»Р°С…
 */
 
 void Shell::ExecuteFile (const char* file_name)
@@ -271,7 +271,7 @@ void Shell::ExecuteFileList (const char* file_mask)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Shell::Swap (Shell& shell)

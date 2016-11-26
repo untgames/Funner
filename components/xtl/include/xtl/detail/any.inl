@@ -9,7 +9,7 @@ namespace adl_defaults
 {
 
 /*
-    Свободные функции по умолчанию, для игнорирования отсутствия соответствующих псевдонимов при ADL
+    РЎРІРѕР±РѕРґРЅС‹Рµ С„СѓРЅРєС†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, РґР»СЏ РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёСЏ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… РїСЃРµРІРґРѕРЅРёРјРѕРІ РїСЂРё ADL
 */
 
 using xtl::to_string;
@@ -21,7 +21,7 @@ struct cast_type
   const std::type_info* info;
 };
 
-//по умолчанию типы не преобразуются к строкам
+//РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ С‚РёРїС‹ РЅРµ РїСЂРµРѕР±СЂР°Р·СѓСЋС‚СЃСЏ Рє СЃС‚СЂРѕРєР°Рј
 inline void to_string (stl::string& s, cast_type type)
 {
   s += type.info->name ();
@@ -30,7 +30,7 @@ inline void to_string (stl::string& s, cast_type type)
 }
 
 /*
-    Интерфейс хранилища вариантных данных
+    РРЅС‚РµСЂС„РµР№СЃ С…СЂР°РЅРёР»РёС‰Р° РІР°СЂРёР°РЅС‚РЅС‹С… РґР°РЅРЅС‹С…
 */
 
 struct any_holder: public reference_counter
@@ -55,7 +55,7 @@ struct any_holder: public reference_counter
 };
 
 /*
-    Объект, хранящий значение (используется для корректной работы с неполными ссылочными типами)
+    РћР±СЉРµРєС‚, С…СЂР°РЅСЏС‰РёР№ Р·РЅР°С‡РµРЅРёРµ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹ СЃ РЅРµРїРѕР»РЅС‹РјРё СЃСЃС‹Р»РѕС‡РЅС‹РјРё С‚РёРїР°РјРё)
 */
 
 #ifdef _MSC_VER
@@ -64,7 +64,7 @@ struct any_holder: public reference_counter
 #endif
 
 /*
-    Содержимое вариативной переменной
+    РЎРѕРґРµСЂР¶РёРјРѕРµ РІР°СЂРёР°С‚РёРІРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 */
 
 template <class T> struct any_content
@@ -107,7 +107,7 @@ template <class T> struct any_impl: public any_content<T>, public any_holder
 */
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 inline any::any ()
@@ -137,7 +137,7 @@ inline any::~any ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 inline any& any::operator = (const any& in_any)
@@ -154,7 +154,7 @@ inline any& any::operator = (const T& value)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 inline any any::clone () const
@@ -163,7 +163,7 @@ inline any any::clone () const
 }
 
 /*
-    Проверка на пустоту / проверка на 0
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ / РїСЂРѕРІРµСЂРєР° РЅР° 0
 */
 
 inline bool any::empty () const
@@ -177,7 +177,7 @@ inline bool any::null () const
 }
 
 /*
-    Тип и данные
+    РўРёРї Рё РґР°РЅРЅС‹Рµ
 */
 
 inline const std::type_info& any::type () const
@@ -203,13 +203,13 @@ inline const T* any::content () const
     return 0;
 
   if (&typeid (T) != &content_ptr->type ())
-    return 0; //преобразование невозможно, из-за неэквивалентности базовых типов
+    return 0; //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ, РёР·-Р·Р° РЅРµСЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё Р±Р°Р·РѕРІС‹С… С‚РёРїРѕРІ
 
   return &static_cast<detail::any_impl<T>*> (const_cast<detail::any_holder*> (content_ptr))->value;
 }
 
 /*
-    Приведение
+    РџСЂРёРІРµРґРµРЅРёРµ
 */
 
 template <class T>
@@ -227,7 +227,7 @@ inline const T any::cast () const
 }
 
 /*
-    Печать в строку
+    РџРµС‡Р°С‚СЊ РІ СЃС‚СЂРѕРєСѓ
 */
 
 inline void any::to_string (stl::string& buffer) const
@@ -247,7 +247,7 @@ inline void to_string (stl::string& buffer, const volatile any& value)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 inline any& any::swap (any& in_any)
@@ -265,11 +265,11 @@ inline void swap (any& a1, any& a2)
 }
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class T>
@@ -311,7 +311,7 @@ inline const T any_cast (const any& a)
 }
 
 /*
-    Многоуровневое приведение типов
+    РњРЅРѕРіРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class T>
@@ -321,7 +321,7 @@ inline const T any_multicast (const any& a)
 }
 
 /*
-    Получение приводимого значения. Используется как базовое при работе any_multicast
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРёРІРѕРґРёРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РєР°Рє Р±Р°Р·РѕРІРѕРµ РїСЂРё СЂР°Р±РѕС‚Рµ any_multicast
 */
 
 template <class T>

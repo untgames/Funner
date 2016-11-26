@@ -8,9 +8,9 @@ namespace
 
 typedef void (*sighandler_t)(int);
 
-sighandler_t prev_segv_handler = 0; //предыдущий обработчик сигнала SEGV
+sighandler_t prev_segv_handler = 0; //РїСЂРµРґС‹РґСѓС‰РёР№ РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРёРіРЅР°Р»Р° SEGV
 
-// дамп карты памяти
+// РґР°РјРї РєР°СЂС‚С‹ РїР°РјСЏС‚Рё
 void dump_maps ()
 {
   static char line [256];
@@ -38,7 +38,7 @@ void dump_maps ()
   Application::Sleep (1000);
 }
 
-// обработчик сигналогв
+// РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРёРіРЅР°Р»РѕРіРІ
 void sighandler (int signum)
 {
   switch (signum)
@@ -61,7 +61,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация обратчиков аварийного завершения
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°С‚С‡РёРєРѕРІ Р°РІР°СЂРёР№РЅРѕРіРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ
 void register_crash_handlers ()
 {
   prev_segv_handler = signal(SIGSEGV, sighandler);

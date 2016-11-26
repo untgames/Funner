@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Описание реализации менеджера примитивов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 namespace
@@ -13,9 +13,9 @@ typedef stl::vector<PrimitiveProxy> PrimitiveProxyList;
 
 struct MeshLibraryEntry: public xtl::reference_counter
 {
-  const media::geometry::MeshLibrary* source_library; //ссылка на исходную библиотеку мешей (может быть недействительна на момент обращения)
-  stl::string                         resource_name;  //имя ресурса
-  PrimitiveProxyList                  primitives;     //примитивы библиотеки
+  const media::geometry::MeshLibrary* source_library; //СЃСЃС‹Р»РєР° РЅР° РёСЃС…РѕРґРЅСѓСЋ Р±РёР±Р»РёРѕС‚РµРєСѓ РјРµС€РµР№ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµРґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° РЅР° РјРѕРјРµРЅС‚ РѕР±СЂР°С‰РµРЅРёСЏ)
+  stl::string                         resource_name;  //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+  PrimitiveProxyList                  primitives;     //РїСЂРёРјРёС‚РёРІС‹ Р±РёР±Р»РёРѕС‚РµРєРё
   
   MeshLibraryEntry () : source_library (0) {}
   
@@ -37,26 +37,26 @@ typedef stl::hash_map<stl::hash_key<const char*>, PrimitiveProxy> PrimitiveProxy
 
 struct PrimitiveManager::Impl
 {
-  DeviceManagerPtr      device_manager;    //менеджер устройства отрисовки
-  MaterialManagerPtr    material_manager;  //менеджер материалов
-  PrimitiveProxyManager proxy_manager;     //менеджер прокси объектов
-  MeshLibraryList       loaded_libraries;  //список загруженных библиотек
-  PrimitiveProxyMap     shared_primitives; //список совместно используемых примитивов
-  Log                   log;               //поток протоколирования
+  DeviceManagerPtr      device_manager;    //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  MaterialManagerPtr    material_manager;  //РјРµРЅРµРґР¶РµСЂ РјР°С‚РµСЂРёР°Р»РѕРІ
+  PrimitiveProxyManager proxy_manager;     //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё РѕР±СЉРµРєС‚РѕРІ
+  MeshLibraryList       loaded_libraries;  //СЃРїРёСЃРѕРє Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… Р±РёР±Р»РёРѕС‚РµРє
+  PrimitiveProxyMap     shared_primitives; //СЃРїРёСЃРѕРє СЃРѕРІРјРµСЃС‚РЅРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РїСЂРёРјРёС‚РёРІРѕРІ
+  Log                   log;               //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager)
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
   {
   }
   
-///Загрузка библиотеки
+///Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
   void LoadMeshLibrary (const media::geometry::MeshLibrary& library, const char* name)
   {        
     try
     {
-        //проверка повторной загрузки
+        //РїСЂРѕРІРµСЂРєР° РїРѕРІС‚РѕСЂРЅРѕР№ Р·Р°РіСЂСѓР·РєРё
       
       for (MeshLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
       {
@@ -66,11 +66,11 @@ struct PrimitiveManager::Impl
           throw xtl::format_operation_exception ("", "Mesh library '%s' has been alredy loaded", *name ? name : *library.Name () ? library.Name () : "<reference>");
       }
       
-        //создание буферов примитивов библиотеки мэшей
+        //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂРѕРІ РїСЂРёРјРёС‚РёРІРѕРІ Р±РёР±Р»РёРѕС‚РµРєРё РјСЌС€РµР№
         
       PrimitiveBuffersPtr primitive_buffers (new PrimitiveBuffersImpl (device_manager), false);
       
-        //создание новой библиотеки
+        //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
         
       MeshLibraryEntryPtr entry (new MeshLibraryEntry, false);
       
@@ -96,7 +96,7 @@ struct PrimitiveManager::Impl
 
       primitive_buffers->DisableCache ();
       
-        //регистрация библиотеки
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
         
       loaded_libraries.push_back (entry);
     }
@@ -107,7 +107,7 @@ struct PrimitiveManager::Impl
     }
   }
   
-///Выгрузка библиотеки
+///Р’С‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
   void UnloadMeshLibrary (const media::geometry::MeshLibrary* source_library, const char* name)
   {
     for (MeshLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
@@ -124,7 +124,7 @@ struct PrimitiveManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimitiveManager::PrimitiveManager (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager)
@@ -137,7 +137,7 @@ PrimitiveManager::~PrimitiveManager ()
 }
 
 /*
-    Создание примитивов
+    РЎРѕР·РґР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 PrimitivePtr PrimitiveManager::CreatePrimitive ()
@@ -180,7 +180,7 @@ PrimitiveBuffersPtr PrimitiveManager::CreatePrimitiveBuffers ()
 }
 
 /*
-    Проверка: является ли ресурс библиотекой мешей
+    РџСЂРѕРІРµСЂРєР°: СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЂРµСЃСѓСЂСЃ Р±РёР±Р»РёРѕС‚РµРєРѕР№ РјРµС€РµР№
 */
 
 bool PrimitiveManager::IsMeshLibraryResource (const char* name)
@@ -189,7 +189,7 @@ bool PrimitiveManager::IsMeshLibraryResource (const char* name)
 }
 
 /*
-    Загрузка / выгрузка библиотек мешей
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє РјРµС€РµР№
 */
 
 void PrimitiveManager::LoadMeshLibrary (const char* name)
@@ -237,7 +237,7 @@ void PrimitiveManager::UnloadMeshLibrary (const media::geometry::MeshLibrary& li
 }
 
 /*
-    Регистрация совместно используемых примитивов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕРІРјРµСЃС‚РЅРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void PrimitiveManager::SharePrimitive (const char* name, const PrimitivePtr& primitive)
@@ -285,7 +285,7 @@ void PrimitiveManager::UnsharePrimitive (const char* name)
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 PrimitiveProxy PrimitiveManager::GetPrimitiveProxy (const char* name)
@@ -294,7 +294,7 @@ PrimitiveProxy PrimitiveManager::GetPrimitiveProxy (const char* name)
 }
 
 /*
-    Поиск загруженного примитива
+    РџРѕРёСЃРє Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ РїСЂРёРјРёС‚РёРІР°
 */
 
 PrimitivePtr PrimitiveManager::FindPrimitive (const char* name)
@@ -303,7 +303,7 @@ PrimitivePtr PrimitiveManager::FindPrimitive (const char* name)
 }
 
 /*
-    Установка примитива по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРјРёС‚РёРІР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void PrimitiveManager::SetDefaultPrimitive (const PrimitivePtr& primitive)

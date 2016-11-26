@@ -1,4 +1,4 @@
-//Тестирование алгоритма adjacent_find 
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° adjacent_find 
 #include <stdio.h>
 #include <stl/list>
 #include <stl/algorithm>

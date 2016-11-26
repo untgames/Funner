@@ -2,7 +2,7 @@
 #define XTL_TYPE_TRAITS_ALIGNMENT_OF_HEADER
 
 /*
-    Определение выравнивания
+    РћРїСЂРµРґРµР»РµРЅРёРµ РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ
 */
 
 namespace detail
@@ -14,7 +14,7 @@ namespace detail
   #pragma warning(disable: 4624) //'xtl::type_traits::detail::alignment_of_helper<T>::storage' : destructor could not be generated because a base class destructor is inaccessible
 #endif
 
-//вспомогательный класс определения выравнивания типа
+//РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ С‚РёРїР°
 template <class T> struct alignment_of_helper
 {
   struct storage

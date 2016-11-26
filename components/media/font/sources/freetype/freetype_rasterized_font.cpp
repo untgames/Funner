@@ -8,11 +8,11 @@ namespace
 
 const char* LOG_NAME = "media.freetype.FreetypeRasterizedFont";
 
-//Обводчик глифов
+//РћР±РІРѕРґС‡РёРє РіР»РёС„РѕРІ
 class FreetypeStroker
 {
   public:
-    //Конструктор/деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     FreetypeStroker (const FreetypeLibrary& in_library, unsigned int stroke_size)
       : library (in_library)
       , stroker (0)
@@ -31,7 +31,7 @@ class FreetypeStroker
         library.FT_Stroker_Done (stroker);
     }
 
-    //Получение обводичка
+    //РџРѕР»СѓС‡РµРЅРёРµ РѕР±РІРѕРґРёС‡РєР°
     FT_Stroker Stroker ()
     {
       return stroker;
@@ -42,15 +42,15 @@ class FreetypeStroker
     FreetypeStroker& operator = (const FreetypeStroker&); //no impl
 
   private:
-    FreetypeLibrary library;  //библиотека
-    FT_Stroker      stroker;  //обводчик
+    FreetypeLibrary library;  //Р±РёР±Р»РёРѕС‚РµРєР°
+    FT_Stroker      stroker;  //РѕР±РІРѕРґС‡РёРє
 };
 
-//Растеризатор глифа
+//Р Р°СЃС‚РµСЂРёР·Р°С‚РѕСЂ РіР»РёС„Р°
 class FreetypeGlyphRasterizer
 {
   public:
-    //Конструктор/деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     FreetypeGlyphRasterizer (FT_ULong char_code, const RasterizedFontParams& params, FT_Stroker stroker)
       : library (params.library)
       , bitmap (0)
@@ -94,7 +94,7 @@ class FreetypeGlyphRasterizer
         library.FT_Done_Glyph (glyph);
     }
 
-    //Получение битовой карты
+    //РџРѕР»СѓС‡РµРЅРёРµ Р±РёС‚РѕРІРѕР№ РєР°СЂС‚С‹
     FT_Bitmap* Bitmap ()
     {
       return bitmap;
@@ -105,9 +105,9 @@ class FreetypeGlyphRasterizer
     FreetypeGlyphRasterizer& operator = (const FreetypeGlyphRasterizer&); //no impl
 
   private:
-    FreetypeLibrary library; //библиотека
-    FT_Bitmap*      bitmap;  //битовая карта
-    FT_Glyph        glyph;   //глиф
+    FreetypeLibrary library; //Р±РёР±Р»РёРѕС‚РµРєР°
+    FT_Bitmap*      bitmap;  //Р±РёС‚РѕРІР°СЏ РєР°СЂС‚Р°
+    FT_Glyph        glyph;   //РіР»РёС„
 };
 
 }
@@ -119,7 +119,7 @@ namespace freetype
 {
 
 /*
-   Растеризатор шрифта
+   Р Р°СЃС‚РµСЂРёР·Р°С‚РѕСЂ С€СЂРёС„С‚Р°
 */
 
 struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
@@ -130,17 +130,17 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
   typedef xtl::uninitialized_storage<unsigned char>  BitmapBuffer;
   typedef stl::hash_map<size_t, unsigned int>        BitmapHashMap;
 
-  common::Log             log;                //протокол
-  RasterizedFontParamsPtr font_params;        //параметры шрифта
-  unsigned int            glyphs_count;       //количество глифов
-  bool                    rasterized;         //выполнялась ли процедура растеризации
-  SizesArray              sizes;              //размеры битмапов символов
-  BitmapPointersArray     bitmap_pointers;    //указатели на битмапы символов
-  BitmapHashMap           bitmaps_hash_map;   //карта хешей
-  GlyphMap                glyph_map;          //карта соответствия глифов уникальному глифу
-  BitmapBuffer            bitmap_data;        //общий буфер для всех битмапов
+  common::Log             log;                //РїСЂРѕС‚РѕРєРѕР»
+  RasterizedFontParamsPtr font_params;        //РїР°СЂР°РјРµС‚СЂС‹ С€СЂРёС„С‚Р°
+  unsigned int            glyphs_count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ РіР»РёС„РѕРІ
+  bool                    rasterized;         //РІС‹РїРѕР»РЅСЏР»Р°СЃСЊ Р»Рё РїСЂРѕС†РµРґСѓСЂР° СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
+  SizesArray              sizes;              //СЂР°Р·РјРµСЂС‹ Р±РёС‚РјР°РїРѕРІ СЃРёРјРІРѕР»РѕРІ
+  BitmapPointersArray     bitmap_pointers;    //СѓРєР°Р·Р°С‚РµР»Рё РЅР° Р±РёС‚РјР°РїС‹ СЃРёРјРІРѕР»РѕРІ
+  BitmapHashMap           bitmaps_hash_map;   //РєР°СЂС‚Р° С…РµС€РµР№
+  GlyphMap                glyph_map;          //РєР°СЂС‚Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РіР»РёС„РѕРІ СѓРЅРёРєР°Р»СЊРЅРѕРјСѓ РіР»РёС„Сѓ
+  BitmapBuffer            bitmap_data;        //РѕР±С‰РёР№ Р±СѓС„РµСЂ РґР»СЏ РІСЃРµС… Р±РёС‚РјР°РїРѕРІ
 
-  ///Конструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (RasterizedFontParamsPtr in_font_params)
     : log (LOG_NAME)
     , font_params (in_font_params)
@@ -149,7 +149,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     glyphs_count = font_params->utf32_charset.empty () ? 0 : font_params->utf32_charset.data () [font_params->utf32_charset.size () - 1] - font_params->utf32_charset.data () [0] + 1;
   }
 
-  ///Растеризация
+  ///Р Р°СЃС‚РµСЂРёР·Р°С†РёСЏ
   void Rasterize ()
   {
     if (rasterized)
@@ -326,7 +326,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
 }
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 FreetypeRasterizedFont::FreetypeRasterizedFont (RasterizedFontParamsPtr font_params)
@@ -352,7 +352,7 @@ FreetypeRasterizedFont& FreetypeRasterizedFont::operator = (const FreetypeRaster
 }
 
 /*
-   Получение количества символов шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃРёРјРІРѕР»РѕРІ С€СЂРёС„С‚Р°
 */
 
 unsigned int FreetypeRasterizedFont::GlyphsCount () const
@@ -361,7 +361,7 @@ unsigned int FreetypeRasterizedFont::GlyphsCount () const
 }
 
 /*
-   Получение растеризованных глифов (битовые карты глифов - 8 битные монохромные)
+   РџРѕР»СѓС‡РµРЅРёРµ СЂР°СЃС‚РµСЂРёР·РѕРІР°РЅРЅС‹С… РіР»РёС„РѕРІ (Р±РёС‚РѕРІС‹Рµ РєР°СЂС‚С‹ РіР»РёС„РѕРІ - 8 Р±РёС‚РЅС‹Рµ РјРѕРЅРѕС…СЂРѕРјРЅС‹Рµ)
 */
 
 unsigned int FreetypeRasterizedFont::UniqueGlyphsCount () const
@@ -393,7 +393,7 @@ const unsigned char** FreetypeRasterizedFont::GlyphsBitmaps () const
 }
 
 /*
-   Создание растеризатора
+   РЎРѕР·РґР°РЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
 */
 
 IFontRasterizer* FreetypeRasterizedFont::operator () (const RasterizedFontCreationParams& params)
@@ -402,7 +402,7 @@ IFontRasterizer* FreetypeRasterizedFont::operator () (const RasterizedFontCreati
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FreetypeRasterizedFont::Swap (FreetypeRasterizedFont& source)

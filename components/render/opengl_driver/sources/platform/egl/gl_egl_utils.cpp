@@ -13,7 +13,7 @@ namespace egl
 {
 
 /*
-    Проверка ошибок
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 */
 
 const char* get_error_message (EGLint status)

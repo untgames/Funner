@@ -11,7 +11,7 @@ namespace
     Constants
 */
 
-const char*  OPENGL_LIB_PATH                 = "libGL.so.1"; //OpenGL library file name (according to OpenGL® Application Binary Interface for Linux https://www.opengl.org/registry/ABI/#3)
+const char*  OPENGL_LIB_PATH                 = "libGL.so.1"; //OpenGL library file name (according to OpenGLÂ® Application Binary Interface for Linux https://www.opengl.org/registry/ABI/#3)
 const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256;          //reserved pixel formats count
 
 /*

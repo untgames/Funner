@@ -3,18 +3,18 @@
 using namespace social;
 
 /*
-   Реализация достижения
+   Р РµР°Р»РёР·Р°С†РёСЏ РґРѕСЃС‚РёР¶РµРЅРёСЏ
 */
 
 struct Achievement::Impl : public xtl::reference_counter
 {
-  stl::string           id;                      //идентификатор
-  stl::string           title;                   //название
-  bool                  hidden;                  //является ли скрытым
-  double                progress;                //прогресс
-  common::PropertyMap   properties;              //другие свойства
-  const void*           handle;                  //низкоуровневый дескриптор
-  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
+  stl::string           id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  stl::string           title;                   //РЅР°Р·РІР°РЅРёРµ
+  bool                  hidden;                  //СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРєСЂС‹С‚С‹Рј
+  double                progress;                //РїСЂРѕРіСЂРµСЃСЃ
+  common::PropertyMap   properties;              //РґСЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
+  const void*           handle;                  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction handle_release_function; //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl ()
     : hidden (false)
@@ -30,7 +30,7 @@ struct Achievement::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Achievement::Achievement ()
@@ -56,7 +56,7 @@ Achievement& Achievement::operator = (const Achievement& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 const char* Achievement::Id () const
@@ -73,7 +73,7 @@ void Achievement::SetId (const char* id)
 }
 
 /*
-   Название
+   РќР°Р·РІР°РЅРёРµ
 */
 
 const char* Achievement::Title () const
@@ -90,7 +90,7 @@ void Achievement::SetTitle (const char* title)
 }
 
 /*
-   Является ли скрытым для пользователя
+   РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРєСЂС‹С‚С‹Рј РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 bool Achievement::IsHidden () const
@@ -104,7 +104,7 @@ void Achievement::SetHidden (bool hidden)
 }
 
 /*
-   Прогресс выполнения
+   РџСЂРѕРіСЂРµСЃСЃ РІС‹РїРѕР»РЅРµРЅРёСЏ
 */
 
 double Achievement::Progress () const
@@ -118,7 +118,7 @@ void Achievement::SetProgress (double progress)
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& Achievement::Properties () const
@@ -137,7 +137,7 @@ void Achievement::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Получение/установка низкоуровневого дескриптора
+   РџРѕР»СѓС‡РµРЅРёРµ/СѓСЃС‚Р°РЅРѕРІРєР° РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 const void* Achievement::Handle () const
@@ -155,7 +155,7 @@ void Achievement::SetHandle (const void* handle, const ReleaseHandleFunction& re
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Achievement::Swap (Achievement& source)
@@ -167,7 +167,7 @@ namespace social
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Achievement& achievement1, Achievement& achievement2)

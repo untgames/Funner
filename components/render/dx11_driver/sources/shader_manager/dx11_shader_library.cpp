@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderLibrary::ShaderLibrary (const DeviceManager& device_manager)
@@ -17,14 +17,14 @@ ShaderLibrary::~ShaderLibrary ()
 }
 
 /*
-    Создание шейдера
+    РЎРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂР°
 */
 
 ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction& error_log)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!desc.name)
       throw xtl::make_null_argument_exception ("", "desc.name");
@@ -73,24 +73,24 @@ ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction
     if (type == (ShaderType)-1)
       throw xtl::make_argument_exception ("", "desc.profile", desc.profile, "Unknown shader profile");
 
-      //формирование хэша для поиска в библиотеке
+      //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С…СЌС€Р° РґР»СЏ РїРѕРёСЃРєР° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 
     size_t source_code_size = desc.source_code_size == (size_t)-1 ? strlen (desc.source_code) : desc.source_code_size,
            hash             = common::crc32 (desc.source_code, source_code_size, common::strhash (options));
 
-      //поиск уже существующего шейдера
+      //РїРѕРёСЃРє СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С€РµР№РґРµСЂР°
 
     ShaderMap::iterator iter = shaders.find (hash);
 
     if (iter != shaders.end ())
       return iter->second;
 
-      //создание нового шейдера
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ С€РµР№РґРµСЂР°
 
     ShaderCodePtr code (new ShaderCode (GetDeviceManager (), desc.name, dx_profile, desc.source_code, source_code_size, options, error_log), false);
     ShaderPtr     shader (new Shader (type, code, *this), false);
 
-     //регистрация шейдера в библиотеке
+     //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С€РµР№РґРµСЂР° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 
     shader->RegisterDestroyHandler (xtl::bind (&ShaderLibrary::RemoveShaderByHash, this, hash), GetTrackable ());
 
@@ -111,7 +111,7 @@ void ShaderLibrary::RemoveShaderByHash (size_t hash)
 }
 
 /*
-    Поиск лэйаута константного буфера по хэшу
+    РџРѕРёСЃРє Р»СЌР№Р°СѓС‚Р° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° РїРѕ С…СЌС€Сѓ
 */
 
 ConstantBufferLayoutPtr ShaderLibrary::FindConstantBufferLayout (size_t hash) const
@@ -125,7 +125,7 @@ ConstantBufferLayoutPtr ShaderLibrary::FindConstantBufferLayout (size_t hash) co
 }
 
 /*
-    Добавление / удаление лэйаута константного буфера по хэшу
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ Р»СЌР№Р°СѓС‚Р° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° РїРѕ С…СЌС€Сѓ
 */
 
 ConstantBufferLayoutPtr ShaderLibrary::AddConstantBufferLayout (const ConstantBufferLayoutPtr& layout)
@@ -169,7 +169,7 @@ void ShaderLibrary::RemoveConstantBufferLayout (size_t hash)
 }
 
 /*
-    Получение синхронизатора
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂР°
 */
 
 ShaderBuffersSynchronizer& ShaderLibrary::GetSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout)
@@ -215,7 +215,7 @@ void ShaderLibrary::RemoveSynchronizer (const SyncLayoutPair& p)
 }
 
 /*
-    Получение целевого константного буфера
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РµРІРѕРіРѕ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 TargetConstantBufferPtr ShaderLibrary::FindConstantBuffer (size_t hash) const
@@ -229,7 +229,7 @@ TargetConstantBufferPtr ShaderLibrary::FindConstantBuffer (size_t hash) const
 }
 
 /*
-    Регистрация и удаление константного буфера
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Рё СѓРґР°Р»РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 void ShaderLibrary::AddConstantBuffer (size_t hash, const TargetConstantBufferPtr& buffer)
@@ -243,7 +243,7 @@ void ShaderLibrary::RemoveConstantBuffer (size_t hash)
 }
 
 /*
-    Получение программы, устанавливаемой в контекст
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 BindableProgram& ShaderLibrary::GetBindableProgram (const Program& program, const ProgramParametersLayout* layout)
@@ -291,7 +291,7 @@ void ShaderLibrary::RemoveBindableProgram (const BindableProgramKey& key)
 }
 
 /*
-    Поиск входного лэйаута
+    РџРѕРёСЃРє РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 */
 
 DxInputLayoutPtr ShaderLibrary::FindInputLayout (size_t input_hash, size_t shader_hash) const
@@ -307,7 +307,7 @@ DxInputLayoutPtr ShaderLibrary::FindInputLayout (size_t input_hash, size_t shade
 }
 
 /*
-    Регистрация и удаление входного лэйаута
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Рё СѓРґР°Р»РµРЅРёРµ РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 */
 
 void ShaderLibrary::AddInputLayout (size_t input_hash, size_t shader_hash, const DxInputLayoutPtr& layout)

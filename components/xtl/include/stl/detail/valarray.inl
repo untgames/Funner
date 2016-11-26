@@ -1,5 +1,5 @@
 /*
-    Базовые конструкторы / деструктор
+    Р‘Р°Р·РѕРІС‹Рµ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -44,7 +44,7 @@ inline valarray<T>::~valarray ()
 }
 
 /*
-    Конструктор proxy_array
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ proxy_array
 */
 
 template <class T> template <class Proxy>
@@ -55,7 +55,7 @@ inline valarray<T>::valarray (const proxy_array<T,Proxy>& array)
 }
 
 /*
-    Конструкторы используемые для оптимизации возвращаемого значения
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РґР»СЏ РѕРїС‚РёРјРёР·Р°С†РёРё РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T> template <class T1,class UnaryOperation>
@@ -93,7 +93,7 @@ inline valarray<T>::valarray (const T1& x,const valarray<T2>& y,BinOperation op)
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 template <class T>
@@ -152,7 +152,7 @@ void valarray<T>::clear ()
 }
 
 /*
-    Операции индексирования
+    РћРїРµСЂР°С†РёРё РёРЅРґРµРєСЃРёСЂРѕРІР°РЅРёСЏ
 */
 
 template <class T>
@@ -168,7 +168,7 @@ inline typename valarray<T>::value_type& valarray<T>::operator [] (size_t i)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -203,7 +203,7 @@ inline valarray<T>& valarray<T>::operator = (const proxy_array<T,Proxy>& x)
 }
 
 /*
-    Преобразования for_each/apply 
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ for_each/apply 
 */
 
 template <class T> template <class BinOperation> 
@@ -238,7 +238,7 @@ inline valarray<T> valarray<T>::apply (value_type f (const value_type&)) const
 }
 
 /*
-    Статистики
+    РЎС‚Р°С‚РёСЃС‚РёРєРё
 */
 
 template <class T>
@@ -260,7 +260,7 @@ inline typename valarray<T>::value_type valarray<T>::max () const
 }
 
 /*
-    Сдвиги
+    РЎРґРІРёРіРё
 */
 
 template <class T>
@@ -304,7 +304,7 @@ valarray<T> valarray<T>::cshift (int m) const
 }
 
 /*
-    Унарные операции
+    РЈРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T> 
@@ -338,7 +338,7 @@ inline valarray<bool> valarray<T>::operator ! () const
 }
 
 /*
-    Основные бинарные операции между вектором и скаляром
+    РћСЃРЅРѕРІРЅС‹Рµ Р±РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё РјРµР¶РґСѓ РІРµРєС‚РѕСЂРѕРј Рё СЃРєР°Р»СЏСЂРѕРј
 */
 
 template <class T> inline valarray<T>& valarray<T>::operator *= (const value_type& x)
@@ -492,7 +492,7 @@ template <class T> inline valarray<T> operator >> (const T& x,const valarray<T>&
 }
 
 /*
-    Основные бинарные операции между двумя векторами
+    РћСЃРЅРѕРІРЅС‹Рµ Р±РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё РјРµР¶РґСѓ РґРІСѓРјСЏ РІРµРєС‚РѕСЂР°РјРё
 */
 
 template <class T> inline valarray<T>& valarray<T>::operator *= (const valarray& x)
@@ -596,7 +596,7 @@ template <class T> inline valarray<T> valarray<T>::operator >> (const valarray& 
 }
 
 /*
-    Логические операции между вектором и скаляром
+    Р›РѕРіРёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё РјРµР¶РґСѓ РІРµРєС‚РѕСЂРѕРј Рё СЃРєР°Р»СЏСЂРѕРј
 */
 
 template <class T> inline valarray<bool> valarray<T>::operator == (const value_type& x) const
@@ -680,7 +680,7 @@ template <class T> inline valarray<bool> operator || (const T& x,const valarray<
 }
 
 /*
-    Логические операции между двумя векторами
+    Р›РѕРіРёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё РјРµР¶РґСѓ РґРІСѓРјСЏ РІРµРєС‚РѕСЂР°РјРё
 */
 
 template <class T> inline valarray<bool> valarray<T>::operator == (const valarray& x) const
@@ -724,7 +724,7 @@ template <class T> inline valarray<bool> valarray<T>::operator || (const valarra
 }
 
 /*
-    Основные математические функции
+    РћСЃРЅРѕРІРЅС‹Рµ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёРµ С„СѓРЅРєС†РёРё
 */
 
 template <class T> inline valarray<T> abs (const valarray<T>& x)
@@ -828,7 +828,7 @@ template <class T> inline valarray<T> tanh (const valarray<T>& x)
 }
 
 /*
-    Работа с slice
+    Р Р°Р±РѕС‚Р° СЃ slice
 */
 
 template <class T> template <class Func>
@@ -837,7 +837,7 @@ inline void valarray<T>::for_each (const slice& s,const valarray& x,Func fn)
   if (s.start () > size ())
     return ;    
 
-    //коррекция диапозона элементов (отсечения выхода за границы)
+    //РєРѕСЂСЂРµРєС†РёСЏ РґРёР°РїРѕР·РѕРЅР° СЌР»РµРјРµРЅС‚РѕРІ (РѕС‚СЃРµС‡РµРЅРёСЏ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹)
   size_t count = stl::min (stl::min ((size ()-s.start ())/s.stride (),x.size ()),s.size ());
     
   value_type*       dst = first + s.start ();
@@ -852,7 +852,7 @@ inline void valarray<T>::for_each (const slice& s,const value_type& val,Func fn)
   if (s.start () > size ())
     return ;
 
-    //коррекция диапозона элементов (отсечения выхода за границы)    
+    //РєРѕСЂСЂРµРєС†РёСЏ РґРёР°РїРѕР·РѕРЅР° СЌР»РµРјРµРЅС‚РѕРІ (РѕС‚СЃРµС‡РµРЅРёСЏ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹)    
   size_t count = stl::min ((size ()-s.start ())/s.stride (),s.size ());
 
   value_type* dst = first + s.start ();
@@ -868,7 +868,7 @@ inline void valarray<T>::assign (const slice& s,const valarray& x)
   if (s.start () > x.size ())
     return ;
 
-    //коррекция диапозона элементов (отсечения выхода за границы)
+    //РєРѕСЂСЂРµРєС†РёСЏ РґРёР°РїРѕР·РѕРЅР° СЌР»РµРјРµРЅС‚РѕРІ (РѕС‚СЃРµС‡РµРЅРёСЏ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹)
   size_t count = stl::min ((x.size ()-s.start ())/s.stride (),s.size ());
 
   resize (count);
@@ -892,7 +892,7 @@ inline slice_array<T> valarray<T>::operator [] (slice s)
 }
 
 /*
-    Работа gslice_array (general slice array)
+    Р Р°Р±РѕС‚Р° gslice_array (general slice array)
 */
 
 template <class T> template <class Func>
@@ -926,9 +926,9 @@ void valarray<T>::assign (const gslice& s,const valarray& x)
     return ;
     
   size_t slice_count = stl::min (s.size ().size (),s.stride ().size ()),
-         max_size    = x.size ()-s.start (); //максимально возможный размер среза
+         max_size    = x.size ()-s.start (); //РјР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ СЃСЂРµР·Р°
   
-    //рассчёт нового размера массива
+    //СЂР°СЃСЃС‡С‘С‚ РЅРѕРІРѕРіРѕ СЂР°Р·РјРµСЂР° РјР°СЃСЃРёРІР°
     
   size_t new_size = 0;
 
@@ -940,7 +940,7 @@ void valarray<T>::assign (const gslice& s,const valarray& x)
     
   resize (new_size,0);
         
-    //копирование
+    //РєРѕРїРёСЂРѕРІР°РЅРёРµ
     
   value_type *dst = first;  
   
@@ -969,7 +969,7 @@ inline gslice_array<T> valarray<T>::operator [] (const gslice& s)
 }
 
 /*
-    Работа с mask_array
+    Р Р°Р±РѕС‚Р° СЃ mask_array
 */
 
 template <class T> template <class Func>
@@ -1027,7 +1027,7 @@ inline mask_array<T> valarray<T>::operator [] (const valarray<bool>& x)
 }
 
 /*
-    Работа с indirect_array
+    Р Р°Р±РѕС‚Р° СЃ indirect_array
 */
 
 template <class T> template <class Func>

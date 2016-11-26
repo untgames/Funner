@@ -1,4 +1,4 @@
-// ����஢���� �㭪樨 swap
+// Тестирование функции swap
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"

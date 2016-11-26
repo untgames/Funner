@@ -4,11 +4,11 @@ using namespace physics::low_level;
 using namespace physics::low_level::bullet;
 
 /*
-    Описание реализации геометрического тела
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Shape::Shape (btCollisionShape* shape)
@@ -22,7 +22,7 @@ Shape::~Shape ()
 }
 
 /*
-   Толщина полей
+   РўРѕР»С‰РёРЅР° РїРѕР»РµР№
 */
 
 float Shape::Margin ()
@@ -36,7 +36,7 @@ void Shape::SetMargin (float value)
 }
 
 /*
-   Получение bullet тела
+   РџРѕР»СѓС‡РµРЅРёРµ bullet С‚РµР»Р°
 */
 
 btCollisionShape* Shape::BulletCollisionShape ()

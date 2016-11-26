@@ -9,7 +9,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* DXGI_LIBRARY_NAME  = "dxgi.dll";
@@ -18,7 +18,7 @@ const char* D3D11_LIBRARY_NAME = "d3d11.dll";
 }
 
 /*
-    Описание реализации библиотеки
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 
@@ -38,19 +38,19 @@ const char* D3D11_LIBRARY_NAME = "d3d11.dll";
 
 struct Library::Impl: public xtl::reference_counter
 {
-  stl::auto_ptr<syslib::DynamicLibrary> dxgi_library;           //библиотека DXGI
-  stl::auto_ptr<syslib::DynamicLibrary> d3d11_library;          //библиотека D3D11
-  stl::auto_ptr<syslib::DynamicLibrary> d3dx11_library;         //библиотека D3DX11
-  stl::auto_ptr<syslib::DynamicLibrary> d3d_compiler_library;   //библиотека D3DCompiler
-  PFN_D3D11_CREATE_DEVICE               create_device_fn;       //функция создания устройства
-  PFN_CREATE_DXGI_FACTORY               create_dxgi_factory_fn; //функция создания фабрики DXGI
-  PFN_D3DX11_COMPILE_FROM_MEMORY        compile_from_memory_fn; //функция компиляции шейдера
-  PFN_D3D_REFLECT                       reflect_fn;             //функция получения информации о шейдере
+  stl::auto_ptr<syslib::DynamicLibrary> dxgi_library;           //Р±РёР±Р»РёРѕС‚РµРєР° DXGI
+  stl::auto_ptr<syslib::DynamicLibrary> d3d11_library;          //Р±РёР±Р»РёРѕС‚РµРєР° D3D11
+  stl::auto_ptr<syslib::DynamicLibrary> d3dx11_library;         //Р±РёР±Р»РёРѕС‚РµРєР° D3DX11
+  stl::auto_ptr<syslib::DynamicLibrary> d3d_compiler_library;   //Р±РёР±Р»РёРѕС‚РµРєР° D3DCompiler
+  PFN_D3D11_CREATE_DEVICE               create_device_fn;       //С„СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  PFN_CREATE_DXGI_FACTORY               create_dxgi_factory_fn; //С„СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р±СЂРёРєРё DXGI
+  PFN_D3DX11_COMPILE_FROM_MEMORY        compile_from_memory_fn; //С„СѓРЅРєС†РёСЏ РєРѕРјРїРёР»СЏС†РёРё С€РµР№РґРµСЂР°
+  PFN_D3D_REFLECT                       reflect_fn;             //С„СѓРЅРєС†РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С€РµР№РґРµСЂРµ
 
   static Impl*         global_impl;
   static syslib::Mutex global_impl_mutex;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : create_device_fn ()
     , create_dxgi_factory_fn ()
@@ -59,7 +59,7 @@ struct Library::Impl: public xtl::reference_counter
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -74,7 +74,7 @@ struct Library::Impl: public xtl::reference_counter
     }
   }
 
-/// Получение реализации
+/// РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
   static Impl* GetImpl ()
   {
     syslib::Lock lock (global_impl_mutex);
@@ -90,7 +90,7 @@ struct Library::Impl: public xtl::reference_counter
     return global_impl;
   }
 
-/// Загрузка библиотек
+/// Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє
   void LoadD3D11Library ()
   {
     if (d3d11_library)
@@ -128,7 +128,7 @@ Library::Impl* Library::Impl::global_impl = 0;
 syslib::Mutex  Library::Impl::global_impl_mutex;
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Library::Library ()
@@ -157,7 +157,7 @@ Library& Library::operator = (const Library& library)
 }
 
 /*
-    Создание устройства
+    РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 HRESULT Library::D3D11CreateDevice (
@@ -196,7 +196,7 @@ HRESULT Library::D3D11CreateDevice (
 }
 
 /*
-    Создание DXGI фабрики
+    РЎРѕР·РґР°РЅРёРµ DXGI С„Р°Р±СЂРёРєРё
 */
 
 HRESULT Library::CreateDXGIFactory (REFIID riid, void** ppFactory)
@@ -225,7 +225,7 @@ HRESULT Library::CreateDXGIFactory (REFIID riid, void** ppFactory)
 }
 
 /*
-    Компиляция шейдера
+    РљРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂР°
 */
 
 HRESULT Library::D3DX11CompileFromMemory 
@@ -267,7 +267,7 @@ HRESULT Library::D3DX11CompileFromMemory
 }
 
 /*
-    Получение информации о шейдере  
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С€РµР№РґРµСЂРµ  
 */
 
 HRESULT Library::D3DReflect (LPCVOID pSrcData, SIZE_T SrcDataSize, REFIID pInterface, void** ppReflector)

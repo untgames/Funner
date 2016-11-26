@@ -3,7 +3,7 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации рендера сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
 */
 
 typedef xtl::array<render::scene::interchange::object_id_t, ObjectType_Num> IdArray;
@@ -13,7 +13,7 @@ namespace
 
 const size_t FENCE_WAITERS_RESERVE_SIZE = 128;
 
-/// Хрнилище менеджеров
+/// РҐСЂРЅРёР»РёС‰Рµ РјРµРЅРµРґР¶РµСЂРѕРІ
 struct ManagersHolder
 {
   SceneManager    scene_manager;
@@ -28,7 +28,7 @@ struct ManagersHolder
   }
 };
 
-//Слушатель событий синхронизации
+//РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 struct FenceWaiter
 {
   uint32          tag;
@@ -45,14 +45,14 @@ typedef stl::vector<FenceWaiter> FenceWaiterArray;
 
 struct ClientImpl::Impl
 {
-  client::Context*                    context;            //контекст (получать только через вызов Context ())
-  IdArray                             id_pool;            //пул идентификаторов
-  interchange::PropertyMapAutoWriter  properties_writer;  //синхронизатор свойств (запись на сервер)
-  interchange::PropertyMapReader      properties_reader;  //синхронизатор свойств (чтение с сервера)
-  stl::auto_ptr<ManagersHolder>       managers;           //менеджеры
-  FenceWaiterArray                    fence_waiters;      //слушатели событий синхронизации
+  client::Context*                    context;            //РєРѕРЅС‚РµРєСЃС‚ (РїРѕР»СѓС‡Р°С‚СЊ С‚РѕР»СЊРєРѕ С‡РµСЂРµР· РІС‹Р·РѕРІ Context ())
+  IdArray                             id_pool;            //РїСѓР» РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
+  interchange::PropertyMapAutoWriter  properties_writer;  //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ (Р·Р°РїРёСЃСЊ РЅР° СЃРµСЂРІРµСЂ)
+  interchange::PropertyMapReader      properties_reader;  //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ (С‡С‚РµРЅРёРµ СЃ СЃРµСЂРІРµСЂР°)
+  stl::auto_ptr<ManagersHolder>       managers;           //РјРµРЅРµРґР¶РµСЂС‹
+  FenceWaiterArray                    fence_waiters;      //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : context ()
   {
@@ -61,7 +61,7 @@ struct ClientImpl::Impl
     fence_waiters.reserve (FENCE_WAITERS_RESERVE_SIZE);
   }
 
-/// Получение контекста
+/// РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
   client::Context& Context ()
   {
     if (!context)
@@ -72,7 +72,7 @@ struct ClientImpl::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ClientImpl::ClientImpl ()
@@ -85,7 +85,7 @@ ClientImpl::~ClientImpl ()
 }
 
 /*
-    Связывание с контекстом
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 void ClientImpl::SetContext (Context* context)
@@ -115,7 +115,7 @@ void ClientImpl::SetContext (Context* context)
 }
 
 /*
-    Выполнение синхронизации с сервером
+    Р’С‹РїРѕР»РЅРµРЅРёРµ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЃ СЃРµСЂРІРµСЂРѕРј
 */
 
 void ClientImpl::Synchronize ()
@@ -135,7 +135,7 @@ void ClientImpl::Synchronize ()
 }
 
 /*
-    Выделение идентификаторов
+    Р’С‹РґРµР»РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
 */
 
 render::scene::interchange::object_id_t ClientImpl::AllocateId (ObjectType type)
@@ -160,7 +160,7 @@ void ClientImpl::DeallocateId (ObjectType type, render::scene::interchange::obje
 }
 
 /*
-    Синхронизация свойств
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃРІРѕР№СЃС‚РІ
 */
 
 PropertyMapSynchronizer ClientImpl::CreateSynchronizer (const common::PropertyMap& properties)
@@ -190,7 +190,7 @@ common::PropertyMap ClientImpl::GetServerProperties (object_id_t id)
 }
 
 /*
-    Обработчики ответов сервера
+    РћР±СЂР°Р±РѕС‚С‡РёРєРё РѕС‚РІРµС‚РѕРІ СЃРµСЂРІРµСЂР°
 */
 
 void ClientImpl::FenceResponse (object_id_t tag)
@@ -238,7 +238,7 @@ void ClientImpl::UpdatePropertyMap (render::scene::interchange::InputStream& str
 }
 
 /*
-   Синхронизация
+   РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
 */
 
 void ClientImpl::RegisterFenceListener (object_id_t tag, IFenceListener* listener)
@@ -262,7 +262,7 @@ void ClientImpl::UnregisterFenceListener (object_id_t tag, IFenceListener* liste
 }
 
 /*
-    Менеджеры
+    РњРµРЅРµРґР¶РµСЂС‹
 */
 
 SceneManager& ClientImpl::SceneManager ()

@@ -5,20 +5,20 @@ using namespace media;
 using namespace stl;
 using namespace common;
 
-const size_t DEFAULT_PRIMITIVES_ARRAY_RESERVE = 8; //количество резервируемых примитивов
-const size_t DEFAULT_VB_ARRAY_RESERVE         = 4; //количество резервируемых вершинных буферов
+const size_t DEFAULT_PRIMITIVES_ARRAY_RESERVE = 8; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР·РµСЂРІРёСЂСѓРµРјС‹С… РїСЂРёРјРёС‚РёРІРѕРІ
+const size_t DEFAULT_VB_ARRAY_RESERVE         = 4; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР·РµСЂРІРёСЂСѓРµРјС‹С… РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
 
 /*
-    Реализация примитива
+    Р РµР°Р»РёР·Р°С†РёСЏ РїСЂРёРјРёС‚РёРІР°
 */
 
 struct PrimitiveImpl: public Primitive
 {
-  size_t material_name_offset; //смещение имени материала в строке имён
+  size_t material_name_offset; //СЃРјРµС‰РµРЅРёРµ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р° РІ СЃС‚СЂРѕРєРµ РёРјС‘РЅ
 };
 
 /*
-    Описание реализации Mesh
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Mesh
 */
 
 typedef stl::vector<PrimitiveImpl> PrimitiveArray;
@@ -26,12 +26,12 @@ typedef stl::vector<VertexBuffer>  VertexBufferArray;
 
 struct Mesh::Impl: public xtl::reference_counter
 {
-  string                       name;                       //имя меша
-  VertexBufferArray            vertex_buffers;             //вершинные буферы
-  media::geometry::IndexBuffer index_buffer;               //индексный буфер
-  PrimitiveArray               primitives;                 //примитивы
-  string                       material_names;             //имена материалов
-  bool                         need_material_names_update; //необходимо обновить имена материалов
+  string                       name;                       //РёРјСЏ РјРµС€Р°
+  VertexBufferArray            vertex_buffers;             //РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+  media::geometry::IndexBuffer index_buffer;               //РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
+  PrimitiveArray               primitives;                 //РїСЂРёРјРёС‚РёРІС‹
+  string                       material_names;             //РёРјРµРЅР° РјР°С‚РµСЂРёР°Р»РѕРІ
+  bool                         need_material_names_update; //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ РёРјРµРЅР° РјР°С‚РµСЂРёР°Р»РѕРІ
   
   Impl (); 
   Impl (const Impl&);
@@ -60,7 +60,7 @@ Mesh::Impl::Impl (const Impl& impl)
 }
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Mesh::Mesh ()
@@ -80,7 +80,7 @@ Mesh::~Mesh ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Mesh& Mesh::operator = (const Mesh& mesh)
@@ -91,7 +91,7 @@ Mesh& Mesh::operator = (const Mesh& mesh)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Mesh Mesh::Clone () const
@@ -100,7 +100,7 @@ Mesh Mesh::Clone () const
 }
 
 /*
-    Идентификатор меша
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРµС€Р°
 */
 
 size_t Mesh::Id () const
@@ -109,7 +109,7 @@ size_t Mesh::Id () const
 }
 
 /*
-    Имя меша
+    РРјСЏ РјРµС€Р°
 */
 
 const char* Mesh::Name () const
@@ -126,10 +126,10 @@ void Mesh::Rename (const char* name)
 }
 
 /*
-    Буферы
+    Р‘СѓС„РµСЂС‹
 */
 
-//количество вершинных буферов
+//РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
 uint32_t Mesh::VertexBuffersCount () const
 {
   return (uint32_t)impl->vertex_buffers.size ();
@@ -160,7 +160,7 @@ media::geometry::IndexBuffer& Mesh::IndexBuffer ()
 
 
 /*
-    Присоединение/отсоединение буферов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ/РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 uint32_t Mesh::Attach (media::geometry::VertexBuffer& vb)
@@ -203,7 +203,7 @@ void Mesh::DetachAllBuffers ()
 }
 
 /*
-    Количество примитивов / доступ к примитивам
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ / РґРѕСЃС‚СѓРї Рє РїСЂРёРјРёС‚РёРІР°Рј
 */
 
 uint32_t Mesh::PrimitivesCount () const
@@ -230,7 +230,7 @@ const Primitive& Mesh::Primitive (uint32_t index) const
 }
 
 /*
-    Добавление/удаление примитивов примитивов
+    Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, const char* material)
@@ -296,7 +296,7 @@ void Mesh::RemoveAllPrimitives ()
 }
 
 /*
-    Очистка меша
+    РћС‡РёСЃС‚РєР° РјРµС€Р°
 */
 
 void Mesh::Clear ()
@@ -306,7 +306,7 @@ void Mesh::Clear ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Mesh::Swap (Mesh& mesh)
@@ -321,7 +321,7 @@ namespace geometry
 {
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
     
 void swap (Mesh& mesh1, Mesh& mesh2)
@@ -330,7 +330,7 @@ void swap (Mesh& mesh1, Mesh& mesh2)
 }
 
 /*
-    Получение имени типа примитива
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С‚РёРїР° РїСЂРёРјРёС‚РёРІР°
 */
 
 const char* get_type_name (PrimitiveType type)
@@ -349,7 +349,7 @@ const char* get_type_name (PrimitiveType type)
 }
 
 /*
-    Получение типа примитива по имени
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РїСЂРёРјРёС‚РёРІР° РїРѕ РёРјРµРЅРё
 */
 
 PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type)
@@ -384,7 +384,7 @@ PrimitiveType get_primitive_type (const char* name, PrimitiveType default_type)
 }
 
 /*
-    Получение количества точек
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° С‚РѕС‡РµРє
 */
 
 unsigned int get_points_count (PrimitiveType type, unsigned int primitives_count)
@@ -403,7 +403,7 @@ unsigned int get_points_count (PrimitiveType type, unsigned int primitives_count
 }
 
 /*
-    Определение количества примитивов
+    РћРїСЂРµРґРµР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 unsigned int get_primitives_count (PrimitiveType type, unsigned int points_count)

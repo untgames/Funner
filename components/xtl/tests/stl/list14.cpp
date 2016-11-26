@@ -1,4 +1,4 @@
-// Тестирование unique
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ unique
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

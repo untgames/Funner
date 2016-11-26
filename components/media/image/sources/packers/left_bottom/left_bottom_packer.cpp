@@ -48,7 +48,7 @@ bool largest_area (size_t first, size_t second, math::vec2ui* images)
   return images [first].x * images [first].y > images [second].x * images [second].y;
 }
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
@@ -127,7 +127,7 @@ class TileImageBuilder
 
       unsigned int pack_try_count = pack_flags & AtlasPackFlag_Fast ? 1 : PACK_TRY_COUNT;
 
-        //массивы для сохранения результатов разных попыток упаковки (для выбора наилучшей)
+        //РјР°СЃСЃРёРІС‹ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂР°Р·РЅС‹С… РїРѕРїС‹С‚РѕРє СѓРїР°РєРѕРІРєРё (РґР»СЏ РІС‹Р±РѕСЂР° РЅР°РёР»СѓС‡С€РµР№)
       xtl::uninitialized_storage<math::vec2ui> origins    (images.size () * pack_try_count);
       xtl::uninitialized_storage<bool>         was_packed (images.size () * pack_try_count);
 
@@ -263,7 +263,7 @@ class TileImageBuilder
           if ((iter->width < image_size.x) || (iter->height < image_size.y))
             continue;
 
-          //проверяем можно ли вставить картинку с отступом в это место
+          //РїСЂРѕРІРµСЂСЏРµРј РјРѕР¶РЅРѕ Р»Рё РІСЃС‚Р°РІРёС‚СЊ РєР°СЂС‚РёРЅРєСѓ СЃ РѕС‚СЃС‚СѓРїРѕРј РІ СЌС‚Рѕ РјРµСЃС‚Рѕ
           if (iter->width < image_size.x + margin)
           {
             if (iter->x_pos + iter->width != result_image_horizontal_side)
@@ -285,7 +285,7 @@ class TileImageBuilder
           out_origin.x = iter->x_pos;
           out_origin.y = iter->y_pos;
 
-          //нашли подходящее место для картинки, для всех свободных мест с которыми пересеклась картинка проводим рассчёт новых свободных мест
+          //РЅР°С€Р»Рё РїРѕРґС…РѕРґСЏС‰РµРµ РјРµСЃС‚Рѕ РґР»СЏ РєР°СЂС‚РёРЅРєРё, РґР»СЏ РІСЃРµС… СЃРІРѕР±РѕРґРЅС‹С… РјРµСЃС‚ СЃ РєРѕС‚РѕСЂС‹РјРё РїРµСЂРµСЃРµРєР»Р°СЃСЊ РєР°СЂС‚РёРЅРєР° РїСЂРѕРІРѕРґРёРј СЂР°СЃСЃС‡С‘С‚ РЅРѕРІС‹С… СЃРІРѕР±РѕРґРЅС‹С… РјРµСЃС‚
           bound_volumes::axis_aligned_box<unsigned int> image_bb (vec3ui (out_origin.x, out_origin.y, 0),
                                                                   vec3ui (out_origin.x + margined_image_size.x - 1, out_origin.y + margined_image_size.y - 1, 1));
 
@@ -296,27 +296,27 @@ class TileImageBuilder
 
             intersects_count++;
 
-            if (my_intersects (free_space_bb, image_bb)) //картинка пересеклась с этим свободным местом, удаляем его и добавляем образовавшиеся новые свободные места
+            if (my_intersects (free_space_bb, image_bb)) //РєР°СЂС‚РёРЅРєР° РїРµСЂРµСЃРµРєР»Р°СЃСЊ СЃ СЌС‚РёРј СЃРІРѕР±РѕРґРЅС‹Рј РјРµСЃС‚РѕРј, СѓРґР°Р»СЏРµРј РµРіРѕ Рё РґРѕР±Р°РІР»СЏРµРј РѕР±СЂР°Р·РѕРІР°РІС€РёРµСЃСЏ РЅРѕРІС‹Рµ СЃРІРѕР±РѕРґРЅС‹Рµ РјРµСЃС‚Р°
             {
-              if (out_origin.x > erase_iter->x_pos) //есть новое свободное место левее картинки
+              if (out_origin.x > erase_iter->x_pos) //РµСЃС‚СЊ РЅРѕРІРѕРµ СЃРІРѕР±РѕРґРЅРѕРµ РјРµСЃС‚Рѕ Р»РµРІРµРµ РєР°СЂС‚РёРЅРєРё
               {
                 FreeSpace left_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origin.x - erase_iter->x_pos, erase_iter->height, swap_axises);
 
                 AddFreeSpace (left_free_space, free_spaces, fast);
               }
-              if ((out_origin.x + margined_image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
+              if ((out_origin.x + margined_image_size.x) < (erase_iter->x_pos + erase_iter->width)) //РµСЃС‚СЊ РЅРѕРІРѕРµ СЃРІРѕР±РѕРґРЅРѕРµ РјРµСЃС‚Рѕ РїСЂР°РІРµРµ РєР°СЂС‚РёРЅРєРё
               {
                 FreeSpace right_free_space (out_origin.x + margined_image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + margined_image_size.x), erase_iter->height, swap_axises);
 
                 AddFreeSpace (right_free_space, free_spaces, fast);
               }
-              if (out_origin.y > erase_iter->y_pos) //есть новое свободное место ниже картинки
+              if (out_origin.y > erase_iter->y_pos) //РµСЃС‚СЊ РЅРѕРІРѕРµ СЃРІРѕР±РѕРґРЅРѕРµ РјРµСЃС‚Рѕ РЅРёР¶Рµ РєР°СЂС‚РёРЅРєРё
               {
                 FreeSpace bottom_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origin.y - erase_iter->y_pos, swap_axises);
 
                 AddFreeSpace (bottom_free_space, free_spaces, fast);
               }
-              if ((out_origin.y + margined_image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
+              if ((out_origin.y + margined_image_size.y) < (erase_iter->y_pos + erase_iter->height)) //РµСЃС‚СЊ РЅРѕРІРѕРµ СЃРІРѕР±РѕРґРЅРѕРµ РјРµСЃС‚Рѕ РІС‹С€Рµ РєР°СЂС‚РёРЅРєРё
               {
                 FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + margined_image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + margined_image_size.y), swap_axises);
 
@@ -385,13 +385,13 @@ void left_bottom_pack (const AtlasBuilder::PackHandlerParams& params)
 }
 
 /*
-   Компонент упаковки картинок
+   РљРѕРјРїРѕРЅРµРЅС‚ СѓРїР°РєРѕРІРєРё РєР°СЂС‚РёРЅРѕРє
 */
 
 class LeftBottomPackerComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     LeftBottomPackerComponent ()
     {
       AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, _1);

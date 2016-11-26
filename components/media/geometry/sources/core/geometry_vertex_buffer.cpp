@@ -4,18 +4,18 @@ using namespace media::geometry;
 using namespace media;
 using namespace common;
 
-const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый размер вершинного массива
+const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°
 
 /*
-    Описание реализации VertexBuffer
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё VertexBuffer
 */
 
 typedef stl::vector<VertexStream> VertexStreamArray;
 
 struct VertexBuffer::Impl: public xtl::reference_counter
 {
-  VertexStreamArray  streams;   //вершинные массивы
-  VertexWeightStream weights;   //массив весов
+  VertexStreamArray  streams;   //РІРµСЂС€РёРЅРЅС‹Рµ РјР°СЃСЃРёРІС‹
+  VertexWeightStream weights;   //РјР°СЃСЃРёРІ РІРµСЃРѕРІ
 
   Impl ();
 };
@@ -30,7 +30,7 @@ VertexBuffer::Impl::Impl ()
 }
   
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VertexBuffer::VertexBuffer ()
@@ -50,7 +50,7 @@ VertexBuffer::~VertexBuffer ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
@@ -61,7 +61,7 @@ VertexBuffer& VertexBuffer::operator = (const VertexBuffer& vb)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 VertexBuffer VertexBuffer::Clone () const
@@ -70,7 +70,7 @@ VertexBuffer VertexBuffer::Clone () const
 }
 
 /*
-    Идентификатор буфера
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р±СѓС„РµСЂР°
 */
 
 size_t VertexBuffer::Id () const
@@ -79,7 +79,7 @@ size_t VertexBuffer::Id () const
 }
 
 /*
-    Количество массивов вершинных атрибутов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РјР°СЃСЃРёРІРѕРІ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 uint32_t VertexBuffer::StreamsCount () const
@@ -88,7 +88,7 @@ uint32_t VertexBuffer::StreamsCount () const
 }
 
 /*
-    Получение массива
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР°
 */
 
 const VertexStream& VertexBuffer::Stream (uint32_t index) const
@@ -105,7 +105,7 @@ VertexStream& VertexBuffer::Stream (uint32_t index)
 }
 
 /*
-    Получение массива весов
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° РІРµСЃРѕРІ
 */
 
 const VertexWeightStream& VertexBuffer::Weights () const
@@ -119,12 +119,12 @@ VertexWeightStream& VertexBuffer::Weights ()
 }
 
 /*
-    Присоединение/отсоединение массивов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ/РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ РјР°СЃСЃРёРІРѕРІ
 */
 
 uint32_t VertexBuffer::Attach (VertexStream& vs)
 {
-    //проверка зарегистрирован ли канал
+    //РїСЂРѕРІРµСЂРєР° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ Р»Рё РєР°РЅР°Р»
     
   size_t id = vs.Id ();
     
@@ -165,7 +165,7 @@ void VertexBuffer::Clear ()
 }
 
 /*
-    Количество вершин (минимум среди всех вершинных массивов)
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ (РјРёРЅРёРјСѓРј СЃСЂРµРґРё РІСЃРµС… РІРµСЂС€РёРЅРЅС‹С… РјР°СЃСЃРёРІРѕРІ)
 */
 
 uint32_t VertexBuffer::VerticesCount () const
@@ -187,7 +187,7 @@ uint32_t VertexBuffer::VerticesCount () const
 }
 
 /*
-    Суммарный размер вершины
+    РЎСѓРјРјР°СЂРЅС‹Р№ СЂР°Р·РјРµСЂ РІРµСЂС€РёРЅС‹
 */
 
 uint32_t VertexBuffer::VertexSize () const
@@ -201,7 +201,7 @@ uint32_t VertexBuffer::VertexSize () const
 }
     
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void VertexBuffer::Swap (VertexBuffer& vb)

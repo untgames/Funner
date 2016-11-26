@@ -4,7 +4,7 @@ using namespace syslib;
 using namespace syslib::tabletos;
 
 /*
-    Генерация исключения: работа с окнами невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РѕРєРЅР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -22,7 +22,7 @@ void raise (const char* method_name)
 struct WindowRegistryImpl
 {
   public:
-    //Конструктор/деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     WindowRegistryImpl ()
     {
     }
@@ -31,7 +31,7 @@ struct WindowRegistryImpl
     {
     }
   
-    //Регистрация окна
+    //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
     void RegisterWindow (screen_window_t window, IWindowImpl* impl)
     {
       if (!window)
@@ -43,7 +43,7 @@ struct WindowRegistryImpl
       windows.insert_pair (window, impl);
     }
     
-    //Отмена регистрации
+    //РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё
     void UnregisterWindow (screen_window_t window)
     {
       if (!window)
@@ -92,8 +92,8 @@ struct WindowImpl: public IWindowImpl
   screen_context_t     screen_context;   // A context encapsulates the connection to the windowing system
   screen_window_t      screen_window;    // The window is the most basic drawing surface.
   screen_display_t     screen_display;   // A display represents the physical display hardware such as a touch screen display.
-  WindowMessageHandler message_handler;                  //обработчик сообщений
-  void*                user_data;                        //пользовательские данные окна
+  WindowMessageHandler message_handler;                  //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№
+  void*                user_data;                        //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РѕРєРЅР°
   bool                 background_state;
   bool                 is_multitouch_enabled;
 
@@ -369,7 +369,7 @@ struct WindowImpl: public IWindowImpl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
@@ -378,7 +378,7 @@ struct WindowImpl: public IWindowImpl
 }
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
@@ -397,7 +397,7 @@ window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHa
     if (parent_handle)
       throw xtl::format_not_supported_exception ("", "Child windows are not supported");
       
-      //создание и инициализация окна
+      //СЃРѕР·РґР°РЅРёРµ Рё РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРєРЅР°
 
     stl::auto_ptr<WindowImpl> handle (new WindowImpl);
     
@@ -465,7 +465,7 @@ void TabletOsWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* TabletOsWindowManager::GetNativeWindowHandle (window_t handle)
@@ -505,7 +505,7 @@ const void* TabletOsWindowManager::GetNativeDisplayHandle (window_t handle)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void TabletOsWindowManager::SetWindowTitle (window_t handle, const wchar_t* buffer)
@@ -550,7 +550,7 @@ void TabletOsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size,
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void TabletOsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -651,7 +651,7 @@ void TabletOsWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -758,7 +758,7 @@ bool TabletOsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void TabletOsWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
@@ -774,7 +774,7 @@ const void* TabletOsWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-   Установка multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР° multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void TabletOsWindowManager::SetMultitouchEnabled (window_t handle, bool enabled)
@@ -814,7 +814,7 @@ bool TabletOsWindowManager::IsMultitouchEnabled (window_t handle)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void TabletOsWindowManager::InvalidateWindow (window_t handle)
@@ -835,7 +835,7 @@ void TabletOsWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void TabletOsWindowManager::SetBackgroundColor (window_t handle, const Color& color)

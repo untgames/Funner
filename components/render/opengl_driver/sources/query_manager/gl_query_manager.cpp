@@ -7,29 +7,29 @@ namespace
 {
 
 /*
-    Состояние менеджера запросов
+    РЎРѕСЃС‚РѕСЏРЅРёРµ РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 class QueryManagerState: public IStageState
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
 
-///Установка предиката отрисовки
+///РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРµРґРёРєР°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
     void SetPredication (IOpenGlPredicate* in_predicate, bool in_predicate_value)
     {
       predicate       = in_predicate;
       predicate_value = in_predicate_value;
     }
 
-///Получение предиката отрисовки
+///РџРѕР»СѓС‡РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
     IOpenGlPredicate* GetPredicate () { return predicate.get (); }
 
-///Получение сравниваемого значения предиката отрисовки
+///РџРѕР»СѓС‡РµРЅРёРµ СЃСЂР°РІРЅРёРІР°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РїСЂРµРґРёРєР°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
     bool GetPredicateValue () { return predicate_value; }
 
-///Получение результата предиката
+///РџРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РїСЂРµРґРёРєР°С‚Р°
     bool GetPredicateAsyncResult ()
     {
       if (!(predicate && predicate->IsResultAvailable ()))
@@ -38,14 +38,14 @@ class QueryManagerState: public IStageState
       return predicate->GetResult () == predicate_value;
     }
 
-///Захват состояния
+///Р—Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
 
-///Восстановление состояния
+///Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -53,7 +53,7 @@ class QueryManagerState: public IStageState
     }
 
   private:
-///Копирование состояния
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Copy (QueryManagerState& source, const StateBlockMask& mask)
     {
       if (mask.predication)
@@ -68,41 +68,41 @@ class QueryManagerState: public IStageState
     typedef xtl::trackable_ptr<IOpenGlPredicate>  PredicatePtr;
 
   private:
-    QueryManagerStatePtr main_state;       //основное состояние уровня
-    PredicatePtr         predicate;        //предикат
-    bool                 predicate_value;  //сравниваемое значение
+    QueryManagerStatePtr main_state;       //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    PredicatePtr         predicate;        //РїСЂРµРґРёРєР°С‚
+    bool                 predicate_value;  //СЃСЂР°РІРЅРёРІР°РµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
 };
 
 }
 
 /*
-    Описание реализации менеджера запросов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 struct QueryManager::Impl: public ContextObject, public QueryManagerState
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const ContextManager& manager) : ContextObject (manager)
     {
       SetContextCacheValue (CacheEntry_IsInQueryRanges, 0);
     }
 
-///Создание предикатов
+///РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРёРєР°С‚РѕРІ
     IPredicate* CreatePredicate ()
     {
-        //проверка наличия необходимых расширений
+        //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРѕР±С…РѕРґРёРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
       if (!GetCaps ().has_arb_occlusion_query)
         return new NullPredicate;
 
-        //установка текущего контекста
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
       MakeContextCurrent ();
       
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-        //получение количества битов в результате запроса
+        //РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° Р±РёС‚РѕРІ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ Р·Р°РїСЂРѕСЃР°
 
       GLint query_counter_bits = 0;
 
@@ -110,12 +110,12 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 
       CheckErrors ("render::low_level::opengl::QueryManager::Impl::CreatePredicate");
 
-        //в случае невозможности получения корректного результата - создаём эмуляцию
+        //РІ СЃР»СѓС‡Р°Рµ РЅРµРІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїРѕР»СѓС‡РµРЅРёСЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р° - СЃРѕР·РґР°С‘Рј СЌРјСѓР»СЏС†РёСЋ
 
       if (!query_counter_bits)
         return new NullPredicate;
 
-        //создание предиката
+        //СЃРѕР·РґР°РЅРёРµ РїСЂРµРґРёРєР°С‚Р°
 
       return new AsyncPredicate (GetContextManager ());
 #else
@@ -125,7 +125,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 QueryManager::QueryManager (const ContextManager& manager)
@@ -137,7 +137,7 @@ QueryManager::~QueryManager ()
 }
 
 /*
-    Создание объекта состояния уровня
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 */
 
 IStageState* QueryManager::CreateStageState ()
@@ -146,7 +146,7 @@ IStageState* QueryManager::CreateStageState ()
 }
 
 /*
-    Создание предикатов
+    РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРёРєР°С‚РѕРІ
 */
 
 IPredicate* QueryManager::CreatePredicate ()
@@ -155,7 +155,7 @@ IPredicate* QueryManager::CreatePredicate ()
 }
 
 /*
-    Управление предикатами отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void QueryManager::SetPredication (IPredicate* predicate, bool predicate_value)
@@ -183,7 +183,7 @@ bool QueryManager::GetPredicateValue ()
 }
 
 /*
-    Получение результата предиката
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РїСЂРµРґРёРєР°С‚Р°
 */
 
 bool QueryManager::GetPredicateAsyncResult ()

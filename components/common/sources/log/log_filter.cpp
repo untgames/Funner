@@ -9,7 +9,7 @@ using namespace common;
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LogFilterImpl::LogFilterImpl (const char* in_mask, const LogHandler& handler)
@@ -54,7 +54,7 @@ LogFilterImpl::~LogFilterImpl ()
 }
 
 /*
-    Маска имени источников протоколирования
+    РњР°СЃРєР° РёРјРµРЅРё РёСЃС‚РѕС‡РЅРёРєРѕРІ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 const char* LogFilterImpl::Mask ()
@@ -65,7 +65,7 @@ const char* LogFilterImpl::Mask ()
 }
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void LogFilterImpl::Print (const char* log_name, const char* log_message)
@@ -78,12 +78,12 @@ void LogFilterImpl::Print (const char* log_name, const char* log_message)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Добавление / удаление источников
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 void LogFilterImpl::AddSource (LogImpl* source)
@@ -107,7 +107,7 @@ void LogFilterImpl::RemoveSource (LogImpl* source)
 */
 
 /*
-    Конструктор/деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LogFilter::LogFilter (const char* log_name_mask, const LogHandler& handler)
@@ -127,7 +127,7 @@ LogFilter::~LogFilter ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 LogFilter& LogFilter::operator = (const LogFilter& filter)
@@ -138,7 +138,7 @@ LogFilter& LogFilter::operator = (const LogFilter& filter)
 }
 
 /*
-    Получение маски
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃРєРё
 */
 
 const char* LogFilter::Mask () const
@@ -147,7 +147,7 @@ const char* LogFilter::Mask () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void LogFilter::Swap (LogFilter& filter)

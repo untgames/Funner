@@ -1,4 +1,4 @@
-//Тестирование rfind (string, pos)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ rfind (string, pos)
 #include <stdio.h>
 #include <stl/string>
 

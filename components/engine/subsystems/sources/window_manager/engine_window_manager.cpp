@@ -39,12 +39,12 @@ namespace window_manager_subsytem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "WindowManager";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.WindowManager"; //имя компонента
-const char* LOG_NAME       = COMPONENT_NAME;                    //имя потока протоколирования
+const char* SUBSYSTEM_NAME = "WindowManager";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.WindowManager"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* LOG_NAME       = COMPONENT_NAME;                    //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 //forwards
 class Window;
@@ -55,13 +55,13 @@ const char* get_cursor_image_name (Window&);
 void        reset_cursor (Window&);
 
 /*
-    Реализация подсистемы инициализации окна
+    Р РµР°Р»РёР·Р°С†РёСЏ РїРѕРґСЃРёСЃС‚РµРјС‹ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 */
 
 class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WindowManagerSubsystem (ParseNode& node)
       : log (LOG_NAME)
       , need_restore_screen_saver (false)
@@ -95,7 +95,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~WindowManagerSubsystem ()
     {
       try
@@ -110,7 +110,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       }
     }
     
-///Поиск курсора
+///РџРѕРёСЃРє РєСѓСЂСЃРѕСЂР°
     syslib::WindowCursor GetCursor (const char* image_name)    
     {
       CursorMap::iterator cursor_iter = cursors.find (image_name);
@@ -121,12 +121,12 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       throw xtl::make_argument_exception ("engine::WindowManagerSubsystem::GetCursor", "image_name", image_name, "Cursor not found");
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }
     void Release () { release (this); }
     
   private:
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
     }
@@ -204,7 +204,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       }
     }  
   
-///Загрузка точек курсора
+///Р—Р°РіСЂСѓР·РєР° С‚РѕС‡РµРє РєСѓСЂСЃРѕСЂР°
     void LoadHotspots (const char* file_name)
     {
       try
@@ -237,7 +237,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       }      
     }
     
-///Загрузка курсора
+///Р—Р°РіСЂСѓР·РєР° РєСѓСЂСЃРѕСЂР°
     syslib::WindowCursor LoadCursor (const char* name, const char* file_name)
     {
       try
@@ -284,7 +284,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 };
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 syslib::WindowStyle get_window_style (ParseNode& node)
@@ -298,14 +298,14 @@ syslib::WindowStyle get_window_style (ParseNode& node)
 }
 
 /*
-    Реализация окна
+    Р РµР°Р»РёР·Р°С†РёСЏ РѕРєРЅР°
 */
 
 class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttachmentRegistryListener<input::Cursor>,
               private input::ICursorListener, public xtl::reference_counter, private xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Window (ParseNode& node, WindowManagerSubsystem& in_manager)
       : log (LOG_NAME),
         manager (in_manager),
@@ -315,7 +315,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     {
       static const char* METHOD_NAME = "engine::Window::Window";
 
-        //создание окна
+        //СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°
 
       const char* title = get<const char*> (node, "Title", (const char*)0);
 
@@ -324,7 +324,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       window.SetMultitouchEnabled (get<bool> (node, "MultitouchEnabled", window.IsMultitouchEnabled ()));
 
-        //сохранение точки привязки родительского окна
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 
       parent_window_name = get<const char*> (node, "Parent", "");
       
@@ -337,7 +337,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         window.SetParentHandle (parent_window->Handle ());
       }
         
-        //цвет заднего фона
+        //С†РІРµС‚ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
         
       const char* background_color_string = get<const char*> (node, "BackgroundColor", "");
       
@@ -355,7 +355,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         window.SetBackgroundColor (color);
       }
       
-        //соотношение сторон
+        //СЃРѕРѕС‚РЅРѕС€РµРЅРёРµ СЃС‚РѕСЂРѕРЅ
         
       const char* aspect_ratio_string = get<const char*> (node, "ViewportAspectRatio", "");
       
@@ -374,7 +374,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         }
       }      
 
-        //размеры и положение окна
+        //СЂР°Р·РјРµСЂС‹ Рё РїРѕР»РѕР¶РµРЅРёРµ РѕРєРЅР°
         
       bool maximized = get<bool> (node, "Maximize", false),
            minimized = get<bool> (node, "Minimize", false);
@@ -461,7 +461,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
             size_t current_mode_resolution = current_mode.width * current_mode.height;
 
-              //поиск режима с максимальным разрешением, частотой развертки и цветностью
+              //РїРѕРёСЃРє СЂРµР¶РёРјР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·СЂРµС€РµРЅРёРµРј, С‡Р°СЃС‚РѕС‚РѕР№ СЂР°Р·РІРµСЂС‚РєРё Рё С†РІРµС‚РЅРѕСЃС‚СЊСЋ
             if (current_mode_resolution < best_mode_resolution)
               continue;
 
@@ -496,13 +496,13 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         }
       }
       
-        //видимость курсора
+        //РІРёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
       
       bool is_cursor_visible = get<bool> (node, "CursorVisible", window.IsCursorVisible ());
 
       window.SetCursorVisible (is_cursor_visible);
       
-        //установка протокола
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕС‚РѕРєРѕР»Р°
 
       const char* log_name = get<const char*> (node, "Log", "");
 
@@ -511,15 +511,15 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       window.SetDebugLog (xtl::bind (&Log::Print, &log, _1));
 
-        //подписка на события окна
+        //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РѕРєРЅР°
 
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3)));
       
-        //обновление области вывода
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
         
       window.InvalidateViewport ();
 
-        //регистрация окна
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
 
       try
       {
@@ -529,7 +529,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         if (!attachment_name.empty ())
           AttachmentRegistry::Register (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (window)));
 
-          //регистрация слушателя событий появления новых окон
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїРѕСЏРІР»РµРЅРёСЏ РЅРѕРІС‹С… РѕРєРѕРЅ
 
         AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this), AttachmentRegistryAttachMode_ForceNotify);
         AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);
@@ -546,7 +546,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Window ()
     {
       try
@@ -565,19 +565,19 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
     }
     
-///Имя курсора
+///РРјСЏ РєСѓСЂСЃРѕСЂР°
     const char* CursorImageName ()
     {
       return cursor ? cursor->Image () : "";
     }
     
-///Сброс курсора
+///РЎР±СЂРѕСЃ РєСѓСЂСЃРѕСЂР°
     void ResetCursor ()
     {
       window.SetCursor (syslib::WindowCursor ());
     }
 
-///Обработчик события регистрации окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕРєРЅР°
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
     {
       if (parent_window_name.empty () || attachment_name != parent_window_name || in_window.Handle () == window.ParentHandle ())
@@ -594,7 +594,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       window.SetParentHandle (0);
     }
 
-///Обработчик события регистрации курсора
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РєСѓСЂСЃРѕСЂР°
     void OnRegisterAttachment (const char* attachment_name, input::Cursor& in_cursor)
     {
       if (cursor_attachment_name.empty () || cursor_attachment_name != attachment_name)
@@ -611,7 +611,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       BindCursor (0);
     }
 
-///Обработчики событий курсора
+///РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РєСѓСЂСЃРѕСЂР°
     void OnChangePosition (const math::vec2f& position)
     {
       if (position == cached_cursor_position)
@@ -677,7 +677,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       SetCursorPosition (context.cursor_position, window.ClientRect ());
     }
     
-///Обновление области вывода окна
+///РћР±РЅРѕРІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° РѕРєРЅР°
     void UpdateViewport (syslib::Rect& viewport)
     {
       unsigned int window_width  = window.ClientWidth (),
@@ -689,14 +689,14 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       if (window_aspect_ratio / aspect_ratio < 1.0)
       {
-          //полосы по вертикали
+          //РїРѕР»РѕСЃС‹ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
 
         viewport_width  = window_width;
         viewport_height = (unsigned int)(viewport_width / aspect_ratio);
       }
       else
       {
-          //полосы по горизонтали
+          //РїРѕР»РѕСЃС‹ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
           
         viewport_height = window_height;
         viewport_width  = (unsigned int)(viewport_height * aspect_ratio);
@@ -737,7 +737,7 @@ void reset_cursor (Window& window)
 }
 
 /*
-    Компонент подсистемы инциализации окон
+    РљРѕРјРїРѕРЅРµРЅС‚ РїРѕРґСЃРёСЃС‚РµРјС‹ РёРЅС†РёР°Р»РёР·Р°С†РёРё РѕРєРѕРЅ
 */
 
 class WindowManagerComponent

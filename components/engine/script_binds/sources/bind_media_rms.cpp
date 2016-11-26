@@ -14,7 +14,7 @@ namespace rms_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* RMS_STATIC_PROGRESS_STATE_LIBRARY = "Engine.ResourceManager.ProgressState";
@@ -26,7 +26,7 @@ const char* BINDER_NAME                       = "ResourceManager";
 const char* COMPONENT_NAME                    = "script.binds.ResourceManager";
 
 /*
-   Регистрация библиотек
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void bind_static_libraries (Environment& environment)
@@ -38,24 +38,24 @@ void bind_static_libraries (Environment& environment)
   progress_state_lib.Register ("get_Failed",     make_const (ProgressState_Failed));
 }
 
-///Создание ресурсного менеджера
+///РЎРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРЅРѕРіРѕ РјРµРЅРµРґР¶РµСЂР°
 ResourceManager create_resource_manager ()
 {
   return ResourceManager ();
 }
 
-//создание биндинга
+//СЃРѕР·РґР°РЅРёРµ Р±РёРЅРґРёРЅРіР°
 Binding create_file_group_binding (const char* resources)
 {
   return ResourceManager::CreateBinding (create_file_group (resources));
 }
 
-///Регистрация библиотеки работы с ресурсными менеджерами
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЂРµСЃСѓСЂСЃРЅС‹РјРё РјРµРЅРµРґР¶РµСЂР°РјРё
 void bind_resource_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RMS_RESOURCE_MANAGER_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("CreateFileGroupBinding", make_invoker (&create_file_group_binding));
   lib.Register ("CreateBinding",          make_invoker (&ResourceManager::CreateBinding));
@@ -65,7 +65,7 @@ void bind_resource_manager_library (Environment& environment)
   environment.RegisterType<ResourceManager> (RMS_RESOURCE_MANAGER_LIBRARY);
 }
 
-///Регистрация библиотеки работы с состоянием выполнения операций
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃРѕСЃС‚РѕСЏРЅРёРµРј РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёР№
 void bind_progress_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RMS_PROGRESS_LIBRARY);
@@ -79,12 +79,12 @@ void bind_progress_library (Environment& environment)
   environment.RegisterType<Progress> (RMS_PROGRESS_LIBRARY);
 }
 
-///Регистрация библиотеки работы со связываниями
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃРІСЏР·С‹РІР°РЅРёСЏРјРё
 void bind_binding_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RMS_BINDING_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("CreateCallbackHandler", make_callback_invoker<Binding::ProgressHandler::signature_type> ());    
   lib.Register ("Load",       make_invoker (&Binding::Load));
@@ -102,29 +102,29 @@ void bind_binding_library (Environment& environment)
   environment.RegisterType<Binding> (RMS_BINDING_LIBRARY);
 }
 
-///Создание группы ресурсов
+///РЎРѕР·РґР°РЅРёРµ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
 Group create_group ()
 {
   return Group ();
 }
 
-//Добавление группы ресурсов
+//Р”РѕР±Р°РІР»РµРЅРёРµ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
 void add_file_group_wrapper (Group& group, const char* file_group)
 {
   add_file_group (file_group, group);
 }
 
-///Регистрация библиотеки работы с группами ресурсов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РіСЂСѓРїРїР°РјРё СЂРµСЃСѓСЂСЃРѕРІ
 void bind_group_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RMS_GROUP_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (implicit_cast<Group (*) (const char*)> (&create_file_group)),
                                         make_invoker (implicit_cast<Group (*) ()> (&create_group))));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_Empty",    make_invoker (&Group::IsEmpty));
   lib.Register ("get_Size",     make_invoker (&Group::Size));
@@ -140,12 +140,12 @@ void bind_group_library (Environment& environment)
 }
 
 /*
-    Регистрация библиотеки менеджера ресурсов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё РјРµРЅРµРґР¶РµСЂР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void bind_rms_library (Environment& environment)
 {
-    //регистрация библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 
   bind_static_libraries         (environment);
   bind_group_library            (environment);  
@@ -155,7 +155,7 @@ void bind_rms_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

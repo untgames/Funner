@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -23,7 +23,7 @@ inline stride_ptr<T>::stride_ptr (const stride_ptr<T1>& p)
   {}
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -45,7 +45,7 @@ inline stride_ptr<T>& stride_ptr<T>::operator = (const stride_ptr<T1>& p)
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T>
@@ -73,7 +73,7 @@ inline typename stride_ptr<T>::reference stride_ptr<T>::operator [] (difference_
 }
 
 /*
-    Арифметика указателей
+    РђСЂРёС„РјРµС‚РёРєР° СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T>
@@ -137,7 +137,7 @@ inline stride_ptr<T> stride_ptr<T>::operator - (difference_type offset) const
 }
 
 /*
-    Проверка на эквивалентность
+    РџСЂРѕРІРµСЂРєР° РЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚СЊ
 */
 
 template <class T>
@@ -147,7 +147,7 @@ inline bool stride_ptr<T>::equal (const stride_ptr& p) const
 }
 
 /*
-    Операторы сравнения
+    РћРїРµСЂР°С‚РѕСЂС‹ СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class T> template <class T1>
@@ -259,7 +259,7 @@ inline bool operator >= (const T1* p1, const stride_ptr<T2>& p2)
 }
 
 /*
-    Получение plain-указателя
+    РџРѕР»СѓС‡РµРЅРёРµ plain-СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T>

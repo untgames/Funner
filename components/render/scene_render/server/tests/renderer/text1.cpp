@@ -131,7 +131,7 @@ int main ()
 
     text_line->BindToScene (scene);
     
-      //настройка области вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     
     scene_graph::Viewport vp;
     

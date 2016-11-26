@@ -8,7 +8,7 @@ namespace scene_graph
 {
 
 /*
-    Получение имени сообщения
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРѕРѕР±С‰РµРЅРёСЏ
 */
 
 const char* get_name (NodeEvent event)
@@ -32,7 +32,7 @@ const char* get_name (NodeEvent event)
 }
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
 namespace
@@ -40,19 +40,19 @@ namespace
 
 const char* LOG_NAME = "scene_graph.Node";
 
-const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //значение по умолчанию для использования центра масштабирования
-const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //значение по умолчанию для использования центра поворотов
+const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ С†РµРЅС‚СЂР° РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
+const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ С†РµРЅС‚СЂР° РїРѕРІРѕСЂРѕС‚РѕРІ
 
-///центр объекта
+///С†РµРЅС‚СЂ РѕР±СЉРµРєС‚Р°
 struct Pivot
 {
-  bool  pivot_enabled;                          //включён ли центр
-  bool  need_local_position_after_pivot_update; //необходимо обновлять локальное положение с учётом центра
-  bool  orientation_pivot_enabled;              //включён центр поворотов
-  bool  scale_pivot_enabled;                    //включён центр масштабирования
-  vec3f pivot_position;                         //локальное положение центра
-  vec3f local_position_after_pivot;             //локальное положение с учётом центра
-  vec3f world_position_after_pivot;             //мировое положение с учётом центра
+  bool  pivot_enabled;                          //РІРєР»СЋС‡С‘РЅ Р»Рё С†РµРЅС‚СЂ
+  bool  need_local_position_after_pivot_update; //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІР»СЏС‚СЊ Р»РѕРєР°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ СЃ СѓС‡С‘С‚РѕРј С†РµРЅС‚СЂР°
+  bool  orientation_pivot_enabled;              //РІРєР»СЋС‡С‘РЅ С†РµРЅС‚СЂ РїРѕРІРѕСЂРѕС‚РѕРІ
+  bool  scale_pivot_enabled;                    //РІРєР»СЋС‡С‘РЅ С†РµРЅС‚СЂ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
+  vec3f pivot_position;                         //Р»РѕРєР°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ С†РµРЅС‚СЂР°
+  vec3f local_position_after_pivot;             //Р»РѕРєР°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ СЃ СѓС‡С‘С‚РѕРј С†РµРЅС‚СЂР°
+  vec3f world_position_after_pivot;             //РјРёСЂРѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ СЃ СѓС‡С‘С‚РѕРј С†РµРЅС‚СЂР°
   
   Pivot ()
     : pivot_enabled (false)
@@ -96,7 +96,7 @@ typedef stl::auto_ptr<common::PropertyBindingMap>                             Pr
 }
 
 /*
-    Описание реализации Node
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Node
 */
 
 struct Node::Impl: public xtl::instance_counter<Node>
@@ -104,57 +104,57 @@ struct Node::Impl: public xtl::instance_counter<Node>
   class NodeIterator;
   class ControllerIterator;
 
-  scene_graph::Scene*   scene;                            //сцена, которой принадлежит объект
-  stl::string           name;                             //имя узла
-  size_t                name_hash;                        //хэш имени
-  size_t                ref_count;                        //количество ссылок на узел
-  Node*                 this_node;                        //текущий узел
-  Node*                 parent;                           //родительский узел
-  Node*                 first_child;                      //первый потомок
-  Node*                 last_child;                       //последний потомок
-  Node*                 prev_child;                       //предыдущий потомок
-  Node*                 next_child;                       //следующий потомок
-  bool                  bind_lock;                        //флаг блокировки на вызов BindToParent
-  bool                  need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
-  NodeSignal            signals [NodeEvent_Num];          //сигналы
-  bool                  signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  SubTreeNodeSignal     subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
-  bool                  subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
-  PivotPtr              pivot;                            //центр объекта
-  vec3f                 local_position;                   //локальное положение
-  quatf                 local_orientation;                //локальная ориентация
-  vec3f                 local_scale;                      //локальный масштаб
-  mat4f                 local_tm;                         //матрица локальных преобразований
-  vec3f                 world_position;                   //мировое положение
-  quatf                 world_orientation;                //мировая ориентация
-  vec3f                 world_scale;                      //мировой масштаб
-  mat4f                 world_tm;                         //матрица мировых преобразований
-  bool                  orientation_inherit;              //флаг наследования родительской ориентации
-  bool                  scale_inherit;                    //флаг наследования родительского масштаба
-  bool                  need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
-  bool                  need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
-  bool                  need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
-  bool                  need_world_position_update;       //флаг, сигнализирующий о необходимости пересчёта мировой позиции
-  bool                  need_world_axises_update;         //флаг, сигнализирующий о необходимости пересчёта мировых осей и масштаба
-  size_t                update_lock;                      //счётчик открытых транзакций обновления
-  bool                  update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
-  Node*                 first_updatable_child;            //первый обновляемый потомок
-  Node*                 last_updatable_child;             //последний обновляемый потомок
-  Node*                 prev_updatable_child;             //предыдущий обновляемый потомок
-  Node*                 next_updatable_child;             //следующий обновляемый потомок
-  ControllerEntry*      first_controller;                 //первый контроллер данного узла
-  ControllerEntry*      last_controller;                  //последний контроллер данного узла
-  bool                  has_updatable_controllers;        //есть ли обновляемые контроллеры
-  PropertyMapPtr        properties;                       //свойства узла
-  PropertyBindingMapPtr property_bindings;                //связывание свойств узла с методами их получения
-  NodeIterator*         first_node_iterator;              //первый активный итератор узла
-  ControllerIterator*   first_controller_iterator;        //первый активный итератор контроллеров
+  scene_graph::Scene*   scene;                            //СЃС†РµРЅР°, РєРѕС‚РѕСЂРѕР№ РїСЂРёРЅР°РґР»РµР¶РёС‚ РѕР±СЉРµРєС‚
+  stl::string           name;                             //РёРјСЏ СѓР·Р»Р°
+  size_t                name_hash;                        //С…СЌС€ РёРјРµРЅРё
+  size_t                ref_count;                        //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃСЃС‹Р»РѕРє РЅР° СѓР·РµР»
+  Node*                 this_node;                        //С‚РµРєСѓС‰РёР№ СѓР·РµР»
+  Node*                 parent;                           //СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓР·РµР»
+  Node*                 first_child;                      //РїРµСЂРІС‹Р№ РїРѕС‚РѕРјРѕРє
+  Node*                 last_child;                       //РїРѕСЃР»РµРґРЅРёР№ РїРѕС‚РѕРјРѕРє
+  Node*                 prev_child;                       //РїСЂРµРґС‹РґСѓС‰РёР№ РїРѕС‚РѕРјРѕРє
+  Node*                 next_child;                       //СЃР»РµРґСѓСЋС‰РёР№ РїРѕС‚РѕРјРѕРє
+  bool                  bind_lock;                        //С„Р»Р°Рі Р±Р»РѕРєРёСЂРѕРІРєРё РЅР° РІС‹Р·РѕРІ BindToParent
+  bool                  need_release_at_unbind;           //РЅСѓР¶РЅРѕ Р»Рё СѓРјРµРЅСЊС€Р°С‚СЊ СЃС‡С‘С‚С‡РёРє СЃСЃС‹Р»РѕРє СѓР·Р»Р° РїСЂРё РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё РѕС‚ СЂРѕРґРёС‚РµР»СЏ
+  NodeSignal            signals [NodeEvent_Num];          //СЃРёРіРЅР°Р»С‹
+  bool                  signal_process [NodeEvent_Num];   //С„Р»Р°РіРё РѕР±СЂР°Р±РѕС‚РєРё СЃРёРіРЅР°Р»РѕРІ
+  SubTreeNodeSignal     subtree_signals [NodeSubTreeEvent_Num]; //СЃРёРіРЅР°Р»С‹ СЃРѕР±С‹С‚РёР№, РІРѕР·РЅРёРєР°СЋС‰РёС… РІ СѓР·Р»Р°С…-РїРѕС‚РѕРјРєР°С…
+  bool                  subtree_signal_process [NodeSubTreeEvent_Num]; //С„Р»Р°РіРё РѕР±СЂР°Р±РѕС‚РєРё СЃРёРіРЅР°Р»РѕРІ, РІРѕР·РЅРёРєР°СЋС‰РёС… РІ СѓР·Р»Р°С… РїРѕС‚РѕРјРєР°С…
+  PivotPtr              pivot;                            //С†РµРЅС‚СЂ РѕР±СЉРµРєС‚Р°
+  vec3f                 local_position;                   //Р»РѕРєР°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
+  quatf                 local_orientation;                //Р»РѕРєР°Р»СЊРЅР°СЏ РѕСЂРёРµРЅС‚Р°С†РёСЏ
+  vec3f                 local_scale;                      //Р»РѕРєР°Р»СЊРЅС‹Р№ РјР°СЃС€С‚Р°Р±
+  mat4f                 local_tm;                         //РјР°С‚СЂРёС†Р° Р»РѕРєР°Р»СЊРЅС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  vec3f                 world_position;                   //РјРёСЂРѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
+  quatf                 world_orientation;                //РјРёСЂРѕРІР°СЏ РѕСЂРёРµРЅС‚Р°С†РёСЏ
+  vec3f                 world_scale;                      //РјРёСЂРѕРІРѕР№ РјР°СЃС€С‚Р°Р±
+  mat4f                 world_tm;                         //РјР°С‚СЂРёС†Р° РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  bool                  orientation_inherit;              //С„Р»Р°Рі РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕР№ РѕСЂРёРµРЅС‚Р°С†РёРё
+  bool                  scale_inherit;                    //С„Р»Р°Рі РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РјР°СЃС€С‚Р°Р±Р°
+  bool                  need_world_transform_update;      //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  bool                  need_world_tm_update;             //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјР°С‚СЂРёС†С‹ РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  bool                  need_local_tm_update;             //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјР°С‚СЂРёС†С‹ Р»РѕРєР°Р»СЊРЅС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  bool                  need_world_position_update;       //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјРёСЂРѕРІРѕР№ РїРѕР·РёС†РёРё
+  bool                  need_world_axises_update;         //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјРёСЂРѕРІС‹С… РѕСЃРµР№ Рё РјР°СЃС€С‚Р°Р±Р°
+  size_t                update_lock;                      //СЃС‡С‘С‚С‡РёРє РѕС‚РєСЂС‹С‚С‹С… С‚СЂР°РЅР·Р°РєС†РёР№ РѕР±РЅРѕРІР»РµРЅРёСЏ
+  bool                  update_notify;                    //С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РѕР±РЅРѕРІР»РµРЅРёСЏС… РїРѕ Р·Р°РІРµСЂС€РµРЅРёРё С‚СЂР°РЅР·Р°РєС†РёРё РѕР±РЅРѕРІР»РµРЅРёСЏ
+  Node*                 first_updatable_child;            //РїРµСЂРІС‹Р№ РѕР±РЅРѕРІР»СЏРµРјС‹Р№ РїРѕС‚РѕРјРѕРє
+  Node*                 last_updatable_child;             //РїРѕСЃР»РµРґРЅРёР№ РѕР±РЅРѕРІР»СЏРµРјС‹Р№ РїРѕС‚РѕРјРѕРє
+  Node*                 prev_updatable_child;             //РїСЂРµРґС‹РґСѓС‰РёР№ РѕР±РЅРѕРІР»СЏРµРјС‹Р№ РїРѕС‚РѕРјРѕРє
+  Node*                 next_updatable_child;             //СЃР»РµРґСѓСЋС‰РёР№ РѕР±РЅРѕРІР»СЏРµРјС‹Р№ РїРѕС‚РѕРјРѕРє
+  ControllerEntry*      first_controller;                 //РїРµСЂРІС‹Р№ РєРѕРЅС‚СЂРѕР»Р»РµСЂ РґР°РЅРЅРѕРіРѕ СѓР·Р»Р°
+  ControllerEntry*      last_controller;                  //РїРѕСЃР»РµРґРЅРёР№ РєРѕРЅС‚СЂРѕР»Р»РµСЂ РґР°РЅРЅРѕРіРѕ СѓР·Р»Р°
+  bool                  has_updatable_controllers;        //РµСЃС‚СЊ Р»Рё РѕР±РЅРѕРІР»СЏРµРјС‹Рµ РєРѕРЅС‚СЂРѕР»Р»РµСЂС‹
+  PropertyMapPtr        properties;                       //СЃРІРѕР№СЃС‚РІР° СѓР·Р»Р°
+  PropertyBindingMapPtr property_bindings;                //СЃРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ СѓР·Р»Р° СЃ РјРµС‚РѕРґР°РјРё РёС… РїРѕР»СѓС‡РµРЅРёСЏ
+  NodeIterator*         first_node_iterator;              //РїРµСЂРІС‹Р№ Р°РєС‚РёРІРЅС‹Р№ РёС‚РµСЂР°С‚РѕСЂ СѓР·Р»Р°
+  ControllerIterator*   first_controller_iterator;        //РїРµСЂРІС‹Р№ Р°РєС‚РёРІРЅС‹Р№ РёС‚РµСЂР°С‚РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
   
-  ///Итератор узлов
+  ///РС‚РµСЂР°С‚РѕСЂ СѓР·Р»РѕРІ
   class NodeIterator: public xtl::noncopyable
   {
     public:
-      ///Конструктор
+      ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
       NodeIterator (Node* in_parent, Node* first_item, Node*& in_last_item, Node* Impl::* in_next_member)
         : item (first_item)
         , last_item (in_last_item)
@@ -165,13 +165,13 @@ struct Node::Impl: public xtl::instance_counter<Node>
         parent->impl->first_node_iterator = this;
       }
       
-      ///Деструктор
+      ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
       ~NodeIterator ()
       {
         parent->impl->first_node_iterator = next_iterator;
       }
 
-      ///Получение текущего элемента и перемемещение к следующему
+      ///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Рё РїРµСЂРµРјРµРјРµС‰РµРЅРёРµ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ
       Node::Pointer Next ()
       {
         Node::Pointer result = item;
@@ -184,10 +184,10 @@ struct Node::Impl: public xtl::instance_counter<Node>
         return result;
       }
       
-      ///Следуюущий итератор
+      ///РЎР»РµРґСѓСЋСѓС‰РёР№ РёС‚РµСЂР°С‚РѕСЂ
       NodeIterator* NextIterator () { return next_iterator; }
       
-      ///Оповещение об удалении узла
+      ///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СѓР·Р»Р°
       void OnRemove (Node* node)
       {
         if (node != item)
@@ -196,7 +196,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
         Next ();
       }
       
-      ///Оповещение о добавлении узла
+      ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РґРѕР±Р°РІР»РµРЅРёРё СѓР·Р»Р°
       void OnAdd (Node* node)
       {
         if (item || node != last_item)
@@ -213,7 +213,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
       NodeIterator*  next_iterator;  
   };
   
-  ///Итератор дочерних узлов
+  ///РС‚РµСЂР°С‚РѕСЂ РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ
   class NodeChildrenIterator: public NodeIterator
   {
     public:
@@ -223,7 +223,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
       }
   };
   
-  ///Итератор обновляемых узлов
+  ///РС‚РµСЂР°С‚РѕСЂ РѕР±РЅРѕРІР»СЏРµРјС‹С… СѓР·Р»РѕРІ
   class NodeUpdatablesIterator: public NodeIterator
   {
     public:
@@ -233,11 +233,11 @@ struct Node::Impl: public xtl::instance_counter<Node>
       }
   };
 
-  ///Итератор контроллеров
+  ///РС‚РµСЂР°С‚РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
   class ControllerIterator: public xtl::noncopyable
   {
     public:
-      ///Конструктор
+      ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
       ControllerIterator (Node* in_node)
         : node (in_node)
         , item (in_node->impl->first_controller)
@@ -246,13 +246,13 @@ struct Node::Impl: public xtl::instance_counter<Node>
         node->impl->first_controller_iterator = this;
       }
       
-      ///Деструктор
+      ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
       ~ControllerIterator ()
       {
         node->impl->first_controller_iterator = next_iterator;
       }
 
-      ///Получение текущего элемента и перемемещение к следующему
+      ///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Рё РїРµСЂРµРјРµРјРµС‰РµРЅРёРµ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ
       ControllerEntry* Next ()
       {
         if (!item)
@@ -265,10 +265,10 @@ struct Node::Impl: public xtl::instance_counter<Node>
         return result;
       }
       
-      ///Следуюущий итератор
+      ///РЎР»РµРґСѓСЋСѓС‰РёР№ РёС‚РµСЂР°С‚РѕСЂ
       ControllerIterator* NextIterator () { return next_iterator; }
       
-      ///Оповещение об удалении контроллера
+      ///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
       void OnRemove (ControllerEntry* entry)
       {
         if (entry != item)
@@ -277,7 +277,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
         Next ();
       }
       
-      ///Оповещение о добавлении контроллера
+      ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РґРѕР±Р°РІР»РµРЅРёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
       void OnAdd (ControllerEntry* entry)
       {
         if (item || entry != node->impl->last_controller)
@@ -313,17 +313,17 @@ struct Node::Impl: public xtl::instance_counter<Node>
     first_node_iterator       = 0;
     first_controller_iterator = 0;
 
-      //масштаб по умолчанию
+      //РјР°СЃС€С‚Р°Р± РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     local_scale = 1.0f;
     world_scale = 1.0f;
 
-      //по умолчанию узел наследует все преобразования родителя
+      //РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СѓР·РµР» РЅР°СЃР»РµРґСѓРµС‚ РІСЃРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЂРѕРґРёС‚РµР»СЏ
 
     orientation_inherit = true;
     scale_inherit       = true;
 
-      //преобразования рассчитаны
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЂР°СЃСЃС‡РёС‚Р°РЅС‹
 
     need_world_transform_update = false;
     need_local_tm_update        = false;
@@ -331,7 +331,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     need_world_position_update  = false;
     need_world_axises_update    = false;
     
-      //очистка массива флагов обработки сигналов
+      //РѕС‡РёСЃС‚РєР° РјР°СЃСЃРёРІР° С„Р»Р°РіРѕРІ РѕР±СЂР°Р±РѕС‚РєРё СЃРёРіРЅР°Р»РѕРІ
       
     for (size_t i=0; i<NodeEvent_Num; i++)
       signal_process [i] = false;
@@ -339,7 +339,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     for (size_t i=0; i<NodeSubTreeEvent_Num; i++)
       subtree_signal_process [i] = false;
       
-      //очистка флага блокировки на вызов BindToParent
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° Р±Р»РѕРєРёСЂРѕРІРєРё РЅР° РІС‹Р·РѕРІ BindToParent
       
     bind_lock = false;
     need_release_at_unbind = false;
@@ -348,16 +348,16 @@ struct Node::Impl: public xtl::instance_counter<Node>
   
   void BeforeDestroy ()
   {
-      //оповещаем клиентов об удалении узла
+      //РѕРїРѕРІРµС‰Р°РµРј РєР»РёРµРЅС‚РѕРІ РѕР± СѓРґР°Р»РµРЅРёРё СѓР·Р»Р°
 
     Notify (NodeEvent_BeforeDestroy);
 
-      //разрываем иерархические связи
+      //СЂР°Р·СЂС‹РІР°РµРј РёРµСЂР°СЂС…РёС‡РµСЃРєРёРµ СЃРІСЏР·Рё
 
     this_node->UnbindAllChildren ();
     this_node->Unbind ();
 
-      //отсоединение всех контроллеров
+      //РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ РІСЃРµС… РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
 
     this_node->DetachAllControllers ();
 
@@ -447,10 +447,10 @@ struct Node::Impl: public xtl::instance_counter<Node>
     return pivot ? pivot->world_position_after_pivot : world_position;
   }
   
-  //оповещение об изменении узла
+  //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СѓР·Р»Р°
   void UpdateNotify ()
   {
-      //если узел не находится в транзакции обновления - оповещаем клиентов об изменениях
+      //РµСЃР»Рё СѓР·РµР» РЅРµ РЅР°С…РѕРґРёС‚СЃСЏ РІ С‚СЂР°РЅР·Р°РєС†РёРё РѕР±РЅРѕРІР»РµРЅРёСЏ - РѕРїРѕРІРµС‰Р°РµРј РєР»РёРµРЅС‚РѕРІ РѕР± РёР·РјРµРЅРµРЅРёСЏС…
 
     if (!update_lock)
     {
@@ -458,19 +458,19 @@ struct Node::Impl: public xtl::instance_counter<Node>
       return;
     }
 
-      //иначе устанавливаем флаг, сигнализирующий о необходимости оповещения клиентов об изменениях по завершении транзакци
-      //обновления
+      //РёРЅР°С‡Рµ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕРїРѕРІРµС‰РµРЅРёСЏ РєР»РёРµРЅС‚РѕРІ РѕР± РёР·РјРµРЅРµРЅРёСЏС… РїРѕ Р·Р°РІРµСЂС€РµРЅРёРё С‚СЂР°РЅР·Р°РєС†Рё
+      //РѕР±РЅРѕРІР»РµРЅРёСЏ
 
     update_notify = true;    
   }
 
   void UpdateWorldTransformNotify ()
   {
-      //оповещение клиентов об изменениях мировых координат
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РєР»РёРµРЅС‚РѕРІ РѕР± РёР·РјРµРЅРµРЅРёСЏС… РјРёСЂРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 
     Notify (NodeEvent_AfterWorldTransformUpdate);
 
-      //оповещение об изменении
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё
 
     UpdateNotify ();
 
@@ -482,7 +482,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     need_world_position_update  = true;
     need_world_axises_update    = true;
     
-      //оповещение производных классов об изменении положения объекта
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С… РєР»Р°СЃСЃРѕРІ РѕР± РёР·РјРµРЅРµРЅРёРё РїРѕР»РѕР¶РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 
     try
     {
@@ -490,10 +490,10 @@ struct Node::Impl: public xtl::instance_counter<Node>
     }
     catch (...)
     {
-      //поглощаем все исключения
+      //РїРѕРіР»РѕС‰Р°РµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
 
-      //оповещение всех потомков о необходимости пересчёта мировых преобразований
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РІСЃРµС… РїРѕС‚РѕРјРєРѕРІ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 
     NodeChildrenIterator iter (this_node);
 
@@ -502,7 +502,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
   }
 
 /*
-    Оповещение о необходимости пересчёта мировых преобразований / пересчёт мировых преобразований
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ / РїРµСЂРµСЃС‡С‘С‚ РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 */
 
   void UpdateLocalTransformNotify ()
@@ -618,12 +618,12 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
   void BindToParentImpl (Node* parent_node, NodeBindMode mode, NodeTransformSpace invariant_space)
   {
-      //защита от вызова Bind в обработчиках соответствующих событий
+      //Р·Р°С‰РёС‚Р° РѕС‚ РІС‹Р·РѕРІР° Bind РІ РѕР±СЂР°Р±РѕС‚С‡РёРєР°С… СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… СЃРѕР±С‹С‚РёР№
 
     if (bind_lock)
       return;
 
-      //определяем инвариантное пространство преобразований
+      //РѕРїСЂРµРґРµР»СЏРµРј РёРЅРІР°СЂРёР°РЅС‚РЅРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
       
     bool  need_transform_in_world_space = false;
     vec3f old_world_position_after_pivot, old_world_scale;
@@ -644,7 +644,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
     }
     
-      //проверяем корректность режима присоединения
+      //РїСЂРѕРІРµСЂСЏРµРј РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ СЂРµР¶РёРјР° РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ
       
     switch (mode)
     {
@@ -655,43 +655,43 @@ struct Node::Impl: public xtl::instance_counter<Node>
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "mode", mode);
     }
     
-      //если родитель не изменяется нет необходимости в присоединии
+      //РµСЃР»Рё СЂРѕРґРёС‚РµР»СЊ РЅРµ РёР·РјРµРЅСЏРµС‚СЃСЏ РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІ РїСЂРёСЃРѕРµРґРёРЅРёРё
 
     if (parent_node == parent)
       return;
       
-      //проверка попытки отсоединения корневого узла от сцены
+      //РїСЂРѕРІРµСЂРєР° РїРѕРїС‹С‚РєРё РѕС‚СЃРѕРµРґРёРЅРµРЅРёСЏ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р° РѕС‚ СЃС†РµРЅС‹
 
     if (!parent && scene)
       throw xtl::format_not_supported_exception ("scene_graph::Node::BindToParent", "Attempt to bind scene '%s' root to parent not supproted", scene->Name ());
 
-      //проверка не присоединяется ли узел к своему потомку
+      //РїСЂРѕРІРµСЂРєР° РЅРµ РїСЂРёСЃРѕРµРґРёРЅСЏРµС‚СЃСЏ Р»Рё СѓР·РµР» Рє СЃРІРѕРµРјСѓ РїРѕС‚РѕРјРєСѓ
       
     for (Node* node = parent_node; node; node=node->impl->parent)
       if (node == this_node)
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "parent", "Attempt to bind object to one of it's child");
         
-      //устанавливаем блокировку на вызов BindToParent
+      //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р±Р»РѕРєРёСЂРѕРІРєСѓ РЅР° РІС‹Р·РѕРІ BindToParent
       
     bind_lock = true;
     
-      //увеличиваем счётчик ссылок
+      //СѓРІРµР»РёС‡РёРІР°РµРј СЃС‡С‘С‚С‡РёРє СЃСЃС‹Р»РѕРє
       
     Pointer node_lock (this_node);
 
-      //если у узла уже есть родитель отсоединяем его
+      //РµСЃР»Рё Сѓ СѓР·Р»Р° СѓР¶Рµ РµСЃС‚СЊ СЂРѕРґРёС‚РµР»СЊ РѕС‚СЃРѕРµРґРёРЅСЏРµРј РµРіРѕ
       
     if (parent)
     {
-        //оповещаем клиентов об отсоединении узла от родителя
+        //РѕРїРѕРІРµС‰Р°РµРј РєР»РёРµРЅС‚РѕРІ РѕР± РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р° РѕС‚ СЂРѕРґРёС‚РµР»СЏ
 
       UnbindNotify ();
       
-        //обновляем итераторы, указывающие на данный узел
+        //РѕР±РЅРѕРІР»СЏРµРј РёС‚РµСЂР°С‚РѕСЂС‹, СѓРєР°Р·С‹РІР°СЋС‰РёРµ РЅР° РґР°РЅРЅС‹Р№ СѓР·РµР»
         
       parent->impl->UpdateIteratorsBeforeRemoveChild (this_node);      
 
-        //отсоединям узел от родителя
+        //РѕС‚СЃРѕРµРґРёРЅСЏРј СѓР·РµР» РѕС‚ СЂРѕРґРёС‚РµР»СЏ
       
       if (prev_child) prev_child->impl->next_child = next_child;
       else            parent->impl->first_child    = next_child;
@@ -699,11 +699,11 @@ struct Node::Impl: public xtl::instance_counter<Node>
       if (next_child) next_child->impl->prev_child = prev_child;
       else            parent->impl->last_child     = prev_child;    
       
-        //отсоединяем узел от списка обновлений родителя
+        //РѕС‚СЃРѕРµРґРёРЅСЏРµРј СѓР·РµР» РѕС‚ СЃРїРёСЃРєР° РѕР±РЅРѕРІР»РµРЅРёР№ СЂРѕРґРёС‚РµР»СЏ
         
       UnbindFromParentUpdateList ();
       
-        //уменьшаем счётчик ссылок
+        //СѓРјРµРЅСЊС€Р°РµРј СЃС‡С‘С‚С‡РёРє СЃСЃС‹Р»РѕРє
       
       if (need_release_at_unbind)
       {
@@ -712,13 +712,13 @@ struct Node::Impl: public xtl::instance_counter<Node>
       }
     }
 
-      //связываем узел с новым родителем
+      //СЃРІСЏР·С‹РІР°РµРј СѓР·РµР» СЃ РЅРѕРІС‹Рј СЂРѕРґРёС‚РµР»РµРј
 
     parent = parent_node;
 
     if (parent_node)
     {
-        //увеличиваем число ссылок если этого требует режим присоединения
+        //СѓРІРµР»РёС‡РёРІР°РµРј С‡РёСЃР»Рѕ СЃСЃС‹Р»РѕРє РµСЃР»Рё СЌС‚РѕРіРѕ С‚СЂРµР±СѓРµС‚ СЂРµР¶РёРј РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ
 
       if (mode == NodeBindMode_AddRef)
       {
@@ -731,7 +731,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
         need_release_at_unbind = false;
       }
 
-        //регистрируем узел в списке потомков родителя
+        //СЂРµРіРёСЃС‚СЂРёСЂСѓРµРј СѓР·РµР» РІ СЃРїРёСЃРєРµ РїРѕС‚РѕРјРєРѕРІ СЂРѕРґРёС‚РµР»СЏ
         
       Impl* parent_impl = parent_node->impl;
 
@@ -742,20 +742,20 @@ struct Node::Impl: public xtl::instance_counter<Node>
       if (prev_child) prev_child->impl->next_child = this_node;
       else            parent_impl->first_child     = this_node;
       
-        //установка текущей сцены
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ СЃС†РµРЅС‹
         
       SetScene (parent_impl->scene);
 
-        //добавление в список обновлений родителя
+        //РґРѕР±Р°РІР»РµРЅРёРµ РІ СЃРїРёСЃРѕРє РѕР±РЅРѕРІР»РµРЅРёР№ СЂРѕРґРёС‚РµР»СЏ
 
       if (HasUpdatables ())
         BindToParentUpdateList ();
         
-        //обновляем итераторы, указывающие на данный узел
+        //РѕР±РЅРѕРІР»СЏРµРј РёС‚РµСЂР°С‚РѕСЂС‹, СѓРєР°Р·С‹РІР°СЋС‰РёРµ РЅР° РґР°РЅРЅС‹Р№ СѓР·РµР»
         
       parent->impl->UpdateIteratorsAfterAddChild (this_node);        
 
-        //оповещение о присоединении узла к родителю
+        //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р° Рє СЂРѕРґРёС‚РµР»СЋ
 
       BindNotify ();
     }
@@ -763,22 +763,22 @@ struct Node::Impl: public xtl::instance_counter<Node>
     {
       prev_child = next_child = 0;
 
-        //установка текущей сцены
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ СЃС†РµРЅС‹
 
       SetScene (0);
 
-        //оповещения об изменениях
+        //РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РёР·РјРµРЅРµРЅРёСЏС…
 
       this_node->BeginUpdate ();
 
-        //родительские преобразования требуют пересчёта
+        //СЂРѕРґРёС‚РµР»СЊСЃРєРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚СЂРµР±СѓСЋС‚ РїРµСЂРµСЃС‡С‘С‚Р°
 
       UpdateWorldTransformNotify ();
 
       this_node->EndUpdate ();      
     }
 
-      //преобразование системы координат
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёСЃС‚РµРјС‹ РєРѕРѕСЂРґРёРЅР°С‚
       
     if (need_transform_in_world_space)
     {           
@@ -800,35 +800,35 @@ struct Node::Impl: public xtl::instance_counter<Node>
       this_node->EndUpdate ();
     }
 
-      //снятие блокировки на вызов BindToParent
+      //СЃРЅСЏС‚РёРµ Р±Р»РѕРєРёСЂРѕРІРєРё РЅР° РІС‹Р·РѕРІ BindToParent
 
     bind_lock = false;
   }
 
-  //оповещение о присоединении узла к родителю
+  //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р° Рє СЂРѕРґРёС‚РµР»СЋ
   void BindNotify ()
   {
-      //оповещения об изменениях
+      //РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РёР·РјРµРЅРµРЅРёСЏС…
     
     this_node->BeginUpdate ();
       
-      //родительские преобразования требуют пересчёта
+      //СЂРѕРґРёС‚РµР»СЊСЃРєРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚СЂРµР±СѓСЋС‚ РїРµСЂРµСЃС‡С‘С‚Р°
 
     UpdateWorldTransformNotify ();
       
-      //оповещаем клиентов о присоединении узла к новому родителю
+      //РѕРїРѕРІРµС‰Р°РµРј РєР»РёРµРЅС‚РѕРІ Рѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р° Рє РЅРѕРІРѕРјСѓ СЂРѕРґРёС‚РµР»СЋ
 
     Notify (NodeEvent_AfterBind);
 
     this_node->EndUpdate ();
     
-      //оповещение родительского узла
+      //РѕРїРѕРІРµС‰РµРЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СѓР·Р»Р°
       
     if (parent)
       parent->impl->BindChildNotify (*this_node);
   }
 
-  //оповещение об отсоединении узла от родителя
+  //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р° РѕС‚ СЂРѕРґРёС‚РµР»СЏ
   void UnbindNotify ()
   {
     Notify (NodeEvent_BeforeUnbind);
@@ -837,7 +837,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
       parent->impl->UnbindChildNotify (*this_node);
   }
 
-  //оповещение о присоединении прямого или косвенного потомка
+  //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё РїСЂСЏРјРѕРіРѕ РёР»Рё РєРѕСЃРІРµРЅРЅРѕРіРѕ РїРѕС‚РѕРјРєР°
   void BindChildNotify (Node& child)
   {
     Notify (child, NodeSubTreeEvent_AfterBind);
@@ -846,7 +846,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
       parent->impl->BindChildNotify (child);
   }
 
-  //оповещени об отсоединении прямого или косвенного потомка
+  //РѕРїРѕРІРµС‰РµРЅРё РѕР± РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё РїСЂСЏРјРѕРіРѕ РёР»Рё РєРѕСЃРІРµРЅРЅРѕРіРѕ РїРѕС‚РѕРјРєР°
   void UnbindChildNotify (Node& child)
   {
     Notify (child, NodeSubTreeEvent_BeforeUnbind);
@@ -856,17 +856,17 @@ struct Node::Impl: public xtl::instance_counter<Node>
   }
 
 /*
-    Установка указателя на сцену, к которой присоединён узел
+    РЈСЃС‚Р°РЅРѕРІРєР° СѓРєР°Р·Р°С‚РµР»СЏ РЅР° СЃС†РµРЅСѓ, Рє РєРѕС‚РѕСЂРѕР№ РїСЂРёСЃРѕРµРґРёРЅС‘РЅ СѓР·РµР»
 */
 
   void SetScene (scene_graph::Scene* in_scene)
   {
-      //если сцены совпадают - игнорируем вызов
+      //РµСЃР»Рё СЃС†РµРЅС‹ СЃРѕРІРїР°РґР°СЋС‚ - РёРіРЅРѕСЂРёСЂСѓРµРј РІС‹Р·РѕРІ
 
     if (scene == in_scene)
       return;
       
-      //оповещение об отсоединении от сцены
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё РѕС‚ СЃС†РµРЅС‹
       
     if (scene)
     {          
@@ -876,24 +876,24 @@ struct Node::Impl: public xtl::instance_counter<Node>
       }
       catch (...)
       {
-        //игнорируем все исключения
+        //РёРіРЅРѕСЂРёСЂСѓРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
       }
       
       Notify (NodeEvent_BeforeSceneDetach);
     }
     
-      //установка указателя на новую сцену
+      //СѓСЃС‚Р°РЅРѕРІРєР° СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РЅРѕРІСѓСЋ СЃС†РµРЅСѓ
 
     scene = in_scene;
     
-      //обновление сцены в потомках
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃС†РµРЅС‹ РІ РїРѕС‚РѕРјРєР°С…
 
     NodeChildrenIterator iter (this_node);
     
     while (Node::Pointer node = iter.Next ())
       node->impl->SetScene (scene);
 
-      //оповещение о присоединии к новой сцене
+      //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёСЃРѕРµРґРёРЅРёРё Рє РЅРѕРІРѕР№ СЃС†РµРЅРµ
       
     if (!in_scene)
     {
@@ -907,7 +907,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     }
     catch (...)
     {
-      //игнорируем все исключения
+      //РёРіРЅРѕСЂРёСЂСѓРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
 
     Notify (NodeEvent_AfterSceneAttach);    
@@ -915,33 +915,33 @@ struct Node::Impl: public xtl::instance_counter<Node>
   }
 
 /*
-    Оповещение клиентов о наступлении события
+    РћРїРѕРІРµС‰РµРЅРёРµ РєР»РёРµРЅС‚РѕРІ Рѕ РЅР°СЃС‚СѓРїР»РµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 */
 
   void Notify (NodeEvent event)
   {
-      //если обработчиков нет - оповещение игнорируется
+      //РµСЃР»Рё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РЅРµС‚ - РѕРїРѕРІРµС‰РµРЅРёРµ РёРіРЅРѕСЂРёСЂСѓРµС‚СЃСЏ
       
     if (!signals [event])
       return;
 
-      //проверяем нет ли рекурсивного вызова
+      //РїСЂРѕРІРµСЂСЏРµРј РЅРµС‚ Р»Рё СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ РІС‹Р·РѕРІР°
 
     if (signal_process [event])
       return;
       
-      //устанавливаем флаг обработки события
+      //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
 
     signal_process [event] = true;
     
-      //автоматическая блокировка на удаление во время оповещения
+      //Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ Р±Р»РѕРєРёСЂРѕРІРєР° РЅР° СѓРґР°Р»РµРЅРёРµ РІРѕ РІСЂРµРјСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ
       
     Pointer self_lock;
 
     if (ref_count)
       self_lock = this_node;
     
-      //вызываем обработчики событий
+      //РІС‹Р·С‹РІР°РµРј РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
 
     static const char* METHOD_NAME = "scene_graph::Node::Impl::Notify(NodeEvent)";
 
@@ -955,7 +955,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
       log.Printf ("'%s': node '%s' event %s handler exception '%s'", METHOD_NAME, name.c_str (), get_name (event), e.what ());
 
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
     catch (...)
     {
@@ -963,38 +963,38 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
       log.Printf ("'%s': node '%s' event %s handler unknown exception", METHOD_NAME, name.c_str (), get_name (event));
 
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
     
-      //снимаем флаг обработки события
+      //СЃРЅРёРјР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
     
     signal_process [event] = false;
   }
 
   void Notify (Node& child, NodeSubTreeEvent event)
   {
-    //если обработчиков нет - оповещение игнорируется
+    //РµСЃР»Рё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РЅРµС‚ - РѕРїРѕРІРµС‰РµРЅРёРµ РёРіРЅРѕСЂРёСЂСѓРµС‚СЃСЏ
 
     if (!subtree_signals [event])
       return;
 
-      //проверяем нет ли рекурсивного вызова
+      //РїСЂРѕРІРµСЂСЏРµРј РЅРµС‚ Р»Рё СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ РІС‹Р·РѕРІР°
 
     if (subtree_signal_process [event])
       return;
       
-      //оповещаем о возникновении события относительно всех потомков child
+      //РѕРїРѕРІРµС‰Р°РµРј Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РІСЃРµС… РїРѕС‚РѕРјРєРѕРІ child
 
     NodeChildrenIterator iter (&child);
     
     while (Node::Pointer node = iter.Next ())
       Notify (*node, event);
       
-      //устанавливаем флаг обработки события
+      //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
 
     subtree_signal_process [event] = true;
     
-      //вызываем обработчики событий
+      //РІС‹Р·С‹РІР°РµРј РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
 
     try
     {
@@ -1002,16 +1002,16 @@ struct Node::Impl: public xtl::instance_counter<Node>
     }
     catch (...)
     {
-      //все исключения клиентских обработчиков событий узла поглощаются
+      //РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ РєР»РёРµРЅС‚СЃРєРёС… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ СѓР·Р»Р° РїРѕРіР»РѕС‰Р°СЋС‚СЃСЏ
     }
     
-      //снимаем флаг обработки события
+      //СЃРЅРёРјР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
     
     subtree_signal_process [event] = false;  
   }
   
 /*
-    Работа со списком обновляемых узлов
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРєРѕРј РѕР±РЅРѕРІР»СЏРµРјС‹С… СѓР·Р»РѕРІ
 */
 
   void BindToParentUpdateList ()
@@ -1022,7 +1022,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     if (prev_updatable_child || next_updatable_child || parent->impl->first_updatable_child == this_node)
       return;
 
-    if (parent->impl->first_updatable_child) //если список обновляемых узлов не пуст
+    if (parent->impl->first_updatable_child) //РµСЃР»Рё СЃРїРёСЃРѕРє РѕР±РЅРѕРІР»СЏРµРјС‹С… СѓР·Р»РѕРІ РЅРµ РїСѓСЃС‚
     {
       next_updatable_child = 0;
       prev_updatable_child = parent->impl->last_updatable_child;
@@ -1031,14 +1031,14 @@ struct Node::Impl: public xtl::instance_counter<Node>
     }
     else
     {
-        //если список обновляемых узлов пуст
+        //РµСЃР»Рё СЃРїРёСЃРѕРє РѕР±РЅРѕРІР»СЏРµРјС‹С… СѓР·Р»РѕРІ РїСѓСЃС‚
 
       parent->impl->first_updatable_child = this_node;
       
       prev_updatable_child = 0;
       next_updatable_child = 0;
       
-        //рекурсивная регистрация родителя
+        //СЂРµРєСѓСЂСЃРёРІРЅР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЂРѕРґРёС‚РµР»СЏ
 
       parent->impl->BindToParentUpdateList ();
     }
@@ -1079,7 +1079,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     prev_updatable_child = 0;
     next_updatable_child = 0;
 
-      //рекурсивная отмена регистрации родителя
+      //СЂРµРєСѓСЂСЃРёРІРЅР°СЏ РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё СЂРѕРґРёС‚РµР»СЏ
           
     if (!parent->impl->first_updatable_child && !parent->impl->has_updatable_controllers)
       parent->impl->UnbindFromParentUpdateList ();
@@ -1088,7 +1088,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
   bool HasUpdatables () { return has_updatable_controllers || first_updatable_child; }
 
 /*
-    Обновление состояния узла
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓР·Р»Р°
 */
 
   void UpdateNode (const TimeValue& time)
@@ -1118,7 +1118,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
       log.Printf ("'%s': node '%s' update exception '%s'", METHOD_NAME, name.c_str (), e.what ());
 
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
     catch (...)
     {
@@ -1126,13 +1126,13 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
       log.Printf ("'%s': node '%s' update unknown exception", METHOD_NAME, name.c_str ());
 
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Node::Node ()
@@ -1142,17 +1142,17 @@ Node::Node ()
 
 Node::~Node ()
 {
-    //оповещение об удалении узла
+    //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СѓР·Р»Р°
 
   impl->Notify (NodeEvent_AfterDestroy);
 
-    //удаляем реализацию узла
+    //СѓРґР°Р»СЏРµРј СЂРµР°Р»РёР·Р°С†РёСЋ СѓР·Р»Р°
 
   delete impl;
 }
 
 /*
-    Создание узла
+    РЎРѕР·РґР°РЅРёРµ СѓР·Р»Р°
 */
 
 Node::Pointer Node::Create ()
@@ -1161,7 +1161,7 @@ Node::Pointer Node::Create ()
 }
 
 /*
-    Сцена, которой принадлежит объект
+    РЎС†РµРЅР°, РєРѕС‚РѕСЂРѕР№ РїСЂРёРЅР°РґР»РµР¶РёС‚ РѕР±СЉРµРєС‚
 */
 
 Scene* Node::Scene ()
@@ -1175,7 +1175,7 @@ const Scene* Node::Scene () const
 }
 
 /*
-    Имя узла
+    РРјСЏ СѓР·Р»Р°
 */
 
 const char* Node::Name () const
@@ -1200,7 +1200,7 @@ void Node::SetName (const char* name)
 }
 
 /*
-    Свойства узла (могут быть NULL)
+    РЎРІРѕР№СЃС‚РІР° СѓР·Р»Р° (РјРѕРіСѓС‚ Р±С‹С‚СЊ NULL)
 */
 
 common::PropertyMap* Node::Properties ()
@@ -1240,7 +1240,7 @@ void Node::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-    Связывание свойств узла с методами узла
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ СѓР·Р»Р° СЃ РјРµС‚РѕРґР°РјРё СѓР·Р»Р°
 */
 
 common::PropertyBindingMap& Node::PropertyBindings ()
@@ -1340,7 +1340,7 @@ void Node::BindProperties (common::PropertyBindingMap& bindings)
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Node::AddRef () const
@@ -1372,7 +1372,7 @@ size_t Node::UseCount () const
 }
 
 /*
-    Связи для перемещения по данному уровню иерархии
+    РЎРІСЏР·Рё РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ РїРѕ РґР°РЅРЅРѕРјСѓ СѓСЂРѕРІРЅСЋ РёРµСЂР°СЂС…РёРё
 */
 
 Node::Pointer Node::Parent ()
@@ -1426,7 +1426,7 @@ Node::ConstPointer Node::NextChild () const
 }
 
 /*
-    Присоединение узла к родителю
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СѓР·Р»Р° Рє СЂРѕРґРёС‚РµР»СЋ
 */
 
 void Node::Unbind (NodeTransformSpace invariant_space)
@@ -1469,7 +1469,7 @@ void Node::UnbindAllChildren ()
 }
 
 /*
-    Поиск потомка по имени
+    РџРѕРёСЃРє РїРѕС‚РѕРјРєР° РїРѕ РёРјРµРЅРё
 */
 
 Node::Pointer Node::FindChild (const char* name, NodeSearchMode mode) //no throw
@@ -1514,7 +1514,7 @@ Node::ConstPointer Node::FindChild (const char* name, NodeSearchMode mode) const
 }
 
 /*
-    Посещение узла с динамической диспетчеризацией по типу (применение паттерна Visitor)
+    РџРѕСЃРµС‰РµРЅРёРµ СѓР·Р»Р° СЃ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёРµР№ РїРѕ С‚РёРїСѓ (РїСЂРёРјРµРЅРµРЅРёРµ РїР°С‚С‚РµСЂРЅР° Visitor)
 */
 
 void Node::Accept (Visitor& visitor) const
@@ -1528,7 +1528,7 @@ void Node::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Обход потомков
+    РћР±С…РѕРґ РїРѕС‚РѕРјРєРѕРІ
 */
 
 void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode) const
@@ -1612,7 +1612,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
 }
 
 /*
-    Положение узла
+    РџРѕР»РѕР¶РµРЅРёРµ СѓР·Р»Р°
 */
 
 void Node::SetPosition (const vec3f& position)
@@ -1656,7 +1656,7 @@ const vec3f& Node::WorldPosition () const
 }
 
 /*
-    Центр узла в локальной системе координат (точка применения поворотов и масштаба)
+    Р¦РµРЅС‚СЂ СѓР·Р»Р° РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ (С‚РѕС‡РєР° РїСЂРёРјРµРЅРµРЅРёСЏ РїРѕРІРѕСЂРѕС‚РѕРІ Рё РјР°СЃС€С‚Р°Р±Р°)
 */
 
 void Node::SetPivotPosition (const math::vec3f& pivot_position)
@@ -1704,7 +1704,7 @@ const math::vec3f& Node::PivotPosition () const
   return impl->pivot ? impl->pivot->pivot_position : ZERO_VEC;
 }
 
-//установка флага применения центра поворотов
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РїСЂРёРјРµРЅРµРЅРёСЏ С†РµРЅС‚СЂР° РїРѕРІРѕСЂРѕС‚РѕРІ
 void Node::SetOrientationPivotEnabled (bool state)
 {
   if (!impl->pivot && state == DEFAULT_ORIENTATION_PIVOT_ENABLED)
@@ -1717,7 +1717,7 @@ void Node::SetOrientationPivotEnabled (bool state)
   impl->UpdateLocalTransformNotify ();
 }
 
-//установка флага применения центра масштаба
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РїСЂРёРјРµРЅРµРЅРёСЏ С†РµРЅС‚СЂР° РјР°СЃС€С‚Р°Р±Р°
 void Node::SetScalePivotEnabled (bool state)
 {
   if (!impl->pivot && state == DEFAULT_SCALE_PIVOT_ENABLED)
@@ -1740,14 +1740,14 @@ bool Node::ScalePivotEnabled () const
   return impl->pivot ? impl->pivot->scale_pivot_enabled : DEFAULT_SCALE_PIVOT_ENABLED;
 }
 
-//проверка: присутствует ли pivot в данном узле
+//РїСЂРѕРІРµСЂРєР°: РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ Р»Рё pivot РІ РґР°РЅРЅРѕРј СѓР·Р»Рµ
 bool Node::PivotEnabled () const
 {
   return impl->pivot && impl->pivot->pivot_enabled && (impl->pivot->orientation_pivot_enabled || impl->pivot->scale_pivot_enabled);
 }
 
 /*
-    Ориентация узла
+    РћСЂРёРµРЅС‚Р°С†РёСЏ СѓР·Р»Р°
 */
 
 void Node::SetOrientation (const quatf& orientation)
@@ -1808,7 +1808,7 @@ const quatf& Node::WorldOrientation () const
 }
 
 /*
-    Позиционирование узла
+    РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ СѓР·Р»Р°
 */
 
 void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpace space)
@@ -1847,7 +1847,7 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
   static const float EPS = 0.001f;
   
   if (qlen (y) < EPS || qlen (z) < EPS || equal (y, z, EPS))
-    return; //игнорирование позиционирования на начало локальной системы координат
+    return; //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РїРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ РЅР° РЅР°С‡Р°Р»Рѕ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјС‹ РєРѕРѕСЂРґРёРЅР°С‚
 
   mat3f view;
 
@@ -1868,7 +1868,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
 {
   static const char* METHOD_NAME = "scene_graph::Node::LookTo(const vec3f&, NodeOrt, NodeOrt, NodeTransformSpace)";
   
-    //приведение целевой точки в локальную систему координат
+    //РїСЂРёРІРµРґРµРЅРёРµ С†РµР»РµРІРѕР№ С‚РѕС‡РєРё РІ Р»РѕРєР°Р»СЊРЅСѓСЋ СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
 
   vec3f local_dir;
 
@@ -1898,7 +1898,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
       throw xtl::make_argument_exception (METHOD_NAME, "space", space);
   }
 
-    //проверка корректности осей
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РѕСЃРµР№
   
   switch (direction)
   {
@@ -1923,7 +1923,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
   if (invariant == direction)
     throw xtl::format_operation_exception (METHOD_NAME, "Bad configuration invariant = direction");
     
-    //диспетчеризация
+    //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
     
   switch (direction)
   {
@@ -2000,7 +2000,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeTransformSpace space)
 }
 
 /*
-    Масштаб узла
+    РњР°СЃС€С‚Р°Р± СѓР·Р»Р°
 */
 
 void Node::SetScale (const vec3f& scale)
@@ -2051,10 +2051,10 @@ const vec3f& Node::WorldScale () const
 }
 
 /*
-    Управление наследованием преобразований
+    РЈРїСЂР°РІР»РµРЅРёРµ РЅР°СЃР»РµРґРѕРІР°РЅРёРµРј РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 */
 
-//установка флага наследования родительской ориентации
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕР№ РѕСЂРёРµРЅС‚Р°С†РёРё
 void Node::SetOrientationInherit (bool state)
 {
   if (state == impl->orientation_inherit)
@@ -2065,13 +2065,13 @@ void Node::SetOrientationInherit (bool state)
   impl->UpdateWorldTransformNotify ();
 }
 
-//наследуется ли родительская ориентация
+//РЅР°СЃР»РµРґСѓРµС‚СЃСЏ Р»Рё СЂРѕРґРёС‚РµР»СЊСЃРєР°СЏ РѕСЂРёРµРЅС‚Р°С†РёСЏ
 bool Node::IsOrientationInherited () const
 {
   return impl->orientation_inherit;
 }
 
-//установка флага наследования родительского масштаба
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РјР°СЃС€С‚Р°Р±Р°
 void Node::SetScaleInherit (bool state)
 {
   if (state == impl->scale_inherit)
@@ -2082,14 +2082,14 @@ void Node::SetScaleInherit (bool state)
   impl->UpdateWorldTransformNotify ();
 }
 
-//наследуется ли родительский масштаб
+//РЅР°СЃР»РµРґСѓРµС‚СЃСЏ Р»Рё СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РјР°СЃС€С‚Р°Р±
 bool Node::IsScaleInherited () const
 {
   return impl->scale_inherit;
 }
 
 /*
-    Кумулятивные преобразования
+    РљСѓРјСѓР»СЏС‚РёРІРЅС‹Рµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
@@ -2167,7 +2167,7 @@ void Node::Scale (float sx, float sy, float sz)
 }
 
 /*
-    Получение матриц преобразования узла
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°С‚СЂРёС† РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СѓР·Р»Р°
 */
 
 const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
@@ -2198,14 +2198,14 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
 }
 
 /*
-    Получение осей
+    РџРѕР»СѓС‡РµРЅРёРµ РѕСЃРµР№
 */
 
 vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
 {
   static const char* METHOD_NAME = "scene_graph::Node::Ort";
 
-    //получение матрицы преобразований
+    //РїРѕР»СѓС‡РµРЅРёРµ РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 
   const mat4f* tm;
   
@@ -2224,7 +2224,7 @@ vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
       throw xtl::make_argument_exception (METHOD_NAME, "space", space);
   }
   
-    //получение оси
+    //РїРѕР»СѓС‡РµРЅРёРµ РѕСЃРё
     
   vec4f local_ort;
 
@@ -2241,7 +2241,7 @@ vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
 }
 
 /*
-    Получение матрицы преобразования узла object в системе координат данного узла
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СѓР·Р»Р° object РІ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ РґР°РЅРЅРѕРіРѕ СѓР·Р»Р°
 */
 
 mat4f Node::ObjectTM (Node& object) const
@@ -2250,7 +2250,7 @@ mat4f Node::ObjectTM (Node& object) const
 }
 
 /*
-    Подписка на события Node
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ Node
 */
 
 xtl::connection Node::RegisterEventHandler (NodeEvent event, const EventHandler& handler) const
@@ -2270,7 +2270,7 @@ xtl::connection Node::RegisterEventHandler (NodeSubTreeEvent event, const SubTre
 }
 
 /*
-    Управление транзакциями обновления
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚СЂР°РЅР·Р°РєС†РёСЏРјРё РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void Node::BeginUpdate ()
@@ -2285,7 +2285,7 @@ void Node::EndUpdate ()
     
   if (!--impl->update_lock)
   {
-      //если во время транзакции обновления узел изменялся - оповещаем клиентов об изменениях
+      //РµСЃР»Рё РІРѕ РІСЂРµРјСЏ С‚СЂР°РЅР·Р°РєС†РёРё РѕР±РЅРѕРІР»РµРЅРёСЏ СѓР·РµР» РёР·РјРµРЅСЏР»СЃСЏ - РѕРїРѕРІРµС‰Р°РµРј РєР»РёРµРЅС‚РѕРІ РѕР± РёР·РјРµРЅРµРЅРёСЏС…
     
     if (impl->update_notify)
     {
@@ -2301,7 +2301,7 @@ bool Node::IsInUpdateTransaction () const
   return impl->update_lock > 0;  
 }
 
-//оповещение об изменении узла
+//РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СѓР·Р»Р°
 void Node::UpdateNotify () const
 {
   impl->UpdateNotify ();
@@ -2313,7 +2313,7 @@ void Node::SetScene (scene_graph::Scene* in_scene)
 }
 
 /*
-    Присоединение / отсоединение контроллера
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ / РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 xtl::com_ptr<controllers::DefaultController> Node::AttachController (const UpdateFunction& updater)
@@ -2373,7 +2373,7 @@ void Node::UpdateControllerList ()
       break;
     }
 
-  if (!impl->HasUpdatables ()) //если нет обновляемых потомков и контроллеров - отсоединение от родительского списка обновлений
+  if (!impl->HasUpdatables ()) //РµСЃР»Рё РЅРµС‚ РѕР±РЅРѕРІР»СЏРµРјС‹С… РїРѕС‚РѕРјРєРѕРІ Рё РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ - РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ РѕС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СЃРїРёСЃРєР° РѕР±РЅРѕРІР»РµРЅРёР№
     impl->UnbindFromParentUpdateList ();
 }
 
@@ -2384,7 +2384,7 @@ void Node::DetachAllControllers ()
 }
 
 /*
-   Перебор контроллеров
+   РџРµСЂРµР±РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
 */
 
 xtl::com_ptr<Controller> Node::FirstController ()
@@ -2414,12 +2414,12 @@ xtl::com_ptr<const Controller> Node::LastController () const
 }
 
 /*
-    Обновление состояния узла и его потомков
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓР·Р»Р° Рё РµРіРѕ РїРѕС‚РѕРјРєРѕРІ
 */
 
 void Node::Update (const TimeValue& time, NodeTraverseMode mode)
 {  
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   Pointer lock (this);
 

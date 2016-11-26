@@ -18,7 +18,7 @@ template <class T> class CollectionBaseClass
 }
 
 /*
-   Реализация коллекции физической библиотеки
+   Р РµР°Р»РёР·Р°С†РёСЏ РєРѕР»Р»РµРєС†РёРё С„РёР·РёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class T>
@@ -31,7 +31,7 @@ struct PhysicsLibraryOrderedCollection<T>::Impl : public xtl::reference_counter
 
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -62,7 +62,7 @@ PhysicsLibraryOrderedCollection<T>& PhysicsLibraryOrderedCollection<T>::operator
 }
     
 /*
-   Количество элементов / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -78,7 +78,7 @@ bool PhysicsLibraryOrderedCollection<T>::IsEmpty () const
 }
 
 /*
-   Перебор
+   РџРµСЂРµР±РѕСЂ
 */
 
 template <class T>
@@ -94,7 +94,7 @@ typename PhysicsLibraryOrderedCollection<T>::ConstIterator PhysicsLibraryOrdered
 }
 
 /*
-   Доступ к элементу по индексу
+   Р”РѕСЃС‚СѓРї Рє СЌР»РµРјРµРЅС‚Сѓ РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 template <class T>
@@ -110,7 +110,7 @@ T& PhysicsLibraryOrderedCollection<T>::operator [] (size_t index)
 }
 
 /*
-   Резервирование элементов
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class T>
@@ -126,7 +126,7 @@ void PhysicsLibraryOrderedCollection<T>::Reserve  (size_t count)
 }
 
 /*
-   Добавление элементов в коллекцию
+   Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РІ РєРѕР»Р»РµРєС†РёСЋ
 */
 
 template <class T>
@@ -136,7 +136,7 @@ size_t PhysicsLibraryOrderedCollection<T>::Add (const Item& item)
 }
 
 /*
-   Удаление элементов из коллекции
+   РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РёР· РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class T>
@@ -146,7 +146,7 @@ void PhysicsLibraryOrderedCollection<T>::Remove (size_t index)
 }
 
 /*
-   Очистка коллекции
+   РћС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class T>
@@ -156,7 +156,7 @@ void PhysicsLibraryOrderedCollection<T>::Clear ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>
@@ -174,7 +174,7 @@ namespace physics
 template class PhysicsLibraryOrderedCollection <CollisionFilter>;
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>

@@ -6,7 +6,7 @@ using namespace render::scene;
 namespace
 {
 
-/// Контекст обработки
+/// РљРѕРЅС‚РµРєСЃС‚ РѕР±СЂР°Р±РѕС‚РєРё
 class ContextImpl: public Context
 {
   public:
@@ -26,15 +26,15 @@ class ContextImpl: public Context
 
 typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
-/// Внутреннее состояние соединения
+/// Р’РЅСѓС‚СЂРµРЅРЅРµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 struct ConnectionInternalState: public xtl::reference_counter
 {
-  ServerImpl&     server;               //ссылка на сервер
-  ConnectionState state;                //состояние соединения
-  ContextImpl     context;              //контекст
-  ConnectionPtr   response_connection;  //обратное соединение с клиентом
+  ServerImpl&     server;               //СЃСЃС‹Р»РєР° РЅР° СЃРµСЂРІРµСЂ
+  ConnectionState state;                //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
+  ContextImpl     context;              //РєРѕРЅС‚РµРєСЃС‚
+  ConnectionPtr   response_connection;  //РѕР±СЂР°С‚РЅРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РєР»РёРµРЅС‚РѕРј
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ConnectionInternalState (ServerImpl& in_server, const char* init_string)
     : server (in_server)
     , state (in_server)
@@ -54,7 +54,7 @@ struct ConnectionInternalState: public xtl::reference_counter
     }
   } 
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ConnectionInternalState ()
   {
     state.SetContext (0);
@@ -66,21 +66,21 @@ typedef xtl::intrusive_ptr<ConnectionInternalState> StatePtr;
 }
 
 /*
-    Описание реализации соединения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 struct Connection::Impl: public xtl::trackable
 {
-  StatePtr state; //внутреннее состояние соединения
+  StatePtr state; //РІРЅСѓС‚СЂРµРЅРЅРµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ServerImpl& server, const char* init_string)
     : state (new ConnectionInternalState (server, init_string), false)
   {
     connect_tracker (server.connect_tracker (xtl::bind (&Impl::OnServerShutdown, this)));
   } 
 
-/// Оповещение об удалении сервера
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЃРµСЂРІРµСЂР°
   void OnServerShutdown ()
   {
     state = StatePtr ();
@@ -88,7 +88,7 @@ struct Connection::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Connection::Connection (ServerImpl& server, const char* init_string)
@@ -114,7 +114,7 @@ Connection::~Connection ()
 }
 
 /*
-    Является ли соединение внутрипроцессным
+    РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
 */
 
 bool Connection::IsInprocessed ()
@@ -123,7 +123,7 @@ bool Connection::IsInprocessed ()
 }
 
 /*
-    Обработка входного потока данных
+    РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
 */
 
 void Connection::ProcessCommands (const interchange::CommandBuffer& commands)
@@ -144,7 +144,7 @@ void Connection::ProcessCommands (const interchange::CommandBuffer& commands)
 }
 
 /*
-    Получение события оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& Connection::GetTrackable ()
@@ -153,7 +153,7 @@ xtl::trackable& Connection::GetTrackable ()
 }
 
 /*
-    Подсчет ссылок
+    РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
 */
 
 void Connection::AddRef  ()

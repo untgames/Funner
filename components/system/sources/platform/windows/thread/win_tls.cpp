@@ -14,13 +14,13 @@ namespace
 {
 
 /*
-    Ìåíåäæåğ TLS
+    ĞœĞµĞ½ĞµĞ´Ğ¶ĞµÑ€ TLS
 */
 
 class TlsManager
 {
   public:
-///Ğåãèñòğàöèÿ TLS
+///Ğ ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ°Ñ†Ğ¸Ñ TLS
     void Register (tls_t tls)
     {
       ThreadPair tls_thread_pair (GetCurrentThreadId (), tls->key);
@@ -41,7 +41,7 @@ class TlsManager
       }
     }
     
-///Ïğîâåğêà íàëè÷èÿ tls äëÿ äàííîé íèòè
+///ĞŸÑ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ½Ğ°Ğ»Ğ¸Ñ‡Ğ¸Ñ tls Ğ´Ğ»Ñ Ğ´Ğ°Ğ½Ğ½Ğ¾Ğ¹ Ğ½Ğ¸Ñ‚Ğ¸
     bool IsPresent (tls_t tls)
     {
       ThreadPair tls_thread_pair (GetCurrentThreadId (), tls->key);
@@ -49,7 +49,7 @@ class TlsManager
       return registered_tls.find (tls_thread_pair) != registered_tls.end ();
     }
     
-///Î÷èñòêà äëÿ òåêóùåé íèòè
+///ĞÑ‡Ğ¸ÑÑ‚ĞºĞ° Ğ´Ğ»Ñ Ñ‚ĞµĞºÑƒÑ‰ĞµĞ¹ Ğ½Ğ¸Ñ‚Ğ¸
     void Cleanup ()
     {
       DWORD current_thread_id = GetCurrentThreadId ();
@@ -67,7 +67,7 @@ class TlsManager
         }
         catch (...)
         {
-          ///ïîäàâëåíèå âñåõ èñêëş÷åíèé
+          ///Ğ¿Ğ¾Ğ´Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ Ğ²ÑĞµÑ… Ğ¸ÑĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ğ¹
         }
 
         registered_tls.erase (ThreadPair (current_thread_id, tls->key));

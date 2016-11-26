@@ -1,4 +1,4 @@
-//Тестирование алгоритма equal_range (first, last, value, less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° equal_range (first, last, value, less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

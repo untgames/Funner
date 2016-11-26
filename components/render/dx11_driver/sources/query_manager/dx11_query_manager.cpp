@@ -4,12 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджера запросов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 struct QueryManager::Impl: public DeviceObject
 {
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
   {
@@ -17,7 +17,7 @@ struct QueryManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 QueryManager::QueryManager (const DeviceManager& manager)
@@ -30,7 +30,7 @@ QueryManager::~QueryManager ()
 }
 
 /*
-    Создание предикатов
+    РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРёРєР°С‚РѕРІ
 */
 
 IPredicate* QueryManager::CreatePredicate ()

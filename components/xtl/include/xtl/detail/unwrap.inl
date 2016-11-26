@@ -5,7 +5,7 @@
 template <class T> class reference_wrapper;
 
 /*
-    Снятие reference_wrapper
+    РЎРЅСЏС‚РёРµ reference_wrapper
 */
 
 template <class T> inline T& unwrap (T& x)

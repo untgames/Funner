@@ -6,7 +6,7 @@ using namespace input::low_level;
 using namespace input::low_level::sensor_input_driver;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
@@ -18,7 +18,7 @@ const char*  UPDATE_INTERVAL_PROPERTY = "UpdateInterval";
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Device::Device (size_t sensor_index, const char* in_full_name)
@@ -39,7 +39,7 @@ Device::~Device ()
 }
 
 /*
-    Имя устройства
+    РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Device::GetName ()
@@ -48,7 +48,7 @@ const char* Device::GetName ()
 }
 
 /*
-    Полное имя устройства (тип.имя.идентификатор)
+    РџРѕР»РЅРѕРµ РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° (С‚РёРї.РёРјСЏ.РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ)
 */
 
 const char* Device::GetFullName ()
@@ -57,7 +57,7 @@ const char* Device::GetFullName ()
 }
 
 /*
-    Получение имени контрола
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєРѕРЅС‚СЂРѕР»Р°
 */
 
 const wchar_t* Device::GetControlName (const char* control_id)
@@ -68,7 +68,7 @@ const wchar_t* Device::GetControlName (const char* control_id)
 }
 
 /*
-    Подписка на события устройства
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void Device::Notify (const syslib::SensorEvent& event)
@@ -97,7 +97,7 @@ xtl::connection Device::RegisterEventHandler (const EventHandler& handler)
 }
 
 /*
-    Настройки устройства
+    РќР°СЃС‚СЂРѕР№РєРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Device::GetProperties ()
@@ -158,7 +158,7 @@ float Device::GetProperty (const char* name)
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Device::AddRef ()

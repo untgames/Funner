@@ -3,14 +3,14 @@
 using namespace render::manager;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const size_t DEFAULT_TIME_DELAY  = 3600 * 1000; //задержка по времени до удаления объекта из кэша по умолчанию
-const size_t DEFAULT_FRAME_DELAY = ~0u - 1;     //задержка по количеству кадров до удаления объекта из кэша по умолчанию
+const size_t DEFAULT_TIME_DELAY  = 3600 * 1000; //Р·Р°РґРµСЂР¶РєР° РїРѕ РІСЂРµРјРµРЅРё РґРѕ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РёР· РєСЌС€Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t DEFAULT_FRAME_DELAY = ~0u - 1;     //Р·Р°РґРµСЂР¶РєР° РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РєР°РґСЂРѕРІ РґРѕ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РёР· РєСЌС€Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 }
 
@@ -21,18 +21,18 @@ const size_t DEFAULT_FRAME_DELAY = ~0u - 1;     //задержка по количеству кадров 
 */
 
 /*
-    Описание реализации кэша
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСЌС€Р°
 */
 
 typedef stl::list<Cache*> CacheList;
 
 struct CacheManager::Impl
 {
-  CacheList caches;        //список кэшей
-  FrameTime time_delay;    //задержка по времени до удаления объекта из кэша
-  FrameId   frame_delay;   //задержка по количеству кадров до удаления объекта из кэша
-  FrameId   current_frame; //текущий кадр
-  FrameTime current_time;  //текущее время
+  CacheList caches;        //СЃРїРёСЃРѕРє РєСЌС€РµР№
+  FrameTime time_delay;    //Р·Р°РґРµСЂР¶РєР° РїРѕ РІСЂРµРјРµРЅРё РґРѕ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РёР· РєСЌС€Р°
+  FrameId   frame_delay;   //Р·Р°РґРµСЂР¶РєР° РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ РєР°РґСЂРѕРІ РґРѕ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РёР· РєСЌС€Р°
+  FrameId   current_frame; //С‚РµРєСѓС‰РёР№ РєР°РґСЂ
+  FrameTime current_time;  //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ
   
   Impl ()
     : time_delay (DEFAULT_TIME_DELAY)
@@ -44,7 +44,7 @@ struct CacheManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CacheManager::CacheManager ()
@@ -57,7 +57,7 @@ CacheManager::~CacheManager ()
 }
 
 /*
-    Параметры кэширования
+    РџР°СЂР°РјРµС‚СЂС‹ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 void CacheManager::SetTimeDelay (FrameTime milliseconds)
@@ -81,7 +81,7 @@ FrameId CacheManager::FrameDelay ()
 }
 
 /*
-    Текущий кадр / текущий фрейм
+    РўРµРєСѓС‰РёР№ РєР°РґСЂ / С‚РµРєСѓС‰РёР№ С„СЂРµР№Рј
 */
 
 FrameTime CacheManager::CurrentTime ()
@@ -95,7 +95,7 @@ FrameId CacheManager::CurrentFrame ()
 }
 
 /*
-    Обновление маркеров времени
+    РћР±РЅРѕРІР»РµРЅРёРµ РјР°СЂРєРµСЂРѕРІ РІСЂРµРјРµРЅРё
 */
 
 void CacheManager::UpdateMarkers ()
@@ -112,7 +112,7 @@ void CacheManager::UpdateMarkers ()
 }
 
 /*
-    Сброс кэшей
+    РЎР±СЂРѕСЃ РєСЌС€РµР№
 */
 
 void CacheManager::FlushCaches ()
@@ -122,7 +122,7 @@ void CacheManager::FlushCaches ()
 }
 
 /*
-    Добавление / удаление кэша
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РєСЌС€Р°
 */
 
 void CacheManager::AddCache (Cache& cache)
@@ -149,7 +149,7 @@ void CacheManager::RemoveCache (Cache& cache)
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Cache::Cache (const CacheManagerPtr& in_manager)
@@ -171,7 +171,7 @@ Cache::~Cache ()
 }
 
 /*
-    Параметры кэширования
+    РџР°СЂР°РјРµС‚СЂС‹ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 FrameTime Cache::TimeDelay ()

@@ -1,4 +1,4 @@
--- Таблица атрибутов
+-- РўР°Р±Р»РёС†Р° Р°С‚СЂРёР±СѓС‚РѕРІ
 
 local meta_attributes_internal =
 {
@@ -9,7 +9,7 @@ local attributes_table = {}
 
 setmetatable (attributes_table, attributes_meta_table)
 
--- Создание атрибута
+-- РЎРѕР·РґР°РЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
 local function CreateAttribute (...)
   local args     = { ... }
   local is_empty = next (args) == nil
@@ -18,7 +18,7 @@ local function CreateAttribute (...)
 
   local attribute_meta_table =
   {
-    -- Установка атрибута для указанного значения
+    -- РЈСЃС‚Р°РЅРѕРІРєР° Р°С‚СЂРёР±СѓС‚Р° РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
     __call = function (attribute, name, value)
       if value == nil then value = true end
     
@@ -64,7 +64,7 @@ local function CreateAttribute (...)
     end,    
   }  
 
-  -- Проверка наличия атрибута для указанного значения  
+  -- РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°С‚СЂРёР±СѓС‚Р° РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ  
   attribute.Check = function (value)
     local entry = attributes_table [value]
 
@@ -86,7 +86,7 @@ local function CreateAttribute (...)
   return attribute
 end
 
--- Получение атрибутов
+-- РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 local function GetAttributes (value)
   local entry = attributes_table [value]
   
@@ -97,6 +97,6 @@ local function GetAttributes (value)
   return pairs (entry)
 end
 
--- Переопределение имён
+-- РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ РёРјС‘РЅ
 attribute     = CreateAttribute
 attributesof  = GetAttributes

@@ -3,7 +3,7 @@
 using namespace physics;
 
 /*
-   Описание точки привязки соединения в теле
+   РћРїРёСЃР°РЅРёРµ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё СЃРѕРµРґРёРЅРµРЅРёСЏ РІ С‚РµР»Рµ
 */
 
 JointBind::JointBind (const RigidBody& in_body, const math::vec3f& in_anchor, const math::vec3f& in_axis)
@@ -11,11 +11,11 @@ JointBind::JointBind (const RigidBody& in_body, const math::vec3f& in_anchor, co
   {}
 
 /*
-   Соединение тел
+   РЎРѕРµРґРёРЅРµРЅРёРµ С‚РµР»
 */
 
 /*
-   Соединение тел
+   РЎРѕРµРґРёРЅРµРЅРёРµ С‚РµР»
 */
 
 struct Joint::Impl : public xtl::reference_counter
@@ -29,7 +29,7 @@ struct Joint::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Joint::Joint (Impl* source_impl)
@@ -55,7 +55,7 @@ Joint& Joint::operator = (const Joint& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Joint::Id () const
@@ -64,7 +64,7 @@ size_t Joint::Id () const
 }
 
 /*
-   Получение соединенных тел
+   РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРµРґРёРЅРµРЅРЅС‹С… С‚РµР»
 */
 
 size_t Joint::BodiesCount () const
@@ -86,7 +86,7 @@ RigidBody& Joint::Body (size_t index)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Joint::Swap (Joint& joint)
@@ -98,7 +98,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Joint& joint1, Joint& joint2)
@@ -109,7 +109,7 @@ void swap (Joint& joint1, Joint& joint2)
 }
 
 /*
-   Создание
+   РЎРѕР·РґР°РЅРёРµ
 */
 
 Joint JointImplProvider::CreateJoint (JointPtr joint, const RigidBodyArray& bodies)

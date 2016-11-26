@@ -15,20 +15,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* VIDEO_DECODERS_COMPONENTS_MASK = "media.video.decoders.*"; //маска имён компонентов загрузки потокового видео
+const char* VIDEO_DECODERS_COMPONENTS_MASK = "media.video.decoders.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р·Р°РіСЂСѓР·РєРё РїРѕС‚РѕРєРѕРІРѕРіРѕ РІРёРґРµРѕ
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
 typedef xtl::uninitialized_storage<char> TempBuffer;
 typedef stl::auto_ptr<IVideoDecoder>     DecoderPtr;
 
 /*
-    Декодер по умолчанию
+    Р”РµРєРѕРґРµСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 class DefaultDecoder: public IVideoDecoder
@@ -54,21 +54,21 @@ class DefaultDecoder: public IVideoDecoder
 }
 
 /*
-    Описание реализации видео потока
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РІРёРґРµРѕ РїРѕС‚РѕРєР°
 */
 
 struct VideoStream::Impl
 {
-  DecoderPtr   decoder;            //декодер видео
-  stl::string  file_name;          //имя файла (для возможности копирования видео)
-  stl::string  name;               //имя видео потока
-  VideoQuality quality;            //качество декодирования видео
-  unsigned int frames_count;       //количество кадров
-  float        frames_per_second;  //количество кадров в секунду
-  unsigned int width;              //ширина кадра
-  unsigned int height;             //высота кадра
-  float        pixel_aspect_ratio; //соотношение сторон кадра
-  TempBuffer   temp_decode_buffer; //временный буфер декодирования
+  DecoderPtr   decoder;            //РґРµРєРѕРґРµСЂ РІРёРґРµРѕ
+  stl::string  file_name;          //РёРјСЏ С„Р°Р№Р»Р° (РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РєРѕРїРёСЂРѕРІР°РЅРёСЏ РІРёРґРµРѕ)
+  stl::string  name;               //РёРјСЏ РІРёРґРµРѕ РїРѕС‚РѕРєР°
+  VideoQuality quality;            //РєР°С‡РµСЃС‚РІРѕ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ РІРёРґРµРѕ
+  unsigned int frames_count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ
+  float        frames_per_second;  //РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ
+  unsigned int width;              //С€РёСЂРёРЅР° РєР°РґСЂР°
+  unsigned int height;             //РІС‹СЃРѕС‚Р° РєР°РґСЂР°
+  float        pixel_aspect_ratio; //СЃРѕРѕС‚РЅРѕС€РµРЅРёРµ СЃС‚РѕСЂРѕРЅ РєР°РґСЂР°
+  TempBuffer   temp_decode_buffer; //РІСЂРµРјРµРЅРЅС‹Р№ Р±СѓС„РµСЂ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ
   
   Impl (const char* in_file_name, VideoQuality in_quality, DecoderPtr& in_decoder)
     : decoder (in_decoder)
@@ -96,7 +96,7 @@ struct VideoStream::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 VideoStream::VideoStream ()
@@ -175,7 +175,7 @@ VideoStream& VideoStream::operator = (const VideoStream& stream)
 }
 
 /*
-    Имя потока
+    РРјСЏ РїРѕС‚РѕРєР°
 */
 
 const char* VideoStream::Name () const
@@ -192,7 +192,7 @@ void VideoStream::Rename (const char* new_name)
 }
 
 /*
-    Получение параметров видео
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РІРёРґРµРѕ
 */
 
 VideoQuality VideoStream::Quality () const
@@ -244,7 +244,7 @@ unsigned int VideoStream::FrameSize () const
 }
 
 /*
-    Получение декодированного кадра
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅРѕРіРѕ РєР°РґСЂР°
 */
 
 void VideoStream::Decode (unsigned int frame_number, Image& image, unsigned int image_offset_x, unsigned int image_offset_y, unsigned int image_offset_z)
@@ -253,14 +253,14 @@ void VideoStream::Decode (unsigned int frame_number, Image& image, unsigned int 
   {
     if (!image_offset_x && !image_offset_y && image.Width () == impl->width && image.Height () == impl->height && image.Format () == PixelFormat_RGBA8)
     {
-        //частный случай - копирование в буфер изображения напрямую
+        //С‡Р°СЃС‚РЅС‹Р№ СЃР»СѓС‡Р°Р№ - РєРѕРїРёСЂРѕРІР°РЅРёРµ РІ Р±СѓС„РµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РЅР°РїСЂСЏРјСѓСЋ
         
       Decode (frame_number, reinterpret_cast<Pixel*> (image.Bitmap (image_offset_z)));
 
       return;
     }
     
-      //общий случай
+      //РѕР±С‰РёР№ СЃР»СѓС‡Р°Р№
      
     if (impl->temp_decode_buffer.size () == 0)
     {
@@ -299,7 +299,7 @@ void VideoStream::Decode (unsigned int frame_number, Pixel* frame_buffer)
 }
 
 /*
-    Загрузка видео
+    Р—Р°РіСЂСѓР·РєР° РІРёРґРµРѕ
 */
 
 void VideoStream::Load (const char* file_name, VideoQuality quality)
@@ -316,7 +316,7 @@ void VideoStream::Load (const char* file_name, VideoQuality quality)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void VideoStream::Swap (VideoStream& stream)

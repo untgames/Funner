@@ -15,13 +15,13 @@ const char* VIDEO_NO_CONTROLS_TARGET_NAME      = "video.no_controls";
 const char* VIDEO_ALL_CONTROLS_TARGET_NAME     = "video.all_controls";
 
 /*
-   Компонент проигрывания медиа
+   РљРѕРјРїРѕРЅРµРЅС‚ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РјРµРґРёР°
 */
 
 class PlayersComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     PlayersComponent ()
     {
       StreamPlayerManager::RegisterPlayer (MUSIC_TARGET_NAME, &PlayersComponent::CreatePlayer);

@@ -3,18 +3,18 @@
 using namespace media::animation;
 
 /*
-    Описание реализации карты имен свойств анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹ РёРјРµРЅ СЃРІРѕР№СЃС‚РІ Р°РЅРёРјР°С†РёРё
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, stl::string> NameMap;
 
 struct PropertyNameMap::Impl: public xtl::reference_counter
 {
-  NameMap names; //карта имен
+  NameMap names; //РєР°СЂС‚Р° РёРјРµРЅ
 };
 
 /*
-    Конструкторы / деструкор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєРѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyNameMap::PropertyNameMap ()
@@ -45,7 +45,7 @@ PropertyNameMap& PropertyNameMap::operator = (const PropertyNameMap& map)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 PropertyNameMap PropertyNameMap::Clone () const
@@ -62,7 +62,7 @@ PropertyNameMap PropertyNameMap::Clone () const
 }
 
 /*
-    Установление соответствия
+    РЈСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ
 */
 
 void PropertyNameMap::Set (const char* channel_name, const char* property_name)
@@ -92,7 +92,7 @@ const char* PropertyNameMap::Get (const char* channel_name) const
 }
 
 /*
-    Сброс соответствий
+    РЎР±СЂРѕСЃ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№
 */
 
 void PropertyNameMap::Reset (const char* channel_name)
@@ -109,7 +109,7 @@ void PropertyNameMap::Clear ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyNameMap::Swap (PropertyNameMap& map)

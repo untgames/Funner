@@ -36,7 +36,7 @@ void print_log (const char* stream, const char* message)
   fflush (stdout);
 }
 
-///Тестовый HTTP сервер
+///РўРµСЃС‚РѕРІС‹Р№ HTTP СЃРµСЂРІРµСЂ
 class TestHttpServer
 {
   public:

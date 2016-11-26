@@ -3,18 +3,18 @@
 using namespace render::scene::client;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const char* LOG_NAME = "render.scene.client"; //имя потока отладочного протоколирования
+const char* LOG_NAME = "render.scene.client"; //РёРјСЏ РїРѕС‚РѕРєР° РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
 /*
-    Описание реализации менеджера сцен
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅ
 */
 
 namespace
@@ -45,15 +45,15 @@ typedef stl::hash_map<scene_graph::Node*, NodeDesc> NodeMap;
 
 struct SceneManager::Impl
 {
-  ClientImpl&      client;      //клиент
-  client::Context& context;     //контекст
-  common::Log      log;         //поток отладочного протоколирования
-  SceneUpdateList  update_list; //список обновлений
-  object_id_t      current_id;  //текущий доступный идентификатор
-  SceneMap         scenes;      //сцены
-  NodeMap          nodes;       //узлы
+  ClientImpl&      client;      //РєР»РёРµРЅС‚
+  client::Context& context;     //РєРѕРЅС‚РµРєСЃС‚
+  common::Log      log;         //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+  SceneUpdateList  update_list; //СЃРїРёСЃРѕРє РѕР±РЅРѕРІР»РµРЅРёР№
+  object_id_t      current_id;  //С‚РµРєСѓС‰РёР№ РґРѕСЃС‚СѓРїРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  SceneMap         scenes;      //СЃС†РµРЅС‹
+  NodeMap          nodes;       //СѓР·Р»С‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ClientImpl& in_client, client::Context& in_context)
     : client (in_client)
     , context (in_context)
@@ -63,7 +63,7 @@ struct SceneManager::Impl
     ResetUpdateList ();
   }
 
-/// Оповещение об удалении сцены
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЃС†РµРЅС‹
   void OnDestroyScene (scene_graph::Scene* scene)
   {
     if (!scene)
@@ -72,7 +72,7 @@ struct SceneManager::Impl
     scenes.erase (scene);
   }
 
-/// Оповещение об удалении узла
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СѓР·Р»Р°
   void OnDestroyNode (scene_graph::Node* node)
   {
     if (!node)
@@ -81,7 +81,7 @@ struct SceneManager::Impl
     nodes.erase (node);
   }
 
-/// Сброк списка обновлений
+/// РЎР±СЂРѕРє СЃРїРёСЃРєР° РѕР±РЅРѕРІР»РµРЅРёР№
   void ResetUpdateList ()
   {
     update_list.first = update_list.last = 0;
@@ -89,7 +89,7 @@ struct SceneManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SceneManager::SceneManager (ClientImpl& client, render::scene::client::Context& context)
@@ -102,7 +102,7 @@ SceneManager::~SceneManager ()
 }
 
 /*
-    Получение сцены
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС†РµРЅС‹
 */
 
 ScenePtr SceneManager::GetScene (scene_graph::Scene& scene)
@@ -158,7 +158,7 @@ ScenePtr SceneManager::FindScene (scene_graph::Scene& scene)
 }
 
 /*
-    Список обновлений
+    РЎРїРёСЃРѕРє РѕР±РЅРѕРІР»РµРЅРёР№
 */
 
 SceneUpdateList& SceneManager::UpdateList ()
@@ -167,7 +167,7 @@ SceneUpdateList& SceneManager::UpdateList ()
 }
 
 /*
-    Клиент
+    РљР»РёРµРЅС‚
 */
 
 ClientImpl& SceneManager::Client ()
@@ -176,7 +176,7 @@ ClientImpl& SceneManager::Client ()
 }
 
 /*
-    Контекст
+    РљРѕРЅС‚РµРєСЃС‚
 */
 
 Context& SceneManager::Context ()
@@ -185,7 +185,7 @@ Context& SceneManager::Context ()
 }
 
 /*
-    Получение узла
+    РџРѕР»СѓС‡РµРЅРёРµ СѓР·Р»Р°
 */
 
 NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
@@ -237,7 +237,7 @@ NodePtr SceneManager::FindNode (scene_graph::Node& src_node)
 }
 
 /*
-    Синхронизация сцен
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃС†РµРЅ
 */
 
 void SceneManager::Update ()

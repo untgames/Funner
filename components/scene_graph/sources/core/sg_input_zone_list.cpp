@@ -4,18 +4,18 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации списка спрайтов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 typedef xtl::uninitialized_storage<InputZoneModel::ZoneDesc> ZoneDescArray;
 
 struct InputZoneList::Impl: public xtl::instance_counter<InputZoneList>
 {
-  ZoneDescArray items;    //массив спрайтов  
+  ZoneDescArray items;    //РјР°СЃСЃРёРІ СЃРїСЂР°Р№С‚РѕРІ  
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputZoneList::InputZoneList ()
@@ -28,7 +28,7 @@ InputZoneList::~InputZoneList ()
 }
 
 /*
-    Создание списка спрайтов
+    РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 InputZoneList::Pointer InputZoneList::Create ()
@@ -37,7 +37,7 @@ InputZoneList::Pointer InputZoneList::Create ()
 }
 
 /*
-    Размер массива спрайтов
+    Р Р°Р·РјРµСЂ РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t InputZoneList::ZonesCount () const
@@ -51,7 +51,7 @@ size_t InputZoneList::ZoneDescsCountCore ()
 }
 
 /*
-    Изменение размера списка спрайтов / резервирование места для хранения спрайтов
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void InputZoneList::Resize (size_t count)
@@ -67,7 +67,7 @@ void InputZoneList::Reserve (size_t count)
 }
 
 /*
-    Массив спрайтов
+    РњР°СЃСЃРёРІ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 const InputZoneModel::ZoneDesc* InputZoneList::Zones () const
@@ -86,7 +86,7 @@ InputZoneModel::ZoneDesc* InputZoneList::Zones ()
 }
 
 /*
-    Добавление спрайтов в массив
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃРїСЂР°Р№С‚РѕРІ РІ РјР°СЃСЃРёРІ
 */
 
 void InputZoneList::Insert (const ZoneDesc& ZoneDesc)
@@ -112,7 +112,7 @@ void InputZoneList::Insert (size_t items_count, const ZoneDesc* items)
 }
 
 /*
-    Очистка списка спрайтов
+    РћС‡РёСЃС‚РєР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void InputZoneList::RemoveAll ()
@@ -121,7 +121,7 @@ void InputZoneList::RemoveAll ()
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void InputZoneList::AcceptCore (Visitor& visitor)
@@ -131,7 +131,7 @@ void InputZoneList::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Оповещение об обновлении данных
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РґР°РЅРЅС‹С…
 */
 
 void InputZoneList::Invalidate ()

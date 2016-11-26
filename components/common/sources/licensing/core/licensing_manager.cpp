@@ -10,10 +10,10 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t COMPONENTS_ARRAY_RESERVE_SIZE = 64; //резервируемое количество компонентов
+const size_t COMPONENTS_ARRAY_RESERVE_SIZE = 64; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 
 const char* ALLOWED_COMPONENTS [] = { "common.*" };
 const char* IGNORED_PROPERTIES [] = { "CheckFiles", "LicenseHash", "AllowedComponents" };
@@ -21,20 +21,20 @@ const char* IGNORED_PROPERTIES [] = { "CheckFiles", "LicenseHash", "AllowedCompo
 const size_t IGNORED_PROPERTIES_COUNT = sizeof (IGNORED_PROPERTIES) / sizeof (*IGNORED_PROPERTIES);
 
 /*
-   Описание реализации менеджера лицензий
+   РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р»РёС†РµРЅР·РёР№
 */
 
 class LicenseManagerImpl
 {
   public:
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     LicenseManagerImpl ()
       : license_loaded (false), till_time (0)
     {
       allowed_components.Reserve (COMPONENTS_ARRAY_RESERVE_SIZE);
     }
 
-    ///Загрузка лицензии
+    ///Р—Р°РіСЂСѓР·РєР° Р»РёС†РµРЅР·РёРё
     void Load (const char* license_path)
     {
       license_loaded = false;
@@ -64,7 +64,7 @@ class LicenseManagerImpl
               break;
           }
 
-          //чтение периода действия лицензии
+          //С‡С‚РµРЅРёРµ РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
 
         const char *since_date_string = common::get<const char*> (root, "SinceDate", ""),
                    *till_date_string  = common::get<const char*> (root, "TillDate", ""),
@@ -92,12 +92,12 @@ class LicenseManagerImpl
             throw xtl::format_operation_exception ("", "License '%s' has expired", license_path);
         }
 
-          //чтение произвольных свойств
+          //С‡С‚РµРЅРёРµ РїСЂРѕРёР·РІРѕР»СЊРЅС‹С… СЃРІРѕР№СЃС‚РІ
 
         for (ParseNode node = root.First (); node; node = node.Next ())
           AddNodeProperties (node, "");
 
-          //чтение разрешенных компонентов
+          //С‡С‚РµРЅРёРµ СЂР°Р·СЂРµС€РµРЅРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 
         for (Parser::NamesakeIterator component_iter = root.First ("AllowedComponents.Component"); component_iter; ++component_iter)
           allowed_components.Add (common::get<const char*> (*component_iter, "Wildcard"));
@@ -109,7 +109,7 @@ class LicenseManagerImpl
 
         properties.SetProperty ("AllowedComponents", allowed_components_property_string.c_str ());
 
-          //проверка корректности содержимого лицензии
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ Р»РёС†РµРЅР·РёРё
 
         stl::vector<CheckFile> check_files_list;
 
@@ -137,7 +137,7 @@ class LicenseManagerImpl
       license_loaded = true;
     }
 
-    ///Проверка состояния
+    ///РџСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ
     int DaysToExpiration ()
     {
       static const char* METHOD_NAME = "common::LicenseManager::DaysToExpiration";
@@ -157,7 +157,7 @@ class LicenseManagerImpl
       return (int)(difftime (till_time, current_time) / (60.f * 60.f * 24.f));
     }
 
-    ///Работа с предопределенными свойствами
+    ///Р Р°Р±РѕС‚Р° СЃ РїСЂРµРґРѕРїСЂРµРґРµР»РµРЅРЅС‹РјРё СЃРІРѕР№СЃС‚РІР°РјРё
     bool IsComponentAllowed (const char* component_name)
     {
       static const char* METHOD_NAME = "common::LicenseManager::IsComponentAllowed";
@@ -178,7 +178,7 @@ class LicenseManagerImpl
       return false;
     }
 
-    ///Работа со свойствами
+    ///Р Р°Р±РѕС‚Р° СЃРѕ СЃРІРѕР№СЃС‚РІР°РјРё
     const char* GetProperty (const char* property_name)
     {
       static const char* METHOD_NAME = "common::LicenseManager::GetProperty";
@@ -316,7 +316,7 @@ typedef common::Singleton<LicenseManagerImpl> LicenseManagerSingleton;
 }
 
 /*
-   Загрузка лицензии
+   Р—Р°РіСЂСѓР·РєР° Р»РёС†РµРЅР·РёРё
 */
 
 void LicenseManager::Load (const char* license_path)
@@ -325,7 +325,7 @@ void LicenseManager::Load (const char* license_path)
 }
 
 /*
-   Проверка состояния
+   РџСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 int LicenseManager::DaysToExpiration ()
@@ -334,7 +334,7 @@ int LicenseManager::DaysToExpiration ()
 }
 
 /*
-   Работа с предопределенными свойствами
+   Р Р°Р±РѕС‚Р° СЃ РїСЂРµРґРѕРїСЂРµРґРµР»РµРЅРЅС‹РјРё СЃРІРѕР№СЃС‚РІР°РјРё
 */
     
 bool LicenseManager::IsComponentAllowed (const char* component_name)
@@ -343,7 +343,7 @@ bool LicenseManager::IsComponentAllowed (const char* component_name)
 }
 
 /*
-   Работа со свойствами
+   Р Р°Р±РѕС‚Р° СЃРѕ СЃРІРѕР№СЃС‚РІР°РјРё
 */
     
 const char* LicenseManager::GetProperty (const char* property_name)

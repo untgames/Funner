@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -18,7 +18,7 @@ inline axis_aligned_box<T>::axis_aligned_box (const sphere<T>& s)
   {}
 
 /*
-    Получение экстент
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЃС‚РµРЅС‚
 */
 
 template <class T>
@@ -34,7 +34,7 @@ inline const typename axis_aligned_box<T>::vec_type& axis_aligned_box<T>::maximu
 }
 
 /*
-    Установка экстент
+    РЈСЃС‚Р°РЅРѕРІРєР° СЌРєСЃС‚РµРЅС‚
 */
 
 template <class T>
@@ -75,7 +75,7 @@ inline void axis_aligned_box<T>::set_extents (const T& min_x, const T& min_y, co
 }
 
 /*
-    Сброс объёма
+    РЎР±СЂРѕСЃ РѕР±СЉС‘РјР°
 */
 
 template <class T>
@@ -85,7 +85,7 @@ inline void axis_aligned_box<T>::reset (const vec_type& p)
 }
 
 /*
-    Получение статистик ограничивающего параллелипиппеда
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚Р°С‚РёСЃС‚РёРє РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
 */
 
 template <class T>
@@ -107,7 +107,7 @@ inline T axis_aligned_box<T>::radius () const
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -123,7 +123,7 @@ inline bool axis_aligned_box<T>::empty () const
 }
 
 /*
-    Получение координат углов параллелипиппеда
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ СѓРіР»РѕРІ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
 */
 
 template <class T>
@@ -157,7 +157,7 @@ inline void axis_aligned_box<T>::get_corners (vec_type corners [8]) const
 }
     
 /*
-    Добавление точки в объём / объединение объёмов
+    Р”РѕР±Р°РІР»РµРЅРёРµ С‚РѕС‡РєРё РІ РѕР±СЉС‘Рј / РѕР±СЉРµРґРёРЅРµРЅРёРµ РѕР±СЉС‘РјРѕРІ
 */
 
 template <class T>
@@ -206,7 +206,7 @@ inline axis_aligned_box<T> axis_aligned_box<T>::operator + (const sphere<T>& s) 
 }
 
 /*
-    Преобразования ограничивающего параллелипиппеда
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
 */
 
 template <class T>
@@ -275,7 +275,7 @@ inline axis_aligned_box<T> operator * (const math::quat<T>& tm, const axis_align
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -291,7 +291,7 @@ inline bool axis_aligned_box<T>::operator != (const axis_aligned_box& box) const
 }
 
 /*
-    Проверка эквивалентности
+    РџСЂРѕРІРµСЂРєР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
 */
 
 template <class T>
@@ -301,7 +301,7 @@ inline bool equal (const axis_aligned_box<T>& box1, const axis_aligned_box<T>& b
 }
     
 /*
-    Проверка пересечения ограничивающего параллелипиппеда с различными примитивами
+    РџСЂРѕРІРµСЂРєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР° СЃ СЂР°Р·Р»РёС‡РЅС‹РјРё РїСЂРёРјРёС‚РёРІР°РјРё
 */
 
 template <class T>
@@ -330,7 +330,7 @@ inline bool intersects (const axis_aligned_box<T>& box, const plane_list<T>& pla
 }
 
 /*
-    Проверка: содержит ли ограничивающий параллелипиппед различные примитивы
+    РџСЂРѕРІРµСЂРєР°: СЃРѕРґРµСЂР¶РёС‚ Р»Рё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґ СЂР°Р·Р»РёС‡РЅС‹Рµ РїСЂРёРјРёС‚РёРІС‹
 */
 
 template <class T>
@@ -368,7 +368,7 @@ inline bool contains (const axis_aligned_box<T>& box, const sphere<T>& s)
 }
 
 /*
-    Определение области перекрытия двух ограничивающих параллелипиппедов
+    РћРїСЂРµРґРµР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ РґРІСѓС… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґРѕРІ
 */
 
 template <class T>
@@ -389,7 +389,7 @@ inline axis_aligned_box<T> intersection (const axis_aligned_box<T>& a, const axi
 }
 
 /*
-    Получение объёма
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉС‘РјР°
 */
 
 template <class T>

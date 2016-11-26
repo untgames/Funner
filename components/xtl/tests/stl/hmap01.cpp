@@ -1,4 +1,4 @@
-// Тестирование конструкторов hash_map
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРѕРІ hash_map
 #include <stdio.h>
 #include <stl/hash_map>
 #include <stl/string>

@@ -4,7 +4,7 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace
@@ -33,7 +33,7 @@ inline size_t hash (const LayoutKey& key)
 }
 
 /*
-    Описание реализации менеджера параметров программ шэйдинга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРј С€СЌР№РґРёРЅРіР°
 */
 
 typedef stl::hash_multimap<size_t, ProgramParametersLayout*> LayoutMap;
@@ -42,14 +42,14 @@ typedef CacheMap<size_t, ProgramParametersLayoutPtr>         CompositeLayoutMap;
 
 struct ProgramParametersManager::Impl: public xtl::trackable
 {
-  LowLevelDevicePtr   device;             //устройство визуализации
-  LayoutMap           layouts;            //лэйауты параметров различной конфигурации
-  LayoutCacheMap      layouts_temp_cache; //кэш лэйаутов
-  CompositeLayoutMap  composite_layouts;  //составные лэйауты параметров различной конфигурации
-  SettingsPtr         settings;           //настройки менеджера рендеринга
-  Log                 log;                //поток отладочного протоколирования
+  LowLevelDevicePtr   device;             //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІРёР·СѓР°Р»РёР·Р°С†РёРё
+  LayoutMap           layouts;            //Р»СЌР№Р°СѓС‚С‹ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°Р·Р»РёС‡РЅРѕР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+  LayoutCacheMap      layouts_temp_cache; //РєСЌС€ Р»СЌР№Р°СѓС‚РѕРІ
+  CompositeLayoutMap  composite_layouts;  //СЃРѕСЃС‚Р°РІРЅС‹Рµ Р»СЌР№Р°СѓС‚С‹ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°Р·Р»РёС‡РЅРѕР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+  SettingsPtr         settings;           //РЅР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+  Log                 log;                //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings, const CacheManagerPtr& cache_manager)
     : device (in_device)
     , layouts_temp_cache (cache_manager)
@@ -65,14 +65,14 @@ struct ProgramParametersManager::Impl: public xtl::trackable
       throw xtl::make_null_argument_exception (METHOD_NAME, "settings");
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     layouts.clear ();
     composite_layouts.Clear ();
   }
 
-///Удаление лэйаута
+///РЈРґР°Р»РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
   void RemoveLayout (size_t hash, ProgramParametersLayout* layout)
   {
     stl::pair<LayoutMap::iterator, LayoutMap::iterator> range = layouts.equal_range (hash);
@@ -88,7 +88,7 @@ struct ProgramParametersManager::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& device, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
@@ -109,7 +109,7 @@ ProgramParametersManager::~ProgramParametersManager ()
 }
 
 /*
-    Получение объекта параметров
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParametersSlot slot, const common::PropertyLayout& layout, bool is_temporary)

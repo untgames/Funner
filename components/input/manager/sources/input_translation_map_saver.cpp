@@ -31,13 +31,13 @@ void translation_map_saver (const char* file_name, const TranslationMap& source_
 }
 
 /*
-   Компонент сохранения карт трансляции
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР°СЂС‚ С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 
 class KeymapSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     KeymapSaverComponent () 
     {
       TranslationMapManager::RegisterSaver ("xkeymap", &translation_map_saver);

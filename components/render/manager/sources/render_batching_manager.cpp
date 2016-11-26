@@ -9,17 +9,17 @@ using namespace render::manager;
 */
 
 /*
-    Описание реализации блока состояний пакета
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїР°РєРµС‚Р°
 */
 
 struct BatchStateBlock::Impl
 {
-  BatchingManager&      batching_manager;             //ссылка на менеджер упаковки
-  MaterialImpl&         material;                     //ссылка на материал
-  LowLevelStateBlockPtr cached_state_block;           //состояние устройства
-  size_t                cached_state_block_mask_hash; //хэш маски состояния устройства
+  BatchingManager&      batching_manager;             //СЃСЃС‹Р»РєР° РЅР° РјРµРЅРµРґР¶РµСЂ СѓРїР°РєРѕРІРєРё
+  MaterialImpl&         material;                     //СЃСЃС‹Р»РєР° РЅР° РјР°С‚РµСЂРёР°Р»
+  LowLevelStateBlockPtr cached_state_block;           //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  size_t                cached_state_block_mask_hash; //С…СЌС€ РјР°СЃРєРё СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (BatchingManager& in_batching_manager, MaterialImpl& in_material)
     : batching_manager (in_batching_manager)
     , material (in_material)
@@ -29,7 +29,7 @@ struct BatchStateBlock::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 BatchStateBlock::BatchStateBlock (BatchingManager& batching_manager, MaterialImpl& material)
@@ -44,7 +44,7 @@ BatchStateBlock::~BatchStateBlock ()
 }
 
 /*
-    Блок состояний
+    Р‘Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 LowLevelStateBlockPtr BatchStateBlock::StateBlock ()
@@ -55,7 +55,7 @@ LowLevelStateBlockPtr BatchStateBlock::StateBlock ()
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void BatchStateBlock::UpdateCacheCore ()
@@ -78,7 +78,7 @@ void BatchStateBlock::UpdateCacheCore ()
       material_state_block->GetMask (mask);
     }
 
-      //установка вершинных/индексного буфера
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІРµСЂС€РёРЅРЅС‹С…/РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
     mask.is_index_buffer       = true;
     mask.is_layout             = true;
@@ -88,7 +88,7 @@ void BatchStateBlock::UpdateCacheCore ()
     context.ISSetInputLayout  (device_manager.InputLayoutManager ().DynamicPrimitivesInputLayout ().get ());
     context.ISSetIndexBuffer  (batching_manager.DynamicIndexBuffer ().LowLevelBuffer ().get ());
 
-      //обновление блока состояний примитива
+      //РѕР±РЅРѕРІР»РµРЅРёРµ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРёРјРёС‚РёРІР°
     
     size_t mask_hash = mask.Hash ();
 
@@ -134,23 +134,23 @@ void BatchStateBlock::ResetCacheCore ()
 */
 
 /*
-    Описание реализации менеджера пакетирования
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 */
 
 namespace
 {
 
-/// Пул для выделения динамических вершин / индексов
+/// РџСѓР» РґР»СЏ РІС‹РґРµР»РµРЅРёСЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… РІРµСЂС€РёРЅ / РёРЅРґРµРєСЃРѕРІ
 template <class T> class Pool: public xtl::noncopyable
 {
   public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Pool () : start (), pos (), end () {}
 
-/// Начало буфера
+/// РќР°С‡Р°Р»Рѕ Р±СѓС„РµСЂР°
     T* const* DataStart () { return &start; }
 
-/// Выделение
+/// Р’С‹РґРµР»РµРЅРёРµ
     T* Allocate (unsigned int count)
     {
       T* prev_pos = pos;
@@ -165,7 +165,7 @@ template <class T> class Pool: public xtl::noncopyable
       return 0;
     }    
 
-/// Предвыделение
+/// РџСЂРµРґРІС‹РґРµР»РµРЅРёРµ
     bool Preallocate (unsigned int count)
     {
       end -= count;
@@ -178,7 +178,7 @@ template <class T> class Pool: public xtl::noncopyable
       return false;
     }
 
-/// Сброс
+/// РЎР±СЂРѕСЃ
     void Reset (T* new_start, unsigned int size, bool save_relative_position)
     {
       unsigned int offset = (unsigned int)(pos - start);
@@ -188,10 +188,10 @@ template <class T> class Pool: public xtl::noncopyable
       pos   = save_relative_position ? start + offset : start;
     }
 
-/// Размер
+/// Р Р°Р·РјРµСЂ
     unsigned int Size () { return (unsigned int)(pos - start); }
 
-/// Установка размера
+/// РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂР°
     bool SetSize (unsigned int size)
     {
       if (size > end - start)
@@ -211,12 +211,12 @@ template <class T> class Pool: public xtl::noncopyable
 typedef Pool<DynamicPrimitiveVertex> DynamicVertexPool;
 typedef Pool<DynamicPrimitiveIndex>  DynamicIndexPool;
 
-/// Вхождение в кэш
+/// Р’С…РѕР¶РґРµРЅРёРµ РІ РєСЌС€
 struct BatchStateBlockEntry
 {
-  BatchStateBlockPtr state_block;     //блок состояний
-  FrameTime          last_use_time;   //последнее время использования
-  FrameId            last_use_frame;  //последний кадр использования
+  BatchStateBlockPtr state_block;     //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№
+  FrameTime          last_use_time;   //РїРѕСЃР»РµРґРЅРµРµ РІСЂРµРјСЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
+  FrameId            last_use_frame;  //РїРѕСЃР»РµРґРЅРёР№ РєР°РґСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
 
   BatchStateBlockEntry (const BatchStateBlockPtr& in_state_block, FrameTime use_time, FrameId use_frame)
     : state_block (in_state_block)
@@ -234,19 +234,19 @@ typedef xtl::uninitialized_storage<DynamicPrimitiveIndex> IndexArray;
 
 struct BatchingManager::Impl: public Cache
 {
-  DeviceManagerPtr                      device_manager;       //менеджер устройства отрисовки
-  render::manager::DynamicVertexBuffer  dynamic_vb;           //динамический вершинный буфер
-  render::manager::DynamicIndexBuffer   dynamic_ib;           //динамический индексный буфер
-  IndexArray                            temp_ib;              //временный индексный буфер
-  DynamicVertexPool                     dynamic_vertex_pool;  //пул динамических вершин
-  DynamicIndexPool                      dynamic_index_pool;   //пул динамических индексов
-  DynamicIndexPool                      temp_index_pool;      //пул динамических индексов для построения примитивов
-  StateBlockMap                         state_blocks;         //блоки состояний
-  const void*                           pass_tag;             //тэг прохода
-  unsigned int                          pass_first_index;     //первый индекс в проходе
-  FrameId                               active_frame;         //номер активного кадра
+  DeviceManagerPtr                      device_manager;       //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  render::manager::DynamicVertexBuffer  dynamic_vb;           //РґРёРЅР°РјРёС‡РµСЃРєРёР№ РІРµСЂС€РёРЅРЅС‹Р№ Р±СѓС„РµСЂ
+  render::manager::DynamicIndexBuffer   dynamic_ib;           //РґРёРЅР°РјРёС‡РµСЃРєРёР№ РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
+  IndexArray                            temp_ib;              //РІСЂРµРјРµРЅРЅС‹Р№ РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
+  DynamicVertexPool                     dynamic_vertex_pool;  //РїСѓР» РґРёРЅР°РјРёС‡РµСЃРєРёС… РІРµСЂС€РёРЅ
+  DynamicIndexPool                      dynamic_index_pool;   //РїСѓР» РґРёРЅР°РјРёС‡РµСЃРєРёС… РёРЅРґРµРєСЃРѕРІ
+  DynamicIndexPool                      temp_index_pool;      //РїСѓР» РґРёРЅР°РјРёС‡РµСЃРєРёС… РёРЅРґРµРєСЃРѕРІ РґР»СЏ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїСЂРёРјРёС‚РёРІРѕРІ
+  StateBlockMap                         state_blocks;         //Р±Р»РѕРєРё СЃРѕСЃС‚РѕСЏРЅРёР№
+  const void*                           pass_tag;             //С‚СЌРі РїСЂРѕС…РѕРґР°
+  unsigned int                          pass_first_index;     //РїРµСЂРІС‹Р№ РёРЅРґРµРєСЃ РІ РїСЂРѕС…РѕРґРµ
+  FrameId                               active_frame;         //РЅРѕРјРµСЂ Р°РєС‚РёРІРЅРѕРіРѕ РєР°РґСЂР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager)
     : Cache (&in_device_manager->CacheManager ())
     , device_manager (in_device_manager)
@@ -258,7 +258,7 @@ struct BatchingManager::Impl: public Cache
   {
   }
 
-/// Резервирование динамических буферов
+/// Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… Р±СѓС„РµСЂРѕРІ
   void ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
   {
     try
@@ -281,7 +281,7 @@ struct BatchingManager::Impl: public Cache
     }
   }
 
-/// Сброс кэша
+/// РЎР±СЂРѕСЃ РєСЌС€Р°
   void FlushCache ()
   {
     if (state_blocks.empty ())
@@ -306,7 +306,7 @@ struct BatchingManager::Impl: public Cache
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 BatchingManager::BatchingManager (const DeviceManagerPtr& device_manager)
@@ -319,7 +319,7 @@ BatchingManager::~BatchingManager ()
 }
 
 /*
-    Ссылка на менеджер устройства
+    РЎСЃС‹Р»РєР° РЅР° РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 render::manager::DeviceManager& BatchingManager::DeviceManager ()
@@ -328,7 +328,7 @@ render::manager::DeviceManager& BatchingManager::DeviceManager ()
 }
 
 /*
-    Резервирование буферов для динамических примитивов
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂРѕРІ РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void BatchingManager::ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
@@ -349,7 +349,7 @@ unsigned int BatchingManager::DynamicIndicesCount () const
 }
 
 /*
-    Динамические буферы
+    Р”РёРЅР°РјРёС‡РµСЃРєРёРµ Р±СѓС„РµСЂС‹
 */
 
 render::manager::DynamicVertexBuffer& BatchingManager::DynamicVertexBuffer ()
@@ -368,7 +368,7 @@ const DynamicPrimitiveIndex* const* BatchingManager::TempIndexBuffer ()
 }
 
 /*
-    Выделение вершин и индексов
+    Р’С‹РґРµР»РµРЅРёРµ РІРµСЂС€РёРЅ Рё РёРЅРґРµРєСЃРѕРІ
 */
 
 DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (unsigned int count, unsigned int* out_base_vertex_index)
@@ -441,7 +441,7 @@ void BatchingManager::ResetDynamicBuffers ()
 }
 
 /*
-    Предвыделение вершин
+    РџСЂРµРґРІС‹РґРµР»РµРЅРёРµ РІРµСЂС€РёРЅ
 */
 
 void BatchingManager::PreallocateDynamicVertices (unsigned int count)
@@ -458,7 +458,7 @@ void BatchingManager::ResetDynamicVerticesPreallocations ()
 }
 
 /*
-    Текущее количество выделенных вершин
+    РўРµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‹РґРµР»РµРЅРЅС‹С… РІРµСЂС€РёРЅ
 */
 
 void BatchingManager::SetAllocatedDynamicVerticesCount (unsigned int count)
@@ -477,7 +477,7 @@ unsigned int BatchingManager::AllocatedDynamicVerticesCount ()
 }
 
 /*
-    Получение блока состояний по материалу
+    РџРѕР»СѓС‡РµРЅРёРµ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїРѕ РјР°С‚РµСЂРёР°Р»Сѓ
 */
 
 BatchStateBlockPtr BatchingManager::GetStateBlock (MaterialImpl* material)
@@ -511,7 +511,7 @@ BatchStateBlockPtr BatchingManager::GetStateBlock (MaterialImpl* material)
 }
 
 /*
-    Тэг текущего прохода
+    РўСЌРі С‚РµРєСѓС‰РµРіРѕ РїСЂРѕС…РѕРґР°
 */
 
 void BatchingManager::SetPassUserData (const void* tag)
@@ -535,7 +535,7 @@ unsigned int BatchingManager::PassFirstIndex ()
 }
 
 /*
-    Номер активного кадра
+    РќРѕРјРµСЂ Р°РєС‚РёРІРЅРѕРіРѕ РєР°РґСЂР°
 */
 
 void BatchingManager::SetActiveFrame (FrameId frame_id)

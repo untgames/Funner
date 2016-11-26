@@ -6,7 +6,7 @@
 
 local write=io.write
 
-ALIVE="•"	DEAD="˛"
+ALIVE="“ê"	DEAD="—é"
 ALIVE="O"	DEAD="-"
 
 function delay() -- NOTE: SYSTEM-DEPENDENT, adjust as necessary

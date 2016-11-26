@@ -6,17 +6,17 @@ using namespace scene_graph::controllers;
 namespace
 {
 
-///Дескриптор анимационной библиотеки
+///Р”РµСЃРєСЂРёРїС‚РѕСЂ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 struct AnimationLibraryDesc: public xtl::reference_counter, public xtl::instance_counter<AnimationLibraryDesc>
 {
-  stl::string                        name;    //имя библиотеки
-  media::animation::AnimationLibrary library; //библиотека
+  stl::string                        name;    //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  media::animation::AnimationLibrary library; //Р±РёР±Р»РёРѕС‚РµРєР°
 };
 
 }
 
 /*
-    Описание реализации менеджера анимаций
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р°РЅРёРјР°С†РёР№
 */
 
 typedef xtl::intrusive_ptr<AnimationLibraryDesc>                                 AnimationLibraryPtr;
@@ -25,17 +25,17 @@ typedef stl::hash_map<stl::hash_key<const char*>, media::animation::Animation*> 
 
 struct AnimationManager::Impl: public xtl::reference_counter, public xtl::instance_counter<AnimationManager>
 {
-  AnimationLibraryList animation_libraries;        //библиотеки анимации
-  AnimationMap         animations;                 //анимации
-  bool                 need_rebuild_animation_map; //карта анимаций требует перестроения
+  AnimationLibraryList animation_libraries;        //Р±РёР±Р»РёРѕС‚РµРєРё Р°РЅРёРјР°С†РёРё
+  AnimationMap         animations;                 //Р°РЅРёРјР°С†РёРё
+  bool                 need_rebuild_animation_map; //РєР°СЂС‚Р° Р°РЅРёРјР°С†РёР№ С‚СЂРµР±СѓРµС‚ РїРµСЂРµСЃС‚СЂРѕРµРЅРёСЏ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : need_rebuild_animation_map (false)
   {
   }
   
-///Построение карты анимаций
+///РџРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚С‹ Р°РЅРёРјР°С†РёР№
   void RebuildAnimationMap ()
   {
     if (!need_rebuild_animation_map)
@@ -62,7 +62,7 @@ struct AnimationManager::Impl: public xtl::reference_counter, public xtl::instan
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AnimationManager::AnimationManager ()
@@ -89,7 +89,7 @@ AnimationManager& AnimationManager::operator = (const AnimationManager& manager)
 }
 
 /*
-    Создание анимации
+    РЎРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРё
 */
 
 Animation AnimationManager::CreateAnimation (const char* name, Node& root)
@@ -99,11 +99,11 @@ Animation AnimationManager::CreateAnimation (const char* name, Node& root)
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
     
-      //перестроение карты анимаций
+      //РїРµСЂРµСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚С‹ Р°РЅРёРјР°С†РёР№
 
     impl->RebuildAnimationMap ();
 
-      //поиск анимации
+      //РїРѕРёСЃРє Р°РЅРёРјР°С†РёРё
 
     AnimationMap::iterator iter = impl->animations.find (name);
 
@@ -112,7 +112,7 @@ Animation AnimationManager::CreateAnimation (const char* name, Node& root)
       
     media::animation::Animation& animation = *iter->second;
 
-      //поиск или создание анимационного контроллера
+      //РїРѕРёСЃРє РёР»Рё СЃРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 
     AnimationController::Pointer controller = root.FirstController<AnimationController> ();
     
@@ -124,7 +124,7 @@ Animation AnimationManager::CreateAnimation (const char* name, Node& root)
         throw xtl::format_operation_exception ("", "Controller is null");
     }    
 
-      //создание анимации
+      //СЃРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРё
 
     return controller->CreateAnimation (animation);
   }
@@ -160,14 +160,14 @@ Animation AnimationManager::PlayAnimation (const char* name, Node& root, const A
 }
 
 /*
-    Управление ресурсами
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 void AnimationManager::LoadResource (const char* name)
 {
   try
   {
-      //проверка корректности аргументов    
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ    
 
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");      
@@ -176,7 +176,7 @@ void AnimationManager::LoadResource (const char* name)
       if ((*iter)->name == name)
         throw xtl::make_argument_exception ("", "name", name, "Animation library has already loaded");
 
-      //создание библиотеки
+      //СЃРѕР·РґР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
 
     AnimationLibraryPtr desc (new AnimationLibraryDesc, false);
 
@@ -184,7 +184,7 @@ void AnimationManager::LoadResource (const char* name)
 
     desc->library.Load (name);
 
-      //регистрация библиотеки
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 
     impl->animation_libraries.push_back (desc);
 
@@ -214,7 +214,7 @@ void AnimationManager::UnloadResource (const char* name)
 }
     
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void AnimationManager::Swap (AnimationManager& manager)

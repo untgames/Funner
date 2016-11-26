@@ -9,7 +9,7 @@ namespace
 {
 
 /*
-    Заливка
+    Р—Р°Р»РёРІРєР°
 */
 
 struct color_rgb8   { unsigned char red, green, blue; };
@@ -135,13 +135,13 @@ void fill_dispatch (PixelFormat source_format, const void* source_color, Image& 
 }
 
 /*
-    Получение характеристик формата
+    РџРѕР»СѓС‡РµРЅРёРµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє С„РѕСЂРјР°С‚Р°
 */
 
 namespace media
 {
 
-//имя формата
+//РёРјСЏ С„РѕСЂРјР°С‚Р°
 const char* get_format_name (PixelFormat format)
 {
   switch (format)
@@ -162,7 +162,7 @@ const char* get_format_name (PixelFormat format)
   return "";
 }
 
-//количество бит на пиксель
+//РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РёС‚ РЅР° РїРёРєСЃРµР»СЊ
 unsigned short get_bits_per_pixel (PixelFormat format)
 {
   switch (format)
@@ -187,7 +187,7 @@ unsigned short get_bytes_per_pixel (PixelFormat format)
   return get_bits_per_pixel (format) / 8;
 }
 
-///Поиск границ непрозрачных пикселей внутри картинки
+///РџРѕРёСЃРє РіСЂР°РЅРёС† РЅРµРїСЂРѕР·СЂР°С‡РЅС‹С… РїРёРєСЃРµР»РµР№ РІРЅСѓС‚СЂРё РєР°СЂС‚РёРЅРєРё
 void crop_by_alpha (const Image& image, unsigned int crop_alpha, unsigned int& crop_x, unsigned int& crop_y, unsigned int& crop_width, unsigned int& crop_height)
 {
   unsigned int alpha_offset = 0,
@@ -265,7 +265,7 @@ void crop_by_alpha (const Image& image, unsigned int crop_alpha, unsigned int& c
 }
 
 /*
-    Заливка картинки
+    Р—Р°Р»РёРІРєР° РєР°СЂС‚РёРЅРєРё
 */
 
 void fill (PixelFormat format, const void* data, Image& image)

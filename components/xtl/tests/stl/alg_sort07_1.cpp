@@ -1,4 +1,4 @@
-//Тестирование алгоритма merge (range1, range2, result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° merge (range1, range2, result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

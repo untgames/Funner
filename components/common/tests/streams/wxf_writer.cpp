@@ -46,7 +46,7 @@ int main ()
     writer.BeginFrame   ("test2", vec4f (1.0f));
     writer.WriteComment ("This frame need to test block-comments in subframes\nDon't worry about it:)");
     writer.Write        ("bool_flag");
-//    writer.EndFrame     (); //�� ᤥ���� ᯥ樠�쭮!
+//    writer.EndFrame     (); //нв® б¤Ґ« ­® бЇҐжЁ «м­®!
 
     writer.Flush ();
 

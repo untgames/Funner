@@ -40,7 +40,7 @@ namespace scene
 namespace server
 {
 
-///Преобразование узла конфигурации в карту свойств
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓР·Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РІ РєР°СЂС‚Сѓ СЃРІРѕР№СЃС‚РІ
 common::PropertyMap to_properties (const common::ParseNode& node);
 
 }

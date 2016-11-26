@@ -1,5 +1,5 @@
 /*
-    Экземпляр синглтона
+    Р­РєР·РµРјРїР»СЏСЂ СЃРёРЅРіР»С‚РѕРЅР°
 */
 
 template <class T,template <class> class CreationPolicy>
@@ -15,7 +15,7 @@ template <class T,template <class> class CreationPolicy>
 SingletonListNode Singleton<T,CreationPolicy>::node;
 
 /*
-    Распределение памяти для синглтона при помощи new/delete
+    Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ СЃРёРЅРіР»С‚РѕРЅР° РїСЂРё РїРѕРјРѕС‰Рё new/delete
 */
 
 template <class T>
@@ -31,7 +31,7 @@ inline void SingletonCreateUsingNew<T>::Destroy (T* object)
 }
 
 /*
-    Распределение памяти для синглтона при помощи malloc/free
+    Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ СЃРёРЅРіР»С‚РѕРЅР° РїСЂРё РїРѕРјРѕС‰Рё malloc/free
 */
 
 template <class T>
@@ -53,7 +53,7 @@ inline void SingletonCreateUsingMalloc<T>::Destroy (T* object)
 }
 
 /*
-    Размещение синглтона в статической памяти
+    Р Р°Р·РјРµС‰РµРЅРёРµ СЃРёРЅРіР»С‚РѕРЅР° РІ СЃС‚Р°С‚РёС‡РµСЃРєРѕР№ РїР°РјСЏС‚Рё
 */
 
 template <class T>
@@ -89,7 +89,7 @@ inline void SingletonStatic<T>::Destroy (T* object)
 */
 
 /*
-    Инициализация и уничтожение синглтона
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Рё СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРёРЅРіР»С‚РѕРЅР°
 */
 
 template <class T,template <class> class CreationPolicy>
@@ -160,7 +160,7 @@ inline bool Singleton<T,CreationPolicy>::IsInitialized ()
 }
 
 /*
-    Получение экземпляра
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
 */
 
 template <class T,template <class> class CreationPolicy>

@@ -1,7 +1,7 @@
--- Предварительные объявления
+-- РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рµ РѕР±СЉСЏРІР»РµРЅРёСЏ
 local ReadFromStringNode
 
--- Преобразователи
+-- РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»Рё
 local DefaultParsers =
 {
   ["number"] = function (node, context)
@@ -21,10 +21,10 @@ local DefaultParsers =
   end
 }
 
--- Преобразователь класса по умолчанию
+-- РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ РєР»Р°СЃСЃР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 local DefaultClassConverter =
 {
---Загрузка из дерева строк
+--Р—Р°РіСЂСѓР·РєР° РёР· РґРµСЂРµРІР° СЃС‚СЂРѕРє
   FromStringTree = function (node, type_name, context)
     local class    = context [type_name]
     local instance = class.Create ()
@@ -67,16 +67,16 @@ local DefaultClassConverter =
   end
 }
 
--- Чтение XML дерева
+-- Р§С‚РµРЅРёРµ XML РґРµСЂРµРІР°
 local function ReadFromStringNode (node, context)
   if not context then context = _G end
 
-  -- Определение типа элемента
+  -- РћРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЌР»РµРјРµРЅС‚Р°
 
   local tag_name  = node.Name
   local type_name = tag_name
   
-  -- Определение конвертера
+  -- РћРїСЂРµРґРµР»РµРЅРёРµ РєРѕРЅРІРµСЂС‚РµСЂР°
   
   local converter = Runtime.Attribute.StringTreeConverter [type_name]
   
@@ -99,14 +99,14 @@ local function ReadFromStringNode (node, context)
   return instance
 end
 
--- Загрузка из XML
+-- Р—Р°РіСЂСѓР·РєР° РёР· XML
 local function ReadFromXml (name, context)
   local node = Common.StringNode.LoadXml (name)
   
   return ReadFromStringNode (node, context)
 end
 
--- Работа с сериализацией
+-- Р Р°Р±РѕС‚Р° СЃ СЃРµСЂРёР°Р»РёР·Р°С†РёРµР№
 local function CreateSerializeClass ()
   return class "Serialize"
   {

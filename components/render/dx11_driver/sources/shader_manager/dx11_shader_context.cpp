@@ -10,31 +10,31 @@ using namespace render::low_level::dx11;
 */
 
 /*
-    Описание реализации состояния контекста менеджера шейдеров
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРµСЂРѕРІ
 */
 
 typedef xtl::com_ptr<Program> ProgramPtr;
 
 struct ShaderManagerContextState::Impl: public DeviceObject
 {
-  InputLayoutPtr             input_layout;                                 //входной лэйаут
-  ProgramPtr                 program;                                      //программа
-  ProgramParametersLayoutPtr parameters_layout;                            //лэйаут параметров программы
-  SourceConstantBufferPtr    buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы
-  BindableProgramContext     bindable_program_context;                     //контекст программы
-  bool                       is_dirty;                                     //флаг "грязности"
+  InputLayoutPtr             input_layout;                                 //РІС…РѕРґРЅРѕР№ Р»СЌР№Р°СѓС‚
+  ProgramPtr                 program;                                      //РїСЂРѕРіСЂР°РјРјР°
+  ProgramParametersLayoutPtr parameters_layout;                            //Р»СЌР№Р°СѓС‚ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
+  SourceConstantBufferPtr    buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рµ Р±СѓС„РµСЂС‹
+  BindableProgramContext     bindable_program_context;                     //РєРѕРЅС‚РµРєСЃС‚ РїСЂРѕРіСЂР°РјРјС‹
+  bool                       is_dirty;                                     //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
     , is_dirty (true)
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl () {}
 
-/// Оповещение об изменении
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё
   void UpdateNotify ()
   {
     is_dirty = true;
@@ -42,7 +42,7 @@ struct ShaderManagerContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderManagerContextState::ShaderManagerContextState (const DeviceManager& device_manager)
@@ -60,7 +60,7 @@ ShaderManagerContextState::~ShaderManagerContextState ()
 }
 
 /*
-    Реализация контекста
+    Р РµР°Р»РёР·Р°С†РёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 ShaderManagerContextState::Impl& ShaderManagerContextState::GetImpl () const
@@ -69,7 +69,7 @@ ShaderManagerContextState::Impl& ShaderManagerContextState::GetImpl () const
 }
 
 /*
-    Управление конфигурацией входных данных
+    РЈРїСЂР°РІР»РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 void ShaderManagerContextState::SetInputLayout (InputLayout* state)
@@ -98,7 +98,7 @@ InputLayout* ShaderManagerContextState::GetInputLayout () const
 }
 
 /*
-    Установка состояния
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void ShaderManagerContextState::SetProgram (IProgram* in_program)
@@ -171,7 +171,7 @@ void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* 
 }
 
 /*
-    Получение состояния, вьюпорта и отсечения
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ, РІСЊСЋРїРѕСЂС‚Р° Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 IProgramParametersLayout* ShaderManagerContextState::GetProgramParametersLayout () const
@@ -201,7 +201,7 @@ IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const
 }
 
 /*
-    Копирование состояния
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void ShaderManagerContextState::CopyTo (const StateBlockMask& mask, ShaderManagerContextState& dst_state) const
@@ -266,7 +266,7 @@ void ShaderManagerContextState::CopyTo (const StateBlockMask& mask, ShaderManage
 */
 
 /*
-    Описание реализации контекста
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 typedef xtl::trackable_ptr<BindableProgram> BindableProgramWeakPtr;
@@ -275,14 +275,14 @@ typedef xtl::com_ptr<Program>               ProgramPtr;
 
 struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
 {
-  ShaderLibraryPtr       shader_library;           //библиотека шейдеров
-  InputLayoutPtr         default_input_layout;     //входной лэйаут по умолчанию
-  ProgramPtr             default_program;          //программа по умолчанию
-  DxContextPtr           context;                  //контекст
-  BindableProgramWeakPtr bindable_program;         //программа, устанавливаемая в контекст
-  size_t                 buffer_hashes [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //хэши буферов
+  ShaderLibraryPtr       shader_library;           //Р±РёР±Р»РёРѕС‚РµРєР° С€РµР№РґРµСЂРѕРІ
+  InputLayoutPtr         default_input_layout;     //РІС…РѕРґРЅРѕР№ Р»СЌР№Р°СѓС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  ProgramPtr             default_program;          //РїСЂРѕРіСЂР°РјРјР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  DxContextPtr           context;                  //РєРѕРЅС‚РµРєСЃС‚
+  BindableProgramWeakPtr bindable_program;         //РїСЂРѕРіСЂР°РјРјР°, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјР°СЏ РІ РєРѕРЅС‚РµРєСЃС‚
+  size_t                 buffer_hashes [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //С…СЌС€Рё Р±СѓС„РµСЂРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ShaderLibrary& library, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : ShaderManagerContextState::Impl (library.GetDeviceManager ())
     , shader_library (&library)
@@ -307,7 +307,7 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context, const DefaultResources& default_resources)
@@ -320,7 +320,7 @@ ShaderManagerContext::~ShaderManagerContext ()
 }
 
 /*
-    Возвращение реализации
+    Р’РѕР·РІСЂР°С‰РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 ShaderManagerContext::Impl& ShaderManagerContext::GetImpl () const
@@ -329,7 +329,7 @@ ShaderManagerContext::Impl& ShaderManagerContext::GetImpl () const
 }
 
 /*
-    Биндинг состояния, вьюпорта и отсечения
+    Р‘РёРЅРґРёРЅРі СЃРѕСЃС‚РѕСЏРЅРёСЏ, РІСЊСЋРїРѕСЂС‚Р° Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void ShaderManagerContext::Bind ()
@@ -338,7 +338,7 @@ void ShaderManagerContext::Bind ()
   {
     Impl& impl = GetImpl ();
 
-      //проверка необходимости биндинга
+      //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР°
 
     if (!impl.is_dirty)
     {
@@ -361,7 +361,7 @@ void ShaderManagerContext::Bind ()
         return;
     }
 
-      //получение программы, устанавливаемой в контекст
+      //РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚
 
     if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
     { 
@@ -375,18 +375,18 @@ void ShaderManagerContext::Bind ()
       impl.bindable_program = &bindable_program;     
     }
 
-      //проверка входного лэйаута
+      //РїСЂРѕРІРµСЂРєР° РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 
     InputLayout* input_layout = impl.input_layout.get ();
 
     if (!input_layout)
       input_layout = impl.default_input_layout.get ();
 
-      //установка в контекст
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚
 
     impl.bindable_program->Bind (*impl.context, *impl.shader_library, impl.buffers, *input_layout, impl.bindable_program_context);
 
-      //обновление флагов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р»Р°РіРѕРІ
 
     impl.is_dirty = false;
   }

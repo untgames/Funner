@@ -1,4 +1,4 @@
-//Тестирование конструктора (string, offs, count)
+//╨в╨╡╤Б╤В╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨║╨╛╨╜╤Б╤В╤А╤Г╨║╤В╨╛╤А╨░ (string, offs, count)
 #include <stdio.h>
 #include <stl/string>
 

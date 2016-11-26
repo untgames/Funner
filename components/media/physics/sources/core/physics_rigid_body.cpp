@@ -3,20 +3,20 @@
 using namespace media::physics;
 
 /*
-   Реализация твердого тела
+   Р РµР°Р»РёР·Р°С†РёСЏ С‚РІРµСЂРґРѕРіРѕ С‚РµР»Р°
 */
 
 struct RigidBody::Impl : public xtl::reference_counter
 {
-  stl::string              name;                       //имя тела
-  stl::string              collision_group;            //группа коллизий
-  float                    mass;                       //масса
-  math::vec3f              center_of_mass_position;    //положение центра масс
-  math::quatf              center_of_mass_orientation; //ориентация центра масс
-  math::vec3f              mass_space_inertia_tensor;  //тензор
-  media::physics::Shape    shape;                      //геометрическое тело
-  media::physics::Material material;                   //материал
-  size_t                   flags;                      //флаги поведения
+  stl::string              name;                       //РёРјСЏ С‚РµР»Р°
+  stl::string              collision_group;            //РіСЂСѓРїРїР° РєРѕР»Р»РёР·РёР№
+  float                    mass;                       //РјР°СЃСЃР°
+  math::vec3f              center_of_mass_position;    //РїРѕР»РѕР¶РµРЅРёРµ С†РµРЅС‚СЂР° РјР°СЃСЃ
+  math::quatf              center_of_mass_orientation; //РѕСЂРёРµРЅС‚Р°С†РёСЏ С†РµРЅС‚СЂР° РјР°СЃСЃ
+  math::vec3f              mass_space_inertia_tensor;  //С‚РµРЅР·РѕСЂ
+  media::physics::Shape    shape;                      //РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ С‚РµР»Рѕ
+  media::physics::Material material;                   //РјР°С‚РµСЂРёР°Р»
+  size_t                   flags;                      //С„Р»Р°РіРё РїРѕРІРµРґРµРЅРёСЏ
 
   Impl ()
     : mass (0.f)
@@ -37,7 +37,7 @@ struct RigidBody::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 RigidBody::RigidBody ()
@@ -69,7 +69,7 @@ RigidBody& RigidBody::operator = (const RigidBody& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 RigidBody RigidBody::Clone () const
@@ -78,7 +78,7 @@ RigidBody RigidBody::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t RigidBody::Id () const
@@ -87,7 +87,7 @@ size_t RigidBody::Id () const
 }
 
 /*
-   Имя тела
+   РРјСЏ С‚РµР»Р°
 */
 
 const char* RigidBody::Name () const
@@ -104,7 +104,7 @@ void RigidBody::Rename (const char* name)
 }
     
 /*
-   Масса
+   РњР°СЃСЃР°
 */
 
 float RigidBody::Mass () const
@@ -118,7 +118,7 @@ void RigidBody::SetMass (float mass)
 }
 
 /*
-   Управление тензором
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРЅР·РѕСЂРѕРј
 */
 
 const math::vec3f& RigidBody::MassSpaceInertiaTensor () const
@@ -132,7 +132,7 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& tensor)
 }
 
 /*
-   Геометрическое тело
+   Р“РµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ С‚РµР»Рѕ
 */
 
 const media::physics::Shape& RigidBody::Shape () const
@@ -146,7 +146,7 @@ void RigidBody::SetShape (const media::physics::Shape& shape)
 }
 
 /*
-   Материал
+   РњР°С‚РµСЂРёР°Р»
 */
 
 const media::physics::Material& RigidBody::Material () const
@@ -160,7 +160,7 @@ void RigidBody::SetMaterial (const media::physics::Material& material)
 }
 
 /*
-   Флаги поведения
+   Р¤Р»Р°РіРё РїРѕРІРµРґРµРЅРёСЏ
 */
 
 size_t RigidBody::Flags () const
@@ -174,7 +174,7 @@ void RigidBody::SetFlags (size_t flags)
 }
 
 /*
-   Группа коллизий
+   Р“СЂСѓРїРїР° РєРѕР»Р»РёР·РёР№
 */
 
 const char* RigidBody::CollisionGroup () const
@@ -191,7 +191,7 @@ void RigidBody::SetCollisionGroup (const char* name)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void RigidBody::Swap (RigidBody& source)
@@ -206,7 +206,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (RigidBody& body1, RigidBody& body2)

@@ -1,4 +1,4 @@
-//Тестирование алгоритма swap (a,b)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° swap (a,b)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

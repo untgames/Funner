@@ -4,26 +4,26 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Описание реализации камеры
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°РјРµСЂС‹
 */
 
 struct Camera::Impl
 {
-  stl::string                name;                     //имя камеры
-  math::mat4f                world_tm;                 //матрица мировых преобразований камеры
-  math::mat4f                proj_tm;                  //матрица проецирования
-  math::mat4f                view_tm;                  //матрица вида
-  math::mat4f                view_proj_tm;             //матрица вид-проецирование
-  bound_volumes::plane_listf frustum;                  //пирамида видимости
-  size_t                     transaction_id;           //идентификатор изменениц параметров камеры
-  size_t                     view_transaction_id;      //идентификатор изменений матрицы вида
-  size_t                     proj_transaction_id;      //идентификатор изменений матрицы проецирования
-  size_t                     view_proj_transaction_id; //идентификатор изменений матрицы вид-проецирование
-  bool                       need_update_view_tm;      //необходимо обновить матрицу вида
-  bool                       need_update_view_proj_tm; //необходимо обновить матрицу проецирования
-  bool                       need_update_frustum;      //необходимо обновить пирамиду видимости
+  stl::string                name;                     //РёРјСЏ РєР°РјРµСЂС‹
+  math::mat4f                world_tm;                 //РјР°С‚СЂРёС†Р° РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ РєР°РјРµСЂС‹
+  math::mat4f                proj_tm;                  //РјР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ
+  math::mat4f                view_tm;                  //РјР°С‚СЂРёС†Р° РІРёРґР°
+  math::mat4f                view_proj_tm;             //РјР°С‚СЂРёС†Р° РІРёРґ-РїСЂРѕРµС†РёСЂРѕРІР°РЅРёРµ
+  bound_volumes::plane_listf frustum;                  //РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё
+  size_t                     transaction_id;           //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёР·РјРµРЅРµРЅРёС† РїР°СЂР°РјРµС‚СЂРѕРІ РєР°РјРµСЂС‹
+  size_t                     view_transaction_id;      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёР·РјРµРЅРµРЅРёР№ РјР°С‚СЂРёС†С‹ РІРёРґР°
+  size_t                     proj_transaction_id;      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёР·РјРµРЅРµРЅРёР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ
+  size_t                     view_proj_transaction_id; //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёР·РјРµРЅРµРЅРёР№ РјР°С‚СЂРёС†С‹ РІРёРґ-РїСЂРѕРµС†РёСЂРѕРІР°РЅРёРµ
+  bool                       need_update_view_tm;      //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ РјР°С‚СЂРёС†Сѓ РІРёРґР°
+  bool                       need_update_view_proj_tm; //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ РјР°С‚СЂРёС†Сѓ РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ
+  bool                       need_update_frustum;      //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ РїРёСЂР°РјРёРґСѓ РІРёРґРёРјРѕСЃС‚Рё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : world_tm (1.0f)
     , proj_tm (1.0f)
@@ -44,7 +44,7 @@ struct Camera::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Camera::Camera ()
@@ -57,7 +57,7 @@ Camera::~Camera ()
 }
 
 /*
-    Индекс изменений
+    РРЅРґРµРєСЃ РёР·РјРµРЅРµРЅРёР№
 */
 
 size_t Camera::TransactionId () const
@@ -66,7 +66,7 @@ size_t Camera::TransactionId () const
 }
 
 /*
-    Имя области вывода
+    РРјСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Camera::SetName (const char* name)
@@ -85,7 +85,7 @@ const char* Camera::Name () const
 }
 
 /*
-    Матрица вида
+    РњР°С‚СЂРёС†Р° РІРёРґР°
 */
 
 void Camera::SetWorldMatrix (const math::mat4f& tm)
@@ -122,7 +122,7 @@ size_t Camera::ViewMatrixTransactionId () const
 }
 
 /*
-    Матрица проецирования
+    РњР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ
 */
 
 void Camera::SetProjectionMatrix (const math::mat4f& tm)
@@ -147,7 +147,7 @@ size_t Camera::ProjectionMatrixTransactionId () const
 }
 
 /*
-    Матрица суперпозиции преобразований
+    РњР°С‚СЂРёС†Р° СЃСѓРїРµСЂРїРѕР·РёС†РёРё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 */
 
 const math::mat4f& Camera::ViewProjectionMatrix () const
@@ -167,7 +167,7 @@ size_t Camera::ViewProjectionMatrixTransactionId () const
 }
 
 /*
-    Получение пирамиды видимости
+    РџРѕР»СѓС‡РµРЅРёРµ РїРёСЂР°РјРёРґС‹ РІРёРґРёРјРѕСЃС‚Рё
 */
 
 const bound_volumes::plane_listf& Camera::Frustum () const

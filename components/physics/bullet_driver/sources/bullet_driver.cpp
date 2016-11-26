@@ -8,16 +8,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  DRIVER_NAME    = "Bullet";                   //имя драйвера
-const char*  COMPONENT_NAME = "physics.low_level.bullet"; //имя компонента
+const char*  DRIVER_NAME    = "Bullet";                   //РёРјСЏ РґСЂР°Р№РІРµСЂР°
+const char*  COMPONENT_NAME = "physics.low_level.bullet"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 }
 
 /*
-    Описание реализации драйвера физической системы на основе библиотеки Bullet
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РґСЂР°Р№РІРµСЂР° С„РёР·РёС‡РµСЃРєРѕР№ СЃРёСЃС‚РµРјС‹ РЅР° РѕСЃРЅРѕРІРµ Р±РёР±Р»РёРѕС‚РµРєРё Bullet
 */
 
 struct Driver::Impl
@@ -25,7 +25,7 @@ struct Driver::Impl
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Driver::Driver ()
@@ -33,7 +33,7 @@ Driver::Driver ()
   {}
 
 /*
-    Описание драйвера
+    РћРїРёСЃР°РЅРёРµ РґСЂР°Р№РІРµСЂР°
 */
 
 const char* Driver::GetDescription ()
@@ -42,7 +42,7 @@ const char* Driver::GetDescription ()
 }
 
 /*
-   Создание сцены
+   РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 */
 
 Scene* Driver::CreateScene ()
@@ -51,7 +51,7 @@ Scene* Driver::CreateScene ()
 }
 
 /*
-   Создание материала
+   РЎРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 Material* Driver::CreateMaterial ()
@@ -60,7 +60,7 @@ Material* Driver::CreateMaterial ()
 }
 
 /*
-   Создание геометрических тел
+   РЎРѕР·РґР°РЅРёРµ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёС… С‚РµР»
 */
 
 Shape* Driver::CreateBoxShape (const math::vec3f& half_dimensions)
@@ -198,7 +198,7 @@ void bullet_deallocate (void* memblock)
 }
 
 /*
-    Компонент драйвера
+    РљРѕРјРїРѕРЅРµРЅС‚ РґСЂР°Р№РІРµСЂР°
 */
 
 namespace components

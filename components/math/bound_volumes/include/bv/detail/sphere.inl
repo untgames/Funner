@@ -1,7 +1,7 @@
 namespace detail
 {
 
-//возведение в квадрат
+//РІРѕР·РІРµРґРµРЅРёРµ РІ РєРІР°РґСЂР°С‚
 template <class T>
 inline T sqr (const T& x)
 {
@@ -11,7 +11,7 @@ inline T sqr (const T& x)
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -25,7 +25,7 @@ inline sphere<T>::sphere (const vec_type& center, const element_type& radius)
   {}
 
 /*
-    Получение параметров
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 template <class T>
@@ -41,7 +41,7 @@ inline typename sphere<T>::element_type sphere<T>::radius () const
 }
 
 /*
-    Установка параметров
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 template <class T>
@@ -63,7 +63,7 @@ inline void sphere<T>::set_center (const element_type& x, const element_type& y,
 }
 
 /*
-    Сброс объёма
+    РЎР±СЂРѕСЃ РѕР±СЉС‘РјР°
 */
 
 template <class T>
@@ -74,7 +74,7 @@ inline void sphere<T>::reset (const vec_type& center, const element_type& radius
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -84,10 +84,10 @@ inline bool sphere<T>::empty () const
 }
 
 /*
-    Добавление примитивов в ограничивающий объём
+    Р”РѕР±Р°РІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ РІ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј
 */
 
-//если текущий радиус < 0 - сбрасываем положение сферы
+//РµСЃР»Рё С‚РµРєСѓС‰РёР№ СЂР°РґРёСѓСЃ < 0 - СЃР±СЂР°СЃС‹РІР°РµРј РїРѕР»РѕР¶РµРЅРёРµ СЃС„РµСЂС‹
 template <class T>
 inline sphere<T>& sphere<T>::operator += (const vec_type& point)
 {
@@ -149,7 +149,7 @@ inline sphere<T> sphere<T>::operator + (const axis_aligned_box<T>& box) const
 }
 
 /*
-    Преобразования ограничивающей сферы
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµР№ СЃС„РµСЂС‹
 */
 
 template <class T>
@@ -185,7 +185,7 @@ inline axis_aligned_box<T> operator * (const math::matrix<T, 4>& m, const sphere
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -201,7 +201,7 @@ inline bool sphere<T>::operator != (const sphere& s) const
 }
 
 /*
-    Проверка пересечения ограничивающей сферы с различными примитивами
+    РџСЂРѕРІРµСЂРєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµР№ СЃС„РµСЂС‹ СЃ СЂР°Р·Р»РёС‡РЅС‹РјРё РїСЂРёРјРёС‚РёРІР°РјРё
 */
 
 template <class T>
@@ -240,7 +240,7 @@ inline bool intersects (const sphere<T>& s, const plane_list<T>& p)
 }
 
 /*
-    Проверка: содержит ли ограничивающая сфера различные примитивы
+    РџСЂРѕРІРµСЂРєР°: СЃРѕРґРµСЂР¶РёС‚ Р»Рё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰Р°СЏ СЃС„РµСЂР° СЂР°Р·Р»РёС‡РЅС‹Рµ РїСЂРёРјРёС‚РёРІС‹
 */
 
 template <class T>
@@ -268,7 +268,7 @@ inline bool contains (const sphere<T>& s, const axis_aligned_box<T>& box)
 }
 
 /*
-    Расчёт объёма сферы
+    Р Р°СЃС‡С‘С‚ РѕР±СЉС‘РјР° СЃС„РµСЂС‹
 */
 
 template <class T>
@@ -280,7 +280,7 @@ inline T volume (const sphere<T>& s)
 }
 
 /*
-    Проверка на эквивалентность
+    РџСЂРѕРІРµСЂРєР° РЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚СЊ
 */
 
 template <class T>

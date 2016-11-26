@@ -1,4 +1,4 @@
-//Тестирование find_last_not_of (c-string, pos, count)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find_last_not_of (c-string, pos, count)
 #include <stdio.h>
 #include <stl/string>
 

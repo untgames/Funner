@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := INPUT.DIRECT_INPUT_DRIVER.SOURCES INPUT.DIRECT_INPUT_DRIVER.TESTS
 
-#Цель №1 - Window driver sources
+#Р¦РµР»СЊ в„–1 - Window driver sources
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.TYPE                 := static-lib
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.NAME                 := funner.input.direct_input_driver
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.INCLUDE_DIRS         :=
@@ -15,7 +15,7 @@ INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_DEFINES     := DIRECT_INPUT_KEYBOARD_
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.IMPORTS              := compile.input.manager compile.system compile.input.low_level compile.extern.dxsdk
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503
 
-#Цель №2 - Window driver tests
+#Р¦РµР»СЊ в„–2 - Window driver tests
 INPUT.DIRECT_INPUT_DRIVER.TESTS.TYPE             := test-suite
 INPUT.DIRECT_INPUT_DRIVER.TESTS.INCLUDE_DIRS     :=
 INPUT.DIRECT_INPUT_DRIVER.TESTS.SOURCE_DIRS      := tests

@@ -5,16 +5,16 @@ using namespace media;
 using namespace common;
 
 /*
-    Описание реализации массива весов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјР°СЃСЃРёРІР° РІРµСЃРѕРІ
 */
 
 struct VertexWeightStream::Impl: public xtl::reference_counter
 {
-  Buffer data_buffer; //буфер данных
+  Buffer data_buffer; //Р±СѓС„РµСЂ РґР°РЅРЅС‹С…
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VertexWeightStream::VertexWeightStream ()
@@ -40,7 +40,7 @@ VertexWeightStream::~VertexWeightStream ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vws)
@@ -51,7 +51,7 @@ VertexWeightStream& VertexWeightStream::operator = (const VertexWeightStream& vw
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 VertexWeightStream VertexWeightStream::Clone () const
@@ -60,7 +60,7 @@ VertexWeightStream VertexWeightStream::Clone () const
 }
 
 /*
-    Идентификатор потока
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕС‚РѕРєР°
 */
 
 size_t VertexWeightStream::Id () const
@@ -69,7 +69,7 @@ size_t VertexWeightStream::Id () const
 }
 
 /*
-    Получение данных
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 const VertexWeight* VertexWeightStream::Data () const
@@ -83,7 +83,7 @@ VertexWeight* VertexWeightStream::Data ()
 }
 
 /*
-    Количество вершин
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ
 */
 
 uint32_t VertexWeightStream::Size () const
@@ -97,7 +97,7 @@ void VertexWeightStream::Resize (uint32_t weights_count)
 }
 
 /*
-    Очистка массива
+    РћС‡РёСЃС‚РєР° РјР°СЃСЃРёРІР°
 */
 
 void VertexWeightStream::Clear ()
@@ -106,7 +106,7 @@ void VertexWeightStream::Clear ()
 }
 
 /*
-    Резервирование памяти
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 */
 
 uint32_t VertexWeightStream::Capacity () const
@@ -120,7 +120,7 @@ void VertexWeightStream::Reserve (uint32_t weights_count)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void VertexWeightStream::Swap (VertexWeightStream& vws)

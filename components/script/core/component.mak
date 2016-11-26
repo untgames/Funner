@@ -1,20 +1,20 @@
 ###################################################################################################
-#Определени¤ и константы
+#РћРїСЂРµРґРµР»РµРЅРёВ¤ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := SCRIPT.CORE.SOURCES SCRIPT.CORE.TESTS SCRIPT.CORE.INFO
 
-#Цель - SCRIPT_CORE sources
+#Р¦РµР»СЊ - SCRIPT_CORE sources
 SCRIPT.CORE.SOURCES.TYPE        := static-lib
 SCRIPT.CORE.SOURCES.NAME        := funner.script.core
 SCRIPT.CORE.SOURCES.SOURCE_DIRS := sources
 SCRIPT.CORE.SOURCES.IMPORTS			:= compile.script.core compile.common
 
-#Цель - SCRIPT_CORE tests
+#Р¦РµР»СЊ - SCRIPT_CORE tests
 SCRIPT.CORE.TESTS.TYPE        := test-suite
 SCRIPT.CORE.TESTS.SOURCE_DIRS := tests
 SCRIPT.CORE.TESTS.IMPORTS			:= compile.script.core link.script.core compile.common
 
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 SCRIPT.CORE.INFO.TYPE        := doxygen-info
 SCRIPT.CORE.INFO.CHM_NAME    := funner.script.core
 SCRIPT.CORE.INFO.SOURCE_DIRS := include

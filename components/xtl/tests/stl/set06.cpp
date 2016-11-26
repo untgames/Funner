@@ -1,4 +1,4 @@
-// Тестирование lower_bound ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ lower_bound ()
 #include <stdio.h>
 #include <stl/set>
 #include "test.h"

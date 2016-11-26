@@ -25,7 +25,7 @@ void raise_error (const char* source)
 }
 
 /*
-    Загрузка динамических библиотек
+    Р—Р°РіСЂСѓР·РєР° РґРёРЅР°РјРёС‡РµСЃРєРёС… Р±РёР±Р»РёРѕС‚РµРє
 */
 
 dll_t UnistdLibraryManager::LoadLibrary (const wchar_t* name)

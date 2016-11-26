@@ -3,13 +3,13 @@
 using namespace engine;
 
 /*
-    Окно
+    РћРєРЅРѕ
 */
 
 class Window: public IWindow, private xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Window (const char* name)
       : system_window (syslib::WindowStyle_PopUp)
     {
@@ -60,13 +60,13 @@ class Window: public IWindow, private xtl::trackable
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Window ()
     {
       AttachmentRegistry::Unregister (window_name.c_str (), system_window);
     }
     
-///Показ / скрытие окна
+///РџРѕРєР°Р· / СЃРєСЂС‹С‚РёРµ РѕРєРЅР°
     void Show (bool state)
     {
       try
@@ -80,7 +80,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Установка дескриптора родительского окна
+///РЈСЃС‚Р°РЅРѕРІРєР° РґРµСЃРєСЂРёРїС‚РѕСЂР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
     void SetParentHandle (void* handle)
     {
       try
@@ -94,7 +94,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Получение дескриптора родительского окна
+///РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
     void* GetParentHandle ()
     {
       try
@@ -108,7 +108,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
     
-///Установка размеров окна
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
     void SetSize (unsigned int width, unsigned int height)
     {
       try
@@ -122,7 +122,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
     
-///Получение ширины окна
+///РџРѕР»СѓС‡РµРЅРёРµ С€РёСЂРёРЅС‹ РѕРєРЅР°
     unsigned int GetWidth ()
     {
       try
@@ -136,7 +136,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
     
-///Получение высоты окна
+///РџРѕР»СѓС‡РµРЅРёРµ РІС‹СЃРѕС‚С‹ РѕРєРЅР°
     unsigned int GetHeight ()
     {
       try
@@ -150,7 +150,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
     
-///Установка положения окна
+///РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
     void SetPosition (int x, int y)
     {
       try
@@ -164,7 +164,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Получение абсциссы положения окна
+///РџРѕР»СѓС‡РµРЅРёРµ Р°Р±СЃС†РёСЃСЃС‹ РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
     int GetX ()
     {
       try
@@ -178,7 +178,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Получение ординаты положения окна
+///РџРѕР»СѓС‡РµРЅРёРµ РѕСЂРґРёРЅР°С‚С‹ РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
     int GetY ()
     {
       try
@@ -192,7 +192,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Добавление слушателя событий
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
     void AttachListener (IWindowListener* listener)
     {
       if (!listener)
@@ -201,7 +201,7 @@ class Window: public IWindow, private xtl::trackable
       listeners.push_back (listener);
     }
 
-///Удаление слушателя событий
+///РЈРґР°Р»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
     void DetachListener (IWindowListener* listener)
     {
       if (!listener)
@@ -210,14 +210,14 @@ class Window: public IWindow, private xtl::trackable
       listeners.erase (stl::remove (listeners.begin (), listeners.end (), listener), listeners.end ());
     }
 
-///Удаление всех слушателей событий
+///РЈРґР°Р»РµРЅРёРµ РІСЃРµС… СЃР»СѓС€Р°С‚РµР»РµР№ СЃРѕР±С‹С‚РёР№
     void DetachAllListeners ()
     {
       listeners.clear ();
     }
 
   private:
-///Обработчик событий окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
     void WindowEventHandler (syslib::WindowEvent event, const syslib::WindowEventContext& context)
     {
       switch (event)
@@ -290,7 +290,7 @@ class Window: public IWindow, private xtl::trackable
       }
     }
 
-///Оповещение слушателей
+///РћРїРѕРІРµС‰РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»РµР№
     template <class Fn> void Notify (Fn fn)
     {
       for (typename ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
@@ -351,9 +351,9 @@ class Window: public IWindow, private xtl::trackable
     typedef stl::vector<IWindowListener*> ListenerArray;
 
   private:
-    syslib::Window system_window; //системное окно
-    stl::string    window_name;   //имя окна
-    ListenerArray  listeners;     //слушатели событий окна
+    syslib::Window system_window; //СЃРёСЃС‚РµРјРЅРѕРµ РѕРєРЅРѕ
+    stl::string    window_name;   //РёРјСЏ РѕРєРЅР°
+    ListenerArray  listeners;     //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 };
 
 namespace engine

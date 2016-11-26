@@ -1,5 +1,5 @@
 /*
-    Статистическая функция (по умолчанию сумма элементов интервала)
+    РЎС‚Р°С‚РёСЃС‚РёС‡РµСЃРєР°СЏ С„СѓРЅРєС†РёСЏ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЃСѓРјРјР° СЌР»РµРјРµРЅС‚РѕРІ РёРЅС‚РµСЂРІР°Р»Р°)
 */
 
 template <class InIter,class T,class BinOperation>
@@ -26,7 +26,7 @@ T average (InIter first,InIter last,T init)
 }
 
 /*
-    Скалярное произведение
+    РЎРєР°Р»СЏСЂРЅРѕРµ РїСЂРѕРёР·РІРµРґРµРЅРёРµ
 */
 
 template <class InIter1,class InIter2,class T,class BinOperation1,class BinOperation2>
@@ -44,7 +44,7 @@ inline T inner_product (InIter1 first1,InIter1 last1,InIter2 first2,T init)
 }
 
 /*
-    Вычисление суммы ряда
+    Р’С‹С‡РёСЃР»РµРЅРёРµ СЃСѓРјРјС‹ СЂСЏРґР°
 */
 
 template <class InIter,class OutIter,class BinOperation>
@@ -66,7 +66,7 @@ inline OutIter partial_sum (InIter first,InIter last,OutIter result)
 }
 
 /*
-    Вычисление разности смежных элементов
+    Р’С‹С‡РёСЃР»РµРЅРёРµ СЂР°Р·РЅРѕСЃС‚Рё СЃРјРµР¶РЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class InIter,class OutIter,class BinOperation>
@@ -95,7 +95,7 @@ inline OutIter adjacent_difference (InIter first,InIter last,OutIter result)
 }
 
 /*
-    Возведение в целую степень (время работы O(logN))
+    Р’РѕР·РІРµРґРµРЅРёРµ РІ С†РµР»СѓСЋ СЃС‚РµРїРµРЅСЊ (РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ O(logN))
 */
 
 template <class T,class Integer,class MonoidOperation>
@@ -134,7 +134,7 @@ inline T power (T x,Integer n)
 }
 
 /*
-    Генерация числовой последовательности
+    Р“РµРЅРµСЂР°С†РёСЏ С‡РёСЃР»РѕРІРѕР№ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
 */
 
 template <class FwdIter,class T>

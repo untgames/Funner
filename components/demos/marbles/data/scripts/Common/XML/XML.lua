@@ -1,6 +1,6 @@
 --[[ 
-  в этом файле собраны все стандартные функции,
-  которые используются для работы с XML
+  РІ СЌС‚РѕРј С„Р°Р№Р»Рµ СЃРѕР±СЂР°РЅС‹ РІСЃРµ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ С„СѓРЅРєС†РёРё,
+  РєРѕС‚РѕСЂС‹Рµ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ XML
 ]]
 
 local BooleanByString={}
@@ -12,7 +12,7 @@ local BooleanByString={}
       BooleanByString["True"]=true
 
 --------------------------------------------------------------------------------------------------
--- сохранение и загрузка
+-- СЃРѕС…СЂР°РЅРµРЅРёРµ Рё Р·Р°РіСЂСѓР·РєР°
 
 function XML_Save(xml, FileName)
   assert(xml, "ERROR: XML_Save(xml, FileName) - xml is nil")
@@ -32,7 +32,7 @@ function XML_Load(xml, FileName)
 end
 
 --------------------------------------------------------------------------------------------------
---Установка имени
+--РЈСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё
 
 function XML_SetName(xml, name)
   assert(name~=nil, "ERROR: XML_SetName(name) - name is nil")
@@ -44,7 +44,7 @@ function  XML_GetName(xml)
 end
 
 --------------------------------------------------------------------------------------------------
--- Запись данных
+-- Р—Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
 
 function XML_WriteStringWithName(xml, name, data)
   assert(xml, "ERROR: XML_WriteStringWithName(xml, name, data) - xml is nil")
@@ -102,7 +102,7 @@ function XML_WriteVec3WithName(xml, name, data)
 end
 
 --------------------------------------------------------------------------------------------------
--- Чтение данных
+-- Р§С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
 function XML_ReadStringByName (xml, name)
   assert(xml,"ERROR: XML_ReadStringByName (xml, name) - xml is nil")
@@ -113,7 +113,7 @@ function XML_ReadStringByName (xml, name)
   end
   local str=data:Attribute(0)
   if LocaleXML then
-    --если обьявлена XML с локализацией - то пробуем
+    --РµСЃР»Рё РѕР±СЊСЏРІР»РµРЅР° XML СЃ Р»РѕРєР°Р»РёР·Р°С†РёРµР№ - С‚Рѕ РїСЂРѕР±СѓРµРј
     if string.sub(str,1,1)=="#" then
       str=LocaleXML.ReadStringByName(string.sub(str,2))
     end
@@ -201,7 +201,7 @@ function XML_ReadVec3ByName(xml, name)
 end
 
 --------------------------------------------------------------------------------------------------
--- работа с потомками
+-- СЂР°Р±РѕС‚Р° СЃ РїРѕС‚РѕРјРєР°РјРё
 
 local function XML_CreateFromNode (node)
   assert(node,"ERROR: XML_CreateFromNode (node) - node is nil")
@@ -234,11 +234,11 @@ local function XML_ForEachChildNode (xml, func, ...)
 end
 
 function XML_GetChild (xml, name, index)
-  --внимание!! индекс начинается с 1, а не с 0 !!!!!
+  --РІРЅРёРјР°РЅРёРµ!! РёРЅРґРµРєСЃ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ 1, Р° РЅРµ СЃ 0 !!!!!
   assert(xml, "ERROR: XML_GetChild( xml, name, index) - xml is nil")
   assert(name, "ERROR: XML_GetChild( xml, name, index) - name is nil")
   if index then
-    --выбор одного из нескольких одноименных потомков с помощью индекса
+    --РІС‹Р±РѕСЂ РѕРґРЅРѕРіРѕ РёР· РЅРµСЃРєРѕР»СЊРєРёС… РѕРґРЅРѕРёРјРµРЅРЅС‹С… РїРѕС‚РѕРјРєРѕРІ СЃ РїРѕРјРѕС‰СЊСЋ РёРЅРґРµРєСЃР°
     local found=nil
     XML_ForEachChildNode(xml, function(child)
       if child.Name==name then
@@ -260,13 +260,13 @@ function XML_GetChild (xml, name, index)
 end
 
 function XML_ForEachChild (xml, func, ...)
-  --func(child, ...) срабатывает для каждого child
+  --func(child, ...) СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РґР»СЏ РєР°Р¶РґРѕРіРѕ child
   assert(xml, "ERROR: XML_ForEachChild (xml, func, ...) - xml is nil")
   assert(func, "ERROR: XML_ForEachChild (xml, func, ...) - func is nil")
   assert(type(func)=="function", "ERROR: XML_ForEachChild (xml, func, ...) - func is not a function")
-  --кеширование порождающей функции
+  --РєРµС€РёСЂРѕРІР°РЅРёРµ РїРѕСЂРѕР¶РґР°СЋС‰РµР№ С„СѓРЅРєС†РёРё
   local NodeToXML=XML_CreateFromNode
-  --обработка всех потомков
+  --РѕР±СЂР°Р±РѕС‚РєР° РІСЃРµС… РїРѕС‚РѕРјРєРѕРІ
   local params={...}
   XML_ForEachChildNode(xml, function(child)
     func (NodeToXML(child), unpack(params))
@@ -277,9 +277,9 @@ function XML_ForEachChildByName (xml, name, func, ...)
   assert(xml, "ERROR: XML_ForEachChildByName (xml, name, func, ...) - xml is nil")
   assert(name,"ERROR: XML_ForEachChildByName (xml, name, func, ...) - name is nil")
   assert(func,"ERROR: XML_ForEachChildByName (xml, name, func, ...) - func is nil")
-  --кеширование порождающей функции
+  --РєРµС€РёСЂРѕРІР°РЅРёРµ РїРѕСЂРѕР¶РґР°СЋС‰РµР№ С„СѓРЅРєС†РёРё
   local NodeToXML=XML_CreateFromNode
-  --обработка всех потомков
+  --РѕР±СЂР°Р±РѕС‚РєР° РІСЃРµС… РїРѕС‚РѕРјРєРѕРІ
   local params={...}
   XML_ForEachChildNode(xml, function(child)
     if child.Name==name then

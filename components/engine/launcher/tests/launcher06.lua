@@ -1,16 +1,16 @@
--- Инициализация графики
+-- ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╨│╤А╨░╤Д╨╕╨║╨╕
 local function InitGraphics ()
-  -- Создание экрана
+  -- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤Н╨║╤А╨░╨╜╨░
   
   local screen = Scene.Screen.Create ()
   
   screen.BackgroundColor = vec4 (0, 1, 0, 1)
   
-  -- Привязка экрана к окну в config.xml
+  -- ╨Я╤А╨╕╨▓╤П╨╖╨║╨░ ╤Н╨║╤А╨░╨╜╨░ ╨║ ╨╛╨║╨╜╤Г ╨▓ config.xml
 
   Engine.Screens.Register ("Screen1", screen)
   
-  -- Добавление на экран области вывода
+  -- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╕╨╡ ╨╜╨░ ╤Н╨║╤А╨░╨╜ ╨╛╨▒╨╗╨░╤Б╤В╨╕ ╨▓╤Л╨▓╨╛╨┤╨░
 
   local viewport = Scene.Viewport.Create ()
   
@@ -24,14 +24,14 @@ local function InitGraphics ()
   return {} 
 end
 
--- Инициализация ввода  
+-- ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╨▓╨▓╨╛╨┤╨░  
 local function InitInput () 
   local this = {}  
   
   local mouse_x = 0
   local mouse_y = 0
 
-  -- Обработчики
+  -- ╨Ю╨▒╤А╨░╨▒╨╛╤В╤З╨╕╨║╨╕
   
   this.OnWindowClosed = function ()
     print ("Window closed")
@@ -65,10 +65,10 @@ local function InitInput ()
     local z = undefined_table.some_field -- string with error
   end  
 
-  -- Регистрация обработчика событий ввода. CreateEventHandler без параметров перенаправит все события ввода в скрипт
+  -- ╨а╨╡╨│╨╕╤Б╤В╤А╨░╤Ж╨╕╤П ╨╛╨▒╤А╨░╨▒╨╛╤В╤З╨╕╨║╨░ ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨▓╨▓╨╛╨┤╨░. CreateEventHandler ╨▒╨╡╨╖ ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨╛╨▓ ╨┐╨╡╤А╨╡╨╜╨░╨┐╤А╨░╨▓╨╕╤В ╨▓╤Б╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨▓╨▓╨╛╨┤╨░ ╨▓ ╤Б╨║╤А╨╕╨┐╤В
   
   local function EventsDispatch (command)
-    -- Компиляция команды
+    -- ╨Ъ╨╛╨╝╨┐╨╕╨╗╤П╤Ж╨╕╤П ╨║╨╛╨╝╨░╨╜╨┤╤Л
     
     local status, value = pcall (loadstring (string.format ("return function (this) %s end", command)))
     local fn
@@ -81,7 +81,7 @@ local function InitInput ()
       return
     end
 
-    -- Запуск команды
+    -- ╨Ч╨░╨┐╤Г╤Б╨║ ╨║╨╛╨╝╨░╨╜╨┤╤Л
 
     status, value = pcall (fn, this)
     
@@ -95,15 +95,15 @@ local function InitInput ()
   return {}
 end
 
--- Создание тестовой сцены
+-- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤В╨╡╤Б╤В╨╛╨▓╨╛╨╣ ╤Б╤Ж╨╡╨╜╤Л
 
 
--- Главная функция
+-- ╨У╨╗╨░╨▓╨╜╨░╤П ╤Д╤Г╨╜╨║╤Ж╨╕╤П
 local function Main ()
-  local gfx_system   = InitGraphics () -- ссылки хранятся, чтобы сборщик мусора не удалил вложенные объекты
+  local gfx_system   = InitGraphics () -- ╤Б╤Б╤Л╨╗╨║╨╕ ╤Е╤А╨░╨╜╤П╤В╤Б╤П, ╤З╤В╨╛╨▒╤Л ╤Б╨▒╨╛╤А╤Й╨╕╨║ ╨╝╤Г╤Б╨╛╤А╨░ ╨╜╨╡ ╤Г╨┤╨░╨╗╨╕╨╗ ╨▓╨╗╨╛╨╢╨╡╨╜╨╜╤Л╨╡ ╨╛╨▒╤К╨╡╨║╤В╤Л
   local input_system = InitInput ()
   
 end
 
--- Вызов Main
+-- ╨Т╤Л╨╖╨╛╨▓ Main
 Main ()

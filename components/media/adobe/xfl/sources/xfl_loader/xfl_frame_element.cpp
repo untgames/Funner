@@ -8,7 +8,7 @@ namespace
 
 const size_t MAX_CORRECT_VALUE = 1000000000;
 
-//Чтение float значения, которое в случае отрицательного значения превращается в unsigned long long
+//Р§С‚РµРЅРёРµ float Р·РЅР°С‡РµРЅРёСЏ, РєРѕС‚РѕСЂРѕРµ РІ СЃР»СѓС‡Р°Рµ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РїСЂРµРІСЂР°С‰Р°РµС‚СЃСЏ РІ unsigned long long
 float read_xfl_float (const ParseNode& node, const char* name)
 {
   float float_value = get<float> (node, name);
@@ -26,7 +26,7 @@ float read_xfl_float (const ParseNode& node, const char* name)
 }
 
 /*
-    Разбор кадра анимации
+    Р Р°Р·Р±РѕСЂ РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseFrameElement (Parser::Iterator iter, Frame::FrameElementList& collection, FrameElementType type)

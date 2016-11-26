@@ -5,7 +5,7 @@ using namespace scene_graph;
 class MyController
 {
   public:
-//Конструктор
+//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MyController  () {}
     MyController  (const MyController&) {}
     ~MyController () {}
@@ -19,7 +19,7 @@ class MyController
 class UnbindController
 {
   public:
-//Конструктор
+//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     UnbindController  (Node* in_node_to_unbind)
       : node_to_unbind (in_node_to_unbind)
       {}

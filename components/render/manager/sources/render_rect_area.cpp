@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 RectAreaImpl::RectAreaImpl ()
@@ -16,7 +16,7 @@ RectAreaImpl::RectAreaImpl (const render::manager::Rect& in_rect)
 }
     
 /*
-    Размеры области
+    Р Р°Р·РјРµСЂС‹ РѕР±Р»Р°СЃС‚Рё
 */
 
 void RectAreaImpl::SetRect (const render::manager::Rect& in_rect)

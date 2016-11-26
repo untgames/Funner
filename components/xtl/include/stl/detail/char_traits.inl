@@ -1,5 +1,5 @@
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Char,class Int>
@@ -22,7 +22,7 @@ inline typename char_traits_base<Char,Int>::char_type* char_traits_base<Char,Int
 }
 
 /*
-    Быстрая инициализация
+    Р‘С‹СЃС‚СЂР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 */
 
 template <class Char,class Int>
@@ -32,7 +32,7 @@ inline void char_traits_base<Char,Int>::fast_init (char_type* dst,size_t count)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class Char,class Int>
@@ -66,7 +66,7 @@ inline typename char_traits_base<Char,Int>::char_type* char_traits_base<Char,Int
 }
 
 /*
-    Сравнение сомволов и строк
+    РЎСЂР°РІРЅРµРЅРёРµ СЃРѕРјРІРѕР»РѕРІ Рё СЃС‚СЂРѕРє
 */
     
 template <class Char,class Int>
@@ -98,7 +98,7 @@ inline int char_traits_base<Char,Int>::compare (const char_type* a,const char_ty
 }
 
 /*
-    Поиск символа / длина строки
+    РџРѕРёСЃРє СЃРёРјРІРѕР»Р° / РґР»РёРЅР° СЃС‚СЂРѕРєРё
 */
 
 template <class Char,class Int>
@@ -126,7 +126,7 @@ inline size_t char_traits_base<Char,Int>::length (const char_type* s)
 }
 
 /*
-    Преобразования
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 template <class Char,class Int>
@@ -142,7 +142,7 @@ inline const typename char_traits_base<Char,Int>::int_type char_traits_base<Char
 } 
 
 /*
-    Маркеры
+    РњР°СЂРєРµСЂС‹
 */
 
 template <class Char,class Int>
@@ -164,7 +164,7 @@ inline const typename char_traits_base<Char,Int>::int_type char_traits_base<Char
 }
 
 /*
-    Специализация для char
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ char
 */
 
 inline char* char_traits<char>::copy (char* dst,const char* src,size_t count)
@@ -208,7 +208,7 @@ inline int char_traits<char>::to_int_type (const char& c)
 }
 
 /*
-    Специализация для wchar_t
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ wchar_t
 */
 
 inline wchar_t* char_traits<wchar_t>::copy (wchar_t* dst,const wchar_t* src,size_t count)

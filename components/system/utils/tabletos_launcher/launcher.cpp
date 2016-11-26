@@ -18,13 +18,13 @@
 #include <bps/bps.h>
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const int SHELL_PORT = 1663; //порт, на который соединяется telnet
+const int SHELL_PORT = 1663; //РїРѕСЂС‚, РЅР° РєРѕС‚РѕСЂС‹Р№ СЃРѕРµРґРёРЅСЏРµС‚СЃСЏ telnet
 
 /*
-    Типы
+    РўРёРїС‹
 */
 
 enum ProtocolMsgId
@@ -120,7 +120,7 @@ struct ArgReader
 };
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
 void sock_send (int socket, const char* buffer, size_t length)
@@ -240,7 +240,7 @@ void* dump (void* data)
 
 int main (int argc, char** argv, char** env)
 {  
-    //инициализация telnet
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ telnet
   
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -276,7 +276,7 @@ int main (int argc, char** argv, char** env)
     return 1;
   }  
   
-    //чтение параметров запуска
+    //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСѓСЃРєР°
     
   ArgReader arg_reader (newsockfd);
     
@@ -292,7 +292,7 @@ int main (int argc, char** argv, char** env)
 
   chdir (cur_dir.c_str ()); 
 
-    //перенаправление стандартного вывода
+    //РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ СЃС‚Р°РЅРґР°СЂС‚РЅРѕРіРѕ РІС‹РІРѕРґР°
 
   int stdout_file = redirect_stdout ();
   
@@ -304,7 +304,7 @@ int main (int argc, char** argv, char** env)
 //  printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());  
 //  fflush (stdout);
 
-    //запуск
+    //Р·Р°РїСѓСЃРє
     
   std::auto_ptr<LaunchInfo> info (new LaunchInfo);
   

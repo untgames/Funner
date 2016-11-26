@@ -3,7 +3,7 @@
 using namespace media;
 
 /*
-   Реализация растеризованного шрифта
+   Р РµР°Р»РёР·Р°С†РёСЏ СЂР°СЃС‚РµСЂРёР·РѕРІР°РЅРЅРѕРіРѕ С€СЂРёС„С‚Р°
 */
 
 namespace media
@@ -21,7 +21,7 @@ struct RasterizedFont::Impl : public xtl::reference_counter
 }
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RasterizedFont::RasterizedFont (IFontRasterizer* rasterizer)
@@ -41,7 +41,7 @@ RasterizedFont::~RasterizedFont ()
 }
 
 /*
-   Присваивание
+   РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 RasterizedFont& RasterizedFont::operator = (const RasterizedFont& source)
@@ -52,7 +52,7 @@ RasterizedFont& RasterizedFont::operator = (const RasterizedFont& source)
 }
 
 /*
-   Растеризованные глифы
+   Р Р°СЃС‚РµСЂРёР·РѕРІР°РЅРЅС‹Рµ РіР»РёС„С‹
 */
 
 const RasterizedGlyphInfo* RasterizedFont::RasterizedGlyphs () const
@@ -61,7 +61,7 @@ const RasterizedGlyphInfo* RasterizedFont::RasterizedGlyphs () const
 }
 
 /*
-   Количество картинок
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°СЂС‚РёРЅРѕРє
 */
 
 unsigned int RasterizedFont::ImagesCount () const
@@ -70,7 +70,7 @@ unsigned int RasterizedFont::ImagesCount () const
 }
 
 /*
-   Построение картинки
+   РџРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚РёРЅРєРё
 */
 
 void RasterizedFont::BuildImage (unsigned int image_index, media::Image& out_image) const
@@ -82,7 +82,7 @@ void RasterizedFont::BuildImage (unsigned int image_index, media::Image& out_ima
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void RasterizedFont::Swap (RasterizedFont& source)
@@ -94,7 +94,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (RasterizedFont& font1, RasterizedFont& font2)

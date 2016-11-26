@@ -11,7 +11,7 @@ namespace media_image_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* IMAGE_LIBRARY        = "Media.Image";
@@ -35,7 +35,7 @@ void bind_image_format_library (Environment& environment)
   lib.Register ("get_LA8",     make_const (PixelFormat_LA8));
 }
 
-///Функции
+///Р¤СѓРЅРєС†РёРё
 Image create_image (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format)
 {
   return Image (width, height, depth, format);
@@ -75,18 +75,18 @@ unsigned int put_image (IStack& stack)
   return 0;
 }
 
-///Регистрация библиотеки работы с картинками
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєР°СЂС‚РёРЅРєР°РјРё
 void bind_image_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (IMAGE_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (&create_image),
                                         make_invoker (&load_image),
                                         make_invoker (&create_default_image)));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_Width",    make_invoker (&Image::Width));
   lib.Register ("get_Height",   make_invoker (&Image::Height));
@@ -111,7 +111,7 @@ void bind_image_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

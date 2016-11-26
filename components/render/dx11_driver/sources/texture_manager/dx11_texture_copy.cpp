@@ -15,7 +15,7 @@ namespace
 {
 
 /*
-    Форматы пикселей
+    Р¤РѕСЂРјР°С‚С‹ РїРёРєСЃРµР»РµР№
 */
 
 struct pixel_rgb       { unsigned char red, green, blue; };
@@ -54,7 +54,7 @@ struct pixel_ds
 };
 
 /*
-    Проверка возможности преобразования
+    РџСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 template <class Src, class Dst> struct has_conversion { enum { value = 0 }; };
@@ -90,7 +90,7 @@ template <class T1, size_t DepthBits1, size_t StencilBits1, class T2, size_t Dep
 struct has_conversion<pixel_ds<T1, DepthBits1, StencilBits1>, pixel_ds<T2, DepthBits2, StencilBits2> > { enum { value = 1 }; };
 
 /*
-    Копирование пикселя
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РїРёРєСЃРµР»СЏ
 */
 
 /// Same types
@@ -156,7 +156,7 @@ inline void copy_pixel (const pixel_ds<T1, DepthBits1, StencilBits1>& src, pixel
 }
 
 /*
-    Копирование образов
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РѕР±СЂР°Р·РѕРІ
 */
 
 inline void copy_direct (PixelFormat format, size_t width, size_t height, size_t src_row_pitch, const void* src_buffer, size_t dst_row_pitch, void* dst_buffer)

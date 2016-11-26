@@ -19,13 +19,13 @@ namespace xtl
 
 typedef unsigned long long high_precision_time_t;
 
-//получение времени с высокой точностью
+//РїРѕР»СѓС‡РµРЅРёРµ РІСЂРµРјРµРЅРё СЃ РІС‹СЃРѕРєРѕР№ С‚РѕС‡РЅРѕСЃС‚СЊСЋ
 high_precision_time_t high_precision_time ();
 
-//получение частоты таймера
+//РїРѕР»СѓС‡РµРЅРёРµ С‡Р°СЃС‚РѕС‚С‹ С‚Р°Р№РјРµСЂР°
 high_precision_time_t high_precision_time_frequency ();
 
-//преобразование к стандартному представлению
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Рє СЃС‚Р°РЅРґР°СЂС‚РЅРѕРјСѓ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЋ
 void convert_high_precision_time (high_precision_time_t span, size_t& out_seconds, size_t& out_nanoseconds);
 
 #include <xtl/detail/high_precision_time.inl>

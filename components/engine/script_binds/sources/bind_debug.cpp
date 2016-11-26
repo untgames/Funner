@@ -14,7 +14,7 @@ namespace engine_script_bind
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* COMPONENT_NAME        = "script.binds.Debug";
@@ -22,7 +22,7 @@ const char* BINDER_NAME           = "Debug";
 const char* DEBUG_MANAGER_LIBRARY = "Debug";
 
 /*
-    Регистрация библиотек
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 namespace
@@ -45,7 +45,7 @@ void bind_debug_manager_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

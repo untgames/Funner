@@ -10,15 +10,15 @@ const float EPS = 0.0001f;
 
 }
 
-///Рассчет ускорения с использованием ускорения, замедления, максимальной скорости
+///Р Р°СЃСЃС‡РµС‚ СѓСЃРєРѕСЂРµРЅРёСЏ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј СѓСЃРєРѕСЂРµРЅРёСЏ, Р·Р°РјРµРґР»РµРЅРёСЏ, РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ СЃРєРѕСЂРѕСЃС‚Рё
 struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter, public xtl::instance_counter<LinearAccelerationEvaluator>
 {
-  float       acceleration;                  //ускорение разгона
-  float       deceleration;                  //ускорение торможения
-  float       max_speed;                     //максимальная скорость
-  float       braking_distance;              //тормозной путь
-  bool        needs_recalc_braking_distance; //необходимо ли обновить тормозной путь
-  math::vec3f return_acceleration;           //поле возвращаемое при рассчете ускорения
+  float       acceleration;                  //СѓСЃРєРѕСЂРµРЅРёРµ СЂР°Р·РіРѕРЅР°
+  float       deceleration;                  //СѓСЃРєРѕСЂРµРЅРёРµ С‚РѕСЂРјРѕР¶РµРЅРёСЏ
+  float       max_speed;                     //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+  float       braking_distance;              //С‚РѕСЂРјРѕР·РЅРѕР№ РїСѓС‚СЊ
+  bool        needs_recalc_braking_distance; //РЅРµРѕР±С…РѕРґРёРјРѕ Р»Рё РѕР±РЅРѕРІРёС‚СЊ С‚РѕСЂРјРѕР·РЅРѕР№ РїСѓС‚СЊ
+  math::vec3f return_acceleration;           //РїРѕР»Рµ РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ РїСЂРё СЂР°СЃСЃС‡РµС‚Рµ СѓСЃРєРѕСЂРµРЅРёСЏ
 
   Impl ()
     : acceleration (1.f)
@@ -47,7 +47,7 @@ struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter, public 
 
     math::vec3f normalized_current_speed = current_speed_module > EPS ? math::normalize (current_speed) : 0.f;
 
-    if (distance_length < EPS)  //торможение
+    if (distance_length < EPS)  //С‚РѕСЂРјРѕР¶РµРЅРёРµ
     {
       if (current_speed_module < EPS)
         return_acceleration = 0.f;
@@ -77,7 +77,7 @@ struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter, public 
   }
 };
 
-///Конструктор / деструктор / копирование
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 LinearAccelerationEvaluator::LinearAccelerationEvaluator ()
   : impl (new Impl ())
 {
@@ -95,7 +95,7 @@ LinearAccelerationEvaluator::~LinearAccelerationEvaluator ()
 }
 
 /*
-   Рассчет ускорения
+   Р Р°СЃСЃС‡РµС‚ СѓСЃРєРѕСЂРµРЅРёСЏ
 */
 
 const math::vec3f& LinearAccelerationEvaluator::operator () (const math::vec3f& current_speed, const math::vec3f& distance, float dt) const
@@ -104,7 +104,7 @@ const math::vec3f& LinearAccelerationEvaluator::operator () (const math::vec3f& 
 }
 
 /*
-   Установка/получение ускорения разгона
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёСЏ СЂР°Р·РіРѕРЅР°
 */
 
 void LinearAccelerationEvaluator::SetAcceleration (float acceleration)
@@ -121,7 +121,7 @@ float LinearAccelerationEvaluator::Acceleration () const
 }
 
 /*
-   Установка/получение ускорения замедления
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёСЏ Р·Р°РјРµРґР»РµРЅРёСЏ
 */
 
 void LinearAccelerationEvaluator::SetDeceleration (float deceleration)
@@ -139,7 +139,7 @@ float LinearAccelerationEvaluator::Deceleration () const
 }
 
 /*
-   Установка/получение максимальной скорости
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ СЃРєРѕСЂРѕСЃС‚Рё
 */
 
 void LinearAccelerationEvaluator::SetMaxSpeed (float max_speed)

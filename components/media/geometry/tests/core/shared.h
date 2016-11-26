@@ -34,7 +34,7 @@ typedef Binormal<float>       Binormalf;
 
 typedef Vertex<Position3f, Normalf, Color4ub, TexChannel<0>::Coord2f> CustomVertex;
 
-//вывод вершинного атрибута
+//РІС‹РІРѕРґ РІРµСЂС€РёРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
 void dump (const VertexAttribute& attribute)
 {
   if (*attribute.name)
@@ -49,7 +49,7 @@ void dump (const VertexAttribute& attribute)
   }
 }
 
-//вывод формата меша
+//РІС‹РІРѕРґ С„РѕСЂРјР°С‚Р° РјРµС€Р°
 void dump (const VertexFormat& format, size_t vertex_size=size_t (-1))
 {  
   if (vertex_size != (size_t)-1)
@@ -66,14 +66,14 @@ void dump (const VertexFormat& format, size_t vertex_size=size_t (-1))
     dump (format.Attribute (i));
 }
 
-//вывод вершины
+//РІС‹РІРѕРґ РІРµСЂС€РёРЅС‹
 void dump (const CustomVertex& v)
 {
   printf ("  xyz=[%g %g %g] normal=[%g %g %g] rgba=[%u %u %u %u] st=[%g %g]\n", v.position.x, v.position.y, v.position.z,
           v.normal.x, v.normal.y, v.normal.z, v.color.x, v.color.y, v.color.z, v.color.w, v.texcoord0.x, v.texcoord0.y);
 }
 
-//вывод потока вершин
+//РІС‹РІРѕРґ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅ
 void dump (const VertexStream& s)
 {
   printf ("vertex stream (%u vertices):\n", s.Size ());

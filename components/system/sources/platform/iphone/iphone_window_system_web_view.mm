@@ -147,7 +147,7 @@ size_t MAX_WAIT_FOR_FINISH_LOAD_TIME = 10000; //time for wait for page complete 
 @end
 
 /*
-   Создание/уничтожение web-view
+   РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t IPhoneWindowManager::CreateWebView (IWebViewListener* listener)
@@ -164,7 +164,7 @@ void IPhoneWindowManager::DestroyWebView (web_view_t handle)
 }
 
 /*
-   Присоединенное окно
+   РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t IPhoneWindowManager::GetWindow (web_view_t handle)
@@ -176,7 +176,7 @@ window_t IPhoneWindowManager::GetWindow (web_view_t handle)
 }
 
 /*
-   Загрузка данных
+   Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void IPhoneWindowManager::LoadRequest (web_view_t handle, const char* uri)
@@ -243,7 +243,7 @@ void IPhoneWindowManager::LoadData (web_view_t handle, const char* data, size_t 
 }
 
 /*
-   Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+   РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void IPhoneWindowManager::Reload (web_view_t handle)
@@ -271,7 +271,7 @@ bool IPhoneWindowManager::IsLoading (web_view_t handle)
 }
 
 /*
-   Средства навигации
+   РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool IPhoneWindowManager::CanGoBack (web_view_t handle)

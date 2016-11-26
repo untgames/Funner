@@ -7,7 +7,7 @@ namespace default_console_handler
 {
 
 /*
-    Компонент печатающий сообщения консоли
+    РљРѕРјРїРѕРЅРµРЅС‚ РїРµС‡Р°С‚Р°СЋС‰РёР№ СЃРѕРѕР±С‰РµРЅРёСЏ РєРѕРЅСЃРѕР»Рё
 */
 
 class DefaultConsoleHandlerComponent

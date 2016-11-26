@@ -26,20 +26,20 @@ namespace window_input_driver_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "WindowInputDriver";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.WindowInputDriver"; //имя компонента
+const char* SUBSYSTEM_NAME = "WindowInputDriver";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.WindowInputDriver"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 /*
-    Устройство ввода окна
+    РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РІРІРѕРґР° РѕРєРЅР°
 */
 
 class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WindowDevice (ParseNode& node)
       : attachment_name (get<const char*> (node, "Window")),
         device_name (get<const char*> (node, "Id", ""))
@@ -54,13 +54,13 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
       AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~WindowDevice ()
     {
       AttachmentRegistry::Detach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-///Обработчик события регистрации окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕРєРЅР°
     void OnRegisterAttachment (const char* name, syslib::Window& window)
     {
       if (name != attachment_name)
@@ -70,7 +70,7 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
       input::low_level::WindowDriver::RegisterDevice (device_name.c_str (), window);
     }
 
-///Обработчик события отмены регистрации окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РѕС‚РјРµРЅС‹ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕРєРЅР°
     void OnUnregisterAttachment (const char* name, syslib::Window&)
     {
       if (name != attachment_name)
@@ -85,20 +85,20 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
 };
 
 /*
-    Подсистема direct input драйвера
+    РџРѕРґСЃРёСЃС‚РµРјР° direct input РґСЂР°Р№РІРµСЂР°
 */
 
 class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WindowInputDriverSubsystem (ParseNode& node)
     {
       for (Parser::NamesakeIterator iter=node.First ("Device"); iter; ++iter)
         devices.push_back (DevicePtr (new WindowDevice (*iter), false));
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -115,7 +115,7 @@ class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_coun
 };
 
 /*
-    Компонент оконного ввода
+    РљРѕРјРїРѕРЅРµРЅС‚ РѕРєРѕРЅРЅРѕРіРѕ РІРІРѕРґР°
 */
 
 class WindowInputDriverComponent

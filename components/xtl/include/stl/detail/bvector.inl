@@ -1,5 +1,5 @@
 /*
-    Итератор (base)
+    РС‚РµСЂР°С‚РѕСЂ (base)
 */
 
 template <class WordT>
@@ -56,7 +56,7 @@ inline bool bit_iterator_base<WordT>::operator >= (const bit_iterator_base& x) c
 }
 
 /*
-    Итератор
+    РС‚РµСЂР°С‚РѕСЂ
 */
   
 template <class WordT,class Ref>  
@@ -177,7 +177,7 @@ inline typename bit_iterator<WordT,Ref>::difference_type bit_iterator<WordT,Ref>
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Allocator>
@@ -215,7 +215,7 @@ inline void bit_vector<Allocator>::_init (Iter first,Iter last,input_iterator_ta
 }
 
 /*
-    Отсечение 
+    РћС‚СЃРµС‡РµРЅРёРµ 
 */
 
 template <class Allocator>
@@ -235,7 +235,7 @@ void bit_vector<Allocator>::trim (size_type new_size)
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Allocator>
@@ -245,7 +245,7 @@ inline typename bit_vector<Allocator>::allocator_type bit_vector<Allocator>::get
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class Allocator>
@@ -297,7 +297,7 @@ inline typename bit_vector<Allocator>::const_reverse_iterator bit_vector<Allocat
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class Allocator>
@@ -355,7 +355,7 @@ inline typename bit_vector<Allocator>::const_reference bit_vector<Allocator>::ba
 }
 
 /*
-    Функции общего назначения    
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ    
 */
 
 template <class Allocator>
@@ -402,7 +402,7 @@ inline bool bit_vector<Allocator>::is_valid (iterator first,iterator last) const
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 template <class Allocator>
@@ -422,7 +422,7 @@ inline void bit_vector<Allocator>::reserve (size_type count)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Allocator>
@@ -478,7 +478,7 @@ inline void bit_vector<Allocator>::assign (Iter first,Iter last)
 }
 
 /*
-    Добавление / извлечение элементов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / РёР·РІР»РµС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Allocator>
@@ -495,7 +495,7 @@ inline void bit_vector<Allocator>::pop_back ()
 }  
 
 /*
-    Вставка элементов
+    Р’СЃС‚Р°РІРєР° СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Allocator>
@@ -580,7 +580,7 @@ inline void bit_vector<Allocator>::insert (iterator position,InIter first,InIter
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Allocator>
@@ -620,7 +620,7 @@ inline void bit_vector<Allocator>::clear ()
 }
 
 /*
-    Инверсия битов
+    РРЅРІРµСЂСЃРёСЏ Р±РёС‚РѕРІ
 */
 
 template <class Allocator>
@@ -633,7 +633,7 @@ inline void bit_vector<Allocator>::flip ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class Allocator>
@@ -650,7 +650,7 @@ inline void swap (bit_vector<Allocator>& x,bit_vector<Allocator>& y)
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Allocator>
@@ -690,7 +690,7 @@ inline bool bit_vector<Allocator>::operator >= (const bit_vector& x) const
 }
 
 /*
-    Специализация для vector<bool>
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ vector<bool>
 */
 
 template <class Allocator>

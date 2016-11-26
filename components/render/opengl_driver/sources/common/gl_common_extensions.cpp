@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Массив поддерживаемых расширений
+    РњР°СЃСЃРёРІ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 */
 
 namespace
@@ -818,7 +818,7 @@ const char* extensions [] = {
 const size_t EXTENSIONS_COUNT = sizeof (extensions) / sizeof (*extensions);      
 
 /*
-    Хранилище ассоциативного массива соответствий между строковым именем расширения и его идентификатором
+    РҐСЂР°РЅРёР»РёС‰Рµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РјР°СЃСЃРёРІР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№ РјРµР¶РґСѓ СЃС‚СЂРѕРєРѕРІС‹Рј РёРјРµРЅРµРј СЂР°СЃС€РёСЂРµРЅРёСЏ Рё РµРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј
 */
 
 class ExtensionMap
@@ -850,7 +850,7 @@ class ExtensionMap
 };
 
 /*
-    Список псевдо-расширений (багов)
+    РЎРїРёСЃРѕРє РїСЃРµРІРґРѕ-СЂР°СЃС€РёСЂРµРЅРёР№ (Р±Р°РіРѕРІ)
 */
 
 class BugExtensionSet: public render::low_level::opengl::ExtensionSet
@@ -876,7 +876,7 @@ namespace opengl
 {
 
 /*
-    Получение идентификатора расширения по строковому имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЂР°СЃС€РёСЂРµРЅРёСЏ РїРѕ СЃС‚СЂРѕРєРѕРІРѕРјСѓ РёРјРµРЅРё
 */
 
 size_t get_extension_id (const char* full_name, size_t length)
@@ -897,7 +897,7 @@ size_t get_extension_id (const char* full_name)
 }
 
 /*
-    Получение имени расширения по идентификатору
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЂР°СЃС€РёСЂРµРЅРёСЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
 */
 
 const char* get_extension_name (size_t id)
@@ -912,7 +912,7 @@ const char* get_extension_name (size_t id)
     class Extension
 */
 
-//конструкторы
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 Extension::Extension (size_t in_id)
   : id (in_id)
 {
@@ -927,7 +927,7 @@ Extension::Extension (const char* full_name)
     throw xtl::format_not_supported_exception ("render::low_level::opengl::Extension::Extension", "Extension '%s' not supported", full_name);
 }
 
-//имя расширения
+//РёРјСЏ СЂР°СЃС€РёСЂРµРЅРёСЏ
 const char* Extension::Name () const
 {
   return extensions [id];
@@ -944,7 +944,7 @@ struct ExtensionSet::Impl
   Bitset flags;
 };
 
-//конструкторы
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 ExtensionSet::ExtensionSet ()
   : impl (new Impl)
 {
@@ -955,13 +955,13 @@ ExtensionSet::ExtensionSet (const ExtensionSet& set)
 {
 }
 
-//деструктор
+//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ExtensionSet::~ExtensionSet ()
 {
   delete impl;
 }
 
-//присваивание
+//РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 ExtensionSet& ExtensionSet::operator = (const ExtensionSet& set)
 {
   ExtensionSet (set).Swap (*this);
@@ -969,13 +969,13 @@ ExtensionSet& ExtensionSet::operator = (const ExtensionSet& set)
   return *this;
 }
 
-//количество расширений в множестве
+//РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°СЃС€РёСЂРµРЅРёР№ РІ РјРЅРѕР¶РµСЃС‚РІРµ
 size_t ExtensionSet::Size ()
 {
   return EXTENSIONS_COUNT;
 }
 
-//установка флагов
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ
 void ExtensionSet::Set (const Extension& extension, bool state)
 {
   impl->flags.set (extension.Id (), state);
@@ -992,7 +992,7 @@ void ExtensionSet::Set (bool state)
   else       impl->flags.reset ();
 }
 
-//установка флагов по строке содержащей имена расширений и wildcard маски
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РїРѕ СЃС‚СЂРѕРєРµ СЃРѕРґРµСЂР¶Р°С‰РµР№ РёРјРµРЅР° СЂР°СЃС€РёСЂРµРЅРёР№ Рё wildcard РјР°СЃРєРё
 void ExtensionSet::SetGroup (const char* extension_names, bool state)
 {
   stl::string mask;
@@ -1033,7 +1033,7 @@ void ExtensionSet::SetGroup (const char* extension_names, bool state)
     {
       mask.assign (first, size_t (pos - first));
 
-      if (!strcmp (mask.c_str (), "*")) //обработка специального случая очистки / установки всех флагов
+      if (!strcmp (mask.c_str (), "*")) //РѕР±СЂР°Р±РѕС‚РєР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ СЃР»СѓС‡Р°СЏ РѕС‡РёСЃС‚РєРё / СѓСЃС‚Р°РЅРѕРІРєРё РІСЃРµС… С„Р»Р°РіРѕРІ
       {
         Set (state);
       }
@@ -1047,7 +1047,7 @@ void ExtensionSet::SetGroup (const char* extension_names, bool state)
   }
 }
 
-//логические операции
+//Р»РѕРіРёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё
 ExtensionSet& ExtensionSet::operator |= (const ExtensionSet& set)
 {
   impl->flags |= set.impl->flags;
@@ -1062,13 +1062,13 @@ ExtensionSet& ExtensionSet::operator &= (const ExtensionSet& set)
   return *this;
 }
 
-//получение списка псевдо-расширений (багов)
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїСЃРµРІРґРѕ-СЂР°СЃС€РёСЂРµРЅРёР№ (Р±Р°РіРѕРІ)
 const ExtensionSet& ExtensionSet::BugExtensions ()
 {
   return *Singleton<BugExtensionSet>::Instance ();
 }
 
-//обмен
+//РѕР±РјРµРЅ
 void ExtensionSet::Swap (ExtensionSet& set)
 {
   Impl* tmp = set.impl;

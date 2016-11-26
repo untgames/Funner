@@ -12,7 +12,7 @@ const char* ROOT_TAG = "DOMDocument";
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XflParser::XflParser (const char* file_name, const char* path_prefix, Document& in_document)
@@ -38,7 +38,7 @@ XflParser::~XflParser ()
 }
 
 /*
-    Разбор корневого узла
+    Р Р°Р·Р±РѕСЂ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р°
 */
 
 void XflParser::ParseRoot (Parser::Iterator iter)
@@ -57,7 +57,7 @@ void XflParser::ParseRoot (Parser::Iterator iter)
 
   document.SetBackgroundColor (background_color);
 
-    //разбор библиотек
+    //СЂР°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
 
   ParseLibraries (iter);
 
@@ -73,7 +73,7 @@ void XflParser::ParseRoot (Parser::Iterator iter)
 }
 
 /*
-    Разбор библиотек
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void XflParser::ParseLibraries (Parser::Iterator iter)

@@ -4,7 +4,7 @@ using namespace script;
 using namespace common;
 
 /*
-    Описание реализации скриптового окружения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРєСЂРёРїС‚РѕРІРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ
 */
 
 namespace
@@ -12,16 +12,16 @@ namespace
 
 struct LibraryImpl
 {
-  stl::string     id;       //идентификатор библиотеки
-  InvokerRegistry registry; //реестр
+  stl::string     id;       //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
+  InvokerRegistry registry; //СЂРµРµСЃС‚СЂ
 
   LibraryImpl (const char* in_id) : id (in_id) {}    
 };
 
 struct TypeImpl: public Environment::Type, public xtl::reference_counter
 {
-  LibraryImpl*          library;   //ссылка на библиотеку
-  const std::type_info* std_type;  //стандартный тип
+  LibraryImpl*          library;   //СЃСЃС‹Р»РєР° РЅР° Р±РёР±Р»РёРѕС‚РµРєСѓ
+  const std::type_info* std_type;  //СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ С‚РёРї
   
   TypeImpl (LibraryImpl* in_library, const std::type_info* in_std_type)
     : library (in_library), std_type (in_std_type) {}
@@ -32,13 +32,13 @@ struct TypeImpl: public Environment::Type, public xtl::reference_counter
     return *std_type;
   }
 
-///Библиотека шлюзов
+///Р‘РёР±Р»РёРѕС‚РµРєР° С€Р»СЋР·РѕРІ
   InvokerRegistry& Library ()
   {
     return library->registry;
   }
   
-///Имя библиотеки типа
+///РРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё С‚РёРїР°
   const char* Name ()
   {
     return library->id.c_str ();
@@ -54,9 +54,9 @@ typedef xtl::signal<void (EnvironmentLibraryEvent, const char*, InvokerRegistry&
 
 struct Environment::Impl: public xtl::reference_counter
 {
-  LibraryMap        libraries;                               //библиотеки
-  TypeMap           types;                                   //типы
-  EnvironmentSignal handlers [EnvironmentLibraryEvent_Num];  //сигналы
+  LibraryMap        libraries;                               //Р±РёР±Р»РёРѕС‚РµРєРё
+  TypeMap           types;                                   //С‚РёРїС‹
+  EnvironmentSignal handlers [EnvironmentLibraryEvent_Num];  //СЃРёРіРЅР°Р»С‹
 
   Impl () {}
 
@@ -71,7 +71,7 @@ struct Environment::Impl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавляем все исключения
+      //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
   }
   
@@ -109,7 +109,7 @@ struct Environment::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Environment::Environment ()
@@ -132,7 +132,7 @@ Environment::~Environment ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Environment& Environment::operator = (const Environment& environment)
@@ -143,7 +143,7 @@ Environment& Environment::operator = (const Environment& environment)
 }
 
 /*
-    Создание / удаление / поиск библиотек
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ / РїРѕРёСЃРє Р±РёР±Р»РёРѕС‚РµРє
 */
 
 InvokerRegistry Environment::CreateLibrary (const char* id)
@@ -193,12 +193,12 @@ void Environment::RemoveLibrary (const char* id)
 
 void Environment::RemoveAllLibraries ()
 {
-    //оповещение об удалении библиотек
+    //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё Р±РёР±Р»РёРѕС‚РµРє
     
   for (LibraryMap::iterator iter = impl->libraries.begin (), end = impl->libraries.end (); iter != end; ++iter)
     impl->Notify (EnvironmentLibraryEvent_OnRemove, iter->second->id.c_str (), iter->second->registry);
 
-    //удаление библиотек
+    //СѓРґР°Р»РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
     
   for (LibraryMap::iterator iter = impl->libraries.begin (), end = impl->libraries.end (); iter != end; ++iter)   
     delete iter->second;
@@ -208,7 +208,7 @@ void Environment::RemoveAllLibraries ()
 }
 
 /*
-    Регистрация ассоциаций
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р°СЃСЃРѕС†РёР°С†РёР№
 */
 
 void Environment::RegisterType (const std::type_info& type, const char* library_id)
@@ -227,7 +227,7 @@ void Environment::UnregisterAllTypes ()
 }
 
 /*
-    Поиск библиотеки
+    РџРѕРёСЃРє Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 InvokerRegistry* Environment::FindLibrary (const char* id) const
@@ -269,7 +269,7 @@ InvokerRegistry* Environment::FindLibrary (const std::type_info& type) const
 }
 
 /*
-    Поиск типа
+    РџРѕРёСЃРє С‚РёРїР°
 */
 
 Environment::Type* Environment::FindType (const std::type_info& type) const
@@ -283,7 +283,7 @@ Environment::Type* Environment::FindType (const std::type_info& type) const
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void Environment::Clear ()
@@ -293,7 +293,7 @@ void Environment::Clear ()
 }
     
 /*
-    Создание итераторов
+    РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 namespace
@@ -332,7 +332,7 @@ Environment::ConstTypeIterator Environment::CreateTypeIterator () const
 }
 
 /*
-    Получение имени библиотеки по итератору
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё РїРѕ РёС‚РµСЂР°С‚РѕСЂСѓ
 */
 
 const char* Environment::LibraryId (const ConstLibraryIterator& i) const
@@ -346,7 +346,7 @@ const char* Environment::LibraryId (const ConstLibraryIterator& i) const
 }
 
 /*
-    Биндинг библиотек
+    Р‘РёРЅРґРёРЅРі Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void Environment::BindLibraries (const char* library_mask)
@@ -363,7 +363,7 @@ void Environment::BindLibraries (const char* library_mask)
 }
 
 /*
-    Регистрация обработчиков событий
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
 */
 
 xtl::connection Environment::RegisterEventHandler (EnvironmentLibraryEvent event_id, const EventHandler& handler)
@@ -375,7 +375,7 @@ xtl::connection Environment::RegisterEventHandler (EnvironmentLibraryEvent event
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Environment::Swap (Environment& environment)

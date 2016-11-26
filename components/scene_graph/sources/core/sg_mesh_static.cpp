@@ -5,20 +5,20 @@ using namespace stl;
 using namespace common;
 
 /*
-    Описание реализации StaticMesh
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё StaticMesh
 */
 
 struct StaticMesh::Impl: public xtl::instance_counter<StaticMesh>
 {
-  string mesh_name;       //имя меша
-  size_t mesh_name_hash;  //хэш имени мэша
+  string mesh_name;       //РёРјСЏ РјРµС€Р°
+  size_t mesh_name_hash;  //С…СЌС€ РёРјРµРЅРё РјСЌС€Р°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl () : mesh_name_hash (0xffffffff) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StaticMesh::StaticMesh ()
@@ -31,7 +31,7 @@ StaticMesh::~StaticMesh ()
 }
 
 /*
-    Создание модели
+    РЎРѕР·РґР°РЅРёРµ РјРѕРґРµР»Рё
 */
 
 StaticMesh::Pointer StaticMesh::Create ()
@@ -40,7 +40,7 @@ StaticMesh::Pointer StaticMesh::Create ()
 }
 
 /*
-    Установка имени меша модели
+    РЈСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РјРµС€Р° РјРѕРґРµР»Рё
 */
 
 void StaticMesh::SetMeshName (const char* name)
@@ -65,7 +65,7 @@ size_t StaticMesh::MeshNameHash () const
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void StaticMesh::AcceptCore (Visitor& visitor)
@@ -75,7 +75,7 @@ void StaticMesh::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void StaticMesh::BindProperties (common::PropertyBindingMap& bindings)

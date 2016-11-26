@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T, class Ptr>
@@ -43,7 +43,7 @@ inline lock_ptr<T, Ptr>::~lock_ptr ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T, class Ptr>
@@ -93,7 +93,7 @@ inline void lock_ptr<T, Ptr>::reset (T1* in_ptr)
 }
 
 /*
-    Запирание
+    Р—Р°РїРёСЂР°РЅРёРµ
 */
 
 template <class T, class Ptr>
@@ -111,7 +111,7 @@ inline void lock_ptr<T, Ptr>::unlock_object ()
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T, class Ptr>
@@ -139,7 +139,7 @@ inline T* get_pointer (lock_ptr<T, Ptr>& p)
 }
 
 /*
-    Информация о состоянии указателя
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T, class Ptr>
@@ -149,7 +149,7 @@ inline bool lock_ptr<T, Ptr>::operator ! () const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T, class Ptr>
@@ -213,7 +213,7 @@ inline bool operator != (const T1* p1, const lock_ptr<T2, Ptr2>& p2)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T, class Ptr>

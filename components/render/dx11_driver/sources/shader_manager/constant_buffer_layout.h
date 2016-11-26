@@ -1,48 +1,48 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Операция преобразования параметра шейдера
+///РћРїРµСЂР°С†РёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂР° С€РµР№РґРµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ShaderParameterConvertOperation
 {
-  ShaderParameterConvertOperation_Copy,              //копировать параметр
-  ShaderParameterConvertOperation_TransposeFloat2x2, //транспонировать матрицу 2x2
-  ShaderParameterConvertOperation_TransposeFloat3x3, //транспонировать матрицу 3x3
-  ShaderParameterConvertOperation_TransposeFloat4x4, //транспонировать матрицу 4x4
+  ShaderParameterConvertOperation_Copy,              //РєРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂ
+  ShaderParameterConvertOperation_TransposeFloat2x2, //С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°С‚СЊ РјР°С‚СЂРёС†Сѓ 2x2
+  ShaderParameterConvertOperation_TransposeFloat3x3, //С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°С‚СЊ РјР°С‚СЂРёС†Сѓ 3x3
+  ShaderParameterConvertOperation_TransposeFloat4x4, //С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°С‚СЊ РјР°С‚СЂРёС†Сѓ 4x4
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание параметра шейдера
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР° С€РµР№РґРµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ShaderParameter: public ProgramParameter
 {
-  ShaderParameterConvertOperation convert_operation; //операция конвертации параметра
+  ShaderParameterConvertOperation convert_operation; //РѕРїРµСЂР°С†РёСЏ РєРѕРЅРІРµСЂС‚Р°С†РёРё РїР°СЂР°РјРµС‚СЂР°
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лэйаут константного буфера
+///Р›СЌР№Р°СѓС‚ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ConstantBufferLayout: public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ConstantBufferLayout  (ID3D11ShaderReflectionConstantBuffer& buffer);
     ~ConstantBufferLayout ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество параметров в буфере
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ РІ Р±СѓС„РµСЂРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t                 GetParamsCount () const { return params.size (); }
     const ShaderParameter* GetParams      () const { return params.empty () ? (ShaderParameter*)0 : &params [0]; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип буфера / размер буфера
+///РўРёРї Р±СѓС„РµСЂР° / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     D3D11_CBUFFER_TYPE GetType () const { return type; }
     size_t             GetSize () const { return buffer_size; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение хэша
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetHash () const { return hash; }
 
@@ -54,11 +54,11 @@ class ConstantBufferLayout: public xtl::reference_counter, public xtl::trackable
     typedef stl::vector<ShaderParameter> ShaderParameterArray;
 
   private:
-    ShaderParameterArray params;      //параметры константного буфера
-    common::StringArray  strings;     //строки с именами параметров
-    D3D11_CBUFFER_TYPE   type;        //тип буфера
-    size_t               buffer_size; //размер буфера
-    size_t               hash;        //хэш лэйаута для идентификации
+    ShaderParameterArray params;      //РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
+    common::StringArray  strings;     //СЃС‚СЂРѕРєРё СЃ РёРјРµРЅР°РјРё РїР°СЂР°РјРµС‚СЂРѕРІ
+    D3D11_CBUFFER_TYPE   type;        //С‚РёРї Р±СѓС„РµСЂР°
+    size_t               buffer_size; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
+    size_t               hash;        //С…СЌС€ Р»СЌР№Р°СѓС‚Р° РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С†РёРё
 };
 
 typedef xtl::intrusive_ptr<ConstantBufferLayout> ConstantBufferLayoutPtr;

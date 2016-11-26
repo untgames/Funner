@@ -22,7 +22,7 @@ int main()
     char          decompress_buffer[DECOMPRESS_BUFFER_SIZE];
     wchar_t       compress_buffer[COMPRESS_BUFFER_SIZE];
 
-    if (sizeof (wchar_t) == 2)  //запись символа "скрипичный ключ"
+    if (sizeof (wchar_t) == 2)  //Р·Р°РїРёСЃСЊ СЃРёРјРІРѕР»Р° "СЃРєСЂРёРїРёС‡РЅС‹Р№ РєР»СЋС‡"
     {
       sources [0] [0] = 0xD834;
       sources [0] [1] = 0xDD1E;

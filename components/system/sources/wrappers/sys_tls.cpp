@@ -3,21 +3,21 @@
 using namespace syslib;
 
 /*
-    Описание релизации локального хранилища данных
+    РћРїРёСЃР°РЅРёРµ СЂРµР»РёР·Р°С†РёРё Р»РѕРєР°Р»СЊРЅРѕРіРѕ С…СЂР°РЅРёР»РёС‰Р° РґР°РЅРЅС‹С…
 */
 
 struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
 {
-  tls_t          key;     //ключ локальных данных нити
-  CleanupHandler cleanup; //очищающий функционал
+  tls_t          key;     //РєР»СЋС‡ Р»РѕРєР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С… РЅРёС‚Рё
+  CleanupHandler cleanup; //РѕС‡РёС‰Р°СЋС‰РёР№ С„СѓРЅРєС†РёРѕРЅР°Р»
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const CleanupHandler& in_cleanup) : cleanup (in_cleanup)
   {
     key = Platform::CreateTls (this);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -26,11 +26,11 @@ struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Оповещение о необходимости очистки данных
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕС‡РёСЃС‚РєРё РґР°РЅРЅС‹С…
   void Cleanup (void* data)
   {
     if (!cleanup)
@@ -42,13 +42,13 @@ struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ThreadLocalStorage::ThreadLocalStorage ()  
@@ -95,7 +95,7 @@ ThreadLocalStorage::~ThreadLocalStorage ()
 }
 
 /*
-    Установка / чтение данных
+    РЈСЃС‚Р°РЅРѕРІРєР° / С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 void ThreadLocalStorage::SetValue (void* data)

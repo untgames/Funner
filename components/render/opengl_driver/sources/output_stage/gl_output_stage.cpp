@@ -9,14 +9,14 @@ namespace
 
 /*
 ===================================================================================================
-    Описание состояния выходного уровня конвейера OpenGL
+    РћРїРёСЃР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РєРѕРЅРІРµР№РµСЂР° OpenGL
 ===================================================================================================    
 */
 
 class OutputStageState: public IStageState
 {
   public:  
-      //конструкторы
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
     OutputStageState (OutputStageState* in_main_state)
     {
       Init (in_main_state, 0);
@@ -27,7 +27,7 @@ class OutputStageState: public IStageState
       Init (0, in_owner);
     }
 
-      //установка текущего состояния подуровня смешивания цветов
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
     void SetBlendState (BlendState* state)
     {
       if (state == blend_state)
@@ -38,10 +38,10 @@ class OutputStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение текущего состояния подуровня смешивания цветов
+      //РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
     BlendState* GetBlendState () const { return blend_state.get (); }
     
-      //установка текущего состояния подуровня попиксельного отсечения
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
     void SetDepthStencilState (DepthStencilState* state)
     {
       if (state == depth_stencil_state)
@@ -52,10 +52,10 @@ class OutputStageState: public IStageState
       UpdateNotify ();      
     }
 
-      //получение текущего состояния подуровня попиксельного отсечения
+      //РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
     DepthStencilState* GetDepthStencilState () const { return depth_stencil_state.get (); }
     
-      //установка значения ссылки трафарета
+      //СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ СЃСЃС‹Р»РєРё С‚СЂР°С„Р°СЂРµС‚Р°
     void SetStencilReference (unsigned int reference)
     {
       stencil_reference = reference;
@@ -63,10 +63,10 @@ class OutputStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение значения ссылки трафарета
+      //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ СЃСЃС‹Р»РєРё С‚СЂР°С„Р°СЂРµС‚Р°
     unsigned int GetStencilReference () const { return stencil_reference; }
 
-      //установка состояние растеризатора
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
     void SetRasterizerState (RasterizerState* state)
     {
       if (state == rasterizer_state)
@@ -77,17 +77,17 @@ class OutputStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение состояния растеризатора
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
     RasterizerState* GetRasterizerState () const { return rasterizer_state.get (); }
 
-      //захват состояния
+      //Р·Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
     
-      //восстановление состояния
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -95,7 +95,7 @@ class OutputStageState: public IStageState
     }
 
   private:    
-      //копирование состояния
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Copy (OutputStageState& source, const StateBlockMask& mask)
     {
       if (mask.os_blend_state)
@@ -111,7 +111,7 @@ class OutputStageState: public IStageState
         SetRasterizerState (source.GetRasterizerState ());
     }
     
-      //оповещение об обновлении состояния уровня
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
     void UpdateNotify ()
     {
       if (!owner)
@@ -137,31 +137,31 @@ class OutputStageState: public IStageState
     typedef xtl::trackable_ptr<RasterizerState>    RasterizerStatePtr;
 
   private:
-    ContextObject*       owner;               //владелец состояния уровня
-    OutputStageStatePtr  main_state;          //основное состояние уровня
-    BlendStatePtr        blend_state;         //текущее состояние подуровня смешивания цветов
-    DepthStencilStatePtr depth_stencil_state; //текущее состояние подуровня попиксельного отсечения
-    unsigned int         stencil_reference;   //текущее значение трафарета
-    RasterizerStatePtr   rasterizer_state;    //состояние уровня растеризации
+    ContextObject*       owner;               //РІР»Р°РґРµР»РµС† СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
+    OutputStageStatePtr  main_state;          //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    BlendStatePtr        blend_state;         //С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
+    DepthStencilStatePtr depth_stencil_state; //С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
+    unsigned int         stencil_reference;   //С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ С‚СЂР°С„Р°СЂРµС‚Р°
+    RasterizerStatePtr   rasterizer_state;    //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 };
 
 }
 
 /*
 ===================================================================================================
-    Описание реализации выходного уровня конвейера OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РєРѕРЅРІРµР№РµСЂР° OpenGL
 ===================================================================================================
 */
 
 struct OutputStage::Impl: public ContextObject, public OutputStageState
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const ContextManager& context_manager) :
       ContextObject (context_manager),
       OutputStageState (static_cast<ContextObject*> (this))
     {
-        //инициализация BlendState
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ BlendState
          
       BlendDesc blend_desc;
       
@@ -177,7 +177,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
       
       null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);      
       
-        //инициализация DepthStencilState
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ DepthStencilState
         
       DepthStencilDesc depth_stencil_desc;
       
@@ -195,7 +195,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
       
       null_depth_stencil_state = DepthStencilStatePtr (new DepthStencilState (GetContextManager (), depth_stencil_desc), false);
       
-        //инициализация состояния растеризатора по умолчанию
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
       RasterizerDesc rasterizer_desc;
 
@@ -211,21 +211,21 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 
       default_rasterizer_state = RasterizerStatePtr (new RasterizerState (GetContextManager (), rasterizer_desc), false);      
       
-        //установка состояния по умолчанию
+        //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
       SetBlendState        (default_blend_state.get ());
       SetDepthStencilState (default_depth_stencil_state.get ());
       SetRasterizerState   (default_rasterizer_state.get ());
     }
     
-///Установка состояния уровня в контекст OpenGL
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     void Bind (const bool has_render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT], bool has_depth_stencil)
     {
       try
       {      
           //TODO: MRT
 
-          //установка состояния подуровня смешивания цветов
+          //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
 
         BlendState* blend_state = GetBlendState ();        
 
@@ -234,7 +234,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 
         blend_state->Bind ();
 
-          //установка состояния подуровня попиксельного отсечения
+          //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 
         DepthStencilState* depth_stencil_state = GetDepthStencilState ();        
 
@@ -243,7 +243,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 
         depth_stencil_state->Bind (GetStencilReference ());
 
-          //установка состояния растеризатора
+          //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
 
         RasterizerState* rasterizer_state = GetRasterizerState ();
       
@@ -252,7 +252,7 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
 
         rasterizer_state->Bind ();
 
-          //проверка ошибок
+          //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
         CheckErrors ("");
       }
@@ -269,15 +269,15 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
     typedef xtl::com_ptr<RasterizerState>   RasterizerStatePtr;
 
   private:
-    BlendStatePtr        default_blend_state;         //состояние подуровня смешивания цветов по умолчанию
-    BlendStatePtr        null_blend_state;            //состояние подуровня смешивания цветов соотв. отключению подуровня
-    DepthStencilStatePtr default_depth_stencil_state; //состояние подуровня попиксельного отсечения по умолчанию
-    DepthStencilStatePtr null_depth_stencil_state;    //состояние подуровня попиксельного отсечения соотв. отключению подуровня
-    RasterizerStatePtr   default_rasterizer_state;    //состояние растеризатора по умолчанию
+    BlendStatePtr        default_blend_state;         //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    BlendStatePtr        null_blend_state;            //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ СЃРѕРѕС‚РІ. РѕС‚РєР»СЋС‡РµРЅРёСЋ РїРѕРґСѓСЂРѕРІРЅСЏ
+    DepthStencilStatePtr default_depth_stencil_state; //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    DepthStencilStatePtr null_depth_stencil_state;    //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ СЃРѕРѕС‚РІ. РѕС‚РєР»СЋС‡РµРЅРёСЋ РїРѕРґСѓСЂРѕРІРЅСЏ
+    RasterizerStatePtr   default_rasterizer_state;    //СЃРѕСЃС‚РѕСЏРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputStage::OutputStage (const ContextManager& context_manager)
@@ -290,7 +290,7 @@ OutputStage::~OutputStage ()
 }
 
 /*
-    Создание объекта состояния устройства
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 IStageState* OutputStage::CreateStageState ()
@@ -299,7 +299,7 @@ IStageState* OutputStage::CreateStageState ()
 }
 
 /*
-    Создание состояний выходного уровня
+    РЎРѕР·РґР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёР№ РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 IBlendState* OutputStage::CreateBlendState (const BlendDesc& desc)
@@ -344,7 +344,7 @@ IRasterizerState* OutputStage::CreateRasterizerState (const RasterizerDesc& desc
 }
 
 /*
-    Настройка подуровня смешивания цветов
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
 */
 
 void OutputStage::SetBlendState (IBlendState* state)
@@ -360,7 +360,7 @@ IBlendState* OutputStage::GetBlendState () const
 }
 
 /*
-    Настройка подуровня попиксельного отсечения
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void OutputStage::SetDepthStencilState (IDepthStencilState* state)
@@ -386,7 +386,7 @@ unsigned int OutputStage::GetStencilReference () const
 }
 
 /*
-    Настройка подуровня растеризации
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 */
 
 void OutputStage::SetRasterizerState (IRasterizerState* state)
@@ -402,7 +402,7 @@ IRasterizerState* OutputStage::GetRasterizerState () const
 }
 
 /*
-    Установка состояния уровня в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void OutputStage::Bind (const bool has_render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT], bool has_depth_stencil_target)

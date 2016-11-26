@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputSceneCollection::InputSceneCollection ()
@@ -17,7 +17,7 @@ InputSceneCollection::~InputSceneCollection ()
 }
 
 /*
-    Поиск сцены
+    РџРѕРёСЃРє СЃС†РµРЅС‹
 */
 
 InputScenePtr InputSceneCollection::GetScene (scene_graph::Scene& scene)
@@ -52,7 +52,7 @@ InputScenePtr InputSceneCollection::GetScene (scene_graph::Scene& scene)
 }
 
 /*
-    Оповещение об удалении сцены
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЃС†РµРЅС‹
 */
 
 void InputSceneCollection::OnSceneDestroyed (scene_graph::Scene* scene)

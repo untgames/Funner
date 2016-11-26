@@ -2,8 +2,8 @@ local function CreatePlayer()
   local Player={}
     Player.ManaBottles=0
   
-  --пополнение запасов маны
-  Player.Mana=0 --изменяется от 0 до 1
+  --РїРѕРїРѕР»РЅРµРЅРёРµ Р·Р°РїР°СЃРѕРІ РјР°РЅС‹
+  Player.Mana=0 --РёР·РјРµРЅСЏРµС‚СЃСЏ РѕС‚ 0 РґРѕ 1
 
   Player.SetMana=function(Value)
     Player.Mana=Value
@@ -59,14 +59,14 @@ end
 --========================================================================================
 
 function InitGame()
-  -- глобальные переменные
+  -- РіР»РѕР±Р°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
   Game={}
   Game.Player=CreatePlayer()
   Game.Locations={}
   
   
   ---------------------------------------------------------------------------------------
-  -- приостановка игры
+  -- РїСЂРёРѕСЃС‚Р°РЅРѕРІРєР° РёРіСЂС‹
   Game.Pused=false
   
   function Game.Pause()
@@ -84,7 +84,7 @@ function InitGame()
   end
   
   ----------------------------------------------------------------------------------------
-  -- загрузка локации
+  -- Р·Р°РіСЂСѓР·РєР° Р»РѕРєР°С†РёРё
   Game.CloseCurrentLocation=function ()
     assert(false, "ERROR: Game.CloseCurrentLocation()")
   end
@@ -93,7 +93,7 @@ function InitGame()
     assert(false, "ERROR: Game.LoadLocation()")
   end
   
-  --вначале игра находится на паузе
+  --РІРЅР°С‡Р°Р»Рµ РёРіСЂР° РЅР°С…РѕРґРёС‚СЃСЏ РЅР° РїР°СѓР·Рµ
   Game.Pause()
 end
 

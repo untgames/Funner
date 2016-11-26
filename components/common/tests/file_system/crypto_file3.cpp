@@ -17,11 +17,11 @@ int main ()
   
   try
   {
-      //установка параметров шифрования
+      //╨│╨▒╨▓┬а┬н┬о╤Ю╨Д┬а ╨З┬а╨░┬а┬м╥Р╨▓╨░┬о╤Ю ╨╕╨Б╨┤╨░┬о╤Ю┬а┬н╨Б╨┐
       
     FileSystem::SetCryptoParameters (CRYPTO_FILE_NAME, DECRYPT_METHOD, ENCRYPT_METHOD, KEY, KEY_BITS);
     
-      //запись данных
+      //┬з┬а╨З╨Б╨▒╨╝ ┬д┬а┬н┬н╨╗╨╡
     
     StdFile out_file (CRYPTO_FILE_NAME, FileMode_ReadWrite);
 
@@ -38,7 +38,7 @@ int main ()
 
     out_file.Close ();
     
-      //чтение данных
+      //╨╖╨▓╥Р┬н╨Б╥Р ┬д┬а┬н┬н╨╗╨╡
     
     InputFile in_file (CRYPTO_FILE_NAME);
 

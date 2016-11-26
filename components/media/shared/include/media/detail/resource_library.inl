@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Селектор ресурса
+    РЎРµР»РµРєС‚РѕСЂ СЂРµСЃСѓСЂСЃР°
 */
 
 template <class T>
@@ -14,7 +14,7 @@ struct resource_selector
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -41,7 +41,7 @@ inline ResourceLibrary<T>& ResourceLibrary<T>::operator = (const ResourceLibrary
 }
 
 /*
-    Количество элементов / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -57,7 +57,7 @@ inline bool ResourceLibrary<T>::IsEmpty () const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T>
@@ -73,7 +73,7 @@ inline typename ResourceLibrary<T>::ConstIterator ResourceLibrary<T>::CreateCons
 }
 
 /*
-    Получение имени ресурса по итератору
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЂРµСЃСѓСЂСЃР° РїРѕ РёС‚РµСЂР°С‚РѕСЂСѓ
 */
 
 template <class T>
@@ -93,7 +93,7 @@ inline const char* ResourceLibrary<T>::ItemId (const ConstIterator& i)
 }
 
 /*
-    Поиск элемента в библиотеке
+    РџРѕРёСЃРє СЌР»РµРјРµРЅС‚Р° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 */
 
 template <class T>
@@ -114,7 +114,7 @@ inline T* ResourceLibrary<T>::Find (const char* name)
 }
 
 /*
-    Добавление/удаление элементов из библиотеки
+    Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РёР· Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class T>
@@ -162,7 +162,7 @@ inline void ResourceLibrary<T>::Remove (Item& item)
 }
 
 /*
-    Очистка библиотеки
+    РћС‡РёСЃС‚РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class T>
@@ -172,7 +172,7 @@ inline void ResourceLibrary<T>::Clear ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>

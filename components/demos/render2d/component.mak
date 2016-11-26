@@ -1,11 +1,11 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := DEMOS.RENDER2D.SHARED DEMOS.RENDER2D.TESTS
 
 #PROFILES += egl gles
 
-#Цель №1 - Общий код 2D рендера
+#Р¦РµР»СЊ в„–1 - РћР±С‰РёР№ РєРѕРґ 2D СЂРµРЅРґРµСЂР°
 DEMOS.RENDER2D.SHARED.TYPE             := static-lib
 DEMOS.RENDER2D.SHARED.NAME             := funner.demos.render2d.shared
 DEMOS.RENDER2D.SHARED.INCLUDE_DIRS     :=
@@ -13,7 +13,7 @@ DEMOS.RENDER2D.SHARED.SOURCE_DIRS      := shared
 DEMOS.RENDER2D.SHARED.IMPORTS          := compile.system compile.render.scene_render.server compile.render.scene_render.client \
                                           compile.scene_graph.core
 
-#Цель №2 - Тесты 2D рендера
+#Р¦РµР»СЊ в„–2 - РўРµСЃС‚С‹ 2D СЂРµРЅРґРµСЂР°
 DEMOS.RENDER2D.TESTS.TYPE             := test-suite
 DEMOS.RENDER2D.TESTS.INCLUDE_DIRS     := shared
 DEMOS.RENDER2D.TESTS.SOURCE_DIRS      := sources

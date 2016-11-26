@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки контроллеров
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
 */
 
 void DaeParser::ParseLibraryControllers (Parser::Iterator iter)
@@ -16,7 +16,7 @@ void DaeParser::ParseLibraryControllers (Parser::Iterator iter)
 }
 
 /*
-    Разбор контроллера
+    Р Р°Р·Р±РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 void DaeParser::ParseController (Parser::Iterator iter)

@@ -11,7 +11,7 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация системы управления шифрованием
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРёСЃС‚РµРјС‹ СѓРїСЂР°РІР»РµРЅРёСЏ С€РёС„СЂРѕРІР°РЅРёРµРј
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class CryptoSystemImpl
 {
@@ -19,14 +19,14 @@ class CryptoSystemImpl
     typedef CryptoSystem::CrypterCreator CrypterCreator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация систем шифрования
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРёСЃС‚РµРј С€РёС„СЂРѕРІР°РЅРёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterCrypter       (const char* method, const CrypterCreator& creator);
     void UnregisterCrypter     (const char* method);
     void UnregisterAllCrypters ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск функции создания контекста шифрования
+///РџРѕРёСЃРє С„СѓРЅРєС†РёРё СЃРѕР·РґР°РЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° С€РёС„СЂРѕРІР°РЅРёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     CrypterCreator GetCrypter (const char* method) const;
 
@@ -34,7 +34,7 @@ class CryptoSystemImpl
     typedef stl::hash_map<stl::hash_key<const char*>, CrypterCreator> CrypterCreatorMap;
 
   private:  
-    CrypterCreatorMap creators; //карта систем шифрования
+    CrypterCreatorMap creators; //РєР°СЂС‚Р° СЃРёСЃС‚РµРј С€РёС„СЂРѕРІР°РЅРёСЏ
 };
 
 typedef Singleton<CryptoSystemImpl> CryptoSystemSingleton;

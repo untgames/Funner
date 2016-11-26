@@ -1,5 +1,5 @@
 /*
-    Проверка является ли T классом
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РєР»Р°СЃСЃРѕРј
 */
 
 namespace detail
@@ -18,7 +18,7 @@ template <class T> struct is_class_helper
 template <class T> struct is_class: public bool_constant<detail::is_class_helper<typename remove_cv<T>::type>::value> {};
 
 /*
-    Проверка является ли T перечислением
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РїРµСЂРµС‡РёСЃР»РµРЅРёРµРј
 */
 
 namespace detail
@@ -43,7 +43,7 @@ template <class T> struct is_enum:
                                     is_class<T>::value || is_union<T>::value || is_array<T>::value>::template type<T> {};
 
 /*
-    Проверка является ли T полиморфным типом
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РїРѕР»РёРјРѕСЂС„РЅС‹Рј С‚РёРїРѕРј
 */
 
 namespace detail
@@ -56,7 +56,7 @@ template <class T, bool is_a_class=is_class<T>::value> struct is_polymorphic_hel
   struct A: public base
   {
       A  ();
-//      ~A () throw();  //деструктор закомментировани для обхода предупреждений об отсутствии виртуального деструктора (при компиляции gcc)
+//      ~A () throw();  //РґРµСЃС‚СЂСѓРєС‚РѕСЂ Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°РЅРё РґР»СЏ РѕР±С…РѕРґР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№ РѕР± РѕС‚СЃСѓС‚СЃС‚РІРёРё РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ РґРµСЃС‚СЂСѓРєС‚РѕСЂР° (РїСЂРё РєРѕРјРїРёР»СЏС†РёРё gcc)
 
       char padding [256];
 
@@ -87,7 +87,7 @@ template <class T> struct is_polymorphic_helper<T, false>: public false_type {};
 template <class T> struct is_polymorphic: public bool_constant<detail::is_polymorphic_helper<T>::value> {};
 
 /*
-    Проверка является ли класс абстрактным
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё РєР»Р°СЃСЃ Р°Р±СЃС‚СЂР°РєС‚РЅС‹Рј
 */
 
 namespace detail

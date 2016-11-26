@@ -14,11 +14,11 @@ const size_t CIRCLE_SEGMENTS_COUNT = 16;
 }
 
 /*
-   Рендер вспомогательной геометрии
+   Р РµРЅРґРµСЂ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕР№ РіРµРѕРјРµС‚СЂРёРё
 */
 
 /*
-   Рисование примитивов
+   Р РёСЃРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void PrimitiveRender::DrawLine (const RenderablePoint& from, const RenderablePoint& to)

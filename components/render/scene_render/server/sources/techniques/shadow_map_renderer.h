@@ -1,32 +1,32 @@
-///Техника рендеринга карты теней
+///РўРµС…РЅРёРєР° СЂРµРЅРґРµСЂРёРЅРіР° РєР°СЂС‚С‹ С‚РµРЅРµР№
 class ShadowMapRenderer: public BasicRenderer
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ShadowMapRenderer  (server::RenderManager& manager, const common::ParseNode& node);
     ~ShadowMapRenderer ();
 
-///Получение теневой карты
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРЅРµРІРѕР№ РєР°СЂС‚С‹
     manager::Texture& ShadowMap () { return depth_map; }
 
-///Получение имени локальной текстуры
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р»РѕРєР°Р»СЊРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     const char* LocalTextureName () { return local_texture_name.c_str (); }
 
-///Обновление карты
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°СЂС‚С‹
     void UpdateShadowMap (RenderingContext& parent_context, Light& light);
 
   private:
     typedef stl::vector<manager::RenderTarget> RenderTargetArray;
 
   private:
-    manager::Texture  color_map;                //карта теней
-    manager::Texture  depth_map;                //карта теней
-    RenderTargetArray color_render_targets;     //цели рендеринга
-    RenderTargetArray depth_render_targets;     //цели рендеринга
-    TraverseResult    traverse_result;          //результат обхода
-    stl::string       color_render_target_name; //имя цели рендеринга
-    stl::string       depth_render_target_name; //имя цели рендеринга
-    stl::string       local_texture_name;       //имя локальной текстуры
+    manager::Texture  color_map;                //РєР°СЂС‚Р° С‚РµРЅРµР№
+    manager::Texture  depth_map;                //РєР°СЂС‚Р° С‚РµРЅРµР№
+    RenderTargetArray color_render_targets;     //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+    RenderTargetArray depth_render_targets;     //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+    TraverseResult    traverse_result;          //СЂРµР·СѓР»СЊС‚Р°С‚ РѕР±С…РѕРґР°
+    stl::string       color_render_target_name; //РёРјСЏ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+    stl::string       depth_render_target_name; //РёРјСЏ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+    stl::string       local_texture_name;       //РёРјСЏ Р»РѕРєР°Р»СЊРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 };
 
 

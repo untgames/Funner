@@ -1,4 +1,4 @@
-// Тестирование функции upper_bound
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё upper_bound
 #include <stdio.h>
 #include <stl/map>
 #include "test.h"

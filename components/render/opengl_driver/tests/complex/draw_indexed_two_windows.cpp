@@ -61,7 +61,7 @@ typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
-//�������� �����
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 struct TestLogFilter
 {
   common::LogFilter log_filter;
@@ -77,7 +77,7 @@ struct TestLogFilter
 
 typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
 
-//�������� ����������
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 struct Test
 {
   typedef xtl::function<void (Test&)> CallbackFn;
@@ -98,7 +98,7 @@ struct Test
     window2 (syslib::WindowStyle_Overlapped, 400, 400),
     redraw (in_redraw)
   {
-    TestLogFilterSingleton::Instance (); //������������� ������� ������������ ���������
+    TestLogFilterSingleton::Instance (); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     window1.SetTitle (title);
     window1.Maximize ();
@@ -240,7 +240,7 @@ struct Test
   }
 };
 
-//������ ��������� ������ ������� � ������
+//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 stl::string read_shader (const char* file_name)
 {
   common::InputFile file (file_name);

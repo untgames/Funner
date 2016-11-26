@@ -7,7 +7,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::egl;
 
 /*
-    Описание реализации поверхности
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 struct EglSurface::Impl
@@ -17,7 +17,7 @@ struct EglSurface::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EglSurface::EglSurface (EGLDisplay display, EGLConfig config, const void* window_handle)
@@ -36,7 +36,7 @@ EglSurface::~EglSurface ()
 }
 
 /*
-    Поверхность
+    РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ
 */
 
 EGLSurface EglSurface::GetSurface () const

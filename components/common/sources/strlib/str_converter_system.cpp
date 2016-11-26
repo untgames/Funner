@@ -19,17 +19,17 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* DEFAULT_CONVERTERS_MASK = "common.string.converters.*";
 
 /*
-    Внутренние классы реализации
+    Р’РЅСѓС‚СЂРµРЅРЅРёРµ РєР»Р°СЃСЃС‹ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Utf-конвертер
+///Utf-РєРѕРЅРІРµСЂС‚РµСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class UtfConverter: public IStringConverter
 {
@@ -74,30 +74,30 @@ class UtfConverter: public IStringConverter
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Синглтон менеджера конвертеров
+///РЎРёРЅРіР»С‚РѕРЅ РјРµРЅРµРґР¶РµСЂР° РєРѕРЅРІРµСЂС‚РµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class StringConverterSystemImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     StringConverterSystemImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация конвертеров
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРЅРІРµСЂС‚РµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterConverter       (const char* source_encoding, const char* destination_encoding, const StringConverterSystem::ConverterFn&);
     void UnregisterConverter     (const char* source_encoding, const char* destination_encoding);
     void UnregisterAllConverters ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка зарегистрированности конвертера
+///РџСЂРѕРІРµСЂРєР° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅРѕСЃС‚Рё РєРѕРЅРІРµСЂС‚РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsConverterRegistered (const char* source_encoding, const char* destination_encoding);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение конвертера
+///РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅРІРµСЂС‚РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IStringConverter* CreateConverter (const char* source_encoding, const char* destination_encoding);  
 
@@ -133,7 +133,7 @@ typedef common::Singleton<StringConverterSystemImpl> StringConverterSystemImplSi
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -162,7 +162,7 @@ StringConverterSystemImpl::StringConverterSystemImpl()
 }
 
 /*
-    Поиск конвертера
+    РџРѕРёСЃРє РєРѕРЅРІРµСЂС‚РµСЂР°
 */
 
 StringConverterSystemImpl::StringConverterList::iterator StringConverterSystemImpl::FindConverter (const char* source_encoding, const char* destination_encoding)
@@ -180,7 +180,7 @@ StringConverterSystemImpl::StringConverterList::iterator StringConverterSystemIm
 }
 
 /*
-    Регистрация конвертеров
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРЅРІРµСЂС‚РµСЂРѕРІ
 */
 
 void StringConverterSystemImpl::RegisterConverter
@@ -300,7 +300,7 @@ bool StringConverterSystem::IsConverterRegistered (const char* source_encoding, 
 
 /*
 ===================================================================================================
-    Конвертер строк
+    РљРѕРЅРІРµСЂС‚РµСЂ СЃС‚СЂРѕРє
 ===================================================================================================
 */
 
@@ -351,7 +351,7 @@ void StringConverter::Convert
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void StringConverter::Swap (StringConverter& conv)

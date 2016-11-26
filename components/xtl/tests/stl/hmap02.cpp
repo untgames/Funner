@@ -1,4 +1,4 @@
-// Тестирование operator []
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ operator []
 #include <stdio.h>
 #include <stl/hash_map>
 #include <stl/string>

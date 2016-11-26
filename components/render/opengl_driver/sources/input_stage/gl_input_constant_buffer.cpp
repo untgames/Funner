@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ConstantBuffer::ConstantBuffer (const ContextManager& context_manager, const BufferDesc& in_desc)
@@ -13,7 +13,7 @@ ConstantBuffer::ConstantBuffer (const ContextManager& context_manager, const Buf
   {}
 
 /*
-    Установка данных после отсечения
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С… РїРѕСЃР»Рµ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void ConstantBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)

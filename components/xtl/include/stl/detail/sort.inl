@@ -7,7 +7,7 @@ const int __stl_chunk_size = 7; //????
 }
 
 /*
-    Сортировка методом Шелла
+    РЎРѕСЂС‚РёСЂРѕРІРєР° РјРµС‚РѕРґРѕРј РЁРµР»Р»Р°
 */
 
 template <class Iter,class Compare>
@@ -47,10 +47,10 @@ void shell_sort (Iter first,Iter last,Compare less)
 }
 
 /*
-    Вспомагательное разбиение. Возвращает диапозон эквивалентности [first;second)
+    Р’СЃРїРѕРјР°РіР°С‚РµР»СЊРЅРѕРµ СЂР°Р·Р±РёРµРЅРёРµ. Р’РѕР·РІСЂР°С‰Р°РµС‚ РґРёР°РїРѕР·РѕРЅ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё [first;second)
 */
 
-//определение медианы
+//РѕРїСЂРµРґРµР»РµРЅРёРµ РјРµРґРёР°РЅС‹
 template< class Iter,class Compare> 
 inline void __med3 (Iter first,Iter mid,Iter last,Compare less)
 { 
@@ -63,9 +63,9 @@ template <class Iter,class Compare>
 inline void __median (Iter first,Iter mid,Iter last,Compare less)
 { 
     // sort median element to middle
-  if (last-first > 40) //медиана из 9-ти элементов
+  if (last-first > 40) //РјРµРґРёР°РЅР° РёР· 9-С‚Рё СЌР»РµРјРµРЅС‚РѕРІ
   { 
-    volatile size_t step = (size_t)(last-first+1) / 8;  //volatile для обхода бага компилятора gcc 4.0 под MacOS
+    volatile size_t step = (size_t)(last-first+1) / 8;  //volatile РґР»СЏ РѕР±С…РѕРґР° Р±Р°РіР° РєРѕРјРїРёР»СЏС‚РѕСЂР° gcc 4.0 РїРѕРґ MacOS
     
     __med3 (first,first+step,first+2*step,less);
     __med3 (mid-step,mid,mid+step,less);
@@ -92,31 +92,31 @@ pair<Iter,Iter> __unguarded_partition (Iter first,Iter last,Compare less)
 { 
   Iter mid = first+(last-first) / 2, pfirst = mid, plast = pfirst + 1;  
   
-  __median (first,mid,last-1,less); // mid - указывает на середину диапозона
+  __median (first,mid,last-1,less); // mid - СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЃРµСЂРµРґРёРЅСѓ РґРёР°РїРѕР·РѕРЅР°
 
-    //определение эквивалентного диапозона
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕРіРѕ РґРёР°РїРѕР·РѕРЅР°
   while (pfirst != first && __order_equal (pfirst-1,pfirst,less)) --pfirst;
   while (plast  != last  && __order_equal (plast,pfirst,less))    ++plast;
 
-  Iter gfirst = plast, glast = pfirst; //эквивалентный диапозон [gfirst;glast)=[plast;pfirst)
+  Iter gfirst = plast, glast = pfirst; //СЌРєРІРёРІР°Р»РµРЅС‚РЅС‹Р№ РґРёР°РїРѕР·РѕРЅ [gfirst;glast)=[plast;pfirst)
 
   for (;;)
   { 
-      //поиск элементов нарушающих порядок следования (относительно диапозона эквивалентности)
+      //РїРѕРёСЃРє СЌР»РµРјРµРЅС‚РѕРІ РЅР°СЂСѓС€Р°СЋС‰РёС… РїРѕСЂСЏРґРѕРє СЃР»РµРґРѕРІР°РЅРёСЏ (РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РґРёР°РїРѕР·РѕРЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё)
     for (;gfirst!=last;++gfirst)
       if      (less (*pfirst,*gfirst)) ;
-      else if (less (*gfirst,*pfirst)) break; //найдено нарушение порядка
-      else                             iter_swap (plast,gfirst), ++plast; //расширение диапозона эквивалентности
+      else if (less (*gfirst,*pfirst)) break; //РЅР°Р№РґРµРЅРѕ РЅР°СЂСѓС€РµРЅРёРµ РїРѕСЂСЏРґРєР°
+      else                             iter_swap (plast,gfirst), ++plast; //СЂР°СЃС€РёСЂРµРЅРёРµ РґРёР°РїРѕР·РѕРЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
       
     for (;glast!=first;--glast)
       if      (less (*(glast-1),*pfirst))  ;
-      else if (less (*pfirst,*(glast-1)))  break; //найдено нарушение порядка
-      else                                 iter_swap (--pfirst,glast-1); //рсширение диапозона эквивалентности
+      else if (less (*pfirst,*(glast-1)))  break; //РЅР°Р№РґРµРЅРѕ РЅР°СЂСѓС€РµРЅРёРµ РїРѕСЂСЏРґРєР°
+      else                                 iter_swap (--pfirst,glast-1); //СЂСЃС€РёСЂРµРЅРёРµ РґРёР°РїРѕР·РѕРЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
       
     if (glast==first && gfirst==last)
-      return pair<Iter,Iter> (pfirst,plast); //возвращаем диапозон эквивалентности
+      return pair<Iter,Iter> (pfirst,plast); //РІРѕР·РІСЂР°С‰Р°РµРј РґРёР°РїРѕР·РѕРЅ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
 
-    if (glast==first) //достигнут предел слева, сдвигаем диапозон эквивалентности вправо
+    if (glast==first) //РґРѕСЃС‚РёРіРЅСѓС‚ РїСЂРµРґРµР» СЃР»РµРІР°, СЃРґРІРёРіР°РµРј РґРёР°РїРѕР·РѕРЅ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё РІРїСЂР°РІРѕ
     {               
       if (plast!=gfirst)
         iter_swap (pfirst,plast);
@@ -127,19 +127,19 @@ pair<Iter,Iter> __unguarded_partition (Iter first,Iter last,Compare less)
       ++pfirst;
       ++gfirst;
     }
-    else if (gfirst==last) //достигнут предел справа, сдвигаем диапозон эквивалентности влево
+    else if (gfirst==last) //РґРѕСЃС‚РёРіРЅСѓС‚ РїСЂРµРґРµР» СЃРїСЂР°РІР°, СЃРґРІРёРіР°РµРј РґРёР°РїРѕР·РѕРЅ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё РІР»РµРІРѕ
     { 
       if (--glast!=--pfirst)
         iter_swap (glast,pfirst);
         
       iter_swap (pfirst,--plast);
     }
-    else iter_swap (gfirst,--glast), ++gfirst; //обмен элементов нарушающих порядок
+    else iter_swap (gfirst,--glast), ++gfirst; //РѕР±РјРµРЅ СЌР»РµРјРµРЅС‚РѕРІ РЅР°СЂСѓС€Р°СЋС‰РёС… РїРѕСЂСЏРґРѕРє
   }
 }
 
 /*
-    Перемещение объектов удовлетворяющих условию в начало диапозона
+    РџРµСЂРµРјРµС‰РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ СѓРґРѕРІР»РµС‚РІРѕСЂСЏСЋС‰РёС… СѓСЃР»РѕРІРёСЋ РІ РЅР°С‡Р°Р»Рѕ РґРёР°РїРѕР·РѕРЅР°
 */
 
 template <class Iter,class Predicate>
@@ -253,7 +253,7 @@ inline Iter stable_partition (Iter first,Iter last,Predicate pred)
 }
 
 /*
-    Размещение объектов упорядоченно относительно n-th
+    Р Р°Р·РјРµС‰РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ СѓРїРѕСЂСЏРґРѕС‡РµРЅРЅРѕ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ n-th
 */   
 
 template <class Iter,class Compare>
@@ -278,7 +278,7 @@ inline void nth_element (Iter first,Iter nth,Iter last)
 }
 
 /*
-    Частичная сортировка с перемещением елементов в диапозон [first,middle) или  [result_first;result_last)
+    Р§Р°СЃС‚РёС‡РЅР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР° СЃ РїРµСЂРµРјРµС‰РµРЅРёРµРј РµР»РµРјРµРЅС‚РѕРІ РІ РґРёР°РїРѕР·РѕРЅ [first,middle) РёР»Рё  [result_first;result_last)
 */
 
 template <class Iter,class Compare>
@@ -341,7 +341,7 @@ inline OutIter partial_sort_copy (InIter first,InIter last,OutIter result_first,
 }
 
 /*
-    Полная сортировка интервала
+    РџРѕР»РЅР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР° РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class Iter,class Compare>
@@ -355,7 +355,7 @@ void __sort (Iter first,Iter last,typename iterator_traits<Iter>::difference_typ
     
     ideal = (ideal + ideal/2)/2; // allow 1.5*log2 (N) divisions
 
-    if (mid.first-first < last-mid.second)  //сортировка большей половины
+    if (mid.first-first < last-mid.second)  //СЃРѕСЂС‚РёСЂРѕРІРєР° Р±РѕР»СЊС€РµР№ РїРѕР»РѕРІРёРЅС‹
     {
       __sort (first,mid.first,ideal,less);
       first = mid.second;
@@ -369,11 +369,11 @@ void __sort (Iter first,Iter last,typename iterator_traits<Iter>::difference_typ
 
   if (count > detail::_ISORT_MAX)
   { 
-      //сортировка с помощью кучи (если количество разбиений велико)
+      //СЃРѕСЂС‚РёСЂРѕРІРєР° СЃ РїРѕРјРѕС‰СЊСЋ РєСѓС‡Рё (РµСЃР»Рё РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·Р±РёРµРЅРёР№ РІРµР»РёРєРѕ)
     make_heap (first,last,less);
     sort_heap (first,last,less);
   }
-  else if (count) shell_sort (first,last,less); //сортировка методом Шелла
+  else if (count) shell_sort (first,last,less); //СЃРѕСЂС‚РёСЂРѕРІРєР° РјРµС‚РѕРґРѕРј РЁРµР»Р»Р°
 }
 
 template <class Iter,class Compare>
@@ -389,7 +389,7 @@ inline void sort (Iter first,Iter last)
 }
 
 /*
-    Слияние диапозонов с сохранением относительной упорядоченности
+    РЎР»РёСЏРЅРёРµ РґРёР°РїРѕР·РѕРЅРѕРІ СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕР№ СѓРїРѕСЂСЏРґРѕС‡РµРЅРЅРѕСЃС‚Рё
 */
 
 template <class Iter1,class Iter2,class OutIter,class Compare>
@@ -704,7 +704,7 @@ inline void stable_sort (Iter first,Iter last)
 }
 
 /*
-    Предикат определяющий отсортирован ли интервал [first;last)
+    РџСЂРµРґРёРєР°С‚ РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅ Р»Рё РёРЅС‚РµСЂРІР°Р» [first;last)
 */
 
 template <class Iter,class Compare>

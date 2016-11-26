@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Базовый класс аттачмента
+    Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ Р°С‚С‚Р°С‡РјРµРЅС‚Р°
 */
 
 class ISceneAttachment
@@ -34,7 +34,7 @@ template <class T> struct SceneAttachmentType<const volatile T> { typedef T Type
 }
 
 /*
-    Присоединенные данные
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ
 */
 
 template <class T>
@@ -84,7 +84,7 @@ inline const T& SceneContext::Attachment () const
 }
 
 /*
-    Присоединенные именованные данные
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Рµ РёРјРµРЅРѕРІР°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ
 */
 
 template <class T>
@@ -134,7 +134,7 @@ inline const T& SceneContext::Attachment (const char* name) const
 }
 
 /*
-    Отсоединение всех данных
+    РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ РІСЃРµС… РґР°РЅРЅС‹С…
 */
 
 template <class T>

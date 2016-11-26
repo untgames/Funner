@@ -1,14 +1,14 @@
 /*
-    Применение функтора к списку аргументов
+    РџСЂРёРјРµРЅРµРЅРёРµ С„СѓРЅРєС‚РѕСЂР° Рє СЃРїРёСЃРєСѓ Р°СЂРіСѓРјРµРЅС‚РѕРІ
 */
 
 namespace detail
 {
 
-//селектор количества аргументов вызова
+//СЃРµР»РµРєС‚РѕСЂ РєРѕР»РёС‡РµСЃС‚РІР° Р°СЂРіСѓРјРµРЅС‚РѕРІ РІС‹Р·РѕРІР°
 template <size_t count> struct apply_selector {};
 
-//обёртка аргументов, возвращаемых по значению
+//РѕР±С‘СЂС‚РєР° Р°СЂРіСѓРјРµРЅС‚РѕРІ, РІРѕР·РІСЂР°С‰Р°РµРјС‹С… РїРѕ Р·РЅР°С‡РµРЅРёСЋ
 template <class T> T& wrap_argument (T& x)
 {
   return x;
@@ -19,42 +19,42 @@ template <class T> const T& wrap_argument (const T& x)
   return x;
 }
 
-//перегрузка для функционального объекта без аргументов
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args&, Evalutor&, apply_selector<0>)
 {
   return funcall<Ret> (fn);
 }
 
-//перегрузка для функционального объекта c 1-м аргументом
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<1>)
 {
   return funcall<Ret> (fn, wrap_argument (e.template eval<0> (args)));
 }
 
-//перегрузка для функционального объекта c 2-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<2>)
 {
   return funcall<Ret> (fn, wrap_argument (e.template eval<0> (args)), wrap_argument (e.template eval<1> (args)));
 }
 
-//перегрузка для функционального объекта c 3-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<3>)
 {
   return funcall<Ret> (fn, wrap_argument (e.template eval<0> (args)), wrap_argument (e.template eval<1> (args)), wrap_argument (e.template eval<2> (args)));
 }
 
-//перегрузка для функционального объекта c 4-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<4>)
 {
   return funcall<Ret> (fn, wrap_argument (e.template eval<0> (args)), wrap_argument (e.template eval<1> (args)), wrap_argument (e.template eval<2> (args)), wrap_argument (e.template eval<3> (args)));
 }
 
-//перегрузка для функционального объекта c 5-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<5>)
 {
@@ -62,7 +62,7 @@ inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<5>)
                            wrap_argument (e.template eval<4> (args)));
 }
 
-//перегрузка для функционального объекта c 6-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<6>)
 {
@@ -70,7 +70,7 @@ inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<6>)
                            wrap_argument (e.template eval<4> (args)), wrap_argument (e.template eval<5> (args)));
 }
 
-//перегрузка для функционального объекта c 7-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<7>)
 {
@@ -78,7 +78,7 @@ inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<7>)
                            wrap_argument (e.template eval<4> (args)), wrap_argument (e.template eval<5> (args)), wrap_argument (e.template eval<6> (args)));
 }
 
-//перегрузка для функционального объекта c 8-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<8>)
 {
@@ -86,7 +86,7 @@ inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<8>)
                            wrap_argument (e.template eval<4> (args)), wrap_argument (e.template eval<5> (args)), wrap_argument (e.template eval<6> (args)), wrap_argument (e.template eval<7> (args)));
 }
 
-//перегрузка для функционального объекта c 9-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class Args, class Evalutor>
 inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<9>)
 {
@@ -95,7 +95,7 @@ inline Ret apply_dispatch (Fn& fn, Args& args, Evalutor& e, apply_selector<9>)
                            wrap_argument (e.template eval<8> (args)));
 }
 
-//вычислитель аргументов кортежа
+//РІС‹С‡РёСЃР»РёС‚РµР»СЊ Р°СЂРіСѓРјРµРЅС‚РѕРІ РєРѕСЂС‚РµР¶Р°
 struct tuple_argument_evalutor
 {
   template <size_t I, class Tuple> static typename tuple_element<I, Tuple>::type eval (Tuple& args)

@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Регистрация систем шифрования
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРёСЃС‚РµРј С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 void CryptoSystemImpl::RegisterCrypter (const char* method, const CrypterCreator& creator)
@@ -35,7 +35,7 @@ void CryptoSystemImpl::UnregisterAllCrypters ()
 }
 
 /*
-    Поиск функции создания контекста шифрования
+    РџРѕРёСЃРє С„СѓРЅРєС†РёРё СЃРѕР·РґР°РЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 CryptoSystemImpl::CrypterCreator CryptoSystemImpl::GetCrypter (const char* method) const
@@ -54,7 +54,7 @@ CryptoSystemImpl::CrypterCreator CryptoSystemImpl::GetCrypter (const char* metho
 }
 
 /*
-    Обёртки
+    РћР±С‘СЂС‚РєРё
 */
 
 void CryptoSystem::RegisterCrypter (const char* method, const CrypterCreator& creator)

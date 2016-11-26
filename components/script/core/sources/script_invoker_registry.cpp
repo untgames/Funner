@@ -6,19 +6,19 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const bool DEFAULT_AUTO_OVERLOADS_MODE = false; //по умолчанию автоматические перегрузки отключены
+const bool DEFAULT_AUTO_OVERLOADS_MODE = false; //РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёРµ РїРµСЂРµРіСЂСѓР·РєРё РѕС‚РєР»СЋС‡РµРЅС‹
 
 /*
-    Именованный шлюз
+    РРјРµРЅРѕРІР°РЅРЅС‹Р№ С€Р»СЋР·
 */
 
 struct NamedInvoker
 {
-  Invoker     invoker; //шлюз
-  stl::string name;    //имя шлюза
+  Invoker     invoker; //С€Р»СЋР·
+  stl::string name;    //РёРјСЏ С€Р»СЋР·Р°
   
   NamedInvoker (const char* in_name, const Invoker& in_invoker) : invoker (in_invoker), name (in_name) {}
 };
@@ -26,7 +26,7 @@ struct NamedInvoker
 }
 
 /*
-    Описание реализации реестра шлюзов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂРµРµСЃС‚СЂР° С€Р»СЋР·РѕРІ
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, NamedInvoker>         InvokerMap;
@@ -34,9 +34,9 @@ typedef xtl::signal<void (InvokerRegistryEvent, const char*, Invoker&)> Registry
 
 struct InvokerRegistry::Impl: public xtl::reference_counter
 {
-  InvokerMap     invokers;                            //карта шлюзов
-  RegistrySignal handlers [InvokerRegistryEvent_Num]; //обработчики событий
-  bool           auto_overloads_mode;                 //режим автоматических перегрузок
+  InvokerMap     invokers;                            //РєР°СЂС‚Р° С€Р»СЋР·РѕРІ
+  RegistrySignal handlers [InvokerRegistryEvent_Num]; //РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
+  bool           auto_overloads_mode;                 //СЂРµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРіСЂСѓР·РѕРє
   
   Impl () : auto_overloads_mode (DEFAULT_AUTO_OVERLOADS_MODE) {}
   Impl (const Impl& impl) : invokers (impl.invokers), auto_overloads_mode (impl.auto_overloads_mode) {}
@@ -48,12 +48,12 @@ struct InvokerRegistry::Impl: public xtl::reference_counter
   
   void Clear ()
   {
-      //оповещение об удалении шлюзов
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё С€Р»СЋР·РѕРІ
       
     for (InvokerMap::iterator iter = invokers.begin (), end = invokers.end (); iter != end; ++iter)
       Notify (InvokerRegistryEvent_OnUnregisterInvoker, iter->second.name.c_str (), iter->second.invoker);
       
-      //удаление шлюзов
+      //СѓРґР°Р»РµРЅРёРµ С€Р»СЋР·РѕРІ
       
     invokers.clear ();
   }
@@ -69,13 +69,13 @@ struct InvokerRegistry::Impl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавляем все исключения
+      //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
   }
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InvokerRegistry::InvokerRegistry ()
@@ -100,7 +100,7 @@ InvokerRegistry::~InvokerRegistry ()
 }
 
 /*
-    Клонирование
+    РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 InvokerRegistry InvokerRegistry::Clone () const
@@ -117,7 +117,7 @@ InvokerRegistry InvokerRegistry::Clone () const
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t InvokerRegistry::Id () const
@@ -126,7 +126,7 @@ size_t InvokerRegistry::Id () const
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InvokerRegistry& InvokerRegistry::operator = (const InvokerRegistry& registry)
@@ -137,7 +137,7 @@ InvokerRegistry& InvokerRegistry::operator = (const InvokerRegistry& registry)
 }
 
 /*
-    Режим автоматических перегрузок
+    Р РµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРіСЂСѓР·РѕРє
 */
 
 void InvokerRegistry::SetAutoOverloadsMode (bool state)
@@ -151,7 +151,7 @@ bool InvokerRegistry::AutoOverloadsMode () const
 }
 
 /*
-    Поиск шлюза по имени
+    РџРѕРёСЃРє С€Р»СЋР·Р° РїРѕ РёРјРµРЅРё
 */
 
 const Invoker* InvokerRegistry::Find (const char* name) const
@@ -165,7 +165,7 @@ const Invoker* InvokerRegistry::Find (const char* name) const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 namespace
@@ -189,7 +189,7 @@ InvokerRegistry::ConstIterator InvokerRegistry::CreateIterator () const
 }
 
 /*
-    Получение идентификатора шлюза
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С€Р»СЋР·Р°
 */
 
 const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
@@ -203,7 +203,7 @@ const char* InvokerRegistry::InvokerId (const ConstIterator& i) const
 }
 
 /*
-    Регистрация/удаление шлюзов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ/СѓРґР°Р»РµРЅРёРµ С€Р»СЋР·РѕРІ
 */
 
 void InvokerRegistry::Register (const char* name, const Invoker& invoker)
@@ -257,14 +257,14 @@ void InvokerRegistry::Register (const char* name, const char* source_name)
   Register (name, *this, source_name);
 }
 
-//регистрация копий шлюзов registry
+//СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРїРёР№ С€Р»СЋР·РѕРІ registry
 void InvokerRegistry::Register (const InvokerRegistry& registry)
 {
   for (InvokerMap::const_iterator i=registry.impl->invokers.begin (), end=registry.impl->invokers.end (); i!=end; ++i)
     Register (i->second.name.c_str (), i->second.invoker);
 }
 
-//регистрация копий шлюзов registry
+//СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРїРёР№ С€Р»СЋР·РѕРІ registry
 void InvokerRegistry::Register (const Environment& environment, const char* registry_name)
 {
   try
@@ -302,7 +302,7 @@ void InvokerRegistry::Unregister (const char* name)
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void InvokerRegistry::Clear ()
@@ -311,7 +311,7 @@ void InvokerRegistry::Clear ()
 }
 
 /*
-    Регистрация обработчиков событий
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
 */
 
 xtl::connection InvokerRegistry::RegisterEventHandler (InvokerRegistryEvent event_id, const EventHandler& handler) const
@@ -323,7 +323,7 @@ xtl::connection InvokerRegistry::RegisterEventHandler (InvokerRegistryEvent even
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void InvokerRegistry::Swap (InvokerRegistry& registry)

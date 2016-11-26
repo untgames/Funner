@@ -12,39 +12,39 @@ namespace
 {
 
 /*
-    Утилита выбора элементов из библиотек
+    РЈС‚РёР»РёС‚Р° РІС‹Р±РѕСЂР° СЌР»РµРјРµРЅС‚РѕРІ РёР· Р±РёР±Р»РёРѕС‚РµРє
 */
 
 class ItemsSelector
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ItemsSelector (Model& model, size_t in_select_flags, const char* in_force_select)
       : source_model (model)
       , select_flags (in_select_flags)
     {
       try
       {
-          //выделение строк выборка элементов
+          //РІС‹РґРµР»РµРЅРёРµ СЃС‚СЂРѕРє РІС‹Р±РѕСЂРєР° СЌР»РµРјРµРЅС‚РѕРІ
         
         force_select = common::split (in_force_select);
 
-          //создание новой модели
+          //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ РјРѕРґРµР»Рё
 
         target_model.Rename (source_model.Name ());
         target_model.SetActiveSceneName (source_model.ActiveSceneName ());
         target_model.SetUnitOfMeasure (source_model.UnitOfMeasure ());
 
-          //выбор объектов, входящих в активную сцену
+          //РІС‹Р±РѕСЂ РѕР±СЉРµРєС‚РѕРІ, РІС…РѕРґСЏС‰РёС… РІ Р°РєС‚РёРІРЅСѓСЋ СЃС†РµРЅСѓ
 
         if (select_flags & ModelSelect_ActiveScene)
           SelectActiveScene ();
         
-          //выбор сцен
+          //РІС‹Р±РѕСЂ СЃС†РµРЅ
         
         SelectScenes ();
         
-          //выбор библиотек
+          //РІС‹Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
 
         SelectLibrary (source_model.Nodes (), ModelSelect_Nodes, "nodes");
         SelectLibrary (source_model.Cameras (), ModelSelect_Cameras, "cameras");
@@ -56,13 +56,13 @@ class ItemsSelector
         SelectLibrary (source_model.Effects (), ModelSelect_Effects, "effects");
         SelectLibrary (source_model.Materials (), ModelSelect_Materials, "materials");
 
-        //выбор анимаций
+        //РІС‹Р±РѕСЂ Р°РЅРёРјР°С†РёР№
 
         if (select_flags & ModelSelect_Animations)
           for (AnimationList::Iterator iter = const_cast <AnimationList&> (source_model.Animations ()).CreateIterator (); iter; ++iter)
             target_model.Animations ().Add (*iter);
 
-        //обмен моделей
+        //РѕР±РјРµРЅ РјРѕРґРµР»РµР№
 
         model.Swap (target_model);
       }
@@ -74,13 +74,13 @@ class ItemsSelector
     }
     
   private:
-///Проверка необходимости выбора
+///РџСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р±РѕСЂР°
     bool IsNeedSelect (const char* id, size_t flags)
     {
       return (select_flags & flags) == flags || IsForceSelect (id);
     }
     
-///Проверка наличия ресурса в списке обязательно выбираемых
+///РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЂРµСЃСѓСЂСЃР° РІ СЃРїРёСЃРєРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РІС‹Р±РёСЂР°РµРјС‹С…
     bool IsForceSelect (const char* id)
     {
       const char** items = force_select.Data ();
@@ -92,7 +92,7 @@ class ItemsSelector
       return false;
     }
     
-///Вставка ресурса
+///Р’СЃС‚Р°РІРєР° СЂРµСЃСѓСЂСЃР°
     template <class Item>
     void Insert (ILibrary<Item>& library, const char* id, const Item& item)
     {
@@ -108,13 +108,13 @@ class ItemsSelector
       Insert (library, item.Id (), item);
     }        
 
-///Выбор изображения
+///Р’С‹Р±РѕСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     void Select (const Image& image)
     {
       Insert (target_model.Images (), image);
     }
 
-///Выбор текстуры
+///Р’С‹Р±РѕСЂ С‚РµРєСЃС‚СѓСЂС‹
     void Select (const Texture& texture)
     {
       if (!*texture.Image ())
@@ -128,7 +128,7 @@ class ItemsSelector
       Select (*image);
     }
 
-///Выбор эффекта
+///Р’С‹Р±РѕСЂ СЌС„С„РµРєС‚Р°
     void Select (const Effect& effect)
     {
       for (int i=0; i<TextureMap_Num; i++)
@@ -152,7 +152,7 @@ class ItemsSelector
       Insert (target_model.Effects (), effect);
     }
 
-///Выбор материала
+///Р’С‹Р±РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
     void Select (const Material& material)
     {
       try
@@ -173,25 +173,25 @@ class ItemsSelector
       }
     }
 
-///Выбор источника света
+///Р’С‹Р±РѕСЂ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
     void Select (const Light& light)
     {
       Insert (target_model.Lights (), light);
     }
 
-///Выбор камеры
+///Р’С‹Р±РѕСЂ РєР°РјРµСЂС‹
     void Select (const Camera& camera)
     {
       Insert (target_model.Cameras (), camera);
     }
    
-///Выбор меша
+///Р’С‹Р±РѕСЂ РјРµС€Р°
     void Select (const Mesh& mesh)
     {
       Insert (target_model.Meshes (), mesh);
     }
     
-///Выбор меша по имени
+///Р’С‹Р±РѕСЂ РјРµС€Р° РїРѕ РёРјРµРЅРё
     void SelectMeshByName (const char* mesh_name, const MaterialBinds* material_binds = 0)
     {
       try
@@ -211,7 +211,7 @@ class ItemsSelector
       }
     }
     
-///Выбор морфа
+///Р’С‹Р±РѕСЂ РјРѕСЂС„Р°
     void Select (const Morph& morph, const MaterialBinds* material_binds = 0)
     {
       try
@@ -230,14 +230,14 @@ class ItemsSelector
       }
     }
 
-///Выбор скина
+///Р’С‹Р±РѕСЂ СЃРєРёРЅР°
     void Select (const Skin& skin, const MaterialBinds* material_binds = 0, const InstanceController* controller = 0)
     {
       try
       {
         SelectMeshByName (skin.BaseMesh (), material_binds);
 
-          //выбор узлов для соединений
+          //РІС‹Р±РѕСЂ СѓР·Р»РѕРІ РґР»СЏ СЃРѕРµРґРёРЅРµРЅРёР№
           
         if (controller)
         {        
@@ -273,7 +273,7 @@ class ItemsSelector
       }
     }
 
-///Выбор инстанцированных материалов
+///Р’С‹Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
     void Select (const Surface& surface, const MaterialBinds& binds)
     {
       const char* material_name = binds.FindMaterial (surface);
@@ -286,7 +286,7 @@ class ItemsSelector
       Select (*material);
     }    
     
-///Выбор инстанцированного меша
+///Р’С‹Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РјРµС€Р°
     void Select (const Mesh& mesh, const MaterialBinds& material_binds)
     {
       try
@@ -303,7 +303,7 @@ class ItemsSelector
       }
     }    
 
-///Выбор инстанцированного меша
+///Р’С‹Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РјРµС€Р°
     void Select (const InstanceMesh& instance_mesh)
     {
       try
@@ -317,12 +317,12 @@ class ItemsSelector
       }
     }    
     
-///Выбор контроллера
+///Р’С‹Р±РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
     void Select (const InstanceController& instance_controller)
     {
       try
       {
-          //выбор контроллера
+          //РІС‹Р±РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
         
         const Skin* skin = source_model.Skins ().Find (instance_controller.Controller ());
         
@@ -341,7 +341,7 @@ class ItemsSelector
         if (!skin && !morph)
           throw xtl::format_operation_exception ("", "Controller '%s' not found", instance_controller.Controller ());
           
-          //выбор меша
+          //РІС‹Р±РѕСЂ РјРµС€Р°
           
         const char* base_mesh_name = instance_controller.FindBaseMesh (source_model);
           
@@ -357,7 +357,7 @@ class ItemsSelector
       }      
     }
     
-///Выбор коллекции
+///Р’С‹Р±РѕСЂ РєРѕР»Р»РµРєС†РёРё
     template <class Item>
     void Select (const ICollection<Item>& collection, const char* collection_name)
     {
@@ -373,7 +373,7 @@ class ItemsSelector
       }
     }    
 
-///Выбор объектов, входящих в узел
+///Р’С‹Р±РѕСЂ РѕР±СЉРµРєС‚РѕРІ, РІС…РѕРґСЏС‰РёС… РІ СѓР·РµР»
     void Select (const Node& node)
     {
       try
@@ -393,7 +393,7 @@ class ItemsSelector
       }
     }
 
-///Выбор объектов, входящих в сцену
+///Р’С‹Р±РѕСЂ РѕР±СЉРµРєС‚РѕРІ, РІС…РѕРґСЏС‰РёС… РІ СЃС†РµРЅСѓ
     void SelectScene (const char* id, const Node& scene)
     {
       try
@@ -409,7 +409,7 @@ class ItemsSelector
       }
     }
 
-///Выбор объектов, входящих в активную сцену
+///Р’С‹Р±РѕСЂ РѕР±СЉРµРєС‚РѕРІ, РІС…РѕРґСЏС‰РёС… РІ Р°РєС‚РёРІРЅСѓСЋ СЃС†РµРЅСѓ
     void SelectActiveScene ()
     {
       try
@@ -428,7 +428,7 @@ class ItemsSelector
       }
     }
 
-///Выбор используемых сцен
+///Р’С‹Р±РѕСЂ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЃС†РµРЅ
     void SelectScenes ()
     {
       try
@@ -450,7 +450,7 @@ class ItemsSelector
       }
     }
 
-///Выбор используемых элементов библиотеки
+///Р’С‹Р±РѕСЂ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЌР»РµРјРµРЅС‚РѕРІ Р±РёР±Р»РёРѕС‚РµРєРё
     template <class Item>
     void SelectLibrary (const ILibrary<Item>& library, size_t flags, const char* library_type)
     {
@@ -472,16 +472,16 @@ class ItemsSelector
     }    
   
   private:
-    const Model& source_model; //исходная модель
-    Model        target_model; //результирующая модель
-    size_t       select_flags; //флаги выбора
-    StringArray  force_select; //список масок идентификаторов ресурсов, обязательно выбираемых
+    const Model& source_model; //РёСЃС…РѕРґРЅР°СЏ РјРѕРґРµР»СЊ
+    Model        target_model; //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РјРѕРґРµР»СЊ
+    size_t       select_flags; //С„Р»Р°РіРё РІС‹Р±РѕСЂР°
+    StringArray  force_select; //СЃРїРёСЃРѕРє РјР°СЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ СЂРµСЃСѓСЂСЃРѕРІ, РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РІС‹Р±РёСЂР°РµРјС‹С…
 };
 
 }
 
 /*
-    Выбор только используемых ресурсов
+    Р’С‹Р±РѕСЂ С‚РѕР»СЊРєРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void remove_unused_resources (Model& model, size_t select_flags, const char* force_select)
@@ -491,7 +491,7 @@ void remove_unused_resources (Model& model, size_t select_flags, const char* for
     if (!force_select)
       throw xtl::make_null_argument_exception ("", "force_select");      
       
-      //селектор
+      //СЃРµР»РµРєС‚РѕСЂ
       
     ItemsSelector (model, select_flags, force_select);
   }

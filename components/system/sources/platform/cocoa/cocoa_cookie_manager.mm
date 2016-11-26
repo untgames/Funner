@@ -3,7 +3,7 @@
 using namespace syslib;
 
 /*
-   Политика приема cookie
+   РџРѕР»РёС‚РёРєР° РїСЂРёРµРјР° cookie
 */
 
 void CocoaCookieManager::SetAcceptCookie (bool policy)
@@ -29,7 +29,7 @@ bool CocoaCookieManager::AcceptCookie ()
 }
 
 /*
-   Удаление cookie
+   РЈРґР°Р»РµРЅРёРµ cookie
 */
 
 void CocoaCookieManager::DeleteCookies (const char* uri)

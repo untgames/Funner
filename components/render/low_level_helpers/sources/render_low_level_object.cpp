@@ -12,7 +12,7 @@ int current_object_id = 1;
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Object::Object ()
@@ -26,7 +26,7 @@ Object::Object ()
 }
 
 /*
-    Список свойств объекта
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р°
 */
 
 IPropertyList* Object::GetProperties ()
@@ -37,7 +37,7 @@ IPropertyList* Object::GetProperties ()
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Object::AddRef ()
@@ -56,7 +56,7 @@ unsigned int Object::UseCount ()
 }
 
 /*
-    Получение trackable
+    РџРѕР»СѓС‡РµРЅРёРµ trackable
 */
 
 xtl::trackable& Object::GetTrackable ()
@@ -65,7 +65,7 @@ xtl::trackable& Object::GetTrackable ()
 }
 
 /*
-    Регистрация обработчиков события удаления объекта
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 xtl::connection Object::RegisterDestroyHandler (xtl::trackable::slot_type& handler)

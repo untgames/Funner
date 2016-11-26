@@ -11,14 +11,14 @@ namespace
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* COMMON_ACTION_LIBRARY               = "Common.Action";
 const char* COMMON_STATIC_ACTION_THREAD_LIBRARY = "Common.ActionThread";
 
 /*
-    Регистрация библиотек
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 }

@@ -3,16 +3,16 @@
 using namespace render::scene::server;
 
 /*
-    Описание реализации сервера рендеринга сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРµСЂРІРµСЂР° СЂРµРЅРґРµСЂРёРЅРіР° СЃС†РµРЅС‹
 */
 
 struct Server::Impl
 {
-  ConnectionAcceptor       acceptor;            //объект, принимающий входящие подключения
-  ServerLoopbackConnection loopback_connection; //соединение для взаимодействия с сервером
-  ClientWindowManager      window_manager;      //менеджер окон
+  ConnectionAcceptor       acceptor;            //РѕР±СЉРµРєС‚, РїСЂРёРЅРёРјР°СЋС‰РёР№ РІС…РѕРґСЏС‰РёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ
+  ServerLoopbackConnection loopback_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ СЃРµСЂРІРµСЂРѕРј
+  ClientWindowManager      window_manager;      //РјРµРЅРµРґР¶РµСЂ РѕРєРѕРЅ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* name, ServerThreadingModel threading_model)
     : acceptor (name, threading_model)
     , loopback_connection (name)
@@ -22,7 +22,7 @@ struct Server::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Server::Server (const char* name, ServerThreadingModel threading_model)
@@ -55,7 +55,7 @@ Server::~Server ()
 }
 
 /*
-    Присоединение окон
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РѕРєРѕРЅ
 */
 
 void Server::AttachWindow (const char* name, syslib::Window& window, const common::PropertyMap& properties)
@@ -98,7 +98,7 @@ void Server::DetachAllWindows ()
 }
 
 /*
-    Ожидание незавершенных операций
+    РћР¶РёРґР°РЅРёРµ РЅРµР·Р°РІРµСЂС€РµРЅРЅС‹С… РѕРїРµСЂР°С†РёР№
 */
 
 bool Server::TryFinish (size_t timeout_ms)

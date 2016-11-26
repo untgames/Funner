@@ -1,4 +1,4 @@
-// SerjTest: Тестирование swap
+// SerjTest: РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ swap
 
 #include <stdio.h>
 #include <stl/string>

@@ -7,10 +7,10 @@ namespace
 typedef xtl::function<void (const char* property, const char* value)> NewPropertyHandler;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-//пропуск пробелов
+//РїСЂРѕРїСѓСЃРє РїСЂРѕР±РµР»РѕРІ
 void skip_whitespace (const char*& pos)
 {
   for (const char* s=pos;;)
@@ -28,7 +28,7 @@ void skip_whitespace (const char*& pos)
     }
 }
 
-//разбор элемента
+//СЂР°Р·Р±РѕСЂ СЌР»РµРјРµРЅС‚Р°
 void parse_element (const char*& pos, stl::string& result)
 {
   skip_whitespace (pos);
@@ -92,7 +92,7 @@ namespace common
 {
 
 /*
-    Разбор строк инициализации (property1=value property2='string value')
+    Р Р°Р·Р±РѕСЂ СЃС‚СЂРѕРє РёРЅРёС†РёР°Р»РёР·Р°С†РёРё (property1=value property2='string value')
 */
 
 void parse_init_string (const char* init_string, const NewPropertyHandler& fn)

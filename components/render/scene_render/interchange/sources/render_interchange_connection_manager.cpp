@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Реализация менеджера соединений
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° СЃРѕРµРґРёРЅРµРЅРёР№
 */
 
 struct ConnectionCreatorResult
@@ -37,7 +37,7 @@ class ConnectionManagerImpl
   public:
     typedef ConnectionManager::ConnectionCreator ConnectionCreator;
 
-/// Регистрация соединения
+/// Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
     void RegisterConnection (const char* name, const char* mask, const ConnectionCreator& creator)
     {
       static const char* METHOD_NAME = "render::scene::interchange::ConnectionManager::RegisterConnection";
@@ -56,7 +56,7 @@ class ConnectionManagerImpl
       managers.insert_pair (name, desc);
     }
 
-/// Отмена регистрации
+/// РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё
     void UnregisterConnection (const char* name)
     {
       if (!name)
@@ -65,13 +65,13 @@ class ConnectionManagerImpl
       managers.erase (name);
     }
 
-/// Отмена всех регистраций
+/// РћС‚РјРµРЅР° РІСЃРµС… СЂРµРіРёСЃС‚СЂР°С†РёР№
     void UnregisterAllConnections ()
     {
       managers.clear ();
     }
 
-///Получение порождающего функтора
+///РџРѕР»СѓС‡РµРЅРёРµ РїРѕСЂРѕР¶РґР°СЋС‰РµРіРѕ С„СѓРЅРєС‚РѕСЂР°
     void GetCreator (const char* name, ConnectionCreatorResult& result)
     {
       try
@@ -137,7 +137,7 @@ typedef common::Singleton<ConnectionManagerImpl> ConnectionManagerSingleton;
 }
 
 /*
-    Обертки
+    РћР±РµСЂС‚РєРё
 */
 
 void ConnectionManager::RegisterConnection (const char* manager_name, const char* mask, const ConnectionCreator& creator)

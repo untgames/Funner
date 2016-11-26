@@ -1,4 +1,4 @@
-//Тестирование алгоритма fill (first, last, val)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° fill (first, last, val)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/list>

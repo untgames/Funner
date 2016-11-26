@@ -23,7 +23,7 @@
 
 using namespace engine;
 
-//Слушатель события окончания проигрывания видео
+//РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РІРёРґРµРѕ
 @interface VideoPlayerFinishPlaybackListener : NSObject
 {
 }
@@ -34,34 +34,34 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "IPhoneAudioSession";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.IPhoneAudioSession"; //имя компонента
+const char* SUBSYSTEM_NAME = "IPhoneAudioSession";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.IPhoneAudioSession"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 const char* LOG_NAME       = COMPONENT_NAME;
 
 const common::ActionQueue::time_t REACTIVATE_DELAY = 0.25;
 
 /*
-   Подсистема
+   РџРѕРґСЃРёСЃС‚РµРјР°
 */
 
 class IPhoneAudioSessionSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-    ///Конструктор/деструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     IPhoneAudioSessionSubsystem (common::ParseNode& node, SubsystemManager& in_subsystem_manager);
     ~IPhoneAudioSessionSubsystem ();
 
-    ///Остановка/запуск необходимых подсистем
+    ///РћСЃС‚Р°РЅРѕРІРєР°/Р·Р°РїСѓСЃРє РЅРµРѕР±С…РѕРґРёРјС‹С… РїРѕРґСЃРёСЃС‚РµРј
     void StopAffectedSubsystems ();
     void StartAffectedSubsystems ();
 
-    ///Выполнение команды
+    ///Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
     void Execute (const char* command);
 
-    ///Подсчёт ссылок
+    ///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -91,7 +91,7 @@ class IPhoneAudioSessionSubsystem : public ISubsystem, public xtl::reference_cou
 
 void audio_session_interruption_listener (void*, UInt32 interruption_state);
 
-//получение имени ошибки Audio Services
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РѕС€РёР±РєРё Audio Services
 const char* get_audio_session_error_name (OSStatus error)
 {
   switch (error)
@@ -111,7 +111,7 @@ const char* get_audio_session_error_name (OSStatus error)
   }
 }
 
-//проверка ошибок Audio Services
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє Audio Services
 void check_audio_session_error (OSStatus error_code, const char* source)
 {
   if (error_code == kAudioSessionNoError)
@@ -120,11 +120,11 @@ void check_audio_session_error (OSStatus error_code, const char* source)
   throw xtl::format_operation_exception (source, "Audio session error. %s. Code %d.", get_audio_session_error_name (error_code), error_code);
 }
 
-//Класс инициализирующий аудиосессию и хранящий указатель на подсистему
+//РљР»Р°СЃСЃ РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ Р°СѓРґРёРѕСЃРµСЃСЃРёСЋ Рё С…СЂР°РЅСЏС‰РёР№ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕРґСЃРёСЃС‚РµРјСѓ
 class AudioSessionManager
 {
   public:
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AudioSessionManager ()
       : log (LOG_NAME)
       , active_subsystem (0)
@@ -171,7 +171,7 @@ class AudioSessionManager
                                  sizeof (category), &category), METHOD_NAME);
     }
 
-    ///Установка/получение подсистемы
+    ///РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРјС‹
     IPhoneAudioSessionSubsystem* ActiveSubsystem ()
     {
       return active_subsystem;
@@ -182,7 +182,7 @@ class AudioSessionManager
       active_subsystem = new_active_subsystem;
     }
 
-    ///Пытаться реактивировать аудио-сессию несколько раз, поскольку с первого раза может не получиться. Аудио-сессия может быть еще заблокирована другим приложением, несмотря на событие окончания прерывания
+    ///РџС‹С‚Р°С‚СЊСЃСЏ СЂРµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ Р°СѓРґРёРѕ-СЃРµСЃСЃРёСЋ РЅРµСЃРєРѕР»СЊРєРѕ СЂР°Р·, РїРѕСЃРєРѕР»СЊРєСѓ СЃ РїРµСЂРІРѕРіРѕ СЂР°Р·Р° РјРѕР¶РµС‚ РЅРµ РїРѕР»СѓС‡РёС‚СЊСЃСЏ. РђСѓРґРёРѕ-СЃРµСЃСЃРёСЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ РµС‰Рµ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР° РґСЂСѓРіРёРј РїСЂРёР»РѕР¶РµРЅРёРµРј, РЅРµСЃРјРѕС‚СЂСЏ РЅР° СЃРѕР±С‹С‚РёРµ РѕРєРѕРЅС‡Р°РЅРёСЏ РїСЂРµСЂС‹РІР°РЅРёСЏ
     void ReactivateAudioSessionWithDelay ()
     {
       log.Printf ("Init reactivation");
@@ -237,7 +237,7 @@ class AudioSessionManager
 
 typedef common::Singleton <AudioSessionManager> AudioSessionManagerSingleton;
 
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 IPhoneAudioSessionSubsystem::IPhoneAudioSessionSubsystem (common::ParseNode& node, SubsystemManager& in_subsystem_manager)
   : subsystem_manager (in_subsystem_manager)
 {
@@ -268,7 +268,7 @@ IPhoneAudioSessionSubsystem::~IPhoneAudioSessionSubsystem ()
   AudioSessionManagerSingleton::Instance ()->SetActiveSubsystem (0);
 }
 
-//Остановка/запуск необходимых подсистем
+//РћСЃС‚Р°РЅРѕРІРєР°/Р·Р°РїСѓСЃРє РЅРµРѕР±С…РѕРґРёРјС‹С… РїРѕРґСЃРёСЃС‚РµРј
 void IPhoneAudioSessionSubsystem::StopAffectedSubsystems ()
 {
   for (AffectedSubsystemsDescsArray::iterator iter = affected_subsystems.begin (), end = affected_subsystems.end (); iter != end; ++iter)
@@ -277,13 +277,13 @@ void IPhoneAudioSessionSubsystem::StopAffectedSubsystems ()
 
 void IPhoneAudioSessionSubsystem::StartAffectedSubsystems ()
 {
-  StopAffectedSubsystems ();  //для обработки ситуации, когда сообщение о восстановлении аудиосессии приходит два раза (воспроизведение видео)
+  StopAffectedSubsystems ();  //РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРёС‚СѓР°С†РёРё, РєРѕРіРґР° СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРё Р°СѓРґРёРѕСЃРµСЃСЃРёРё РїСЂРёС…РѕРґРёС‚ РґРІР° СЂР°Р·Р° (РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ РІРёРґРµРѕ)
 
   for (AffectedSubsystemsDescsArray::reverse_iterator iter = affected_subsystems.rbegin (), end = affected_subsystems.rend (); iter != end; ++iter)
     subsystem_manager.Start ((*iter)->config_file.c_str (), (*iter)->name_wildcard.c_str ());
 }
 
-///Выполнение команды
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
 void IPhoneAudioSessionSubsystem::Execute (const char* command)
 {
   if (!common::wcimatch (command, "iPhoneAudioSession:*"))
@@ -310,7 +310,7 @@ void IPhoneAudioSessionSubsystem::Execute (const char* command)
   }
 }
 
-//обработчик событий прерывания/восстановления аудиосессии
+//РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РїСЂРµСЂС‹РІР°РЅРёСЏ/РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ Р°СѓРґРёРѕСЃРµСЃСЃРёРё
 void audio_session_interruption_listener (void*, UInt32 interruption_state)
 {
   try
@@ -379,13 +379,13 @@ namespace
 {
 
 /*
-   Компонент регистрации слушателя прерываний аудио
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё СЃР»СѓС€Р°С‚РµР»СЏ РїСЂРµСЂС‹РІР°РЅРёР№ Р°СѓРґРёРѕ
 */
 
 class IPhoneAudioSessionComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     IPhoneAudioSessionComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

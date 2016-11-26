@@ -4,12 +4,12 @@ using namespace scene_graph;
 using namespace scene_graph::controllers;
 
 /*
-    Описание реализации контрллера ресурсов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂР»Р»РµСЂР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 struct ResourceController::Impl: public xtl::instance_counter<ResourceController>
 {
-  media::rms::Binding binding; //связывание с группой ресурсов
+  media::rms::Binding binding; //СЃРІСЏР·С‹РІР°РЅРёРµ СЃ РіСЂСѓРїРїРѕР№ СЂРµСЃСѓСЂСЃРѕРІ
   
   Impl (media::rms::Binding& in_binding) 
     : binding (in_binding)
@@ -18,7 +18,7 @@ struct ResourceController::Impl: public xtl::instance_counter<ResourceController
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ResourceController::ResourceController (Node& node, media::rms::Binding& binding)
@@ -33,7 +33,7 @@ ResourceController::~ResourceController ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 ResourceController::Pointer ResourceController::Create (Node& node, media::rms::Binding& binding)
@@ -42,7 +42,7 @@ ResourceController::Pointer ResourceController::Create (Node& node, media::rms::
 }
 
 /*
-    Связывание с группой ресурсов
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃ РіСЂСѓРїРїРѕР№ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ResourceController::SetBinding (media::rms::Binding& binding)

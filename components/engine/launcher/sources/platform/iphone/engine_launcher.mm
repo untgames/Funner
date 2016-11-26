@@ -8,7 +8,7 @@
 
 using namespace engine;
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [], const char* env [])
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];

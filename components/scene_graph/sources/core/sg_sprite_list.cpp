@@ -4,18 +4,18 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации списка спрайтов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 typedef xtl::uninitialized_storage<SpriteDesc> SpriteDescArray;
 
 struct SpriteList::Impl: public xtl::instance_counter<SpriteList>
 {
-  SpriteDescArray items;    //массив спрайтов  
+  SpriteDescArray items;    //РјР°СЃСЃРёРІ СЃРїСЂР°Р№С‚РѕРІ  
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SpriteList::SpriteList ()
@@ -28,7 +28,7 @@ SpriteList::~SpriteList ()
 }
 
 /*
-    Создание списка спрайтов
+    РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 SpriteList::Pointer SpriteList::Create ()
@@ -37,7 +37,7 @@ SpriteList::Pointer SpriteList::Create ()
 }
 
 /*
-    Размер массива спрайтов
+    Р Р°Р·РјРµСЂ РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t SpriteList::SpritesCount () const
@@ -56,7 +56,7 @@ size_t SpriteList::SpriteDescsCapacityCore ()
 }
 
 /*
-    Изменение размера списка спрайтов / резервирование места для хранения спрайтов
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteList::Resize (size_t count)
@@ -72,7 +72,7 @@ void SpriteList::Reserve (size_t count)
 }
 
 /*
-    Массив спрайтов
+    РњР°СЃСЃРёРІ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 const SpriteDesc* SpriteList::Sprites () const
@@ -91,7 +91,7 @@ SpriteDesc* SpriteList::Sprites ()
 }
 
 /*
-    Добавление спрайтов в массив
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃРїСЂР°Р№С‚РѕРІ РІ РјР°СЃСЃРёРІ
 */
 
 void SpriteList::Insert (const SpriteDesc& desc)
@@ -117,7 +117,7 @@ void SpriteList::Insert (size_t items_count, const SpriteDesc* items)
 }
 
 /*
-    Очистка списка спрайтов
+    РћС‡РёСЃС‚РєР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteList::RemoveAll ()
@@ -126,7 +126,7 @@ void SpriteList::RemoveAll ()
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void SpriteList::AcceptCore (Visitor& visitor)
@@ -136,7 +136,7 @@ void SpriteList::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Оповещение об обновлении данных
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РґР°РЅРЅС‹С…
 */
 
 void SpriteList::Invalidate ()

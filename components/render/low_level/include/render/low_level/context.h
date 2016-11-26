@@ -17,47 +17,47 @@ namespace low_level
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Флаги очистки буфера кадра
+///Р¤Р»Р°РіРё РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° РєР°РґСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ClearFlag
 {
-  ClearFlag_RenderTarget = 1, //очищать буферы цвета (render-target)
-  ClearFlag_Depth        = 2, //очищать буфер глубины
-  ClearFlag_Stencil      = 4, //очищать буфер трафарета
-  ClearFlag_ViewportOnly = 8, //очищать только область вывода
+  ClearFlag_RenderTarget = 1, //РѕС‡РёС‰Р°С‚СЊ Р±СѓС„РµСЂС‹ С†РІРµС‚Р° (render-target)
+  ClearFlag_Depth        = 2, //РѕС‡РёС‰Р°С‚СЊ Р±СѓС„РµСЂ РіР»СѓР±РёРЅС‹
+  ClearFlag_Stencil      = 4, //РѕС‡РёС‰Р°С‚СЊ Р±СѓС„РµСЂ С‚СЂР°С„Р°СЂРµС‚Р°
+  ClearFlag_ViewportOnly = 8, //РѕС‡РёС‰Р°С‚СЊ С‚РѕР»СЊРєРѕ РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
 
   ClearFlag_DepthStencil = ClearFlag_Depth | ClearFlag_Stencil,
   ClearFlag_All          = ClearFlag_RenderTarget | ClearFlag_DepthStencil
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип примитивов
+///РўРёРї РїСЂРёРјРёС‚РёРІРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum PrimitiveType
 {
-  PrimitiveType_PointList,     //список точек
-  PrimitiveType_LineList,      //список отрезков
-  PrimitiveType_LineStrip,     //цепочка отрезков
-  PrimitiveType_TriangleList,  //список треугольников
-  PrimitiveType_TriangleStrip, //цепочка треугольников
-  PrimitiveType_TriangleFan,   //вейер треугольников
+  PrimitiveType_PointList,     //СЃРїРёСЃРѕРє С‚РѕС‡РµРє
+  PrimitiveType_LineList,      //СЃРїРёСЃРѕРє РѕС‚СЂРµР·РєРѕРІ
+  PrimitiveType_LineStrip,     //С†РµРїРѕС‡РєР° РѕС‚СЂРµР·РєРѕРІ
+  PrimitiveType_TriangleList,  //СЃРїРёСЃРѕРє С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ
+  PrimitiveType_TriangleStrip, //С†РµРїРѕС‡РєР° С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ
+  PrimitiveType_TriangleFan,   //РІРµР№РµСЂ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ
 
   PrimitiveType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Список команд
+///РЎРїРёСЃРѕРє РєРѕРјР°РЅРґ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ICommandList: virtual public IObject {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Контекст отрисовки
+///РљРѕРЅС‚РµРєСЃС‚ РѕС‚СЂРёСЃРѕРІРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IDeviceContext: virtual public IObject
 {
   public:  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление входным уровнем (input-stage)
+///РЈРїСЂР°РІР»РµРЅРёРµ РІС…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (input-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void          ISSetInputLayout  (IInputLayout* state) = 0;
     virtual void          ISSetVertexBuffer (unsigned int vertex_buffer_slot,  IBuffer* buffer) = 0;
@@ -67,8 +67,8 @@ class IDeviceContext: virtual public IObject
     virtual IBuffer*      ISGetIndexBuffer  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление шейдерными уровнями (shader-stage)
-/// в случае несовпадения расположения переменных в программе и лэйауте - генерируется исключение
+///РЈРїСЂР°РІР»РµРЅРёРµ С€РµР№РґРµСЂРЅС‹РјРё СѓСЂРѕРІРЅСЏРјРё (shader-stage)
+/// РІ СЃР»СѓС‡Р°Рµ РЅРµСЃРѕРІРїР°РґРµРЅРёСЏ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… РІ РїСЂРѕРіСЂР°РјРјРµ Рё Р»СЌР№Р°СѓС‚Рµ - РіРµРЅРµСЂРёСЂСѓРµС‚СЃСЏ РёСЃРєР»СЋС‡РµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void                      SSSetProgram                 (IProgram* program) = 0;
     virtual void                      SSSetProgramParametersLayout (IProgramParametersLayout* parameters_layout) = 0;
@@ -82,7 +82,7 @@ class IDeviceContext: virtual public IObject
     virtual IBuffer*                  SSGetConstantBuffer          (unsigned int buffer_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление растеризатором (rasterizer-stage)
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂРѕРј (rasterizer-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void              RSSetState    (IRasterizerState* state) = 0;
     virtual void              RSSetViewport (unsigned int render_target_slot, const Viewport& viewport) = 0;
@@ -92,7 +92,7 @@ class IDeviceContext: virtual public IObject
     virtual const Rect&       RSGetScissor  (unsigned int render_target_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление выходным уровнем (output-stage)
+///РЈРїСЂР°РІР»РµРЅРёРµ РІС‹С…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (output-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void                OSSetBlendState        (IBlendState* state) = 0;
     virtual void                OSSetDepthStencilState (IDepthStencilState* state) = 0;
@@ -107,7 +107,7 @@ class IDeviceContext: virtual public IObject
     virtual IView*              OSGetDepthStencilView  () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление уровнем вывода вершин
+///РЈРїСЂР°РІР»РµРЅРёРµ СѓСЂРѕРІРЅРµРј РІС‹РІРѕРґР° РІРµСЂС€РёРЅ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void         SOSetTargets      (unsigned int buffers_count, IBuffer** buffers, const unsigned int* offsets) = 0;
     virtual void         SOSetTarget       (unsigned int stream_output_slot, IBuffer* buffer, unsigned int offset) = 0;
@@ -115,26 +115,26 @@ class IDeviceContext: virtual public IObject
     virtual unsigned int SOGetTargetOffset (unsigned int stream_output_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка буферов отрисовки
+///РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void ClearRenderTargetView (unsigned int render_target_slot, const Color4f& color) = 0;
     virtual void ClearDepthStencilView (unsigned int clear_flags, float depth, unsigned char stencil) = 0;
     virtual void ClearViews            (unsigned int clear_flags, unsigned int render_targets_count, const unsigned int* render_target_indices, const Color4f* colors, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+///Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void GenerateMips (ITexture* texture) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление предикатами отрисовки
+///РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void        SetPredication    (IPredicate* predicate, bool predicate_value) = 0;
     virtual IPredicate* GetPredicate      () = 0;
     virtual bool        GetPredicateValue () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Рисование примитивов
+///Р РёСЃРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void DrawAuto             (PrimitiveType primitive_type) = 0;
     virtual void Draw                 (PrimitiveType primitive_type, unsigned int first_vertex, unsigned int vertices_count) = 0;
@@ -143,12 +143,12 @@ class IDeviceContext: virtual public IObject
     virtual void DrawIndexedInstanced (PrimitiveType primitive_type, unsigned int index_count_per_instance, unsigned int instance_count, unsigned int first_index, unsigned int base_vertex, unsigned int first_instance_location) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Ожидание завершения выполнения буфера команд
+///РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р±СѓС„РµСЂР° РєРѕРјР°РЅРґ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Flush () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выполнение списка команд
+///Р’С‹РїРѕР»РЅРµРЅРёРµ СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual ICommandList* FinishCommandList  (bool restore_state = 0) = 0;
     virtual void          ExecuteCommandList (ICommandList* list, bool restore_state = false) = 0;

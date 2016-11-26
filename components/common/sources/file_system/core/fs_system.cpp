@@ -7,10 +7,10 @@ using namespace xtl;
 namespace
 {
 
-const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
-const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //префикс имён анонимных файлов
-const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //максимальное количество подстановок символьных ссылок
-const char*  LOG_NAME                             = "common.file_systems";   //имя лога
+const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ, РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј
+const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //РїСЂРµС„РёРєСЃ РёРјС‘РЅ Р°РЅРѕРЅРёРјРЅС‹С… С„Р°Р№Р»РѕРІ
+const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґСЃС‚Р°РЅРѕРІРѕРє СЃРёРјРІРѕР»СЊРЅС‹С… СЃСЃС‹Р»РѕРє
+const char*  LOG_NAME                             = "common.file_systems";   //РёРјСЏ Р»РѕРіР°
 
 struct RemoveFileWithPrefix
 {
@@ -38,21 +38,21 @@ void background_copy_file_notify (const FileSystem::BackgroundCopyFileCallback& 
     ActionQueue::PushAction (xtl::bind (callback, copy_state.Clone ()), ActionThread_Main);
 }
 
-//Рабочие данные процесса фонового копирования файла
+//Р Р°Р±РѕС‡РёРµ РґР°РЅРЅС‹Рµ РїСЂРѕС†РµСЃСЃР° С„РѕРЅРѕРІРѕРіРѕ РєРѕРїРёСЂРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
 struct BackgroundCopyFileData : public xtl::reference_counter
 {
-  BackgroundCopyState                    copy_state;            //Состояние копирования
-  File                                   input_file;            //Файл для чтения
-  File                                   output_file;           //Файл для записи
-  stl::string                            source_file_name;      //Имя исходного файла
-  stl::string                            destination_file_name; //Имя целевого файла
-  FileSystem::BackgroundCopyFileCallback callback;              //Колбек
-  ActionThread                           thread;                //Нить вызова колбека
-  size_t                                 buffer_size;           //Размер буфера копирования
-  size_t                                 bytes_copied;          //Объем скопированных данных
-  xtl::uninitialized_storage<char>       buffer;                //Буфер копирования
-  bool                                   started;               //Началось ли копирование
-  bool                                   finished;              //Завершилось ли копирование
+  BackgroundCopyState                    copy_state;            //РЎРѕСЃС‚РѕСЏРЅРёРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+  File                                   input_file;            //Р¤Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ
+  File                                   output_file;           //Р¤Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё
+  stl::string                            source_file_name;      //РРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  stl::string                            destination_file_name; //РРјСЏ С†РµР»РµРІРѕРіРѕ С„Р°Р№Р»Р°
+  FileSystem::BackgroundCopyFileCallback callback;              //РљРѕР»Р±РµРє
+  ActionThread                           thread;                //РќРёС‚СЊ РІС‹Р·РѕРІР° РєРѕР»Р±РµРєР°
+  size_t                                 buffer_size;           //Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+  size_t                                 bytes_copied;          //РћР±СЉРµРј СЃРєРѕРїРёСЂРѕРІР°РЅРЅС‹С… РґР°РЅРЅС‹С…
+  xtl::uninitialized_storage<char>       buffer;                //Р‘СѓС„РµСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+  bool                                   started;               //РќР°С‡Р°Р»РѕСЃСЊ Р»Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ
+  bool                                   finished;              //Р—Р°РІРµСЂС€РёР»РѕСЃСЊ Р»Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ
 
   BackgroundCopyFileData (const char* in_source_file_name, const char* in_destination_file_name,
                           const FileSystem::BackgroundCopyFileCallback& in_callback,
@@ -164,7 +164,7 @@ void background_copy_file_impl (Action& action, BackgroundCopyFileDataPtr data)
 #endif
 
 /*
-    Реализация вспомогательных классы
+    Р РµР°Р»РёР·Р°С†РёСЏ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… РєР»Р°СЃСЃС‹
 */
 
 inline PackFileType::PackFileType (const char* _extension,size_t _hash,const FileSystem::PackFileCreater& _creater)
@@ -201,7 +201,7 @@ inline SymbolicLink::SymbolicLink (const char* in_prefix, const char* in_link)
 }
 
 /*
-    Инициализация / завершение
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ / Р·Р°РІРµСЂС€РµРЅРёРµ
 */
 
 FileSystemImpl::FileSystemImpl ()
@@ -226,7 +226,7 @@ FileSystemImpl::~FileSystemImpl ()
 }
 
 /*
-    Загрузка файловых систем
+    Р—Р°РіСЂСѓР·РєР° С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј
 */
 
 void FileSystemImpl::LoadFileSystems ()
@@ -242,7 +242,7 @@ void FileSystemImpl::LoadFileSystems ()
 }
 
 /*
-    Установление дефолтного пути поиска
+    РЈСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РґРµС„РѕР»С‚РЅРѕРіРѕ РїСѓС‚Рё РїРѕРёСЃРєР°
 */
 
 const char* FileSystemImpl::CompressPath (const char* path)
@@ -316,7 +316,7 @@ void FileSystemImpl::SetDefaultPath (const char* path)
 }
 
 /*
-    Работа с путями анонимных файлов
+    Р Р°Р±РѕС‚Р° СЃ РїСѓС‚СЏРјРё Р°РЅРѕРЅРёРјРЅС‹С… С„Р°Р№Р»РѕРІ
 */
 
 stl::string FileSystemImpl::AddAnonymousFilePath (const FileImplPtr& file)
@@ -335,7 +335,7 @@ void FileSystemImpl::RemoveAllAnonymousFilePaths ()
 }
 
 /*
-    Регистрация типов пак-файлов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РїР°Рє-С„Р°Р№Р»РѕРІ
 */
 
 void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreater& creater)
@@ -374,7 +374,7 @@ void FileSystemImpl::UnregisterPackFile (const char* extension)
 }
 
 /*
-    Добавление пак-файлов и путей поиска
+    Р”РѕР±Р°РІР»РµРЅРёРµ РїР°Рє-С„Р°Р№Р»РѕРІ Рё РїСѓС‚РµР№ РїРѕРёСЃРєР°
 */
 
 void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,const FileSystem::LogHandler& log_handler)
@@ -524,7 +524,7 @@ void FileSystemImpl::RemoveAllSearchPaths ()
 }
 
 /*
-    Работа со смонтированными файловыми системами
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРјРѕРЅС‚РёСЂРѕРІР°РЅРЅС‹РјРё С„Р°Р№Р»РѕРІС‹РјРё СЃРёСЃС‚РµРјР°РјРё
 */
 
 void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_system)
@@ -573,7 +573,7 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,bool link,
     if (!*path_prefix)
       throw xtl::make_argument_exception (METHOD_NAME, "path_prefix", path_prefix, "Path prefix must be non empty");
 
-      //добавление символьной ссылки
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЃРёРјРІРѕР»СЊРЅРѕР№ СЃСЃС‹Р»РєРё
 
     stl::string prefix = path_prefix;
 
@@ -701,7 +701,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
 }
 
 /*
-    Настройка шифрования
+    РќР°СЃС‚СЂРѕР№РєР° С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 void FileSystemImpl::SetCryptoParameters (const char* path, const FileCryptoParameters& parameters)
@@ -766,7 +766,7 @@ void FileSystemImpl::RemoveAllCryptoParameters ()
 }
 
 /*
-   Файловые атрибуты
+   Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
 */
 
 void FileSystemImpl::SetFileAttribute (const char* src_file_name, const char* attribute, const void* data, size_t size)
@@ -876,7 +876,7 @@ void FileSystemImpl::RemoveFileAttribute (const char* src_file_name, const char*
 }
 
 /*
-    Определение принадлежности файла к файловой системе
+    РћРїСЂРµРґРµР»РµРЅРёРµ РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С„Р°Р№Р»Р° Рє С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 */
 
 ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name, string& result_file_name, string* prefix_name, bool ignore_mount_point_fs)
@@ -889,7 +889,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
     {
       switch (file_name [i->prefix.size ()-1])
       {
-        case '\0': //запрос к точке монтирования
+        case '\0': //Р·Р°РїСЂРѕСЃ Рє С‚РѕС‡РєРµ РјРѕРЅС‚РёСЂРѕРІР°РЅРёСЏ
           if (!ignore_mount_point_fs)
           {
             result_file_name = file_name;
@@ -908,7 +908,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 
             return i->file_system;
           }
-        case '/': //запрос к смонтированной файловой системе
+        case '/': //Р·Р°РїСЂРѕСЃ Рє СЃРјРѕРЅС‚РёСЂРѕРІР°РЅРЅРѕР№ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
           result_file_name = file_name + i->prefix.size ();
 
           if (prefix_name)
@@ -935,7 +935,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
   string file_name = FileSystem::GetNormalizedFileName (src_file_name);
 
-    //обработка символьных ссылок
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃРёРјРІРѕР»СЊРЅС‹С… СЃСЃС‹Р»РѕРє
 
   size_t replacement_count = 0;      
 
@@ -967,7 +967,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     else ++iter;
   }  
 
-    //пытаемся найти файл не используя путей поиска
+    //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё С„Р°Р№Р» РЅРµ РёСЃРїРѕР»СЊР·СѓСЏ РїСѓС‚РµР№ РїРѕРёСЃРєР°
 
   if (file_name [0] == '/')
   {
@@ -983,7 +983,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   
   ICustomFileSystemPtr owner_file_system;
 
-    //пытаемся найти файл в списке путей поиска
+    //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё С„Р°Р№Р» РІ СЃРїРёСЃРєРµ РїСѓС‚РµР№ РїРѕРёСЃРєР°
 
   for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
   {
@@ -1001,7 +1001,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     }
   }
 
-    //пытаемся найти файл в списке пак-файлов
+    //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё С„Р°Р№Р» РІ СЃРїРёСЃРєРµ РїР°Рє-С„Р°Р№Р»РѕРІ
     
   for (SearchPathList::iterator iter=search_paths.begin ();iter!=search_paths.end ();++iter)
   {
@@ -1032,7 +1032,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
       return i->file_system;
     }  
   
-    //пытаемся найти файл по дефолтному пути поиска
+    //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё С„Р°Р№Р» РїРѕ РґРµС„РѕР»С‚РЅРѕРјСѓ РїСѓС‚Рё РїРѕРёСЃРєР°
     
   full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ());
   owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name,0,ignore_mount_point_fs);
@@ -1047,7 +1047,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     return owner_file_system;
   }  
 
-    //возвращаем ссылку на файловую систему включающую путь по умолчанию
+    //РІРѕР·РІСЂР°С‰Р°РµРј СЃСЃС‹Р»РєСѓ РЅР° С„Р°Р№Р»РѕРІСѓСЋ СЃРёСЃС‚РµРјСѓ РІРєР»СЋС‡Р°СЋС‰СѓСЋ РїСѓС‚СЊ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
   if (!owner_file_system)
     throw format_operation_exception (METHOD_NAME, "File '%s' does not belong to any file system",src_file_name);
@@ -1061,7 +1061,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 }
 
 /*
-    Открытие файла
+    РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 */
 
 FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size)
@@ -1189,7 +1189,7 @@ size_t FileSystemImpl::GetDefaultFileBufferSize () const
 }
 
 /*
-    Управление расположением файлов
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
 */
 
 void FileSystemImpl::Remove (const char* src_file_name)
@@ -1300,7 +1300,7 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
 }
 
 /*
-    Получение информации о файле
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 */
 
 bool FileSystemImpl::IsFileExist (const char* src_file_name)
@@ -1350,7 +1350,7 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
 }
 
 /*
-   Информация о файловой системе
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 */
 
 filesize_t FileSystemImpl::GetFreeSpace (const char* path)
@@ -1402,7 +1402,7 @@ filesize_t FileSystemImpl::GetTotalSpace (const char* path)
 */
 
 /*
-    Оболочки над методами работы с файловой системой
+    РћР±РѕР»РѕС‡РєРё РЅР°Рґ РјРµС‚РѕРґР°РјРё СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРѕР№
 */
 
 void FileSystem::AddSearchPath (const char* path,const LogHandler& log_handler)
@@ -1573,7 +1573,7 @@ const char* FileSystem::GetCurrentDir ()
 }
 
 /*
-    Получение MD5 хэша файла
+    РџРѕР»СѓС‡РµРЅРёРµ MD5 С…СЌС€Р° С„Р°Р№Р»Р°
 */
 
 static void InternalGetFileHash (File& file,size_t max_hash_size,FileHash& hash)
@@ -1661,7 +1661,7 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
 }
 
 /*
-    Приведение файлового имени к стандартному виду
+    РџСЂРёРІРµРґРµРЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ РёРјРµРЅРё Рє СЃС‚Р°РЅРґР°СЂС‚РЅРѕРјСѓ РІРёРґСѓ
 */
 
 string FileSystem::GetNormalizedFileName (const char* file_name)
@@ -1677,7 +1677,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
 //      case '\\':
 //        *i = '/';
 //        break;
-      case '<': //замена шаблона <VarName> на значение переменной VarName
+      case '<': //Р·Р°РјРµРЅР° С€Р°Р±Р»РѕРЅР° <VarName> РЅР° Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ VarName
       {
         string::iterator end = strchr (i, '>');
 
@@ -1717,7 +1717,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
 }
 
 /*
-    Чтение текстового файла в строку
+    Р§С‚РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕРіРѕ С„Р°Р№Р»Р° РІ СЃС‚СЂРѕРєСѓ
 */
 
 void FileSystem::LoadTextFile (const char* file_name, string& buffer)
@@ -1750,7 +1750,7 @@ string FileSystem::LoadTextFile (const char* file_name)
 }
 
 /*
-    Настройка шифрования
+    РќР°СЃС‚СЂРѕР№РєР° С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 void FileSystem::SetCryptoParameters
@@ -1789,7 +1789,7 @@ void FileSystem::RemoveAllCryptoParameters ()
 }
 
 /*
-    Получение ключа шифрования по файлу
+    РџРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡Р° С€РёС„СЂРѕРІР°РЅРёСЏ РїРѕ С„Р°Р№Р»Сѓ
 */
 
 void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
@@ -1813,7 +1813,7 @@ void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
 }
 
 /*
-   Файловые атрибуты
+   Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
 */
 
 void FileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
@@ -1837,7 +1837,7 @@ void FileSystem::RemoveFileAttribute (const char* file_name, const char* attribu
 }
 
 /*
-    Копирование файла
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р°
 */
 
 void FileSystem::CopyFile (const char* source_file_name, const char* destination_file_name, size_t buffer_size)

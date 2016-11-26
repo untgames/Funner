@@ -4,19 +4,19 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Цель морфинга
+    Р¦РµР»СЊ РјРѕСЂС„РёРЅРіР°
 */
 
 struct MorphTarget::Impl: public xtl::reference_counter
 {
-  stl::string mesh;   //меш
-  float       weight; //вес
+  stl::string mesh;   //РјРµС€
+  float       weight; //РІРµСЃ
   
   Impl () : weight (0.0f) {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 MorphTarget::MorphTarget ()
@@ -43,7 +43,7 @@ MorphTarget& MorphTarget::operator = (const MorphTarget& target)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 MorphTarget MorphTarget::Clone () const
@@ -52,7 +52,7 @@ MorphTarget MorphTarget::Clone () const
 }
 
 /*
-    Меш
+    РњРµС€
 */
 
 const char* MorphTarget::Mesh () const
@@ -69,7 +69,7 @@ void MorphTarget::SetMesh (const char* mesh)
 }
 
 /*
-    Вес
+    Р’РµСЃ
 */
 
 void MorphTarget::SetWeight (float weight)
@@ -83,23 +83,23 @@ float MorphTarget::Weight () const
 }
 
 /*
-    Морфер
+    РњРѕСЂС„РµСЂ
 */
 
 typedef media::CollectionImpl<MorphTarget, ICollection<MorphTarget> > MorphTargetListImpl;
 
 struct Morph::Impl: public xtl::reference_counter
 {
-  MorphMethod         method;    //метод морфинга
-  MorphTargetListImpl targets;   //цели морфинга
-  stl::string         base_mesh; //базовый меш
-  stl::string         id;        //идентификатор морфера
+  MorphMethod         method;    //РјРµС‚РѕРґ РјРѕСЂС„РёРЅРіР°
+  MorphTargetListImpl targets;   //С†РµР»Рё РјРѕСЂС„РёРЅРіР°
+  stl::string         base_mesh; //Р±Р°Р·РѕРІС‹Р№ РјРµС€
+  stl::string         id;        //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРѕСЂС„РµСЂР°
   
   Impl () : method (MorphMethod_Normalized) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Morph::Morph ()
@@ -126,7 +126,7 @@ Morph& Morph::operator = (const Morph& morph)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Morph Morph::Clone () const
@@ -135,7 +135,7 @@ Morph Morph::Clone () const
 }
 
 /*
-    Идентификатор морфера
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРѕСЂС„РµСЂР°
 */
 
 const char* Morph::Id () const
@@ -152,7 +152,7 @@ void Morph::SetId (const char* id)
 }
 
 /*
-    Метод морфинга
+    РњРµС‚РѕРґ РјРѕСЂС„РёРЅРіР°
 */
 
 MorphMethod Morph::Method () const
@@ -176,7 +176,7 @@ void Morph::SetMethod (MorphMethod method)
 }
 
 /*
-    Базовый меш
+    Р‘Р°Р·РѕРІС‹Р№ РјРµС€
 */
 
 const char* Morph::BaseMesh () const
@@ -193,7 +193,7 @@ void Morph::SetBaseMesh (const char* mesh)
 }
 
 /*
-    Список целей морфинга
+    РЎРїРёСЃРѕРє С†РµР»РµР№ РјРѕСЂС„РёРЅРіР°
 */
 
 Morph::TargetList& Morph::Targets ()

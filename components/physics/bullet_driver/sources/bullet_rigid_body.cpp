@@ -20,24 +20,24 @@ const math::vec3f DEFAULT_MASS_SPACE_INERTIA_TENSOR (1.f);
 }
 
 /*
-    Описание реализации твердого тела
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РІРµСЂРґРѕРіРѕ С‚РµР»Р°
 */
 
 struct RigidBody::Impl : public btDefaultMotionState
 {
-  RigidBody             *rigid_body;                 //родительский объект
-  btRigidBody           *body;                       //тело
-  ShapePtr              shape;                       //геометрическое представление тела
-  MaterialPtr           material;                    //материал
-  Transform             world_transform;             //положение тела в мировых координатах
-  size_t                collision_group;             //группа коллизий тела
-  size_t                flags;                       //флаги поведения тела
-  math::vec3f           inertia_tensor;              //тензор инерции
-  math::vec3f           linear_velocity;             //линейная скорость
-  math::vec3f           angular_velocity;            //угловая скорость
-  BeforeDestroySignal   before_destroy_signal;       //сигнал удаления тела
-  TransformUpdateSignal transform_update_signal;     //сигнал обновления положения тела
-  xtl::auto_connection  material_update_connection;  //соединение обновления свойств материала
+  RigidBody             *rigid_body;                 //СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
+  btRigidBody           *body;                       //С‚РµР»Рѕ
+  ShapePtr              shape;                       //РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ С‚РµР»Р°
+  MaterialPtr           material;                    //РјР°С‚РµСЂРёР°Р»
+  Transform             world_transform;             //РїРѕР»РѕР¶РµРЅРёРµ С‚РµР»Р° РІ РјРёСЂРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
+  size_t                collision_group;             //РіСЂСѓРїРїР° РєРѕР»Р»РёР·РёР№ С‚РµР»Р°
+  size_t                flags;                       //С„Р»Р°РіРё РїРѕРІРµРґРµРЅРёСЏ С‚РµР»Р°
+  math::vec3f           inertia_tensor;              //С‚РµРЅР·РѕСЂ РёРЅРµСЂС†РёРё
+  math::vec3f           linear_velocity;             //Р»РёРЅРµР№РЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+  math::vec3f           angular_velocity;            //СѓРіР»РѕРІР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+  BeforeDestroySignal   before_destroy_signal;       //СЃРёРіРЅР°Р» СѓРґР°Р»РµРЅРёСЏ С‚РµР»Р°
+  TransformUpdateSignal transform_update_signal;     //СЃРёРіРЅР°Р» РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕР»РѕР¶РµРЅРёСЏ С‚РµР»Р°
+  xtl::auto_connection  material_update_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р°
 
   Impl (bullet::Shape* in_shape, float mass, RigidBody* in_rigid_body)
     : rigid_body (in_rigid_body), collision_group (0), flags (0)
@@ -71,7 +71,7 @@ struct RigidBody::Impl : public btDefaultMotionState
     body->setRestitution         (material->Restitution ());
   }
 
-  //Реализация btMotionState
+  //Р РµР°Р»РёР·Р°С†РёСЏ btMotionState
   void setWorldTransform (const btTransform& worldTrans)
   {
     btDefaultMotionState::setWorldTransform (worldTrans);
@@ -81,7 +81,7 @@ struct RigidBody::Impl : public btDefaultMotionState
 };
 
 /*
-    Конструктор/деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RigidBody::RigidBody (bullet::Shape* shape, float mass)
@@ -101,7 +101,7 @@ RigidBody::~RigidBody ()
 }
 
 /*
-   Геометрическое представление
+   Р“РµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ
 */
 
 Shape* RigidBody::Shape ()
@@ -110,7 +110,7 @@ Shape* RigidBody::Shape ()
 }
 
 /*
-   Материал
+   РњР°С‚РµСЂРёР°Р»
 */
 
 IMaterial* RigidBody::Material ()
@@ -135,7 +135,7 @@ void RigidBody::SetMaterial (IMaterial* material)
 }
 
 /*
-   Флаги поведения
+   Р¤Р»Р°РіРё РїРѕРІРµРґРµРЅРёСЏ
 */
 
 size_t RigidBody::Flags ()
@@ -176,7 +176,7 @@ void RigidBody::SetFlags (size_t flags)
 }
 
 /*
-   Приложение силы/импульса/вращения
+   РџСЂРёР»РѕР¶РµРЅРёРµ СЃРёР»С‹/РёРјРїСѓР»СЊСЃР°/РІСЂР°С‰РµРЅРёСЏ
 */
 
 void RigidBody::AddForce (const math::vec3f& force, const math::vec3f& relative_position)
@@ -222,7 +222,7 @@ void RigidBody::AddTorqueImpulse (const math::vec3f& torque)
 }
 
 /*
-   Управление линейной/угловой скоростями
+   РЈРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРµР№РЅРѕР№/СѓРіР»РѕРІРѕР№ СЃРєРѕСЂРѕСЃС‚СЏРјРё
 */
 
 const math::vec3f& RigidBody::LinearVelocity ()
@@ -254,7 +254,7 @@ void RigidBody::SetAngularVelocity (const math::vec3f& velocity)
 }
 
 /*
-   Управление массой
+   РЈРїСЂР°РІР»РµРЅРёРµ РјР°СЃСЃРѕР№
 */
 
 float RigidBody::Mass ()
@@ -271,7 +271,7 @@ void RigidBody::SetMass (float mass)
 }
 
 /*
-   Управление тензором
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРЅР·РѕСЂРѕРј
 */
 
 const math::vec3f& RigidBody::MassSpaceInertiaTensor ()
@@ -290,7 +290,7 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& value)
 }
 
 /*
-   Управление сном
+   РЈРїСЂР°РІР»РµРЅРёРµ СЃРЅРѕРј
 */
 
 float RigidBody::SleepLinearVelocity ()
@@ -314,7 +314,7 @@ void RigidBody::SetSleepAngularVelocity (float value)
 }
 
 /*
-   Управление пороговым значением скорости перехода в режим непрерывного движения
+   РЈРїСЂР°РІР»РµРЅРёРµ РїРѕСЂРѕРіРѕРІС‹Рј Р·РЅР°С‡РµРЅРёРµРј СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµС…РѕРґР° РІ СЂРµР¶РёРј РЅРµРїСЂРµСЂС‹РІРЅРѕРіРѕ РґРІРёР¶РµРЅРёСЏ
 */
 
 float RigidBody::CcdMotionThreshold ()
@@ -328,7 +328,7 @@ void RigidBody::SetCcdMotionThreshold (float value)
 }
 
 /*
-   Согласование объекта с группой
+   РЎРѕРіР»Р°СЃРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃ РіСЂСѓРїРїРѕР№
 */
 
 size_t RigidBody::CollisionGroup ()
@@ -342,7 +342,7 @@ void RigidBody::SetCollisionGroup (size_t group_number)
 }
 
 /*
-   Мировое положение
+   РњРёСЂРѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
 */
 
 const Transform& RigidBody::WorldTransform ()
@@ -384,7 +384,7 @@ xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdat
 }
 
 /*
-   Получение bullet тела
+   РџРѕР»СѓС‡РµРЅРёРµ bullet С‚РµР»Р°
 */
 
 btRigidBody* RigidBody::BulletRigidBody ()
@@ -393,7 +393,7 @@ btRigidBody* RigidBody::BulletRigidBody ()
 }
 
 /*
-   Подписка на удаление объекта
+   РџРѕРґРїРёСЃРєР° РЅР° СѓРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р°
 */
 
 xtl::connection RigidBody::RegisterDestroyHandler (const BeforeDestroyHandler& handler)

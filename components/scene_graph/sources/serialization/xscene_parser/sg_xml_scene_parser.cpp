@@ -13,13 +13,13 @@ template <> void XmlSceneParser::CreateNode<TextLine>     (const common::ParseNo
 }
 
 /*
-    Парсинг внутренних типов сцены
+    РџР°СЂСЃРёРЅРі РІРЅСѓС‚СЂРµРЅРЅРёС… С‚РёРїРѕРІ СЃС†РµРЅС‹
 */
 
 namespace scene_graph
 {
 
-///Отображение тэга на значение
+///РћС‚РѕР±СЂР°Р¶РµРЅРёРµ С‚СЌРіР° РЅР° Р·РЅР°С‡РµРЅРёРµ
 template <class T> struct Tag2Value
 {
   const char* tag;
@@ -120,23 +120,23 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const math::vec3f DEFAULT_BEFORE_NODE_OFFSET (0.0f, 0.0f, 1e-06f);
 
 /*
-    Описание внутренних структур
+    РћРїРёСЃР°РЅРёРµ РІРЅСѓС‚СЂРµРЅРЅРёС… СЃС‚СЂСѓРєС‚СѓСЂ
 */
 
-///Описание параметров узла
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СѓР·Р»Р°
 struct NodeDecl: public xtl::reference_counter
 {
   struct Pivot
   {
-    math::vec3f position;              //точка поворота
-    bool        has_orientation_pivot; //центр поворота не совпадает с геометрическим центром
-    bool        has_scale_pivot;       //центр масштабирования не совпадает с геометрическим центром
+    math::vec3f position;              //С‚РѕС‡РєР° РїРѕРІРѕСЂРѕС‚Р°
+    bool        has_orientation_pivot; //С†РµРЅС‚СЂ РїРѕРІРѕСЂРѕС‚Р° РЅРµ СЃРѕРІРїР°РґР°РµС‚ СЃ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёРј С†РµРЅС‚СЂРѕРј
+    bool        has_scale_pivot;       //С†РµРЅС‚СЂ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РЅРµ СЃРѕРІРїР°РґР°РµС‚ СЃ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёРј С†РµРЅС‚СЂРѕРј
     
     Pivot ()
       : has_orientation_pivot (true)
@@ -145,19 +145,19 @@ struct NodeDecl: public xtl::reference_counter
     }
   };
 
-  stl::string                name;                //имя узла
-  math::vec3f                position;            //положение
-  math::vec3f                scale;               //масштаб
-  math::quatf                orientation;         //ориентация
-  bool                       orientation_inherit; //наследуется ли ориентация
-  bool                       scale_inherit;       //наследуется ли масштаб
-  stl::auto_ptr<Pivot>       pivot;               //точка поворота/масштабирования
-  bool                       is_world_transform;  //трансформации заданы в мировых координатах
-  stl::auto_ptr<stl::string> before_node;         //имя узла, перед которым будет прибинден данный узел
-  stl::auto_ptr<PropertyMap> properties;          //пользовательские свойства узла
-  stl::auto_ptr<stl::string> parent_name;         //имя родительского узла
+  stl::string                name;                //РёРјСЏ СѓР·Р»Р°
+  math::vec3f                position;            //РїРѕР»РѕР¶РµРЅРёРµ
+  math::vec3f                scale;               //РјР°СЃС€С‚Р°Р±
+  math::quatf                orientation;         //РѕСЂРёРµРЅС‚Р°С†РёСЏ
+  bool                       orientation_inherit; //РЅР°СЃР»РµРґСѓРµС‚СЃСЏ Р»Рё РѕСЂРёРµРЅС‚Р°С†РёСЏ
+  bool                       scale_inherit;       //РЅР°СЃР»РµРґСѓРµС‚СЃСЏ Р»Рё РјР°СЃС€С‚Р°Р±
+  stl::auto_ptr<Pivot>       pivot;               //С‚РѕС‡РєР° РїРѕРІРѕСЂРѕС‚Р°/РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
+  bool                       is_world_transform;  //С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё Р·Р°РґР°РЅС‹ РІ РјРёСЂРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
+  stl::auto_ptr<stl::string> before_node;         //РёРјСЏ СѓР·Р»Р°, РїРµСЂРµРґ РєРѕС‚РѕСЂС‹Рј Р±СѓРґРµС‚ РїСЂРёР±РёРЅРґРµРЅ РґР°РЅРЅС‹Р№ СѓР·РµР»
+  stl::auto_ptr<PropertyMap> properties;          //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° СѓР·Р»Р°
+  stl::auto_ptr<stl::string> parent_name;         //РёРјСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СѓР·Р»Р°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   NodeDecl ()
     : scale (1.0f)
     , orientation_inherit (true)
@@ -167,7 +167,7 @@ struct NodeDecl: public xtl::reference_counter
   }  
 };
 
-///Параметр объекта
+///РџР°СЂР°РјРµС‚СЂ РѕР±СЉРµРєС‚Р°
 template <class T> struct Param
 {
   T    value;
@@ -214,7 +214,7 @@ template <class T, unsigned int Size> struct Param<math::vector<T, Size> >
   }
 };
 
-///Описание параметров камеры
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РєР°РјРµСЂС‹
 struct OrthoCameraDecl: public xtl::reference_counter
 {
   enum ParamId
@@ -235,7 +235,7 @@ struct PerspectiveCameraDecl: public xtl::reference_counter
   Param<float> params [Param_Num];
 };
 
-///Описание параметров источника света
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 struct LightDecl: public xtl::reference_counter
 {
   Param<math::vec3f> light_color;
@@ -247,7 +247,7 @@ struct LightDecl: public xtl::reference_counter
   Param<float>       angle;
 };
 
-///Описание параметров визуальной модели
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РІРёР·СѓР°Р»СЊРЅРѕР№ РјРѕРґРµР»Рё
 struct StaticMeshDecl: public xtl::reference_counter
 {
   stl::string        source;
@@ -255,7 +255,7 @@ struct StaticMeshDecl: public xtl::reference_counter
   Param<math::vec3f> max_bound;  
 };
 
-///Описание параметров спрайта
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРїСЂР°Р№С‚Р°
 struct SpriteDecl: public xtl::reference_counter
 {
   stl::string                 material;
@@ -269,7 +269,7 @@ struct SpriteDecl: public xtl::reference_counter
   Param<SpriteUsage>          usage;
 };
 
-///Описание параметров текстовой строки
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё
 struct TextLineDecl: public xtl::reference_counter
 {
   stl::string              text;
@@ -280,14 +280,14 @@ struct TextLineDecl: public xtl::reference_counter
   Param<TextLineAlignment> vertical_alignment;
 };
 
-///Описание параметров источника звука
+///РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° Р·РІСѓРєР°
 struct SoundEmitterDecl: public xtl::reference_counter
 {
   stl::string  source;
   Param<float> gain;
 };
 
-//Описание параметров шрифта
+//РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С€СЂРёС„С‚Р°
 struct FontDecl : public xtl::reference_counter
 {
   stl::string               face_name;
@@ -322,12 +322,12 @@ PropertyType get_property_type (const common::ParseNode& node)
 }
 
 /*
-    Описание реализации парсера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїР°СЂСЃРµСЂР°
 */
 
 struct XmlSceneParser::Impl
 {
-  ///Описание парсера
+  ///РћРїРёСЃР°РЅРёРµ РїР°СЂСЃРµСЂР°
   struct ParserDesc
   {
     ParseHandler   parse_handler;
@@ -344,22 +344,22 @@ struct XmlSceneParser::Impl
   typedef stl::hash_map<stl::hash_key<const char*>, ParserDesc>         ParserMap;
   typedef stl::hash_map<stl::hash_key<const char*>, FontDeclPtr>        FontDeclMap;
 
-  common::ParseNode root;        //корневой узел
-  SceneParserCache  cache;       //кэш парсера
-  ResourceGroup     resources;   //ресурсы сцены
-  IncludeMap        includes;    //карта подключаемых файлов
-  ParserMap         parsers;     //парсеры
-  FontDeclMap       fonts_decls; //загруженные шрифты
-  bool              prepared;    //был проведен предварительный разбор
+  common::ParseNode root;        //РєРѕСЂРЅРµРІРѕР№ СѓР·РµР»
+  SceneParserCache  cache;       //РєСЌС€ РїР°СЂСЃРµСЂР°
+  ResourceGroup     resources;   //СЂРµСЃСѓСЂСЃС‹ СЃС†РµРЅС‹
+  IncludeMap        includes;    //РєР°СЂС‚Р° РїРѕРґРєР»СЋС‡Р°РµРјС‹С… С„Р°Р№Р»РѕРІ
+  ParserMap         parsers;     //РїР°СЂСЃРµСЂС‹
+  FontDeclMap       fonts_decls; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ С€СЂРёС„С‚С‹
+  bool              prepared;    //Р±С‹Р» РїСЂРѕРІРµРґРµРЅ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const ParseNode& in_root)
     : root (in_root)
     , prepared (false)
   {
   }
   
-///Предварительный разбор
+///РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
   void Prepare (const ParseNode& decl)
   {
     for (Parser::Iterator iter=decl.First (); iter; ++iter)
@@ -373,13 +373,13 @@ struct XmlSceneParser::Impl
         ParserMap::iterator iter = parsers.find (type);
 
         if (iter == parsers.end () || !iter->second.prepare_handler)
-          continue; //игнорирование неизвестных узлов
+          continue; //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РЅРµРёР·РІРµСЃС‚РЅС‹С… СѓР·Р»РѕРІ
 
         iter->second.prepare_handler (decl);
       }
       catch (common::ParserException&)
       {
-        //игнорирование, протоколирование уже произведено
+        //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ, РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ СѓР¶Рµ РїСЂРѕРёР·РІРµРґРµРЅРѕ
       }
       catch (std::exception& e)
       {
@@ -394,7 +394,7 @@ struct XmlSceneParser::Impl
     prepared = true;
   }
 
-///Разбор узла описания ресурсов
+///Р Р°Р·Р±РѕСЂ СѓР·Р»Р° РѕРїРёСЃР°РЅРёСЏ СЂРµСЃСѓСЂСЃРѕРІ
   void PrepareResourceNode (const ParseNode& decl)
   {
     const char* name = get<const char*> (decl, "name");
@@ -405,7 +405,7 @@ struct XmlSceneParser::Impl
     resources.Add (name);
   }
   
-///Разбор узла описания шрифта
+///Р Р°Р·Р±РѕСЂ СѓР·Р»Р° РѕРїРёСЃР°РЅРёСЏ С€СЂРёС„С‚Р°
   void PrepareFontNode (const ParseNode& decl)
   {
     FontDeclPtr font_decl = FontDeclPtr (new FontDecl, false);
@@ -430,7 +430,7 @@ struct XmlSceneParser::Impl
     fonts_decls [get<const char*> (decl, "id")] = font_decl;
   }
 
-///Разбор подключаемого узла
+///Р Р°Р·Р±РѕСЂ РїРѕРґРєР»СЋС‡Р°РµРјРѕРіРѕ СѓР·Р»Р°
   void PrepareIncludeNode (const ParseNode& decl)
   {
     const char* source_name = get<const char*> (decl, "source");
@@ -440,14 +440,14 @@ struct XmlSceneParser::Impl
     if (!source_name)
       return;
       
-      //попытка найти в списке уже загруженных
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РІ СЃРїРёСЃРєРµ СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С…
       
     IncludeMap::iterator iter = includes.find (source_name);
     
     if (iter != includes.end ())
       return;
 
-      //парсинг
+      //РїР°СЂСЃРёРЅРі
 
     if (!FileSystem::IsFileExist (source_name) && ignore_unavailability)
       return;
@@ -466,16 +466,16 @@ struct XmlSceneParser::Impl
     if (!partial)
       throw xtl::format_operation_exception ("", "Bad XML scene file '%s'. Only partial definitions are allowed in this context", source_name);            
 
-      //сохранение ссылки на подключаемый файл
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃСЃС‹Р»РєРё РЅР° РїРѕРґРєР»СЋС‡Р°РµРјС‹Р№ С„Р°Р№Р»
       
     includes.insert_pair (source_name, xscene_root);
     
-      //вложенный разбор
+      //РІР»РѕР¶РµРЅРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     Prepare (xscene_root);
   }
 
-///Предварительный разбор
+///РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
   NodeDeclPtr              PrepareNode              (const ParseNode& decl);
   OrthoCameraDeclPtr       PrepareOrthoCamera       (const ParseNode& decl);
   PerspectiveCameraDeclPtr PreparePerspectiveCamera (const ParseNode& decl);
@@ -487,18 +487,18 @@ struct XmlSceneParser::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XmlSceneParser::XmlSceneParser (const ParseNode& root)
 {
   try
   { 
-      //создание реализации
+      //СЃРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 
     impl = new Impl (root);
     
-      //регистрация парсеров
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїР°СЂСЃРµСЂРѕРІ
       
     RegisterParser ("node", xtl::bind (&XmlSceneParser::CreateNode<Node>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareNode, impl.get (), _1));
     RegisterParser ("ortho_camera", xtl::bind (&XmlSceneParser::CreateNode<OrthoCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareOrthoCamera, impl.get (), _1));
@@ -527,7 +527,7 @@ XmlSceneParser::~XmlSceneParser ()
 }
 
 /*
-    Создание парсера
+    РЎРѕР·РґР°РЅРёРµ РїР°СЂСЃРµСЂР°
 */
 
 ISceneParser* XmlSceneParser::Create (const ParseNode& root)
@@ -544,7 +544,7 @@ ISceneParser* XmlSceneParser::Create (const ParseNode& root)
 }
 
 /*
-    Предварительный разбор
+    РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
 */
 
 void XmlSceneParser::Prepare ()
@@ -561,7 +561,7 @@ void XmlSceneParser::Prepare ()
 }
 
 /*
-    Получение списка ресурсов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 const ResourceGroup& XmlSceneParser::Resources ()
@@ -570,7 +570,7 @@ const ResourceGroup& XmlSceneParser::Resources ()
 }
 
 /*
-    Корневой узел
+    РљРѕСЂРЅРµРІРѕР№ СѓР·РµР»
 */
 
 const ParseNode& XmlSceneParser::Root () const
@@ -579,7 +579,7 @@ const ParseNode& XmlSceneParser::Root () const
 }
 
 /*
-    Кэш
+    РљСЌС€
 */
 
 SceneParserCache& XmlSceneParser::Cache ()
@@ -588,7 +588,7 @@ SceneParserCache& XmlSceneParser::Cache ()
 }
 
 /*
-    Регистрация парсера узла определенного типа
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РїР°СЂСЃРµСЂР° СѓР·Р»Р° РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°
 */
 
 void XmlSceneParser::RegisterParser (const char* type, const ParseHandler& parse_handler)
@@ -618,7 +618,7 @@ void XmlSceneParser::UnregisterAllParsers ()
 }
 
 /*
-    Разбор атрибутов
+    Р Р°Р·Р±РѕСЂ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 void XmlSceneParser::ParseAttribute (const common::ParseNode& decl, const char* name, math::vec2f& value)
@@ -726,7 +726,7 @@ void XmlSceneParser::ParseAttribute (const common::ParseNode& decl, const char* 
 }
 
 /*
-    Создание сцены
+    РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 */
 
 namespace
@@ -762,7 +762,7 @@ void XmlSceneParser::CreateScene (Node& parent, SceneContext& context)
 }
     
 /*
-    Разбор узла
+    Р Р°Р·Р±РѕСЂ СѓР·Р»Р°
 */
 
 template <class T>
@@ -812,7 +812,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& c
         Impl::ParserMap::iterator iter = impl->parsers.find (type);
 
         if (iter == impl->parsers.end () || !iter->second.parse_handler)
-          continue; //игнорирование неизвестных узлов
+          continue; //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РЅРµРёР·РІРµСЃС‚РЅС‹С… СѓР·Р»РѕРІ
 
         iter->second.parse_handler (decl, parent, context);
       }
@@ -842,25 +842,25 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& c
 }
 
 /*
-    Парсинг
+    РџР°СЂСЃРёРЅРі
 */
 
 NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
       
     if (NodeDeclPtr* node_decl_ptr = cache.FindValue<NodeDeclPtr> (decl))
       return *node_decl_ptr;
 
     NodeDeclPtr node_decl (new NodeDecl, false);
 
-      //парсинг базовых свойств
+      //РїР°СЂСЃРёРЅРі Р±Р°Р·РѕРІС‹С… СЃРІРѕР№СЃС‚РІ
     
     node_decl->name = get<const char*> (decl, "id", "");
 
-      //парсинг точки поворота
+      //РїР°СЂСЃРёРЅРі С‚РѕС‡РєРё РїРѕРІРѕСЂРѕС‚Р°
 
     if (decl.First ("pivot"))      
     {
@@ -874,7 +874,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
       node_decl->pivot = pivot;
     }
 
-      //парсинг трансформаций
+      //РїР°СЂСЃРёРЅРі С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёР№
 
     node_decl->is_world_transform = strcmp (get<const char*> (decl, "bind_space", "local"), "world") == 0;
 
@@ -908,7 +908,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
     node_decl->orientation_inherit = strcmp (get<const char*> (decl, "orientation_inherit", "true"), "true") == 0;
     node_decl->scale_inherit       = strcmp (get<const char*> (decl, "scale_inherit", "true"), "true") == 0;
 
-      //парсинг пользовательских свойств
+      //РїР°СЂСЃРёРЅРі РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… СЃРІРѕР№СЃС‚РІ
 
     PropertyMap* properties = 0;
     
@@ -929,7 +929,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
       properties->SetProperty (property_index, value.c_str ());
     }
 
-      //парсинг after node
+      //РїР°СЂСЃРёРЅРі after node
       
     if (ParseNode before_node_decl = decl.First ("before_node"))
     {
@@ -938,7 +938,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
       *node_decl->before_node = get<const char*> (before_node_decl, "");
     }
             
-      //парсинг привязки к родителю
+      //РїР°СЂСЃРёРЅРі РїСЂРёРІСЏР·РєРё Рє СЂРѕРґРёС‚РµР»СЋ
       
     if (ParseNode parent_name_decl = decl.First ("parent"))
     {
@@ -947,7 +947,7 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
       *node_decl->parent_name = get<const char*> (parent_name_decl, "");
     }
 
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
       
     cache.SetValue (decl, node_decl);
     
@@ -964,11 +964,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
 {
   try
   {
-      //подготовка узла
+      //РїРѕРґРіРѕС‚РѕРІРєР° СѓР·Р»Р°
 
     NodeDeclPtr node_decl = impl->PrepareNode (decl);
 
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
 
     if (!node_decl->name.empty ())
       node.SetName (node_decl->name.c_str ());
@@ -990,7 +990,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     if (node_decl->properties)
       node.SetProperties (node_decl->properties->Clone ());
       
-    if (node_decl->before_node && !node_decl->before_node->empty ()) //TODO: сделать в виде контроллера!!!
+    if (node_decl->before_node && !node_decl->before_node->empty ()) //TODO: СЃРґРµР»Р°С‚СЊ РІ РІРёРґРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°!!!
     {
       math::vec3f offset = DEFAULT_BEFORE_NODE_OFFSET;
       
@@ -1026,7 +1026,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
 
     node.BindToParent (*parent, NodeBindMode_AddRef, node_decl->is_world_transform ? NodeTransformSpace_World : NodeTransformSpace_Local);
 
-      //разбор вложенных узлов
+      //СЂР°Р·Р±РѕСЂ РІР»РѕР¶РµРЅРЅС‹С… СѓР·Р»РѕРІ
       
     Parse (decl, node, context);
   }
@@ -1067,7 +1067,7 @@ OrthoCameraDeclPtr XmlSceneParser::Impl::PrepareOrthoCamera (const ParseNode& de
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (OrthoCameraDeclPtr* node_decl_ptr = cache.FindValue<OrthoCameraDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1081,7 +1081,7 @@ OrthoCameraDeclPtr XmlSceneParser::Impl::PrepareOrthoCamera (const ParseNode& de
     node_decl->params [OrthoCameraDecl::ZNear].Parse (decl, "znear");
     node_decl->params [OrthoCameraDecl::ZFar].Parse (decl, "zfar");
     
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
       
     cache.SetValue (decl, node_decl);
     
@@ -1098,11 +1098,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, OrthoCamera& node, Node& pare
 {
   try
   { 
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     OrthoCameraDeclPtr node_decl = impl->PrepareOrthoCamera (decl);
 
-      //настройка камеры
+      //РЅР°СЃС‚СЂРѕР№РєР° РєР°РјРµСЂС‹
       
     if (node_decl->params [OrthoCameraDecl::Left].state)    node.SetLeft (node_decl->params [OrthoCameraDecl::Left].value);
     if (node_decl->params [OrthoCameraDecl::Right].state)   node.SetRight (node_decl->params [OrthoCameraDecl::Right].value);
@@ -1111,7 +1111,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, OrthoCamera& node, Node& pare
     if (node_decl->params [OrthoCameraDecl::ZNear].state)   node.SetZNear (node_decl->params [OrthoCameraDecl::ZNear].value);
     if (node_decl->params [OrthoCameraDecl::ZFar].state)    node.SetZFar (node_decl->params [OrthoCameraDecl::ZFar].value);
 
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Camera&> (node), parent, context);
   }
@@ -1126,7 +1126,7 @@ PerspectiveCameraDeclPtr XmlSceneParser::Impl::PreparePerspectiveCamera (const P
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (PerspectiveCameraDeclPtr* node_decl_ptr = cache.FindValue<PerspectiveCameraDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1138,7 +1138,7 @@ PerspectiveCameraDeclPtr XmlSceneParser::Impl::PreparePerspectiveCamera (const P
     node_decl->params [PerspectiveCameraDecl::ZNear].Parse (decl, "znear");
     node_decl->params [PerspectiveCameraDecl::ZFar].Parse (decl, "zfar");
     
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
       
     cache.SetValue (decl, node_decl);    
     
@@ -1155,18 +1155,18 @@ void XmlSceneParser::Parse (const ParseNode& decl, PerspectiveCamera& node, Node
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
       
     PerspectiveCameraDeclPtr node_decl = impl->PreparePerspectiveCamera (decl);
 
-      //настройка камеры
+      //РЅР°СЃС‚СЂРѕР№РєР° РєР°РјРµСЂС‹
 
     if (node_decl->params [PerspectiveCameraDecl::FovX].state)  node.SetFovX (degree (node_decl->params [PerspectiveCameraDecl::FovX].value));
     if (node_decl->params [PerspectiveCameraDecl::FovY].state)  node.SetFovY (degree (node_decl->params [PerspectiveCameraDecl::FovY].value)); 
     if (node_decl->params [PerspectiveCameraDecl::ZNear].state) node.SetZNear (node_decl->params [PerspectiveCameraDecl::ZNear].value);
     if (node_decl->params [PerspectiveCameraDecl::ZFar].state)  node.SetZFar (node_decl->params [PerspectiveCameraDecl::ZFar].value);
 
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     Parse (decl, static_cast<Camera&> (node), parent, context);    
   }
@@ -1181,7 +1181,7 @@ LightDeclPtr XmlSceneParser::Impl::PrepareLight (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (LightDeclPtr* node_decl_ptr = cache.FindValue<LightDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1196,7 +1196,7 @@ LightDeclPtr XmlSceneParser::Impl::PrepareLight (const ParseNode& decl)
     node_decl->exponent.Parse (decl, "exponent");
     node_decl->angle.Parse (decl, "angle");
     
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
       
     cache.SetValue (decl, node_decl);    
     
@@ -1213,18 +1213,18 @@ void XmlSceneParser::Parse (const ParseNode& decl, Light& node, Node& parent, Sc
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     LightDeclPtr node_decl = impl->PrepareLight (decl);
     
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     if (node_decl->light_color.state) node.SetLightColor (node_decl->light_color.value);
     if (node_decl->attenuation.state) node.SetAttenuation (node_decl->attenuation.value);
     if (node_decl->intensity.state)   node.SetIntensity (node_decl->intensity.value);
     if (node_decl->range.state)       node.SetRange (node_decl->range.value);
       
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
@@ -1239,15 +1239,15 @@ void XmlSceneParser::Parse (const ParseNode& decl, DirectLight& node, Node& pare
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     LightDeclPtr node_decl = impl->PrepareLight (decl);    
     
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     if (node_decl->radius.state) node.SetRadius (node_decl->radius.value);
     
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Light&> (node), parent, context);        
   }
@@ -1262,16 +1262,16 @@ void XmlSceneParser::Parse (const ParseNode& decl, SpotLight& node, Node& parent
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     LightDeclPtr node_decl = impl->PrepareLight (decl);    
     
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     if (node_decl->exponent.state) node.SetExponent (node_decl->exponent.value);
     if (node_decl->angle.state)    node.SetAngle (degree (node_decl->angle.value));
     
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Light&> (node), parent, context);    
   }
@@ -1299,7 +1299,7 @@ StaticMeshDeclPtr XmlSceneParser::Impl::PrepareStaticMesh (const ParseNode& decl
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (StaticMeshDeclPtr* node_decl_ptr = cache.FindValue<StaticMeshDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1311,7 +1311,7 @@ StaticMeshDeclPtr XmlSceneParser::Impl::PrepareStaticMesh (const ParseNode& decl
 
     node_decl->source = get<const char*> (decl, "source", "");
 
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
       
     cache.SetValue (decl, node_decl);    
     
@@ -1328,11 +1328,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, StaticMesh& node, Node& paren
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     StaticMeshDeclPtr node_decl = impl->PrepareStaticMesh (decl);
 
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
 
     node.SetMeshName (node_decl->source.c_str ());
 
@@ -1343,7 +1343,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, StaticMesh& node, Node& paren
 
     node.SetBoundBox (box);
 
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Entity&> (node), parent, context);
   }
@@ -1358,7 +1358,7 @@ SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (SpriteDeclPtr* node_decl_ptr = cache.FindValue<SpriteDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1376,7 +1376,7 @@ SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
     if (ParseNode layout_node = decl.First ("layout"))
       node_decl->layout.reset (new stl::string (get<const char*> (layout_node, "")));
 
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
 
     cache.SetValue (decl, node_decl);    
 
@@ -1393,11 +1393,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
 
     SpriteDeclPtr node_decl = impl->PrepareSprite (decl);
 
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
 
     node.SetMaterial (node_decl->material.c_str ());
 
@@ -1409,11 +1409,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
     if (node_decl->mode.state)       node.SetMode (node_decl->mode.value);
     if (node_decl->usage.state)      node.SetUsage (node_decl->usage.value);
 
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
       
     Parse (decl, static_cast<Entity&> (node), parent, context);    
     
-      //добавление свойств
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
       
     if (node_decl->layout && !node_decl->layout->empty ())
     {
@@ -1436,7 +1436,7 @@ TextLineDeclPtr XmlSceneParser::Impl::PrepareTextLine (const ParseNode& decl)
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (TextLineDeclPtr* node_decl_ptr = cache.FindValue<TextLineDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1451,7 +1451,7 @@ TextLineDeclPtr XmlSceneParser::Impl::PrepareTextLine (const ParseNode& decl)
     node_decl->text = get<const char*> (decl, "text", "");
     node_decl->font = get<const char*> (decl, "font", "");        
 
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
 
     cache.SetValue (decl, node_decl);    
 
@@ -1468,11 +1468,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent,
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     TextLineDeclPtr node_decl = impl->PrepareTextLine (decl);
     
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     node.SetTextUtf8 (node_decl->text.c_str ());
 
@@ -1524,7 +1524,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent,
     
     node.SetColor (color);
       
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
@@ -1539,11 +1539,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, Listener& node, Node& parent,
 {
   try
   {
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     node.SetGain (get<float> (decl, "gain", node.Gain ()));
     
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
@@ -1558,7 +1558,7 @@ SoundEmitterDeclPtr XmlSceneParser::Impl::PrepareSoundEmitter (const ParseNode& 
 {
   try
   {
-      //попытка найти параметры в кеше
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё РїР°СЂР°РјРµС‚СЂС‹ РІ РєРµС€Рµ
 
     if (SoundEmitterDeclPtr* node_decl_ptr = cache.FindValue<SoundEmitterDeclPtr> (decl))
       return *node_decl_ptr;
@@ -1569,7 +1569,7 @@ SoundEmitterDeclPtr XmlSceneParser::Impl::PrepareSoundEmitter (const ParseNode& 
     
     node_decl->gain.Parse (decl, "gain");
 
-      //регистрация дескриптора узла
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓР·Р»Р°
 
     cache.SetValue (decl, node_decl);    
 
@@ -1586,17 +1586,17 @@ template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNo
 {
   try
   {
-      //предварительный разбор
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
       
     SoundEmitterDeclPtr node_decl = impl->PrepareSoundEmitter (decl);
     
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
 
     SoundEmitter::Pointer node = SoundEmitter::Create (node_decl->source.c_str ());
     
     if (node_decl->gain.state) node->SetGain (node_decl->gain.value);
     
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     Parse (decl, static_cast<Entity&> (*node), parent, context);
   }
@@ -1611,11 +1611,11 @@ template <> void XmlSceneParser::CreateNode<TextLine> (const common::ParseNode& 
 {
   try
   {
-      //получение библиотеки шрифтов
+      //РїРѕР»СѓС‡РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
       
     media::FontLibrary& font_library = context.Attachment<media::FontLibrary> ();
 
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
 
     TextLine::Pointer node = TextLine::Create (font_library);
     
@@ -1633,11 +1633,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, SoundEmitter& node, Node& par
 {
   try
   {    
-      //настройка узла
+      //РЅР°СЃС‚СЂРѕР№РєР° СѓР·Р»Р°
       
     node.SetGain (get<float> (decl, "gain", node.Gain ()));
     
-      //разбор родительских параметров
+      //СЂР°Р·Р±РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }

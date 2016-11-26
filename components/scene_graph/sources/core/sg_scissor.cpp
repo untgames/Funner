@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Scissor::Scissor ()
@@ -16,7 +16,7 @@ Scissor::~Scissor ()
 }
 
 /*
-    Создание 
+    РЎРѕР·РґР°РЅРёРµ 
 */
 
 Scissor::Pointer Scissor::Create ()
@@ -25,7 +25,7 @@ Scissor::Pointer Scissor::Create ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Scissor::AcceptCore (Visitor& visitor)

@@ -1,5 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := BOUND_VOLUMES.SOURCES BOUND_VOLUMES.TESTS BOUND_VOLUMES.INFO
 
@@ -8,12 +8,12 @@ BOUND_VOLUMES.SOURCES.NAME        := funner.math.bound_volumes
 BOUND_VOLUMES.SOURCES.SOURCE_DIRS := sources
 BOUND_VOLUMES.SOURCES.IMPORTS     := compile.math.bound_volumes compile.xtl
 
-#Цель - Bound volumes tests
+#Р¦РµР»СЊ - Bound volumes tests
 BOUND_VOLUMES.TESTS.TYPE        := test-suite
 BOUND_VOLUMES.TESTS.SOURCE_DIRS := tests
 BOUND_VOLUMES.TESTS.IMPORTS     := compile.math.bound_volumes link.math.bound_volumes
 
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 BOUND_VOLUMES.INFO.TYPE        := doxygen-info
 BOUND_VOLUMES.INFO.CHM_NAME    := funner.math.bound_volumes
 BOUND_VOLUMES.INFO.SOURCE_DIRS := include

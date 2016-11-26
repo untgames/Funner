@@ -28,33 +28,33 @@ const size_t UNALLOWED_PROPERTIES_COUNT = sizeof (UNALLOWED_PROPERTIES) / sizeof
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                name;          //имя команды
-  char                       short_name;    //короткое имя
-  const char*                argument_name; //имя аргумента
-  const char*                tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                       short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
 typedef stl::vector<CheckFile> CheckFileArray;
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option*  options;            //массив опций
-  size_t         options_count;      //количество опций
-  stl::string    result_license;     //файл генерируемой лицензии
-  time_t         since_date;         //дата начала действия лицензии
-  time_t         till_date;          //дата окончания действия лицензии
-  StringArray    allowed_components; //список разрешенных компонентов
-  CheckFileArray check_files;        //список файлов для хеширования
-  PropertyMap    properties;         //свойства
-  bool           force;              //игнорирование ошибок неправильного указания времени
-  bool           silent;             //отключение предупреждений
-  bool           unlimited;          //лицензия не ограничена по времени
-  bool           print_help;         //печатать ли справку
+  const Option*  options;            //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t         options_count;      //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string    result_license;     //С„Р°Р№Р» РіРµРЅРµСЂРёСЂСѓРµРјРѕР№ Р»РёС†РµРЅР·РёРё
+  time_t         since_date;         //РґР°С‚Р° РЅР°С‡Р°Р»Р° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
+  time_t         till_date;          //РґР°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
+  StringArray    allowed_components; //СЃРїРёСЃРѕРє СЂР°Р·СЂРµС€РµРЅРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
+  CheckFileArray check_files;        //СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ РґР»СЏ С…РµС€РёСЂРѕРІР°РЅРёСЏ
+  PropertyMap    properties;         //СЃРІРѕР№СЃС‚РІР°
+  bool           force;              //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РѕС€РёР±РѕРє РЅРµРїСЂР°РІРёР»СЊРЅРѕРіРѕ СѓРєР°Р·Р°РЅРёСЏ РІСЂРµРјРµРЅРё
+  bool           silent;             //РѕС‚РєР»СЋС‡РµРЅРёРµ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№
+  bool           unlimited;          //Р»РёС†РµРЅР·РёСЏ РЅРµ РѕРіСЂР°РЅРёС‡РµРЅР° РїРѕ РІСЂРµРјРµРЅРё
+  bool           print_help;         //РїРµС‡Р°С‚Р°С‚СЊ Р»Рё СЃРїСЂР°РІРєСѓ
 };
 
 void parse_date (const char* date_string, time_t& result_date)
@@ -80,7 +80,7 @@ void parse_date (const char* date_string, time_t& result_date)
   result_date = date;
 }
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -107,7 +107,7 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка периода действия лицензии
+//СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
 void command_line_license_period (const char* period, Params& params)
 {
   static const char* METHOD_NAME = "command_line_license_period";
@@ -144,7 +144,7 @@ void command_line_license_period (const char* period, Params& params)
   params.till_date = mktime (since_time);
 }
 
-//установка периода действия лицензии
+//СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
 void command_line_till_date (const char* date_string, Params& params)
 {
   static const char* METHOD_NAME = "command_line_till_date";
@@ -155,7 +155,7 @@ void command_line_till_date (const char* date_string, Params& params)
   parse_date (date_string, params.till_date);
 }
 
-//установка периода действия лицензии
+//СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
 void command_line_since_date (const char* date_string, Params& params)
 {
   static const char* METHOD_NAME = "command_line_since_date";
@@ -166,7 +166,7 @@ void command_line_since_date (const char* date_string, Params& params)
   parse_date (date_string, params.since_date);
 }
 
-//установка периода действия лицензии
+//СѓСЃС‚Р°РЅРѕРІРєР° РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Р»РёС†РµРЅР·РёРё
 void command_line_result_license (const char* file_name, Params& params)
 {
   if (!params.result_license.empty ())
@@ -175,13 +175,13 @@ void command_line_result_license (const char* file_name, Params& params)
   params.result_license = file_name;
 }
 
-//установка списка разрешенных компонентов
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃРїРёСЃРєР° СЂР°Р·СЂРµС€РµРЅРЅС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 void command_line_allowed_components (const char* components_list, Params& params)
 {
   params.allowed_components += split (components_list);
 }
 
-//установка списка файлов для хеширования
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ РґР»СЏ С…РµС€РёСЂРѕРІР°РЅРёСЏ
 void command_line_check_files (const char* check_files_list, Params& params)
 {
   common::StringArray strings = split (check_files_list);
@@ -190,25 +190,25 @@ void command_line_check_files (const char* check_files_list, Params& params)
     params.check_files.push_back (CheckFile (strings [i]));
 }
 
-//установка режима игнорирования ошибок
+//СѓСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёСЏ РѕС€РёР±РѕРє
 void command_line_force (const char*, Params& params)
 {
   params.force = true;
 }
 
-//установка тихого режима
+//СѓСЃС‚Р°РЅРѕРІРєР° С‚РёС…РѕРіРѕ СЂРµР¶РёРјР°
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка неограниченной лицензии
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕРіСЂР°РЅРёС‡РµРЅРЅРѕР№ Р»РёС†РµРЅР·РёРё
 void command_line_unlimited (const char*, Params& params)
 {
   params.unlimited = true;
 }
 
-//формирование строки из даты
+//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РёР· РґР°С‚С‹
 stl::string date_to_string (time_t date)
 {
   tm* tm_date = gmtime (&date);
@@ -216,7 +216,7 @@ stl::string date_to_string (time_t date)
   return format ("%04d-%02d-%02d", tm_date->tm_year + 1900, tm_date->tm_mon + 1, tm_date->tm_mday);
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   static const char* METHOD_NAME = "validate";
@@ -256,7 +256,7 @@ void validate (Params& params)
   }
 }
 
-//добавление свойств на основе дерева разбора
+//РґРѕР±Р°РІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РЅР° РѕСЃРЅРѕРІРµ РґРµСЂРµРІР° СЂР°Р·Р±РѕСЂР°
 void add_node_properties (Params& params, ParseNode node, const char* base_name)
 {
   const char* METHOD_NAME = "add_node_property";
@@ -296,14 +296,14 @@ void add_node_properties (Params& params, ParseNode node, const char* base_name)
 typedef xtl::shared_ptr<XmlWriter::Scope> ScopePtr;
 typedef stl::stack<ScopePtr>              ScopeStack;
 
-//генерация лицензии
+//РіРµРЅРµСЂР°С†РёСЏ Р»РёС†РµРЅР·РёРё
 void generate_license (Params& params)
 {
   unsigned char hash [16];
 
   calculate_license_hash (params.check_files, params.properties, hash);
 
-    //Убираем свойство компонентов
+    //РЈР±РёСЂР°РµРј СЃРІРѕР№СЃС‚РІРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
   params.properties.RemoveProperty ("AllowedComponents");
 
   stl::string hex_hash_string;
@@ -372,7 +372,7 @@ int main (int argc, const char *argv[])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     Params params;
 
     static Option options [] = {
@@ -404,10 +404,10 @@ int main (int argc, const char *argv[])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
     if (params.print_help)
       return 0;            
 
@@ -473,7 +473,7 @@ int main (int argc, const char *argv[])
         add_node_properties (params, node, "");
     }
 
-      //Добавление данных периода действия и набора компонентов в свойства
+      //Р”РѕР±Р°РІР»РµРЅРёРµ РґР°РЅРЅС‹С… РїРµСЂРёРѕРґР° РґРµР№СЃС‚РІРёСЏ Рё РЅР°Р±РѕСЂР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РІ СЃРІРѕР№СЃС‚РІР°
     stl::string allowed_components_string;
 
     for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
@@ -481,10 +481,10 @@ int main (int argc, const char *argv[])
 
     params.properties.SetProperty ("AllowedComponents", allowed_components_string.c_str ());
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
     validate (params);
 
-      //Генерация лицензии
+      //Р“РµРЅРµСЂР°С†РёСЏ Р»РёС†РµРЅР·РёРё
     generate_license (params);
   }
   catch (std::exception& exception)

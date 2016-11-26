@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RasterizerState::RasterizerState (const ContextManager& manager, const RasterizerDesc& in_desc)
@@ -20,14 +20,14 @@ RasterizerState::~RasterizerState ()
 }
 
 /*
-   Биндинг состояния
+   Р‘РёРЅРґРёРЅРі СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void RasterizerState::Bind ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::Bind";
   
-    //проверка необходимости биндинга (кэширование состояния)
+    //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР° (РєСЌС€РёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ)
     
   const size_t current_desc_hash      = GetContextCacheValue (CacheEntry_RasterizerStateHash),
                current_scissor_enable = GetContextCacheValue (CacheEntry_ScissorEnable);
@@ -35,26 +35,26 @@ void RasterizerState::Bind ()
   if (current_desc_hash == desc_hash && current_scissor_enable == size_t (desc.scissor_enable))
     return;
 
-    //установка состояния в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   MakeContextCurrent ();  
   
-    //выполнение команд
+    //РІС‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ
 
   executer->ExecuteCommands ();
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //установка кэш-переменных
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
     
   SetContextCacheValue (CacheEntry_RasterizerStateHash, desc_hash);
   SetContextCacheValue (CacheEntry_ScissorEnable,       desc.scissor_enable);
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void RasterizerState::GetDesc (RasterizerDesc& out_desc)
@@ -63,21 +63,21 @@ void RasterizerState::GetDesc (RasterizerDesc& out_desc)
 }
 
 /*
-   Изменение дескриптора
+   РР·РјРµРЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RasterizerState::SetDesc";
   
-    //проверка наличия необходимых расширений
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРѕР±С…РѕРґРёРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
     
   const ContextCaps& caps = GetCaps ();
 
   if (in_desc.multisample_enable && !caps.has_arb_multisample)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
     
-    //проверка корректности аргументов и преобразование дескриптора
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
     
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
@@ -118,11 +118,11 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       throw xtl::make_argument_exception (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
   }
 
-    //выбор текущего контекста
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();  
 
-    //запись команд в контекст OpenGL
+    //Р·Р°РїРёСЃСЊ РєРѕРјР°РЅРґ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     
   CommandListBuilder cmd_list;
   
@@ -206,21 +206,21 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 #endif
   }
     
-    //создание исполнителя команд
+    //СЃРѕР·РґР°РЅРёРµ РёСЃРїРѕР»РЅРёС‚РµР»СЏ РєРѕРјР°РЅРґ
 
   ExecuterPtr new_executer = cmd_list.Finish ();
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //сохранение параметров
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
   executer  = new_executer;
   
-    //оповещение о необходимости ребиндинга уровня
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 
   StageRebindNotify (Stage_Output);
 }

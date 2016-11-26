@@ -28,7 +28,7 @@ typedef stl::hash_map<stl::hash_key<const char*>, EventList::iterator> EventMap;
 }
 
 /*
-    Описание реализации упаковщика событий
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓРїР°РєРѕРІС‰РёРєР° СЃРѕР±С‹С‚РёР№
 */
 
 struct EventBatcher::Impl: public xtl::reference_counter
@@ -36,7 +36,7 @@ struct EventBatcher::Impl: public xtl::reference_counter
   EventMap  event_map;
   EventList event_list;
 
-/// Обновление
+/// РћР±РЅРѕРІР»РµРЅРёРµ
   void UpdateEvent (const char* name, ResourceState state)
   {
     EventMap::iterator iter = event_map.find (name);
@@ -97,7 +97,7 @@ struct EventBatcher::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 EventBatcher::EventBatcher ()
@@ -125,7 +125,7 @@ EventBatcher& EventBatcher::operator = (const EventBatcher& batcher)
 }
 
 /*
-    Операции над ресурсом
+    РћРїРµСЂР°С†РёРё РЅР°Рґ СЂРµСЃСѓСЂСЃРѕРј
 */
 
 void EventBatcher::PrefetchResource (const char* resource_name)
@@ -153,7 +153,7 @@ void EventBatcher::UnloadResource (const char* resource_name)
 }
 
 /*
-    Опустошение
+    РћРїСѓСЃС‚РѕС€РµРЅРёРµ
 */
 
 void EventBatcher::Flush (ICustomServer& server)

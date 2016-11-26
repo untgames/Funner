@@ -11,7 +11,7 @@ namespace
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* COMMON_BACKGROUND_COPY_STATE_LIBRARY               = "Common.BackgroundCopyState";
@@ -19,10 +19,10 @@ const char* COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY = "Common.Backgro
 const char* COMMON_FILE_LIBRARY                                = "Common.File";
 
 /*
-    Регистрация библиотек
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 */
 
-//добавление/удаление пути поиска
+//РґРѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїСѓС‚Рё РїРѕРёСЃРєР°
 void add_search_path (const char* path)
 {
   FileSystem::AddSearchPath (path);
@@ -38,7 +38,7 @@ void remove_all_search_paths ()
   FileSystem::RemoveAllSearchPaths ();
 }
 
-//загрузка строки с фильтрацией определённых символов
+//Р·Р°РіСЂСѓР·РєР° СЃС‚СЂРѕРєРё СЃ С„РёР»СЊС‚СЂР°С†РёРµР№ РѕРїСЂРµРґРµР»С‘РЅРЅС‹С… СЃРёРјРІРѕР»РѕРІ
 stl::string load_string_filter_out (const char* file_name, const char* out_filter_string)
 {
   stl::string s, filter = common::compress (out_filter_string);
@@ -53,7 +53,7 @@ stl::string load_string_filter_out (const char* file_name, const char* out_filte
   return s;
 }
 
-//посылка строки (обычно используется для HTTP запросов)
+//РїРѕСЃС‹Р»РєР° СЃС‚СЂРѕРєРё (РѕР±С‹С‡РЅРѕ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ HTTP Р·Р°РїСЂРѕСЃРѕРІ)
 stl::string post_string (const char* file_name, const char* string)
 {
   try

@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SceneSpace::SceneSpace ()

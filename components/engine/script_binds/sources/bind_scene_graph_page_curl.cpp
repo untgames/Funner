@@ -23,7 +23,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание листания
+    РЎРѕР·РґР°РЅРёРµ Р»РёСЃС‚Р°РЅРёСЏ
 */
 
 PageCurl::Pointer create_page_curl ()
@@ -32,7 +32,7 @@ PageCurl::Pointer create_page_curl ()
 }
 
 /*
-   Регистрация библиотеки работы с листанием
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ Р»РёСЃС‚Р°РЅРёРµРј
 */
 
 void bind_static_page_curl_library (Environment& environment)
@@ -67,21 +67,21 @@ math::vec2f get_grid_size (PageCurl& page_curl)
 
 void bind_page_curl_library (Environment& environment)
 {
-    //регистрация статических переменных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
 
   bind_static_page_curl_library (environment);
 
   InvokerRegistry lib = environment.CreateLibrary (SCENE_PAGE_CURL_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_page_curl));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_BindingMismatchWeight",         make_invoker (&PageCurl::SetBindingMismatchWeight));
   lib.Register ("set_CurlPointPosition",             make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetCurlPointPosition)));
@@ -126,7 +126,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("SetSize",              make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetSize)));
   lib.Register ("SetGridSize",          make_invoker (xtl::implicit_cast<void (PageCurl::*) (unsigned int, unsigned int)> (&PageCurl::SetGridSize)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<PageCurl> (SCENE_PAGE_CURL_LIBRARY);
 }

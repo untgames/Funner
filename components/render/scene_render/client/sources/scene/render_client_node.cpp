@@ -3,25 +3,25 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации узла
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓР·Р»Р°
 */
 
 struct Node::Impl
 {  
-  Node&                 owner;                         //обратная ссылки
-  scene_graph::Node&    node;                          //исходный узел
-  SceneManager&         scene_manager;                 //менеджер сцен
-  Scene*                scene;                         //текущая сцена
-  interchange::NodeType node_type;                     //тип узла
-  object_id_t           id;                            //идентификатор объекта
-  xtl::auto_connection  on_update_connection;          //оповещение об обновлении объекта
-  xtl::auto_connection  on_update_world_tm_connection; //оповещение об обновлении матрицы мировых преобразований
-  xtl::auto_connection  on_scene_changed_connection;   //оповещение об изменении принадлежности сцене
-  size_t                name_hash;                     //хэш имени узла
-  bool                  need_update_world_tm;          //требуется обновление матрицы преобразований
-  bool                  need_update_scene;             //требуется обновление сцены
+  Node&                 owner;                         //РѕР±СЂР°С‚РЅР°СЏ СЃСЃС‹Р»РєРё
+  scene_graph::Node&    node;                          //РёСЃС…РѕРґРЅС‹Р№ СѓР·РµР»
+  SceneManager&         scene_manager;                 //РјРµРЅРµРґР¶РµСЂ СЃС†РµРЅ
+  Scene*                scene;                         //С‚РµРєСѓС‰Р°СЏ СЃС†РµРЅР°
+  interchange::NodeType node_type;                     //С‚РёРї СѓР·Р»Р°
+  object_id_t           id;                            //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕР±СЉРµРєС‚Р°
+  xtl::auto_connection  on_update_connection;          //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РѕР±СЉРµРєС‚Р°
+  xtl::auto_connection  on_update_world_tm_connection; //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РјР°С‚СЂРёС†С‹ РјРёСЂРѕРІС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  xtl::auto_connection  on_scene_changed_connection;   //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё СЃС†РµРЅРµ
+  size_t                name_hash;                     //С…СЌС€ РёРјРµРЅРё СѓР·Р»Р°
+  bool                  need_update_world_tm;          //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
+  bool                  need_update_scene;             //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ СЃС†РµРЅС‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Node& in_owner, scene_graph::Node& in_node, SceneManager& in_scene_manager, interchange::NodeType in_node_type)
     : owner (in_owner)
     , node (in_node)
@@ -38,7 +38,7 @@ struct Node::Impl
     OnSceneChanged ();
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -50,7 +50,7 @@ struct Node::Impl
     }
   }
 
-/// Оповещение об обновлении матрицы преобразований
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
   void UpdateWorldMatrixNotify ()
   {
     need_update_world_tm = true;
@@ -58,7 +58,7 @@ struct Node::Impl
     owner.UpdateNotify ();
   }
 
-/// Изменение сцены
+/// РР·РјРµРЅРµРЅРёРµ СЃС†РµРЅС‹
   void SetScene (Scene* new_scene, bool need_notify = true)
   {
     if (new_scene == scene)
@@ -70,7 +70,7 @@ struct Node::Impl
     owner.UpdateNotify ();
   }
 
-/// Оповещение об обновлении сцены
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё СЃС†РµРЅС‹
   void OnSceneChanged ()
   {
     scene_graph::Scene* sg_scene = node.Scene ();
@@ -94,7 +94,7 @@ struct Node::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Node::Node (scene_graph::Node& node, SceneManager& scene_manager, render::scene::interchange::NodeType node_type)
@@ -120,7 +120,7 @@ Node::~Node ()
 }
 
 /*
-    Идентификатор узла / тип узла
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р° / С‚РёРї СѓР·Р»Р°
 */
 
 object_id_t Node::Id () const
@@ -134,7 +134,7 @@ render::scene::interchange::NodeType Node::Type () const
 }
 
 /*
-    Исходный узел
+    РСЃС…РѕРґРЅС‹Р№ СѓР·РµР»
 */
 
 scene_graph::Node& Node::SourceNode () const
@@ -143,7 +143,7 @@ scene_graph::Node& Node::SourceNode () const
 }
 
 /*
-    Менеджер сцены
+    РњРµРЅРµРґР¶РµСЂ СЃС†РµРЅС‹
 */
 
 SceneManager& Node::Scenes () const
@@ -152,14 +152,14 @@ SceneManager& Node::Scenes () const
 }
 
 /*
-    Реализация синхронизации
+    Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 */
 
 void Node::UpdateCore (render::scene::client::Context& context)
 {
   try
   {
-      //обновление сцены
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃС†РµРЅС‹
 
     if (impl->need_update_scene)
     {
@@ -168,7 +168,7 @@ void Node::UpdateCore (render::scene::client::Context& context)
       impl->need_update_scene = false;
     }
 
-      //обновление имени узла
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РёРјРµРЅРё СѓР·Р»Р°
 
     size_t name_hash = impl->node.NameHash ();
 
@@ -179,7 +179,7 @@ void Node::UpdateCore (render::scene::client::Context& context)
       impl->name_hash = name_hash;
     }
 
-      //обновление матрицы преобразований
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 
     if (impl->need_update_world_tm)
     {
@@ -196,7 +196,7 @@ void Node::UpdateCore (render::scene::client::Context& context)
 }
 
 /*
-    Имя объекта
+    РРјСЏ РѕР±СЉРµРєС‚Р°
 */
 
 const char* Node::NameCore ()
@@ -205,7 +205,7 @@ const char* Node::NameCore ()
 }
 
 /*
-    Указатель на сцену (может быть нулевым)
+    РЈРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС†РµРЅСѓ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅСѓР»РµРІС‹Рј)
 */
 
 Scene* Node::SceneOwner () const

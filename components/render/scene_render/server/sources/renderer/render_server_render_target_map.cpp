@@ -4,10 +4,10 @@ using namespace render;
 using namespace render::scene::server;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемое количество слушателей
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»СѓС€Р°С‚РµР»РµР№
 
 /*
     RenderTargetDesc
@@ -81,7 +81,7 @@ void RenderTargetDesc::SetTarget (const manager::RenderTarget& target)
 }
 
 /*
-    Описание реализации карты целей рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDesc> DescMap;
@@ -89,10 +89,10 @@ typedef stl::vector<IRenderTargetMapListener*>                      ListenerArra
 
 struct RenderTargetMap::Impl: public xtl::reference_counter
 {
-  DescMap       targets;   //цели рендеринга
-  ListenerArray listeners; //слушатели
+  DescMap       targets;   //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  ListenerArray listeners; //СЃР»СѓС€Р°С‚РµР»Рё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
@@ -100,7 +100,7 @@ struct RenderTargetMap::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 RenderTargetMap::RenderTargetMap ()
@@ -134,7 +134,7 @@ RenderTargetMap& RenderTargetMap::operator = (const RenderTargetMap& map)
 }
 
 /*
-    Количество целей
+    РљРѕР»РёС‡РµСЃС‚РІРѕ С†РµР»РµР№
 */
 
 size_t RenderTargetMap::Size () const
@@ -143,7 +143,7 @@ size_t RenderTargetMap::Size () const
 }
 
 /*
-    Поиск по имени
+    РџРѕРёСЃРє РїРѕ РёРјРµРЅРё
 */
 
 const RenderTargetDesc* RenderTargetMap::Find (const char* name) const
@@ -165,7 +165,7 @@ RenderTargetDesc* RenderTargetMap::Find (const char* name)
 }
 
 /*
-    Добавление целей 
+    Р”РѕР±Р°РІР»РµРЅРёРµ С†РµР»РµР№ 
 */
 
 void RenderTargetMap::Add (const char* name, const manager::RenderTarget& target, const Rect& rect)
@@ -195,7 +195,7 @@ void RenderTargetMap::Add (const char* name, const manager::RenderTarget& target
 }
 
 /*
-    Обновление целей 
+    РћР±РЅРѕРІР»РµРЅРёРµ С†РµР»РµР№ 
 */
 
 void RenderTargetMap::SetRenderTarget (const char* name, const manager::RenderTarget& target)
@@ -276,7 +276,7 @@ void RenderTargetMap::SetArea (const Rect& rect)
 }
 
 /*
-    Удаление целей
+    РЈРґР°Р»РµРЅРёРµ С†РµР»РµР№
 */
 
 void RenderTargetMap::Remove (const char* name)
@@ -304,7 +304,7 @@ void RenderTargetMap::Remove (const char* name)
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void RenderTargetMap::Clear ()
@@ -329,7 +329,7 @@ void RenderTargetMap::Clear ()
 }
 
 /*
-    Принудительное оповещение об обновлении целей рендеринга
+    РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void RenderTargetMap::ForceUpdateNotify ()
@@ -352,7 +352,7 @@ void RenderTargetMap::ForceUpdateNotify ()
 }
 
 /*
-    Добавление слушателей
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»РµР№
 */
 
 void RenderTargetMap::AttachListener (IRenderTargetMapListener* listener)

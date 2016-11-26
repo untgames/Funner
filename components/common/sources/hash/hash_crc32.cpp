@@ -11,7 +11,7 @@
 namespace
 {
 
-//Взято из https://database.cs.brown.edu/svn/hstore/trunk/src/dtxn/logging/crc32ctables.cc
+//Р’Р·СЏС‚Рѕ РёР· https://database.cs.brown.edu/svn/hstore/trunk/src/dtxn/logging/crc32ctables.cc
 
 /*
  * The following CRC lookup table was generated automagically
@@ -441,7 +441,7 @@ inline size_t crc32 (unsigned char data,size_t crc)
 
 inline size_t crc32 (wchar_t data, size_t crc)
 { 
-  //???? что делать с 4-байтовыми wchar???
+  //???? С‡С‚Рѕ РґРµР»Р°С‚СЊ СЃ 4-Р±Р°Р№С‚РѕРІС‹РјРё wchar???
 
   unsigned char* c = (unsigned char*)&data;
   
@@ -521,7 +521,7 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
   #endif
 #endif
 
-  //Взято из https://database.cs.brown.edu/svn/hstore/trunk/src/dtxn/logging/crc32c.cc
+  //Р’Р·СЏС‚Рѕ РёР· https://database.cs.brown.edu/svn/hstore/trunk/src/dtxn/logging/crc32c.cc
 
   const char* p_buf = (const char*) data;
 

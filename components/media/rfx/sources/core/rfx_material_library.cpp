@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Дескриптор материала
+    Р”РµСЃРєСЂРёРїС‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct MaterialDesc
@@ -25,15 +25,15 @@ struct MaterialDesc
 }
 
 /*
-    Описание реализации библиотеки материалов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, MaterialDesc> MaterialMap;
 
 struct MaterialLibrary::Impl
 {
-  stl::string name;      //имя библиотеки
-  MaterialMap materials; //библиотека материалов
+  stl::string name;      //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  MaterialMap materials; //Р±РёР±Р»РёРѕС‚РµРєР° РјР°С‚РµСЂРёР°Р»РѕРІ
   
   Impl ()
   {
@@ -48,7 +48,7 @@ struct MaterialLibrary::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MaterialLibrary::MaterialLibrary ()
@@ -87,7 +87,7 @@ MaterialLibrary::~MaterialLibrary ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 MaterialLibrary& MaterialLibrary::operator = (const MaterialLibrary& library)
@@ -97,7 +97,7 @@ MaterialLibrary& MaterialLibrary::operator = (const MaterialLibrary& library)
 }
 
 /*
-    Имя библиотеки
+    РРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 const char* MaterialLibrary::Name () const
@@ -114,7 +114,7 @@ void MaterialLibrary::SetName (const char* name)
 }
 
 /*
-    Количество материалов / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РјР°С‚РµСЂРёР°Р»РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 size_t MaterialLibrary::Size () const
@@ -128,13 +128,13 @@ bool MaterialLibrary::IsEmpty () const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 namespace
 {
 
-//селектор материала
+//СЃРµР»РµРєС‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
 template <class T>
 struct material_selector
 {
@@ -154,7 +154,7 @@ MaterialLibrary::ConstIterator MaterialLibrary::CreateIterator () const
 }
 
 /*
-    Получение идентификатора материала
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* MaterialLibrary::ItemId (const ConstIterator& i) const
@@ -168,7 +168,7 @@ const char* MaterialLibrary::ItemId (const ConstIterator& i) const
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 Material* MaterialLibrary::Find (const char* name)
@@ -187,7 +187,7 @@ const Material* MaterialLibrary::Find (const char* name) const
 }
 
 /*
-    Присоединение материалов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void MaterialLibrary::Attach (const char* id, const Material& material)
@@ -212,7 +212,7 @@ void MaterialLibrary::DetachAll ()
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void MaterialLibrary::Clear ()
@@ -223,7 +223,7 @@ void MaterialLibrary::Clear ()
 }
 
 /*
-    Загрузка / сохранение
+    Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void MaterialLibrary::Load (const char* file_name)
@@ -258,7 +258,7 @@ void MaterialLibrary::Save (const char* file_name)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void MaterialLibrary::Swap (MaterialLibrary& library)
@@ -282,7 +282,7 @@ void swap (MaterialLibrary& material1, MaterialLibrary& material2)
 }
 
 /*
-    Регистрация сериализаторов по умолчанию
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void MaterialLibrary::RegisterDefaultSavers ()

@@ -4,7 +4,7 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Описание реализации сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃС†РµРЅС‹
 */
 
 typedef stl::list<Entity*>                         EntityList;
@@ -12,11 +12,11 @@ typedef stl::hash_map<Node*, EntityList::iterator> EntityMap;
 
 struct Scene::Impl: public xtl::reference_counter
 {
-  stl::string name;        //имя сцены
-  EntityList  entity_list; //список узлов
-  EntityMap   entity_map;  //карта узлов
+  stl::string name;        //РёРјСЏ СЃС†РµРЅС‹
+  EntityList  entity_list; //СЃРїРёСЃРѕРє СѓР·Р»РѕРІ
+  EntityMap   entity_map;  //РєР°СЂС‚Р° СѓР·Р»РѕРІ
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     while (!entity_list.empty ())
@@ -28,7 +28,7 @@ struct Scene::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Scene::Scene ()
@@ -57,7 +57,7 @@ Scene& Scene::operator = (const Scene& scene)
 }
 
 /*
-    Имя сцены
+    РРјСЏ СЃС†РµРЅС‹
 */
 
 void Scene::SetName (const char* name)
@@ -74,7 +74,7 @@ const char* Scene::Name () const
 }
 
 /*
-    Присоединение узла
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СѓР·Р»Р°
 */
 
 void Scene::AttachNode (Entity* node)
@@ -128,12 +128,12 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& 
   {
     Entity& entity = **iter;
 
-      //если объект невидим - исключаем его из обхода
+      //РµСЃР»Рё РѕР±СЉРµРєС‚ РЅРµРІРёРґРёРј - РёСЃРєР»СЋС‡Р°РµРј РµРіРѕ РёР· РѕР±С…РѕРґР°
 
     if (!entity.IsVisible ())
       continue;
 
-      //если объект имеет бесконечные ограничивающие объёмы - обрабатываем его
+      //РµСЃР»Рё РѕР±СЉРµРєС‚ РёРјРµРµС‚ Р±РµСЃРєРѕРЅРµС‡РЅС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ - РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РµРіРѕ
 
     if (entity.IsInfiniteBounds ())
     {
@@ -141,7 +141,7 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& 
       continue;
     }
 
-      //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
+      //РµСЃР»Рё РѕР±СЉРµРєС‚ РёРјРµРµС‚ РєРѕРЅРµС‡РЅС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ - РїСЂРѕРІРµСЂСЏРµРј РµРіРѕ РїРѕРїР°РґР°РЅРёРµ РІ Р·Р°РґР°РЅРЅС‹Р№ РѕР±СЉС‘Рј
 
     if (intersects (frustum, entity.BoundBox ()))
       entity.Visit (visitor);

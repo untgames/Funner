@@ -23,8 +23,8 @@
 namespace scene_graph
 {
 
-const size_t DEFAULT_SCREEN_WIDTH  = 100; //�ਭ� ��࠭� �� 㬮�砭��
-const size_t DEFAULT_SCREEN_HEIGHT = 100; //���� ��࠭� �� 㬮�砭��
+const size_t DEFAULT_SCREEN_WIDTH  = 100; //иЁаЁ­  нЄа ­  Ї® г¬®«з ­Ёо
+const size_t DEFAULT_SCREEN_HEIGHT = 100; //ўлб®в  нЄа ­  Ї® г¬®«з ­Ёо
 
 }
 

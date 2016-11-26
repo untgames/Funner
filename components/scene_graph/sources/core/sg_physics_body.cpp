@@ -4,16 +4,16 @@ using namespace scene_graph;
 using namespace scene_graph::physics;
 
 /*
-    Описание реализации физического тела
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С„РёР·РёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
 */
 
 struct Body::Impl: public xtl::instance_counter<Body>
 {
-  stl::string model_name; //имя физической модели
+  stl::string model_name; //РёРјСЏ С„РёР·РёС‡РµСЃРєРѕР№ РјРѕРґРµР»Рё
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Body::Body ()
@@ -26,7 +26,7 @@ Body::~Body ()
 }
 
 /*
-    Создание тела
+    РЎРѕР·РґР°РЅРёРµ С‚РµР»Р°
 */
 
 Body::Pointer Body::Create ()
@@ -35,7 +35,7 @@ Body::Pointer Body::Create ()
 }
 
 /*
-    Установка физической модели
+    РЈСЃС‚Р°РЅРѕРІРєР° С„РёР·РёС‡РµСЃРєРѕР№ РјРѕРґРµР»Рё
 */
 
 void Body::SetModelName (const char* name)
@@ -52,7 +52,7 @@ const char* Body::ModelName () const
 }
 
 /*
-    Метод, вызываемый при посещении данного объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 void Body::AcceptCore (Visitor& visitor)

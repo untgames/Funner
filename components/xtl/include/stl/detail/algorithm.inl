@@ -1,5 +1,5 @@
 /*
-    Адаптеры предикатов сравнения
+    РђРґР°РїС‚РµСЂС‹ РїСЂРµРґРёРєР°С‚РѕРІ СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Iter1,class Iter2=Iter1>
@@ -11,7 +11,7 @@ struct iter_equal: public equal_to<typename iterator_traits<Iter1>::value_type,
                                    typename iterator_traits<Iter2>::value_type> { };
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Iter,class T>
@@ -240,7 +240,7 @@ Iter1 search (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2,Predicate equal)
   
   while (first1 != last1) 
   {     
-    for (;first1!=last1 && !equal (*first1,*first2);++first1); //поиск первого совпадения
+    for (;first1!=last1 && !equal (*first1,*first2);++first1); //РїРѕРёСЃРє РїРµСЂРІРѕРіРѕ СЃРѕРІРїР°РґРµРЅРёСЏ
                            
     if (first1 == last1)
       return last1;
@@ -253,8 +253,8 @@ Iter1 search (Iter1 first1,Iter1 last1,Iter2 first2,Iter2 last2,Predicate equal)
 
     while (equal (*current,*p))
     {    
-      if (++p == last2)       return first1; //возвращение позиции соответствия     
-      if (++current == last1) return last1;  //поиск закончен неудачей
+      if (++p == last2)       return first1; //РІРѕР·РІСЂР°С‰РµРЅРёРµ РїРѕР·РёС†РёРё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ     
+      if (++current == last1) return last1;  //РїРѕРёСЃРє Р·Р°РєРѕРЅС‡РµРЅ РЅРµСѓРґР°С‡РµР№
     }    
     
     ++first1;    
@@ -486,7 +486,7 @@ pair<Iter,Iter> equal_range (Iter first,Iter last,const T& val)
 }
 
 /*
-    Копирование, перемещение, замена
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ, РїРµСЂРµРјРµС‰РµРЅРёРµ, Р·Р°РјРµРЅР°
 */
 
 template <class InIter,class OutIter,class T>
@@ -639,7 +639,7 @@ Iter2 swap_ranges (Iter1 first1,Iter1 last1,Iter2 first2)
 }
 
 /*
-    Преобразования интервала
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class Iter>
@@ -950,7 +950,7 @@ inline OutIter transform (InIter1 first1,InIter1 last1,InIter2 first2,OutIter re
 }
 
 /*
-    Генераторы
+    Р“РµРЅРµСЂР°С‚РѕСЂС‹
 */
 
 template <class Iter,class Generator> 

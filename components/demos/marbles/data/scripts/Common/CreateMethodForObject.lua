@@ -1,7 +1,7 @@
 function CreateMethodForObject(func, obj)
   assert(func,"ERROR: MakeMethodForObject(func, obj) - func is nil")
   assert(obj,"ERROR: MakeMethodForObject(func, obj) - obj is nil")
-  -- создает из универсальной функции метод для конкретного обьекта
+  -- СЃРѕР·РґР°РµС‚ РёР· СѓРЅРёРІРµСЂСЃР°Р»СЊРЅРѕР№ С„СѓРЅРєС†РёРё РјРµС‚РѕРґ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЊРµРєС‚Р°
   local meth=function(...)
     return func( obj, ...)
   end

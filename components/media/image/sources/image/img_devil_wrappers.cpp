@@ -10,13 +10,13 @@ namespace devil_serializers
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "media.image.devil"; //имя потока протоколирования
+const char* LOG_NAME = "media.image.devil"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Протоколирование исключения
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 struct LogHolder
@@ -44,7 +44,7 @@ void log_exception (const char* source)
 }
 
 /*
-    Функции работы с памятью и файлами, заменяющии стандартные DevIL функции
+    Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РїР°РјСЏС‚СЊСЋ Рё С„Р°Р№Р»Р°РјРё, Р·Р°РјРµРЅСЏСЋС‰РёРё СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ DevIL С„СѓРЅРєС†РёРё
 */
 
 void* ILAPIENTRY devil_allocate (ILsizei size)
@@ -285,7 +285,7 @@ ILint ILAPIENTRY devil_file_write (const void* buffer, ILuint size, ILuint count
 }
 
 /*
-   Компонент работы с DevIL картинками
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂР°Р±РѕС‚С‹ СЃ DevIL РєР°СЂС‚РёРЅРєР°РјРё
 */
 
 enum DevILComponentType
@@ -294,22 +294,22 @@ enum DevILComponentType
   DevILComponentType_Savers
 };
 
-int devil_init_count = 0; //количество инициализаций DevILComponent
+int devil_init_count = 0; //РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРёС†РёР°Р»РёР·Р°С†РёР№ DevILComponent
 
 template <DevILComponentType type>
 class DevILComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     DevILComponent ()
     {
       if (!devil_init_count++)
       {
-//        ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
+//        ilSetMemory (&devil_allocate, &devil_deallocate); //РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р·С‹РІР°С‚СЊ РґРѕ РІС‹Р·РѕРІР° ilInit ();
 
         ilInit ();
 
-        ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,  //Необходимо вызывать после вызова ilInit ();
+        ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,  //РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р·С‹РІР°С‚СЊ РїРѕСЃР»Рµ РІС‹Р·РѕРІР° ilInit ();
                     &devil_file_read, &devil_file_seek, &devil_file_tell);
         ilSetWrite (&devil_file_open_write_only, &devil_file_close, &devil_file_putc, &devil_file_seek,
                     &devil_file_tell, &devil_file_write);
@@ -349,7 +349,7 @@ class DevILComponent
       }
     }
 
-    //выгрузка компонента
+    //РІС‹РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     ~DevILComponent ()
     {
       if (!--devil_init_count)

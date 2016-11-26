@@ -19,13 +19,13 @@ using namespace common;
 using namespace media;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t HELP_STRING_PREFIX_LENGTH = 30;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -43,33 +43,33 @@ void error (const char* format, ...)
 }
 
 /*
-    Обработка командной строки
+    РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                name;          //имя команды
-  char                       short_name;    //короткое имя
-  const char*                argument_name; //имя аргумента
-  const char*                tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                       short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                  //массив опций
-  size_t        options_count;            //количество опций
-  StringArray   sources;                  //имя исходных изображений
-  stl::string   output_file_format;       //маска имен выходных файлов
-  bool          silent;                   //минимальное число сообщений
-  bool          print_help;               //нужно ли печатать сообщение помощи
+  const Option* options;                  //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  StringArray   sources;                  //РёРјСЏ РёСЃС…РѕРґРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
+  stl::string   output_file_format;       //РјР°СЃРєР° РёРјРµРЅ РІС‹С…РѕРґРЅС‹С… С„Р°Р№Р»РѕРІ
+  bool          silent;                   //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool          print_help;               //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("interlacer [<OPTIONS>] <SOURCE> ...\n");
@@ -96,19 +96,19 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра маски имен выходных файлов
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РјР°СЃРєРё РёРјРµРЅ РІС‹С…РѕРґРЅС‹С… С„Р°Р№Р»РѕРІ
 void command_line_output_file_format (const char* value, Params& params)
 {
   params.output_file_format = value;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.sources.IsEmpty ())
@@ -119,7 +119,7 @@ void validate (Params& params)
   }
 }
 
-//построение атласа
+//РїРѕСЃС‚СЂРѕРµРЅРёРµ Р°С‚Р»Р°СЃР°
 void build (Params& params)
 {
   try
@@ -136,7 +136,7 @@ void build (Params& params)
       
       Image src_image (params.sources [i]);   
 
-      if (i > 0)  //операция не выполняется для первого кадра в последовательности
+      if (i > 0)  //РѕРїРµСЂР°С†РёСЏ РЅРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РґР»СЏ РїРµСЂРІРѕРіРѕ РєР°РґСЂР° РІ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
       {
         if (src_image.Format () != dst_image.Format ())
           error ("Image format mismatch on image '%s'", params.sources [i]);
@@ -157,7 +157,7 @@ void build (Params& params)
       }
       else dst_image = src_image;
       
-        //определение имени результирующего изображения
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
         
       stl::string result_name = params.output_file_format.empty () ? params.sources [i] : format (params.output_file_format.c_str (), i);
       
@@ -182,7 +182,7 @@ int main (int argc, const char* argv [])
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
 
-    //инициализация
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 
   params.options           = options;
   params.options_count     = options_count;
@@ -194,11 +194,11 @@ int main (int argc, const char* argv [])
   for (size_t i = 0; i < params.options_count; i++)
     command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-    //разбор командной строки
+    //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
   command_line.Process (argc, argv);
   
-    // --help только печатает сообщение помощи
+    // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
   
   if (params.print_help)
     return 0;
@@ -206,11 +206,11 @@ int main (int argc, const char* argv [])
   for (size_t i = 0, count = command_line.ParamsCount (); i < count; i++)
     params.sources.Add (command_line.Param (i));
 
-    //проверка корректности ввода
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
   validate (params);
   
-    //построение
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ
 
   build (params);
 

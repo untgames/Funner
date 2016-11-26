@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Список стандартных точек входа
+    РЎРїРёСЃРѕРє СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… С‚РѕС‡РµРє РІС…РѕРґР°
 */
 
 struct DefaultEntry
@@ -379,18 +379,18 @@ class GlesLibrary
 }
 
 /*
-    Описание реализации библиотеки
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, void*> EntryMap;
 
 struct Library::Impl
 {
-  NativeDisplayType display;      //соединение с дисплеем
-  EntryMap          entries;      //карта стандартных точек входа
-  GlesLibrary       gles_library; //динамическая библиотека GLES
+  NativeDisplayType display;      //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  EntryMap          entries;      //РєР°СЂС‚Р° СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… С‚РѕС‡РµРє РІС…РѕРґР°
+  GlesLibrary       gles_library; //РґРёРЅР°РјРёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР° GLES
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : display (0)
   {
@@ -404,7 +404,7 @@ struct Library::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Library::Library ()  
@@ -425,7 +425,7 @@ Library::~Library ()
 }
 
 /*
-    Получение адреса точки входа
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР°
 */
 
 void* Library::GetProcAddress (const char* name, size_t search_flags)

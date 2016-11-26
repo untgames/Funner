@@ -6,7 +6,7 @@
 using namespace syslib;
 
 /*
-    Приостановка выполнения приложения на miliseconds милисекунд
+    РџСЂРёРѕСЃС‚Р°РЅРѕРІРєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° miliseconds РјРёР»РёСЃРµРєСѓРЅРґ
 */
 
 void UnistdApplicationManager::Sleep (size_t miliseconds)
@@ -15,7 +15,7 @@ void UnistdApplicationManager::Sleep (size_t miliseconds)
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* UnistdApplicationManager::CreateDefaultApplicationDelegate ()

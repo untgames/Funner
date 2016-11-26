@@ -14,12 +14,12 @@ const size_t MESSAGE_BUFFER_SIZE = 64;
 
 struct IPhoneDevice::Impl : public IWindowListener
 {
-  IPhoneDevice*        device;                        //устройство
-  xtl::auto_connection window_destroy_connection;     //соединение удаления окна
-  syslib::Window       *window;                       //окно
-  char                 message [MESSAGE_BUFFER_SIZE]; //сообщение
+  IPhoneDevice*        device;                        //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ
+  xtl::auto_connection window_destroy_connection;     //СЃРѕРµРґРёРЅРµРЅРёРµ СѓРґР°Р»РµРЅРёСЏ РѕРєРЅР°
+  syslib::Window       *window;                       //РѕРєРЅРѕ
+  char                 message [MESSAGE_BUFFER_SIZE]; //СЃРѕРѕР±С‰РµРЅРёРµ
 
-  ///Конструктор / деструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (IPhoneDevice* in_device, syslib::Window* in_window)
     : device (in_device)
     , window (in_window)
@@ -43,7 +43,7 @@ struct IPhoneDevice::Impl : public IWindowListener
       WindowManager::DetachWindowListener (*window, this);
   }
 
-  ///События разворота
+  ///РЎРѕР±С‹С‚РёСЏ СЂР°Р·РІРѕСЂРѕС‚Р°
   void OnInterfaceOrientationWillChange (InterfaceOrientation old_orientation, InterfaceOrientation new_orientation, float duration)
   {
     xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "OrientationChange began %s %s %f", OrientationName (old_orientation),
@@ -58,7 +58,7 @@ struct IPhoneDevice::Impl : public IWindowListener
     device->Notify (message);
   }
 
-  ///События движения
+  ///РЎРѕР±С‹С‚РёСЏ РґРІРёР¶РµРЅРёСЏ
   void OnShakeMotionBegan ()
   {
     device->Notify ("ShakeMotion began");
@@ -89,7 +89,7 @@ struct IPhoneDevice::Impl : public IWindowListener
 };
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 IPhoneDevice::IPhoneDevice (syslib::Window* window, const char* name, const char* full_name)

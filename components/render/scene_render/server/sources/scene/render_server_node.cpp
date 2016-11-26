@@ -4,15 +4,15 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации узла
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓР·Р»Р°
 */
 
 struct Node::Impl
 {
-  stl::string name;     //имя узла
-  math::mat4f world_tm; //матрица преобразований узла
+  stl::string name;     //РёРјСЏ СѓР·Р»Р°
+  math::mat4f world_tm; //РјР°С‚СЂРёС†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ СѓР·Р»Р°
 
-/// Конструкторы
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   Impl ()
     : world_tm (1.0f)
   {
@@ -20,7 +20,7 @@ struct Node::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Node::Node ()
@@ -33,7 +33,7 @@ Node::~Node ()
 }
 
 /*
-    Имя узла
+    РРјСЏ СѓР·Р»Р°
 */
 
 void Node::SetName (const char* name)
@@ -50,7 +50,7 @@ const char* Node::Name () const
 }
 
 /*
-    Матрица преобразований
+    РњР°С‚СЂРёС†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 */
 
 void Node::SetWorldMatrix (const math::mat4f& tm)

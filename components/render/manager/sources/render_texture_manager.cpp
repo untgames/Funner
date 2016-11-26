@@ -6,20 +6,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char*  DYNAMIC_TEXTURE_NAME_PREFIX        = "dynamic:";
 const size_t DYNAMIC_TEXTURE_NAME_PREFIX_LENGTH = strlen (DYNAMIC_TEXTURE_NAME_PREFIX);
 
 /*
-    Описание динамической текстуры
+    РћРїРёСЃР°РЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 struct DynamicTextureDesc: public xtl::reference_counter
 {
-  stl::string                           name_mask; //маска имени
-  TextureManager::DynamicTextureCreator creator;   //функтор создания текстуры
+  stl::string                           name_mask; //РјР°СЃРєР° РёРјРµРЅРё
+  TextureManager::DynamicTextureCreator creator;   //С„СѓРЅРєС‚РѕСЂ СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
   
   DynamicTextureDesc (const char* in_name_mask, const TextureManager::DynamicTextureCreator& in_creator)
     : name_mask (in_name_mask)
@@ -34,20 +34,20 @@ typedef stl::list<DynamicTextureDescPtr>       DynamicTextureDescList;
 }
 
 /*
-    Описание реализации менеджера текстур
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С‚РµРєСЃС‚СѓСЂ
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, TextureProxy> ProxyMap;
 
 struct TextureManager::Impl
 {
-  DeviceManagerPtr        device_manager;             //менеджер устройства отрисовки
-  TextureProxyManager     texture_proxy_manager;      //менеджер прокси текстур
-  TextureDescProxyManager texture_desc_proxy_manager; //менеджер прокси описателей текстур  
-  SamplerProxyManager     sampler_proxy_manager;      //менеджер прокси сэмплеров
-  ProxyMap                loaded_textures;            //загруженные текстуры
-  DynamicTextureDescList  dynamic_texture_descs;      //реестр дескрипторов динамических текстур  
-  Log                     log;                        //протокол сообщений  
+  DeviceManagerPtr        device_manager;             //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TextureProxyManager     texture_proxy_manager;      //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё С‚РµРєСЃС‚СѓСЂ
+  TextureDescProxyManager texture_desc_proxy_manager; //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё РѕРїРёСЃР°С‚РµР»РµР№ С‚РµРєСЃС‚СѓСЂ  
+  SamplerProxyManager     sampler_proxy_manager;      //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё СЃСЌРјРїР»РµСЂРѕРІ
+  ProxyMap                loaded_textures;            //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹
+  DynamicTextureDescList  dynamic_texture_descs;      //СЂРµРµСЃС‚СЂ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ  
+  Log                     log;                        //РїСЂРѕС‚РѕРєРѕР» СЃРѕРѕР±С‰РµРЅРёР№  
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -56,7 +56,7 @@ struct TextureManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureManager::TextureManager (const DeviceManagerPtr& device_manager)
@@ -69,7 +69,7 @@ TextureManager::~TextureManager ()
 }
 
 /*
-    Создание текстур
+    РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂ
 */
 
 TexturePtr TextureManager::CreateTexture (const char* name)
@@ -244,7 +244,7 @@ TexturePtr TextureManager::CreateTexture
 }
 
 /*
-    Проверка: является ли ресурс текстурой
+    РџСЂРѕРІРµСЂРєР°: СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЂРµСЃСѓСЂСЃ С‚РµРєСЃС‚СѓСЂРѕР№
 */
 
 bool TextureManager::IsTextureResource (const char* name)
@@ -253,7 +253,7 @@ bool TextureManager::IsTextureResource (const char* name)
 }
 
 /*
-    Загрузка / выгрузка текстур
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° С‚РµРєСЃС‚СѓСЂ
 */
 
 void TextureManager::LoadTexture (const char* name)
@@ -347,7 +347,7 @@ void TextureManager::UnloadTexture (const char* name)
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 TextureProxy TextureManager::GetTextureProxy (const char* name)
@@ -366,7 +366,7 @@ SamplerProxy TextureManager::GetSamplerProxy (const char* name)
 }
 
 /*
-    Поиск загруженной текстуры / сэмплера
+    РџРѕРёСЃРє Р·Р°РіСЂСѓР¶РµРЅРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹ / СЃСЌРјРїР»РµСЂР°
 */
 
 TexturePtr TextureManager::FindTexture (const char* name)
@@ -385,7 +385,7 @@ LowLevelSamplerStatePtr TextureManager::FindSampler (const char* name)
 }
 
 /*
-    Создание динамической текстуры
+    РЎРѕР·РґР°РЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, EntityImpl& entity)
@@ -412,7 +412,7 @@ DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, Entity
 }
 
 /*
-    Регистрация динамических текстур
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ
 */
 
 void TextureManager::RegisterDynamicTexture (const char* name_mask, const DynamicTextureCreator& creator)
@@ -458,7 +458,7 @@ bool TextureManager::IsDynamicTexture (const char* name)
 }
 
 /*
-    Установка текстуры по умолчанию / сэмплера по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ / СЃСЌРјРїР»РµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void TextureManager::SetDefaultTexture (const TexturePtr& texture)

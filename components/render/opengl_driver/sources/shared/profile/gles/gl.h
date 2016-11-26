@@ -6,7 +6,7 @@
 #include <shared/profile/gles/entries.h>
 
 /*
-    Переопределения для упрощения портируемости
+    РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёСЏ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РїРѕСЂС‚РёСЂСѓРµРјРѕСЃС‚Рё
 */
 
 typedef PFNGLBLENDEQUATIONOESPROC                       PFNGLBLENDEQUATIONPROC;

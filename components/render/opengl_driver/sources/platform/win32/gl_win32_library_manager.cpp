@@ -9,7 +9,7 @@ namespace
 
 /*
 ===================================================================================================
-    Точки входа WGL драйвера
+    РўРѕС‡РєРё РІС…РѕРґР° WGL РґСЂР°Р№РІРµСЂР°
 ===================================================================================================
 */
 
@@ -23,7 +23,7 @@ typedef BOOL  (WINAPI *wglSwapBuffersFn)         (HDC dc);
 
 /*
 ===================================================================================================
-    Точки входа ICD драйвера
+    РўРѕС‡РєРё РІС…РѕРґР° ICD РґСЂР°Р№РІРµСЂР°
 ===================================================================================================
 */
 
@@ -41,7 +41,7 @@ typedef void* (WINAPI *DrvSetContextFn)      (HDC dc, HGLRC context, void* callb
 typedef void  (WINAPI *DrvReleaseContextFn)  (HGLRC context);
 typedef BOOL  (WINAPI *DrvValidateVersionFn) (DWORD version);
 
-//таблица точек входа OpenGL-функций
+//С‚Р°Р±Р»РёС†Р° С‚РѕС‡РµРє РІС…РѕРґР° OpenGL-С„СѓРЅРєС†РёР№
 struct IcdTable
 {
   DWORD size;
@@ -50,26 +50,26 @@ struct IcdTable
 
 /*
 ===================================================================================================
-    Динамическая библиотека
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
 ===================================================================================================
 */
 
 class DynamicLibrary
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DynamicLibrary (const char* in_path)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::DynamicLibrary::DynamicLibrary";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!in_path)
         throw xtl::make_null_argument_exception (METHOD_NAME, "path");
         
       path = in_path;
       
-        //загрузка библиотеки
+        //Р·Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 
       module = LoadLibrary (path.c_str ());
       
@@ -77,19 +77,19 @@ class DynamicLibrary
         raise_error ("LoadLibrary");
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~DynamicLibrary ()
     {
       FreeLibrary (module);
     }
     
-///Получение модуля
+///РџРѕР»СѓС‡РµРЅРёРµ РјРѕРґСѓР»СЏ
     HMODULE GetModule () { return module; }
     
-///Получение пути к библиотеке
+///РџРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё Рє Р±РёР±Р»РёРѕС‚РµРєРµ
     const char* GetPath () { return path.c_str (); }
     
-///Получение точки входа
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РѕС‡РєРё РІС…РѕРґР°
     void* GetSymbol (const char* name)
     {
       if (!name)
@@ -99,25 +99,25 @@ class DynamicLibrary
     }
 
   private:
-    HMODULE     module; //дескриптор модуля
-    stl::string path;   //путь к библиотеке
+    HMODULE     module; //РґРµСЃРєСЂРёРїС‚РѕСЂ РјРѕРґСѓР»СЏ
+    stl::string path;   //РїСѓС‚СЊ Рє Р±РёР±Р»РёРѕС‚РµРєРµ
 };
 
 typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
 
 /*
 ===================================================================================================
-    Загружаемая библиотека адаптера
+    Р—Р°РіСЂСѓР¶Р°РµРјР°СЏ Р±РёР±Р»РёРѕС‚РµРєР° Р°РґР°РїС‚РµСЂР°
 ===================================================================================================
 */
 
 class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AdapterLibrary (DynamicLibraryPtr& in_dll) : dll (in_dll), current_context (0), current_dc (0), listener (0)
     {
-        //регистрация библиотеки
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 
       next = first;
       prev = 0;
@@ -127,12 +127,12 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       first = this;
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~AdapterLibrary ()
     {
       log.Printf ("...unload dll '%s'", GetName ());
       
-        //отмена регистрации библиотеки
+        //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
         
       if (prev) prev->next = next;
       else      first      = next;
@@ -140,7 +140,7 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       if (next) next->prev = prev;            
     }  
   
-///Поиск библиотеки
+///РџРѕРёСЃРє Р±РёР±Р»РёРѕС‚РµРєРё
     static AdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
     {
       HMODULE module = dll->GetModule ();
@@ -152,16 +152,16 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       return 0;
     }
 
-///Получение текущего контекста
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     HGLRC GetCurrentContext () { return current_context; }
 
-///Получение текущего устройства вывода
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
     HDC GetCurrentDC () { return current_dc; }
 
-///Установка текущего контекста
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     void MakeCurrent (HDC new_dc, HGLRC new_context, IContextLostListener* new_listener)
     {
-        //сброс текущего контекста
+        //СЃР±СЂРѕСЃ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
       if (listener)
       {
@@ -171,15 +171,15 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }
 
-        //проверка необходимости физической смены контекста (введена для обхода багов драйверов ATI)
+        //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё С„РёР·РёС‡РµСЃРєРѕР№ СЃРјРµРЅС‹ РєРѕРЅС‚РµРєСЃС‚Р° (РІРІРµРґРµРЅР° РґР»СЏ РѕР±С…РѕРґР° Р±Р°РіРѕРІ РґСЂР°Р№РІРµСЂРѕРІ ATI)
 
       if (current_dc != new_dc || current_context != new_context)
       {
-          //сохранение параметров текущего контекста
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
         HGLRC old_current_context = current_context;
 
@@ -187,11 +187,11 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         current_context = 0;
         listener        = 0;
 
-          //установка текущего контекста
+          //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
         MakeCurrentCore (new_dc, new_context, old_current_context);
 
-          //обновление параметров
+          //РѕР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
         current_dc      = new_dc;
         current_context = new_context;
@@ -200,24 +200,24 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       listener = new_listener;
     }
 
-///Получение имени библиотеки
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё
     const char* GetName () { return dll->GetPath (); }
     
-///Получение модуля
+///РџРѕР»СѓС‡РµРЅРёРµ РјРѕРґСѓР»СЏ
     HMODULE GetModule () { return dll->GetModule (); }    
     
-///Освобождение ресурсов, связанных с контекстом устройства
+///РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ, СЃРІСЏР·Р°РЅРЅС‹С… СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІР°
     void ReleasePixelFormat (HDC dc) {}
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
   protected:
-///Определение адреса точки входа
+///РћРїСЂРµРґРµР»РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР°
     void* GetSymbol (const char* name) { return dll->GetSymbol (name); }    
     
-///Определение адреса точки входа с приведением типов и проверкой корректности аргументов
+///РћРїСЂРµРґРµР»РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР° СЃ РїСЂРёРІРµРґРµРЅРёРµРј С‚РёРїРѕРІ Рё РїСЂРѕРІРµСЂРєРѕР№ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
     {
       fn = (Fn)dll->GetSymbol (symbol);
@@ -228,33 +228,33 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
     }        
 
   private:
-    virtual void MakeCurrentCore (HDC new_dc, HGLRC new_context, HGLRC current_context) = 0; //реализация установки текущего контекста
+    virtual void MakeCurrentCore (HDC new_dc, HGLRC new_context, HGLRC current_context) = 0; //СЂРµР°Р»РёР·Р°С†РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     
   protected:
-    Log log; //протокол
+    Log log; //РїСЂРѕС‚РѕРєРѕР»
 
   private:
-    DynamicLibraryPtr      dll;             //динамическая библиотека
-    HGLRC                  current_context; //текущий контекст
-    HDC                    current_dc;      //текущий контекст устройства вывода
-    IContextLostListener*  listener;        //слушатель события потери контекста
-    AdapterLibrary*        prev;            //предыдущая библиотека
-    AdapterLibrary*        next;            //следующая библиотека
-    static AdapterLibrary* first;           //первая библиотека
+    DynamicLibraryPtr      dll;             //РґРёРЅР°РјРёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    HGLRC                  current_context; //С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚
+    HDC                    current_dc;      //С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+    IContextLostListener*  listener;        //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёСЏ РїРѕС‚РµСЂРё РєРѕРЅС‚РµРєСЃС‚Р°
+    AdapterLibrary*        prev;            //РїСЂРµРґС‹РґСѓС‰Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    AdapterLibrary*        next;            //СЃР»РµРґСѓСЋС‰Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    static AdapterLibrary* first;           //РїРµСЂРІР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
 };
 
 AdapterLibrary* AdapterLibrary::first = 0;
 
 /*
 ===================================================================================================
-    WGL библиотека
+    WGL Р±РёР±Р»РёРѕС‚РµРєР°
 ===================================================================================================
 */
 
 class WglAdapterLibrary: public AdapterLibrary
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WglAdapterLibrary (DynamicLibraryPtr& dll) :
       AdapterLibrary (dll)
     {
@@ -262,7 +262,7 @@ class WglAdapterLibrary: public AdapterLibrary
       {
         log.Printf ("...get default WGL-entries");
         
-          //инициализация точек входа
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР°
           
         GetSymbol ("wglCreateContext",       fwglCreateContext);
         GetSymbol ("wglDeleteContext",       fwglDeleteContext);
@@ -277,7 +277,7 @@ class WglAdapterLibrary: public AdapterLibrary
         if (!xtl::xstrnicmp (GetName (), OPENGL32_DLL, strlen (OPENGL32_DLL)))
           fwglSetPixelFormat = &::SetPixelFormat;
           
-          //перенаправление вызовов GDI
+          //РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹Р·РѕРІРѕРІ GDI
 
         PixelFormatManager::RedirectApiCalls (GetModule ());
 
@@ -291,13 +291,13 @@ class WglAdapterLibrary: public AdapterLibrary
       }
     }    
     
-///Получение описания формата пикселей
+///РџРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     int DescribePixelFormat (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd)
     {
       return fwglDescribePixelFormat (dc, pixel_format, size, pfd);
     }
 
-///Установка формата пикселей
+///РЈСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     void SetPixelFormat (HDC dc, int pixel_format)
     {
       try
@@ -319,7 +319,7 @@ class WglAdapterLibrary: public AdapterLibrary
       }
     }
     
-///Создание контекста
+///РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     HGLRC CreateContext (HDC dc)
     {
       try
@@ -338,7 +338,7 @@ class WglAdapterLibrary: public AdapterLibrary
       }
     }
 
-///Удаление контекста
+///РЈРґР°Р»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     void DeleteContext (HGLRC context)
     {
       try
@@ -353,7 +353,7 @@ class WglAdapterLibrary: public AdapterLibrary
       }
     }    
 
-///Установка текущего контекста
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     void MakeCurrentCore (HDC dc, HGLRC context, HGLRC)
     {
       try
@@ -368,7 +368,7 @@ class WglAdapterLibrary: public AdapterLibrary
       }
     }    
 
-///Получение адреса точки входа OpenGL
+///РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР° OpenGL
     void* GetProcAddress (const char* name, unsigned int search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
@@ -401,7 +401,7 @@ class WglAdapterLibrary: public AdapterLibrary
       throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in WGL library '%s'", name, GetName ());
     }
 
-///Обмен буферов
+///РћР±РјРµРЅ Р±СѓС„РµСЂРѕРІ
     void SwapBuffers (HDC dc)
     {
       try
@@ -428,21 +428,21 @@ class WglAdapterLibrary: public AdapterLibrary
 
 /*
 ===================================================================================================
-    ICD библиотека
+    ICD Р±РёР±Р»РёРѕС‚РµРєР°
 ===================================================================================================
 */
 
 class IcdAdapterLibrary: public AdapterLibrary
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     IcdAdapterLibrary (DynamicLibraryPtr& dll) : AdapterLibrary (dll)
     {
       try
       {
         log.Printf ("...get ICD entries");
         
-          //инициализация точек входа
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР°
 
         GetSymbol ("DrvCreateContext",       fDrvCreateContext, false);
         GetSymbol ("DrvCreateLayerContext",  fDrvCreateLayerContext, false);                
@@ -456,7 +456,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         GetSymbol ("DrvSwapLayerBuffers",    fDrvSwapLayerBuffers, false);
         GetSymbol ("DrvValidateVersion",     fDrvValidateVersion);
 
-          //проверка совместимости с библиотекой
+          //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ Р±РёР±Р»РёРѕС‚РµРєРѕР№
 
         if (!fDrvCreateContext && !fDrvCreateLayerContext)
           throw xtl::format_not_supported_exception ("", "No DrvCreateContext/DrvCreateLayerContext entries in dll '%s'", GetName ());
@@ -469,7 +469,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (!fDrvValidateVersion (REQUIRED_ICD_VERSION))
           throw xtl::format_not_supported_exception ("", "Adapter library '%s' doesn't support version %u", GetName (), REQUIRED_ICD_VERSION);          
 
-          //проверка наличия неподдерживаемый функций
+          //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ С„СѓРЅРєС†РёР№
 
         void* set_callback_procs_fn = 0;
 
@@ -478,7 +478,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (set_callback_procs_fn)
           throw xtl::format_not_supported_exception ("", "Adapter library '%s' has unsupported function 'DrvSetCallbackProcs'", GetName ());
           
-          //перенаправление вызовов GDI
+          //РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹Р·РѕРІРѕРІ GDI
           
         PixelFormatManager::RedirectApiCalls (GetModule ());
        
@@ -492,13 +492,13 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
     }
 
-///Получение описания формата пикселей
+///РџРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     int DescribePixelFormat (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd)
     {
       return fDrvDescribePixelFormat (dc, pixel_format, size, pfd);
     }
 
-///Установка формата пикселей
+///РЈСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     void SetPixelFormat (HDC dc, int pixel_format)
     {
       try
@@ -520,7 +520,7 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
     }
     
-///Создание контекста
+///РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     HGLRC CreateContext (HDC dc)
     {
       try
@@ -556,7 +556,7 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
     }
 
-///Удаление контекста
+///РЈРґР°Р»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     void DeleteContext (HGLRC context)
     {
       try
@@ -571,21 +571,21 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
     }
 
-///Установка текущего контекста
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     void MakeCurrentCore (HDC dc, HGLRC context, HGLRC current_context)
     {
       try
       {
-          //отмена текущего контекста
+          //РѕС‚РјРµРЅР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
           
         if (current_library != this)
         {
           if (current_library)
-            current_library->MakeCurrent (0, 0, 0); //вызывается не MakeCurrentCore, поскольку необходимо оповестить слушателей потери контекста
+            current_library->MakeCurrent (0, 0, 0); //РІС‹Р·С‹РІР°РµС‚СЃСЏ РЅРµ MakeCurrentCore, РїРѕСЃРєРѕР»СЊРєСѓ РЅРµРѕР±С…РѕРґРёРјРѕ РѕРїРѕРІРµСЃС‚РёС‚СЊ СЃР»СѓС€Р°С‚РµР»РµР№ РїРѕС‚РµСЂРё РєРѕРЅС‚РµРєСЃС‚Р°
         }
         else
         {
-            //освобождение текущего контекста
+            //РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
           current_icd_table = 0;
           current_library   = 0;
@@ -597,7 +597,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (!dc && !context)
           return;
 
-          //установка текущего контекста
+          //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
         if (!fDrvSetContext (dc, context, (void*)&SetContextCallBack))
           raise_error ("DrvSetContext");
@@ -606,12 +606,12 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
       catch (xtl::exception& exception)
       {
-        exception.touch ("render::low_level::opengl::windows::IcdAdapterLibrary::MakeCurrentСore");
+        exception.touch ("render::low_level::opengl::windows::IcdAdapterLibrary::MakeCurrentРЎore");
         throw;
       }
     }    
     
-///Получение адреса точки входа OpenGL
+///РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР° OpenGL
     void* GetProcAddress (const char* name, unsigned int search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
@@ -656,7 +656,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         name, GetName (), icd_table->size);
     }
 
-///Обмен буферов
+///РћР±РјРµРЅ Р±СѓС„РµСЂРѕРІ
     void SwapBuffers (HDC dc)
     {            
       try
@@ -684,14 +684,14 @@ class IcdAdapterLibrary: public AdapterLibrary
       }
     }
 
-///Освобождение ресурсов, связанных с контекстом устройства
+///РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ, СЃРІСЏР·Р°РЅРЅС‹С… СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІР°
     void ReleasePixelFormat (HDC dc)
     {
       PixelFormatManager::ReleasePixelFormat (dc);
     }
 
   private:
-///Установка ICD-таблицы точек входа
+///РЈСЃС‚Р°РЅРѕРІРєР° ICD-С‚Р°Р±Р»РёС†С‹ С‚РѕС‡РµРє РІС…РѕРґР°
     static DWORD CALLBACK SetContextCallBack (const IcdTable* table)
     {
       current_icd_table = table;
@@ -723,12 +723,12 @@ IcdAdapterLibrary* IcdAdapterLibrary::current_library   = 0;
 
 /*
 ===================================================================================================
-    Менеджер загружаемых библиотеки
+    РњРµРЅРµРґР¶РµСЂ Р·Р°РіСЂСѓР¶Р°РµРјС‹С… Р±РёР±Р»РёРѕС‚РµРєРё
 ===================================================================================================
 */
 
 /*
-    Загрузка библиотеки
+    Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
@@ -742,13 +742,13 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
   {
     Log log;        
     
-      //загрузка динамической библиотеки
+      //Р·Р°РіСЂСѓР·РєР° РґРёРЅР°РјРёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
       
     log.Printf ("...load library '%s'", name);
       
     DynamicLibraryPtr dll (new DynamicLibrary (name));
     
-      //попытка найти уже загруженную библиотеку
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅСѓСЋ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
     AdapterLibrary* library = AdapterLibrary::FindLibrary (dll);
 
@@ -758,7 +758,7 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
       return library;
     }
 
-      //создание новой библиотеки
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
       
     if (dll->GetSymbol ("wglCreateContext"))
       return AdapterLibraryPtr (new WglAdapterLibrary (dll), false);

@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки анимаций
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё Р°РЅРёРјР°С†РёР№
 */
 
 void DaeParser::ParseLibraryAnimations (Parser::Iterator iter)
@@ -19,21 +19,21 @@ void DaeParser::ParseAnimation (Parser::Iterator iter, AnimationList& collection
 {
   const char *id = get<const char*> (*iter, "id", "");
 
-    //создание анимации
+    //СЃРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРё
   Animation animation;
 
   animation.SetId (id);
 
-    //чтение каналов анимаций
+    //С‡С‚РµРЅРёРµ РєР°РЅР°Р»РѕРІ Р°РЅРёРјР°С†РёР№
   for_each_child (*iter, "channel", xtl::bind (&DaeParser::ParseAnimationChannel, this, _1, iter, xtl::ref (animation)));
 
-    //чтение дочерних анимаций
+    //С‡С‚РµРЅРёРµ РґРѕС‡РµСЂРЅРёС… Р°РЅРёРјР°С†РёР№
   for_each_child (*iter, "animation", xtl::bind (&DaeParser::ParseAnimation, this, _1, xtl::ref (animation.Animations ())));
 
   if (animation.Animations ().IsEmpty () && animation.Channels ().IsEmpty ())
     raise_parser_exception (*iter, "Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair");
 
-    //добавление анимации в коллекцию в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРё РІ РєРѕР»Р»РµРєС†РёСЋ РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
   collection.Add (animation);
 }
 
@@ -43,7 +43,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
              *target       = get<const char*> (*channel_iter, "target");
   size_t     target_length = xtl::xstrlen (target);
 
-    //проверка корректности формата ссылок
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„РѕСЂРјР°С‚Р° СЃСЃС‹Р»РѕРє
   if (!target_length)
     raise_parser_exception (*channel_iter, "Incorrect 'channel' tag, 'target' attribute is empty");
 
@@ -77,10 +77,10 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
   if (semantic_iter == animation_semantics.end ())
     raise_parser_exception (*channel_iter, "Incorrect 'channel' tag, can't determine semantic for this animation");
 
-    //проверка наличия соответсвующего сэмплера
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРѕРѕС‚РІРµС‚СЃРІСѓСЋС‰РµРіРѕ СЃСЌРјРїР»РµСЂР°
   Parser::Iterator sampler;
 
-  source++; //избавляемся от префиксного '#'
+  source++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
 
   for (Parser::NamesakeIterator sampler_iter = animation_iter->First ("sampler"); sampler_iter; ++sampler_iter)
     if (!xtl::xstrcmp (get <const char*> (*sampler_iter, "id"), source))
@@ -92,7 +92,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
   if (!sampler)
     raise_parser_exception (*channel_iter, "Incorrect 'channel' tag 'source' attribute, sampler with this name not found");
 
-    //чтение данных канала анимации
+    //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С… РєР°РЅР°Р»Р° Р°РЅРёРјР°С†РёРё
   int samples_count = -1;
 
   stl::vector <float> samples_times, samples_data;
@@ -102,7 +102,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
     const char *semantic     = get <const char*> (*input_iter, "semantic"),
                *input_source = get <const char*> (*input_iter, "source");
 
-    input_source++; //избавляемся от префиксного '#'
+    input_source++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
 
     bool is_source_found = false;
 

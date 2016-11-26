@@ -4,20 +4,20 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации отображаемой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕР№ РјРѕРґРµР»Рё
 */
 
 struct StaticMesh::Impl
 {
-  stl::string      mesh_name; //имя меша
-  manager::Entity& entity;    //сущность
+  stl::string      mesh_name; //РёРјСЏ РјРµС€Р°
+  manager::Entity& entity;    //СЃСѓС‰РЅРѕСЃС‚СЊ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (manager::Entity& in_entity) : entity (in_entity) {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 StaticMesh::StaticMesh (RenderManager& render_manager)
@@ -31,7 +31,7 @@ StaticMesh::~StaticMesh ()
 }
 
 /*
-    Имя меша
+    РРјСЏ РјРµС€Р°
 */
 
 void StaticMesh::SetMeshName (const char* name)

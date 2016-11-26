@@ -1,4 +1,4 @@
-//Тестирование алгоритма stable_partition (first, last, pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° stable_partition (first, last, pred)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

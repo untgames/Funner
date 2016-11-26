@@ -23,7 +23,7 @@ namespace input
 {
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EventTranslator::EventTranslator (const char* input_event, const char* event_replacement, const char* tag)
@@ -45,7 +45,7 @@ EventTranslator::~EventTranslator ()
 }
 
 /*
-   Выполнение замены
+   Р’С‹РїРѕР»РЅРµРЅРёРµ Р·Р°РјРµРЅС‹
 */
 
 bool EventTranslator::Replace (const common::StringArray& event_components, string& result)
@@ -72,7 +72,7 @@ bool EventTranslator::Replace (const common::StringArray& event_components, stri
 }
 
 /*
-   Разбиение строки замены на составляющие
+   Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё Р·Р°РјРµРЅС‹ РЅР° СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ
 */
 
 void EventTranslator::ParseFormatString (const char* prefix, const char* replacement_tag)

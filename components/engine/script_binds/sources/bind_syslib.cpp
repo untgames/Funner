@@ -14,7 +14,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* APPLICATION_BACKGROUND_MODE_LIBRARY = "System.ApplicationBackgroundMode";
@@ -33,7 +33,7 @@ const char* COMPONENT_NAME                      = "script.binds.System";
 const char* BINDER_NAME                         = "System";
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void bind_application_background_mode_library (Environment& environment)
@@ -68,7 +68,7 @@ void bind_application_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (APPLICATION_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_BackgroundMode",          make_invoker (&syslib::Application::BackgroundMode));
   lib.Register ("get_ScreenSaverState",        make_invoker (&syslib::Application::ScreenSaverState));
@@ -140,7 +140,7 @@ void bind_window_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (WINDOW_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Title",            make_invoker ((void (syslib::Window::*)(const char*))&syslib::Window::SetTitle));
   lib.Register ("get_Title",            make_invoker (&syslib::Window::Title));
@@ -220,7 +220,7 @@ void bind_web_view_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (WEB_VIEW_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("Create", make_invoker (&create_web_view));
 
@@ -398,7 +398,7 @@ namespace system_script_bind
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

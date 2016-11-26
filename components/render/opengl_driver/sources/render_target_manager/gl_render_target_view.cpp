@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 View::View (const ContextManager& context_manager, ITexture* in_texture, const ViewDesc& in_desc)
@@ -15,14 +15,14 @@ View::View (const ContextManager& context_manager, ITexture* in_texture, const V
 {
   static const char* METHOD_NAME = "render::low_level::opengl::View::View";
 
-    //проверка корректности текстуры и совместимости с текущим контекстом
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С‚РµРєСЃС‚СѓСЂС‹ Рё СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ С‚РµРєСѓС‰РёРј РєРѕРЅС‚РµРєСЃС‚РѕРј
 
   if (!texture)
     throw xtl::make_null_argument_exception (METHOD_NAME, "texture");
 
   cast_object<ContextObject> (GetContextManager (), in_texture, METHOD_NAME, "texture");
 
-     //проверка корректности дескриптора
+     //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   TextureDesc texture_desc;
 
@@ -31,11 +31,11 @@ View::View (const ContextManager& context_manager, ITexture* in_texture, const V
   if (in_desc.layer >= texture_desc.layers)
     throw xtl::make_range_exception (METHOD_NAME, "desc.layer", in_desc.layer, texture_desc.layers);
     
-    //копирование флагов биндинга
+    //РєРѕРїРёСЂРѕРІР°РЅРёРµ С„Р»Р°РіРѕРІ Р±РёРЅРґРёРЅРіР°
     
   bind_flags = texture_desc.bind_flags;
     
-    //установка дескриптора
+    //СѓСЃС‚Р°РЅРѕРІРєР° РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   desc = in_desc;
 }
@@ -45,7 +45,7 @@ View::~View ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void View::GetDesc (ViewDesc& out_desc)
@@ -54,7 +54,7 @@ void View::GetDesc (ViewDesc& out_desc)
 }
 
 /*
-    Получение целевой текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РµРІРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 ITexture* View::GetTexture ()

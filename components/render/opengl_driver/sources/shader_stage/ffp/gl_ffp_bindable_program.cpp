@@ -5,26 +5,26 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Описание параметра и группы параметров ffp-программы
+    РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР° Рё РіСЂСѓРїРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ ffp-РїСЂРѕРіСЂР°РјРјС‹
 */
 
 struct FfpBindableProgram::Parameter
 {
-  const FfpDynamicParameter* location; //указатель на динамический параметр шейдера
-  unsigned int               offset;   //смещение относительно начала константного буфера
-  unsigned int               size;     //размер параметра в байтах
+  const FfpDynamicParameter* location; //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РґРёРЅР°РјРёС‡РµСЃРєРёР№ РїР°СЂР°РјРµС‚СЂ С€РµР№РґРµСЂР°
+  unsigned int               offset;   //СЃРјРµС‰РµРЅРёРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
+  unsigned int               size;     //СЂР°Р·РјРµСЂ РїР°СЂР°РјРµС‚СЂР° РІ Р±Р°Р№С‚Р°С…
 };
 
 struct FfpBindableProgram::Group
 {
-  unsigned int slot;        //номер слота с константым буфером
-  size_t       data_hash;   //хеш данных константного буфера
-  unsigned int count;       //количество элементов группы
-  Parameter*   parameters;  //указатель на начало области с элементами
+  unsigned int slot;        //РЅРѕРјРµСЂ СЃР»РѕС‚Р° СЃ РєРѕРЅСЃС‚Р°РЅС‚С‹Рј Р±СѓС„РµСЂРѕРј
+  size_t       data_hash;   //С…РµС€ РґР°РЅРЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
+  unsigned int count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РіСЂСѓРїРїС‹
+  Parameter*   parameters;  //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ РѕР±Р»Р°СЃС‚Рё СЃ СЌР»РµРјРµРЅС‚Р°РјРё
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FfpBindableProgram::FfpBindableProgram
@@ -35,27 +35,27 @@ FfpBindableProgram::FfpBindableProgram
 {
   try
   {
-      //получение базового состояния фиксированной программы шейдинга
+      //РїРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ С„РёРєСЃРёСЂРѕРІР°РЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
     
     ffp_state = program.GetBaseState ();  
     
     identity_matrix (view_object_matrix);
 
-      //обновление хэшей
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€РµР№
 
     UpdateHashes ();  
 
-      //обработка ситуации отсутствия параметров
+      //РѕР±СЂР°Р±РѕС‚РєР° СЃРёС‚СѓР°С†РёРё РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 
     if (!parameters_layout || !parameters_layout->GetParametersCount ())
       return;
 
-      //резервирование памяти для хранения параметров и групп
+      //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё РіСЂСѓРїРї
     
     parameters.reserve (parameters_layout->GetParametersCount ());
     groups.reserve     (parameters_layout->GetGroupsCount ());
     
-      //преобразование параметров
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
       
     const ProgramParameterGroup* src_groups = parameters_layout->GetGroups ();  
       
@@ -70,15 +70,15 @@ FfpBindableProgram::FfpBindableProgram
         const ProgramParameter& src_param = src_group.parameters [j];
         Parameter               dst_param;
         
-          //поиск параметра в шейдере
+          //РїРѕРёСЃРє РїР°СЂР°РјРµС‚СЂР° РІ С€РµР№РґРµСЂРµ
 
         dst_param.location = program.FindDynamicParameter (src_param.name);
         dst_param.offset   = src_param.offset;
 
         if (!dst_param.location)
-          continue; //если параметр отсутствует - игнорируем его
+          continue; //РµСЃР»Рё РїР°СЂР°РјРµС‚СЂ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ - РёРіРЅРѕСЂРёСЂСѓРµРј РµРіРѕ
 
-          //проверка соответствия типов
+          //РїСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ С‚РёРїРѕРІ
           
         const FfpDynamicParameter& dyn_param = *dst_param.location;
 
@@ -154,17 +154,17 @@ FfpBindableProgram::FfpBindableProgram
           continue;
         }
 
-          //добавляем созданный параметр
+          //РґРѕР±Р°РІР»СЏРµРј СЃРѕР·РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ
 
         parameters.push_back (dst_param);
       }
       
-        //добавление новой группы
+        //РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ РіСЂСѓРїРїС‹
         
       size_t group_parameters_count = parameters.size () - start_parameters_count;
 
       if (!group_parameters_count)
-        continue; //игнорируем пустые группы
+        continue; //РёРіРЅРѕСЂРёСЂСѓРµРј РїСѓСЃС‚С‹Рµ РіСЂСѓРїРїС‹
 
       Group dst_group;
 
@@ -184,13 +184,13 @@ FfpBindableProgram::FfpBindableProgram
 }
 
 /*
-    Биндинг
+    Р‘РёРЅРґРёРЅРі
 */
 
 namespace
 {
 
-//эмуляция загрузки транспонированной матрицы в контекст OpenGL
+//СЌРјСѓР»СЏС†РёСЏ Р·Р°РіСЂСѓР·РєРё С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРЅРѕР№ РјР°С‚СЂРёС†С‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 void load_transpose_matrix (Matrix4f matrix, const ContextCaps& caps)
 {
 #ifndef OPENGL_ES_SUPPORT
@@ -216,12 +216,12 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FfpBindableProgram::Bind";
   
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
   if (!constant_buffers)
     throw xtl::make_null_argument_exception (METHOD_NAME, "constant_buffers");
   
-    //получение кэш переменных
+    //РїРѕР»СѓС‡РµРЅРёРµ РєСЌС€ РїРµСЂРµРјРµРЅРЅС‹С…
 
   const ContextCaps& caps = GetCaps ();
                    
@@ -236,7 +236,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
 #ifndef OPENGL_ES_SUPPORT               
                
-    //отключение glsl-шейдеров
+    //РѕС‚РєР»СЋС‡РµРЅРёРµ glsl-С€РµР№РґРµСЂРѕРІ
 
   if (current_program != GetId ())
   {    
@@ -248,11 +248,11 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   
 #endif
 
-    //извлечение параметров из кэша расположения параметров
+    //РёР·РІР»РµС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёР· РєСЌС€Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
     
   char* dst_data = (char*)&ffp_state;
 
-    //обновление динамических параметров
+    //РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
     
   bool need_update_hashes = false;
 
@@ -262,33 +262,33 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     IBindableBuffer* buffer = constant_buffers [group.slot].get ();
 
-      //проверка наличия требуемого константного буфера
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚СЂРµР±СѓРµРјРѕРіРѕ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 
     if (!buffer)
       throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u", group.slot);
 
-      //проверка необходимости обновления параметров
+      //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 
     if (group.data_hash == buffer->GetDataHash ())
       continue;
       
     need_update_hashes = true;
 
-      //получение базового адреса константного буфера
+      //РїРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ Р°РґСЂРµСЃР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
       
     char* buffer_base = (char*)buffer->GetDataPointer ();
  
     if (!buffer_base)
       throw xtl::format_operation_exception (METHOD_NAME, "Null constant buffer #%u data pointer", group.slot);
       
-      //обновление динамических параметров
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     for (size_t j=0; j<group.count; j++)
     {
       const Parameter& param      = group.parameters [j];
       const char*      src_data   = buffer_base + param.offset;
 
-        //обновление всех полей FfpState, ассоциированных с динамическим параметром
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РІСЃРµС… РїРѕР»РµР№ FfpState, Р°СЃСЃРѕС†РёРёСЂРѕРІР°РЅРЅС‹С… СЃ РґРёРЅР°РјРёС‡РµСЃРєРёРј РїР°СЂР°РјРµС‚СЂРѕРј
 
       const unsigned int* offset      = &param.location->field_offsets [0],
                           update_size = param.size;
@@ -297,19 +297,19 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         memcpy (dst_data + *offset, src_data, update_size);
     }
 
-      //обновление хэша данных группы параметров
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р° РґР°РЅРЅС‹С… РіСЂСѓРїРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ
 
     group.data_hash = buffer->GetDataHash ();    
   }
   
-    //обновление хэшей FfpState
+    //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€РµР№ FfpState
     
   if (need_update_hashes)
   {
     UpdateHashes ();
   }
 
-    //установка состояния в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     
   bool need_update_modelview_matrix = false,
        need_update_modes            = current_modes_hash != modes_hash,
@@ -320,7 +320,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
        need_update_lighting         = current_lighting_hash != lighting_hash || need_update_viewer,
        need_update_texmaps          = current_texmaps_hash != texmaps_hash;    
     
-    //установка режимов отрисовки
+    //СѓСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
     
   if (need_update_modes)
   {
@@ -330,7 +330,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FfpModesStateHash, modes_hash);
   }    
   
-    //установка параметров растеризации
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
     
   if (need_update_rasterization)
   {
@@ -347,13 +347,13 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     glPointSize (point_size);
     glLineWidth (line_width);
     
-      //проблемы с поддержкой на MSOGL
+      //РїСЂРѕР±Р»РµРјС‹ СЃ РїРѕРґРґРµСЂР¶РєРѕР№ РЅР° MSOGL
 //    glLineStipple (line_stipple_factor, static_cast<unsigned short> (ffp_state.rasterization.line_stipple_pattern));
 
     SetContextCacheValue (CacheEntry_FfpRasterizationStateHash, rasterization_hash);
   }
 
-    //установка параметров источников освещения
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєРѕРІ РѕСЃРІРµС‰РµРЅРёСЏ
 
   if (need_update_lighting)
   {
@@ -368,7 +368,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       
     if (lighting)
     {
-        //включение освещения
+        //РІРєР»СЋС‡РµРЅРёРµ РѕСЃРІРµС‰РµРЅРёСЏ
       
       glEnable      (GL_LIGHTING);
       glLightModelf (GL_LIGHT_MODEL_TWO_SIDE,     1.0f);
@@ -377,7 +377,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       glLightModelf (GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
 #endif
       
-        //установка преобразования наблюдателя
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РЅР°Р±Р»СЋРґР°С‚РµР»СЏ
 
       glMatrixMode (GL_MODELVIEW);
 
@@ -385,7 +385,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       need_update_modelview_matrix = true;
       
-        //установка параметров источника
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР°
 
       for (unsigned int i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
       {
@@ -421,7 +421,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FfpLightingStateHash, lighting_hash);
   }    
   
-    //установка параметров материала
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РјР°С‚РµСЂРёР°Р»Р°
 
   if (need_update_material)
   {
@@ -431,7 +431,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&ffp_state.material.specular_color);
     glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, ffp_state.material.shininess);
 
-      //настройка передачи цвета материала
+      //РЅР°СЃС‚СЂРѕР№РєР° РїРµСЂРµРґР°С‡Рё С†РІРµС‚Р° РјР°С‚РµСЂРёР°Р»Р°
 
     if (ffp_state.material.color_material == ColorMaterial_Explicit)
     {
@@ -458,7 +458,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       glEnable (GL_COLOR_MATERIAL);
     }
 
-      //включение параметров альфа-теста
+      //РІРєР»СЋС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р°Р»СЊС„Р°-С‚РµСЃС‚Р°
 
     if (ffp_state.material.alpha_compare_mode != CompareMode_AlwaysPass)
     {
@@ -489,7 +489,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FfpMaterialStateHash, material_hash);
   }  
 
-    //установка параметров текстурирования
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ
     
   if (need_update_texmaps)
   {    
@@ -504,7 +504,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     for (unsigned int i=0; i<ffp_texture_units_count; i++)
     {
-        //установка активного слота текстурирования
+        //СѓСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ СЃР»РѕС‚Р° С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ
 
       if (active_texture_slot != i)
       {
@@ -513,7 +513,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         SetContextCacheValue (CacheEntry_ActiveTextureSlot, i);
       }
 
-        //если текстура не установлена - отключение текстурирования канала
+        //РµСЃР»Рё С‚РµРєСЃС‚СѓСЂР° РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅР° - РѕС‚РєР»СЋС‡РµРЅРёРµ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ РєР°РЅР°Р»Р°
 
       if (!(current_enabled_textures & (1 << i)))
       {
@@ -522,13 +522,13 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         continue;
       }
       
-        //включение текстурирования на канале
+        //РІРєР»СЋС‡РµРЅРёРµ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ РЅР° РєР°РЅР°Р»Рµ
         
       glEnable (GL_TEXTURE_2D);        
       
       TexmapDesc& texmap = ffp_state.maps [i];
       
-        //установка параметров смешивания цветов
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
         
       GLenum blend_mode;
         
@@ -548,7 +548,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, blend_mode);
 
-        //установка параметров генерации текстурных координат
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РіРµРЅРµСЂР°С†РёРё С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 
       load_transpose_matrix (texmap.transform, caps);
       
@@ -590,7 +590,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FfpTexmapsStateHash, texmaps_hash);
   }
   
-    //установка параметров наблюдателя
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РЅР°Р±Р»СЋРґР°С‚РµР»СЏ
     
   bool need_compute_view_object_matrix = false;
 
@@ -604,7 +604,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     need_compute_view_object_matrix = true;
   }
 
-    //установка параметров объекта
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±СЉРµРєС‚Р°
 
   if (need_update_object)
   {
@@ -626,13 +626,13 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     load_transpose_matrix (view_object_matrix, caps);
   }  
   
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
     
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Обновление хэшей
+    РћР±РЅРѕРІР»РµРЅРёРµ С…СЌС€РµР№
 */
 
 void FfpBindableProgram::UpdateHashes ()

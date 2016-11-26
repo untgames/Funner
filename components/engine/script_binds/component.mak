@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := ENGINE.SCRIPT_BINDS.SOURCES ENGINE.SCRIPT_BINDS.TESTS
 
-#Цель №1 - SCRIPT_BINDS sources
+#Р¦РµР»СЊ в„–1 - SCRIPT_BINDS sources
 ENGINE.SCRIPT_BINDS.SOURCES.TYPE         := static-lib
 ENGINE.SCRIPT_BINDS.SOURCES.NAME         := funner.engine.script_binds
 ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
@@ -16,7 +16,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_gr
                                             compile.media.image compile.analytics.flurry \
                                             compile.push_notifications.core
 
-#Цель №2 - SCRIPT_BINDS tests
+#Р¦РµР»СЊ в„–2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite
 ENGINE.SCRIPT_BINDS.TESTS.SOURCE_DIRS := tests/lua
 ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath compile.common compile.system compile.engine.core \

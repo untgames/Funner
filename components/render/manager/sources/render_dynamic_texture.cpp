@@ -3,14 +3,14 @@
 using namespace render::manager;
 
 /*
-    Описание реализации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 struct DynamicTextureImpl::Impl
 {
-  stl::string      name;            //имя динамической текстуры
-  IDynamicTexture* dynamic_texture; //ссылка на динамическую текстуру
-  TexturePtr       texture;         //текстура
+  stl::string      name;            //РёРјСЏ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ С‚РµРєСЃС‚СѓСЂС‹
+  IDynamicTexture* dynamic_texture; //СЃСЃС‹Р»РєР° РЅР° РґРёРЅР°РјРёС‡РµСЃРєСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ
+  TexturePtr       texture;         //С‚РµРєСЃС‚СѓСЂР°
 
   Impl (const char* in_name, EntityImpl& entity, const RenderManager::DynamicTextureCreator& creator)
     : name (in_name ? in_name : "")
@@ -55,7 +55,7 @@ struct DynamicTextureImpl::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DynamicTextureImpl::DynamicTextureImpl (const char* name, EntityImpl& entity, const RenderManager::DynamicTextureCreator& creator)
@@ -68,7 +68,7 @@ DynamicTextureImpl::~DynamicTextureImpl ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* DynamicTextureImpl::Name ()
@@ -77,7 +77,7 @@ const char* DynamicTextureImpl::Name ()
 }
 
 /*
-    Текстура
+    РўРµРєСЃС‚СѓСЂР°
 */
 
 TexturePtr DynamicTextureImpl::Texture ()
@@ -86,7 +86,7 @@ TexturePtr DynamicTextureImpl::Texture ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void DynamicTextureImpl::Update (const FramePtr& frame)

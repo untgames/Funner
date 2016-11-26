@@ -3,7 +3,7 @@
 using namespace render::low_level::opengl;
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 Version::Version ()
@@ -18,25 +18,25 @@ Version::Version (const char* string)
     minor_version (0),
     build_number (0)
 {
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!string)
     throw xtl::make_null_argument_exception ("render::low_level::opengl::Version::Version", "string");
 
-    //разбор строки версии
+    //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РІРµСЂСЃРёРё
     
   const char* dot = strchr (string, '.');
   
   if (!dot)
     return;
 
-    //получение старшего номера версии    
+    //РїРѕР»СѓС‡РµРЅРёРµ СЃС‚Р°СЂС€РµРіРѕ РЅРѕРјРµСЂР° РІРµСЂСЃРёРё    
 
   stl::string buffer (string, dot);  
 
   major_version = atoi (buffer.c_str ());
   
-    //получение младшего номера версии
+    //РїРѕР»СѓС‡РµРЅРёРµ РјР»Р°РґС€РµРіРѕ РЅРѕРјРµСЂР° РІРµСЂСЃРёРё
     
   string = dot + 1;    
   dot    = strchr (string, '.');
@@ -48,7 +48,7 @@ Version::Version (const char* string)
   
   minor_version = atoi (buffer.c_str ());
   
-    //получение номера билда
+    //РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° Р±РёР»РґР°
     
   if (*dot)
   {    
@@ -59,7 +59,7 @@ Version::Version (const char* string)
 }
 
 /*
-    Проверка корректности версии
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРµСЂСЃРёРё
 */
 
 bool Version::IsValid () const
@@ -70,7 +70,7 @@ bool Version::IsValid () const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 bool Version::operator < (const Version& version) const

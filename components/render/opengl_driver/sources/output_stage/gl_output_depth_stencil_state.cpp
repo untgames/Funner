@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DepthStencilState::DepthStencilState (const ContextManager& manager, const DepthStencilDesc& in_desc)
@@ -20,14 +20,14 @@ DepthStencilState::~DepthStencilState ()
 }
 
 /*
-    Установка / изменение дескриптора
+    РЈСЃС‚Р°РЅРѕРІРєР° / РёР·РјРµРЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 namespace
 {
 
 /*
-    Преобразование констант
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚
 */
 
 GLenum get_gl_compare_mode (CompareMode mode, const char* source, const char* param)
@@ -68,17 +68,17 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilState::SetDesc";
   
-    //выбор контекста
+    //РІС‹Р±РѕСЂ РєРѕРЅС‚РµРєСЃС‚Р°
     
   MakeContextCurrent ();
   
-    //получение информации о доступных расширениях    
+    //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРѕСЃС‚СѓРїРЅС‹С… СЂР°СЃС€РёСЂРµРЅРёСЏС…    
     
   const ContextCaps& caps = GetCaps ();
   
   bool has_two_side_stencil = caps.has_ext_stencil_two_side || caps.has_ati_separate_stencil;
   
-    //преобразование данных дескриптора
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РґРµСЃРєСЂРёРїС‚РѕСЂР°
     
   GLenum gl_depth_compare_mode = get_gl_compare_mode (in_desc.depth_compare_mode, METHOD_NAME, "desc.depth_compare_mode");
   bool   need_two_side_stencil = false;
@@ -125,13 +125,13 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
     }
   };
   
-    //проверка наличия расширений
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЂР°СЃС€РёСЂРµРЅРёР№
   
   if (in_desc.stencil_test_enable && need_two_side_stencil && !has_two_side_stencil)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.stencil_desc [FaceMode_Front] != desc.stencil_desc [FaceMode_Back] "
       "(GL_EXT_stencil_two_side and GL_ATI_separate_stencil not supported)");  
          
-    //запись команд в контексте OpenGL
+    //Р·Р°РїРёСЃСЊ РєРѕРјР°РЅРґ РІ РєРѕРЅС‚РµРєСЃС‚Рµ OpenGL
 
   CommandListBuilder cmd_list;
   
@@ -205,15 +205,15 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
 
   cmd_list.Add (glStencilMask, in_desc.stencil_write_mask);
   
-    //создание нового исполнителя команд
+    //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РёСЃРїРѕР»РЅРёС‚РµР»СЏ РєРѕРјР°РЅРґ
 
   ExecuterPtr new_executer = cmd_list.Finish ();
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
   
-    //сохранение параметров
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
@@ -231,14 +231,14 @@ void DepthStencilState::GetDesc (DepthStencilDesc& out_desc)
 }
 
 /*
-    Установка состояния в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void DepthStencilState::Bind (unsigned int reference)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::DepthStencilState::Bind";
   
-    //проверка необходимости биндинга (кэширование состояния)
+    //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР° (РєСЌС€РёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ)
     
   const size_t current_desc_hash          = GetContextCacheValue (CacheEntry_DepthStencilStateHash),
                current_reference          = GetContextCacheValue (CacheEntry_StencilReference),
@@ -249,11 +249,11 @@ void DepthStencilState::Bind (unsigned int reference)
       current_stencil_write_mask == size_t (desc.stencil_write_mask))
     return;  
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
   
-    //установка состояния в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   if (desc_hash != current_desc_hash)
     executer->ExecuteCommands ();
@@ -263,11 +263,11 @@ void DepthStencilState::Bind (unsigned int reference)
 #ifndef OPENGL_ES_SUPPORT
     if (need_two_side_stencil)
     {
-        //получение информации о доступных расширениях
+        //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРѕСЃС‚СѓРїРЅС‹С… СЂР°СЃС€РёСЂРµРЅРёСЏС…
         
       const ContextCaps& caps = GetCaps ();
 
-        //настройка функции трафарета        
+        //РЅР°СЃС‚СЂРѕР№РєР° С„СѓРЅРєС†РёРё С‚СЂР°С„Р°СЂРµС‚Р°        
 
       if (caps.has_ati_separate_stencil)
       {
@@ -299,18 +299,18 @@ void DepthStencilState::Bind (unsigned int reference)
     }
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //установка кэш-переменных
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   SetContextCacheValue (CacheEntry_DepthStencilStateHash, desc_hash);
   SetContextCacheValue (CacheEntry_StencilReference,      reference);
   SetContextCacheValue (CacheEntry_DepthWriteEnable,      desc.depth_write_enable);
   SetContextCacheValue (CacheEntry_StencilWriteMask,      desc.stencil_write_mask);
 
-    //оповещение о необходимости ребиндинга уровня
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 
   StageRebindNotify (Stage_Output);
 }

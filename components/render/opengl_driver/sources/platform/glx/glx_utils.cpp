@@ -13,7 +13,7 @@ namespace glx
 {
 
 /*
-    Получние экрана и номера экрана
+    РџРѕР»СѓС‡РЅРёРµ СЌРєСЂР°РЅР° Рё РЅРѕРјРµСЂР° СЌРєСЂР°РЅР°
 */
 
 Screen* get_screen (Window window)
@@ -50,7 +50,7 @@ int get_screen_number (Window window)
 }
 
 /*
-    Проверка ошибок
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 */
 
 int glxErrorHandler (Display *display, XErrorEvent *error_event)

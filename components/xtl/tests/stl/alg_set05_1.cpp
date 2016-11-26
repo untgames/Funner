@@ -1,4 +1,4 @@
-//Тестирование алгоритма set_symmetric_difference (range1,range2,result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° set_symmetric_difference (range1,range2,result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

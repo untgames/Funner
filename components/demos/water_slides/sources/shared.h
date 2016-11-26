@@ -58,21 +58,21 @@ typedef xtl::com_ptr<render::low_level::IPredicate>               PredicatePtr;
 typedef scene_graph::Listener::Pointer                            ListenerPtr;
 typedef scene_graph::SoundEmitter::Pointer                        SoundEmitterPtr;
 
-//интерфейс игрового отображения
+//РёРЅС‚РµСЂС„РµР№СЃ РёРіСЂРѕРІРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 class IGameView: public xtl::reference_counter
 {
   public:
     virtual ~IGameView () {}
     
-      //виртуальные размеры отображения
+      //РІРёСЂС‚СѓР°Р»СЊРЅС‹Рµ СЂР°Р·РјРµСЂС‹ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
     virtual size_t Width  () { return 100; }
     virtual size_t Height () { return 100; }    
     
-      //создание ресурсов
+      //СЃРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
     virtual void LoadResources (sound::ScenePlayer*, render::low_level::IDevice&) {}
     virtual void FlushResources () {}
     
-      //обработчики событий
+      //РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
     virtual void OnDraw  () {}
     virtual void OnIdle  () {}
     virtual void OnMouse (syslib::WindowEvent event, int x, int y) {}
@@ -80,7 +80,7 @@ class IGameView: public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<IGameView> GameView;
 
-//класс конфигурационного файла
+//РєР»Р°СЃСЃ РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅРѕРіРѕ С„Р°Р№Р»Р°
 class Configuration
 {
   public:
@@ -103,23 +103,23 @@ class Configuration
     stl::auto_ptr<Impl> impl;
 };
 
-//класс приложения
+//РєР»Р°СЃСЃ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class MyApplication
 {
   public:
-      //получение количества милисекунд, прошедших от момента запуска приложения
+      //РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РјРёР»РёСЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РёС… РѕС‚ РјРѕРјРµРЅС‚Р° Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
     static size_t Milliseconds ();  
 
-      //протоколирование
+      //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
     void LogMessage        (const char* message);
     void LogFormatMessage  (const char* format, ...);
     void VLogFormatMessage (const char* format, va_list list);    
     
-      //установка текущего отображения
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
     void            SetView (const GameView&);
     const GameView& View    () const;    
 
-      //конструкторы / деструктор / присваивание
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
     MyApplication  ();
     ~MyApplication ();
 
@@ -132,13 +132,13 @@ class MyApplication
     stl::auto_ptr<Impl> impl;
 };
 
-//получение ортографической матрицы проекции
+//РїРѕР»СѓС‡РµРЅРёРµ РѕСЂС‚РѕРіСЂР°С„РёС‡РµСЃРєРѕР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµРєС†РёРё
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar);
 
-//получение перспективной матрицы проекции
+//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂСЃРїРµРєС‚РёРІРЅРѕР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµРєС†РёРё
 math::mat4f get_perspective_proj (const math::anglef& fov_x, const math::anglef& fov_y, float znear, float zfar);
 
-//создание игровых отображений
+//СЃРѕР·РґР°РЅРёРµ РёРіСЂРѕРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 GameView create_test_game_view ();
 
 #endif

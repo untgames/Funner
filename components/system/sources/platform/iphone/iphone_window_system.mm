@@ -68,16 +68,16 @@ namespace iphone
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание реализации окна
+///РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowImpl
 {
-  void*                user_data;       //указатель на пользовательские данные
-  WindowMessageHandler message_handler; //функция обработки сообщений окна
-  window_t             cocoa_window;    //окно
-  common::Log          log;             //поток протоколирования
+  void*                user_data;       //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+  WindowMessageHandler message_handler; //С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  window_t             cocoa_window;    //РѕРєРЅРѕ
+  common::Log          log;             //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-  //Конструктор/деструктор
+  //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   WindowImpl (WindowMessageHandler handler, void* in_user_data, void* new_window)
     : user_data (in_user_data)
     , message_handler (handler)
@@ -90,7 +90,7 @@ struct WindowImpl
     [(UIWindow*)cocoa_window release];
   }
 
-  //Посылка сообщений
+  //РџРѕСЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёР№
   void Notify (WindowEvent event, const WindowEventContext& context)
   {
     try
@@ -127,15 +127,15 @@ struct WindowImpl
 @end
 
 /*
-   Класс, обрабатывающий события ввода и отвечающий за отрисовку
+   РљР»Р°СЃСЃ, РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰РёР№ СЃРѕР±С‹С‚РёСЏ РІРІРѕРґР° Рё РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РѕС‚СЂРёСЃРѕРІРєСѓ
 */
 
 @interface UIViewWrapper : UIView
 {
   @private
-    Color   background_color;       //цвет фона
-    UIColor *ui_background_color;   //цвет фона
-    bool    background_state;       //состояние включения цвета фона
+    Color   background_color;       //С†РІРµС‚ С„РѕРЅР°
+    UIColor *ui_background_color;   //С†РІРµС‚ С„РѕРЅР°
+    bool    background_state;       //СЃРѕСЃС‚РѕСЏРЅРёРµ РІРєР»СЋС‡РµРЅРёСЏ С†РІРµС‚Р° С„РѕРЅР°
 }
 
 @property (nonatomic, assign) Color    background_color;
@@ -185,7 +185,7 @@ struct WindowImpl
 @end
 
 /*
-   Класс, отвечающий за управление ориентацией окна
+   РљР»Р°СЃСЃ, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° СѓРїСЂР°РІР»РµРЅРёРµ РѕСЂРёРµРЅС‚Р°С†РёРµР№ РѕРєРЅР°
 */
 
 @interface UIViewControllerWrapper : UIViewController
@@ -495,7 +495,7 @@ struct WindowImpl
 }
 
 /*
-   Добавление/удаление подписчиков
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРѕРґРїРёСЃС‡РёРєРѕРІ
 */
 
 -(void) attachListener:(IWindowListener*)listener
@@ -511,7 +511,7 @@ struct WindowImpl
 @end
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
@@ -524,7 +524,7 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
   if (parent_handle)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Parent windows not supported for iPhonePlatform");
 
-    //Создание окна
+    //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
   UIWindowWrapper* new_window = [[UIWindowWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
 
   if (!new_window)
@@ -573,7 +573,7 @@ void IPhoneWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* IPhoneWindowManager::GetNativeWindowHandle (window_t handle)
@@ -593,7 +593,7 @@ const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t handle)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void IPhoneWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
@@ -624,7 +624,7 @@ void IPhoneWindowManager::GetWindowTitle (window_t handle, size_t size, wchar_t*
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -712,7 +712,7 @@ void IPhoneWindowManager::GetClientRect (window_t handle, Rect& target_rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -743,7 +743,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
   {
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
         if (state)
         {
           [wnd makeKeyAndVisible];
@@ -762,7 +762,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         }
 
         break;
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         if (state)
         {
           [wnd makeKeyAndVisible];
@@ -774,7 +774,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
           throw xtl::format_operation_exception ("", "Can't make window inactive");
 
         break;
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
         if (state)
         {
           if (wnd)
@@ -875,7 +875,7 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void IPhoneWindowManager::InvalidateWindow (window_t handle)
@@ -890,7 +890,7 @@ void IPhoneWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-   Установка multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР° multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void IPhoneWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
@@ -916,7 +916,7 @@ bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
 }
 
 /*
-   Цвет фона
+   Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& color)
@@ -992,11 +992,11 @@ bool IPhoneWindowManager::GetBackgroundState (window_t window)
 }
 
 /*
-   Менеджер окон
+   РњРµРЅРµРґР¶РµСЂ РѕРєРѕРЅ
 */
 
 /*
-   Добавление/удаление подписчиков
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРѕРґРїРёСЃС‡РёРєРѕРІ
 */
 
 void WindowManager::AttachWindowListener (const Window& window, IWindowListener* listener)
@@ -1019,7 +1019,7 @@ void WindowManager::DetachWindowListener (const Window& window, IWindowListener*
 }
 
 /*
-   Установка/получение разрешенных ориентаций окна
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·СЂРµС€РµРЅРЅС‹С… РѕСЂРёРµРЅС‚Р°С†РёР№ РѕРєРЅР°
 */
 
 void WindowManager::SetAllowedOrientations (const Window& window, int orientations)

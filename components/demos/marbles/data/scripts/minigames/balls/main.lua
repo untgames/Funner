@@ -8,7 +8,7 @@ local INPUT_ATTACHMENT_NAME = "Balls"
 local LEFT_PLAYER_MANA_BOTTLE_POSITION  = vec3 (-0.46, -0.295, 1)
 local RIGHT_PLAYER_MANA_BOTTLE_POSITION = vec3 (0.375, -0.39, 1)
 
-local game_paused = nil --��������� �� ���� � ������ �����
+local game_paused = nil --пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 BallsMinigameState = BallsMinigameState or {}  
 UIControlScript = UIControlScript or {}

@@ -1,4 +1,4 @@
-//Тестирование алгоритма max (a,b,less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° max (a,b,less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

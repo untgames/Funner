@@ -27,20 +27,20 @@ namespace iphone_configuration_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "IPhoneConfiguration";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.IPhoneConfiguration"; //имя компонента
+const char* SUBSYSTEM_NAME = "IPhoneConfiguration";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.IPhoneConfiguration"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 /*
-    Подсистема настроек iOS
+    РџРѕРґСЃРёСЃС‚РµРјР° РЅР°СЃС‚СЂРѕРµРє iOS
 */
 
 class IPhoneConfigurationSubsystem : public ISubsystem, public IAttachmentRegistryListener<syslib::Window>, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     IPhoneConfigurationSubsystem (ParseNode& node)
     {
       for (Parser::NamesakeIterator iter=node.First ("Window"); iter; ++iter)
@@ -73,13 +73,13 @@ class IPhoneConfigurationSubsystem : public ISubsystem, public IAttachmentRegist
       AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~IPhoneConfigurationSubsystem ()
     {
       AttachmentRegistry::Detach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-///Обработчик события регистрации окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕРєРЅР°
     void OnRegisterAttachment (const char* name, syslib::Window& window)
     {
       WindowsOrientations::iterator iter = windows_orientations.find (name);
@@ -90,7 +90,7 @@ class IPhoneConfigurationSubsystem : public ISubsystem, public IAttachmentRegist
       WindowManager::SetAllowedOrientations (window, iter->second);
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -106,7 +106,7 @@ class IPhoneConfigurationSubsystem : public ISubsystem, public IAttachmentRegist
 };
 
 /*
-    Компонент настроек iOS
+    РљРѕРјРїРѕРЅРµРЅС‚ РЅР°СЃС‚СЂРѕРµРє iOS
 */
 
 class IPhoneConfigurationComponent

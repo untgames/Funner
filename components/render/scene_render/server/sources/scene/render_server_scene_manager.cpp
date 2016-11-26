@@ -6,7 +6,7 @@ using namespace render::scene;
 using interchange::object_id_t;
 
 /*
-    Описание реализации менеджера сцен
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅ
 */
 
 typedef stl::hash_map<object_id_t, Scene>   SceneMap;
@@ -14,13 +14,13 @@ typedef stl::hash_map<object_id_t, NodePtr> NodeMap;
 
 struct SceneManager::Impl
 {
-  RenderManager render_manager; //менеджер рендеринга
-  SceneMap      scenes;         //сцены
-  NodeMap       nodes;          //узлы
-  object_id_t   cached_node_id; //закэшированный идентификатор узла (для последовательных обновлений одного узла)
-  Node*         cached_node;    //закэшированный узел (для последовательных обновлений одного узла)
+  RenderManager render_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  SceneMap      scenes;         //СЃС†РµРЅС‹
+  NodeMap       nodes;          //СѓР·Р»С‹
+  object_id_t   cached_node_id; //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р° (РґР»СЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹С… РѕР±РЅРѕРІР»РµРЅРёР№ РѕРґРЅРѕРіРѕ СѓР·Р»Р°)
+  Node*         cached_node;    //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ СѓР·РµР» (РґР»СЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹С… РѕР±РЅРѕРІР»РµРЅРёР№ РѕРґРЅРѕРіРѕ СѓР·Р»Р°)
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RenderManager& in_render_manager)
     : render_manager (in_render_manager)
     , cached_node_id ()
@@ -30,7 +30,7 @@ struct SceneManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SceneManager::SceneManager (const RenderManager& render_manager)
@@ -43,7 +43,7 @@ SceneManager::~SceneManager ()
 }
 
 /*
-    Добавление и удаление сцен
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ СЃС†РµРЅ
 */
 
 Scene SceneManager::CreateScene (object_id_t id)
@@ -62,7 +62,7 @@ void SceneManager::RemoveScene (object_id_t id)
 }
 
 /*
-    Поиск сцены
+    РџРѕРёСЃРє СЃС†РµРЅС‹
 */
 
 Scene& SceneManager::GetScene (object_id_t id) const
@@ -76,7 +76,7 @@ Scene& SceneManager::GetScene (object_id_t id) const
 }
 
 /*
-    Добавление и удаление узла
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ СѓР·Р»Р°
 */
 
 xtl::intrusive_ptr<Node> SceneManager::CreateNode (interchange::object_id_t id, interchange::NodeType type)
@@ -108,7 +108,7 @@ void SceneManager::RemoveNode (interchange::object_id_t id)
 }
 
 /*
-    Поиск узла
+    РџРѕРёСЃРє СѓР·Р»Р°
 */
 
 Node& SceneManager::GetNode (interchange::object_id_t id) const

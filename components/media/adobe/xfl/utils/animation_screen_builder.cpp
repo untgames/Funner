@@ -44,57 +44,57 @@ typedef math::tcb_splinef  trackf;
 typedef math::tcb_spline2f track2f;
 typedef math::tcb_spline3f track3f;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  ProcessOption process;       //функция-обработчик опции
-  const char*   name;          //имя команды
-  char          short_name;    //короткое имя
-  const char*   argument_name; //имя аргумента
-  const char*   tip;           //подсказка
+  ProcessOption process;       //С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїС†РёРё
+  const char*   name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char          short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*   argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*   tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option*       options;                           //массив опций
-  size_t              options_count;                     //количество опций
-  stl::string         xfl_name;                          //имя исходного файла или папки
-  stl::string         output_textures_dir_name;          //имя каталога с сохранёнными текстурами
-  stl::string         output_material_textures_dir_name; //имя каталога с текстурами, используемое при генерации материала
-  stl::string         output_scene_animation_dir_name;   //имя каталога с анимацией, используемое при генерации сцены
-  stl::string         output_textures_format;            //формат имён файлов в папке с текстурами
-  stl::string         output_materials_file_name;        //имя файла с материалами
-  stl::string         output_scene_file_name;            //имя файла со сценой
-  stl::string         output_animation_file_name;        //имя файла с анимациями
-  stl::string         material_name_pattern;             //строка шаблона поиска имени материала
-  stl::string         material_name_replacement;         //строка преобразования имени материала
-  stl::string         sprite_name_pattern;               //строка шаблона поиска имени спрайта
-  stl::string         sprite_name_replacement;           //строка преобразования имени спрайта
-  stl::string         crop_exclude;                      //необрезаемые слои
-  stl::string         layers_exclude;                    //неэкспортируемые слои
-  common::StringArray loop_sprites;                      //спрайты, требующие лупа
-  unsigned int        crop_alpha;                        //коэффициент обрезания по прозрачности
-  math::vec2f         total_scale;                       //общий коэффициент сжатия по осям
-  math::vec2f         total_offset;                      //общее смещение по осям
-  bool                silent;                            //минимальное число сообщений
-  bool                print_help;                        //нужно ли печатать сообщение помощи
-  bool                need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
-  bool                need_crop_alpha;                   //нужно ли обрезать картинку по нулевой прозрачности
-  bool                need_inverse_x;                    //нужно ли инвертировать знак оси X
-  bool                need_inverse_y;                    //нужно ли инвертировать знак оси Y
-  bool                need_relative;                     //нужно генерировать данные в относительной системе координат
-  bool                ignore_image_size;                 //игнорировать размер картинок
+  const Option*       options;                           //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t              options_count;                     //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string         xfl_name;                          //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р° РёР»Рё РїР°РїРєРё
+  stl::string         output_textures_dir_name;          //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё С‚РµРєСЃС‚СѓСЂР°РјРё
+  stl::string         output_material_textures_dir_name; //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ С‚РµРєСЃС‚СѓСЂР°РјРё, РёСЃРїРѕР»СЊР·СѓРµРјРѕРµ РїСЂРё РіРµРЅРµСЂР°С†РёРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string         output_scene_animation_dir_name;   //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ Р°РЅРёРјР°С†РёРµР№, РёСЃРїРѕР»СЊР·СѓРµРјРѕРµ РїСЂРё РіРµРЅРµСЂР°С†РёРё СЃС†РµРЅС‹
+  stl::string         output_textures_format;            //С„РѕСЂРјР°С‚ РёРјС‘РЅ С„Р°Р№Р»РѕРІ РІ РїР°РїРєРµ СЃ С‚РµРєСЃС‚СѓСЂР°РјРё
+  stl::string         output_materials_file_name;        //РёРјСЏ С„Р°Р№Р»Р° СЃ РјР°С‚РµСЂРёР°Р»Р°РјРё
+  stl::string         output_scene_file_name;            //РёРјСЏ С„Р°Р№Р»Р° СЃРѕ СЃС†РµРЅРѕР№
+  stl::string         output_animation_file_name;        //РёРјСЏ С„Р°Р№Р»Р° СЃ Р°РЅРёРјР°С†РёСЏРјРё
+  stl::string         material_name_pattern;             //СЃС‚СЂРѕРєР° С€Р°Р±Р»РѕРЅР° РїРѕРёСЃРєР° РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string         material_name_replacement;         //СЃС‚СЂРѕРєР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string         sprite_name_pattern;               //СЃС‚СЂРѕРєР° С€Р°Р±Р»РѕРЅР° РїРѕРёСЃРєР° РёРјРµРЅРё СЃРїСЂР°Р№С‚Р°
+  stl::string         sprite_name_replacement;           //СЃС‚СЂРѕРєР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РёРјРµРЅРё СЃРїСЂР°Р№С‚Р°
+  stl::string         crop_exclude;                      //РЅРµРѕР±СЂРµР·Р°РµРјС‹Рµ СЃР»РѕРё
+  stl::string         layers_exclude;                    //РЅРµСЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Рµ СЃР»РѕРё
+  common::StringArray loop_sprites;                      //СЃРїСЂР°Р№С‚С‹, С‚СЂРµР±СѓСЋС‰РёРµ Р»СѓРїР°
+  unsigned int        crop_alpha;                        //РєРѕСЌС„С„РёС†РёРµРЅС‚ РѕР±СЂРµР·Р°РЅРёСЏ РїРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
+  math::vec2f         total_scale;                       //РѕР±С‰РёР№ РєРѕСЌС„С„РёС†РёРµРЅС‚ СЃР¶Р°С‚РёСЏ РїРѕ РѕСЃСЏРј
+  math::vec2f         total_offset;                      //РѕР±С‰РµРµ СЃРјРµС‰РµРЅРёРµ РїРѕ РѕСЃСЏРј
+  bool                silent;                            //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool                print_help;                        //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
+  bool                need_pot_extent;                   //РЅСѓР¶РЅРѕ Р»Рё СЂР°СЃС€РёСЂСЏС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
+  bool                need_crop_alpha;                   //РЅСѓР¶РЅРѕ Р»Рё РѕР±СЂРµР·Р°С‚СЊ РєР°СЂС‚РёРЅРєСѓ РїРѕ РЅСѓР»РµРІРѕР№ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
+  bool                need_inverse_x;                    //РЅСѓР¶РЅРѕ Р»Рё РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ Р·РЅР°Рє РѕСЃРё X
+  bool                need_inverse_y;                    //РЅСѓР¶РЅРѕ Р»Рё РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ Р·РЅР°Рє РѕСЃРё Y
+  bool                need_relative;                     //РЅСѓР¶РЅРѕ РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РґР°РЅРЅС‹Рµ РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
+  bool                ignore_image_size;                 //РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ СЂР°Р·РјРµСЂ РєР°СЂС‚РёРЅРѕРє
 };
 
-//прямоугольная область
+//РїСЂСЏРјРѕСѓРіРѕР»СЊРЅР°СЏ РѕР±Р»Р°СЃС‚СЊ
 struct Rect
 {
   unsigned int x, y;
   unsigned int width, height;
 };
 
-//дескриптор изображения
+//РґРµСЃРєСЂРёРїС‚РѕСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 struct ImageDesc
 {
   size_t      x, y;
@@ -104,7 +104,7 @@ struct ImageDesc
   stl::string source_resource_name;
 };
 
-//событие
+//СЃРѕР±С‹С‚РёРµ
 struct Event
 {
   float       time;
@@ -115,7 +115,7 @@ typedef stl::hash_set<stl::hash_key<const char*> > UsedResourcesSet;
 typedef stl::hash_map<stl::string, ImageDesc>      ImageMap;
 typedef stl::list<Event>                           EventList;
 
-//параметры конвертации
+//РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅРІРµСЂС‚Р°С†РёРё
 struct ConvertData
 {
   Document                     document;
@@ -133,7 +133,7 @@ enum LayerType
   LayerType_Instance,
 };
 
-//сравнение дробных чисел
+//СЃСЂР°РІРЅРµРЅРёРµ РґСЂРѕР±РЅС‹С… С‡РёСЃРµР»
 bool float_compare (float v1, float v2)
 {
   if ((v1 > v2 + EPSILON) || (v1 < v2 - EPSILON))
@@ -142,7 +142,7 @@ bool float_compare (float v1, float v2)
   return true;
 }
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
@@ -159,7 +159,7 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
-//печать ошибки с выходом из программы
+//РїРµС‡Р°С‚СЊ РѕС€РёР±РєРё СЃ РІС‹С…РѕРґРѕРј РёР· РїСЂРѕРіСЂР°РјРјС‹
 void error (const char* format, ...)
 {
   va_list args;
@@ -174,7 +174,7 @@ void error (const char* format, ...)
   exit (1);
 }
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -201,73 +201,73 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка имени пути сохранения текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ
 void command_line_result_textures_dir (const char* file_name, Params& params)
 {
   params.output_textures_dir_name = file_name;
 }
 
-//установка имени пути сохранения текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ
 void command_line_result_material_textures_dir (const char* file_name, Params& params)
 {
   params.output_material_textures_dir_name = file_name;
 }
 
-//установка имени пути сохранения анимаций
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ Р°РЅРёРјР°С†РёР№
 void command_line_result_scene_animation_dir (const char* file_name, Params& params)
 {
   params.output_scene_animation_dir_name = file_name;
 }
 
-//установка формата сохранения текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ
 void command_line_result_textures_format (const char* value, Params& params)
 {
   params.output_textures_format = value;
 }
 
-//установка файла материалов
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° РјР°С‚РµСЂРёР°Р»РѕРІ
 void command_line_materials_file_name (const char* file_name, Params& params)
 {
   params.output_materials_file_name = file_name;
 }
 
-//установка файла сцены
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° СЃС†РµРЅС‹
 void command_line_scene_file_name (const char* file_name, Params& params)
 {
   params.output_scene_file_name = file_name;
 }
 
-//установка файла анимации
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° Р°РЅРёРјР°С†РёРё
 void command_line_animation_file_name (const char* file_name, Params& params)
 {
   params.output_animation_file_name = file_name;
 }
 
-//установка необрезаемых слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±СЂРµР·Р°РµРјС‹С… СЃР»РѕС‘РІ
 void command_line_crop_exclude (const char* string, Params& params)
 {
   params.crop_exclude = string;
 }
 
-//установка неэкспортируемых слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµСЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… СЃР»РѕС‘РІ
 void command_line_layers_exclude (const char* string, Params& params)
 {
   params.layers_exclude = string;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра генерации слоёв размерами кратными степени двойки
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РіРµРЅРµСЂР°С†РёРё СЃР»РѕС‘РІ СЂР°Р·РјРµСЂР°РјРё РєСЂР°С‚РЅС‹РјРё СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 void command_line_pot (const char*, Params& params)
 {
   params.need_pot_extent = true;
 }
 
-//установка параметра обрезания по прозрачности
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РѕР±СЂРµР·Р°РЅРёСЏ РїРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
 void command_line_crop_alpha (const char* value_string, Params& params)
 {
   int value = atoi (value_string);
@@ -276,7 +276,7 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
-//установка строки замены имени материала
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃС‚СЂРѕРєРё Р·Р°РјРµРЅС‹ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
 void command_line_material_replacement (const char* string, Params& params)
 {
   common::StringArray tokens = common::split (string, ",", "");
@@ -288,7 +288,7 @@ void command_line_material_replacement (const char* string, Params& params)
   params.material_name_replacement = tokens [1];  
 }
 
-//установка строки замены имени спрайта
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃС‚СЂРѕРєРё Р·Р°РјРµРЅС‹ РёРјРµРЅРё СЃРїСЂР°Р№С‚Р°
 void command_line_sprite_name_replacement (const char* string, Params& params)
 {
   common::StringArray tokens = common::split (string, ",", "");
@@ -300,37 +300,37 @@ void command_line_sprite_name_replacement (const char* string, Params& params)
   params.sprite_name_replacement = tokens [1];
 }
 
-//установка флага необходимости инвертирования координат по оси X
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚ РїРѕ РѕСЃРё X
 void command_line_inverse_x (const char*, Params& params)
 {
   params.need_inverse_x = true;
 }
 
-//установка флага необходимости инвертирования координат по оси Y
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚ РїРѕ РѕСЃРё Y
 void command_line_inverse_y (const char*, Params& params)
 {
   params.need_inverse_y = true;
 }
 
-//установка флага необходимости генерации в относительной системе координат
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РіРµРЅРµСЂР°С†РёРё РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
 void command_line_relative (const char*, Params& params)
 {
   params.need_relative = true;
 }
 
-//установка флага необходимости игнорирования размеров картинки
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РєР°СЂС‚РёРЅРєРё
 void command_line_ignore_image_size (const char*, Params& params)
 {
   params.ignore_image_size = true;
 }
 
-//установка списка луповых спрайтов
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃРїРёСЃРєР° Р»СѓРїРѕРІС‹С… СЃРїСЂР°Р№С‚РѕРІ
 void command_line_loop_sprites (const char* value, Params& params)
 {
   params.loop_sprites = common::split (value, " ", " \t", "''\"\"");
 }
 
-//установка общего смещения
+//СѓСЃС‚Р°РЅРѕРІРєР° РѕР±С‰РµРіРѕ СЃРјРµС‰РµРЅРёСЏ
 void command_line_total_offset (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, ";", " \t");
@@ -340,7 +340,7 @@ void command_line_total_offset (const char* value, Params& params)
   params.total_offset = xtl::io::get<math::vec2f> (iter);
 }
 
-//установка общего масштаба
+//СѓСЃС‚Р°РЅРѕРІРєР° РѕР±С‰РµРіРѕ РјР°СЃС€С‚Р°Р±Р°
 void command_line_total_scale (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, ";", " \t");
@@ -350,7 +350,7 @@ void command_line_total_scale (const char* value, Params& params)
   params.total_scale = xtl::io::get<math::vec2f> (iter);
 }
 
-//разбор командной строки
+//СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
@@ -383,7 +383,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   params.options       = options;
   params.options_count = options_count;
 
-    //разбор командной строки
+    //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
   for (int i=1; i<argc; i++)
   {
@@ -412,7 +412,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     stl::string   option_argument;
     const Option* option = 0;
 
-      //разбор длинных опций
+      //СЂР°Р·Р±РѕСЂ РґР»РёРЅРЅС‹С… РѕРїС†РёР№
 
     if (long_option)
     {
@@ -454,7 +454,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
       option_name = LONG_OPTION_NAME_PREFIX + option_name;
     }
 
-      //разбор коротких опций
+      //СЂР°Р·Р±РѕСЂ РєРѕСЂРѕС‚РєРёС… РѕРїС†РёР№
 
     if (short_option)
     {
@@ -503,7 +503,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
         arg = "";
     }
 
-      //получение аргумента
+      //РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 
     for (;*arg; arg++)
     {
@@ -554,7 +554,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-///проверка попадания имени в список строк
+///РїСЂРѕРІРµСЂРєР° РїРѕРїР°РґР°РЅРёСЏ РёРјРµРЅРё РІ СЃРїРёСЃРѕРє СЃС‚СЂРѕРє
 bool is_present (const char* name, const StringArray& strings)
 {
   for (size_t i = 0, count = strings.Size (); i < count; i++)
@@ -568,7 +568,7 @@ bool is_present (const char* name, const StringArray& strings)
   return false;
 }
 
-//получение полного имени материала
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕР»РЅРѕРіРѕ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
 stl::string get_full_material_name (const Params& params, const char* name)
 {
   if (params.material_name_pattern.empty ())
@@ -577,7 +577,7 @@ stl::string get_full_material_name (const Params& params, const char* name)
   return common::replace (name, params.material_name_pattern.c_str (), params.material_name_replacement.c_str ());
 }
 
-//получение имени спрайта
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРїСЂР°Р№С‚Р°
 stl::string get_sprite_name (const Params& params, const char* name)
 {
   if (params.sprite_name_pattern.empty ())
@@ -586,11 +586,11 @@ stl::string get_sprite_name (const Params& params, const char* name)
   return common::replace (name, params.sprite_name_pattern.c_str (), params.sprite_name_replacement.c_str ());
 }
 
-//сохранение материалов
+//СЃРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 void process_materials (Params& params, ConvertData& data)
 {
   if (params.output_materials_file_name.empty ())
-    return; //если имя файла материалов не указано - экспорт не производится
+    return; //РµСЃР»Рё РёРјСЏ С„Р°Р№Р»Р° РјР°С‚РµСЂРёР°Р»РѕРІ РЅРµ СѓРєР°Р·Р°РЅРѕ - СЌРєСЃРїРѕСЂС‚ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
     
   if (params.output_material_textures_dir_name.empty ())
     params.output_material_textures_dir_name = params.output_textures_dir_name;
@@ -628,10 +628,10 @@ void process_materials (Params& params, ConvertData& data)
   }
 }
 
-///обработка текстур
+///РѕР±СЂР°Р±РѕС‚РєР° С‚РµРєСЃС‚СѓСЂ
 void process_textures (Params& params, ConvertData& data)
 {
-    //в случае, если имя каталога с текстурами и формата текстур не задано - сохранение текстур не производится
+    //РІ СЃР»СѓС‡Р°Рµ, РµСЃР»Рё РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ С‚РµРєСЃС‚СѓСЂР°РјРё Рё С„РѕСЂРјР°С‚Р° С‚РµРєСЃС‚СѓСЂ РЅРµ Р·Р°РґР°РЅРѕ - СЃРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
 
   if (!params.silent)
     printf ("Processing textures...\n");
@@ -644,13 +644,13 @@ void process_textures (Params& params, ConvertData& data)
     if (params.output_textures_format.empty ())
       params.output_textures_format = DEFAULT_TEXTURES_FORMAT;
       
-      //создание каталога для хранения текстур
+      //СЃРѕР·РґР°РЅРёРµ РєР°С‚Р°Р»РѕРіР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ
 
     if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
       FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
   }
 
-    //построение списка текстур
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° С‚РµРєСЃС‚СѓСЂ
     
   common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
   common::StringArray textures_list;
@@ -661,18 +661,18 @@ void process_textures (Params& params, ConvertData& data)
   TexturesSet       textures_set;
   TexturesSymbolMap textures_symbol;
   
-    //обход символов
+    //РѕР±С…РѕРґ СЃРёРјРІРѕР»РѕРІ
 
   for (size_t symbol_index = 0; symbol_index < data.document.Symbols ().Size (); symbol_index++)
   {
     const Symbol& symbol = data.document.Symbols () [symbol_index];
 
-      //исключение из обработки неиспользуемых символов
+      //РёСЃРєР»СЋС‡РµРЅРёРµ РёР· РѕР±СЂР°Р±РѕС‚РєРё РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЃРёРјРІРѕР»РѕРІ
     
     if (data.used_symbols.find (symbol.Name ()) == data.used_symbols.end ())
       continue;
       
-      //обработка таймлайна данного символа
+      //РѕР±СЂР°Р±РѕС‚РєР° С‚Р°Р№РјР»Р°Р№РЅР° РґР°РЅРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
 
     const Timeline& symbol_timeline = symbol.Timeline ();
 
@@ -697,31 +697,31 @@ void process_textures (Params& params, ConvertData& data)
     }
   }
   
-    //кэш текстур
+    //РєСЌС€ С‚РµРєСЃС‚СѓСЂ
   
   typedef stl::hash_map<size_t, stl::string> ImageCache;
   
   ImageCache image_cache;
   
-    //счётчик имён текстур
+    //СЃС‡С‘С‚С‡РёРє РёРјС‘РЅ С‚РµРєСЃС‚СѓСЂ
     
   size_t texture_name_index = 0;
     
-    //обход используемых текстур
+    //РѕР±С…РѕРґ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… С‚РµРєСЃС‚СѓСЂ
     
   for (size_t i=0; i<textures_list.Size (); i++)
   {
-      //формирование имени исходной и целевой текстуры
+      //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё РёСЃС…РѕРґРЅРѕР№ Рё С†РµР»РµРІРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     
     const char* resource_name = textures_list [i];
     stl::string source_path   = data.document.Resources ()[resource_name].Path ();
     stl::string target_path   = common::format (common::format ("%s/%s", params.output_textures_dir_name.c_str (), params.output_textures_format.c_str ()).c_str (), texture_name_index);
     
-      //загрузка исходной текстуры
+      //Р·Р°РіСЂСѓР·РєР° РёСЃС…РѕРґРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     
     Image source_image (source_path.c_str ());
 
-        //отсечение по альфа
+        //РѕС‚СЃРµС‡РµРЅРёРµ РїРѕ Р°Р»СЊС„Р°
         
     bool need_crop_alpha = params.need_crop_alpha && !is_present (textures_symbol [resource_name].c_str (), crop_exclude_list);
     
@@ -749,7 +749,7 @@ void process_textures (Params& params, ConvertData& data)
       
       media::Image (crop_rect.width, crop_rect.height, 1, source_image.Format (), image_copy_buffer.data ()).Swap (source_image);
       
-        //сохранение смещения после отсечения
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ РїРѕСЃР»Рµ РѕС‚СЃРµС‡РµРЅРёСЏ
      
       offset_x = crop_rect.x;
       offset_y = crop_rect.y;
@@ -759,7 +759,7 @@ void process_textures (Params& params, ConvertData& data)
           crop_rect.x + crop_rect.width, crop_rect.y + crop_rect.height);
     }
     
-      //поиск изображения в кэше
+      //РїРѕРёСЃРє РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РєСЌС€Рµ
     
     size_t               image_hash = common::crc32 (source_image.Bitmap (), get_bytes_per_pixel (source_image.Format ()) * source_image.Width () * source_image.Height ());
     ImageCache::iterator image_iter = image_cache.find (image_hash);
@@ -775,7 +775,7 @@ void process_textures (Params& params, ConvertData& data)
     
     if (image_iter != image_cache.end ())
     {
-        //сохранять изображения не нужно - достаточно сделать ссылку
+        //СЃРѕС…СЂР°РЅСЏС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РЅРµ РЅСѓР¶РЅРѕ - РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРґРµР»Р°С‚СЊ СЃСЃС‹Р»РєСѓ
         
       desc.image_path           = data.images [image_iter->second].image_path;
       desc.source_resource_name = image_iter->second;
@@ -785,18 +785,18 @@ void process_textures (Params& params, ConvertData& data)
       continue;
     }
     
-      //сохранение изображения
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
       
     desc.image_path           = target_path;
     desc.source_resource_name = resource_name;
     
     data.images.insert_pair (resource_name, desc);
     
-      //обновление кэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
     
     image_cache [image_hash] = resource_name;
     
-      //увеличение до степени двойки
+      //СѓРІРµР»РёС‡РµРЅРёРµ РґРѕ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
       
     if (params.need_pot_extent)
     {
@@ -815,7 +815,7 @@ void process_textures (Params& params, ConvertData& data)
   }
 }
 
-///определение типа слоя
+///РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЃР»РѕСЏ
 LayerType get_layer_type (const Layer& layer)
 {
   size_t resources_count = 0, symbols_count = 0;
@@ -853,7 +853,7 @@ LayerType get_layer_type (const Layer& layer)
   return LayerType_Undefined;
 }
 
-///создание канала
+///СЃРѕР·РґР°РЅРёРµ РєР°РЅР°Р»Р°
 template <class Track>
 Track& create_channel (ConvertData& data, const char* target_name, const char* parameter_name)
 {
@@ -870,7 +870,7 @@ Track& create_channel (ConvertData& data, const char* target_name, const char* p
   return *channel.Track<Track> ();
 }
 
-///компоновка трека
+///РєРѕРјРїРѕРЅРѕРІРєР° С‚СЂРµРєР°
 void write_track
  (track3f&                 track,
   float                    time_offset,
@@ -966,7 +966,7 @@ void write_angle_track (track3f& dst_track, float time_offset, const PropertyAni
   }
 }
 
-//обработка событий
+//РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№
 void write_events_track (ConvertData& data, const EventList& events)
 {
   media::animation::EventTrack track = data.animation.Events ();
@@ -979,19 +979,19 @@ void write_events_track (ConvertData& data, const EventList& events)
   }
 }
 
-//запись треков таймлайн-спрайта
+//Р·Р°РїРёСЃСЊ С‚СЂРµРєРѕРІ С‚Р°Р№РјР»Р°Р№РЅ-СЃРїСЂР°Р№С‚Р°
 void write_timeline_node_tracks (Params& params, ConvertData& data, const EventList& events)
 {
   write_events_track (data, events);
 }
 
-//запись таймлайн-спрайта
+//Р·Р°РїРёСЃСЊ С‚Р°Р№РјР»Р°Р№РЅ-СЃРїСЂР°Р№С‚Р°
 void write_timeline_node_data (ConvertData& data, const char* name)
 {
   data.scene_writer->WriteAttribute ("id", name);
 }
 
-///общая часть обработки спрайтов
+///РѕР±С‰Р°СЏ С‡Р°СЃС‚СЊ РѕР±СЂР°Р±РѕС‚РєРё СЃРїСЂР°Р№С‚РѕРІ
 void process_sprite_common
  (Params&            params,
   ConvertData&       data,
@@ -1001,11 +1001,11 @@ void process_sprite_common
   const math::vec2f& position = math::vec2f (0.0f),
   const math::vec2f& scale = math::vec2f (1.0f))
 {
-    //получение объекта анимаций
+    //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° Р°РЅРёРјР°С†РёР№
     
   const AnimationCore& animation = frame.Animation ();
 
-    //сохранение положений
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёР№
   
   const PropertyAnimation *x_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_X"),
                           *y_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_Y");
@@ -1039,7 +1039,7 @@ void process_sprite_common
       params.total_scale.y * (params.need_inverse_y ? -position.y : position.y), 0.0f).c_str ());
   }
 
-    //сохранение масштаба
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РјР°СЃС€С‚Р°Р±Р°
     
   const PropertyAnimation *x_scale_track = animation.Properties ().Find ("headContainer.Transformation.Scale_X"),
                           *y_scale_track = animation.Properties ().Find ("headContainer.Transformation.Scale_Y");
@@ -1058,7 +1058,7 @@ void process_sprite_common
     }
   }
 
-    //сохранение угла
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СѓРіР»Р°
     
   const PropertyAnimation *angle_track = animation.Properties ().Find ("headContainer.Basic_Motion.Rotation_Z"),
                           *skewx_track = animation.Properties ().Find ("headContainer.Transformation.Skew_X"),
@@ -1111,7 +1111,7 @@ void process_sprite_common
     }
   }
 
-    //сохранение альфа
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°Р»СЊС„Р°
     
   const PropertyAnimation* alpha_track = animation.Properties ().Find ("headContainer.Colors.Alpha_Color.Alpha_Amount");
   
@@ -1130,18 +1130,18 @@ void process_sprite_common
   }
 }
 
-///обработка спрайта
+///РѕР±СЂР°Р±РѕС‚РєР° СЃРїСЂР°Р№С‚Р°
 void process_sprite (Params& params, ConvertData& data, const Frame& frame, const char* name, const char* parent, bool looped)
 {
   const FrameElement& element = frame.Elements ()[(size_t)0];
 
   XmlWriter::Scope scope (*data.scene_writer, "sprite");
   
-    //запись имени спрайта
+    //Р·Р°РїРёСЃСЊ РёРјРµРЅРё СЃРїСЂР°Р№С‚Р°
   
   data.scene_writer->WriteAttribute ("id", name);
   
-    //запись материала спрайта
+    //Р·Р°РїРёСЃСЊ РјР°С‚РµСЂРёР°Р»Р° СЃРїСЂР°Р№С‚Р°
   
   const char* resource_name = element.Name ();
   
@@ -1171,7 +1171,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     
   data.scene_writer->WriteAttribute ("visible", "false");
   
-    //сохранение центра вращений
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ С†РµРЅС‚СЂР° РІСЂР°С‰РµРЅРёР№
     
   math::vec2f transformation_point = (element.TransformationPoint () - math::vec2f ((float)image_desc.x, (float)image_desc.y)) /
     math::vec2f ((float)image_desc.width, (float)image_desc.height);
@@ -1188,14 +1188,14 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
 
   data.scene_writer->WriteAttribute ("pivot", pivot_value_string.c_str ());
   
-    //сохранение размера
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
   
   if (!params.need_relative && !params.ignore_image_size)
   {
     data.scene_writer->WriteAttribute ("scale", common::format ("%g; %g; 1", params.total_scale.x * image_desc.width, params.total_scale.y * image_desc.height).c_str ());
   }
   
-    //сохранение общей части
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РѕР±С‰РµР№ С‡Р°СЃС‚Рё
     
   math::vec2f position = element.Translation () + math::vec2f (image_desc.width / 2.0f, image_desc.height / 2.0f) +
     math::vec2f (float (image_desc.x), float (image_desc.y));
@@ -1203,7 +1203,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   process_sprite_common (params, data, frame, name, looped, position);
 }
 
-//является ли спрайт луповым
+//СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРїСЂР°Р№С‚ Р»СѓРїРѕРІС‹Рј
 bool is_sprite_looped (const char* name, Params& params)
 {
   if (!name)
@@ -1222,7 +1222,7 @@ bool is_sprite_looped (const char* name, Params& params)
 
 float process_timeline (Params& params, ConvertData& data, Timeline& timeline, const char* name_prefix, EventList& events);
 
-///обработка вложенного символа (возвращает время окончания анимации включая все вложения)
+///РѕР±СЂР°Р±РѕС‚РєР° РІР»РѕР¶РµРЅРЅРѕРіРѕ СЃРёРјРІРѕР»Р° (РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ Р°РЅРёРјР°С†РёРё РІРєР»СЋС‡Р°СЏ РІСЃРµ РІР»РѕР¶РµРЅРёСЏ)
 float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, const char* name_prefix, bool looped)
 {
   const FrameElement& element     = frame.Elements ()[(size_t)0];
@@ -1231,17 +1231,17 @@ float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, 
   if (!data.document.Symbols ().Find (symbol_name))
     error ("Symbol '%s' not found while processing '%s'", symbol_name, name_prefix);
 
-    //обработка вложений
+    //РѕР±СЂР°Р±РѕС‚РєР° РІР»РѕР¶РµРЅРёР№
     
   EventList events;
   
-    //обработка спрайта
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃРїСЂР°Р№С‚Р°
     
   XmlWriter::Scope node_scope (*data.scene_writer, "node");
   
   write_timeline_node_data (data, name_prefix);  
 
-    //сохранение центра вращений
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ С†РµРЅС‚СЂР° РІСЂР°С‰РµРЅРёР№
     
   math::vec2f transformation_point = element.TransformationPoint ();
   
@@ -1263,7 +1263,7 @@ float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, 
   data.scene_writer->WriteAttribute ("scale_pivot", "true");
   data.scene_writer->WriteAttribute ("orientation_pivot", "true");
   
-    //получение объекта анимаций
+    //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° Р°РЅРёРјР°С†РёР№
     
   AnimationCore animation = frame.Animation ();
   
@@ -1280,7 +1280,7 @@ float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, 
         {
           Layer& layer = *layer_iter;
           
-            //определение типа слоя
+            //РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЃР»РѕСЏ
            
           LayerType layer_type = get_layer_type (layer);
            
@@ -1311,10 +1311,10 @@ float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, 
   return process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);  
 }
 
-///обработка таймлайна (возвращает время окончания анимации включая все вложения)
+///РѕР±СЂР°Р±РѕС‚РєР° С‚Р°Р№РјР»Р°Р№РЅР° (РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ Р°РЅРёРјР°С†РёРё РІРєР»СЋС‡Р°СЏ РІСЃРµ РІР»РѕР¶РµРЅРёСЏ)
 float process_timeline (Params& params, ConvertData& data, Timeline& timeline, const char* parent_name, EventList& events)
 {
-    //обход слоёв
+    //РѕР±С…РѕРґ СЃР»РѕС‘РІ
     
   float end_time = 0.0f;
 
@@ -1322,7 +1322,7 @@ float process_timeline (Params& params, ConvertData& data, Timeline& timeline, c
   {
     Layer& layer = *layer_iter;
     
-      //определение типа слоя
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЃР»РѕСЏ
     
     LayerType layer_type = get_layer_type (layer);
     
@@ -1340,7 +1340,7 @@ float process_timeline (Params& params, ConvertData& data, Timeline& timeline, c
         process_sprite (params, data, layer.Frames ()[0u], name_prefix.c_str (), parent_name, is_looped);
         
         /*
-          //регистрация события запуска
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР±С‹С‚РёСЏ Р·Р°РїСѓСЃРєР°
         
         Event event;
         
@@ -1372,7 +1372,7 @@ float process_timeline (Params& params, ConvertData& data, Timeline& timeline, c
         if (symbol_end_time > end_time)
           end_time = symbol_end_time;
         
-          //регистрация события запуска
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР±С‹С‚РёСЏ Р·Р°РїСѓСЃРєР°
           
         /*
         const Frame& frame = layer.Frames ()[0u];          
@@ -1403,7 +1403,7 @@ float process_timeline (Params& params, ConvertData& data, Timeline& timeline, c
     }    
   }
 
-    //автоматическая деактивация
+    //Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ РґРµР°РєС‚РёРІР°С†РёСЏ
 /*    
   if (!float_compare (end_time, 0.0f))
   {    
@@ -1421,7 +1421,7 @@ float process_timeline (Params& params, ConvertData& data, Timeline& timeline, c
 void process_timeline (Params& params, ConvertData& data)
 {
   if (params.output_scene_file_name.empty ())
-    return; //в случае отсутствия файла сцены - экспорт не производится
+    return; //РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ С„Р°Р№Р»Р° СЃС†РµРЅС‹ - СЌРєСЃРїРѕСЂС‚ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
     
   if (params.output_animation_file_name.empty ())
     params.output_animation_file_name = common::basename (params.output_scene_file_name) + ".xanim";
@@ -1460,27 +1460,27 @@ void process_timeline (Params& params, ConvertData& data)
   animation_library.Save (params.output_animation_file_name.c_str ());
 }
 
-//построение списка используемых символов
+//РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЃРёРјРІРѕР»РѕРІ
 void build_used_symbols (const Params& params, const Timeline& timeline, UsedResourcesSet& used_symbols)
 {
-    //построение списка исключенных их конвертации слоёв
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РёСЃРєР»СЋС‡РµРЅРЅС‹С… РёС… РєРѕРЅРІРµСЂС‚Р°С†РёРё СЃР»РѕС‘РІ
 
   common::StringArray layers_exclude_list = common::split (params.layers_exclude.c_str ());
   
-    //обход слоёв
+    //РѕР±С…РѕРґ СЃР»РѕС‘РІ
 
   for (Timeline::LayerList::ConstIterator layer_iter = timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
   {
     const Layer& layer = *layer_iter;
     
     if (is_present (layer.Name (), layers_exclude_list))
-      continue; //пропускаем исключенные слои
+      continue; //РїСЂРѕРїСѓСЃРєР°РµРј РёСЃРєР»СЋС‡РµРЅРЅС‹Рµ СЃР»РѕРё
       
-      //обход фреймов данного слоя
+      //РѕР±С…РѕРґ С„СЂРµР№РјРѕРІ РґР°РЅРЅРѕРіРѕ СЃР»РѕСЏ
 
     for (Layer::FrameList::ConstIterator frame_iter = layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
     {
-        //обход элементов фрейма
+        //РѕР±С…РѕРґ СЌР»РµРјРµРЅС‚РѕРІ С„СЂРµР№РјР°
       
       for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
       {
@@ -1493,7 +1493,7 @@ void build_used_symbols (const Params& params, const Timeline& timeline, UsedRes
   }
 }
 
-//экспорт
+//СЌРєСЃРїРѕСЂС‚
 void export_data (Params& params)
 {
   if (!common::FileSystem::IsDir (params.xfl_name.c_str ()))
@@ -1504,7 +1504,7 @@ void export_data (Params& params)
 
   ConvertData data;
   
-    //открытие документа
+    //РѕС‚РєСЂС‹С‚РёРµ РґРѕРєСѓРјРµРЅС‚Р°
     
   {  
     Document document (params.xfl_name.c_str ());
@@ -1518,25 +1518,25 @@ void export_data (Params& params)
     data.document.Swap (document);
   }
   
-    //построение списка используемых символов
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЃРёРјРІРѕР»РѕРІ
 
   for (Document::TimelineList::ConstIterator iter = data.document.Timelines ().CreateIterator (); iter; ++iter)
     build_used_symbols (params, *iter, data.used_symbols);
     
-    //обработка текстур
+    //РѕР±СЂР°Р±РѕС‚РєР° С‚РµРєСЃС‚СѓСЂ
     
   process_textures (params, data);
   
-    //обработка таймлайна
+    //РѕР±СЂР°Р±РѕС‚РєР° С‚Р°Р№РјР»Р°Р№РЅР°
     
   process_timeline (params, data);
     
-    //обработка материалов
+    //РѕР±СЂР°Р±РѕС‚РєР° РјР°С‚РµСЂРёР°Р»РѕРІ
     
   process_materials (params, data);
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.xfl_name.empty ())
@@ -1551,7 +1551,7 @@ int main (int argc, const char *argv[])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     Params params;
 
     params.options           = 0;
@@ -1567,17 +1567,17 @@ int main (int argc, const char *argv[])
     params.ignore_image_size = false;
     params.total_scale       = math::vec2f (1.0f);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line_parse (argc, argv, params);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
     if (params.print_help)
       return 0;
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
     validate (params);
 
-      //экспорт
+      //СЌРєСЃРїРѕСЂС‚
     export_data (params);
   }
   catch (std::exception& exception)

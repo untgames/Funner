@@ -8,7 +8,7 @@ using namespace render::low_level::dx11;
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TargetConstantBufferPrototype::TargetConstantBufferPrototype (ShaderLibrary& library, const ProgramParametersLayout& src_layout, const ProgramBufferLayout& in_dst_layout)
@@ -40,7 +40,7 @@ TargetConstantBufferPrototype::~TargetConstantBufferPrototype ()
 }
 
 /*
-    Биндинг
+    Р‘РёРЅРґРёРЅРі
 */
 
 inline void TargetConstantBufferPrototype::Bind (ID3D11Buffer& buffer, ID3D11Buffer* context_buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const
@@ -52,7 +52,7 @@ inline void TargetConstantBufferPrototype::Bind (ID3D11Buffer& buffer, ID3D11Buf
 }
 
 /*
-    Создание буфера
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 */
 
 TargetConstantBufferPtr TargetConstantBufferPrototype::CreateBuffer (const DeviceManager& device_manager, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const
@@ -69,14 +69,14 @@ TargetConstantBufferPtr TargetConstantBufferPrototype::CreateBuffer (const Devic
 }
 
 /*
-    Получение буфера
+    РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР°
 */
 
 TargetConstantBuffer& TargetConstantBufferPrototype::GetBuffer (const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT], ShaderLibrary& library) const
 {
   try
   {
-      //формирование хэша
+      //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С…СЌС€Р°
 
     SourceConstantBuffer* buffers_hash_array [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
 
@@ -94,14 +94,14 @@ TargetConstantBuffer& TargetConstantBufferPrototype::GetBuffer (const SourceCons
 
     size_t hash = common::crc32 (buffers_hash_array, sizeof (buffers_hash_array), common::crc32 (&prototype, 0, sizeof (prototype)));
 
-      //поиск константного буфера
+      //РїРѕРёСЃРє РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 
     TargetConstantBufferPtr buffer = library.FindConstantBuffer (hash);
 
     if (buffer)
       return *buffer;
 
-      //создание константного буфера и его регистрация
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° Рё РµРіРѕ СЂРµРіРёСЃС‚СЂР°С†РёСЏ
 
     buffer = CreateBuffer (library.GetDeviceManager (), buffers);
 
@@ -140,7 +140,7 @@ TargetConstantBuffer& TargetConstantBufferPrototype::GetBuffer (const SourceCons
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -161,7 +161,7 @@ TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager,
 {
   try
   {
-      //сохранение исходных буферов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РёСЃС…РѕРґРЅС‹С… Р±СѓС„РµСЂРѕРІ
 
     src_buffers.reserve (prototype.GetSourceBuffersCount ());
 
@@ -188,7 +188,7 @@ TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager,
       src_buffers.push_back (SourceBufferDesc (src_buffer.get ()));
     }
 
-      //создание целевого буфера
+      //СЃРѕР·РґР°РЅРёРµ С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР°
 
     D3D11_BUFFER_DESC desc;
 
@@ -229,14 +229,14 @@ TargetConstantBuffer::~TargetConstantBuffer ()
 }
 
 /*
-    Биндинг
+    Р‘РёРЅРґРёРЅРі
 */
 
 void TargetConstantBuffer::Bind (ID3D11DeviceContext& context, ID3D11Buffer* context_buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
 {
   try
   {
-      //синхронизация
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
     D3D11_MAPPED_SUBRESOURCE subresource;
 
     void* dst_buffer_data = 0;
@@ -268,7 +268,7 @@ void TargetConstantBuffer::Bind (ID3D11DeviceContext& context, ID3D11Buffer* con
     if (dst_buffer_data)
       context.Unmap (dst_buffer.get (), 0);
 
-      //биндинг
+      //Р±РёРЅРґРёРЅРі
 
     prototype.Bind (*dst_buffer, context_buffers);
   }

@@ -1,4 +1,4 @@
-//тестирование функции rbegin()/rend()
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё rbegin()/rend()
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

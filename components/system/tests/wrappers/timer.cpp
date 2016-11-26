@@ -10,7 +10,7 @@ void test (Timer& timer)
 
     count++;
 
-    if (common::milliseconds () - last < timer.Period () + 20) //точность до 1/50 секунды
+    if (common::milliseconds () - last < timer.Period () + 20) //С‚РѕС‡РЅРѕСЃС‚СЊ РґРѕ 1/50 СЃРµРєСѓРЅРґС‹
     {
       printf ("#%lu: ok\n", count);
     }

@@ -1,16 +1,16 @@
--- Инициализация графики
+-- ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╨│╤А╨░╤Д╨╕╨║╨╕
 local function InitGraphics ()
-  -- Создание экрана
+  -- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤Н╨║╤А╨░╨╜╨░
   
   local screen = Scene.Screen.Create ()
   
   screen:DisableBackground ()
   
-  -- Привязка экрана к окну в config.xml
+  -- ╨Я╤А╨╕╨▓╤П╨╖╨║╨░ ╤Н╨║╤А╨░╨╜╨░ ╨║ ╨╛╨║╨╜╤Г ╨▓ config.xml
 
   Engine.Screens.Register ("Screen1", screen)
   
-  -- Добавление на экран области вывода
+  -- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╕╨╡ ╨╜╨░ ╤Н╨║╤А╨░╨╜ ╨╛╨▒╨╗╨░╤Б╤В╨╕ ╨▓╤Л╨▓╨╛╨┤╨░
 
   local viewport = Scene.Viewport.Create ()
   
@@ -30,14 +30,14 @@ local function InitGraphics ()
   return methods
 end
 
--- Инициализация ввода  
+-- ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╨▓╨▓╨╛╨┤╨░  
 local function InitInput () 
   local this = {}  
   
   local mouse_x = 0
   local mouse_y = 0
 
-  -- Обработчики
+  -- ╨Ю╨▒╤А╨░╨▒╨╛╤В╤З╨╕╨║╨╕
   
   this.OnWindowClosed = function ()
     print ("Window closed")
@@ -69,10 +69,10 @@ local function InitInput ()
     print ("cursor out of window")
   end  
 
-  -- Регистрация обработчика событий ввода. CreateEventHandler без параметров перенаправит все события ввода в скрипт
+  -- ╨а╨╡╨│╨╕╤Б╤В╤А╨░╤Ж╨╕╤П ╨╛╨▒╤А╨░╨▒╨╛╤В╤З╨╕╨║╨░ ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨▓╨▓╨╛╨┤╨░. CreateEventHandler ╨▒╨╡╨╖ ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨╛╨▓ ╨┐╨╡╤А╨╡╨╜╨░╨┐╤А╨░╨▓╨╕╤В ╨▓╤Б╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨▓╨▓╨╛╨┤╨░ ╨▓ ╤Б╨║╤А╨╕╨┐╤В
   
   local function EventsDispatch (command)
-    -- Компиляция команды
+    -- ╨Ъ╨╛╨╝╨┐╨╕╨╗╤П╤Ж╨╕╤П ╨║╨╛╨╝╨░╨╜╨┤╤Л
     
     local status, value = pcall (loadstring (string.format ("return function (this) %s end", command)))
     local fn
@@ -85,7 +85,7 @@ local function InitInput ()
       return
     end
 
-    -- Запуск команды
+    -- ╨Ч╨░╨┐╤Г╤Б╨║ ╨║╨╛╨╝╨░╨╜╨┤╤Л
 
     status, value = pcall (fn, this)
     
@@ -99,7 +99,7 @@ local function InitInput ()
   return {}
 end
 
--- Загрузка ресурсов
+-- ╨Ч╨░╨│╤А╤Г╨╖╨║╨░ ╤А╨╡╤Б╤Г╤А╤Б╨╛╨▓
 local function InitResources ()
   local resource_group = Engine.ResourceManager.Group.Create ()
 
@@ -113,9 +113,9 @@ local function InitResources ()
   return {}
 end
 
--- Создание тестовой сцены
+-- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤В╨╡╤Б╤В╨╛╨▓╨╛╨╣ ╤Б╤Ж╨╡╨╜╤Л
 local function InitScene (gfx)
-  -- Создание сцены и камеры
+  -- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤Б╤Ж╨╡╨╜╤Л ╨╕ ╨║╨░╨╝╨╡╤А╤Л
 
   local scene  = Scene.Scene.Create ()
   local camera = Scene.OrthoCamera.Create ()
@@ -129,22 +129,22 @@ local function InitScene (gfx)
   
   camera:BindToScene (scene)
   
-  -- Создание слушателя
+  -- ╨б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╤Б╨╗╤Г╤И╨░╤В╨╡╨╗╤П
 
   local listener = Scene.Listener.Create () 
 
   listener:BindToScene (scene)   
   listener:SetPosition (0, 0, -1)
   
-  -- Связывание слушателя с звуковой системой в config.xml
+  -- ╨б╨▓╤П╨╖╤Л╨▓╨░╨╜╨╕╨╡ ╤Б╨╗╤Г╤И╨░╤В╨╡╨╗╤П ╤Б ╨╖╨▓╤Г╨║╨╛╨▓╨╛╨╣ ╤Б╨╕╤Б╤В╨╡╨╝╨╛╨╣ ╨▓ config.xml
 
   Engine.Listeners.Register ("Listener1", listener)
 
-  -- Установка активной камеры
+  -- ╨г╤Б╤В╨░╨╜╨╛╨▓╨║╨░ ╨░╨║╤В╨╕╨▓╨╜╨╛╨╣ ╨║╨░╨╝╨╡╤А╤Л
   
   gfx.SetCamera (camera)
   
-  -- Загрузка спрайтов  
+  -- ╨Ч╨░╨│╤А╤Г╨╖╨║╨░ ╤Б╨┐╤А╨░╨╣╤В╨╛╨▓  
   
   local function LoadSprite (node, z)
     local sprite   = Scene.Sprite.Create ()
@@ -160,7 +160,7 @@ local function InitScene (gfx)
     return sprite
   end
   
-  -- Загрузка звука
+  -- ╨Ч╨░╨│╤А╤Г╨╖╨║╨░ ╨╖╨▓╤Г╨║╨░
   local function LoadSound (node)
     local emitter = Scene.SoundEmitter.Create (node:Get ("source"))
     
@@ -207,7 +207,7 @@ local function InitScene (gfx)
   return sprites
 end
 
--- Обновление игрового состояния
+-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╕╨│╤А╨╛╨▓╨╛╨│╨╛ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╤П
 local function Update (timer, sprites)
   timer:Update ()
   
@@ -216,9 +216,9 @@ local function Update (timer, sprites)
   end
 end
 
--- Главная функция
+-- ╨У╨╗╨░╨▓╨╜╨░╤П ╤Д╤Г╨╜╨║╤Ж╨╕╤П
 local function Main ()
-  local gfx_system      = InitGraphics () -- ссылки хранятся, чтобы сборщик мусора не удалил вложенные объекты
+  local gfx_system      = InitGraphics () -- ╤Б╤Б╤Л╨╗╨║╨╕ ╤Е╤А╨░╨╜╤П╤В╤Б╤П, ╤З╤В╨╛╨▒╤Л ╤Б╨▒╨╛╤А╤Й╨╕╨║ ╨╝╤Г╤Б╨╛╤А╨░ ╨╜╨╡ ╤Г╨┤╨░╨╗╨╕╨╗ ╨▓╨╗╨╛╨╢╨╡╨╜╨╜╤Л╨╡ ╨╛╨▒╤К╨╡╨║╤В╤Л
   local resource_system = InitResources ()      
   local input_system    = InitInput ()  
   local sprites         = InitScene (gfx_system)
@@ -226,7 +226,7 @@ local function Main ()
   
   timer.Started = true
   
-  -- Главный цикл  
+  -- ╨У╨╗╨░╨▓╨╜╤Л╨╣ ╤Ж╨╕╨║╨╗  
   
   local action_queue = Common.ActionQueue.Create ()    
   local update_connection
@@ -244,5 +244,5 @@ local function Main ()
   update_connection = action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler (SafeUpdate))
 end
 
--- Вызов Main
+-- ╨Т╤Л╨╖╨╛╨▓ Main
 Main ()

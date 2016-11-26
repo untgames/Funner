@@ -1,16 +1,16 @@
--- à≠®Ê®†´®ß†Ê®Ô £‡†‰®™®
+-- –ò–Ω–∏—Ü–∏–∞–ª–∏–∑–∞—Ü–∏—è –≥—Ä–∞—Ñ–∏–∫–∏
 local function InitGraphics ()
-  -- ëÆß§†≠®• Ì™‡†≠†
+  -- –°–æ–∑–¥–∞–Ω–∏–µ —ç–∫—Ä–∞–Ω–∞
   
   local screen = Scene.Screen.Create ()
   
   screen:DisableBackground ()
   
-  -- è‡®¢Ôß™† Ì™‡†≠† ™ Æ™≠„ ¢ config.xml
+  -- –ü—Ä–∏–≤—è–∑–∫–∞ —ç–∫—Ä–∞–Ω–∞ –∫ –æ–∫–Ω—É –≤ config.xml
 
   Engine.Screens.Register ("Screen1", screen)
   
-  -- ÑÆ°†¢´•≠®• ≠† Ì™‡†≠ Æ°´†·‚® ¢Î¢Æ§†
+  -- –î–æ–±–∞–≤–ª–µ–Ω–∏–µ –Ω–∞ —ç–∫—Ä–∞–Ω –æ–±–ª–∞—Å—Ç–∏ –≤—ã–≤–æ–¥–∞
 
   local viewport = Scene.Viewport.Create ()
   
@@ -30,14 +30,14 @@ local function InitGraphics ()
   return methods
 end
 
--- à≠®Ê®†´®ß†Ê®Ô ¢¢Æ§†  
+-- –ò–Ω–∏—Ü–∏–∞–ª–∏–∑–∞—Ü–∏—è –≤–≤–æ–¥–∞  
 local function InitInput () 
   local this = {}  
   
   local mouse_x = 0
   local mouse_y = 0
 
-  -- é°‡†°Æ‚Á®™®
+  -- –û–±—Ä–∞–±–æ—Ç—á–∏–∫–∏
   
   this.OnWindowClosed = function ()
     print ("Window closed")
@@ -69,10 +69,10 @@ local function InitInput ()
     print ("cursor out of window")
   end  
 
-  -- ê•£®·‚‡†Ê®Ô Æ°‡†°Æ‚Á®™† ·Æ°Î‚®© ¢¢Æ§†. CreateEventHandler °•ß Ø†‡†¨•‚‡Æ¢ Ø•‡•≠†Ø‡†¢®‚ ¢·• ·Æ°Î‚®Ô ¢¢Æ§† ¢ ·™‡®Ø‚
+  -- –†–µ–≥–∏—Å—Ç—Ä–∞—Ü–∏—è –æ–±—Ä–∞–±–æ—Ç—á–∏–∫–∞ —Å–æ–±—ã—Ç–∏–π –≤–≤–æ–¥–∞. CreateEventHandler –±–µ–∑ –ø–∞—Ä–∞–º–µ—Ç—Ä–æ–≤ –ø–µ—Ä–µ–Ω–∞–ø—Ä–∞–≤–∏—Ç –≤—Å–µ —Å–æ–±—ã—Ç–∏—è –≤–≤–æ–¥–∞ –≤ —Å–∫—Ä–∏–ø—Ç
   
   local function EventsDispatch (command)
-    -- äÆ¨Ø®´ÔÊ®Ô ™Æ¨†≠§Î
+    -- –ö–æ–º–ø–∏–ª—è—Ü–∏—è –∫–æ–º–∞–Ω–¥—ã
     
     local status, value = pcall (loadstring (string.format ("return function (this) %s end", command)))
     local fn
@@ -85,7 +85,7 @@ local function InitInput ()
       return
     end
 
-    -- á†Ø„·™ ™Æ¨†≠§Î
+    -- –ó–∞–ø—É—Å–∫ –∫–æ–º–∞–Ω–¥—ã
 
     status, value = pcall (fn, this)
     
@@ -99,7 +99,7 @@ local function InitInput ()
   return {}
 end
 
--- á†£‡„ß™† ‡•·„‡·Æ¢
+-- –ó–∞–≥—Ä—É–∑–∫–∞ —Ä–µ—Å—É—Ä—Å–æ–≤
 local function InitResources ()
   local resource_group = Engine.ResourceManager.Group.Create ()
 
@@ -112,9 +112,9 @@ local function InitResources ()
   return {}
 end
 
--- ëÆß§†≠®• ‚•·‚Æ¢Æ© ·Ê•≠Î
+-- –°–æ–∑–¥–∞–Ω–∏–µ —Ç–µ—Å—Ç–æ–≤–æ–π —Å—Ü–µ–Ω—ã
 local function InitScene (gfx)
-  -- ëÆß§†≠®• ·Ê•≠Î ® ™†¨•‡Î
+  -- –°–æ–∑–¥–∞–Ω–∏–µ —Å—Ü–µ–Ω—ã –∏ –∫–∞–º–µ—Ä—ã
 
   local scene  = Scene.Scene.Create ()
   local camera = Scene.OrthoCamera.Create ()
@@ -128,11 +128,11 @@ local function InitScene (gfx)
   
   camera:BindToScene (scene)
   
-  -- ì·‚†≠Æ¢™† †™‚®¢≠Æ© ™†¨•‡Î
+  -- –£—Å—Ç–∞–Ω–æ–≤–∫–∞ –∞–∫—Ç–∏–≤–Ω–æ–π –∫–∞–º–µ—Ä—ã
   
   gfx.SetCamera (camera)
   
-  -- á†£‡„ß™† ·Ø‡†©‚Æ¢  
+  -- –ó–∞–≥—Ä—É–∑–∫–∞ —Å–ø—Ä–∞–π—Ç–æ–≤  
   
   local function LoadSprite (node, z)
     local sprite   = Scene.Sprite.Create ()
@@ -174,7 +174,7 @@ local function InitScene (gfx)
   return sprites
 end
 
--- é°≠Æ¢´•≠®• ®£‡Æ¢Æ£Æ ·Æ·‚ÆÔ≠®Ô
+-- –û–±–Ω–æ–≤–ª–µ–Ω–∏–µ –∏–≥—Ä–æ–≤–æ–≥–æ —Å–æ—Å—Ç–æ—è–Ω–∏—è
 local function Update (timer, sprites)
   timer:Update ()
   
@@ -183,9 +183,9 @@ local function Update (timer, sprites)
   end
 end
 
--- É´†¢≠†Ô ‰„≠™Ê®Ô
+-- –ì–ª–∞–≤–Ω–∞—è —Ñ—É–Ω–∫—Ü–∏—è
 local function Main ()
-  local gfx_system      = InitGraphics () -- ··Î´™® Â‡†≠Ô‚·Ô, Á‚Æ°Î ·°Æ‡È®™ ¨„·Æ‡† ≠• „§†´®´ ¢´Æ¶•≠≠Î• Æ°Í•™‚Î
+  local gfx_system      = InitGraphics () -- —Å—Å—ã–ª–∫–∏ —Ö—Ä–∞–Ω—è—Ç—Å—è, —á—Ç–æ–±—ã —Å–±–æ—Ä—â–∏–∫ –º—É—Å–æ—Ä–∞ –Ω–µ —É–¥–∞–ª–∏–ª –≤–ª–æ–∂–µ–Ω–Ω—ã–µ –æ–±—ä–µ–∫—Ç—ã
   local input_system    = InitInput ()  
   local sprites         = InitScene (gfx_system)
   local resource_system = InitResources ()    
@@ -193,7 +193,7 @@ local function Main ()
   
   timer.Started = true
   
-  -- É´†¢≠Î© Ê®™´  
+  -- –ì–ª–∞–≤–Ω—ã–π —Ü–∏–∫–ª  
   
   local action_queue = Common.ActionQueue.Create ()    
   local update_connection
@@ -211,5 +211,5 @@ local function Main ()
   update_connection = action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler (SafeUpdate))
 end
 
--- ÇÎßÆ¢ Main
+-- –í—ã–∑–æ–≤ Main
 Main ()

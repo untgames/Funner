@@ -10,7 +10,7 @@ const size_t DEFAULT_FILTER_POOL_SIZE = 64;
 }
 
 /*
-   Описание реализации класса LogFile
+   РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР»Р°СЃСЃР° LogFile
 */
 
 struct LogFile::Impl: public Lockable
@@ -26,7 +26,7 @@ struct LogFile::Impl: public Lockable
     }
 
 /*
-   Установка/получение текущего файла
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р°
 */
     void SetFile (const common::File& in_file)
     {
@@ -43,7 +43,7 @@ struct LogFile::Impl: public Lockable
     }
 
 /*
-   Печать сообщения в файл
+   РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РІ С„Р°Р№Р»
 */
     void Print (const char* log_name, const char* message)
     {
@@ -159,7 +159,7 @@ struct LogFile::Impl: public Lockable
     }
 
 /*
-   Установка/удаление фильтров замены сообщений
+   РЈСЃС‚Р°РЅРѕРІРєР°/СѓРґР°Р»РµРЅРёРµ С„РёР»СЊС‚СЂРѕРІ Р·Р°РјРµРЅС‹ СЃРѕРѕР±С‰РµРЅРёР№
 */
     size_t AddFilter (const char* replace_mask, const char* replacement, size_t sort_order)
     {
@@ -237,7 +237,7 @@ struct LogFile::Impl: public Lockable
     }
 
 /*
-   Сброс файлового буффера
+   РЎР±СЂРѕСЃ С„Р°Р№Р»РѕРІРѕРіРѕ Р±СѓС„С„РµСЂР°
 */
     void Flush ()
     {
@@ -304,20 +304,20 @@ struct LogFile::Impl: public Lockable
     }
 
   private:
-    common::File               file;                          //текущий файл вывода
-    stl::vector<size_t>        filter_pool;                   //пул свободных индексов фильтров
-    size_t                     current_filter_pool_capacity;  //текущее количество индексов фильтров
-    LogFiltersSet              log_filters;                   //набор фильтров
-    ReplacementComponentsArray *current_replacement_array;    //текущий обрабатываемый массив замен
-    size_t                     find_index;                    //текущий искомый индекс
+    common::File               file;                          //С‚РµРєСѓС‰РёР№ С„Р°Р№Р» РІС‹РІРѕРґР°
+    stl::vector<size_t>        filter_pool;                   //РїСѓР» СЃРІРѕР±РѕРґРЅС‹С… РёРЅРґРµРєСЃРѕРІ С„РёР»СЊС‚СЂРѕРІ
+    size_t                     current_filter_pool_capacity;  //С‚РµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ С„РёР»СЊС‚СЂРѕРІ
+    LogFiltersSet              log_filters;                   //РЅР°Р±РѕСЂ С„РёР»СЊС‚СЂРѕРІ
+    ReplacementComponentsArray *current_replacement_array;    //С‚РµРєСѓС‰РёР№ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Р№ РјР°СЃСЃРёРІ Р·Р°РјРµРЅ
+    size_t                     find_index;                    //С‚РµРєСѓС‰РёР№ РёСЃРєРѕРјС‹Р№ РёРЅРґРµРєСЃ
 };
 
 /*
-   Запись протокола в файл
+   Р—Р°РїРёСЃСЊ РїСЂРѕС‚РѕРєРѕР»Р° РІ С„Р°Р№Р»
 */
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LogFile::LogFile ()
@@ -339,7 +339,7 @@ LogFile::~LogFile ()
 }
 
 /*
-   Установка/получение текущего файла
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ С„Р°Р№Р»Р°
 */
 
 void LogFile::SetFile (const common::File& file)
@@ -353,7 +353,7 @@ common::File LogFile::File () const
 }
 
 /*
-   Печать сообщения в файл
+   РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РІ С„Р°Р№Р»
 */
 
 void LogFile::Print (const char* log_name, const char* message)
@@ -370,7 +370,7 @@ void LogFile::Print (const char* log_name, const char* message)
 }
 
 /*
-   Установка/удаление фильтров замены сообщений
+   РЈСЃС‚Р°РЅРѕРІРєР°/СѓРґР°Р»РµРЅРёРµ С„РёР»СЊС‚СЂРѕРІ Р·Р°РјРµРЅС‹ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 size_t LogFile::AddFilter (const char* replace_mask, const char* replacement, size_t sort_order)
@@ -410,7 +410,7 @@ void LogFile::RemoveAllFilters ()
 }
 
 /*
-   Сброс файлового буффера
+   РЎР±СЂРѕСЃ С„Р°Р№Р»РѕРІРѕРіРѕ Р±СѓС„С„РµСЂР°
 */
 
 void LogFile::Flush ()

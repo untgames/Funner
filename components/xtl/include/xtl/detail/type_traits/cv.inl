@@ -2,10 +2,10 @@
 #define XTL_TYPE_TRAITS_CV_HEADER
 
 /*
-    CV-проверки и преобразования
+    CV-РїСЂРѕРІРµСЂРєРё Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
-//проверка имеет ли T квалификатор const/volatile
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё T РєРІР°Р»РёС„РёРєР°С‚РѕСЂ const/volatile
 template <class T>           struct is_const:                       public false_type {};
 template <class T>           struct is_const<const T>:              public true_type {};
 template <class T>           struct is_const<const volatile T>:     public true_type {};
@@ -26,7 +26,7 @@ template <class T>           struct is_volatile<T []>:                 public is
 template <class T>           struct is_volatile<volatile T []>:        public true_type {};
 template <class T>           struct is_volatile<const volatile T []>:  public true_type {};
 
-//удаление квалификатора const
+//СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const
 template <class T>           struct remove_const                       { typedef T          type; };
 template <class T>           struct remove_const<T&>                   { typedef T&         type; };
 template <class T>           struct remove_const<const T>              { typedef T          type; };
@@ -35,7 +35,7 @@ template <class T, size_t N> struct remove_const<T const volatile [N]> { typedef
 template <class T>           struct remove_const<T const []>           { typedef T          type []; };
 template <class T>           struct remove_const<T const volatile []>  { typedef T volatile type []; };
 
-//удаление квалификатора volatile
+//СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° volatile
 template <class T>           struct remove_volatile                       { typedef T       type; };
 template <class T>           struct remove_volatile<T&>                   { typedef T&      type; };
 template <class T>           struct remove_volatile<volatile T>           { typedef T       type; };
@@ -44,18 +44,18 @@ template <class T, size_t N> struct remove_volatile<T const volatile [N]> { type
 template <class T>           struct remove_volatile<T volatile []>        { typedef T       type []; };
 template <class T>           struct remove_volatile<T const volatile []>  { typedef T const type []; };
 
-//удаление квалификаторов const+volatile
+//СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂРѕРІ const+volatile
 template <class T> struct remove_cv: public remove_const<typename remove_volatile<T>::type> {};
 
-//добавление квалификатора const
+//РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const
 template <class T> struct add_const     { typedef T const type; };
 template <class T> struct add_const<T&> { typedef T& type; };
 
-//добавление квалификатора volatile
+//РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° volatile
 template <class T> struct add_volatile     { typedef T volatile type; };
 template <class T> struct add_volatile<T&> { typedef T& type; };
 
-//добавление квалификатора const volatile
+//РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const volatile
 template <class T> struct add_cv     { typedef T const volatile type; };
 template <class T> struct add_cv<T&> { typedef T& type; };
 

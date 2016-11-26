@@ -77,22 +77,22 @@ void check_gestalt_manager_error (OSErr error_code, const char* source, const ch
 }
 
 /*
-   Устройство вывода
+   РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
 */
 
 struct CarbonScreen::Impl : public xtl::reference_counter
 {
   CGDirectDisplayID display_id;
   stl::string       name;
-  ScreenModeArray   modes;        //поддерживаемые режимы
-  ScreenModeDesc    default_mode; //режим по умолчанию
+  ScreenModeArray   modes;        //РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ СЂРµР¶РёРјС‹
+  ScreenModeDesc    default_mode; //СЂРµР¶РёРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
   Impl (CGDirectDisplayID in_display_id)
     : display_id (in_display_id)
   {
     static const char* METHOD_NAME = "syslib::macosx::CarbonScreen::CarbonScreen";
 
-      //получение имени устройства
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
     io_connect_t display_port = CGDisplayIOServicePort (display_id);
 
@@ -128,7 +128,7 @@ struct CarbonScreen::Impl : public xtl::reference_counter
       CFRelease (dictionary);
     }
 
-      //получение поддерживаемых режимов
+      //РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂРµР¶РёРјРѕРІ
 
     CFArrayRef cg_display_modes = CGDisplayAvailableModes (display_id);
 
@@ -199,7 +199,7 @@ struct CarbonScreen::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 CarbonScreen::CarbonScreen (CGDirectDisplayID display_id)
@@ -225,7 +225,7 @@ CarbonScreen& CarbonScreen::operator = (const CarbonScreen& source)
 }
 
 /*
-   Получение имени устройства
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* CarbonScreen::GetName ()
@@ -234,7 +234,7 @@ const char* CarbonScreen::GetName ()
 }
 
 /*
-   Получение списка видео-режимов
+   РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t CarbonScreen::GetModesCount ()
@@ -251,7 +251,7 @@ void CarbonScreen::GetMode (size_t mode_index, ScreenModeDesc& mode_desc)
 }
 
 /*
-   Установка текущего видео-режима
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void CarbonScreen::SetCurrentMode (const ScreenModeDesc& new_mode)
@@ -267,7 +267,7 @@ void CarbonScreen::SetCurrentMode (const ScreenModeDesc& new_mode)
       if (iter->mode_desc.color_bits != new_mode.color_bits || iter->mode_desc.refresh_rate != new_mode.refresh_rate)
         continue;
 
-    if (new_mode.color_bits)  //поиск подходящего по остальным параметрам режима с максимальной частотой обновления
+    if (new_mode.color_bits)  //РїРѕРёСЃРє РїРѕРґС…РѕРґСЏС‰РµРіРѕ РїРѕ РѕСЃС‚Р°Р»СЊРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј СЂРµР¶РёРјР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ С‡Р°СЃС‚РѕС‚РѕР№ РѕР±РЅРѕРІР»РµРЅРёСЏ
     {
       if (iter->mode_desc.color_bits != new_mode.color_bits)
         continue;
@@ -275,7 +275,7 @@ void CarbonScreen::SetCurrentMode (const ScreenModeDesc& new_mode)
       if ((mode_iter == impl->modes.end ()) || (mode_iter->mode_desc.refresh_rate < iter->mode_desc.refresh_rate))
         mode_iter = iter;
     }
-    else                      //поиск подходящего по остальным параметрам режима с максимальной цветностью
+    else                      //РїРѕРёСЃРє РїРѕРґС…РѕРґСЏС‰РµРіРѕ РїРѕ РѕСЃС‚Р°Р»СЊРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј СЂРµР¶РёРјР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ С†РІРµС‚РЅРѕСЃС‚СЊСЋ
     {
       if (iter->mode_desc.refresh_rate != new_mode.refresh_rate)
         continue;
@@ -311,7 +311,7 @@ void CarbonScreen::GetDefaultMode (ScreenModeDesc& mode_desc)
 }
 
 /*
-   Возвращение внутреннего дескриптора дисплея
+   Р’РѕР·РІСЂР°С‰РµРЅРёРµ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РґРёСЃРїР»РµСЏ
 */
 
 CGDirectDisplayID CarbonScreen::GetDisplayID ()
@@ -320,7 +320,7 @@ CGDirectDisplayID CarbonScreen::GetDisplayID ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void CarbonScreen::Swap (CarbonScreen& screen)
@@ -334,7 +334,7 @@ namespace syslib
 namespace macosx
 {
 
-//обмен
+//РѕР±РјРµРЅ
 void swap (CarbonScreen& screen1, CarbonScreen& screen2)
 {
   screen1.Swap (screen2);

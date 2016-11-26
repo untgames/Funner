@@ -6,13 +6,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* PARSER_COMPONENTS_MASK = "common.parsers.*"; //маска имён компонентов парсеров
+const char* PARSER_COMPONENTS_MASK = "common.parsers.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РїР°СЂСЃРµСЂРѕРІ
 
 /*
-    Реализация менеджера парсеров
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїР°СЂСЃРµСЂРѕРІ
 */
 
 class ParserManagerImpl
@@ -21,7 +21,7 @@ class ParserManagerImpl
     typedef ParserManager::ParseHandler ParseHandler;
     typedef ParserManager::CheckHandler CheckHandler;
 
-///Регистрация пользовательского парсера
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ РїР°СЂСЃРµСЂР°
     void RegisterParser (const char* type, const ParseHandler& parser, const CheckHandler& checker)
     {
       static const char* METHOD_NAME = "common::ParserManagerImpl::RegisterParser";
@@ -37,7 +37,7 @@ class ParserManagerImpl
       parsers.insert_pair (type, ParserDecl (parser, checker));
     }
     
-///Отмена регистрации парсера
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РїР°СЂСЃРµСЂР°
     void UnregisterParser (const char* type)
     {
       if (!type)
@@ -46,18 +46,18 @@ class ParserManagerImpl
       parsers.erase (type);
     }
     
-///Отмена регистрации всех парсеров
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… РїР°СЂСЃРµСЂРѕРІ
     void UnregisterAllParsers ()
     {
       parsers.clear ();
     }
 
-///Парсинг
+///РџР°СЂСЃРёРЅРі
     void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer)
     {            
       static const char* METHOD_NAME = "common::ParserManagerImpl::Parse";
       
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
         
       if (!type)
         throw xtl::make_null_argument_exception (METHOD_NAME, "type");
@@ -68,11 +68,11 @@ class ParserManagerImpl
       if (!buffer && buffer_size)
         throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
         
-        //загрузка парсеров по умолчанию
+        //Р·Р°РіСЂСѓР·РєР° РїР°СЂСЃРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
         
       LoadDefaultParsers ();
         
-        //поиск парсера по типу
+        //РїРѕРёСЃРє РїР°СЂСЃРµСЂР° РїРѕ С‚РёРїСѓ
         
       ParserDecl* decl = 0;
         
@@ -87,13 +87,13 @@ class ParserManagerImpl
       }
       else
       {      
-          //поиск по расширению
+          //РїРѕРёСЃРє РїРѕ СЂР°СЃС€РёСЂРµРЅРёСЋ
           
         size_t name_len = strlen (name);
         
         if (name_len)
         {          
-            //получение расширения имени буфера
+            //РїРѕР»СѓС‡РµРЅРёРµ СЂР°СЃС€РёСЂРµРЅРёСЏ РёРјРµРЅРё Р±СѓС„РµСЂР°
           
           const char* ext = name + name_len - 1;
           
@@ -101,7 +101,7 @@ class ParserManagerImpl
           
           ext++;
           
-            //поиск парсера
+            //РїРѕРёСЃРє РїР°СЂСЃРµСЂР°
           
           DeclMap::iterator iter = parsers.find (ext);
           
@@ -109,7 +109,7 @@ class ParserManagerImpl
             decl = &iter->second;
         }
         
-          //поиск с опросом возможности разбора
+          //РїРѕРёСЃРє СЃ РѕРїСЂРѕСЃРѕРј РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂР°Р·Р±РѕСЂР°
           
         if (!decl)
         {          
@@ -117,7 +117,7 @@ class ParserManagerImpl
           {
             ParserDecl& check_decl = iter->second;
             
-              //проверка возможности разбора
+              //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂР°Р·Р±РѕСЂР°
             
             try
             {
@@ -138,7 +138,7 @@ class ParserManagerImpl
           throw xtl::format_operation_exception (METHOD_NAME, "Buffer '%s' has unknown type. Parser not found", name);
       }
 
-        //разбор
+        //СЂР°Р·Р±РѕСЂ
 
       builder.SetSource (name);
 
@@ -146,7 +146,7 @@ class ParserManagerImpl
     }
     
   private:
-///Загрузка парсеров по умолчанию
+///Р—Р°РіСЂСѓР·РєР° РїР°СЂСЃРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     static void LoadDefaultParsers ()
     {
       static ComponentLoader loader (PARSER_COMPONENTS_MASK);
@@ -155,8 +155,8 @@ class ParserManagerImpl
   private:
     struct ParserDecl
     {
-      ParseHandler parse_handler; //обработчик разбора
-      CheckHandler check_handler; //функтор проверки возможности разбора
+      ParseHandler parse_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЂР°Р·Р±РѕСЂР°
+      CheckHandler check_handler; //С„СѓРЅРєС‚РѕСЂ РїСЂРѕРІРµСЂРєРё РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂР°Р·Р±РѕСЂР°
       
       ParserDecl (const ParseHandler& in_parse_handler) : parse_handler (in_parse_handler) {}
 
@@ -175,7 +175,7 @@ typedef Singleton<ParserManagerImpl> ParserManagerSingleton;
 }
 
 /*
-    Обёртки над ParserManagerImpl
+    РћР±С‘СЂС‚РєРё РЅР°Рґ ParserManagerImpl
 */
 
 void ParserManager::RegisterParser (const char* type, const ParseHandler& parser)
@@ -202,7 +202,7 @@ namespace common
 {
 
 /*
-    Грамматический разбор
+    Р“СЂР°РјРјР°С‚РёС‡РµСЃРєРёР№ СЂР°Р·Р±РѕСЂ
 */
 
 void parse (ParseTreeBuilder& builder, ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer)

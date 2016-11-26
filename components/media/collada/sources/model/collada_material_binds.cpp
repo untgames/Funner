@@ -4,7 +4,7 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Описание реализации присоединенного материала
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 typedef stl::hash_map<size_t, stl::string>                     ChannelMap;
@@ -12,12 +12,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, stl::string> MaterialMap;
 
 struct MaterialBinds::Impl: public xtl::reference_counter
 {
-  ChannelMap  channels;  //карта каналов
-  MaterialMap materials; //карта материалов
+  ChannelMap  channels;  //РєР°СЂС‚Р° РєР°РЅР°Р»РѕРІ
+  MaterialMap materials; //РєР°СЂС‚Р° РјР°С‚РµСЂРёР°Р»РѕРІ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 MaterialBinds::MaterialBinds ()
@@ -44,7 +44,7 @@ MaterialBinds& MaterialBinds::operator = (const MaterialBinds& binds)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 MaterialBinds MaterialBinds::Clone () const
@@ -53,7 +53,7 @@ MaterialBinds MaterialBinds::Clone () const
 }
 
 /*
-    Связывание материалов
+    РЎРІСЏР·С‹РІР°РЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 const char* MaterialBinds::FindMaterial (const char* symbol) const //nothrow
@@ -68,7 +68,7 @@ const char* MaterialBinds::FindMaterial (const char* symbol) const //nothrow
 
 const char* MaterialBinds::FindMaterial (const Surface& surface) const //nothrow
 {
-    //здесь должна быть проверка совместимости с поверхностью, но пока что это невозможно из-за отсутствия метода Surface::Owner
+    //Р·РґРµСЃСЊ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊСЋ, РЅРѕ РїРѕРєР° С‡С‚Рѕ СЌС‚Рѕ РЅРµРІРѕР·РјРѕР¶РЅРѕ РёР·-Р·Р° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РјРµС‚РѕРґР° Surface::Owner
 
   return FindMaterial (surface.Material ());
 }
@@ -93,7 +93,7 @@ void MaterialBinds::RemoveMaterial (const char* symbol)
 }
 
 /*
-    Имя канала текстурированных вершин поверхности
+    РРјСЏ РєР°РЅР°Р»Р° С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹С… РІРµСЂС€РёРЅ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 namespace
@@ -168,7 +168,7 @@ int MaterialBinds::FindTexcoordChannel (const Surface& surface, const Texture& t
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void MaterialBinds::Clear ()

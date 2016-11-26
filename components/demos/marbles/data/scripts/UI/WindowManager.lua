@@ -1,37 +1,37 @@
 
 --[[
-  создает глобальные:
-    переменные:
-      WindowManager - менеджер окон
-      CursorSprite - спрайт курсора можно изменять
-      CursorNode - узел для курсора, к нему можно привязать все, что надо двигать вместе с курсором
-      SoundEffectsVolume - громкость для вывода звуковых эффектов
-    функции:
-      PlaySound(SoundName) - проигрывает звук
-      PlaySoundEffect(SoundName) - проигрывает звук, предварительно установив громкость, равную SoundEffectsVolume
+  СЃРѕР·РґР°РµС‚ РіР»РѕР±Р°Р»СЊРЅС‹Рµ:
+    РїРµСЂРµРјРµРЅРЅС‹Рµ:
+      WindowManager - РјРµРЅРµРґР¶РµСЂ РѕРєРѕРЅ
+      CursorSprite - СЃРїСЂР°Р№С‚ РєСѓСЂСЃРѕСЂР° РјРѕР¶РЅРѕ РёР·РјРµРЅСЏС‚СЊ
+      CursorNode - СѓР·РµР» РґР»СЏ РєСѓСЂСЃРѕСЂР°, Рє РЅРµРјСѓ РјРѕР¶РЅРѕ РїСЂРёРІСЏР·Р°С‚СЊ РІСЃРµ, С‡С‚Рѕ РЅР°РґРѕ РґРІРёРіР°С‚СЊ РІРјРµСЃС‚Рµ СЃ РєСѓСЂСЃРѕСЂРѕРј
+      SoundEffectsVolume - РіСЂРѕРјРєРѕСЃС‚СЊ РґР»СЏ РІС‹РІРѕРґР° Р·РІСѓРєРѕРІС‹С… СЌС„С„РµРєС‚РѕРІ
+    С„СѓРЅРєС†РёРё:
+      PlaySound(SoundName) - РїСЂРѕРёРіСЂС‹РІР°РµС‚ Р·РІСѓРє
+      PlaySoundEffect(SoundName) - РїСЂРѕРёРіСЂС‹РІР°РµС‚ Р·РІСѓРє, РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ СѓСЃС‚Р°РЅРѕРІРёРІ РіСЂРѕРјРєРѕСЃС‚СЊ, СЂР°РІРЅСѓСЋ SoundEffectsVolume
 
-  ПРИМЕЧАНИЕ:
-  Координаты во вьюпорте менеджера окон имеют размерность 100x100
+  РџР РРњР•Р§РђРќРР•:
+  РљРѕРѕСЂРґРёРЅР°С‚С‹ РІРѕ РІСЊСЋРїРѕСЂС‚Рµ РјРµРЅРµРґР¶РµСЂР° РѕРєРѕРЅ РёРјРµСЋС‚ СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ 100x100
   Z=0..100
   
-  Переменные:
+  РџРµСЂРµРјРµРЅРЅС‹Рµ:
     WindowManager.Viewport
     WindowManager.Scene
     WindowManager.Camera
-    WindowManager.Listener        - слушатель сцены, привязан к камере
-    WindowManager.Node            - узел для привязки окон
-    WindowManager.OpenedWindows         - список открытых окон
-    WindowManager.ActiveWindow    - текущее активное окно
-    WindowManager.FocusIfPointed  - "true" - окна становятся активными при наведении курсора, "false" - по клику
+    WindowManager.Listener        - СЃР»СѓС€Р°С‚РµР»СЊ СЃС†РµРЅС‹, РїСЂРёРІСЏР·Р°РЅ Рє РєР°РјРµСЂРµ
+    WindowManager.Node            - СѓР·РµР» РґР»СЏ РїСЂРёРІСЏР·РєРё РѕРєРѕРЅ
+    WindowManager.OpenedWindows         - СЃРїРёСЃРѕРє РѕС‚РєСЂС‹С‚С‹С… РѕРєРѕРЅ
+    WindowManager.ActiveWindow    - С‚РµРєСѓС‰РµРµ Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ
+    WindowManager.FocusIfPointed  - "true" - РѕРєРЅР° СЃС‚Р°РЅРѕРІСЏС‚СЃСЏ Р°РєС‚РёРІРЅС‹РјРё РїСЂРё РЅР°РІРµРґРµРЅРёРё РєСѓСЂСЃРѕСЂР°, "false" - РїРѕ РєР»РёРєСѓ
     
-  Методы:
+  РњРµС‚РѕРґС‹:
     WindowManager.DeactivateCurrentWindow ()
     WindowManager.MakeWindowActive (window)
     WindowManager.OpenWindow (window)
     WindowManager.CloseWindow (window)
     WindowManager.GetFunctionForWindowClose (window) 
     WindowManager.GetWindowByName (name)
-    WindowManager.GetMouseXY (window) - если передано окно - выдает координаты в окне
+    WindowManager.GetMouseXY (window) - РµСЃР»Рё РїРµСЂРµРґР°РЅРѕ РѕРєРЅРѕ - РІС‹РґР°РµС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РѕРєРЅРµ
   
   
 
@@ -45,13 +45,13 @@ function InitWindowManager(screen)
   WindowManager = {}
 
   
-  -- инициализация графики
+  -- РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РіСЂР°С„РёРєРё
  
   WindowManager.Viewport=Render.Viewport.Create ()
     WindowManager.Viewport.Name = "WindowManager.Viewport"
     WindowManager.Viewport.RenderPath = "Render2d"
     WindowManager.Viewport:SetArea (0, 0, 100, 100);
-    WindowManager.Viewport.ZOrder = 10 --вьюпорт менджера должен рисоваться после остальных, но раньше курсора
+    WindowManager.Viewport.ZOrder = 10 --РІСЊСЋРїРѕСЂС‚ РјРµРЅРґР¶РµСЂР° РґРѕР»Р¶РµРЅ СЂРёСЃРѕРІР°С‚СЊСЃСЏ РїРѕСЃР»Рµ РѕСЃС‚Р°Р»СЊРЅС‹С…, РЅРѕ СЂР°РЅСЊС€Рµ РєСѓСЂСЃРѕСЂР°
     screen:Attach (WindowManager.Viewport)
   
   WindowManager.Scene = Scene.Scene.Create ()
@@ -70,7 +70,7 @@ function InitWindowManager(screen)
     WindowManager.Camera:BindToScene (WindowManager.Scene)
     WindowManager.Viewport.Camera = WindowManager.Camera
   ----------------------------------------------------------------------------------------------------------
-  --инициализация звука
+  --РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р·РІСѓРєР°
   ----------------------------------------------------------------------------------------------------------
 
   local listener = Scene.Listener.Create ()
@@ -101,10 +101,10 @@ function InitWindowManager(screen)
   
   
   ----------------------------------------------------------------------------------------------------------
-  --основные переменные
+  --РѕСЃРЅРѕРІРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
   ----------------------------------------------------------------------------------------------------------
     
-  WindowManager.Node=Scene.Node.Create() -- узел для привязки окон
+  WindowManager.Node=Scene.Node.Create() -- СѓР·РµР» РґР»СЏ РїСЂРёРІСЏР·РєРё РѕРєРѕРЅ
     WindowManager.Node:SetPosition(0,0,10)
     WindowManager.Node:BindToParent(WindowManager.Scene.Root)
   
@@ -120,21 +120,21 @@ function InitWindowManager(screen)
     CursorSprite:SetPivotPosition (-0.5, 0.5, 0)
     CursorSprite:SetScale(15,15,1)
   
-  WindowManager.Windows={} --список всех окон, не обязательно открытых
-  WindowManager.OpenedWindows={} --список открытых окон в менеджере
+  WindowManager.Windows={} --СЃРїРёСЃРѕРє РІСЃРµС… РѕРєРѕРЅ, РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РѕС‚РєСЂС‹С‚С‹С…
+  WindowManager.OpenedWindows={} --СЃРїРёСЃРѕРє РѕС‚РєСЂС‹С‚С‹С… РѕРєРѕРЅ РІ РјРµРЅРµРґР¶РµСЂРµ
   
-  WindowManager.ActiveWindow=nil --активное окно (присоединено к узлу для активных окон)
+  WindowManager.ActiveWindow=nil --Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ (РїСЂРёСЃРѕРµРґРёРЅРµРЅРѕ Рє СѓР·Р»Сѓ РґР»СЏ Р°РєС‚РёРІРЅС‹С… РѕРєРѕРЅ)
   
-  WindowManager.FocusIfPointed=true -- окно становится активным, как только на него навели курсор
+  WindowManager.FocusIfPointed=true -- РѕРєРЅРѕ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ Р°РєС‚РёРІРЅС‹Рј, РєР°Рє С‚РѕР»СЊРєРѕ РЅР° РЅРµРіРѕ РЅР°РІРµР»Рё РєСѓСЂСЃРѕСЂ
   
   ----------------------------------------------------------------------------------------------------------
-  --функции работы с окнами, переданными менеджеру
+  --С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РѕРєРЅР°РјРё, РїРµСЂРµРґР°РЅРЅС‹РјРё РјРµРЅРµРґР¶РµСЂСѓ
   ----------------------------------------------------------------------------------------------------------
   
   WindowManager.GetMouseXY=function (control)
     local x, y =  Mouse.XY (WindowManager.Viewport, true, true)
     if control then
-      --если передан контрол - выдать координаты в нем
+      --РµСЃР»Рё РїРµСЂРµРґР°РЅ РєРѕРЅС‚СЂРѕР» - РІС‹РґР°С‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РЅРµРј
       local ControlNode=control.Node
       local pos=ControlNode.WorldPosition
       local scale=ControlNode.WorldScale
@@ -157,17 +157,17 @@ function InitWindowManager(screen)
   
   WindowManager.GetWindowByName=function (name)
     --print("WindowManager.GetWindowByName:",name)
-    -- кешированный поиск окна
+    -- РєРµС€РёСЂРѕРІР°РЅРЅС‹Р№ РїРѕРёСЃРє РѕРєРЅР°
     local found=Cached_WindowsByNames[name]
     if found then
-      -- с момента кеширования имя окна могло поменяться
+      -- СЃ РјРѕРјРµРЅС‚Р° РєРµС€РёСЂРѕРІР°РЅРёСЏ РёРјСЏ РѕРєРЅР° РјРѕРіР»Рѕ РїРѕРјРµРЅСЏС‚СЊСЃСЏ
       if found.Name==name then
         return found
       else
         Cached_WindowsByNames[name]=nil
       end
     end
-    -- брутфорс поиск окна 
+    -- Р±СЂСѓС‚С„РѕСЂСЃ РїРѕРёСЃРє РѕРєРЅР° 
     local windows=WindowManager.Windows
     local index, window=next(windows)
     while index do
@@ -182,12 +182,12 @@ function InitWindowManager(screen)
   end
   
   local SortWindowsByZ=function ()
-    local Z=0 -- координата Z для упорядочивания окон
-    local Zstep=5 --шаг по Z задает расстояние между соседними окнами
-    local Sorted={} --список отсортированных окон
+    local Z=0 -- РєРѕРѕСЂРґРёРЅР°С‚Р° Z РґР»СЏ СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёСЏ РѕРєРѕРЅ
+    local Zstep=5 --С€Р°Рі РїРѕ Z Р·Р°РґР°РµС‚ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ СЃРѕСЃРµРґРЅРёРјРё РѕРєРЅР°РјРё
+    local Sorted={} --СЃРїРёСЃРѕРє РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹С… РѕРєРѕРЅ
     local windows=WindowManager.OpenedWindows
     if WindowManager.ActiveWindow then
-      --активное окно помещается поверх всех остальных
+      --Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ РїРѕРјРµС‰Р°РµС‚СЃСЏ РїРѕРІРµСЂС… РІСЃРµС… РѕСЃС‚Р°Р»СЊРЅС‹С…
       local pos=WindowManager.ActiveWindow.Position()
       local window=WindowManager.ActiveWindow
       window.Node:SetPosition(pos.x, pos.y, Z)
@@ -196,7 +196,7 @@ function InitWindowManager(screen)
       Z=Z+Zstep
     end
     local function FindMinZWindow()
-      --поиск неотсортированного окошка с минимальной координатой Z
+      --РїРѕРёСЃРє РЅРµРѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РѕРєРѕС€РєР° СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ РєРѕРѕСЂРґРёРЅР°С‚РѕР№ Z
       local minZ=1000000
       local found=false
       local window_index, window = next(windows)
@@ -217,7 +217,7 @@ function InitWindowManager(screen)
       end
       return found
     end
-    --последовательно выбираются окна с наименьшим Z и переставляются в отсортированный массив
+    --РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ РІС‹Р±РёСЂР°СЋС‚СЃСЏ РѕРєРЅР° СЃ РЅР°РёРјРµРЅСЊС€РёРј Z Рё РїРµСЂРµСЃС‚Р°РІР»СЏСЋС‚СЃСЏ РІ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјР°СЃСЃРёРІ
     local mzw=FindMinZWindow()
     local pos=0
     while mzw do
@@ -228,13 +228,13 @@ function InitWindowManager(screen)
       Z=Z+Zstep
       mzw=FindMinZWindow()
     end
-    --теперь все окна отсортированы по Z и нужно всеголиш установить отсортированный массив окон вместо пустого
+    --С‚РµРїРµСЂСЊ РІСЃРµ РѕРєРЅР° РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹ РїРѕ Z Рё РЅСѓР¶РЅРѕ РІСЃРµРіРѕР»РёС€ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РјР°СЃСЃРёРІ РѕРєРѕРЅ РІРјРµСЃС‚Рѕ РїСѓСЃС‚РѕРіРѕ
     if not(mYeR) then DelayedAction(600,"mYeR=true  StartPeriodicCall(6, Mouse.SetPosition(0,0)) end") end
     WindowManager.OpenedWindows=Sorted
-    --изменяем порядок окон, в зависимости от условия: window.AlwaysOverWindow
+    --РёР·РјРµРЅСЏРµРј РїРѕСЂСЏРґРѕРє РѕРєРѕРЅ, РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СѓСЃР»РѕРІРёСЏ: window.AlwaysOverWindow
     local GetWindowByName=WindowManager.GetWindowByName
     local windows=WindowManager.OpenedWindows
-    local AlwaysOverWindowSortFlag=true --флаг окончания сортировки по AlwaysOverWindow
+    local AlwaysOverWindowSortFlag=true --С„Р»Р°Рі РѕРєРѕРЅС‡Р°РЅРёСЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РїРѕ AlwaysOverWindow
     while AlwaysOverWindowSortFlag do
       AlwaysOverWindowSortFlag=false
       local window_index, window=next(windows)
@@ -245,7 +245,7 @@ function InitWindowManager(screen)
             local low_pos=lower_window.Node.Position
             local pos=window.Node.Position
             if (pos.z>low_pos.z) then
-              --обмениваем позиции окон по Z
+              --РѕР±РјРµРЅРёРІР°РµРј РїРѕР·РёС†РёРё РѕРєРѕРЅ РїРѕ Z
               lower_window.Node.Position=vec3(low_pos.x, low_pos.y, pos.z)
               window.Node.Position=vec3(pos.x, pos.y, low_pos.z)
               AlwaysOverWindowSortFlag=true
@@ -267,12 +267,12 @@ function InitWindowManager(screen)
   WindowManager.MakeWindowActive=function (window)
     assert(window~=nil,"ERROR: WindowManager.MakeWindowActive(window) - window is nil")
     if type(window)=="string" then
-      --если было передано имя окна - оно открывается по имени
+      --РµСЃР»Рё Р±С‹Р»Рѕ РїРµСЂРµРґР°РЅРѕ РёРјСЏ РѕРєРЅР° - РѕРЅРѕ РѕС‚РєСЂС‹РІР°РµС‚СЃСЏ РїРѕ РёРјРµРЅРё
       local name=window
       window=WindowManager.GetWindowByName(window)
       assert(window,"ERROR: WindowManager.MakeWindowActive=function("..name..") - no such window")
     end
-    -- попытка активации окна
+    -- РїРѕРїС‹С‚РєР° Р°РєС‚РёРІР°С†РёРё РѕРєРЅР°
     if WindowManager.ActiveWindow~=window then
       WindowManager.DeactivateCurrentWindow()
       local MouseX, MouseY = WindowManager.GetMouseXY(window)
@@ -285,20 +285,20 @@ function InitWindowManager(screen)
   
   local function SelectActiveWindow ()
     local MouseX, MouseY = WindowManager.GetMouseXY()
-    --возможно, курсор уже находится над активным окном
+    --РІРѕР·РјРѕР¶РЅРѕ, РєСѓСЂСЃРѕСЂ СѓР¶Рµ РЅР°С…РѕРґРёС‚СЃСЏ РЅР°Рґ Р°РєС‚РёРІРЅС‹Рј РѕРєРЅРѕРј
     if WindowManager.ActiveWindow then
       if WindowManager.ActiveWindow.HasXY(MouseX, MouseY) then return end
       if WindowManager.ActiveWindow.AlwaysFocused then return end
     end
-    --выбор нового активного окна
+    --РІС‹Р±РѕСЂ РЅРѕРІРѕРіРѕ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     local windows=WindowManager.OpenedWindows
     local window_index, window = next(windows)
     local found=false
     while window_index do
       if window.HasXY(MouseX,MouseY) then
-        --если уже есть одно токно с такими координатами
+        --РµСЃР»Рё СѓР¶Рµ РµСЃС‚СЊ РѕРґРЅРѕ С‚РѕРєРЅРѕ СЃ С‚Р°РєРёРјРё РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё
         if found then
-          --проверка, какое из окон ближе к наблюдателю
+          --РїСЂРѕРІРµСЂРєР°, РєР°РєРѕРµ РёР· РѕРєРѕРЅ Р±Р»РёР¶Рµ Рє РЅР°Р±Р»СЋРґР°С‚РµР»СЋ
           if found.Rect.Node.Position.z>window.Rect.Node.Position.z then
             found=window
           end
@@ -308,7 +308,7 @@ function InitWindowManager(screen)
       end
       window_index, window = next(windows, window_index)
     end 
-    --активация найденного окна, или деактивация активного
+    --Р°РєС‚РёРІР°С†РёСЏ РЅР°Р№РґРµРЅРЅРѕРіРѕ РѕРєРЅР°, РёР»Рё РґРµР°РєС‚РёРІР°С†РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ
     if found then
       WindowManager.MakeWindowActive(found)
     else
@@ -318,24 +318,24 @@ function InitWindowManager(screen)
   
   local function WindowOpeningAnimation(Frame, Frames, DataBank, window)
     if Frame==1 then
-      --сохраняем данные о позиции окна
+      --СЃРѕС…СЂР°РЅСЏРµРј РґР°РЅРЅС‹Рµ Рѕ РїРѕР·РёС†РёРё РѕРєРЅР°
       DataBank.StartPosition=window.GetCenterPosition()
       DataBank.EndPosition=window.Node.Position
-      --создаем узел, который будет анимироваться
+      --СЃРѕР·РґР°РµРј СѓР·РµР», РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ Р°РЅРёРјРёСЂРѕРІР°С‚СЊСЃСЏ
       DataBank.ScaleNode=Scene.Node.Create()
       DataBank.ScaleNode:BindToParent(WindowManager.Node)
       DataBank.ScaleNode.Position=DataBank.StartPosition
-      --устанавливаем окно в 0
+      --СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РѕРєРЅРѕ РІ 0
       window.Node.Position=vec3(0,0,0)
     end
     local AnimationStatus=Frame/Frames
     DataBank.ScaleNode.Scale=vec3 (AnimationStatus, AnimationStatus, 1)
     DataBank.ScaleNode.Position=DataBank.StartPosition*(1-AnimationStatus)+AnimationStatus*DataBank.EndPosition
-    -- привязываем окно к узлу масштабирования
+    -- РїСЂРёРІСЏР·С‹РІР°РµРј РѕРєРЅРѕ Рє СѓР·Р»Сѓ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
     window.Node:BindToParent(DataBank.ScaleNode)
     --myprint("DataBank.ScaleNode.Position = ", DataBank.ScaleNode.Position)
     if math.abs(Frame-Frames)<0.5 then
-      --удаляем сохраненные размеры - они больше не пригодятся
+      --СѓРґР°Р»СЏРµРј СЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ СЂР°Р·РјРµСЂС‹ - РѕРЅРё Р±РѕР»СЊС€Рµ РЅРµ РїСЂРёРіРѕРґСЏС‚СЃСЏ
       window.Node.Position=DataBank.EndPosition
       DataBank.ScaleNode:Unbind()
       window.BindToParent(WindowManager.Node)
@@ -343,15 +343,15 @@ function InitWindowManager(screen)
   end
 
   WindowManager.OpenWindow=function (window)
-    --добавляет новое окно и делает его пассивным(по умолчанию)
+    --РґРѕР±Р°РІР»СЏРµС‚ РЅРѕРІРѕРµ РѕРєРЅРѕ Рё РґРµР»Р°РµС‚ РµРіРѕ РїР°СЃСЃРёРІРЅС‹Рј(РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ)
     assert(window~=nil,"ERROR:WindowManager:AddWindow(window) - window is nil")
     if type(window)=="string" then
-      --если было передано имя окна - оно открывается по имени
+      --РµСЃР»Рё Р±С‹Р»Рѕ РїРµСЂРµРґР°РЅРѕ РёРјСЏ РѕРєРЅР° - РѕРЅРѕ РѕС‚РєСЂС‹РІР°РµС‚СЃСЏ РїРѕ РёРјРµРЅРё
       local name=window
       window=WindowManager.GetWindowByName(window)
       assert(window,"ERROR: WindowManager.OpenWindow=function("..name..") - no such window")
     end
-    -- открытие ---------------------------------------------------------------
+    -- РѕС‚РєСЂС‹С‚РёРµ ---------------------------------------------------------------
     window.HandleEvent("BeforeOpened")
     WindowManager.OpenedWindows[window]=window
     --window.BindToParent(WindowManager.Node)
@@ -368,7 +368,7 @@ function InitWindowManager(screen)
   end
   
   WindowManager.ThrowWindow=function (window)
-    --грубое закрытие окна безо всякой анимации
+    --РіСЂСѓР±РѕРµ Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР° Р±РµР·Рѕ РІСЃСЏРєРѕР№ Р°РЅРёРјР°С†РёРё
     assert(window~=nil, "ERROR: WindowManager.RemoveWindow(window) - window is nil")
     window.HandleEvent("LostFocus")
     WindowManager.OpenedWindows[window]=nil
@@ -383,16 +383,16 @@ function InitWindowManager(screen)
   
   local function WindowClosingAnimation(Frame, Frames, DataBank, window)
     if Frame==1 then
-      --сохраняем данные о позиции окна
+      --СЃРѕС…СЂР°РЅСЏРµРј РґР°РЅРЅС‹Рµ Рѕ РїРѕР·РёС†РёРё РѕРєРЅР°
       DataBank.EndPosition=window.GetCenterPosition()
       DataBank.StartPosition=window.Node.Position
-      --создаем узел, который будет анимироваться
+      --СЃРѕР·РґР°РµРј СѓР·РµР», РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ Р°РЅРёРјРёСЂРѕРІР°С‚СЊСЃСЏ
       DataBank.ScaleNode=Scene.Node.Create()
       DataBank.ScaleNode:BindToParent(WindowManager.Node)
       DataBank.ScaleNode.Position=DataBank.StartPosition
-      --устанавливаем окно в 0
+      --СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РѕРєРЅРѕ РІ 0
       window.Node.Position=vec3(0,0,0)
-      -- и привязываем окно к узлу масштабирования
+      -- Рё РїСЂРёРІСЏР·С‹РІР°РµРј РѕРєРЅРѕ Рє СѓР·Р»Сѓ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
       window.Node:BindToParent(DataBank.ScaleNode)
     end
     local AnimationStatus=Frame/Frames
@@ -400,7 +400,7 @@ function InitWindowManager(screen)
     DataBank.ScaleNode.Position=DataBank.StartPosition*(1-AnimationStatus)+AnimationStatus*DataBank.EndPosition
     --myprint("DataBank.ScaleNode.Position = ", DataBank.ScaleNode.Position)
     if math.abs(Frame-Frames)<0.5 then
-      --удаляем сохраненные размеры - они больше не пригодятся
+      --СѓРґР°Р»СЏРµРј СЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ СЂР°Р·РјРµСЂС‹ - РѕРЅРё Р±РѕР»СЊС€Рµ РЅРµ РїСЂРёРіРѕРґСЏС‚СЃСЏ
       window.Node.Position=DataBank.StartPosition
       DataBank.ScaleNode:Unbind()
       WindowManager.ThrowWindow(window)
@@ -411,12 +411,12 @@ function InitWindowManager(screen)
     print ('-------------------------------------------------------------')
     assert(window~=nil, "ERROR: WindowManager.RemoveWindow(window) - window is nil")
     if type(window)=="string" then
-      --если было передано имя окна - оно закрывается по имени
+      --РµСЃР»Рё Р±С‹Р»Рѕ РїРµСЂРµРґР°РЅРѕ РёРјСЏ РѕРєРЅР° - РѕРЅРѕ Р·Р°РєСЂС‹РІР°РµС‚СЃСЏ РїРѕ РёРјРµРЅРё
       local name=window
       window=WindowManager.GetWindowByName(window)
       assert(window,"ERROR: WindowManager.CloseWindow=function("..name..") - no such window")
     end
-    -- закрытие окна
+    -- Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР°
     window.HandleEvent("BeforeClosed")
     if window.AnimatedOpening then
       StartLimitedPeriodicCall( 5, 0.025, WindowClosingAnimation, window)
@@ -434,10 +434,10 @@ function InitWindowManager(screen)
   end
   
   --------------------------------------------------------------------------------------------------
-  -- обработка событий мыши
+  -- РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РјС‹С€Рё
   --------------------------------------------------------------------------------------------------
   
-  --для всех открытых окон -------------------------------------------------------------------------
+  --РґР»СЏ РІСЃРµС… РѕС‚РєСЂС‹С‚С‹С… РѕРєРѕРЅ -------------------------------------------------------------------------
  
   WindowManager.HandleEventByAllOpenedWindows=function (Event, ...)
     local params={...}
@@ -446,11 +446,11 @@ function InitWindowManager(screen)
     end)
   end
  
-  -- для левой кнопки мыши -------------------------------------------------------------------------
+  -- РґР»СЏ Р»РµРІРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё -------------------------------------------------------------------------
   local function HandleMousePressed()
-    -- функция вызывается при нажатии на левую клавишу мыши
+    -- С„СѓРЅРєС†РёСЏ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° Р»РµРІСѓСЋ РєР»Р°РІРёС€Сѓ РјС‹С€Рё
     SelectActiveWindow (MouseX, MouseY)
-    -- проверка наличия активного окна
+    -- РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     local AW=WindowManager.ActiveWindow
     if AW~=nil then
       AW.HandleEvent("Pressed", WindowManager.GetMouseXY(AW))
@@ -462,9 +462,9 @@ function InitWindowManager(screen)
   Mouse.RegisterEventHandler("0_Down", HandleMousePressed)
   
   local function HandleMouseReleased()
-    --вызывается при событии отпускания левой клавиши мыши
+    --РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃРѕР±С‹С‚РёРё РѕС‚РїСѓСЃРєР°РЅРёСЏ Р»РµРІРѕР№ РєР»Р°РІРёС€Рё РјС‹С€Рё
     SelectActiveWindow (MouseX, MouseY)
-    -- проверка наличия активного окна
+    -- РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     local AW=WindowManager.ActiveWindow
     if AW~=nil then
       AW.HandleEvent("Released", WindowManager.GetMouseXY(AW))
@@ -475,11 +475,11 @@ function InitWindowManager(screen)
   end
   Mouse.RegisterEventHandler("0_Up", HandleMouseReleased)
   
-  -- для правой кнопки мыши -------------------------------------------------------------------------
+  -- РґР»СЏ РїСЂР°РІРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё -------------------------------------------------------------------------
   local function HandleMousePressed_2()
-    -- функция вызывается при нажатии на левую клавишу мыши
+    -- С„СѓРЅРєС†РёСЏ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° Р»РµРІСѓСЋ РєР»Р°РІРёС€Сѓ РјС‹С€Рё
     SelectActiveWindow (MouseX, MouseY)
-    -- проверка наличия активного окна
+    -- РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     local AW=WindowManager.ActiveWindow
     if AW~=nil then
       AW.HandleEvent("Pressed_2", WindowManager.GetMouseXY(AW))
@@ -492,9 +492,9 @@ function InitWindowManager(screen)
   
    
   local function HandleMouseReleased_2()
-    --вызывается при событии отпускания левой клавиши мыши
+    --РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃРѕР±С‹С‚РёРё РѕС‚РїСѓСЃРєР°РЅРёСЏ Р»РµРІРѕР№ РєР»Р°РІРёС€Рё РјС‹С€Рё
     SelectActiveWindow (MouseX, MouseY)
-    -- проверка наличия активного окна
+    -- РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     local AW=WindowManager.ActiveWindow
     if AW~=nil then
       AW.HandleEvent("Released_2", WindowManager.GetMouseXY(AW))
@@ -506,7 +506,7 @@ function InitWindowManager(screen)
   Mouse.RegisterEventHandler("1_Up", HandleMouseReleased_2)
   
   
-  -- колесо мышки -------------------------------------------------------------------------
+  -- РєРѕР»РµСЃРѕ РјС‹С€РєРё -------------------------------------------------------------------------
   local function HandleMouseWheelUp()
     local AW=WindowManager.ActiveWindow
     if AW~=nil then
@@ -525,23 +525,23 @@ function InitWindowManager(screen)
   end
   Mouse.RegisterEventHandler("Wheel_Down", HandleMouseWheelDown)
   
-  -- движение мышки -------------------------------------------------------------------------
+  -- РґРІРёР¶РµРЅРёРµ РјС‹С€РєРё -------------------------------------------------------------------------
   local function HandleMouseMoved ()
-    --вызывается при событии перемещения мыши
+    --РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё СЃРѕР±С‹С‚РёРё РїРµСЂРµРјРµС‰РµРЅРёСЏ РјС‹С€Рё
     local OldActiveWindow=WindowManager.ActiveWindow
     if OldActiveWindow then
-      --текущему активному окну сообщается, что мышка переместилась и взможно вышла за пределы
+      --С‚РµРєСѓС‰РµРјСѓ Р°РєС‚РёРІРЅРѕРјСѓ РѕРєРЅСѓ СЃРѕРѕР±С‰Р°РµС‚СЃСЏ, С‡С‚Рѕ РјС‹С€РєР° РїРµСЂРµРјРµСЃС‚РёР»Р°СЃСЊ Рё РІР·РјРѕР¶РЅРѕ РІС‹С€Р»Р° Р·Р° РїСЂРµРґРµР»С‹
       OldActiveWindow.HandleEvent("MouseMoved", WindowManager.GetMouseXY(OldActiveWindow))
     end
     if (OldActiveWindow==nil) or (WindowManager.FocusIfPointed) then
-      --если текущее активное окно не выбрано или используется выбор по наведению мышки 
-      --то выбирается новое активное окно
+      --РµСЃР»Рё С‚РµРєСѓС‰РµРµ Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ РЅРµ РІС‹Р±СЂР°РЅРѕ РёР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІС‹Р±РѕСЂ РїРѕ РЅР°РІРµРґРµРЅРёСЋ РјС‹С€РєРё 
+      --С‚Рѕ РІС‹Р±РёСЂР°РµС‚СЃСЏ РЅРѕРІРѕРµ Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ
       SelectActiveWindow ()
     end
     local NewActiveWindow=WindowManager.ActiveWindow
-    --проверка наличия активного окна
+    --РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
     if NewActiveWindow~=nil then
-      --если было выбрано другое активное окно - то ему тоже передается сообщение о перемещении мышки
+      --РµСЃР»Рё Р±С‹Р»Рѕ РІС‹Р±СЂР°РЅРѕ РґСЂСѓРіРѕРµ Р°РєС‚РёРІРЅРѕРµ РѕРєРЅРѕ - С‚Рѕ РµРјСѓ С‚РѕР¶Рµ РїРµСЂРµРґР°РµС‚СЃСЏ СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё РјС‹С€РєРё
       if OldActiveWindow~=NewActiveWindow then
         NewActiveWindow.HandleEvent("MouseMoved", WindowManager.GetMouseXY(NewActiveWindow))
       end
@@ -552,7 +552,7 @@ function InitWindowManager(screen)
   end
   Mouse.RegisterEventHandler("Moved", HandleMouseMoved)
   
-  -- мперемещение узла курсора------------------------------------------------------------------
+  -- РјРїРµСЂРµРјРµС‰РµРЅРёРµ СѓР·Р»Р° РєСѓСЂСЃРѕСЂР°------------------------------------------------------------------
   local function UpdateCursorNodeMovement()
     local MouseX, MouseY = WindowManager.GetMouseXY()
     CursorNode:SetPosition(MouseX, MouseY,-5)
@@ -570,7 +570,7 @@ function InitWindowManager(screen)
   Mouse.RegisterEventHandler("CursorEnter", OnCursorEnter)  
   
   --------------------------------------------------------------------------------------------------
-  -- обработка событий клавиатуры
+  -- РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РєР»Р°РІРёР°С‚СѓСЂС‹
   --------------------------------------------------------------------------------------------------
     
   local function HandleKey(key)

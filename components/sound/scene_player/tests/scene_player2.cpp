@@ -19,7 +19,7 @@ using namespace syslib;
 using namespace scene_graph;
 using namespace math;
 
-const size_t TEST_WORK_TIME = 8000;  //время работы теста (в милисекундах)
+const size_t TEST_WORK_TIME = 8000;  //РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ С‚РµСЃС‚Р° (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…)
 const size_t ACTION_TIME    = 20;
 const char* library_file    = "data/test.snddecl";
 

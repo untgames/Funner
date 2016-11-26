@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-   Состояние фонового копирования
+   РЎРѕСЃС‚РѕСЏРЅРёРµ С„РѕРЅРѕРІРѕРіРѕ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 */
 
 struct BackgroundCopyState::Impl : public xtl::reference_counter
@@ -21,7 +21,7 @@ struct BackgroundCopyState::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор/деструктор/копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ/РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 BackgroundCopyState::BackgroundCopyState ()
@@ -53,7 +53,7 @@ BackgroundCopyState& BackgroundCopyState::operator = (const BackgroundCopyState&
 }
 
 /*
-    Клонирование
+    РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 BackgroundCopyState BackgroundCopyState::Clone () const
@@ -62,7 +62,7 @@ BackgroundCopyState BackgroundCopyState::Clone () const
 }
 
 /*
-   Получение размера файла
+   РџРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° С„Р°Р№Р»Р°
 */
 
 void BackgroundCopyState::SetFileSize (filesize_t size)
@@ -76,7 +76,7 @@ filesize_t BackgroundCopyState::FileSize () const
 }
 
 /*
-   Получение количества скопированных байт
+   РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃРєРѕРїРёСЂРѕРІР°РЅРЅС‹С… Р±Р°Р№С‚
 */
 
 void BackgroundCopyState::SetBytesCopied (filesize_t size)
@@ -90,7 +90,7 @@ filesize_t BackgroundCopyState::BytesCopied () const
 }
 
 /*
-   Статус операции
+   РЎС‚Р°С‚СѓСЃ РѕРїРµСЂР°С†РёРё
 */
 
 void BackgroundCopyState::SetStatus (BackgroundCopyStateStatus status)
@@ -104,7 +104,7 @@ BackgroundCopyStateStatus BackgroundCopyState::Status () const
 }
 
 /*
-   Текст ошибки
+   РўРµРєСЃС‚ РѕС€РёР±РєРё
 */
 
 void BackgroundCopyState::SetStatusText (const char* error)
@@ -121,7 +121,7 @@ const char* BackgroundCopyState::StatusText () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void BackgroundCopyState::Swap (BackgroundCopyState& state)

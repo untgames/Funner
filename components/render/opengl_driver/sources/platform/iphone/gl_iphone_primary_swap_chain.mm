@@ -9,7 +9,7 @@ using namespace render::low_level::opengl::iphone;
 namespace
 {
 
-//Интерфейс реакции на события изменения размеров View
+//РРЅС‚РµСЂС„РµР№СЃ СЂРµР°РєС†РёРё РЅР° СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ View
 class IViewSizeChangeListener
 {
   public:
@@ -81,29 +81,29 @@ class IViewSizeChangeListener
 @end
 
 /*
-    Описание реализации PrimarySwapChain
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PrimarySwapChain
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 {
-  Log                    log;                       //протокол
-  AdapterPtr             adapter;                   //адаптер цепочки обмена
-  SwapChainDesc          desc;                      //дескриптор цепочки обмена
-  Context*               context;                   //установленный контекст
-  EAGLContext*           eagl_context;              //установленный контекст
-  ISwapChain*            swap_chain;                //цепочка обмена
-  GLuint                 frame_buffer;              //буфер кадра
-  GLuint                 render_buffer;             //буфер рендеринга
-  GLuint                 depth_buffer;              //буфер глубины
-  GLuint                 stencil_buffer;            //буфер шаблона
-  GLuint                 sample_frame_buffer;       //буфер кадра для мультисэмплинга
-  GLuint                 sample_render_buffer;      //буфер рендеринга для мультисэмплинга
-  GLuint                 sample_depth_buffer;       //буфер глубины для мультисэмплинга
-  ViewSizeChangeHandler* view_size_change_handler;  //обработчик изменения размеров view
+  Log                    log;                       //РїСЂРѕС‚РѕРєРѕР»
+  AdapterPtr             adapter;                   //Р°РґР°РїС‚РµСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  SwapChainDesc          desc;                      //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  Context*               context;                   //СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚
+  EAGLContext*           eagl_context;              //СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚
+  ISwapChain*            swap_chain;                //С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  GLuint                 frame_buffer;              //Р±СѓС„РµСЂ РєР°РґСЂР°
+  GLuint                 render_buffer;             //Р±СѓС„РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  GLuint                 depth_buffer;              //Р±СѓС„РµСЂ РіР»СѓР±РёРЅС‹
+  GLuint                 stencil_buffer;            //Р±СѓС„РµСЂ С€Р°Р±Р»РѕРЅР°
+  GLuint                 sample_frame_buffer;       //Р±СѓС„РµСЂ РєР°РґСЂР° РґР»СЏ РјСѓР»СЊС‚РёСЃСЌРјРїР»РёРЅРіР°
+  GLuint                 sample_render_buffer;      //Р±СѓС„РµСЂ СЂРµРЅРґРµСЂРёРЅРіР° РґР»СЏ РјСѓР»СЊС‚РёСЃСЌРјРїР»РёРЅРіР°
+  GLuint                 sample_depth_buffer;       //Р±СѓС„РµСЂ РіР»СѓР±РёРЅС‹ РґР»СЏ РјСѓР»СЊС‚РёСЃСЌРјРїР»РёРЅРіР°
+  ViewSizeChangeHandler* view_size_change_handler;  //РѕР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ view
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter, ISwapChain *in_swap_chain)
     : adapter (in_adapter)
     , context (0)
@@ -117,12 +117,12 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     , sample_render_buffer (0)
     , sample_depth_buffer (0)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!in_desc.window_handle)
       throw xtl::make_null_argument_exception ("", "in_desc.window_handle");
 
-      //заполнение дескриптора цепочки обмена
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
     memset (&desc, 0, sizeof (desc));
 
@@ -150,7 +150,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     view_size_change_handler = [[ViewSizeChangeHandler alloc] initWithSuperview:draw_view listener:this];
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     log.Printf ("...release resources");
@@ -158,7 +158,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     [view_size_change_handler release];
   }
 
-  ///Установка нового контекста
+  ///РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void InitializeForContext (EAGLContext* new_eagl_context, Context* new_context)
   {
     static const char* METHOD_NAME = "render::low_level::opengl::iphone::PrimarySwapChain::Impl::SetContext";
@@ -166,7 +166,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     if (context)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't set two contexts for one swap chain");
 
-    //??????Необходимо учитывать разные имена функций при наличии/отсутсвии расширения
+    //??????РќРµРѕР±С…РѕРґРёРјРѕ СѓС‡РёС‚С‹РІР°С‚СЊ СЂР°Р·РЅС‹Рµ РёРјРµРЅР° С„СѓРЅРєС†РёР№ РїСЂРё РЅР°Р»РёС‡РёРё/РѕС‚СЃСѓС‚СЃРІРёРё СЂР°СЃС€РёСЂРµРЅРёСЏ
 
     context      = new_context;
     eagl_context = new_eagl_context;
@@ -275,7 +275,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     }
   }
 
-  ///Освобождение ресурсов старого контекста
+  ///РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ СЃС‚Р°СЂРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void DoneForContext ()
   {
     if (!context)
@@ -315,7 +315,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     CheckErrors ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::DoneForContext");
   }
 
-  ///Обмен текущего заднего буфера и переднего буфера
+  ///РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
   void Present ()
   {
     static const char* METHOD_NAME = "render::low_level::opengl::iphone::PrimarySwapChain::Impl::Present";
@@ -405,7 +405,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
   }
 
   private:
-     ///Проверка ошибок OpenGL
+     ///РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє OpenGL
     void CheckErrors (const char* source)
     {
       GLenum error = glGetError ();
@@ -429,7 +429,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& desc, Adapter* adapter)
@@ -467,12 +467,12 @@ PrimarySwapChain::~PrimarySwapChain ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* PrimarySwapChain::GetAdapter ()
@@ -481,7 +481,7 @@ IAdapter* PrimarySwapChain::GetAdapter ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -490,7 +490,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
@@ -499,7 +499,7 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PrimarySwapChain::Present ()
@@ -517,7 +517,7 @@ void PrimarySwapChain::Present ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PrimarySwapChain::SetFullscreenState (bool state)
@@ -533,7 +533,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-   Инициализация связи с контекстом/закрытие связи
+   РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРІСЏР·Рё СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј/Р·Р°РєСЂС‹С‚РёРµ СЃРІСЏР·Рё
 */
 
 void PrimarySwapChain::InitializeForContext (EAGLContext* eagl_context, Context* context)
@@ -547,7 +547,7 @@ void PrimarySwapChain::DoneForContext ()
 }
 
 /*
-   Получение идентификатора буфера
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р±СѓС„РµСЂР°
 */
 
 unsigned int PrimarySwapChain::GetFrameBufferId ()

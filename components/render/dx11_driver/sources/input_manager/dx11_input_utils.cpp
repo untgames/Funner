@@ -12,11 +12,11 @@ namespace dx11
 namespace
 {
 
-//сопоставление семантики и её имени
+//СЃРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ СЃРµРјР°РЅС‚РёРєРё Рё РµС‘ РёРјРµРЅРё
 struct Semantic2Name
 {
-  VertexAttributeSemantic semantic; //семантика
-  const char*             name;     //имя
+  VertexAttributeSemantic semantic; //СЃРµРјР°РЅС‚РёРєР°
+  const char*             name;     //РёРјСЏ
 };
 
 const Semantic2Name semantic_names [] = {
@@ -37,7 +37,7 @@ const size_t semantic_names_count = sizeof (semantic_names) / sizeof (*semantic_
 
 }
 
-//получение семантики по имени
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРµРјР°РЅС‚РёРєРё РїРѕ РёРјРµРЅРё
 VertexAttributeSemantic get_semantic_by_name (const char* name)
 {
   static const char* METHOD_NAME = "render::low_level::dx11::get_semantic_by_name";
@@ -54,7 +54,7 @@ VertexAttributeSemantic get_semantic_by_name (const char* name)
   return (VertexAttributeSemantic)-1;
 }
 
-//получение имени семантики
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРµРјР°РЅС‚РёРєРё
 const char* get_semantic_name (VertexAttributeSemantic semantic)
 {
   static const char* METHOD_NAME = "render::low_level::dx11::get_semantic_name";

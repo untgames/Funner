@@ -5,19 +5,19 @@ using namespace common;
 using namespace media;
 
 /*
-    Описание реализации SoundDeclarationLibrary
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё SoundDeclarationLibrary
 */
 
 typedef ResourceLibrary<SoundDeclaration> SoundDeclarationLibraryHolder;
 
 struct SoundDeclarationLibrary::Impl
 {
-  string                        name;         //имя библиотеки
-  SoundDeclarationLibraryHolder declarations; //библиотека звуков
+  string                        name;         //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  SoundDeclarationLibraryHolder declarations; //Р±РёР±Р»РёРѕС‚РµРєР° Р·РІСѓРєРѕРІ
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SoundDeclarationLibrary::SoundDeclarationLibrary ()
@@ -54,7 +54,7 @@ SoundDeclarationLibrary::~SoundDeclarationLibrary ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SoundDeclarationLibrary& SoundDeclarationLibrary::operator = (const SoundDeclarationLibrary& library)
@@ -64,7 +64,7 @@ SoundDeclarationLibrary& SoundDeclarationLibrary::operator = (const SoundDeclara
 }
 
 /*
-    Имя модели
+    РРјСЏ РјРѕРґРµР»Рё
 */
 
 const char* SoundDeclarationLibrary::Name () const
@@ -81,7 +81,7 @@ void SoundDeclarationLibrary::Rename (const char* name)
 }
 
 /*
-    Количество звуков / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р·РІСѓРєРѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 size_t SoundDeclarationLibrary::Size () const
@@ -95,7 +95,7 @@ bool SoundDeclarationLibrary::IsEmpty () const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 SoundDeclarationLibrary::Iterator SoundDeclarationLibrary::CreateIterator ()
@@ -109,7 +109,7 @@ SoundDeclarationLibrary::ConstIterator SoundDeclarationLibrary::CreateIterator (
 }
 
 /*
-    Имя декларации по итератору
+    РРјСЏ РґРµРєР»Р°СЂР°С†РёРё РїРѕ РёС‚РµСЂР°С‚РѕСЂСѓ
 */
 
 const char* SoundDeclarationLibrary::ItemId (const ConstIterator& i) const
@@ -118,7 +118,7 @@ const char* SoundDeclarationLibrary::ItemId (const ConstIterator& i) const
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 SoundDeclaration* SoundDeclarationLibrary::Find (const char* name)
@@ -132,7 +132,7 @@ const SoundDeclaration* SoundDeclarationLibrary::Find (const char* name) const
 }
 
 /*
-    Присоединение звуков
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ Р·РІСѓРєРѕРІ
 */
 
 void SoundDeclarationLibrary::Attach (const char* name, SoundDeclaration& decl)
@@ -151,7 +151,7 @@ void SoundDeclarationLibrary::DetachAll ()
 }
 
 /*
-    Загрузка / сохранение
+    Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void SoundDeclarationLibrary::Load (const char* file_name)
@@ -186,7 +186,7 @@ void SoundDeclarationLibrary::Save (const char* file_name)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SoundDeclarationLibrary::Swap (SoundDeclarationLibrary& library)

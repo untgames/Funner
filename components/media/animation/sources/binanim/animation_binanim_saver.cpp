@@ -23,7 +23,7 @@ namespace bin_anim_saver
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char HEADER [4] = {'B', 'A', 'N', 'M'};
@@ -44,13 +44,13 @@ void file_write (OutputFile& file, const char* string)
 }
 
 /*
-    Класс, сохраняющий анимации в бинарном формате
+    РљР»Р°СЃСЃ, СЃРѕС…СЂР°РЅСЏСЋС‰РёР№ Р°РЅРёРјР°С†РёРё РІ Р±РёРЅР°СЂРЅРѕРј С„РѕСЂРјР°С‚Рµ
 */
 
 class BinAnimationLibrarySaver
 {
   private:
-    //сохранение трека событий
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ С‚СЂРµРєР° СЃРѕР±С‹С‚РёР№
     void SaveEventTrack (const EventTrack& track)
     {
       unsigned int events_count = track.Size ();
@@ -69,7 +69,7 @@ class BinAnimationLibrarySaver
       }
     }
 
-    //сохранение канала анимации
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РєР°РЅР°Р»Р° Р°РЅРёРјР°С†РёРё
     template <class T> void SaveSpecificKeyInfo (const math::spline_tcb_key<T>& key)
     {
       typedef typename math::spline_tcb_key<T>::scalar_type scalar_type;
@@ -175,7 +175,7 @@ class BinAnimationLibrarySaver
                                                "Unsupported channel track type '%s'", track_type.name ());
     }
 
-    //сохранение анимации
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°РЅРёРјР°С†РёРё
     void SaveAnimation (const Animation& animation, const char* id)
     {
       file_write (result_file, id);
@@ -206,7 +206,7 @@ class BinAnimationLibrarySaver
     }
     
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BinAnimationLibrarySaver (const char* file_name, const AnimationLibrary& library)
       : result_file (file_name)
     {
@@ -221,11 +221,11 @@ class BinAnimationLibrarySaver
     }
 
   private:
-    OutputFile result_file; //результирующий файл
+    OutputFile result_file; //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ С„Р°Р№Р»
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class BinAnimSaverComponent

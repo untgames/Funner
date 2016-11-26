@@ -1,5 +1,5 @@
 /*
-    Установка значения
+    РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T>
@@ -9,7 +9,7 @@ inline void SceneParserCache::SetValue (const common::ParseNode& decl, const T& 
 }
 
 /*
-    Поиск значения
+    РџРѕРёСЃРє Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T>

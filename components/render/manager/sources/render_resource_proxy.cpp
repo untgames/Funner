@@ -21,8 +21,8 @@ template <class Ptr> struct ResourceProxyManagerImpl: public xtl::reference_coun
   typedef stl::hash_map<stl::hash_key<const char*>, ProxyImpl*> ProxyMap;
   typedef typename ProxyMap::iterator                           ProxyMapIterator;
 
-  ProxyMap proxies;          //прокси объекты
-  Pointer  default_resource; //ресурс по умолчанию
+  ProxyMap proxies;          //РїСЂРѕРєСЃРё РѕР±СЉРµРєС‚С‹
+  Pointer  default_resource; //СЂРµСЃСѓСЂСЃ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 };
 
 /*
@@ -39,13 +39,13 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
   typedef typename ProxyMap::iterator     ProxyMapIterator;
   typedef xtl::intrusive_ptr<ManagerImpl> ResourceProxyManagerPtr;
 
-  Pointer                 resource;       //хранимый объект
-  ResourceProxyManagerPtr manager;        //ссылка на менеджер
-  stl::string             name;           //имя ресурса
-  bool                    is_default;     //является ли ресурс дэфолтным
-  ProxyMapIterator        proxy_position; //положение прокси объекта в списке менеджера
+  Pointer                 resource;       //С…СЂР°РЅРёРјС‹Р№ РѕР±СЉРµРєС‚
+  ResourceProxyManagerPtr manager;        //СЃСЃС‹Р»РєР° РЅР° РјРµРЅРµРґР¶РµСЂ
+  stl::string             name;           //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+  bool                    is_default;     //СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЂРµСЃСѓСЂСЃ РґСЌС„РѕР»С‚РЅС‹Рј
+  ProxyMapIterator        proxy_position; //РїРѕР»РѕР¶РµРЅРёРµ РїСЂРѕРєСЃРё РѕР±СЉРµРєС‚Р° РІ СЃРїРёСЃРєРµ РјРµРЅРµРґР¶РµСЂР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ResourceProxyImpl (ManagerImpl& in_manager, const char* in_name)
     : manager (&in_manager)
     , name (in_name ? in_name : "")
@@ -54,14 +54,14 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
   {
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ResourceProxyImpl ()
   {   
     if (proxy_position != manager->proxies.end ())
       manager->proxies.erase (proxy_position);
   }
   
-///Переопределение методов кэша
+///РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ РјРµС‚РѕРґРѕРІ РєСЌС€Р°
   void UpdateCacheCore ()
   {
     InvalidateCacheDependencies ();
@@ -81,7 +81,7 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Ptr>
@@ -140,7 +140,7 @@ ResourceProxy<Ptr>& ResourceProxy<Ptr>::operator = (const ResourceProxy& proxy)
 }
 
 /*
-    Проверка корректности связанных данных
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРІСЏР·Р°РЅРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 template <class Ptr>
@@ -150,7 +150,7 @@ bool ResourceProxy<Ptr>::IsDefaultResource ()
 }
 
 /*
-    Получение данных
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 template <class Ptr>
@@ -215,7 +215,7 @@ void ResourceProxy<Ptr>::SetDefaultResource (const Pointer& ptr)
 }
 
 /*
-    Связывание со списком обновления кэша
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРѕ СЃРїРёСЃРєРѕРј РѕР±РЅРѕРІР»РµРЅРёСЏ РєСЌС€Р°
 */
 
 template <class Ptr>
@@ -231,7 +231,7 @@ void ResourceProxy<Ptr>::DetachCacheHolder (CacheHolder& holder)
 }
 
 /*
-    Обновления кэша / сброс кэша
+    РћР±РЅРѕРІР»РµРЅРёСЏ РєСЌС€Р° / СЃР±СЂРѕСЃ РєСЌС€Р°
 */
 
 template <class Ptr>
@@ -247,7 +247,7 @@ void ResourceProxy<Ptr>::ResetCache ()
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class Ptr>
@@ -269,7 +269,7 @@ bool ResourceProxy<Ptr>::operator != (const ResourceProxy& proxy)
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Ptr>
@@ -285,7 +285,7 @@ ResourceProxyManager<Ptr>::~ResourceProxyManager ()
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 template <class Ptr>
@@ -294,7 +294,7 @@ typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (c
   if (!name)
     throw xtl::make_null_argument_exception ("render::manager::ResourceProxyManager::GetProxy", "name");
     
-    //поиск прокси в кэше
+    //РїРѕРёСЃРє РїСЂРѕРєСЃРё РІ РєСЌС€Рµ
     
   typedef typename Impl::ProxyMapIterator ProxyMapIterator;
   
@@ -303,13 +303,13 @@ typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (c
   if (iter != impl->proxies.end ())
     return iter->second;
 
-    //создание нового прокси
+    //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РїСЂРѕРєСЃРё
 
   return Proxy (*impl, name);
 }
 
 /*
-    Поиск ресурса
+    РџРѕРёСЃРє СЂРµСЃСѓСЂСЃР°
 */
 
 template <class Ptr>
@@ -318,7 +318,7 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::FindResou
   if (!name)
     return Pointer ();
     
-    //поиск прокси в кэше
+    //РїРѕРёСЃРє РїСЂРѕРєСЃРё РІ РєСЌС€Рµ
     
   typedef typename Impl::ProxyMapIterator ProxyMapIterator;
   
@@ -336,7 +336,7 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::FindResou
 }
 
 /*
-    Установка объекта по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЉРµРєС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 template <class Ptr>
@@ -360,7 +360,7 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::DefaultRe
 }
 
 /*
-    Инстанцирование
+    РРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРёРµ
 */
 
 template class ResourceProxy<TexturePtr>;

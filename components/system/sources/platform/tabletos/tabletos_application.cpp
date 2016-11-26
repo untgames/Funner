@@ -7,13 +7,13 @@ namespace
 {
 
 /*
-    Делегат для TabletOs приложения
+    Р”РµР»РµРіР°С‚ РґР»СЏ TabletOs РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     TabletOsApplicationDelegate ()
       : message_queue (*MessageQueueSingleton::Instance ())        
       , wakeup_event ()
@@ -44,7 +44,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~TabletOsApplicationDelegate ()
     {
       try
@@ -55,11 +55,11 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }      
     }
     
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {      
       platform_initialize ();      
@@ -74,7 +74,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       
       while (!is_exited)
       {        
-          //обработка очереди сообщений делегата
+          //РѕР±СЂР°Р±РѕС‚РєР° РѕС‡РµСЂРµРґРё СЃРѕРѕР±С‰РµРЅРёР№ РґРµР»РµРіР°С‚Р°
         
         if (is_active)
         {
@@ -82,10 +82,10 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
             DoNextEvent ();
         }
   
-          //обработка системной очереди сообщений
+          //РѕР±СЂР°Р±РѕС‚РєР° СЃРёСЃС‚РµРјРЅРѕР№ РѕС‡РµСЂРµРґРё СЃРѕРѕР±С‰РµРЅРёР№
         while (ProcessSystemEvent (0));        
 
-          //обработка внутренней очереди сообщений
+          //РѕР±СЂР°Р±РѕС‚РєР° РІРЅСѓС‚СЂРµРЅРЅРµР№ РѕС‡РµСЂРµРґРё СЃРѕРѕР±С‰РµРЅРёР№
 
         if (!idle_enabled)
         {
@@ -102,13 +102,13 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }
     
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));      
     }
     
-///Обработка события выхода из приложения
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnExit (int code)
     {
       is_exited = true;
@@ -117,19 +117,19 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         listener->OnExit (code);
     }        
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -141,7 +141,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     }    
     
   private:
-///Отложенное события выхода из приложения
+///РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     struct ExitMessage: public MessageQueue::Message
     {
       ExitMessage (TabletOsApplicationDelegate& in_delegate, int in_code) : delegate (in_delegate), code (in_code) {}
@@ -155,7 +155,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       int                          code;
     };
 
-///Проверка очереди событий на пустоту
+///РџСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРё СЃРѕР±С‹С‚РёР№ РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsMessageQueueEmpty ()
     {
       if (is_exited)
@@ -164,7 +164,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       return message_queue.IsEmpty ();
     }    
     
-///Обработка системного сообщения
+///РћР±СЂР°Р±РѕС‚РєР° СЃРёСЃС‚РµРјРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
     bool ProcessSystemEvent (int timeout)
     {
       try
@@ -204,13 +204,13 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }
     
-///Просыпание нити обработки сообщений
+///РџСЂРѕСЃС‹РїР°РЅРёРµ РЅРёС‚Рё РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void WakeupRunLoop ()
     {
       bps_push_event (wakeup_event);
     }
     
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvent ()
     {
       try
@@ -224,7 +224,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }            
     
-///Обработка событий экрана
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ СЌРєСЂР°РЅР°
     void HandleScreenEvent (bps_event_t *event)
     {
       screen_event_t screen_event = screen_event_get_event (event);
@@ -274,7 +274,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }
     
-///Обработка событий навигатора
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РЅР°РІРёРіР°С‚РѕСЂР°
     void HandleNavigatorEvent (bps_event_t *event)
     {
       unsigned int code = bps_event_get_code (event);
@@ -308,7 +308,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       }
     }
 
-///Обработка событий сенсоров
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂРѕРІ
     void HandleSensorEvent (bps_event_t *event)
     {
       unsigned int event_code = bps_event_get_code(event);
@@ -353,7 +353,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
           sensor = SENSOR_TYPE_ROTATION_MATRIX;
           break;
         default:
-//---------------- добавить обработку исключения??????
+//---------------- РґРѕР±Р°РІРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ РёСЃРєР»СЋС‡РµРЅРёСЏ??????
           break; 
       }
       ISensorImpl* sensor_impl = SensorRegistry::FindSensor (sensor);
@@ -380,7 +380,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* TabletOsApplicationManager::CreateDefaultApplicationDelegate ()
@@ -389,7 +389,7 @@ IApplicationDelegate* TabletOsApplicationManager::CreateDefaultApplicationDelega
 }
 
 /*
-    Открытие URL во внешнем браузере
+    РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void TabletOsApplicationManager::OpenUrl (const char* url)
@@ -398,7 +398,7 @@ void TabletOsApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-    Получение системных свойств
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void TabletOsApplicationManager::GetSystemProperties (common::PropertyMap& properties)
@@ -415,7 +415,7 @@ void TabletOsApplicationManager::GetSystemProperties (common::PropertyMap& prope
 }
 
 /*
-   Управление энергосбережением
+   РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void TabletOsApplicationManager::SetScreenSaverState (bool state)

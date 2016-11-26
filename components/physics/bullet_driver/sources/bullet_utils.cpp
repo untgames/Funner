@@ -9,7 +9,7 @@ namespace low_level
 namespace bullet
 {
 
-//преобразование векторов
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРµРєС‚РѕСЂРѕРІ
 void vector_from_bullet_vector (const btVector3& bullet_vector, math::vec3f& target_vector)
 {
   target_vector.x = bullet_vector.x ();
@@ -24,7 +24,7 @@ void bullet_vector_from_vector (const math::vec3f& vector, btVector3& target_vec
   target_vector.setZ (vector.z);
 }
 
-//преобразование кватернионов
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРІР°С‚РµСЂРЅРёРѕРЅРѕРІ
 void quaternion_from_bullet_quaternion (const btQuaternion& bullet_quaternion, math::quatf& target_quaternion)
 {
   target_quaternion.x = bullet_quaternion.getX ();

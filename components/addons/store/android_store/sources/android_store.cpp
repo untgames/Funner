@@ -23,13 +23,13 @@ void on_consume_failed (JNIEnv& env, jobject, jobject purchase, jstring error);
 void on_consume_succeeded (JNIEnv& env, jobject, jobject purchase);
 
 /*
-   Реализация магазина
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°РіР°Р·РёРЅР°
 */
 
 class AndroidStore
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     AndroidStore  ()
       : log (LOG_NAME)
       , initialized (false)
@@ -53,7 +53,7 @@ class AndroidStore
       }
     }
 
-///Инициализация
+///РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     xtl::connection Initialize (const IStore::OnInitializedCallback& callback)
     {
       if (initialized)
@@ -101,14 +101,14 @@ class AndroidStore
       on_initialized_signal.disconnect_all ();
     }
 
-///Можно ли осуществлять покупки
+///РњРѕР¶РЅРѕ Р»Рё РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊ РїРѕРєСѓРїРєРё
     bool CanBuyProducts ()
     {
       return can_buy_products;
     }
 
-///Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-///products ответа может содержать не все запрошенные продукты)
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРІР°СЂР°С… (products_ids - СЂР°Р·РґРµР»РµРЅРЅС‹Р№ РїСЂРѕР±РµР»Р°РјРё СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїСЂРѕРґСѓРєС‚РѕРІ,
+///products РѕС‚РІРµС‚Р° РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРµ РІСЃРµ Р·Р°РїСЂРѕС€РµРЅРЅС‹Рµ РїСЂРѕРґСѓРєС‚С‹)
     void LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
     {
       try
@@ -130,7 +130,7 @@ class AndroidStore
       }
     }
 
-///Покупка / восстановление покупок
+///РџРѕРєСѓРїРєР° / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕРєСѓРїРѕРє
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
     {
       TransactionsArray transactions = pending_transactions;
@@ -205,7 +205,7 @@ class AndroidStore
       }
     }
 
-///Инициализация java-биндинга
+///РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ java-Р±РёРЅРґРёРЅРіР°
    void InitJavaBindings (JNIEnv* env)
    {
      static const char* METHOD_NAME = "store::android_store::AndroidStore::InitJavaBindings";
@@ -266,7 +266,7 @@ class AndroidStore
      }
    }
 
-///Завершение транзакции
+///Р—Р°РІРµСЂС€РµРЅРёРµ С‚СЂР°РЅР·Р°РєС†РёРё
    void FinishTransaction (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
    {
      try
@@ -358,7 +358,7 @@ class AndroidStore
      }
    }
 
-///Обновление транзакций
+///РћР±РЅРѕРІР»РµРЅРёРµ С‚СЂР°РЅР·Р°РєС†РёР№
    void OnPurchaseInitiated (const stl::string& sku)
    {
      try
@@ -475,7 +475,7 @@ class AndroidStore
     };
 
   private:
-///Поиск первой незавершенной транзакции по sku
+///РџРѕРёСЃРє РїРµСЂРІРѕР№ РЅРµР·Р°РІРµСЂС€РµРЅРЅРѕР№ С‚СЂР°РЅР·Р°РєС†РёРё РїРѕ sku
    TransactionDesc& FindPendingTransaction (const char* sku)
    {
      static const char* METHOD_NAME = "store::android_store::AndroidStore::FindIncompleteTransaction";
@@ -499,19 +499,19 @@ class AndroidStore
     typedef stl::vector<TransactionDescPtr>        TransactionsArray;
 
   public:
-    common::Log         log;                      //протокол
-    bool                initialized;              //завершена ли инициализация магазина
-    bool                initialize_started;       //начата ли инициализация магазина
-    bool                can_buy_products;         //доступны ли покупки
-    StoreSignal         store_signal;             //соединение оповещения обновления транзакций
-    OnInitializedSignal on_initialized_signal;    //соединение оповещения завершения инициализации магазина
-    jclass              store_class;              //класс Store
-    jobject             store;                    //объект Store
-    jmethodID           store_init_method;        //конструктор Store
-    jmethodID           buy_method;               //метод покупки
-    jmethodID           consume_method;           //метод поглощения покупки
-    jmethodID           stop_processing_method;   //метод остановки обработки покупок
-    TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
+    common::Log         log;                      //РїСЂРѕС‚РѕРєРѕР»
+    bool                initialized;              //Р·Р°РІРµСЂС€РµРЅР° Р»Рё РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°РіР°Р·РёРЅР°
+    bool                initialize_started;       //РЅР°С‡Р°С‚Р° Р»Рё РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°РіР°Р·РёРЅР°
+    bool                can_buy_products;         //РґРѕСЃС‚СѓРїРЅС‹ Р»Рё РїРѕРєСѓРїРєРё
+    StoreSignal         store_signal;             //СЃРѕРµРґРёРЅРµРЅРёРµ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёР№
+    OnInitializedSignal on_initialized_signal;    //СЃРѕРµРґРёРЅРµРЅРёРµ РѕРїРѕРІРµС‰РµРЅРёСЏ Р·Р°РІРµСЂС€РµРЅРёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјР°РіР°Р·РёРЅР°
+    jclass              store_class;              //РєР»Р°СЃСЃ Store
+    jobject             store;                    //РѕР±СЉРµРєС‚ Store
+    jmethodID           store_init_method;        //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Store
+    jmethodID           buy_method;               //РјРµС‚РѕРґ РїРѕРєСѓРїРєРё
+    jmethodID           consume_method;           //РјРµС‚РѕРґ РїРѕРіР»РѕС‰РµРЅРёСЏ РїРѕРєСѓРїРєРё
+    jmethodID           stop_processing_method;   //РјРµС‚РѕРґ РѕСЃС‚Р°РЅРѕРІРєРё РѕР±СЂР°Р±РѕС‚РєРё РїРѕРєСѓРїРѕРє
+    TransactionsArray   pending_transactions;     //С‚РµРєСѓС‰РёРµ РЅРµР·Р°РІРµСЂС€РµРЅРЅС‹Рµ С‚СЂР°РЅР·Р°РєС†РёРё
 };
 
 typedef common::Singleton<AndroidStore> StoreSingleton;
@@ -559,7 +559,7 @@ void finish_transaction_handler (const Transaction& transaction, const Transacti
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StoreImpl::StoreImpl ()
@@ -571,7 +571,7 @@ StoreImpl::~StoreImpl ()
 }
 
 /*
-   Инициализация
+   РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 */
 
 void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
@@ -580,7 +580,7 @@ void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 }
 
 /*
-   Описание магазина
+   РћРїРёСЃР°РЅРёРµ РјР°РіР°Р·РёРЅР°
 */
 
 const char* StoreImpl::Description ()
@@ -589,7 +589,7 @@ const char* StoreImpl::Description ()
 }
 
 /*
-   Можно ли осуществлять покупки
+   РњРѕР¶РЅРѕ Р»Рё РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊ РїРѕРєСѓРїРєРё
 */
 
 bool StoreImpl::CanBuyProducts ()
@@ -598,8 +598,8 @@ bool StoreImpl::CanBuyProducts ()
 }
 
 /*
-   Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-   products ответа может содержать не все запрошенные продукты)
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРІР°СЂР°С… (products_ids - СЂР°Р·РґРµР»РµРЅРЅС‹Р№ РїСЂРѕР±РµР»Р°РјРё СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїСЂРѕРґСѓРєС‚РѕРІ,
+   products РѕС‚РІРµС‚Р° РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРµ РІСЃРµ Р·Р°РїСЂРѕС€РµРЅРЅС‹Рµ РїСЂРѕРґСѓРєС‚С‹)
 */
 
 void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
@@ -608,7 +608,7 @@ void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProducts
 }
 
 /*
-   Покупка / восстановление покупок
+   РџРѕРєСѓРїРєР° / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕРєСѓРїРѕРє
 */
 
 xtl::connection StoreImpl::RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
@@ -627,7 +627,7 @@ Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const c
 }
 
 /*
-   Инициализация java-биндинга
+   РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ java-Р±РёРЅРґРёРЅРіР°
 */
 
 void StoreImpl::InitJavaBindings (JNIEnv* env)

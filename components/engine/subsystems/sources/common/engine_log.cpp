@@ -10,21 +10,21 @@ namespace log_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME    = "Log";                   //имя подсистемы
-const char* COMPONENT_NAME    = "engine.subsystems.Log"; //имя компонента
-const char* DEFAULT_FILE_NAME = "/io/stdout/log.txt";    //имя файла вывода по умолчанию
+const char* SUBSYSTEM_NAME    = "Log";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME    = "engine.subsystems.Log"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* DEFAULT_FILE_NAME = "/io/stdout/log.txt";    //РёРјСЏ С„Р°Р№Р»Р° РІС‹РІРѕРґР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 /*
-   Подсистема печати лог сообщений в консоль
+   РџРѕРґСЃРёСЃС‚РµРјР° РїРµС‡Р°С‚Рё Р»РѕРі СЃРѕРѕР±С‰РµРЅРёР№ РІ РєРѕРЅСЃРѕР»СЊ
 */
 
 class LogSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     LogSubsystem (common::ParseNode& node)
       : need_flush (false)
     {
@@ -114,7 +114,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -154,13 +154,13 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 };
 
 /*
-   Компонент печати лог сообщений в консоль
+   РљРѕРјРїРѕРЅРµРЅС‚ РїРµС‡Р°С‚Рё Р»РѕРі СЃРѕРѕР±С‰РµРЅРёР№ РІ РєРѕРЅСЃРѕР»СЊ
 */
 
 class LogComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     LogComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

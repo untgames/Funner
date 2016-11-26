@@ -2,10 +2,10 @@
 
 using namespace network;
 
-//+mutex на ToString
+//+mutex РЅР° ToString
 
 /*
-    Описание реализации адреса в интернете
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґСЂРµСЃР° РІ РёРЅС‚РµСЂРЅРµС‚Рµ
 */
 
 struct InetAddress::Impl: public xtl::reference_counter
@@ -44,7 +44,7 @@ struct InetAddress::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InetAddress::InetAddress ()
@@ -133,7 +133,7 @@ InetAddress& InetAddress::operator = (const InetAddress& address)
 }
 
 /*
-    Размер адреса
+    Р Р°Р·РјРµСЂ Р°РґСЂРµСЃР°
 */
 
 size_t InetAddress::Size () const
@@ -142,7 +142,7 @@ size_t InetAddress::Size () const
 }
 
 /*
-    Получение частей адреса
+    РџРѕР»СѓС‡РµРЅРёРµ С‡Р°СЃС‚РµР№ Р°РґСЂРµСЃР°
 */
 
 unsigned char InetAddress::operator [] (size_t index) const
@@ -154,7 +154,7 @@ unsigned char InetAddress::operator [] (size_t index) const
 }
 
 /*
-    Сравнение двух адресов
+    РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… Р°РґСЂРµСЃРѕРІ
 */
 
 bool InetAddress::operator == (const InetAddress& address) const
@@ -168,7 +168,7 @@ bool InetAddress::operator != (const InetAddress& address) const
 }
 
 /*
-    Строковое представление адреса
+    РЎС‚СЂРѕРєРѕРІРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Р°РґСЂРµСЃР°
 */
 
 const char* InetAddress::ToString () const
@@ -225,7 +225,7 @@ const char* InetAddress::ToString () const
 }
 
 /*
-    Стандартные адреса
+    РЎС‚Р°РЅРґР°СЂС‚РЅС‹Рµ Р°РґСЂРµСЃР°
 */
 
 namespace
@@ -249,7 +249,7 @@ InetAddress InetAddress::Loopback ()
 }
 
 /*
-    Свойства адреса
+    РЎРІРѕР№СЃС‚РІР° Р°РґСЂРµСЃР°
 */
 
 bool InetAddress::IsAny () const
@@ -296,7 +296,7 @@ bool InetAddress::IsMulticast () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void InetAddress::Swap (InetAddress& address)

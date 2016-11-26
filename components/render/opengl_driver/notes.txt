@@ -1,8 +1,7 @@
-Новая функциональность:
-!. Убрать SetDesc
+!. Remove SetDesc
 
-1. Работа с буферами
-  - Отображение буферов в память - http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt
+1. Work with buffers
+  - Mapping buffers to memory - http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt
   - http://www.opengl.org/registry/specs/ARB/uniform_buffer_object.txt
   - http://www.opengl.org/registry/specs/NV/shader_buffer_load.txt
   - http://www.opengl.org/registry/specs/NV/vertex_buffer_unified_memory.txt
@@ -21,19 +20,19 @@
   - http://www.opengl.org/registry/specs/ARB/debug_output.txt
   - GL_ATI_meminfo
   - GL_AMD_performance_monitor
-7. Текстуры
+7. РўTextures
   - texture arrays
   - compression formats
 8. Standards
   - 2.1
     image buffer objects
   - 3.0
-    * убраны все встроенные вершинные атрибуты и функции по их установке (теперь только пользовательские атрибуты)
-    * убран FFP: убран весь GL state кроме gl_DepthRange и стек матриц трансформаций, а также функции для настройки FFP
-    * убрана смена толщины линий
-    * теперь режим отображения задних и передних граней обязательно должен совпадать
-    * убрана запись пикселей
-    * убраны форматы ALPHA LUMINANCE, LUMINANCE ALPHA, и INTENSITY (заменены R и RG текстурами)
+    * builtin vertex attributes are removed
+    * FFP was removed: only gl_DepthRange & matrix stack is working
+    * line width was removed
+    * back/fron surfaces rendering has to be same
+    * pixel writing was removed
+    * removed formats ALPHA LUMINANCE, LUMINANCE ALPHA, Рё INTENSITY (replaced with R & RG textures)
     * added GL_EXT_framebuffer_object
     * added GL_EXT_framebuffer_multisample
     * added GL_EXT_draw_instanced

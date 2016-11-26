@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T,class Sequence>
@@ -13,7 +13,7 @@ inline stack<T,Sequence>::stack (const Sequence& seq)
   { }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */  
 
 template <class T,class Sequence>  
@@ -29,7 +29,7 @@ inline typename stack<T,Sequence>::size_type stack<T,Sequence>::size () const
 }
 
 /*
-    Доступ
+    Р”РѕСЃС‚СѓРї
 */
 
 template <class T,class Sequence>  
@@ -45,7 +45,7 @@ inline typename stack<T,Sequence>::const_reference stack<T,Sequence>::top () con
 }
 
 /*
-    Вставка / извлечение элементов
+    Р’СЃС‚Р°РІРєР° / РёР·РІР»РµС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class T,class Sequence>  
@@ -61,7 +61,7 @@ inline void stack<T,Sequence>::pop ()
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T,class Sequence>

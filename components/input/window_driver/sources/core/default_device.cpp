@@ -33,21 +33,21 @@ struct DefaultDevice::Impl : private xtl::trackable
 {
   typedef xtl::signal<void (const char*)> DeviceSignal;
 
-  stl::string                  name;                         //имя устройства
-  stl::string                  full_name;                    //полное имя устройства
-  stl::string                  properties;                   //настройки
-  DeviceSignal                 signals;                      //обработчики событий
-  size_t                       x_cursor_pos;                 //последние координаты курсора
-  size_t                       y_cursor_pos;                 //последние координаты курсора
-  bool                         mouse_in_window;              //курсор мыши в пределах клиентской области окна
-  bool                         autocenter_cursor;            //автоматическое центрирование курсора
-  float                        cursor_sensitivity;           //множитель delt'ы курсора
-  float                        vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
-  float                        horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
-  stl::bitset<syslib::Key_Num> pressed_keys;                 //какие кнопки являются нажатыми
-  stl::wstring                 control_name;                 //имя контрола
+  stl::string                  name;                         //РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  stl::string                  full_name;                    //РїРѕР»РЅРѕРµ РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  stl::string                  properties;                   //РЅР°СЃС‚СЂРѕР№РєРё
+  DeviceSignal                 signals;                      //РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
+  size_t                       x_cursor_pos;                 //РїРѕСЃР»РµРґРЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РєСѓСЂСЃРѕСЂР°
+  size_t                       y_cursor_pos;                 //РїРѕСЃР»РµРґРЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РєСѓСЂСЃРѕСЂР°
+  bool                         mouse_in_window;              //РєСѓСЂСЃРѕСЂ РјС‹С€Рё РІ РїСЂРµРґРµР»Р°С… РєР»РёРµРЅС‚СЃРєРѕР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
+  bool                         autocenter_cursor;            //Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ С†РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РєСѓСЂСЃРѕСЂР°
+  float                        cursor_sensitivity;           //РјРЅРѕР¶РёС‚РµР»СЊ delt'С‹ РєСѓСЂСЃРѕСЂР°
+  float                        vertical_wheel_sensitivity;   //РјРЅРѕР¶РёС‚РµР»СЊ delt'С‹ РІРµСЂС‚РёРєР°Р»СЊРЅРѕРіРѕ РєРѕР»РµСЃР° РјС‹С€Рё
+  float                        horisontal_wheel_sensitivity; //РјРЅРѕР¶РёС‚РµР»СЊ delt'С‹ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРіРѕ РєРѕР»РµСЃР° РјС‹С€Рё
+  stl::bitset<syslib::Key_Num> pressed_keys;                 //РєР°РєРёРµ РєРЅРѕРїРєРё СЏРІР»СЏСЋС‚СЃСЏ РЅР°Р¶Р°С‚С‹РјРё
+  stl::wstring                 control_name;                 //РёРјСЏ РєРѕРЅС‚СЂРѕР»Р°
 
-  ///Конструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Window* window, const char* in_name, const char* in_full_name)
     : name (in_name)
     , full_name (in_full_name)
@@ -125,7 +125,7 @@ struct DefaultDevice::Impl : private xtl::trackable
     }
   }
 
-  //Преобразование систем координат
+  //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРёСЃС‚РµРј РєРѕРѕСЂРґРёРЅР°С‚
   void TransformWindowPointToViewportPoint (const Rect& viewport_rect, Point& point)
   {
     point.x = point.x > viewport_rect.right ? viewport_rect.right : point.x;
@@ -139,7 +139,7 @@ struct DefaultDevice::Impl : private xtl::trackable
     return point.x > rect.left && point.y > rect.top && point.x < rect.right && point.y < rect.bottom;
   }
 
-  ///Обработчик сообщений окна
+  ///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
   void WindowEventHandler (syslib::Window& window, syslib::WindowEvent event, const syslib::WindowEventContext& window_event_context)
   {
     static char message [MESSAGE_BUFFER_SIZE];
@@ -436,7 +436,7 @@ struct DefaultDevice::Impl : private xtl::trackable
     }
   }
 
-  ///Оповещение о событии
+  ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (const char* message)
   {
     signals (message);
@@ -444,7 +444,7 @@ struct DefaultDevice::Impl : private xtl::trackable
 };
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DefaultDevice::DefaultDevice (Window* window, const char* name, const char* full_name)
@@ -458,7 +458,7 @@ DefaultDevice::~DefaultDevice ()
 }
 
 /*
-   Получение имени контрола
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєРѕРЅС‚СЂРѕР»Р°
 */
 
 const wchar_t* DefaultDevice::GetControlName (const char* control_id)
@@ -469,7 +469,7 @@ const wchar_t* DefaultDevice::GetControlName (const char* control_id)
 }
 
 /*
-   Подписка на события устройства
+   РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 xtl::connection DefaultDevice::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
@@ -478,7 +478,7 @@ xtl::connection DefaultDevice::RegisterEventHandler (const input::low_level::IDe
 }
 
 /*
-   Настройки устройства
+   РќР°СЃС‚СЂРѕР№РєРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* DefaultDevice::GetProperties ()
@@ -537,7 +537,7 @@ float DefaultDevice::GetProperty (const char* name)
 }
 
 /*
-   Получение имени устройства
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* DefaultDevice::GetName ()
@@ -546,7 +546,7 @@ const char* DefaultDevice::GetName ()
 }
 
 /*
-   Полное имя устройства (тип.имя.идентификатор)
+   РџРѕР»РЅРѕРµ РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° (С‚РёРї.РёРјСЏ.РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ)
 */
 
 const char* DefaultDevice::GetFullName ()
@@ -555,7 +555,7 @@ const char* DefaultDevice::GetFullName ()
 }
 
 /*
-   Оповещение о событии
+   РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
 */
 
 void DefaultDevice::Notify (const char* message)

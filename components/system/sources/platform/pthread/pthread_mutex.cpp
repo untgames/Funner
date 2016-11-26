@@ -2,7 +2,7 @@
 
 using namespace syslib;
 
-//создание исключающего семафора
+//СЃРѕР·РґР°РЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 mutex_t PThreadManager::CreateMutex ()
 {
   try
@@ -38,7 +38,7 @@ mutex_t PThreadManager::CreateMutex ()
   }
 }
 
-//удаление исключающего семафора
+//СѓРґР°Р»РµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void PThreadManager::DestroyMutex (mutex_t handle)
 {
   try
@@ -60,7 +60,7 @@ void PThreadManager::DestroyMutex (mutex_t handle)
   }
 }
 
-//захват исключающего семафора
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void PThreadManager::LockMutex (mutex_t handle)
 {
   try
@@ -80,13 +80,13 @@ void PThreadManager::LockMutex (mutex_t handle)
   }
 }
 
-//захват исключающего семафора с указанием максимального времени ожидания
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР° СЃ СѓРєР°Р·Р°РЅРёРµРј РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РІСЂРµРјРµРЅРё РѕР¶РёРґР°РЅРёСЏ
 bool PThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   throw xtl::make_not_implemented_exception ("syslib::PThreadManager::LockMutex(mutex_t, size_t)");
 }
 
-//попытка захвата исключающего семафора
+//РїРѕРїС‹С‚РєР° Р·Р°С…РІР°С‚Р° РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 bool PThreadManager::TryLockMutex (mutex_t handle)
 {
   try
@@ -112,7 +112,7 @@ bool PThreadManager::TryLockMutex (mutex_t handle)
   }
 }
 
-//освобождение исключающего семафора
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void PThreadManager::UnlockMutex (mutex_t handle)
 {
   try

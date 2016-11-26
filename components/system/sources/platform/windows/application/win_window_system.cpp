@@ -10,7 +10,7 @@ const wchar_t* WINDOW_CLASS_NAME = L"Funner.Default window class";
 const char* LOG_NAME          = "system.windows";
 
 /*
-    Получение экземпляра приложения
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 HINSTANCE GetApplicationInstance ()
@@ -19,7 +19,7 @@ HINSTANCE GetApplicationInstance ()
 }
 
 /*
-    Копирование файла в папку temp
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р° РІ РїР°РїРєСѓ temp
 */
 
 class SysTempFile
@@ -30,7 +30,7 @@ class SysTempFile
       if (!source_file_name)
         throw xtl::make_null_argument_exception ("syslib::TempFile::TempFile", "source_file_name");
         
-        //генерация имени нового файла
+        //РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
         
       stl::wstring dir_name;
       
@@ -46,7 +46,7 @@ class SysTempFile
       if (!GetTempFileNameW (dir_name.c_str (), L"TEMP", 0, &file_name [0]))
         raise_error ("::GetTempFileName");
         
-        //копирование содержимого
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
       
       #ifndef WINCE
         #undef CopyFile
@@ -69,26 +69,26 @@ class SysTempFile
     stl::string Path () const { return tostring(file_name); }
   
   private:
-    stl::wstring file_name; //имя файла
+    stl::wstring file_name; //РёРјСЏ С„Р°Р№Р»Р°
 };
 
 /*
-    Описание реализации окна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 */
 
 struct WindowImpl
 {
-  void*                user_data;             //указатель на пользовательские данные
-  WindowMessageHandler message_handler;       //функция обработки сообщений окна
-  bool                 is_cursor_visible;     //видим ли курсор
-  bool                 is_cursor_in_window;   //находится ли курсор в окне
-  HCURSOR              default_cursor;        //курсор по умолчанию
-  HCURSOR              preferred_cursor;      //предпочитаемый курсор для данного окна
-  HBRUSH               background_brush;      //кисть для очистки заднего фона
-  Color                background_color;      //цвет заднего фона
-  bool                 background_state;      //включен ли задний фон
-  bool                 is_multitouch_enabled; //включен ли multitouch
-  void*                locked_session;        //заблокированная сессия
+  void*                user_data;             //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+  WindowMessageHandler message_handler;       //С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  bool                 is_cursor_visible;     //РІРёРґРёРј Р»Рё РєСѓСЂСЃРѕСЂ
+  bool                 is_cursor_in_window;   //РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РєСѓСЂСЃРѕСЂ РІ РѕРєРЅРµ
+  HCURSOR              default_cursor;        //РєСѓСЂСЃРѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  HCURSOR              preferred_cursor;      //РїСЂРµРґРїРѕС‡РёС‚Р°РµРјС‹Р№ РєСѓСЂСЃРѕСЂ РґР»СЏ РґР°РЅРЅРѕРіРѕ РѕРєРЅР°
+  HBRUSH               background_brush;      //РєРёСЃС‚СЊ РґР»СЏ РѕС‡РёСЃС‚РєРё Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  Color                background_color;      //С†РІРµС‚ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  bool                 background_state;      //РІРєР»СЋС‡РµРЅ Р»Рё Р·Р°РґРЅРёР№ С„РѕРЅ
+  bool                 is_multitouch_enabled; //РІРєР»СЋС‡РµРЅ Р»Рё multitouch
+  void*                locked_session;        //Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅР°СЏ СЃРµСЃСЃРёСЏ
 
   WindowImpl (WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -141,13 +141,13 @@ struct WindowImpl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Получение контекста события
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
 */
 
 void GetEventContext (HWND wnd, WindowEventContext& context, RECT& client_rect)
@@ -180,7 +180,7 @@ void GetEventContext (HWND wnd, WindowEventContext& context, RECT& client_rect)
 }
 
 /*
-    Преобразование виртуальных кодов клавиш в syslib::Key
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРёСЂС‚СѓР°Р»СЊРЅС‹С… РєРѕРґРѕРІ РєР»Р°РІРёС€ РІ syslib::Key
 */
 
 Key VirtualKey2SystemKey (size_t vkey)
@@ -228,7 +228,7 @@ Key VirtualKey2SystemKey (size_t vkey)
 }
 
 /*
-    Получение скэн-кода
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРєСЌРЅ-РєРѕРґР°
 */
 
 ScanCode GetScanCode (size_t lParam)
@@ -237,18 +237,18 @@ ScanCode GetScanCode (size_t lParam)
 }
 
 /*
-    Функция обработки сообщений окна
+    Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
 */
 
 LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 
-    //получение указателя на пользовательские данные
+    //РїРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
 
   WindowImpl* impl          = reinterpret_cast<WindowImpl*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
   window_t    window_handle = (window_t)wnd;
 
-    //если указатель на пользовательские данные не установлен - делаем попытку его установить
+    //РµСЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ - РґРµР»Р°РµРј РїРѕРїС‹С‚РєСѓ РµРіРѕ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ
 
   if (!impl)
   {
@@ -261,11 +261,11 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       impl = reinterpret_cast<WindowImpl*> (cs->lpCreateParams);
 
-        //устанавливаем указатель на пользовательские данные
+        //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
 
       SetWindowLongPtr (wnd, GWLP_USERDATA, (LONG_PTR)impl);
 
-        //оповещаем окно об изменении низкоуровневого дескриптора
+        //РѕРїРѕРІРµС‰Р°РµРј РѕРєРЅРѕ РѕР± РёР·РјРµРЅРµРЅРёРё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
       WindowEventContext context;
 
@@ -281,18 +281,18 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     return DefWindowProc (wnd, message, wparam, lparam);
   }
 
-    //получение контекста события
+    //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
 
   WindowEventContext context;
   RECT               client_rect;
 
   GetEventContext (wnd, context, client_rect);
 
-    //обработка сообщений
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№
     
   switch (message)
   {
-    case WM_DESTROY: //уничтожение окна
+    case WM_DESTROY: //СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
       impl->Notify (window_handle, WindowEvent_OnDestroy, context);
 
       delete impl;
@@ -300,10 +300,10 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       SetWindowLongPtr (wnd, GWLP_USERDATA, 0);
 
       return 0;
-    case WM_CLOSE: //попытка закрытия окна
+    case WM_CLOSE: //РїРѕРїС‹С‚РєР° Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
       impl->Notify (window_handle, WindowEvent_OnClose, context);
       return 0;
-    case WM_ACTIVATE: //активация/деактивация окна
+    case WM_ACTIVATE: //Р°РєС‚РёРІР°С†РёСЏ/РґРµР°РєС‚РёРІР°С†РёСЏ РѕРєРЅР°
       switch (wparam)
       {
         case WA_ACTIVE:
@@ -316,17 +316,17 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       }
 
       return 0;
-    case WM_SHOWWINDOW: //изменение видимости
+    case WM_SHOWWINDOW: //РёР·РјРµРЅРµРЅРёРµ РІРёРґРёРјРѕСЃС‚Рё
       impl->Notify (window_handle, wparam ? WindowEvent_OnShow : WindowEvent_OnHide, context);
       return 0;
-    case WM_SETFOCUS: //получение фокуса ввода
+    case WM_SETFOCUS: //РїРѕР»СѓС‡РµРЅРёРµ С„РѕРєСѓСЃР° РІРІРѕРґР°
       impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
       return 0;
-    case WM_KILLFOCUS: //потеря фокуса ввода
+    case WM_KILLFOCUS: //РїРѕС‚РµСЂСЏ С„РѕРєСѓСЃР° РІРІРѕРґР°
       impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
       return 0;
-    case WM_SETCURSOR: //изменение положения курсора
-      if (LOWORD(lparam) == HTCLIENT) //наша клиентная область
+    case WM_SETCURSOR: //РёР·РјРµРЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР°
+      if (LOWORD(lparam) == HTCLIENT) //РЅР°С€Р° РєР»РёРµРЅС‚РЅР°СЏ РѕР±Р»Р°СЃС‚СЊ
       {
         if (impl->is_cursor_visible)
         {
@@ -344,10 +344,10 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
         return 1;
       }
 
-        //не клиентная область - обработчик по умолчанию
+        //РЅРµ РєР»РёРµРЅС‚РЅР°СЏ РѕР±Р»Р°СЃС‚СЊ - РѕР±СЂР°Р±РѕС‚С‡РёРє РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
       return DefWindowProc (wnd, message, wparam, lparam);
-    case WM_PAINT: //необходима перерисовка
+    case WM_PAINT: //РЅРµРѕР±С…РѕРґРёРјР° РїРµСЂРµСЂРёСЃРѕРІРєР°
     {
       PAINTSTRUCT ps;
 
@@ -365,15 +365,15 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 0;
     }
-    case WM_ERASEBKGND: //нужно ли очищать фон
-      return 1; //очищать фон не нужно
-    case WM_SIZE: //изменение размеров окна
+    case WM_ERASEBKGND: //РЅСѓР¶РЅРѕ Р»Рё РѕС‡РёС‰Р°С‚СЊ С„РѕРЅ
+      return 1; //РѕС‡РёС‰Р°С‚СЊ С„РѕРЅ РЅРµ РЅСѓР¶РЅРѕ
+    case WM_SIZE: //РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
       impl->Notify (window_handle, WindowEvent_OnSize, context);
       return 0;
-    case WM_MOVE: //изменение положения окна
+    case WM_MOVE: //РёР·РјРµРЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
       impl->Notify (window_handle, WindowEvent_OnMove, context);
       return 0;
-    case WM_MOUSEMOVE: //изменение положения курсора над областью окна
+    case WM_MOUSEMOVE: //РёР·РјРµРЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР° РЅР°Рґ РѕР±Р»Р°СЃС‚СЊСЋ РѕРєРЅР°
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
@@ -387,54 +387,54 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
       return 0;
 #endif
-    case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
+    case WM_MOUSEWHEEL: //РёР·РјРµРЅРёР»РѕСЃСЊ РїРѕР»РѕР¶РµРЅРёРµ РІРµСЂС‚РёРєР°Р»СЊРЅРѕРіРѕ РєРѕР»РµСЃР° РјС‹С€Рё
       context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
 
       impl->Notify (window_handle, WindowEvent_OnMouseVerticalWheel, context);
       return 0;
 #ifdef WM_MOUSEHWHEEL
-    case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
+    case WM_MOUSEHWHEEL: //РёР·РјРµРЅРёР»РѕСЃСЊ РїРѕР»РѕР¶РµРЅРёРµ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРіРѕ РєРѕР»РµСЃР° РјС‹С€Рё
       context.mouse_horisontal_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
       impl->Notify (window_handle, WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
 #endif
-    case WM_LBUTTONDOWN: //нажата левая кнопка мыши
+    case WM_LBUTTONDOWN: //РЅР°Р¶Р°С‚Р° Р»РµРІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnLeftButtonDown, context);
       return 0;
-    case WM_LBUTTONUP: //отпущена левая кнопка мыши
+    case WM_LBUTTONUP: //РѕС‚РїСѓС‰РµРЅР° Р»РµРІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnLeftButtonUp, context);
       return 0;
-    case WM_LBUTTONDBLCLK: //двойной щелчок левой кнопкой мыши
+    case WM_LBUTTONDBLCLK: //РґРІРѕР№РЅРѕР№ С‰РµР»С‡РѕРє Р»РµРІРѕР№ РєРЅРѕРїРєРѕР№ РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnLeftButtonDoubleClick, context);
       return 0;
-    case WM_RBUTTONDOWN: //нажата правая кнопка мыши
+    case WM_RBUTTONDOWN: //РЅР°Р¶Р°С‚Р° РїСЂР°РІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnRightButtonDown, context);
       return 0;
-    case WM_RBUTTONUP: //отпущена правая кнопка мыши
+    case WM_RBUTTONUP: //РѕС‚РїСѓС‰РµРЅР° РїСЂР°РІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnRightButtonUp, context);
       return 0;
-    case WM_RBUTTONDBLCLK: //двойной щелчок правой кнопкой мыши
+    case WM_RBUTTONDBLCLK: //РґРІРѕР№РЅРѕР№ С‰РµР»С‡РѕРє РїСЂР°РІРѕР№ РєРЅРѕРїРєРѕР№ РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnRightButtonDoubleClick, context);
       return 0;
-    case WM_XBUTTONDOWN: //нажата X кнопка мыши
+    case WM_XBUTTONDOWN: //РЅР°Р¶Р°С‚Р° X РєРЅРѕРїРєР° РјС‹С€Рё
     {
       WindowEvent event;
 
@@ -452,7 +452,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 1;
     }
-    case WM_XBUTTONUP: //отпущена X кнопка мыши
+    case WM_XBUTTONUP: //РѕС‚РїСѓС‰РµРЅР° X РєРЅРѕРїРєР° РјС‹С€Рё
     {
       WindowEvent event;
 
@@ -470,7 +470,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 1;
     }
-    case WM_XBUTTONDBLCLK: //двойной щелчок X кнопкой мыши
+    case WM_XBUTTONDBLCLK: //РґРІРѕР№РЅРѕР№ С‰РµР»С‡РѕРє X РєРЅРѕРїРєРѕР№ РјС‹С€Рё
     {
       WindowEvent event;
 
@@ -488,43 +488,43 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       return 1;
     }
-    case WM_MBUTTONDOWN: //нажата средняя кнопка мыши
+    case WM_MBUTTONDOWN: //РЅР°Р¶Р°С‚Р° СЃСЂРµРґРЅСЏСЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnMiddleButtonDown, context);
       return 0;
-    case WM_MBUTTONUP: //отпущена средняя кнопка мыши
+    case WM_MBUTTONUP: //РѕС‚РїСѓС‰РµРЅР° СЃСЂРµРґРЅСЏСЏ РєРЅРѕРїРєР° РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnMiddleButtonUp, context);
       return 0;
-    case WM_MBUTTONDBLCLK: //двойной щелчок средней кнопкой мыши
+    case WM_MBUTTONDBLCLK: //РґРІРѕР№РЅРѕР№ С‰РµР»С‡РѕРє СЃСЂРµРґРЅРµР№ РєРЅРѕРїРєРѕР№ РјС‹С€Рё
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnMiddleButtonDoubleClick, context);
       return 0;
-    case WM_KEYDOWN: //нажата клавиша клавиатуры
+    case WM_KEYDOWN: //РЅР°Р¶Р°С‚Р° РєР»Р°РІРёС€Р° РєР»Р°РІРёР°С‚СѓСЂС‹
       context.key           = VirtualKey2SystemKey (wparam);
       context.key_scan_code = GetScanCode (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
       return 0;
-    case WM_KEYUP: //отпущена клавиша клавиатуры
+    case WM_KEYUP: //РѕС‚РїСѓС‰РµРЅР° РєР»Р°РІРёС€Р° РєР»Р°РІРёР°С‚СѓСЂС‹
       context.key           = VirtualKey2SystemKey (wparam);
       context.key_scan_code = GetScanCode (lparam);
 
       impl->Notify (window_handle, WindowEvent_OnKeyUp, context);
       return 0;
-    case WM_CHAR: //в буфере окна появился символ
+    case WM_CHAR: //РІ Р±СѓС„РµСЂРµ РѕРєРЅР° РїРѕСЏРІРёР»СЃСЏ СЃРёРјРІРѕР»
       wcscpy ( &context.char_code, to_wstring_from_utf8((char*)&wparam, 1).c_str () );
 //      mbtowc (&context.char_code, (char*)&wparam, 1);
       impl->Notify (window_handle, WindowEvent_OnChar, context);
       return 0;
 #ifndef WINCE
-    case WM_WTSSESSION_CHANGE: //состояние сессии изменилось              
+    case WM_WTSSESSION_CHANGE: //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРµСЃСЃРёРё РёР·РјРµРЅРёР»РѕСЃСЊ              
       switch (wparam)
       {
         case WTS_SESSION_LOCK:
@@ -561,13 +561,13 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 #endif
   }
 
-    //обработка сообщений по умолчанию    
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ    
 
   return DefWindowProc (wnd, message, wparam, lparam);
 }
 
 /*
-    Регистрация оконного класса
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРѕРЅРЅРѕРіРѕ РєР»Р°СЃСЃР°
 */
 
 void RegisterWindowClass ()
@@ -599,7 +599,7 @@ void RegisterWindowClass ()
 
 UINT get_window_style (WindowStyle style, bool has_parent)
 {
-    //определение стиля окна
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃС‚РёР»СЏ РѕРєРЅР°
 
   UINT win_style;
 
@@ -626,7 +626,7 @@ UINT get_window_style (WindowStyle style, bool has_parent)
 }
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 #undef CreateWindow
@@ -635,25 +635,25 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
 {  
   try
   {
-      //определение стиля окна
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃС‚РёР»СЏ РѕРєРЅР°
 
     UINT win_style = get_window_style (style, parent_handle != 0);
     
     static bool is_window_class_registered = false;
 
-      //регистрация оконного класса
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРѕРЅРЅРѕРіРѕ РєР»Р°СЃСЃР°
 
     if (!is_window_class_registered)
     {
-        //корректная реализация требует также вызова UnregisterClass при выходе из приложения, но данный вызов
-        //осуществляется автоматически поэтому не производится в ручную
+        //РєРѕСЂСЂРµРєС‚РЅР°СЏ СЂРµР°Р»РёР·Р°С†РёСЏ С‚СЂРµР±СѓРµС‚ С‚Р°РєР¶Рµ РІС‹Р·РѕРІР° UnregisterClass РїСЂРё РІС‹С…РѕРґРµ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ, РЅРѕ РґР°РЅРЅС‹Р№ РІС‹Р·РѕРІ
+        //РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕСЌС‚РѕРјСѓ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІ СЂСѓС‡РЅСѓСЋ
 
       RegisterWindowClass ();
 
       is_window_class_registered = true;
     }
 
-      //создание окна
+      //СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°
 
     WindowImpl* volatile window_impl = new WindowImpl (handler, user_data);
 
@@ -730,7 +730,7 @@ void WindowsWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Попытка изменения стиля окна (может быть проигнорирована)
+    РџРѕРїС‹С‚РєР° РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ РѕРєРЅР° (РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСЂРѕРёРіРЅРѕСЂРёСЂРѕРІР°РЅР°)
 */
 
 bool WindowsWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
@@ -770,7 +770,7 @@ bool WindowsWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* WindowsWindowManager::GetNativeWindowHandle (window_t handle)
@@ -784,7 +784,7 @@ const void* WindowsWindowManager::GetNativeDisplayHandle (window_t)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
@@ -833,7 +833,7 @@ void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, 
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void WindowsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -852,14 +852,14 @@ void WindowsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
     if (size_t (window_rect.right - window_rect.left) == size_t (rect.right - rect.left) &&
         size_t (window_rect.bottom - window_rect.top) == size_t (rect.bottom - rect.top))
     {
-        //изменять размеры окна не нужно
+        //РёР·РјРµРЅСЏС‚СЊ СЂР°Р·РјРµСЂС‹ РѕРєРЅР° РЅРµ РЅСѓР¶РЅРѕ
 
       flags |= SWP_NOSIZE;
     }
 
     if ((size_t)window_rect.left == rect.left && (size_t)window_rect.top == rect.top)
     {
-        //изменять положение окна не нужно
+        //РёР·РјРµРЅСЏС‚СЊ РїРѕР»РѕР¶РµРЅРёРµ РѕРєРЅР° РЅРµ РЅСѓР¶РЅРѕ
 
       flags |= SWP_NOMOVE;
     }
@@ -953,7 +953,7 @@ void WindowsWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -964,12 +964,12 @@ void WindowsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool
   {
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
         ShowWindow (wnd, state ? SW_SHOW : SW_HIDE);
-        SetLastError (0);  //подавление ошибки Win32 error 126. Не найден указанный модуль. Возникающей при запуске fraps.
+        SetLastError (0);  //РїРѕРґР°РІР»РµРЅРёРµ РѕС€РёР±РєРё Win32 error 126. РќРµ РЅР°Р№РґРµРЅ СѓРєР°Р·Р°РЅРЅС‹Р№ РјРѕРґСѓР»СЊ. Р’РѕР·РЅРёРєР°СЋС‰РµР№ РїСЂРё Р·Р°РїСѓСЃРєРµ fraps.
 //        check_errors ("::ShowWindow");
         break;
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         if (state)
         {
           if (!SetActiveWindow (wnd))
@@ -988,7 +988,7 @@ void WindowsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool
         }
 
         break;
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
         if (!SetFocus (state ? wnd : HWND_TOP))
           raise_error ("::SetFocus");
         break;
@@ -1077,7 +1077,7 @@ bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
@@ -1112,7 +1112,7 @@ const void* WindowsWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void WindowsWindowManager::InvalidateWindow (window_t handle)
@@ -1132,7 +1132,7 @@ void WindowsWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 void WindowsWindowManager::SetCursorPosition (const Point& position)
@@ -1167,7 +1167,7 @@ Point WindowsWindowManager::GetCursorPosition ()
   }
 }
 
-//в клиентских координатах окна
+//РІ РєР»РёРµРЅС‚СЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚Р°С… РѕРєРЅР°
 void WindowsWindowManager::SetCursorPosition (window_t handle, const Point& client_position)
 {
   try
@@ -1189,7 +1189,7 @@ void WindowsWindowManager::SetCursorPosition (window_t handle, const Point& clie
   }
 }
 
-//в клиентских координатах окна
+//РІ РєР»РёРµРЅС‚СЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚Р°С… РѕРєРЅР°
 Point WindowsWindowManager::GetCursorPosition (window_t handle)
 {
   try
@@ -1214,7 +1214,7 @@ Point WindowsWindowManager::GetCursorPosition (window_t handle)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 void WindowsWindowManager::SetCursorVisible (window_t handle, bool state)
@@ -1229,7 +1229,7 @@ void WindowsWindowManager::SetCursorVisible (window_t handle, bool state)
 
     impl->is_cursor_visible = state;
 
-      //посылка WM_SETCURSOR
+      //РїРѕСЃС‹Р»РєР° WM_SETCURSOR
 
     POINT position;
 
@@ -1266,7 +1266,7 @@ bool WindowsWindowManager::GetCursorVisible (window_t handle)
 }
 
 /*
-    Изображение курсора
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 #ifndef WINCE
 
@@ -1350,7 +1350,7 @@ void WindowsWindowManager::SetCursor (window_t window, cursor_t cursor)
 #endif
 
 /*
-   Установка/получение multitouch режима
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ multitouch СЂРµР¶РёРјР°
 */
 
 void WindowsWindowManager::SetMultitouchEnabled (window_t window, bool state)
@@ -1398,7 +1398,7 @@ bool WindowsWindowManager::IsMultitouchEnabled (window_t window)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void WindowsWindowManager::SetBackgroundColor (window_t window, const Color& color)

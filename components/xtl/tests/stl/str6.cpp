@@ -1,4 +1,4 @@
-//Тестирование append
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ append
 
 #include <stdio.h>
 #include <stl/string>

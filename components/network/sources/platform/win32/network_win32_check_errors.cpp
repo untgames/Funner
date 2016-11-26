@@ -5,7 +5,7 @@ namespace network
 
 const size_t MAX_BUFFER_SIZE = 2048;
 
-//получение строки с сообщением об ошибке
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ СЃРѕРѕР±С‰РµРЅРёРµРј РѕР± РѕС€РёР±РєРµ
 stl::string get_error_message (DWORD error_code)
 {
   void* buffer = malloc (MAX_BUFFER_SIZE);
@@ -16,7 +16,7 @@ stl::string get_error_message (DWORD error_code)
   FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                  0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
 
-    //отсечение завершающих \n и пробелов
+    //РѕС‚СЃРµС‡РµРЅРёРµ Р·Р°РІРµСЂС€Р°СЋС‰РёС… \n Рё РїСЂРѕР±РµР»РѕРІ
 
   char* iter = (char*)buffer;
   
@@ -48,7 +48,7 @@ stl::string get_error_message (DWORD error_code)
   return message;
 }
 
-//проверка ошибок использования WinAPI и генерация исключения в случае их наличия
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ WinAPI Рё РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ РёС… РЅР°Р»РёС‡РёСЏ
 void check_errors (const char* source)
 {
   DWORD error_code = WSAGetLastError ();

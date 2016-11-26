@@ -7,7 +7,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
@@ -23,13 +23,13 @@ TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_
 
   Bind ();
 
-    //преобразование формата текстуры
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С‚РµРєСЃС‚СѓСЂС‹
     
   GLenum gl_internal_format = get_gl_internal_format (tex_desc.format),
          gl_format          = get_gl_format (tex_desc.format),
          gl_type            = get_gl_type (tex_desc.format);  
          
-    //проверка возможности создания текстуры
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
   glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
                 gl_format, gl_type, 0);
@@ -42,17 +42,17 @@ TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create rectangle texture %ux%ux%u@%s (proxy texture fail)", 
                        tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
 
-    //создание текстуры
+    //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 
   glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_format, gl_type, data ? data->data : 0);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void TextureNpot::SetUncompressedData

@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Query::Query (const DeviceManager& manager, QueryType in_type)
@@ -92,7 +92,7 @@ Query::~Query ()
 }
 
 /*
-    Указание границ запроса
+    РЈРєР°Р·Р°РЅРёРµ РіСЂР°РЅРёС† Р·Р°РїСЂРѕСЃР°
 */
 
 void Query::Begin (IDeviceContext* context)
@@ -132,7 +132,7 @@ void Query::End (IDeviceContext* context)
 }
 
 /*
-    Получение данных
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 bool Query::GetDataCore (size_t size, void* data, IDeviceContext* context, UINT flags)

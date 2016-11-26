@@ -24,7 +24,7 @@
  * dealings in this Software without prior written authorization from the
  * XFree86 Project.
  *
- * Author: Paulo César Pereira de Andrade
+ * Author: Paulo CÐ¹sar Pereira de Andrade
  */
 
 /* $XFree86: xc/lib/Xaw/Tip.h,v 1.1 1999/06/27 14:07:35 dawes Exp $ */

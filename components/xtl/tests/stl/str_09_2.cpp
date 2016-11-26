@@ -1,4 +1,4 @@
-//Тестирование find_last_of (c-string, pos)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find_last_of (c-string, pos)
 #include <stdio.h>
 #include <stl/string>
 

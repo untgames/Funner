@@ -19,24 +19,24 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t LIGHTS_RESERVE_SIZE = 64;   //резервируемое количество источников света
+const size_t LIGHTS_RESERVE_SIZE = 64;   //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
 
 }
 
-///Техника рендеринга: отрисовка изображения из каждого источника и сложение полученных изображений
+///РўРµС…РЅРёРєР° СЂРµРЅРґРµСЂРёРЅРіР°: РѕС‚СЂРёСЃРѕРІРєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РёР· РєР°Р¶РґРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° Рё СЃР»РѕР¶РµРЅРёРµ РїРѕР»СѓС‡РµРЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
 class ForwardShading: public Technique
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ForwardShading (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
       , shadow_map_renderer (in_manager, node.First ("shadow_map"))
       , shadows_enabled (true)
     {
-        //чтение конфигурации
+        //С‡С‚РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
       lighting_effect                = common::get<const char*> (node, "lighting_effect");
       root_effect                    = common::get<const char*> (node, "root_effect");
@@ -45,15 +45,15 @@ class ForwardShading: public Technique
       point_light_shader_light_type  = common::get<const char*> (node, "point_light_shader_type", "");
     }    
 
-/// Имена для регистрации
+/// РРјРµРЅР° РґР»СЏ СЂРµРіРёСЃС‚СЂР°С†РёРё
     static const char* ClassName     () { return "forward_shading"; }
     static const char* ComponentName () { return "render.scene.server.techniques.forward_shading"; }
 
   protected:
-///Обновление свойств
+///РћР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
     void UpdatePropertiesCore () {}
 
-///Связывание свойств техники с методами техники
+///РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ С‚РµС…РЅРёРєРё СЃ РјРµС‚РѕРґР°РјРё С‚РµС…РЅРёРєРё
     void BindProperties (common::PropertyBindingMap& bindings)
     {
       bindings.AddProperty ("ShadowsEnabled", xtl::bind (&ForwardShading::ShadowsEnabled, this), xtl::bind (&ForwardShading::SetShadowsEnabled, this, _1));
@@ -93,20 +93,20 @@ class ForwardShading: public Technique
     };
   
   private:
-///Обновление кадра
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР°
     void UpdateFrameCore (RenderingContext& parent_context, TechniquePrivateData& private_data_holder)
     {
       try
       {
-          //получение приватных данных техники
+          //РїРѕР»СѓС‡РµРЅРёРµ РїСЂРёРІР°С‚РЅС‹С… РґР°РЅРЅС‹С… С‚РµС…РЅРёРєРё
 
         PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
-          //определение списка источников и визуализируемых объектов, попадающих в камеру
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃРїРёСЃРєР° РёСЃС‚РѕС‡РЅРёРєРѕРІ Рё РІРёР·СѓР°Р»РёР·РёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ, РїРѕРїР°РґР°СЋС‰РёС… РІ РєР°РјРµСЂСѓ
         
         TraverseResult& result = parent_context.TraverseResult ();
 
-          //обход источников
+          //РѕР±С…РѕРґ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 
         RenderingContext context (parent_context, private_data.frame);
 
@@ -115,7 +115,7 @@ class ForwardShading: public Technique
         for (TraverseResult::LightArray::iterator iter=result.lights.begin (), end=result.lights.end (); iter!=end; ++iter, ++light_index)
           UpdateFromLight (context, **iter, result, light_index, private_data);
 
-          //добавление дочернего кадра
+          //РґРѕР±Р°РІР»РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ РєР°РґСЂР°
 
         parent_context.Frame ().AddFrame (private_data.frame);
       }
@@ -126,14 +126,14 @@ class ForwardShading: public Technique
       }
     }
 
-///Обновление кадра из источника света
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР° РёР· РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
     void UpdateFromLight (RenderingContext& context, Light& light, TraverseResult& result, size_t light_index, PrivateData& private_data)
     {
-        //получение данных отрисовки
+        //РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕС‚СЂРёСЃРѕРІРєРё
 
       LightContext& light_context = AllocateLightContext (private_data, light_index);
 
-        //обновление тени
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРЅРё
 
       RenderingContext shadow_context (context, light_context.renderer->Frame ());   //TODO this for debug
 
@@ -141,7 +141,7 @@ class ForwardShading: public Technique
         shadow_map_renderer.UpdateShadowMap (shadow_context, light);   //TODO this for debug too
 //      UpdateShadowMap (context, light);   //TODO this commented for debug
 
-        //установка параметров источника
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР°
 
       manager::Frame&                 frame  = light_context.renderer->Frame ();
       const interchange::LightParams& params = light.Params ();
@@ -181,14 +181,14 @@ class ForwardShading: public Technique
 
       frame_defines.SetProperty ("LightType", shader_light_type);
      
-        //обновление визуализируемых объектов
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РІРёР·СѓР°Р»РёР·РёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ
 
 //TODO: draw only visual models affected by light
 
       light_context.renderer->Draw (context);
     }
 
-///Отрисовка теневой карты
+///РћС‚СЂРёСЃРѕРІРєР° С‚РµРЅРµРІРѕР№ РєР°СЂС‚С‹
     void UpdateShadowMap (RenderingContext& context, Light& light)
     {
       try
@@ -202,7 +202,7 @@ class ForwardShading: public Technique
       }
     }
 
-///Резервирование контекста источника
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РёСЃС‚РѕС‡РЅРёРєР°
     LightContext& AllocateLightContext (PrivateData& private_data, size_t light_index)
     {
       if (light_index < private_data.light_frames.size ())
@@ -215,7 +215,7 @@ class ForwardShading: public Technique
       return *light_context;
     }
 
-///Работа со свойствам
+///Р Р°Р±РѕС‚Р° СЃРѕ СЃРІРѕР№СЃС‚РІР°Рј
     bool ShadowsEnabled ()
     {
       return shadows_enabled;
@@ -227,14 +227,14 @@ class ForwardShading: public Technique
     }
 
   private:
-    RenderManager     manager;                        //менеджер рендеринга
-    stl::string       lighting_effect;                //эффект отрисовки с источником света
-    stl::string       root_effect;                    //корневой эффект отрисовки
-    stl::string       spot_light_shader_light_type;   //настройки шейдера для конического источника света
-    stl::string       direct_light_shader_light_type; //настройки шейдера для цилиндрического источника света
-    stl::string       point_light_shader_light_type;  //настройки шейдера для точечного источника света
-    ShadowMapRenderer shadow_map_renderer;            //рендер карты теней
-    bool              shadows_enabled;                //включена ли генерация теней
+    RenderManager     manager;                        //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+    stl::string       lighting_effect;                //СЌС„С„РµРєС‚ РѕС‚СЂРёСЃРѕРІРєРё СЃ РёСЃС‚РѕС‡РЅРёРєРѕРј СЃРІРµС‚Р°
+    stl::string       root_effect;                    //РєРѕСЂРЅРµРІРѕР№ СЌС„С„РµРєС‚ РѕС‚СЂРёСЃРѕРІРєРё
+    stl::string       spot_light_shader_light_type;   //РЅР°СЃС‚СЂРѕР№РєРё С€РµР№РґРµСЂР° РґР»СЏ РєРѕРЅРёС‡РµСЃРєРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+    stl::string       direct_light_shader_light_type; //РЅР°СЃС‚СЂРѕР№РєРё С€РµР№РґРµСЂР° РґР»СЏ С†РёР»РёРЅРґСЂРёС‡РµСЃРєРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+    stl::string       point_light_shader_light_type;  //РЅР°СЃС‚СЂРѕР№РєРё С€РµР№РґРµСЂР° РґР»СЏ С‚РѕС‡РµС‡РЅРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+    ShadowMapRenderer shadow_map_renderer;            //СЂРµРЅРґРµСЂ РєР°СЂС‚С‹ С‚РµРЅРµР№
+    bool              shadows_enabled;                //РІРєР»СЋС‡РµРЅР° Р»Рё РіРµРЅРµСЂР°С†РёСЏ С‚РµРЅРµР№
 };
 
 }

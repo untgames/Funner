@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
@@ -16,7 +16,7 @@ const float  UPDATE_PERIOD               = 1.0f;
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DeviceDebugLayer::DeviceDebugLayer (const DxDevicePtr& in_device)
@@ -54,7 +54,7 @@ DeviceDebugLayer::~DeviceDebugLayer ()
 }
 
 /*
-    Остановка
+    РћСЃС‚Р°РЅРѕРІРєР°
 */
 
 void DeviceDebugLayer::StopAndJoin ()
@@ -73,7 +73,7 @@ void DeviceDebugLayer::StopAndJoin ()
 }
 
 /*
-    Обновление сообщений
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void DeviceDebugLayer::UpdateMessages ()

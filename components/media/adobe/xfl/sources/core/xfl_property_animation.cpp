@@ -5,14 +5,14 @@ using namespace media::adobe::xfl;
 typedef media::CollectionImpl<PropertyAnimationKeyframe, ICollection<PropertyAnimationKeyframe> > KeyframeCollection;
 
 /*
-    Описание реализации анимируемого свойства
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 */
 
 struct PropertyAnimation::Impl : public xtl::reference_counter
 {
-  stl::string        name;      //имя свойства
-  bool               enabled;   //статус
-  KeyframeCollection keyframes; //ключевые точки
+  stl::string        name;      //РёРјСЏ СЃРІРѕР№СЃС‚РІР°
+  bool               enabled;   //СЃС‚Р°С‚СѓСЃ
+  KeyframeCollection keyframes; //РєР»СЋС‡РµРІС‹Рµ С‚РѕС‡РєРё
   
   Impl ()
     : enabled (true)
@@ -20,7 +20,7 @@ struct PropertyAnimation::Impl : public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyAnimation::PropertyAnimation ()
@@ -46,7 +46,7 @@ PropertyAnimation& PropertyAnimation::operator = (const PropertyAnimation& sourc
 }
 
 /*
-   Имя свойства
+   РРјСЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 const char* PropertyAnimation::Name () const
@@ -63,7 +63,7 @@ void PropertyAnimation::SetName (const char* name)
 }
 
 /*
-   Включена ли анимация для этого свойства
+   Р’РєР»СЋС‡РµРЅР° Р»Рё Р°РЅРёРјР°С†РёСЏ РґР»СЏ СЌС‚РѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 */
 
 bool PropertyAnimation::Enabled () const
@@ -77,7 +77,7 @@ void PropertyAnimation::SetEnabled (bool enabled)
 }
 
 /*
-   Анимации
+   РђРЅРёРјР°С†РёРё
 */
 
 PropertyAnimation::KeyframeList& PropertyAnimation::Keyframes ()
@@ -91,7 +91,7 @@ const PropertyAnimation::KeyframeList& PropertyAnimation::Keyframes () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void PropertyAnimation::Swap (PropertyAnimation& animation)
@@ -109,7 +109,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (PropertyAnimation& animation1, PropertyAnimation& animation2)

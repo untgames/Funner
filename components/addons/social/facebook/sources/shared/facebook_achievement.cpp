@@ -4,7 +4,7 @@ using namespace social;
 using namespace social::facebook;
 
 /*
-   Достижения
+   Р”РѕСЃС‚РёР¶РµРЅРёСЏ
 */
 
 void FacebookSessionImpl::LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties)
@@ -13,7 +13,7 @@ void FacebookSessionImpl::LoadAchievements (const LoadAchievementsCallback& call
 }
 
 /*
-   Иконка
+   РРєРѕРЅРєР°
 */
 
 void FacebookSessionImpl::LoadAchievementPicture (const Achievement& achievement, const LoadAchievementPictureCallback& callback, const common::PropertyMap& properties)
@@ -22,7 +22,7 @@ void FacebookSessionImpl::LoadAchievementPicture (const Achievement& achievement
 }
 
 /*
-   Публикация
+   РџСѓР±Р»РёРєР°С†РёСЏ
 */
 
 void FacebookSessionImpl::SendAchievement (const Achievement& achievement, const SendAchievementCallback& callback, const common::PropertyMap& properties)

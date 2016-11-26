@@ -13,7 +13,7 @@
 using namespace input::low_level;
 using namespace common;
 
-const size_t DRIVER_ARRAY_RESERVE = 4; //резервируемый размер массива драйверов
+const size_t DRIVER_ARRAY_RESERVE = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР° РґСЂР°Р№РІРµСЂРѕРІ
 
 namespace input
 {
@@ -22,7 +22,7 @@ namespace low_level
 {
 
 /*
-    Описание реализации системы управления низкоуровневыми драйверами устройств ввода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјС‹ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё СѓСЃС‚СЂРѕР№СЃС‚РІ РІРІРѕРґР°
 */
 
 class DriverManagerImpl
@@ -34,32 +34,32 @@ class DriverManagerImpl
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация драйверов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void RegisterDriver       (const char* name, IDriver* driver);
     void UnregisterDriver     (const char* name);
     void UnregisterAllDrivers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск драйвера по имени
+///РџРѕРёСЃРє РґСЂР°Р№РІРµСЂР° РїРѕ РёРјРµРЅРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDriver* FindDriver (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление драйверов
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґСЂР°Р№РІРµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t      DriversCount ();
     IDriver*    Driver       (size_t index);
     const char* DriverName   (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание устройства ввода
+///РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРІРѕРґР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string = "");
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка драйверов по умолчанию
+///Р—Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadDefaultDrivers ();
 
@@ -75,7 +75,7 @@ class DriverManagerImpl
     typedef stl::vector<InputDriver> DriverArray;
   
   private:
-    DriverArray drivers; //карта драйверов
+    DriverArray drivers; //РєР°СЂС‚Р° РґСЂР°Р№РІРµСЂРѕРІ
 };
 
 }
@@ -83,7 +83,7 @@ class DriverManagerImpl
 }
 
 /*
-    Регистрация драйверов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂРѕРІ
 */
 
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
@@ -119,7 +119,7 @@ void DriverManagerImpl::UnregisterAllDrivers ()
 }
 
 /*
-    Поиск драйвера по имени
+    РџРѕРёСЃРє РґСЂР°Р№РІРµСЂР° РїРѕ РёРјРµРЅРё
 */
 
 IDriver* DriverManagerImpl::FindDriver (const char* name)
@@ -137,7 +137,7 @@ IDriver* DriverManagerImpl::FindDriver (const char* name)
 }
 
 /*
-   Перечисление драйверов
+   РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґСЂР°Р№РІРµСЂРѕРІ
 */
 
 size_t DriverManagerImpl::DriversCount ()
@@ -168,7 +168,7 @@ const char* DriverManagerImpl::DriverName (size_t index)
 }
 
 /*
-   Создание устройства ввода
+   РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРІРѕРґР°
 */
 
 IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
@@ -184,7 +184,7 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
   if (!init_string)
     init_string = "";
 
-    //поиск драйвера
+    //РїРѕРёСЃРє РґСЂР°Р№РІРµСЂР°
 
   for (DriverArray::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
     if (wcimatch (iter->name.c_str (), driver_mask))
@@ -201,7 +201,7 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
 }
 
 /*
-   Загрузка драйверов по умолчанию
+   Р—Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void DriverManagerImpl::LoadDefaultDrivers ()
@@ -210,7 +210,7 @@ void DriverManagerImpl::LoadDefaultDrivers ()
 }
 
 /*
-    Обёртки над обращениями к системе управления низкоуровневыми драйверами отрисовки
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РѕР±СЂР°С‰РµРЅРёСЏРјРё Рє СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 typedef Singleton<DriverManagerImpl> DriverManagerSingleton;

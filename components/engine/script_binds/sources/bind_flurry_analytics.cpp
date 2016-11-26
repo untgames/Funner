@@ -9,7 +9,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* BINDER_NAME              = "Analytics.Flurry";
@@ -76,7 +76,7 @@ namespace flurry_analytics_script_binds
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

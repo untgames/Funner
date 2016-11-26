@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* color_view, View* depth_stencil_view)
@@ -16,18 +16,18 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::FboFrameBuffer";
   
-    //выбор текущего контекста
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();    
 
-    //проверка поддержки необходимого расширения
+    //РїСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ СЂР°СЃС€РёСЂРµРЅРёСЏ
     
   const ContextCaps& caps = GetCaps ();
     
   if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
-    //создание буфера кадра
+    //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
   caps.glGenFramebuffers_fn (1, &id);
 
@@ -36,13 +36,13 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
 
   try
   {    
-      //установка текущего буфера кадра в контекст OpenGL
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     
     frame_buffer_manager->SetFrameBuffer (id, GetId ());
     
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     
-      //установка активного буфера вывода и чтения
+      //СѓСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ Р±СѓС„РµСЂР° РІС‹РІРѕРґР° Рё С‡С‚РµРЅРёСЏ
 
     if (color_view)
     {
@@ -57,13 +57,13 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
 
 #endif
     
-      //инициализация целевых отображений
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РµР»РµРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
     
     SetAttachment (RenderTargetType_Color, color_view);
     SetAttachment (RenderTargetType_DepthStencil, depth_stencil_view);
     FinishInitialization ();
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     CheckErrors (METHOD_NAME);    
   }
@@ -95,12 +95,12 @@ FboFrameBuffer::~FboFrameBuffer ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Установка целевых отображений
+    РЈСЃС‚Р°РЅРѕРІРєР° С†РµР»РµРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
@@ -110,19 +110,19 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
   if (!view)
     return;
     
-    //установка флага активности целевого буфера
+    //СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° Р°РєС‚РёРІРЅРѕСЃС‚Рё С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР°
 
   if (target_type == RenderTargetType_Color)
     is_color_buffer_active = view != 0;
  
-    //проверка совместимости хранимой в отображении текстуры и буфера кадра    
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С…СЂР°РЅРёРјРѕР№ РІ РѕС‚РѕР±СЂР°Р¶РµРЅРёРё С‚РµРєСЃС‚СѓСЂС‹ Рё Р±СѓС„РµСЂР° РєР°РґСЂР°    
     
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
     throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
   
-    //обработка случая рендеринга в текстуру
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ С‚РµРєСЃС‚СѓСЂСѓ
   
   if (IRenderTargetTexture* texture = dynamic_cast<IRenderTargetTexture*> (base_texture))
   {
@@ -136,7 +136,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
     return;
   }
   
-    //обработка случая рендеринга в render-buffer
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ render-buffer
     
   if (FboRenderBuffer* render_buffer = dynamic_cast<FboRenderBuffer*> (base_texture))
   {
@@ -145,7 +145,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
     return;
   }
   
-    //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
+    //РµСЃР»Рё С†РµР»РµРІР°СЏ С‚РµРєСЃС‚СѓСЂР° РёРјРµРµС‚ РЅРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї - СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР° РЅРµРІРѕР·РјРѕР¶РЅРѕ
     
   const char* target_name;
 
@@ -237,7 +237,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetT
       break;
   }
   
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
@@ -276,32 +276,32 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, FboRenderBuffe
       break;
   }
   
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::FboFrameBuffer::SetAttachment(RenderTargetType,FboRenderBuffer*)");
 }
 
 /*
-    Завершение инициализации
+    Р—Р°РІРµСЂС€РµРЅРёРµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 */
 
 void FboFrameBuffer::FinishInitialization ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBuffer::FinishInitialization";
 
-    //проверка состояния буфера кадра
+    //РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
   
   GLenum status = (GLenum)GetCaps ().glCheckFramebufferStatus_fn (GL_FRAMEBUFFER);
 
   check_frame_buffer_status (METHOD_NAME, status);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Выбор буфера в контекст OpenGL
+    Р’С‹Р±РѕСЂ Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void FboFrameBuffer::Bind ()

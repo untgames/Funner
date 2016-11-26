@@ -1,5 +1,5 @@
 /*
-    Минимальный / максимальный узлы в поддеревьях
+    РњРёРЅРёРјР°Р»СЊРЅС‹Р№ / РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓР·Р»С‹ РІ РїРѕРґРґРµСЂРµРІСЊСЏС…
 */
 
 inline rbtree_node_base* rbtree_node_base::min () const
@@ -21,7 +21,7 @@ inline rbtree_node_base* rbtree_node_base::max () const
 }
 
 /*
-      Следующий / предыдущий узел по порядку следования
+      РЎР»РµРґСѓСЋС‰РёР№ / РїСЂРµРґС‹РґСѓС‰РёР№ СѓР·РµР» РїРѕ РїРѕСЂСЏРґРєСѓ СЃР»РµРґРѕРІР°РЅРёСЏ
 */
 
 inline rbtree_node_base* rbtree_node_base::next () const
@@ -66,7 +66,7 @@ inline rbtree_node_base* rbtree_node_base::prev () const
 }
 
 /*
-    Вращения
+    Р’СЂР°С‰РµРЅРёСЏ
 */
 
 inline void rbtree_node_base::rotate_left (Node*& root)
@@ -106,7 +106,7 @@ inline void rbtree_node_base::rotate_right (Node*& root)
 }
 
 /*
-    Перебалансировка
+    РџРµСЂРµР±Р°Р»Р°РЅСЃРёСЂРѕРІРєР°
 */
 
 inline void rbtree_node_base::rebalance (Node*& root)
@@ -326,7 +326,7 @@ inline rbtree_node_base* rbtree_node_base::rebalance_for_erase (Node*& root,Node
 }
 
 /*
-    Итератор красно-чёрного дерева
+    РС‚РµСЂР°С‚РѕСЂ РєСЂР°СЃРЅРѕ-С‡С‘СЂРЅРѕРіРѕ РґРµСЂРµРІР°
 */
 
 template <class Val,class Ref,class Ptr>
@@ -408,7 +408,7 @@ inline bool rbtree_iterator<Val,Ref,Ptr>::operator != (const rbtree_iterator& i)
 }
 
 /*
-    Получение unqualified итератора
+    РџРѕР»СѓС‡РµРЅРёРµ unqualified РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class Val,class Ref,class Ptr>
@@ -419,7 +419,7 @@ inline typename rbtree_iterator<Val,Ref,Ptr>::iterator rbtree_iterator<Val,Ref,P
 
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -470,7 +470,7 @@ inline rbtree<Key,Value,KeyOfValue,Compare,Allocator>::~rbtree ()
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -481,7 +481,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::get_allocator () const
 }
 
 /*
-    Функции внутреннего использования
+    Р¤СѓРЅРєС†РёРё РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -586,7 +586,7 @@ inline const Key& rbtree<Key,Value,KeyOfValue,Compare,Allocator>::key (const_lin
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -616,7 +616,7 @@ inline Compare rbtree<Key,Value,KeyOfValue,Compare,Allocator>::key_comp () const
 }
 
 /*
-    Итераторы
+    РС‚РµСЂР°С‚РѕСЂС‹
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -675,7 +675,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::rend () const
 } 
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -707,7 +707,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::operator = (const rbtree<Key,Val
 }
 
 /*
-    Вставка
+    Р’СЃС‚Р°РІРєР°
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -716,25 +716,25 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_insert (link_type x,link_type y
 {
   link_type z = create_node (v);  
 
-  if (y == &header || x || compare (key (v),key (y))) //вставка слева от y
+  if (y == &header || x || compare (key (v),key (y))) //РІСЃС‚Р°РІРєР° СЃР»РµРІР° РѕС‚ y
   {    
     y->left = z;
                                       
-    if      (y == &header)     y->right    = y->parent = z; //z становится корнем дерева
-    else if (y == header.left) header.left = z; //добавлен новый минимальный элемент (z < min)
+    if      (y == &header)     y->right    = y->parent = z; //z СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РєРѕСЂРЅРµРј РґРµСЂРµРІР°
+    else if (y == header.left) header.left = z; //РґРѕР±Р°РІР»РµРЅ РЅРѕРІС‹Р№ РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ (z < min)
   }
-  else  //вставка справа от y
+  else  //РІСЃС‚Р°РІРєР° СЃРїСЂР°РІР° РѕС‚ y
   {
     y->right = z;   
 
     if (y == header.right)
-      header.right = z; //добавлен новый максимальный элемент (z > max)
+      header.right = z; //РґРѕР±Р°РІР»РµРЅ РЅРѕРІС‹Р№ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЌР»РµРјРµРЅС‚ (z > max)
   }
 
   z->parent = y;
   z->left   = z->right = 0;
     
-  z->rebalance (header.parent); //перебалансировка дерева
+  z->rebalance (header.parent); //РїРµСЂРµР±Р°Р»Р°РЅСЃРёСЂРѕРІРєР° РґРµСЂРµРІР°
   
   ++node_count;
   
@@ -756,16 +756,16 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::iterator 
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::insert_equal (iterator position,const value_type& v)
 {
-  if (position.node == header.left) //вставка в начало
+  if (position.node == header.left) //РІСЃС‚Р°РІРєР° РІ РЅР°С‡Р°Р»Рѕ
   {
     return node_count && compare (key (v),key (position.node)) ? _insert (position.node,position.node,v) : 
                                                                  insert_equal (v);
   } 
-  else if (position.node == &header) //вставка в конец
+  else if (position.node == &header) //РІСЃС‚Р°РІРєР° РІ РєРѕРЅРµС†
   {
     return !compare (key (v),key (header.right)) ? _insert (0,header.right,v) : insert_equal (v);
   }
-  else //попытка вставить в произвольную позицию дерева
+  else //РїРѕРїС‹С‚РєР° РІСЃС‚Р°РІРёС‚СЊ РІ РїСЂРѕРёР·РІРѕР»СЊРЅСѓСЋ РїРѕР·РёС†РёСЋ РґРµСЂРµРІР°
   {
     iterator before = position;
     
@@ -812,16 +812,16 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::iterator 
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::insert_unique (iterator position,const value_type& v)
 {
-  if (position.node == header.left) //вставка в начало
+  if (position.node == header.left) //РІСЃС‚Р°РІРєР° РІ РЅР°С‡Р°Р»Рѕ
   { 
     return node_count && compare (key (v), key (position.node)) ? _insert (position.node,position.node,v) :
                                                                   insert_unique (v).first;
   } 
-  else if (position.node == &header) //вставка в конец
+  else if (position.node == &header) //РІСЃС‚Р°РІРєР° РІ РєРѕРЅРµС†
   { 
     return compare (key (header.right),key (v)) ? _insert (0,header.right,v) : insert_unique (v).first;
   } 
-  else  //вставка в произвольную позицию
+  else  //РІСЃС‚Р°РІРєР° РІ РїСЂРѕРёР·РІРѕР»СЊРЅСѓСЋ РїРѕР·РёС†РёСЋ
   {
     iterator before = position;
     
@@ -848,15 +848,15 @@ inline void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::insert_unique (Iter 
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
-void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_erase (link_type x) //удаление без перебалансировки
+void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_erase (link_type x) //СѓРґР°Р»РµРЅРёРµ Р±РµР· РїРµСЂРµР±Р°Р»Р°РЅСЃРёСЂРѕРІРєРё
 {                                
   while (x) 
   {
-    _erase (x->right); //расписать рекурсию!!!
+    _erase (x->right); //СЂР°СЃРїРёСЃР°С‚СЊ СЂРµРєСѓСЂСЃРёСЋ!!!
     
     link_type y = x->left;
     
@@ -925,15 +925,15 @@ inline void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::clear()
 }      
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::link_type 
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_find (const key_type& k) const
 {
-  link_type y = (link_type)&header,       //последний узел не меньший k
-            x = header.parent; //текущий узел
+  link_type y = (link_type)&header,       //РїРѕСЃР»РµРґРЅРёР№ СѓР·РµР» РЅРµ РјРµРЅСЊС€РёР№ k
+            x = header.parent; //С‚РµРєСѓС‰РёР№ СѓР·РµР»
             
   while (x) 
     if (!compare (key (x),k)) y = x, x = x->left;
@@ -946,8 +946,8 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::link_type
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_lower_bound (const key_type& k) const
 {
-  link_type y = (link_type)&header,       //последний узел не меньший k
-            x = header.parent; //текущий узел
+  link_type y = (link_type)&header,       //РїРѕСЃР»РµРґРЅРёР№ СѓР·РµР» РЅРµ РјРµРЅСЊС€РёР№ k
+            x = header.parent; //С‚РµРєСѓС‰РёР№ СѓР·РµР»
 
   while (x) 
     if (!compare (key (x),k)) y = x, x = x->left;
@@ -960,8 +960,8 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::link_type
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::_upper_bound (const key_type& k) const
 {
-  link_type y = (link_type)&header,       //последний узел не меньший k
-            x = header.parent; //текущий узел
+  link_type y = (link_type)&header,       //РїРѕСЃР»РµРґРЅРёР№ СѓР·РµР» РЅРµ РјРµРЅСЊС€РёР№ k
+            x = header.parent; //С‚РµРєСѓС‰РёР№ СѓР·РµР»
 
    while (x) 
      if (compare (k,key (x))) y = x, x = x->left;
@@ -1038,7 +1038,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::equal_range (const key_type& k) 
 }
 
 /*
-    Обмен содержимого двух деревьев
+    РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… РґРµСЂРµРІСЊРµРІ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -1086,7 +1086,7 @@ inline void swap
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>

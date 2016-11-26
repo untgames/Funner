@@ -4,19 +4,19 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Реализация Mesh
+    Р РµР°Р»РёР·Р°С†РёСЏ Mesh
 */
 
 typedef media::CollectionImpl<Surface, ICollection<Surface> > SurfaceCollection;
 
 struct Mesh::Impl: public xtl::reference_counter
 {
-  SurfaceCollection surfaces; //поверхности меша
-  stl::string       id;       //идентификатор меша
+  SurfaceCollection surfaces; //РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РјРµС€Р°
+  stl::string       id;       //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРµС€Р°
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Mesh::Mesh ()
@@ -43,7 +43,7 @@ Mesh& Mesh::operator = (const Mesh& mesh)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Mesh Mesh::Clone () const
@@ -52,7 +52,7 @@ Mesh Mesh::Clone () const
 }
 
 /*
-    Идентификатор меша
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРµС€Р°
 */
 
 const char* Mesh::Id () const
@@ -69,7 +69,7 @@ void Mesh::SetId (const char* id)
 }
 
 /*
-    Список поверхностей
+    РЎРїРёСЃРѕРє РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 */
 
 Mesh::SurfaceList& Mesh::Surfaces ()

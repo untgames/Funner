@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Key,class Compare,class Allocator>
@@ -13,7 +13,7 @@ inline set_base<Key,Compare,Allocator>::set_base (const key_compare& cmp,const a
 { }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Key,class Compare,class Allocator>
@@ -23,7 +23,7 @@ inline typename set_base<Key,Compare,Allocator>::allocator_type set_base<Key,Com
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Key,class Compare,class Allocator>
@@ -57,7 +57,7 @@ inline bool set_base<Key,Compare,Allocator>::empty () const
 }
 
 /*
-    Итераторы
+    РС‚РµСЂР°С‚РѕСЂС‹
 */
 
 template <class Key,class Compare,class Allocator>
@@ -85,7 +85,7 @@ inline typename set_base<Key,Compare,Allocator>::reverse_iterator set_base<Key,C
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Key,class Compare,class Allocator>
@@ -113,7 +113,7 @@ inline void set_base<Key,Compare,Allocator>::clear ()
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Key,class Compare,class Allocator>
@@ -148,7 +148,7 @@ set_base<Key,Compare,Allocator>::equal_range (const key_type& x) const
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Key,class Compare,class Allocator>
@@ -188,7 +188,7 @@ inline bool set_base<Key,Compare,Allocator>::operator >= (const set_base& x) con
 }
 
 /*
-    Множество с уникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ СѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class Compare,class Allocator>
@@ -235,7 +235,7 @@ inline void set<Key,Compare,Allocator>::insert (Iter first,Iter last)
   tree.insert_unique (first,last);
 }
 
-//Обмен содердимого двух множеств
+//РћР±РјРµРЅ СЃРѕРґРµСЂРґРёРјРѕРіРѕ РґРІСѓС… РјРЅРѕР¶РµСЃС‚РІ
 template <class Key,class Compare,class Allocator>
 inline void set<Key,Compare,Allocator>::swap (set& s)
 {
@@ -249,7 +249,7 @@ inline void swap (set<Key,Compare,Allocator>& a,set<Key,Compare,Allocator>& b)
 }
 
 /*
-    Множество с неуникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ РЅРµСѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class Compare,class Allocator>
@@ -294,7 +294,7 @@ inline void multiset<Key,Compare,Allocator>::insert (Iter first,Iter last)
   tree.insert_equal (first,last);
 }
 
-//Обмен содердимого двух множеств
+//РћР±РјРµРЅ СЃРѕРґРµСЂРґРёРјРѕРіРѕ РґРІСѓС… РјРЅРѕР¶РµСЃС‚РІ
 template <class Key,class Compare,class Allocator>
 inline void multiset<Key,Compare,Allocator>::swap (multiset& s)
 {

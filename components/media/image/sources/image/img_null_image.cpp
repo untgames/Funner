@@ -6,18 +6,18 @@ using namespace common;
 namespace
 {
 
-///Заглушка, используемая во время загрузки
+///Р—Р°РіР»СѓС€РєР°, РёСЃРїРѕР»СЊР·СѓРµРјР°СЏ РІРѕ РІСЂРµРјСЏ Р·Р°РіСЂСѓР·РєРё
 class NullImageImpl: public ImageImpl
 {
   public:    
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
     NullImageImpl* Clone ()
     {
       addref (this);
       return this;
     }
 
-///Формат / преобразование формата
+///Р¤РѕСЂРјР°С‚ / РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р°
     PixelFormat Format  () { return PixelFormat_RGBA8; }
 
     void Convert (PixelFormat new_format)
@@ -25,7 +25,7 @@ class NullImageImpl: public ImageImpl
       throw xtl::format_not_supported_exception ("media::NullImageImpl::Convert", "Convert not supported");
     }
 
-///Размеры картинки / изменение размеров
+///Р Р°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё / РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ
     unsigned int Width  () { return 1; }
     unsigned int Height () { return 1; }
     unsigned int Depth  () { return 1; }
@@ -35,7 +35,7 @@ class NullImageImpl: public ImageImpl
       throw xtl::format_not_supported_exception ("media::NullImageImpl::Resize", "Resize not supported");
     }
 
-///Работа с образом
+///Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј
     void* Bitmap (unsigned int z)
     {
       static char buffer [8];
@@ -53,13 +53,13 @@ class NullImageImpl: public ImageImpl
       throw xtl::format_not_supported_exception ("media::NullImageImpl::GetImage", "Image operations are not supported");            
     }
 
-///Сохранение
+///РЎРѕС…СЂР°РЅРµРЅРёРµ
     void Save (const char* file_name)
     {
       throw xtl::format_not_supported_exception ("media::NullImageImpl::Save", "Save image not supported");
     }
 
-///Создание экземпляра
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
     static NullImageImpl* Create ()
     {
       return Singleton<Holder>::Instance ()->impl->Clone ();
@@ -80,7 +80,7 @@ namespace media
 {
 
 /*
-    Создание реализаций картинок
+    РЎРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёР№ РєР°СЂС‚РёРЅРѕРє
 */
 
 ImageImpl* create_null_image ()

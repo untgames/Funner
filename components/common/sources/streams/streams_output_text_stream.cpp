@@ -2,21 +2,21 @@
 
 using namespace common;
 
-const size_t FORMAT_BUFFER_SIZE = 16; //размер буфера форматирования
+const size_t FORMAT_BUFFER_SIZE = 16; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Описание реализации текстового потока вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚РѕРІРѕРіРѕ РїРѕС‚РѕРєР° РІС‹РІРѕРґР°
 */
 
 struct OutputTextStream::Impl
 {
-  OutputStreamBuffer buffer; //буфер
+  OutputStreamBuffer buffer; //Р±СѓС„РµСЂ
 
   Impl (size_t buffer_size, const WriteFunction& in_writer = &OutputStreamBuffer::DefaultWriter) : buffer (in_writer, buffer_size) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputTextStream::OutputTextStream (size_t buffer_size)
@@ -32,7 +32,7 @@ OutputTextStream::~OutputTextStream ()
 }
 
 /*
-    Буфер потока
+    Р‘СѓС„РµСЂ РїРѕС‚РѕРєР°
 */
 
 const common::OutputStreamBuffer& OutputTextStream::Buffer () const
@@ -46,7 +46,7 @@ common::OutputStreamBuffer& OutputTextStream::Buffer ()
 }
 
 /*
-    Вывод строк
+    Р’С‹РІРѕРґ СЃС‚СЂРѕРє
 */
 
 void OutputTextStream::Write (const char* string, size_t size)
@@ -86,7 +86,7 @@ namespace common
 {
 
 /*
-    Вывод строк
+    Р’С‹РІРѕРґ СЃС‚СЂРѕРє
 */
 
 void write (OutputTextStream& stream, const char* string)
@@ -100,7 +100,7 @@ void write (OutputTextStream& stream, const wchar_t* string)
 }
 
 /*
-    Вывод символов
+    Р’С‹РІРѕРґ СЃРёРјРІРѕР»РѕРІ
 */
 
 void write (OutputTextStream& stream, char symbol)
@@ -147,20 +147,20 @@ void write (OutputTextStream& stream, size_t count, wchar_t symbol)
 }
 
 /*
-    Вывод целых чисел
+    Р’С‹РІРѕРґ С†РµР»С‹С… С‡РёСЃРµР»
       format:
-        ""      - вывод с форматированием по умолчанию
-        "hex"   - вывод в шестнадцатиричном формате
-        "#"     - вывод с заполнителем по умолчанию (' ') и шириной не меньше 1
-        "000"   - вывод с заполнителем 0 и шириной 3
-        "+##"   - вывод с заполнителем по умолчанию, шириной 3 и указанием знака
-        "hex:#" - вывод с заполнителем по умолчанию, шириной 1 в шастнадцатиричном формате
+        ""      - РІС‹РІРѕРґ СЃ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+        "hex"   - РІС‹РІРѕРґ РІ С€РµСЃС‚РЅР°РґС†Р°С‚РёСЂРёС‡РЅРѕРј С„РѕСЂРјР°С‚Рµ
+        "#"     - РІС‹РІРѕРґ СЃ Р·Р°РїРѕР»РЅРёС‚РµР»РµРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ (' ') Рё С€РёСЂРёРЅРѕР№ РЅРµ РјРµРЅСЊС€Рµ 1
+        "000"   - РІС‹РІРѕРґ СЃ Р·Р°РїРѕР»РЅРёС‚РµР»РµРј 0 Рё С€РёСЂРёРЅРѕР№ 3
+        "+##"   - РІС‹РІРѕРґ СЃ Р·Р°РїРѕР»РЅРёС‚РµР»РµРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, С€РёСЂРёРЅРѕР№ 3 Рё СѓРєР°Р·Р°РЅРёРµРј Р·РЅР°РєР°
+        "hex:#" - РІС‹РІРѕРґ СЃ Р·Р°РїРѕР»РЅРёС‚РµР»РµРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, С€РёСЂРёРЅРѕР№ 1 РІ С€Р°СЃС‚РЅР°РґС†Р°С‚РёСЂРёС‡РЅРѕРј С„РѕСЂРјР°С‚Рµ
 */
 
 namespace
 {
 
-//приведение формата к printf-форме
+//РїСЂРёРІРµРґРµРЅРёРµ С„РѕСЂРјР°С‚Р° Рє printf-С„РѕСЂРјРµ
 void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_BUFFER_SIZE])
 {
   char*       pos         = buffer;
@@ -197,7 +197,7 @@ void get_int_printf_format (const char*& format, bool sign, char buffer [FORMAT_
                              *format == '0' ? "0" : "", strlen (format), base_format);
 }
 
-//печать целого числа
+//РїРµС‡Р°С‚СЊ С†РµР»РѕРіРѕ С‡РёСЃР»Р°
 void write_int (OutputTextStream& stream, unsigned long long value, const char* format, bool sign)
 {
   if (!format)
@@ -245,17 +245,17 @@ void write (OutputTextStream& stream, unsigned long long value, const char* form
 }
 
 /*
-  Вывод чисел с плавающей точкой
-    format (аналогично целым числам, исключая системы счисления):
-      отсутствие точки - печать дробной части с форматированием по умолчанию
-      ".##" - ширина не больше 2-х (1.2=1.2, 1.21=1.21)
-      ".00" - ширина 2 (1.2=1.20, 1.211=1.21)
+  Р’С‹РІРѕРґ С‡РёСЃРµР» СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
+    format (Р°РЅР°Р»РѕРіРёС‡РЅРѕ С†РµР»С‹Рј С‡РёСЃР»Р°Рј, РёСЃРєР»СЋС‡Р°СЏ СЃРёСЃС‚РµРјС‹ СЃС‡РёСЃР»РµРЅРёСЏ):
+      РѕС‚СЃСѓС‚СЃС‚РІРёРµ С‚РѕС‡РєРё - РїРµС‡Р°С‚СЊ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё СЃ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµРј РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+      ".##" - С€РёСЂРёРЅР° РЅРµ Р±РѕР»СЊС€Рµ 2-С… (1.2=1.2, 1.21=1.21)
+      ".00" - С€РёСЂРёРЅР° 2 (1.2=1.20, 1.211=1.21)
 */
 
 namespace
 {
 
-//приведение формата к printf-форме
+//РїСЂРёРІРµРґРµРЅРёРµ С„РѕСЂРјР°С‚Р° Рє printf-С„РѕСЂРјРµ
 void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE], unsigned int int_size)
 {
   char* pos = buffer;
@@ -348,10 +348,10 @@ void write (OutputTextStream& stream, long double value, const char* format)
 }
 
 /*
-    Вывод логических значений
+    Р’С‹РІРѕРґ Р»РѕРіРёС‡РµСЃРєРёС… Р·РЅР°С‡РµРЅРёР№
       format:
-        "alpha" - вывод в текстовом виде (true, false)
-        ""      - вывод в численном виде (0, 1)
+        "alpha" - РІС‹РІРѕРґ РІ С‚РµРєСЃС‚РѕРІРѕРј РІРёРґРµ (true, false)
+        ""      - РІС‹РІРѕРґ РІ С‡РёСЃР»РµРЅРЅРѕРј РІРёРґРµ (0, 1)
 */
 
 void write (OutputTextStream& stream, bool value, const char* format)

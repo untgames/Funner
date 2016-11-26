@@ -1,5 +1,5 @@
 /*
-    База
+    Р‘Р°Р·Р°
 */
 
 template <class T> 
@@ -23,7 +23,7 @@ inline void return_temporary_buffer (T* buffer)
 }
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -80,7 +80,7 @@ inline temporary_buffer<T>::~temporary_buffer ()
 }
 
 /*
-    Размер / запрошенный размер 
+    Р Р°Р·РјРµСЂ / Р·Р°РїСЂРѕС€РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ 
 */
 
 template <class T>
@@ -96,7 +96,7 @@ inline typename temporary_buffer<T>::size_type temporary_buffer<T>::requested_si
 }
     
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class T>

@@ -1,4 +1,4 @@
-//тестирование operator[]
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ operator[]
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -17,14 +17,14 @@ void raise (const char* method_name)
 
 }
 
-//создание условия
+//СЃРѕР·РґР°РЅРёРµ СѓСЃР»РѕРІРёСЏ
 condition_t DefaultThreadManager::CreateCondition ()
 {
   raise ("syslib::DefaultThreadManager::CreateCondition");
   return 0;
 }
 
-//удаление условия
+//СѓРґР°Р»РµРЅРёРµ СѓСЃР»РѕРІРёСЏ
 void DefaultThreadManager::DestroyCondition (condition_t handle)
 {
   raise ("syslib::DefaultThreadManager::DestroyCondition");

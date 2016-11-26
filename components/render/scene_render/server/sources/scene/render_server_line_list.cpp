@@ -5,19 +5,19 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации списка спрайтов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 struct LineList::Impl
 {
-  manager::Entity&                   entity;                //сущность
-  RenderManager                      render_manager;        //менеджер рендеринга
-  PrimitiveUsage                     usage;                 //режим использования
-  stl::string                        batch_name;            //имя пакета
-  stl::auto_ptr<manager::LineList>   list;                  //список спрайтов
-  size_t                             descs_count;           //количество спрайтов
+  manager::Entity&                   entity;                //СЃСѓС‰РЅРѕСЃС‚СЊ
+  RenderManager                      render_manager;        //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  PrimitiveUsage                     usage;                 //СЂРµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
+  stl::string                        batch_name;            //РёРјСЏ РїР°РєРµС‚Р°
+  stl::auto_ptr<manager::LineList>   list;                  //СЃРїРёСЃРѕРє СЃРїСЂР°Р№С‚РѕРІ
+  size_t                             descs_count;           //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (RenderManager& in_render_manager, manager::Entity& in_entity)
     : entity (in_entity)
     , render_manager (in_render_manager)
@@ -26,7 +26,7 @@ struct LineList::Impl
   {
   }
 
-/// Обновление списка спрайтов
+/// РћР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
   void ResetLineList (PrimitiveUsage in_usage, const char* batch_name)
   {
     entity.ResetPrimitive ();
@@ -88,7 +88,7 @@ struct LineList::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 LineList::LineList (RenderManager& render_manager)
@@ -110,7 +110,7 @@ LineList::~LineList ()
 }
 
 /*
-    Основные параметры
+    РћСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 */
 
 void LineList::SetParams (PrimitiveUsage in_usage, const char* batch)
@@ -146,7 +146,7 @@ const char* LineList::Batch () const
 }
 
 /*
-    Имя материала
+    РРјСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 void LineList::SetMaterial (const char* name)
@@ -174,7 +174,7 @@ const char* LineList::Material () const
 }
 
 /*
-    Количество спрайтов / размер буфера
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 */
 
 size_t LineList::Size () const
@@ -188,7 +188,7 @@ size_t LineList::Capacity () const
 }
 
 /*
-    Изменение размера списка спрайтов / резервирование места для хранения спрайтов
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void LineList::Resize (size_t count)
@@ -227,7 +227,7 @@ void LineList::Reserve (size_t count)
 }
 
 /*
-    Обновление дескрипторов спрайтов
+    РћР±РЅРѕРІР»РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void LineList::SetDescs (size_t first, size_t count, const LineDesc* descs)

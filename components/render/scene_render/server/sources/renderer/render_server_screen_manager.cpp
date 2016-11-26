@@ -3,19 +3,19 @@
 using namespace render::scene::server;
 
 /*
-    Описание реализации менеджера экранов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЌРєСЂР°РЅРѕРІ
 */
 
 typedef stl::hash_map<object_id_t, Screen> ScreenMap;
 
 struct ScreenManager::Impl
 {
-  WindowManager&  window_manager;   //менеджер окон
-  ViewportManager viewport_manager; //менеджер областей вывода
-  RenderManager   render_manager;   //менеджер рендеринга
-  ScreenMap       screens;          //карта экранов
+  WindowManager&  window_manager;   //РјРµРЅРµРґР¶РµСЂ РѕРєРѕРЅ
+  ViewportManager viewport_manager; //РјРµРЅРµРґР¶РµСЂ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+  RenderManager   render_manager;   //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  ScreenMap       screens;          //РєР°СЂС‚Р° СЌРєСЂР°РЅРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (WindowManager& in_window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
     : window_manager (in_window_manager)
     , viewport_manager (in_viewport_manager)
@@ -25,7 +25,7 @@ struct ScreenManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ScreenManager::ScreenManager (WindowManager& window_manager, const RenderManager& render_manager, const ViewportManager& viewport_manager)
@@ -46,7 +46,7 @@ ScreenManager::~ScreenManager ()
 }
 
 /*
-    Получение экрана / области вывода
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЂР°РЅР° / РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 Screen& ScreenManager::GetScreen (object_id_t id)
@@ -73,7 +73,7 @@ Viewport& ScreenManager::GetViewport (object_id_t id)
 }
 
 /*
-    Создание экрана
+    РЎРѕР·РґР°РЅРёРµ СЌРєСЂР°РЅР°
 */
 
 Screen ScreenManager::CreateScreen (object_id_t id, const char* name, const char* init_string)
@@ -104,7 +104,7 @@ void ScreenManager::RemoveScreen (object_id_t id)
 }
 
 /*
-    Максимальный уровень вложенности рендеринга
+    РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void ScreenManager::SetMaxDrawDepth (size_t level)

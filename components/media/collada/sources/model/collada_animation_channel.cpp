@@ -4,17 +4,17 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Реализация AnimationChannel
+    Р РµР°Р»РёР·Р°С†РёСЏ AnimationChannel
 */
 
 typedef xtl::uninitialized_storage <char> SamplesStorage;
 
 struct AnimationChannel::Impl: public xtl::reference_counter
 {
-  stl::string              target;    //идентификатор анимируемого объекта
-  stl::string              parameter; //идентификатор анимируемого параметра
-  AnimationChannelSemantic semantic;  //семантика анимации
-  SamplesStorage           samples;   //данные канала
+  stl::string              target;    //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
+  stl::string              parameter; //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
+  AnimationChannelSemantic semantic;  //СЃРµРјР°РЅС‚РёРєР° Р°РЅРёРјР°С†РёРё
+  SamplesStorage           samples;   //РґР°РЅРЅС‹Рµ РєР°РЅР°Р»Р°
 
   Impl (AnimationChannelSemantic inSemantic)
     : semantic (inSemantic)
@@ -40,7 +40,7 @@ struct AnimationChannel::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AnimationChannel::AnimationChannel (AnimationChannelSemantic semantic)
@@ -67,7 +67,7 @@ AnimationChannel& AnimationChannel::operator = (const AnimationChannel& animatio
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 AnimationChannel AnimationChannel::Clone () const
@@ -76,7 +76,7 @@ AnimationChannel AnimationChannel::Clone () const
 }
 
 /*
-   Имя анимируемого объекта
+   РРјСЏ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 const char* AnimationChannel::TargetName () const
@@ -93,7 +93,7 @@ void AnimationChannel::SetTargetName (const char* name)
 }
 
 /*
-   Имя анимируемого параметра
+   РРјСЏ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 */
 
 const char* AnimationChannel::ParameterName () const
@@ -110,7 +110,7 @@ void AnimationChannel::SetParameterName (const char* name)
 }
 
 /*
-   Семантика анимации
+   РЎРµРјР°РЅС‚РёРєР° Р°РЅРёРјР°С†РёРё
 */
 
 AnimationChannelSemantic AnimationChannel::Semantic () const
@@ -119,7 +119,7 @@ AnimationChannelSemantic AnimationChannel::Semantic () const
 }
 
 /*
-   Анимационный трек
+   РђРЅРёРјР°С†РёРѕРЅРЅС‹Р№ С‚СЂРµРє
 */
 
 void AnimationChannel::SetSamplesCount (size_t new_size)

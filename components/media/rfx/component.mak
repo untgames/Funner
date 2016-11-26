@@ -1,5 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS += MEDIA.RFX.SOURCES
 TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES
@@ -9,41 +9,41 @@ TARGETS += MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES
 TARGETS += MEDIA.RFX.MATERIALS_PROCESSOR.TESTS
 TARGETS += MEDIA.RFX.INFO
 
-#Цель - sources
+#Р¦РµР»СЊ - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib
 MEDIA.RFX.SOURCES.NAME             := funner.media.rfx
 MEDIA.RFX.SOURCES.SOURCE_DIRS      := sources/core
 MEDIA.RFX.SOURCES.IMPORTS          := compile.media.rfx compile.media.shared
 
-#Цель - Default serializers sources
+#Р¦РµР»СЊ - Default serializers sources
 MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES.TYPE             := static-lib
 MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES.NAME             := funner.media.rfx.default_serializers
 MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES.SOURCE_DIRS      := sources/default_serializers
 MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES.IMPORTS          := compile.media.rfx
 
-#Цель - tests
+#Р¦РµР»СЊ - tests
 MEDIA.RFX.TESTS.TYPE             := test-suite
 MEDIA.RFX.TESTS.SOURCE_DIRS      := tests/core
 MEDIA.RFX.TESTS.IMPORTS          := link.media.rfx compile.media.rfx
 
-#Цель - XMTL tests
+#Р¦РµР»СЊ - XMTL tests
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.TYPE             := test-suite
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.SOURCE_DIRS      := tests/default_serializers
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.IMPORTS          := link.media.rfx.default_serializers compile.media.rfx
 
-#Цель - materials processor
+#Р¦РµР»СЊ - materials processor
 MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES.TYPE        := application
 MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES.NAME        := materials-processor
 MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES.SOURCE_DIRS := utils/materials_processor
 MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES.IMPORTS     := compile.media.rfx link.media.rfx.default_serializers
 
-#Цель - materials processor tests
+#Р¦РµР»СЊ - materials processor tests
 MEDIA.RFX.MATERIALS_PROCESSOR.TESTS.TYPE              := test-suite
 MEDIA.RFX.MATERIALS_PROCESSOR.TESTS.SOURCE_DIRS       := tests/materials_processor
 MEDIA.RFX.MATERIALS_PROCESSOR.TESTS.EXECUTION_DIR     := tests/materials_processor
 MEDIA.RFX.MATERIALS_PROCESSOR.TESTS.USED_APPLICATIONS := materials-processor
 
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 MEDIA.RFX.INFO.TYPE        := doxygen-info
 MEDIA.RFX.INFO.CHM_NAME    := funner.media.rfx
 MEDIA.RFX.INFO.SOURCE_DIRS := include

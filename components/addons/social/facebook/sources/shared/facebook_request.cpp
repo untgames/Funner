@@ -163,7 +163,7 @@ common::ParseNode FacebookSessionImpl::ParseRequestResponse (const stl::string& 
 }
 
 /*
-   Выполнение запроса
+   Р’С‹РїРѕР»РЅРµРЅРёРµ Р·Р°РїСЂРѕСЃР°
 */
 
 void FacebookSessionImpl::PerformRequest (const char* method_name, const char* params, const RequestCallback& callback)

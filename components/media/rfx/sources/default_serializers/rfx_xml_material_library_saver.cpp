@@ -10,20 +10,20 @@ namespace xmtl_saver
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENT_NAME = "media.rfx.material.savers.xmtl"; //имя компонента
-const char* EXTENSION      = "xmtl";                           //расширение ресурса
+const char* COMPONENT_NAME = "media.rfx.material.savers.xmtl"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* EXTENSION      = "xmtl";                           //СЂР°СЃС€РёСЂРµРЅРёРµ СЂРµСЃСѓСЂСЃР°
 
 /*
-    Сериализатор
+    РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ
 */
 
 class XmtlSaver
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     XmtlSaver (const char* in_name, const MaterialLibrary& in_library)
       : library (in_library)
       , writer (in_name)
@@ -32,7 +32,7 @@ class XmtlSaver
     }
 
   private:
-///Сохранение библиотеки
+///РЎРѕС…СЂР°РЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     void SaveLibrary ()
     {
       XmlWriter::Scope scope1 (writer, "material_library");
@@ -43,7 +43,7 @@ class XmtlSaver
       SaveMaterials ();
     }
     
-///Поиск объектов совместного использования
+///РџРѕРёСЃРє РѕР±СЉРµРєС‚РѕРІ СЃРѕРІРјРµСЃС‚РЅРѕРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
     void SearchSharedEntries ()
     {
       for (MaterialLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
@@ -96,7 +96,7 @@ class XmtlSaver
       }
     }
     
-///Сохранение шаблонов
+///РЎРѕС…СЂР°РЅРµРЅРёРµ С€Р°Р±Р»РѕРЅРѕРІ
     void SaveLayouts ()
     {
       XmlWriter::Scope layouts_scope (writer, "layouts");
@@ -118,7 +118,7 @@ class XmtlSaver
         }
     }
     
-///Сохранение шаблона
+///РЎРѕС…СЂР°РЅРµРЅРёРµ С€Р°Р±Р»РѕРЅР°
     void SaveLayout (const PropertyLayout& layout)
     {
       for (size_t i=0, count=layout.Size (); i<count; i++)
@@ -131,7 +131,7 @@ class XmtlSaver
       }
     }
     
-///Сохранение описания свойства
+///РЎРѕС…СЂР°РЅРµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ СЃРІРѕР№СЃС‚РІР°
     void SaveProperty (const PropertyDesc& desc)
     {
       writer.WriteAttribute ("name",  desc.name);
@@ -161,7 +161,7 @@ class XmtlSaver
         writer.WriteAttribute ("count", desc.elements_count);
     }
     
-///Сохранение текстурных карт
+///РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
     void SaveTexmaps ()
     {
       XmlWriter::Scope scope (writer, "texmaps");      
@@ -183,7 +183,7 @@ class XmtlSaver
         }      
     }
     
-///Сохранение текстурной карты
+///РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹
     void SaveTexmap (const Texmap& texmap)
     {
       writer.WriteAttribute ("semantic", texmap.Semantic ());
@@ -193,7 +193,7 @@ class XmtlSaver
         writer.WriteAttribute ("sampler", texmap.Sampler ());
     }
     
-///Сохранение материалов
+///РЎРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
     void SaveMaterials ()
     {
       XmlWriter::Scope scope (writer, "materials");
@@ -206,7 +206,7 @@ class XmtlSaver
         SaveMaterial (*iter, library.ItemId (iter));
     }
 
-///Сохранение материала
+///РЎРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р°
     void SaveMaterial (const Material& material, const char* id)
     {
       MaterialMap::iterator iter = materials.find (material.Id ());
@@ -273,7 +273,7 @@ class XmtlSaver
       SaveMaterialTexmaps (material);            
     }
     
-///Сохранение свойств
+///РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ
     void SaveMaterialProperties (const PropertyMap& properties, bool dump_layout)
     {
       for (size_t i=0, count=properties.Size (); i<count; i++)
@@ -318,7 +318,7 @@ class XmtlSaver
       }
     }
     
-///Сохранение значения свойства
+///РЎРѕС…СЂР°РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР°
     template <class T> void SavePropertyValue (size_t count, const T* data, bool explicit_node_save = false)
     {
       if (count == 1 && !explicit_node_save)
@@ -331,7 +331,7 @@ class XmtlSaver
       }
     }
     
-///Сохранение текстурных карт материала
+///РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚ РјР°С‚РµСЂРёР°Р»Р°
     void SaveMaterialTexmaps (const Material& material)
     {
       for (size_t i=0; i<material.TexmapCount (); i++)
@@ -374,15 +374,15 @@ class XmtlSaver
     typedef stl::hash_map<size_t, SharedEntry<Material> >       MaterialMap;    
     
   private:
-    const MaterialLibrary& library;   //сохраняемая библиотека
-    XmlWriter              writer;    //XML сериализатор
-    MaterialMap            materials; //сохраненные материалы
-    TexmapMap              texmaps;   //текстурные карты
-    LayoutMap              layouts;   //шаблоны свойств
+    const MaterialLibrary& library;   //СЃРѕС…СЂР°РЅСЏРµРјР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    XmlWriter              writer;    //XML СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ
+    MaterialMap            materials; //СЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹
+    TexmapMap              texmaps;   //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹
+    LayoutMap              layouts;   //С€Р°Р±Р»РѕРЅС‹ СЃРІРѕР№СЃС‚РІ
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

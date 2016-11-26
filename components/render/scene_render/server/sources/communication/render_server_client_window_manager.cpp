@@ -8,25 +8,25 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t INIT_STRING_RESERVE_SIZE = 256; //резервируемый объем строки инициализации
+const size_t INIT_STRING_RESERVE_SIZE = 256; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ РѕР±СЉРµРј СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 
 /*
-    Окно
+    РћРєРЅРѕ
 */
 
 typedef xtl::com_ptr<manager::INativeWindow> NativeWindowPtr;
 
 struct ClientWindow: public xtl::reference_counter, public manager::INativeWindowListener
 {
-  NativeWindowPtr           native_window; //окно
-  size_t                    id;            //идентификатор окна
-  stl::string               name;          //имя окна
-  ServerLoopbackConnection& connection;    //соединение
+  NativeWindowPtr           native_window; //РѕРєРЅРѕ
+  size_t                    id;            //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕРєРЅР°
+  stl::string               name;          //РёРјСЏ РѕРєРЅР°
+  ServerLoopbackConnection& connection;    //СЃРѕРµРґРёРЅРµРЅРёРµ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ClientWindow (syslib::Window& window, size_t in_id, const char* in_name, const char* init_string, ServerLoopbackConnection& in_connection)
     : id (in_id)
     , name (in_name)
@@ -52,7 +52,7 @@ struct ClientWindow: public xtl::reference_counter, public manager::INativeWindo
     }
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ClientWindow ()
   {
     try
@@ -66,7 +66,7 @@ struct ClientWindow: public xtl::reference_counter, public manager::INativeWindo
     }
   }
 
-/// События окна
+/// РЎРѕР±С‹С‚РёСЏ РѕРєРЅР°
   void OnSizeChanged (unsigned int width, unsigned int height)
   {
     try
@@ -126,21 +126,21 @@ typedef stl::hash_map<stl::hash_key<const char*>, WindowPtr> WindowMap;
 }
 
 /*
-    Описание реализации внутреннего менеджера окон
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РјРµРЅРµРґР¶РµСЂР° РѕРєРѕРЅ
 */
 
 struct ClientWindowManager::Impl
 {
-  ServerLoopbackConnection& connection; //соединение с сервером
-  WindowMap                 windows;    //окна
-  size_t                    current_id; //текущий идентификатор окна
+  ServerLoopbackConnection& connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРµСЂРІРµСЂРѕРј
+  WindowMap                 windows;    //РѕРєРЅР°
+  size_t                    current_id; //С‚РµРєСѓС‰РёР№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕРєРЅР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ServerLoopbackConnection& in_connection) : connection (in_connection), current_id (1) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ClientWindowManager::ClientWindowManager (ServerLoopbackConnection& connection)
@@ -154,7 +154,7 @@ ClientWindowManager::~ClientWindowManager ()
 }
 
 /*
-    Присоединение окон
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РѕРєРѕРЅ
 */
 
 void ClientWindowManager::AttachWindow (const char* name, syslib::Window& in_window, const common::PropertyMap& properties)

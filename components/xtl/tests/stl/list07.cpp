@@ -1,4 +1,4 @@
-// Тестирование push_front
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ push_front
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

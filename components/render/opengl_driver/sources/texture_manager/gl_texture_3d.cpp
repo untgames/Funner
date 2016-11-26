@@ -7,7 +7,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
@@ -15,13 +15,13 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture3D::Texture3D";
   
-    //выбор текущего контекста и биндинг текстуры
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° Рё Р±РёРЅРґРёРЅРі С‚РµРєСЃС‚СѓСЂС‹
 
   MakeContextCurrent ();
   
   Bind ();
   
-    //проверка корректности формата создаваемой текстуры
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„РѕСЂРјР°С‚Р° СЃРѕР·РґР°РІР°РµРјРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     
   switch (GetFormat ())
   {
@@ -53,7 +53,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", GetFormat ());
   }
   
-    //преобразование формата текстуры
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С‚РµРєСЃС‚СѓСЂС‹
     
   GLenum gl_internal_format = get_gl_internal_format (GetFormat ()),
          gl_format          = get_gl_format (GetFormat ()),
@@ -79,18 +79,18 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
 #endif
       
-    //настройка расположения данных в буфере
+    //РЅР°СЃС‚СЂРѕР№РєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂРµ
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
+  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРє
 
 #ifndef OPENGL_ES2_SUPPORT
-  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
-  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
-  glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //количество пропускаемых слоев
-  glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях
+  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃС‚СЂРѕРє
+  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… РїРёРєСЃРµР»РµР№
+  glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃР»РѕРµРІ
+  glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //РІС‹СЃРѕС‚Р° СЃР»РѕСЏ РІ РїРёРєСЃРµР»СЏС…
 #endif
 
-    //создание mip-уровней
+    //СЃРѕР·РґР°РЅРёРµ mip-СѓСЂРѕРІРЅРµР№
 
   TextureDataSelector data_selector (tex_desc, data);
 
@@ -103,7 +103,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     GetMipLevelDesc (mip_level, level_desc);    
     
 #ifndef OPENGL_ES2_SUPPORT
-    glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для данного mip-уровня)
+    glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС… (РґР»СЏ РґР°РЅРЅРѕРіРѕ mip-СѓСЂРѕРІРЅСЏ)
 #endif
     
     TextureLevelData level_data;
@@ -118,14 +118,14 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     data_selector.Next ();
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Работа с данными
-      данная перегрузка обсуловлена необходимостью обхода некорректной работы функции glGetTexImage в драйверах ATI
+    Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё
+      РґР°РЅРЅР°СЏ РїРµСЂРµРіСЂСѓР·РєР° РѕР±СЃСѓР»РѕРІР»РµРЅР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊСЋ РѕР±С…РѕРґР° РЅРµРєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹ С„СѓРЅРєС†РёРё glGetTexImage РІ РґСЂР°Р№РІРµСЂР°С… ATI
 */
 
 void Texture3D::GetData
@@ -140,12 +140,12 @@ void Texture3D::GetData
   IDeviceContext* context)
 {  
     /*
-        Функция всегда проходит через "ручное" копирование, поскольку определить баг на старых версиях драйверов ATI невозможно
-        из-за crash при вызове glGetTexImage
+        Р¤СѓРЅРєС†РёСЏ РІСЃРµРіРґР° РїСЂРѕС…РѕРґРёС‚ С‡РµСЂРµР· "СЂСѓС‡РЅРѕРµ" РєРѕРїРёСЂРѕРІР°РЅРёРµ, РїРѕСЃРєРѕР»СЊРєСѓ РѕРїСЂРµРґРµР»РёС‚СЊ Р±Р°Рі РЅР° СЃС‚Р°СЂС‹С… РІРµСЂСЃРёСЏС… РґСЂР°Р№РІРµСЂРѕРІ ATI РЅРµРІРѕР·РјРѕР¶РЅРѕ
+        РёР·-Р·Р° crash РїСЂРё РІС‹Р·РѕРІРµ glGetTexImage
     */
 
 /*
-    //если баг работы функции glGetTexImage не обнаружен - копирование производится как и в общем случае
+    //РµСЃР»Рё Р±Р°Рі СЂР°Р±РѕС‚С‹ С„СѓРЅРєС†РёРё glGetTexImage РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅ - РєРѕРїРёСЂРѕРІР°РЅРёРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РєР°Рє Рё РІ РѕР±С‰РµРј СЃР»СѓС‡Р°Рµ
 
   static Extension BUG_Texture3D_GetTexImage = "GLBUG_texture3D_get_tex_image";
 
@@ -157,7 +157,7 @@ void Texture3D::GetData
 
 */
 
-    //"ручное" копирование из внутреннего формата текстуры в требуемый
+    //"СЂСѓС‡РЅРѕРµ" РєРѕРїРёСЂРѕРІР°РЅРёРµ РёР· РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ С„РѕСЂРјР°С‚Р° С‚РµРєСЃС‚СѓСЂС‹ РІ С‚СЂРµР±СѓРµРјС‹Р№
 
   if (!width || !height)
     return;  
@@ -199,7 +199,7 @@ void Texture3D::GetData
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture3D::SetUncompressedData

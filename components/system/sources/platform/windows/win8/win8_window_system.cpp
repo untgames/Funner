@@ -17,7 +17,7 @@ namespace syslib
 namespace
 {
 
-/// Получение контекста по умолчанию
+/// РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 inline WindowEventContext get_event_context ()
 {
   WindowEventContext context;
@@ -27,14 +27,14 @@ inline WindowEventContext get_event_context ()
   return context;
 }
 
-/// Реализация окна
+/// Р РµР°Р»РёР·Р°С†РёСЏ РѕРєРЅР°
 struct WindowImpl: public xtl::reference_counter
 {
-  Platform::Agile<CoreWindow> window;          //окно
-  WindowMessageHandler        message_handler; //обработчик событий окна
-  void*                       user_data;       //пользовательские данные обработчика
+  Platform::Agile<CoreWindow> window;          //РѕРєРЅРѕ
+  WindowMessageHandler        message_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
+  void*                       user_data;       //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   WindowImpl (CoreWindow^ in_window, WindowMessageHandler in_message_handler, void* in_user_data)
     : window (in_window)
     , message_handler (in_message_handler)
@@ -51,12 +51,12 @@ struct WindowImpl: public xtl::reference_counter
     window->PointerExited   += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerExited, this, _2), Platform::CallbackContext::Same);
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~WindowImpl ()
   {
   }
 
-/// События
+/// РЎРѕР±С‹С‚РёСЏ
   void Notify (WindowEvent event, const WindowEventContext& context = get_event_context ())
   {
     try
@@ -65,7 +65,7 @@ struct WindowImpl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
@@ -153,7 +153,7 @@ struct WindowImpl: public xtl::reference_counter
 }
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t WindowsWindowManager::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data, const wchar_t*)
@@ -205,7 +205,7 @@ void WindowsWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Попытка изменения стиля окна (может быть проигнорирована)
+    РџРѕРїС‹С‚РєР° РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ РѕРєРЅР° (РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСЂРѕРёРіРЅРѕСЂРёСЂРѕРІР°РЅР°)
 */
 
 bool WindowsWindowManager::ChangeWindowStyle (window_t window, WindowStyle style)
@@ -214,7 +214,7 @@ bool WindowsWindowManager::ChangeWindowStyle (window_t window, WindowStyle style
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* WindowsWindowManager::GetNativeWindowHandle (window_t handle)
@@ -241,7 +241,7 @@ const void* WindowsWindowManager::GetNativeDisplayHandle (window_t)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetWindowTitle (window_t, const wchar_t*)
@@ -270,7 +270,7 @@ void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, 
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void WindowsWindowManager::SetWindowRect (window_t handle, const Rect&)
@@ -341,7 +341,7 @@ void WindowsWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetWindowFlag (window_t, WindowFlag, bool)
@@ -359,11 +359,11 @@ bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
         return impl->window->Visible;
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         return true;
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
         return true;
       case WindowFlag_Maximized:
       case WindowFlag_Minimized:
@@ -380,7 +380,7 @@ bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
@@ -394,7 +394,7 @@ const void* WindowsWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-   Установка multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР° multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void WindowsWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
@@ -407,7 +407,7 @@ bool WindowsWindowManager::IsMultitouchEnabled (window_t window)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void WindowsWindowManager::InvalidateWindow (window_t handle)
@@ -429,7 +429,7 @@ void WindowsWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 void WindowsWindowManager::SetCursorPosition (const Point&)
@@ -459,7 +459,7 @@ Point WindowsWindowManager::GetCursorPosition (window_t)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 void WindowsWindowManager::SetCursorVisible (window_t, bool state)
@@ -474,7 +474,7 @@ bool WindowsWindowManager::GetCursorVisible (window_t)
 }
 
 /*
-    Изображение курсора
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 cursor_t WindowsWindowManager::CreateCursor (const char*, int, int)
@@ -495,7 +495,7 @@ void WindowsWindowManager::SetCursor (window_t, cursor_t)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void WindowsWindowManager::SetBackgroundColor (window_t window, const Color& color)
@@ -517,7 +517,7 @@ bool WindowsWindowManager::GetBackgroundState (window_t window)
 }
 
 /*
-    Создание/уничтожение web-view
+    РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t WindowsWindowManager::CreateWebView (IWebViewListener*)
@@ -531,7 +531,7 @@ void WindowsWindowManager::DestroyWebView (web_view_t)
 }
 
 /*
-    Присоединенное окно
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t WindowsWindowManager::GetWindow (web_view_t)
@@ -540,7 +540,7 @@ window_t WindowsWindowManager::GetWindow (web_view_t)
 }
 
 /*
-    Загрузка данных
+    Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void WindowsWindowManager::LoadRequest (web_view_t, const char*)
@@ -554,7 +554,7 @@ void WindowsWindowManager::LoadData (web_view_t, const char*, size_t, const char
 }
 
 /*
-    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void WindowsWindowManager::Reload (web_view_t)
@@ -574,7 +574,7 @@ bool WindowsWindowManager::IsLoading (web_view_t)
 }
 
 /*
-    Средства навигации
+    РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool WindowsWindowManager::CanGoBack (web_view_t)
@@ -600,10 +600,10 @@ void WindowsWindowManager::GoForward (web_view_t)
 }
 
 /*
-    Получение имени клавиши
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°РІРёС€Рё
 */
 
-//возвращается длина строки без учёта '\0'
+//РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё Р±РµР· СѓС‡С‘С‚Р° '\0'
 size_t WindowsWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
 {
   static const char* METHOD_NAME = "syslib::WindowsWindowManager::GetKeyName";

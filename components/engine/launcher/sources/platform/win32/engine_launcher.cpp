@@ -14,7 +14,7 @@ const char* ENGINE_LIBRARY_NAME = "funner.dll";
 
 }
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [], const char* env [])
 {
   HMODULE library = LoadLibrary (ENGINE_LIBRARY_NAME);
@@ -50,5 +50,5 @@ int main (int argc, const char* argv [], const char* env [])
 
   delete funner;
 
-  //FreeLibrary (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в funner.dll
+  //FreeLibrary (library); //Р±РёР±Р»РёРѕС‚РµРєР° РЅРµ РІС‹РіСЂСѓР¶Р°РµС‚СЃСЏ, РёР·-Р·Р° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃСЂР°Р±Р°С‚С‹РІР°РЅРёР№ atexit, РІС‹Р·РІР°РЅРЅС‹С… РІ funner.dll
 }

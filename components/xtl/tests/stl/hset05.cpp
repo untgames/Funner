@@ -1,4 +1,4 @@
-// Тестирование count ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ count ()
 #include <stdio.h>
 #include <stl/hash_set>
 #include "test.h"

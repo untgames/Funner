@@ -35,14 +35,14 @@ struct RiffHeader
 ///Animation cursor header
 struct AniHeader
 {
-  uint32_t header_size;    // размер AniHeader (36 bytes)
-  uint32_t images_count;   // количество изображений в файле
-  uint32_t frames_count;   // количество кадров в файле
-  uint32_t cx, cy;         // зарезервированы
-  uint32_t bits_per_pixel; // зарезервировано, должны быть равны нулю
-  uint32_t planes_count;   // зарезервировано, должно быть равно нулю
-  uint32_t fps;            // количество кадров в секунду
-  uint32_t flags;          // флаги
+  uint32_t header_size;    // СЂР°Р·РјРµСЂ AniHeader (36 bytes)
+  uint32_t images_count;   // РєРѕР»РёС‡РµСЃС‚РІРѕ РёР·РѕР±СЂР°Р¶РµРЅРёР№ РІ С„Р°Р№Р»Рµ
+  uint32_t frames_count;   // РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ С„Р°Р№Р»Рµ
+  uint32_t cx, cy;         // Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅС‹
+  uint32_t bits_per_pixel; // Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРѕ, РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СЂР°РІРЅС‹ РЅСѓР»СЋ
+  uint32_t planes_count;   // Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРѕ, РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ СЂР°РІРЅРѕ РЅСѓР»СЋ
+  uint32_t fps;            // РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ
+  uint32_t flags;          // С„Р»Р°РіРё
 };
 
 #ifdef _MSC_VER

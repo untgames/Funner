@@ -7,7 +7,7 @@ using namespace media;
 namespace
 {
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k) 
 {
   if (!k)
@@ -146,17 +146,17 @@ media::PixelFormat max_image_format (media::PixelFormat format_1, media::PixelFo
   }
 }
 
-//класс предоставляющий информацию о картинке
+//РєР»Р°СЃСЃ РїСЂРµРґРѕСЃС‚Р°РІР»СЏСЋС‰РёР№ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РєР°СЂС‚РёРЅРєРµ
 class IImageHolder : public xtl::reference_counter
 {
   public:
     virtual ~IImageHolder () {}
 
-    //Загрузка/выгрузка картинки
+    //Р—Р°РіСЂСѓР·РєР°/РІС‹РіСЂСѓР·РєР° РєР°СЂС‚РёРЅРєРё
     virtual void LoadImage () {};
     virtual void UnloadImage () {};
 
-    //Получение атрибутов картинки
+    //РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ РєР°СЂС‚РёРЅРєРё
     virtual const void*  ImageBitmap () = 0;
     virtual unsigned int ImageWidth  () = 0;
     virtual unsigned int ImageHeight () = 0;
@@ -166,7 +166,7 @@ class IImageHolder : public xtl::reference_counter
     virtual unsigned int ImageTag    () = 0;
 };
 
-//Класс, хранящий картинку в памяти
+//РљР»Р°СЃСЃ, С…СЂР°РЅСЏС‰РёР№ РєР°СЂС‚РёРЅРєСѓ РІ РїР°РјСЏС‚Рё
 class MemoryImageHolder : public IImageHolder
 {
   public:
@@ -177,7 +177,7 @@ class MemoryImageHolder : public IImageHolder
       image_hash = common::crc32 (image.Bitmap (), image.Width () * image.Height () * get_bytes_per_pixel (image.Format ()));
     }
 
-    //Получение атрибутов картинки
+    //РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ РєР°СЂС‚РёРЅРєРё
     const void* ImageBitmap ()
     {
       return image.Bitmap ();
@@ -219,7 +219,7 @@ class MemoryImageHolder : public IImageHolder
     unsigned int tag;
 };
 
-//Класс, загружающий картинку из файла по требованию
+//РљР»Р°СЃСЃ, Р·Р°РіСЂСѓР¶Р°СЋС‰РёР№ РєР°СЂС‚РёРЅРєСѓ РёР· С„Р°Р№Р»Р° РїРѕ С‚СЂРµР±РѕРІР°РЅРёСЋ
 class LoadOnDemandImageHolder : public IImageHolder
 {
   public:
@@ -235,7 +235,7 @@ class LoadOnDemandImageHolder : public IImageHolder
       image_hash   = common::crc32 (tmp_image.Bitmap (), tmp_image.Width () * tmp_image.Height () * get_bytes_per_pixel (tmp_image.Format ()));
     }
 
-    //Загрузка/выгрузка картинки
+    //Р—Р°РіСЂСѓР·РєР°/РІС‹РіСЂСѓР·РєР° РєР°СЂС‚РёРЅРєРё
     void LoadImage ()
     {
       image.Load (image_name.c_str ());
@@ -246,7 +246,7 @@ class LoadOnDemandImageHolder : public IImageHolder
       Image ().Swap (image);
     }
 
-    //Получение атрибутов картинки
+    //РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ РєР°СЂС‚РёРЅРєРё
     const void* ImageBitmap ()
     {
       return image.Bitmap ();
@@ -292,7 +292,7 @@ class LoadOnDemandImageHolder : public IImageHolder
     unsigned int tag;
 };
 
-//Класс, хранящий данные о картинке
+//РљР»Р°СЃСЃ, С…СЂР°РЅСЏС‰РёР№ РґР°РЅРЅС‹Рµ Рѕ РєР°СЂС‚РёРЅРєРµ
 class DataImageHolder : public IImageHolder
 {
   public:
@@ -306,7 +306,7 @@ class DataImageHolder : public IImageHolder
       , name (in_name)
       {}
 
-    //Получение атрибутов картинки
+    //РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ РєР°СЂС‚РёРЅРєРё
     const void* ImageBitmap ()
     {
       return data;
@@ -354,19 +354,19 @@ class DataImageHolder : public IImageHolder
 
 typedef xtl::intrusive_ptr<IImageHolder> ImageHolderPtr;
 
-//Описание экземпляра картинки
+//РћРїРёСЃР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° РєР°СЂС‚РёРЅРєРё
 struct ImageDesc : public xtl::reference_counter
 {
-  ImageHolderPtr image_holder;       //картинка
-  unsigned int   duplicate_of_index; //индекс картинки в массиве images, дубликатом которой является эта картинка
+  ImageHolderPtr image_holder;       //РєР°СЂС‚РёРЅРєР°
+  unsigned int   duplicate_of_index; //РёРЅРґРµРєСЃ РєР°СЂС‚РёРЅРєРё РІ РјР°СЃСЃРёРІРµ images, РґСѓР±Р»РёРєР°С‚РѕРј РєРѕС‚РѕСЂРѕР№ СЏРІР»СЏРµС‚СЃСЏ СЌС‚Р° РєР°СЂС‚РёРЅРєР°
 };
 
 struct PackResult : public xtl::reference_counter
 {
-  unsigned int                             image_width;   //ширина результирующей картинки
-  unsigned int                             image_height;  //высота результирующей картинки
-  xtl::uninitialized_storage<math::vec2ui> origins;       //позиции картинок
-  xtl::uninitialized_storage<unsigned int> indices;       //индексы картинок
+  unsigned int                             image_width;   //С€РёСЂРёРЅР° СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ РєР°СЂС‚РёРЅРєРё
+  unsigned int                             image_height;  //РІС‹СЃРѕС‚Р° СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ РєР°СЂС‚РёРЅРєРё
+  xtl::uninitialized_storage<math::vec2ui> origins;       //РїРѕР·РёС†РёРё РєР°СЂС‚РёРЅРѕРє
+  xtl::uninitialized_storage<unsigned int> indices;       //РёРЅРґРµРєСЃС‹ РєР°СЂС‚РёРЅРѕРє
 };
 
 typedef stl::vector<unsigned int>           IndexArray;
@@ -380,21 +380,21 @@ typedef AtlasBuilder::PackHandler           PackHandler;
 }
 
 /*
-   Реализация построителя атласа изображений
+   Р РµР°Р»РёР·Р°С†РёСЏ РїРѕСЃС‚СЂРѕРёС‚РµР»СЏ Р°С‚Р»Р°СЃР° РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 struct AtlasBuilder::Impl
 {
-  PackHandler      pack_handler;      //обработчик упаковки
-  ImagesDescsArray images;            //картинки
-  BitmapHashMap    images_hash_map;   //карта хешей картинок
-  PackResultsArray pack_results;      //результаты упаковки
-  unsigned int     max_image_size;    //максимальный размер одного атласа
-  unsigned int     margin;            //размер поля
-  unsigned int     pack_flags;        //флаги сжатия
-  bool             needs_rebuild;     //необходимо ли перестроить атлас
+  PackHandler      pack_handler;      //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРїР°РєРѕРІРєРё
+  ImagesDescsArray images;            //РєР°СЂС‚РёРЅРєРё
+  BitmapHashMap    images_hash_map;   //РєР°СЂС‚Р° С…РµС€РµР№ РєР°СЂС‚РёРЅРѕРє
+  PackResultsArray pack_results;      //СЂРµР·СѓР»СЊС‚Р°С‚С‹ СѓРїР°РєРѕРІРєРё
+  unsigned int     max_image_size;    //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РѕРґРЅРѕРіРѕ Р°С‚Р»Р°СЃР°
+  unsigned int     margin;            //СЂР°Р·РјРµСЂ РїРѕР»СЏ
+  unsigned int     pack_flags;        //С„Р»Р°РіРё СЃР¶Р°С‚РёСЏ
+  bool             needs_rebuild;     //РЅРµРѕР±С…РѕРґРёРјРѕ Р»Рё РїРµСЂРµСЃС‚СЂРѕРёС‚СЊ Р°С‚Р»Р°СЃ
   
-  ///Конструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const PackHandler& in_pack_handler)
     : pack_handler (in_pack_handler)
     , max_image_size (-1)
@@ -403,7 +403,7 @@ struct AtlasBuilder::Impl
     , needs_rebuild (true)
     {}
 
-  ///Добавление изображений
+  ///Р”РѕР±Р°РІР»РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёР№
   void Insert (Image& image, AtlasBuilderInsertMode mode, unsigned int tag)
   {
     try
@@ -513,7 +513,7 @@ struct AtlasBuilder::Impl
 
     try
     {
-        //построение массива индексов уникальных картинок
+        //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° РёРЅРґРµРєСЃРѕРІ СѓРЅРёРєР°Р»СЊРЅС‹С… РєР°СЂС‚РёРЅРѕРє
       IndexArray images_to_process;
 
       for (unsigned int i = 0, count = (unsigned int)images.size (); i != count; i++)
@@ -524,7 +524,7 @@ struct AtlasBuilder::Impl
           images_to_process.push_back (i);
       }
 
-        //упаковка
+        //СѓРїР°РєРѕРІРєР°
       xtl::uninitialized_storage<math::vec2ui> sizes (images_to_process.size ()), origins (images_to_process.size ()), success_origins (images_to_process.size ());
       xtl::uninitialized_storage<bool>         was_packed (images_to_process.size ());
       IndexArray                               packed_indices;
@@ -604,7 +604,7 @@ struct AtlasBuilder::Impl
           result_image_width = result_image_height = stl::max (result_image_width, result_image_height);
         }
 
-          //подсчет количества упакованных неуникальных картинок
+          //РїРѕРґСЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° СѓРїР°РєРѕРІР°РЅРЅС‹С… РЅРµСѓРЅРёРєР°Р»СЊРЅС‹С… РєР°СЂС‚РёРЅРѕРє
         unsigned int packed_images_count = 0;
 
         for (unsigned int i = 0, images_count = (unsigned int)images.size (); i < images_count; i++)
@@ -623,7 +623,7 @@ struct AtlasBuilder::Impl
           }
         }
 
-          //формирование результата упаковки
+          //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° СѓРїР°РєРѕРІРєРё
         PackResultPtr pack_result (new PackResult, false);
 
         pack_result->image_width  = result_image_width;
@@ -746,11 +746,11 @@ struct AtlasBuilder::Impl
 };
 
 /*
-   Построитель атласа изображений
+   РџРѕСЃС‚СЂРѕРёС‚РµР»СЊ Р°С‚Р»Р°СЃР° РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
   
 /*
-   Конструкторы / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AtlasBuilder::AtlasBuilder (const char* pack_handler_name)
@@ -778,7 +778,7 @@ AtlasBuilder::~AtlasBuilder ()
 }
 
 /*
-   Установка/получение максимального размера одного атласа
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РѕРґРЅРѕРіРѕ Р°С‚Р»Р°СЃР°
 */
 
 void AtlasBuilder::SetMaxImageSize (unsigned int max_image_size)
@@ -793,7 +793,7 @@ unsigned int AtlasBuilder::MaxImageSize () const
 }
 
 /*
-   Установка/получение размера поля
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РїРѕР»СЏ
 */
 
 void AtlasBuilder::SetMargin (unsigned int margin)
@@ -808,7 +808,7 @@ unsigned int AtlasBuilder::Margin () const
 }
 
 /*
-   Установка/получение флагов упаковки
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С„Р»Р°РіРѕРІ СѓРїР°РєРѕРІРєРё
 */
 
 void AtlasBuilder::SetPackFlags (unsigned int pack_flags)
@@ -823,7 +823,7 @@ unsigned int AtlasBuilder::PackFlags () const
 }
 
 /*
-   Добавление изображений
+   Р”РѕР±Р°РІР»РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void AtlasBuilder::Insert (Image& image, AtlasBuilderInsertMode mode, unsigned int tag)
@@ -859,7 +859,7 @@ void AtlasBuilder::Insert (unsigned int width, unsigned int height, PixelFormat 
 }
 
 /*
-   Сброс
+   РЎР±СЂРѕСЃ
 */
 
 void AtlasBuilder::Reset ()
@@ -868,7 +868,7 @@ void AtlasBuilder::Reset ()
 }
 
 /*
-   Получение результатов упаковки
+   РџРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СѓРїР°РєРѕРІРєРё
 */
 
 unsigned int AtlasBuilder::AtlasesCount ()
@@ -926,7 +926,7 @@ void AtlasBuilder::BuildAtlasImage (unsigned int index, Image& result)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void AtlasBuilder::Swap (AtlasBuilder& atlas_builder)
@@ -938,7 +938,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (AtlasBuilder& atlas_builder1, AtlasBuilder& atlas_builder2)

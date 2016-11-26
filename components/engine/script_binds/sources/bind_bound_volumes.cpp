@@ -14,7 +14,7 @@ namespace bind_volumes_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY = "BoundVolumes.Corner";
@@ -23,7 +23,7 @@ const char* COMPONENT_NAME                            = "script.binds.BoundVolum
 const char* BINDER_NAME                               = "BoundVolumes";
 
 /*
-    Создание ограничивающего параллелепипеда
+    РЎРѕР·РґР°РЅРёРµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РµРїРёРїРµРґР°
 */
 
 template <class T>
@@ -53,7 +53,7 @@ axis_aligned_box<T> create_axis_aligned_box
 }
 
 /*
-   Регистрация библиотеки работы с ограничивающим параллелепипедом
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРј РїР°СЂР°Р»Р»РµР»РµРїРёРїРµРґРѕРј
 */
 
 void bind_static_axis_aligned_box_library (Environment& environment)
@@ -79,7 +79,7 @@ void bind_axis_aligned_box_library (Environment& environment)
   InvokerRegistry lib        = environment.CreateLibrary (BV_AXIS_ALIGNED_BOX_LIBRARY);
   InvokerRegistry global_lib = environment.Library ("global");
   
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (
                             make_invoker ((box_type (*)(T, T, T, T, T, T))&create_axis_aligned_box<T>),
@@ -88,11 +88,11 @@ void bind_axis_aligned_box_library (Environment& environment)
                           ));
   global_lib.Register ("AABB", lib, "Create");
 
-    //регистрация статических переменных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
 
   bind_static_axis_aligned_box_library (environment);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Minimum", make_invoker (implicit_cast<void (axis_aligned_box<T>::*) (const typename axis_aligned_box<T>::vec_type&)> 
                                             (&box_type::set_minimum)));
@@ -130,13 +130,13 @@ void bind_axis_aligned_box_library (Environment& environment)
   ));
   lib.Register ("Intersection", make_invoker (implicit_cast<box_type (*) (const box_type&, const box_type&)> (&bound_volumes::intersection)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<box_type> (BV_AXIS_ALIGNED_BOX_LIBRARY);
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

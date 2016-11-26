@@ -1,4 +1,4 @@
-// Тестирование sort
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ sort
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

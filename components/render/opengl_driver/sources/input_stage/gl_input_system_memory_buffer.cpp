@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SystemMemoryBuffer::SystemMemoryBuffer (const ContextManager& context_manager, const BufferDesc& in_desc)
@@ -18,7 +18,7 @@ SystemMemoryBuffer::~SystemMemoryBuffer ()
 }
 
 /*
-    Установка / чтение данных после отсечения
+    РЈСЃС‚Р°РЅРѕРІРєР° / С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С… РїРѕСЃР»Рµ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void SystemMemoryBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
@@ -34,7 +34,7 @@ void SystemMemoryBuffer::GetDataCore (unsigned int offset, unsigned int size, vo
 }
 
 /*
-    Получение указателя на начало буфера
+    РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РЅР°С‡Р°Р»Рѕ Р±СѓС„РµСЂР°
 */
 
 void* SystemMemoryBuffer::GetDataPointer ()
@@ -43,7 +43,7 @@ void* SystemMemoryBuffer::GetDataPointer ()
 }
 
 /*
-   Получение хеша данных (0 - данные не хешируются)
+   РџРѕР»СѓС‡РµРЅРёРµ С…РµС€Р° РґР°РЅРЅС‹С… (0 - РґР°РЅРЅС‹Рµ РЅРµ С…РµС€РёСЂСѓСЋС‚СЃСЏ)
 */
 
 size_t SystemMemoryBuffer::GetDataHash ()

@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Реализация менеджера проигрывателей медиа-потоков
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїСЂРѕРёРіСЂС‹РІР°С‚РµР»РµР№ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
 */
 
 class StreamPlayerManagerImpl
@@ -14,7 +14,7 @@ class StreamPlayerManagerImpl
   public:
     typedef StreamPlayerManager::PlayerCreator PlayerCreator;
 
-///Регистрация проигрывателя медиа-потоков
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
     void RegisterPlayer (const char* target, const PlayerCreator& creator)
     {
       static const char* METHOD_NAME = "media::players::StreamPlayerManagerImpl::RegisterPlayer";
@@ -30,7 +30,7 @@ class StreamPlayerManagerImpl
       creators.insert_pair (target, creator);
     }
 
-///Отмена регистрации проигрывателя медиа-потоков
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
     void UnregisterPlayer (const char* target)
     {
       if (!target)
@@ -39,13 +39,13 @@ class StreamPlayerManagerImpl
       creators.erase (target);
     }
 
-///Отмена регистрации всех проигрывателей медиа-потоков
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… РїСЂРѕРёРіСЂС‹РІР°С‚РµР»РµР№ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
     void UnregisterAllPlayers ()
     {
       creators.clear ();
     }
     
-///Создание проигрывателя медиа-потока
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ РјРµРґРёР°-РїРѕС‚РѕРєР°
     IStreamPlayer* CreatePlayer (const char* target, const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
     {
       try
@@ -74,7 +74,7 @@ class StreamPlayerManagerImpl
     typedef stl::hash_map<stl::hash_key<const char*>, PlayerCreator> CreatorMap;
 
   private:
-    CreatorMap creators; //карта функторов, создающих проигрыватели медиа-поток
+    CreatorMap creators; //РєР°СЂС‚Р° С„СѓРЅРєС‚РѕСЂРѕРІ, СЃРѕР·РґР°СЋС‰РёС… РїСЂРѕРёРіСЂС‹РІР°С‚РµР»Рё РјРµРґРёР°-РїРѕС‚РѕРє
 };
 
 typedef common::Singleton<StreamPlayerManagerImpl> StreamPlayerSingleton;
@@ -82,7 +82,7 @@ typedef common::Singleton<StreamPlayerManagerImpl> StreamPlayerSingleton;
 }
 
 /*
-    Обёртки над вызовами к менеджеру потоков
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё Рє РјРµРЅРµРґР¶РµСЂСѓ РїРѕС‚РѕРєРѕРІ
 */
 
 void StreamPlayerManager::RegisterPlayer (const char* target, const PlayerCreator& creator)

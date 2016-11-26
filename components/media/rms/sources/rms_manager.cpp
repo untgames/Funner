@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Связывание менеджера с группами ресурсов
+    РЎРІСЏР·С‹РІР°РЅРёРµ РјРµРЅРµРґР¶РµСЂР° СЃ РіСЂСѓРїРїР°РјРё СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 class ManagerBinding;
@@ -16,27 +16,27 @@ typedef stl::list<ManagerBinding*> ManagerBindingList;
 class ManagerBinding: public ICustomBinding, public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ManagerBinding (ManagerBindingList& in_bindings) : bindings (in_bindings)
     {
-        //регистрация в списке связываний
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІ СЃРїРёСЃРєРµ СЃРІСЏР·С‹РІР°РЅРёР№
 
       bindings_pos = bindings.insert (bindings.end (), this);
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ManagerBinding ()
     {
       bindings.erase (bindings_pos);
     }
 
-///Добавление связывания группы ресурсов с сервером
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃРІСЏР·С‹РІР°РЅРёСЏ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ СЃ СЃРµСЂРІРµСЂРѕРј
     void AddBinding (const Group& group, IServerGroupInstance* server_group)
     {
       server_bindings.push_back (ServerBinding (group, server_group));
     }
 
-///Удаление связывания с сервером
+///РЈРґР°Р»РµРЅРёРµ СЃРІСЏР·С‹РІР°РЅРёСЏ СЃ СЃРµСЂРІРµСЂРѕРј
     void RemoveBinding (IServerGroupInstance* server_group)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end;)
@@ -55,7 +55,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
       }
     }
 
-///Загрузка ресурсов
+///Р—Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
     void AsyncLoad (AsyncOperation& async_operation)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
@@ -70,7 +70,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
       }
     }
 
-///Выгрузка ресурсов
+///Р’С‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
     void AsyncUnload (AsyncOperation& async_operation)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
@@ -85,7 +85,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
       }
     }
     
-///Оповещение об удалении
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё
     xtl::trackable* GetTrackable () { return this; }
 
   private:
@@ -104,25 +104,25 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
     typedef stl::list<ServerBinding> ServerBindingList;
 
   private:
-    ServerBindingList            server_bindings; //список связываний групп ресурсов с сервером
-    ManagerBindingList&          bindings;       //список связываний
-    ManagerBindingList::iterator bindings_pos;   //положение в списке связываний
+    ServerBindingList            server_bindings; //СЃРїРёСЃРѕРє СЃРІСЏР·С‹РІР°РЅРёР№ РіСЂСѓРїРї СЂРµСЃСѓСЂСЃРѕРІ СЃ СЃРµСЂРІРµСЂРѕРј
+    ManagerBindingList&          bindings;       //СЃРїРёСЃРѕРє СЃРІСЏР·С‹РІР°РЅРёР№
+    ManagerBindingList::iterator bindings_pos;   //РїРѕР»РѕР¶РµРЅРёРµ РІ СЃРїРёСЃРєРµ СЃРІСЏР·С‹РІР°РЅРёР№
 };
 
 }
 
 /*
-    Описание реализации менеджера ресурсов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 typedef stl::vector<IServerGroupInstance*> ServerGroupList;
 
 struct ResourceManagerImpl::Impl
 {
-  ManagerBindingList bindings; //список связываний
-  ServerGroupList    groups;   //список групп
+  ManagerBindingList bindings; //СЃРїРёСЃРѕРє СЃРІСЏР·С‹РІР°РЅРёР№
+  ServerGroupList    groups;   //СЃРїРёСЃРѕРє РіСЂСѓРїРї
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     while (!bindings.empty ())
@@ -131,7 +131,7 @@ struct ResourceManagerImpl::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ResourceManagerImpl::ResourceManagerImpl ()
@@ -144,7 +144,7 @@ ResourceManagerImpl::~ResourceManagerImpl ()
 }
 
 /*
-    Связывание с серверами ресурсов
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃ СЃРµСЂРІРµСЂР°РјРё СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 Binding ResourceManagerImpl::CreateBinding (const Group& group)
@@ -167,7 +167,7 @@ Binding ResourceManagerImpl::CreateBinding (const Group& group)
 }
 
 /*
-    Регистрация группы ресурсов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ResourceManagerImpl::RegisterServerGroup (const char* name, IServerGroupInstance* group)
@@ -180,12 +180,12 @@ void ResourceManagerImpl::UnregisterServerGroup (IServerGroupInstance* group)
   for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
     if (*iter == group)
     {
-        //удаление связываний с данной группой серверов
+        //СѓРґР°Р»РµРЅРёРµ СЃРІСЏР·С‹РІР°РЅРёР№ СЃ РґР°РЅРЅРѕР№ РіСЂСѓРїРїРѕР№ СЃРµСЂРІРµСЂРѕРІ
 
       for (ManagerBindingList::iterator binding=impl->bindings.begin (), binding_end=impl->bindings.end (); binding!=binding_end; ++binding)
         (*binding)->RemoveBinding (group);
 
-        //удаление группы серверов из списка
+        //СѓРґР°Р»РµРЅРёРµ РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ РёР· СЃРїРёСЃРєР°
 
       impl->groups.erase (iter);
 
@@ -194,7 +194,7 @@ void ResourceManagerImpl::UnregisterServerGroup (IServerGroupInstance* group)
 }
 
 /*
-    Поиск группы серверов
+    РџРѕРёСЃРє РіСЂСѓРїРїС‹ СЃРµСЂРІРµСЂРѕРІ
 */
 
 IServerGroupInstance* ResourceManagerImpl::FindServerGroup (const char* name) const
@@ -210,7 +210,7 @@ IServerGroupInstance* ResourceManagerImpl::FindServerGroup (const char* name) co
 }
 
 /*
-    Перебор групп
+    РџРµСЂРµР±РѕСЂ РіСЂСѓРїРї
 */
 
 size_t ResourceManagerImpl::ServerGroupsCount () const
@@ -227,7 +227,7 @@ IServerGroupInstance* ResourceManagerImpl::ServerGroup (size_t index) const
 }
 
 /*
-    Сброс неиспользуемых ресурсов
+    РЎР±СЂРѕСЃ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ResourceManagerImpl::FlushUnusedResources ()
@@ -253,7 +253,7 @@ void ResourceManagerImpl::FlushUnusedResources ()
 }
 
 /*
-    Делегирование вызовов ResourceManager
+    Р”РµР»РµРіРёСЂРѕРІР°РЅРёРµ РІС‹Р·РѕРІРѕРІ ResourceManager
 */
 
 Binding ResourceManager::CreateBinding (const Group& group)

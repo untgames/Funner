@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Реализация информации о типе
+    Р РµР°Р»РёР·Р°С†РёСЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РёРїРµ
 */
 
 template <class T>
@@ -10,7 +10,7 @@ class type_info_impl: virtual public type_info
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Стандартная информация о типе
+///РЎС‚Р°РЅРґР°СЂС‚РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РёРїРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const std::type_info& std_type () const                           { return typeid (T); }
     const char*           name     () const                           { return typeid (T).name (); }
@@ -18,7 +18,7 @@ class type_info_impl: virtual public type_info
     bool                  before   (const std::type_info& type) const { return typeid (T).before (type) != 0; }
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к базовым категориям типов
+///РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє Р±Р°Р·РѕРІС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool is_void () const                         { return xtl::type_traits::is_void<T>::value; }                     
     bool is_integral () const                     { return xtl::type_traits::is_integral<T>::value; }
@@ -34,7 +34,7 @@ class type_info_impl: virtual public type_info
     bool is_function () const                     { return xtl::type_traits::is_function<T>::value; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к объединённым категориям типов
+///РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє РѕР±СЉРµРґРёРЅС‘РЅРЅС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool is_arithmetic () const      { return xtl::type_traits::is_arithmetic<T>::value; }
     bool is_fundamental () const     { return xtl::type_traits::is_fundamental<T>::value; }
@@ -44,7 +44,7 @@ class type_info_impl: virtual public type_info
     bool is_member_pointer () const  { return xtl::type_traits::is_member_pointer<T>::value; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка свойств типа
+///РџСЂРѕРІРµСЂРєР° СЃРІРѕР№СЃС‚РІ С‚РёРїР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool is_const () const                  { return xtl::type_traits::is_const<T>::value; }
     bool is_volatile () const               { return xtl::type_traits::is_volatile<T>::value; }
@@ -66,7 +66,7 @@ class type_info_impl: virtual public type_info
     unsigned int rank () const              { return xtl::type_traits::rank<T>::value; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования константности типов
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕСЃС‚Рё С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const type_info& remove_const () const    { return get_type<typename xtl::type_traits::remove_const<T>::type> (); }
     const type_info& remove_volatile () const { return get_type<typename xtl::type_traits::remove_volatile<T>::type> (); }
@@ -76,18 +76,18 @@ class type_info_impl: virtual public type_info
     const type_info& add_cv () const          { return get_type<typename xtl::type_traits::add_cv<T>::type> (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования ссылочных типов
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃСЃС‹Р»РѕС‡РЅС‹С… С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const type_info& remove_reference () const { return get_type<typename xtl::type_traits::remove_reference<T>::type> (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление размерностей массива
+///РЈРґР°Р»РµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const type_info& remove_extent () const       { return get_type<typename xtl::type_traits::remove_extent<T>::type> (); }
     const type_info& remove_all_extents () const  { return get_type<typename xtl::type_traits::remove_all_extents<T>::type> (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования указателей
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СѓРєР°Р·Р°С‚РµР»РµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const type_info& remove_pointer () const  { return get_type<typename xtl::type_traits::remove_pointer<T>::type> (); }
 };
@@ -98,7 +98,7 @@ class type_info_impl: virtual public type_info
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Динамическая информация о типе функционале
+///Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РёРїРµ С„СѓРЅРєС†РёРѕРЅР°Р»Рµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <unsigned int ArgsCount> struct functional_type_info_arguments_holder
 {
@@ -133,7 +133,7 @@ class functional_type_info_impl: virtual public functional_type_info, virtual pu
   using functional_type_info_arguments_holder<traits_type::arguments_count>::argument_types;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     functional_type_info_impl ()
     {
@@ -141,17 +141,17 @@ class functional_type_info_impl: virtual public functional_type_info, virtual pu
     }  
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип возвращаемого значения
+///РўРёРї РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const type_info& result_type () const { return get_type<typename traits_type::result_type> (); }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество аргументов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р°СЂРіСѓРјРµРЅС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual unsigned int arguments_count () const { return traits_type::arguments_count; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение типа аргумента (индексация с нуля)
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р° (РёРЅРґРµРєСЃР°С†РёСЏ СЃ РЅСѓР»СЏ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const xtl::type_info& argument_type (unsigned int index) const
     {
@@ -167,7 +167,7 @@ class functional_type_info_impl: virtual public functional_type_info, virtual pu
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подстановка реализации при получении типа
+///РџРѕРґСЃС‚Р°РЅРѕРІРєР° СЂРµР°Р»РёР·Р°С†РёРё РїСЂРё РїРѕР»СѓС‡РµРЅРёРё С‚РёРїР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, bool IsFn = type_traits::is_function<T>::value> struct type_info_impl_selector
 {
@@ -182,7 +182,7 @@ template <class T> struct type_info_impl_selector<T, true>
 }
 
 /*
-    Получение информации о типе
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РёРїРµ
 */
 
 template <class T>

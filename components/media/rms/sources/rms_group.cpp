@@ -4,7 +4,7 @@ using namespace media::rms;
 using namespace common;
 
 /*
-    Описание реализации группы ресурсов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 typedef stl::hash_set<stl::hash_key<const char*> > ResourceSet;
@@ -12,9 +12,9 @@ typedef xtl::signal<void (const char*)>            EventSignal;
 
 struct Group::Impl: public xtl::reference_counter
 {
-  ResourceSet references;                       //карта ресурсов
-  StringArray resources;                        //имена ресурсов
-  EventSignal signals [GroupEvent_Num]; //сигналы
+  ResourceSet references;                       //РєР°СЂС‚Р° СЂРµСЃСѓСЂСЃРѕРІ
+  StringArray resources;                        //РёРјРµРЅР° СЂРµСЃСѓСЂСЃРѕРІ
+  EventSignal signals [GroupEvent_Num]; //СЃРёРіРЅР°Р»С‹
 
   ~Impl ()
   {
@@ -23,7 +23,7 @@ struct Group::Impl: public xtl::reference_counter
 
   void Clear ()
   {
-      //оповещение об удалении всех ресурсов
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё РІСЃРµС… СЂРµСЃСѓСЂСЃРѕРІ
       
     for (size_t i=0, count=resources.Size (); i<count; i++)
     {
@@ -33,11 +33,11 @@ struct Group::Impl: public xtl::reference_counter
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-      //очистка
+      //РѕС‡РёСЃС‚РєР°
       
     references.clear ();
     resources.Clear ();    
@@ -45,7 +45,7 @@ struct Group::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Group::Group ()
@@ -72,23 +72,23 @@ Group& Group::operator = (const Group& group)
 }
 
 /*
-    Информация о группе
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РіСЂСѓРїРїРµ
 */
 
-//пуста ли группа
+//РїСѓСЃС‚Р° Р»Рё РіСЂСѓРїРїР°
 bool Group::IsEmpty () const
 {
   return impl->resources.IsEmpty ();
 }
 
-//количество элементов в группе
+//РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ РіСЂСѓРїРїРµ
 size_t Group::Size () const
 {
   return impl->resources.Size ();
 }
 
 /*
-    Перебор ресурсов
+    РџРµСЂРµР±РѕСЂ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 const char* Group::Item (size_t index) const
@@ -105,19 +105,19 @@ const char* Group::Item (size_t index) const
 }
 
 /*
-    Добавление / удаление ресурсов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void Group::Add (const char* name)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
 
-      //проверка: добавлен ли уже ресурс
+      //РїСЂРѕРІРµСЂРєР°: РґРѕР±Р°РІР»РµРЅ Р»Рё СѓР¶Рµ СЂРµСЃСѓСЂСЃ
 
     if (impl->references.find (name) != impl->references.end ())
       return;
@@ -140,7 +140,7 @@ void Group::Add (const char* name)
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   catch (xtl::exception& exception)
@@ -154,7 +154,7 @@ void Group::Add (const Group& group)
 {
   try
   {
-    if (impl == group.impl) //защита от добавления объекта к самому себе
+    if (impl == group.impl) //Р·Р°С‰РёС‚Р° РѕС‚ РґРѕР±Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° Рє СЃР°РјРѕРјСѓ СЃРµР±Рµ
       return;
       
     const StringArray& array = group.impl->resources;
@@ -171,7 +171,7 @@ void Group::Add (const Group& group)
 
 void Group::Remove (const char* name)
 {
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!name)
     return;
@@ -198,7 +198,7 @@ void Group::Remove (const char* name)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
@@ -206,7 +206,7 @@ void Group::Remove (const Group& group)
 {
   try
   {
-    if (impl == group.impl) //защита от добавления объекта к самому себе
+    if (impl == group.impl) //Р·Р°С‰РёС‚Р° РѕС‚ РґРѕР±Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° Рє СЃР°РјРѕРјСѓ СЃРµР±Рµ
     {
       Clear ();
       return;
@@ -230,7 +230,7 @@ void Group::Clear ()
 }
 
 /*
-    Подписка на события
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection Group::RegisterEventHandler (GroupEvent event, const EventHandler& handler) const
@@ -242,7 +242,7 @@ xtl::connection Group::RegisterEventHandler (GroupEvent event, const EventHandle
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Group::Swap (Group& group)

@@ -10,19 +10,19 @@ namespace xanim_saver
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* FLOAT_FORMAT = ".000"; //количество знаков после запятой при выводе вещественных чисел
+const char* FLOAT_FORMAT = ".000"; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ РїСЂРё РІС‹РІРѕРґРµ РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… С‡РёСЃРµР»
 
 /*
-    Класс, сохраняющий анимации в Xml-формате
+    РљР»Р°СЃСЃ, СЃРѕС…СЂР°РЅСЏСЋС‰РёР№ Р°РЅРёРјР°С†РёРё РІ Xml-С„РѕСЂРјР°С‚Рµ
 */
 
 class XmlAnimationLibrarySaver
 {
   private:
-    //сохранение трека событий
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ С‚СЂРµРєР° СЃРѕР±С‹С‚РёР№
     void SaveEventTrack (const EventTrack& track)
     {
       if (!track.Size ())
@@ -40,7 +40,7 @@ class XmlAnimationLibrarySaver
       }
     }
 
-    //сохранение канала анимации
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РєР°РЅР°Р»Р° Р°РЅРёРјР°С†РёРё
     template <class T> void SaveSpecificKeyInfo (const math::spline_tcb_key<T>& key)
     {
       writer.WriteAttribute ("tension", key.tension, FLOAT_FORMAT);
@@ -202,7 +202,7 @@ class XmlAnimationLibrarySaver
                                                "Unsupported channel track type '%s'", track_type.name ());
     }
 
-    //сохранение анимации
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°РЅРёРјР°С†РёРё
     void SaveAnimation (const Animation& animation, const char* id)
     {
       XmlWriter::Scope scope (writer, "animation");
@@ -227,7 +227,7 @@ class XmlAnimationLibrarySaver
     }
     
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     XmlAnimationLibrarySaver (const char* file_name, const AnimationLibrary& library) : writer (file_name)
     {
       XmlWriter::Scope library_scope (writer, "animation_library");
@@ -237,11 +237,11 @@ class XmlAnimationLibrarySaver
     }
 
   private:
-    XmlWriter writer; //сериализатор Xml
+    XmlWriter writer; //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ Xml
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XAnimSaverComponent

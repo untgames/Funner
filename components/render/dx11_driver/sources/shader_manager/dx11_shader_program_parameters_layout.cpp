@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ProgramParametersLayout::ProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
@@ -25,7 +25,7 @@ ProgramParametersLayout::ProgramParametersLayout (const ProgramParametersLayoutD
 }
 
 /*
-    Поиск параметра
+    РџРѕРёСЃРє РїР°СЂР°РјРµС‚СЂР°
 */
 
 const ProgramParameter* ProgramParametersLayout::FindParameter (const char* name) const

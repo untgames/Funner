@@ -6,40 +6,40 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVED_BINDINGS_COUNT = 8; //резервируемое количество связываний
+const size_t RESERVED_BINDINGS_COUNT = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІСЏР·С‹РІР°РЅРёР№
 
 }
 
 /*
-    Описание реализации PropertyBindingMap
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PropertyBindingMap
 */
 
 struct PropertyBindingMap::Impl: public xtl::reference_counter, public xtl::trackable
 {
   struct BindingDesc: public xtl::reference_counter
   {
-    stl::string             name;       //имя свойства
-    size_t                  name_hash;  //хэш имени свойства
-    common::PropertyBinding binding;    //связывание
+    stl::string             name;       //РёРјСЏ СЃРІРѕР№СЃС‚РІР°
+    size_t                  name_hash;  //С…СЌС€ РёРјРµРЅРё СЃРІРѕР№СЃС‚РІР°
+    common::PropertyBinding binding;    //СЃРІСЏР·С‹РІР°РЅРёРµ
   };
   
   typedef xtl::intrusive_ptr<BindingDesc>             BindingDescPtr;
   typedef stl::vector<BindingDescPtr>                 BindingDescArray;
   typedef xtl::signal<void (PropertyBindingMapEvent)> Signal;
   
-  BindingDescArray bindings;                              //массив связываний
-  Signal           signals [PropertyBindingMapEvent_Num]; //сигналы
+  BindingDescArray bindings;                              //РјР°СЃСЃРёРІ СЃРІСЏР·С‹РІР°РЅРёР№
+  Signal           signals [PropertyBindingMapEvent_Num]; //СЃРёРіРЅР°Р»С‹
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     bindings.reserve (RESERVED_BINDINGS_COUNT);
   }  
   
-///Синхронизация
+///РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
   struct SyncFromPropertyMap { void operator () (common::PropertyBinding& binding, const common::PropertyMap& map, size_t index) const { binding.CopyFromPropertyMap (map, index); } };
   struct SyncToPropertyMap   { void operator () (const common::PropertyBinding& binding, common::PropertyMap& map, size_t index) const { binding.CopyToPropertyMap (map, index); } };  
 
@@ -83,7 +83,7 @@ struct PropertyBindingMap::Impl: public xtl::reference_counter, public xtl::trac
       throw xtl::format_operation_exception ("", "Property bindings synchronization exception. Errors:%s", error_string->c_str ());
   }
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void Notify (PropertyBindingMapEvent event)
   {
     if (signals [event].empty ())
@@ -95,13 +95,13 @@ struct PropertyBindingMap::Impl: public xtl::reference_counter, public xtl::trac
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyBindingMap::PropertyBindingMap ()
@@ -128,7 +128,7 @@ PropertyBindingMap& PropertyBindingMap::operator = (const PropertyBindingMap& ma
 }
 
 /*
-    Количество свойств в карте
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ РІ РєР°СЂС‚Рµ
 */
 
 size_t PropertyBindingMap::Size () const
@@ -137,7 +137,7 @@ size_t PropertyBindingMap::Size () const
 }
 
 /*
-    Поиск индекса свойства
+    РџРѕРёСЃРє РёРЅРґРµРєСЃР° СЃРІРѕР№СЃС‚РІР°
 */
 
 int PropertyBindingMap::IndexOf (const char* name) const
@@ -160,7 +160,7 @@ bool PropertyBindingMap::IsPresent (const char* name) const
 }
 
 /*
-    Имя свойства
+    РРјСЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 const char* PropertyBindingMap::PropertyName (size_t index) const
@@ -198,7 +198,7 @@ void PropertyBindingMap::SetPropertyName (size_t index, const char* name)
 }
 
 /*
-    Связывание свойства
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 common::PropertyBinding& PropertyBindingMap::PropertyBinding (size_t index)
@@ -223,7 +223,7 @@ void PropertyBindingMap::SetPropertyBinding (size_t index, const common::Propert
 }
 
 /*
-    Добавление нового свойства
+    Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 */
 
 size_t PropertyBindingMap::AddProperty (const char* name, const common::PropertyBinding& binding)
@@ -247,7 +247,7 @@ size_t PropertyBindingMap::AddProperty (const char* name, const common::Property
 }
 
 /*
-    Удаление свойств
+    РЈРґР°Р»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyBindingMap::RemoveProperty (size_t index)
@@ -273,7 +273,7 @@ void PropertyBindingMap::Clear ()
 }
 
 /*
-    Синхронизация с картой свойств
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃ РєР°СЂС‚РѕР№ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyBindingMap::CopyFromPropertyMap (const PropertyMap& map)
@@ -303,7 +303,7 @@ void PropertyBindingMap::CopyToPropertyMap (PropertyMap& map) const
 }
 
 /*
-    Создание объекта синхронизации
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 */
 
 PropertyBindingMapSynchronizer PropertyBindingMap::CreateSynchronizer (PropertyMap& map)
@@ -320,7 +320,7 @@ PropertyBindingMapSynchronizer PropertyBindingMap::CreateSynchronizer (PropertyM
 }
 
 /*
-    Создание карты свойств
+    РЎРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 PropertyMap PropertyBindingMap::CreatePropertyMap () const
@@ -346,7 +346,7 @@ PropertyMap PropertyBindingMap::CreatePropertyMap () const
 }
 
 /*
-    Подписка на события карты связывания свойств
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєР°СЂС‚С‹ СЃРІСЏР·С‹РІР°РЅРёСЏ СЃРІРѕР№СЃС‚РІ
 */
 
 xtl::connection PropertyBindingMap::RegisterEventHandler (PropertyBindingMapEvent event, const EventHandler& handler) const
@@ -358,7 +358,7 @@ xtl::connection PropertyBindingMap::RegisterEventHandler (PropertyBindingMapEven
 }
 
 /*
-    Объект оповещения об удалении
+    РћР±СЉРµРєС‚ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& PropertyBindingMap::Trackable () const
@@ -377,7 +377,7 @@ xtl::trackable& get_trackable (PropertyBindingMap& map)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyBindingMap::Swap (PropertyBindingMap& map)
@@ -394,7 +394,7 @@ void swap (PropertyBindingMap& map1, PropertyBindingMap& map2)
 }
 
 /*
-    Копирование из строки
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РёР· СЃС‚СЂРѕРєРё
 */
 
 void copy_to (const stl::string& value, PropertyMap& map, const PropertySelector& property_selector)

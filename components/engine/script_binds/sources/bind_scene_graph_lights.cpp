@@ -25,7 +25,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание источников света
+    РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
 */
 
 DirectLight::Pointer create_direct_light ()
@@ -44,27 +44,27 @@ PointLight::Pointer create_point_light ()
 }
 
 /*
-    Регистрация библиотек работы с источниками света
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє СЂР°Р±РѕС‚С‹ СЃ РёСЃС‚РѕС‡РЅРёРєР°РјРё СЃРІРµС‚Р°
 */
 
 void bind_direct_light_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_DIRECT_LIGHT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_direct_light));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Radius", make_invoker (&DirectLight::SetRadius));
   lib.Register ("get_Radius", make_invoker (&DirectLight::Radius));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<DirectLight> (SCENE_DIRECT_LIGHT_LIBRARY);
 }
@@ -73,22 +73,22 @@ void bind_spot_light_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SPOT_LIGHT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_spot_light));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Angle",    make_invoker<void (SpotLight&, math::anglef)> (&SpotLight::SetAngle));
   lib.Register ("set_Exponent", make_invoker (&SpotLight::SetExponent));
   lib.Register ("get_Angle",    make_invoker<math::anglef (SpotLight&)> (&SpotLight::Angle));
   lib.Register ("get_Exponent", make_invoker (&SpotLight::Exponent));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<SpotLight> (SCENE_SPOT_LIGHT_LIBRARY);
 }
@@ -97,15 +97,15 @@ void bind_point_light_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_POINT_LIGHT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_LIGHT_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_point_light));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<PointLight> (SCENE_POINT_LIGHT_LIBRARY);
 }
@@ -114,11 +114,11 @@ void bind_light_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_LIGHT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_LightColor",  make_invoker (&Light::SetLightColor));
   lib.Register ("set_Attenuation", make_invoker (&Light::SetAttenuation));
@@ -127,7 +127,7 @@ void bind_light_library (Environment& environment)
   lib.Register ("get_Attenuation", make_invoker (&Light::Attenuation));
   lib.Register ("get_Range",       make_invoker (&Light::Range));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Light> (SCENE_LIGHT_LIBRARY);
 }

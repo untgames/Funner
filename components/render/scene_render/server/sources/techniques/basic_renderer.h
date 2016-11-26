@@ -1,51 +1,51 @@
-///Базовый рендер
+///Р‘Р°Р·РѕРІС‹Р№ СЂРµРЅРґРµСЂ
 class BasicRenderer: public xtl::reference_counter, public xtl::noncopyable
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     BasicRenderer  (server::RenderManager& manager, const char* effect_name);
     virtual ~BasicRenderer ();
 
-///Доступ к полям
+///Р”РѕСЃС‚СѓРї Рє РїРѕР»СЏРј
     server::RenderManager&  RenderManager   () { return manager; } 
     manager::Frame&         Frame           () { return frame; }
     common::PropertyMap&    FrameProperties () { return frame_properties; }
 
-///Отрисовка
+///РћС‚СЂРёСЃРѕРІРєР°
     void Draw (RenderingContext& parent_context);
 
   protected:
-///Настройка кадра перед рендерингом
+///РќР°СЃС‚СЂРѕР№РєР° РєР°РґСЂР° РїРµСЂРµРґ СЂРµРЅРґРµСЂРёРЅРіРѕРј
     virtual void ConfigureFrame (RenderingContext& parent_context);
 
-///Настройка объекта
+///РќР°СЃС‚СЂРѕР№РєР° РѕР±СЉРµРєС‚Р°
     virtual void ConfigureEntity (manager::Frame& frame, manager::Entity& entity, VisualModel& model, manager::EntityDrawParams& out_params);
 
-///Отрисовка моделей
+///РћС‚СЂРёСЃРѕРІРєР° РјРѕРґРµР»РµР№
     void DrawVisualModels (RenderingContext& parent_context);
 
   private:
-///Отрисовка массива отображаемых моделей
+///РћС‚СЂРёСЃРѕРІРєР° РјР°СЃСЃРёРІР° РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹С… РјРѕРґРµР»РµР№
     void Draw (RenderingContext& context, size_t visual_models_count, VisualModel* const* models, void* user_data = 0) const;
     void Draw (RenderingContext& context, const stl::vector<VisualModel*>& models, void* user_data = 0) const;
 
   private:
-///Обработчик отрисовки объектов
+///РћР±СЂР°Р±РѕС‚С‡РёРє РѕС‚СЂРёСЃРѕРІРєРё РѕР±СЉРµРєС‚РѕРІ
     void EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, void* user_data, manager::EntityDrawParams& out_params);
   
   private:
-    server::RenderManager manager;                      //менеджер рендеринга
-    manager::Frame        frame;                        //фрейм
-    common::PropertyMap   frame_properties;             //свойства кадра
-    common::PropertyMap   frame_entity_properties;      //свойства кадр-объект
-    size_t                view_transaction_id;          //счетчик обновлений матрицы вида
-    size_t                proj_transaction_id;          //счетчик обновлений матрицы проекции
-    size_t                view_proj_transaction_id;     //счетчик обновлений матрицы вид-проекция
-    math::mat4f           view_tm;                      //матрица вида
-    math::mat4f           view_proj_tm;                 //матрица вид-проекция
-    size_t                mv_matrix_property_index;     //индекс свойства матрицы ModelView
-    size_t                mvp_matrix_property_index;    //индекс свойства матрицы ModelViewProjection
-    size_t                object_matrix_property_index; //индекс свойства матрицы ObjectMatrix
-    size_t                view_matrix_property_index;   //индекс свойства матрицы View (в свойствах кадра)
-    size_t                proj_matrix_property_index;   //индекс свойства матрицы Projection (в свойства кадра)
+    server::RenderManager manager;                      //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+    manager::Frame        frame;                        //С„СЂРµР№Рј
+    common::PropertyMap   frame_properties;             //СЃРІРѕР№СЃС‚РІР° РєР°РґСЂР°
+    common::PropertyMap   frame_entity_properties;      //СЃРІРѕР№СЃС‚РІР° РєР°РґСЂ-РѕР±СЉРµРєС‚
+    size_t                view_transaction_id;          //СЃС‡РµС‚С‡РёРє РѕР±РЅРѕРІР»РµРЅРёР№ РјР°С‚СЂРёС†С‹ РІРёРґР°
+    size_t                proj_transaction_id;          //СЃС‡РµС‚С‡РёРє РѕР±РЅРѕРІР»РµРЅРёР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµРєС†РёРё
+    size_t                view_proj_transaction_id;     //СЃС‡РµС‚С‡РёРє РѕР±РЅРѕРІР»РµРЅРёР№ РјР°С‚СЂРёС†С‹ РІРёРґ-РїСЂРѕРµРєС†РёСЏ
+    math::mat4f           view_tm;                      //РјР°С‚СЂРёС†Р° РІРёРґР°
+    math::mat4f           view_proj_tm;                 //РјР°С‚СЂРёС†Р° РІРёРґ-РїСЂРѕРµРєС†РёСЏ
+    size_t                mv_matrix_property_index;     //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РјР°С‚СЂРёС†С‹ ModelView
+    size_t                mvp_matrix_property_index;    //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РјР°С‚СЂРёС†С‹ ModelViewProjection
+    size_t                object_matrix_property_index; //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РјР°С‚СЂРёС†С‹ ObjectMatrix
+    size_t                view_matrix_property_index;   //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РјР°С‚СЂРёС†С‹ View (РІ СЃРІРѕР№СЃС‚РІР°С… РєР°РґСЂР°)
+    size_t                proj_matrix_property_index;   //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РјР°С‚СЂРёС†С‹ Projection (РІ СЃРІРѕР№СЃС‚РІР° РєР°РґСЂР°)
 };

@@ -5,15 +5,15 @@ using namespace media::adobe::xfl;
 typedef media::CollectionImpl<FrameElement, INamedCollection<FrameElement> > FrameElementCollection;
 
 /*
-    Описание реализации кадра анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 */
 
 struct Frame::Impl : public xtl::reference_counter
 {
-  size_t                 first_frame; //номер кадра (в глобальном времени), с которого начинается отображение данного кадра
-  size_t                 duration;    //длительность отображения данного кадра в количестве кадров (в глобальном времени)
-  FrameElementCollection elements;    //кадры анимации слоя
-  AnimationCore          animation;   //анимация
+  size_t                 first_frame; //РЅРѕРјРµСЂ РєР°РґСЂР° (РІ РіР»РѕР±Р°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё), СЃ РєРѕС‚РѕСЂРѕРіРѕ РЅР°С‡РёРЅР°РµС‚СЃСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РґР°РЅРЅРѕРіРѕ РєР°РґСЂР°
+  size_t                 duration;    //РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ РєР°РґСЂР° РІ РєРѕР»РёС‡РµСЃС‚РІРµ РєР°РґСЂРѕРІ (РІ РіР»РѕР±Р°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё)
+  FrameElementCollection elements;    //РєР°РґСЂС‹ Р°РЅРёРјР°С†РёРё СЃР»РѕСЏ
+  AnimationCore          animation;   //Р°РЅРёРјР°С†РёСЏ
   
   Impl ()
     : first_frame (0)
@@ -22,7 +22,7 @@ struct Frame::Impl : public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Frame::Frame ()
@@ -48,7 +48,7 @@ Frame& Frame::operator = (const Frame& source)
 }
 
 /*
-   Тайминги
+   РўР°Р№РјРёРЅРіРё
 */
 
 size_t Frame::FirstFrame () const
@@ -72,7 +72,7 @@ void Frame::SetDuration (size_t duration)
 }
 
 /*
-   Кадры анимации слоя
+   РљР°РґСЂС‹ Р°РЅРёРјР°С†РёРё СЃР»РѕСЏ
 */
 
 Frame::FrameElementList& Frame::Elements ()
@@ -86,7 +86,7 @@ const Frame::FrameElementList& Frame::Elements () const
 }
 
 /*
-   Анимация кадра
+   РђРЅРёРјР°С†РёСЏ РєР°РґСЂР°
 */
 
 const AnimationCore& Frame::Animation () const
@@ -105,7 +105,7 @@ void Frame::SetAnimation (const AnimationCore& animation)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Frame::Swap (Frame& frame)
@@ -123,7 +123,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Frame& frame1, Frame& frame2)

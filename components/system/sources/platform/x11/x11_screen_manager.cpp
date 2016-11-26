@@ -8,31 +8,31 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_SCREEN_ARRAY_RESERVE = 8;            //резервируемое количество экранов
-const size_t MODE_ARRAY_RESERVE           = 32;           //резервируемое количество видео-режимов
-const char*  LOG_NAME                     = "system.x11"; //имя протокола вывода сообщений
+const size_t DEFAULT_SCREEN_ARRAY_RESERVE = 8;            //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЌРєСЂР°РЅРѕРІ
+const size_t MODE_ARRAY_RESERVE           = 32;           //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
+const char*  LOG_NAME                     = "system.x11"; //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р° РІС‹РІРѕРґР° СЃРѕРѕР±С‰РµРЅРёР№
 
 /*
-    Описатель экрана
+    РћРїРёСЃР°С‚РµР»СЊ СЌРєСЂР°РЅР°
 */
 
 typedef stl::vector<ScreenModeDesc> ScreenModeArray;
 
 struct ScreenDesc: public xtl::reference_counter
 {
-  stl::string     name;           //имя устройства
-  ScreenModeArray modes;          //режимы экрана
+  stl::string     name;           //РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  ScreenModeArray modes;          //СЂРµР¶РёРјС‹ СЌРєСЂР°РЅР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ScreenDesc (const char* in_name, const char* in_win_name)
     : device_context ()
     , name (in_name)
     , win_name (in_win_name)
   {
-      //отсечение завершающих пробелов в имени устройства
+      //РѕС‚СЃРµС‡РµРЅРёРµ Р·Р°РІРµСЂС€Р°СЋС‰РёС… РїСЂРѕР±РµР»РѕРІ РІ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
     stl::string::reverse_iterator iter;
 
@@ -40,7 +40,7 @@ struct ScreenDesc: public xtl::reference_counter
 
     name.erase (iter.base (), name.end ());    
     
-      //построение списка видео-режимов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
       
     modes.reserve (MODE_ARRAY_RESERVE);
 
@@ -50,7 +50,7 @@ struct ScreenDesc: public xtl::reference_counter
       modes.push_back (mode_desc);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ScreenDesc ()
   {
 
@@ -61,23 +61,23 @@ typedef xtl::intrusive_ptr<ScreenDesc> ScreenDescPtr;
 typedef stl::vector<ScreenDescPtr>     ScreenDescArray;
 
 /*
-    Менеджер экранов
+    РњРµРЅРµРґР¶РµСЂ СЌРєСЂР°РЅРѕРІ
 */
 
 struct ScreenManagerImpl
 {
-  ScreenDescArray screens; //экраны
+  ScreenDescArray screens; //СЌРєСЂР°РЅС‹
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ScreenManagerImpl ()
   {
     screens.reserve (DEFAULT_SCREEN_ARRAY_RESERVE);  
 
-      //построение массива экранов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° СЌРєСЂР°РЅРѕРІ
 
   }
   
-///Получение экрана
+///РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЂР°РЅР°
   static ScreenDescPtr GetScreen (screen_t handle)
   {
     if (!handle)
@@ -92,7 +92,7 @@ typedef common::Singleton<ScreenManagerImpl> ScreenManagerSingleton;
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t XlibScreenManager::GetScreensCount ()
@@ -101,7 +101,7 @@ size_t XlibScreenManager::GetScreensCount ()
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t XlibScreenManager::CreateScreen (size_t screen_index)
@@ -131,7 +131,7 @@ void XlibScreenManager::DestroyScreen (screen_t handle)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* XlibScreenManager::GetScreenName (screen_t handle)
@@ -149,7 +149,7 @@ const char* XlibScreenManager::GetScreenName (screen_t handle)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t XlibScreenManager::GetScreenModesCount (screen_t handle)
@@ -182,7 +182,7 @@ void XlibScreenManager::GetScreenMode (screen_t handle, size_t mode_index, Scree
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void XlibScreenManager::SetScreenCurrentMode (screen_t handle, const ScreenModeDesc& mode_desc)
@@ -232,7 +232,7 @@ void XlibScreenManager::GetScreenDefaultMode (screen_t handle, ScreenModeDesc& m
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void XlibScreenManager::SetScreenGammaRamp (screen_t handle, const Color3f table [256])
@@ -264,7 +264,7 @@ void XlibScreenManager::GetScreenGammaRamp (screen_t handle, Color3f table [256]
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t XlibScreenManager::FindContainingScreen (const void* native_window_handle)
@@ -283,7 +283,7 @@ screen_t XlibScreenManager::FindContainingScreen (const void* native_window_hand
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* XlibScreenManager::GetNativeScreenHandle (screen_t handle)
@@ -302,7 +302,7 @@ const void* XlibScreenManager::GetNativeScreenHandle (screen_t handle)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void XlibScreenManager::GetScreenProperties (screen_t handle, common::PropertyMap& properties)

@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Получение имени формата
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С„РѕСЂРјР°С‚Р°
 */
 
 namespace render

@@ -1,5 +1,5 @@
 ###################################################################################################
-#Ξοπεδελενθÿ θ κξνρςΰνςϋ
+#ΠΠΏΡ€ΠµΠ΄ΠµΠ»ΠµΠ½ΠΈΡ ΠΈ ΠΊΠΎΠ½ΡΡ‚Π°Π½Ρ‚Ρ‹
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES  \
            MEDIA.DDS_LOADER.SOURCES MEDIA.KTX_LOADER.SOURCES MEDIA.IMAGE.ANI_CURSORS MEDIA.IMAGE.TESTS \
@@ -13,50 +13,50 @@ ifneq (,$(filter win32,$(PROFILES))$(filter macosx,$(PROFILES)))
 endif
 endif
 
-#Φελό - Image sources
+#Π¦ΠµΠ»Ρ - Image sources
 MEDIA.IMAGE.SOURCES.TYPE        := static-lib
 MEDIA.IMAGE.SOURCES.NAME        := funner.media.image
 MEDIA.IMAGE.SOURCES.SOURCE_DIRS := sources/image sources/atlas
 MEDIA.IMAGE.SOURCES.IMPORTS     := compile.media.image compile.extern.devil
 
-#Φελό - XAtlas sources
+#Π¦ΠµΠ»Ρ - XAtlas sources
 MEDIA.XATLAS.SOURCES.TYPE        := static-lib
 MEDIA.XATLAS.SOURCES.NAME        := funner.media.image.xatlas
 MEDIA.XATLAS.SOURCES.SOURCE_DIRS := sources/xatlas
 MEDIA.XATLAS.SOURCES.IMPORTS     := compile.media.image
 
-#Φελό - Left-bottom packer sources
+#Π¦ΠµΠ»Ρ - Left-bottom packer sources
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.TYPE         := static-lib
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.NAME         := funner.media.image.left_bottom_packer
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.SOURCE_DIRS  := sources/packers/left_bottom
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.IMPORTS      := compile.media.image
 
-#Φελό - PVR loader
+#Π¦ΠµΠ»Ρ - PVR loader
 MEDIA.PVR_LOADER.SOURCES.TYPE         := static-lib
 MEDIA.PVR_LOADER.SOURCES.NAME         := funner.media.image.pvr_loader
 MEDIA.PVR_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/pvr
 MEDIA.PVR_LOADER.SOURCES.IMPORTS      := compile.media.image
 
-#Φελό - DDS loader
+#Π¦ΠµΠ»Ρ - DDS loader
 MEDIA.DDS_LOADER.SOURCES.TYPE         := static-lib
 MEDIA.DDS_LOADER.SOURCES.NAME         := funner.media.image.dds_loader
 MEDIA.DDS_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/dds
 MEDIA.DDS_LOADER.SOURCES.IMPORTS      := compile.media.image
 
-#Φελό - KTX loader
+#Π¦ΠµΠ»Ρ - KTX loader
 MEDIA.KTX_LOADER.SOURCES.TYPE         := static-lib
 MEDIA.KTX_LOADER.SOURCES.NAME         := funner.media.image.ktx_loader
 MEDIA.KTX_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/ktx
 MEDIA.KTX_LOADER.SOURCES.IMPORTS      := compile.media.image
 
-#Φελό - ANI cursors
+#Π¦ΠµΠ»Ρ - ANI cursors
 MEDIA.IMAGE.ANI_CURSORS.TYPE        := static-lib
 MEDIA.IMAGE.ANI_CURSORS.NAME        := funner.media.image.ani_cursors
 MEDIA.IMAGE.ANI_CURSORS.SOURCE_DIRS := sources/ani_cursors
 MEDIA.IMAGE.ANI_CURSORS.IMPORTS     := compile.media.image
 
-#Φελό - Image tests
+#Π¦ΠµΠ»Ρ - Image tests
 MEDIA.IMAGE.TESTS.TYPE         := test-suite
 MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
@@ -64,41 +64,41 @@ MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.medi
                                   link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr link.media.image.dds \
                                   link.media.image.ani_cursor_loader link.media.image.ktx
 
-#Φελό - PSD exporter
+#Π¦ΠµΠ»Ρ - PSD exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.TYPE        := application
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.NAME        := psd-exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.SOURCE_DIRS := utils/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.IMPORTS     := compile.media.image link.media.image compile.extern.libpsd link.extern.libpsd
 
-#Φελό - PSD exporter tests
+#Π¦ΠµΠ»Ρ - PSD exporter tests
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.TYPE              := test-suite
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS       := tests/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR     := tests/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.USED_APPLICATIONS := psd-exporter
 
-#Φελό - XAtlas builder
+#Π¦ΠµΠ»Ρ - XAtlas builder
 MEDIA.XATLAS_BUILDER.SOURCES.TYPE          := application
 MEDIA.XATLAS_BUILDER.SOURCES.NAME          := atlas-builder
 MEDIA.XATLAS_BUILDER.SOURCES.SOURCE_DIRS   := utils/atlas_builder
 MEDIA.XATLAS_BUILDER.SOURCES.IMPORTS       := compile.common compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer
 
-#Φελό - XAtlas builder tests
+#Π¦ΠµΠ»Ρ - XAtlas builder tests
 MEDIA.XATLAS_BUILDER.TESTS.TYPE              := test-suite
 MEDIA.XATLAS_BUILDER.TESTS.SOURCE_DIRS       := tests/atlas_builder
 MEDIA.XATLAS_BUILDER.TESTS.USED_APPLICATIONS := atlas-builder
 
-#Φελό - Interlacer
+#Π¦ΠµΠ»Ρ - Interlacer
 MEDIA.INTERLACER.SOURCES.TYPE          := application
 MEDIA.INTERLACER.SOURCES.NAME          := interlacer
 MEDIA.INTERLACER.SOURCES.SOURCE_DIRS   := utils/interlacer
 MEDIA.INTERLACER.SOURCES.IMPORTS       := compile.common compile.media.image link.media.image
 
-#Φελό - Interlacer
+#Π¦ΠµΠ»Ρ - Interlacer
 MEDIA.INTERLACER.TESTS.TYPE              := test-suite
 MEDIA.INTERLACER.TESTS.SOURCE_DIRS       := tests/interlacer
 MEDIA.INTERLACER.TESTS.USED_APPLICATIONS := interlacer
 
-#Φελό
+#Π¦ΠµΠ»Ρ
 MEDIA.TEXTURE_CONVERTER.SOURCES.TYPE           := application
 MEDIA.TEXTURE_CONVERTER.SOURCES.NAME           := texture-converter
 MEDIA.TEXTURE_CONVERTER.SOURCES.SOURCE_DIRS    := utils/texture_converter
@@ -106,14 +106,14 @@ MEDIA.TEXTURE_CONVERTER.SOURCES.IMPORTS        := compile.common compile.media.i
 MEDIA.TEXTURE_CONVERTER.SOURCES.win32.IMPORTS  := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
 MEDIA.TEXTURE_CONVERTER.SOURCES.macosx.IMPORTS := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
 
-#Φελό
+#Π¦ΠµΠ»Ρ
 MEDIA.TEXTURE_CONVERTER.TESTS.TYPE              := test-suite
 MEDIA.TEXTURE_CONVERTER.TESTS.SOURCE_DIRS       := tests/texture_converter
 MEDIA.TEXTURE_CONVERTER.TESTS.USED_APPLICATIONS := texture-converter
 MEDIA.TEXTURE_CONVERTER.TESTS.win32.IMPORTS     := run.extern.qualcomm_texture_converter
 MEDIA.TEXTURE_CONVERTER.TESTS.macosx.IMPORTS    := run.extern.qualcomm_texture_converter
 
-#Φελό
+#Π¦ΠµΠ»Ρ
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.TYPE              := test-suite
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.SOURCE_DIRS       := tests/qualcomm_texture_converter
 MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.USED_APPLICATIONS := texture-converter

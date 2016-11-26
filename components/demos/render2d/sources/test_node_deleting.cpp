@@ -19,7 +19,7 @@ struct Test
   Test ()
     : current_angle (0), sprite_position_radius (8), angle_delta (3.14f / 10.f)
   {
-      //создание сцены
+      //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
     for (size_t i = 0; i < SPRITES_COUNT; i++)
       CreateSprite ();
@@ -36,7 +36,7 @@ struct Test
     camera->SetZNear    (-20);
     camera->SetZFar     (20);
 
-      //создание областей вывода
+      //СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     Viewport vp;
 
@@ -53,17 +53,17 @@ struct Test
 
     screen.Attach (vp);
 
-      //настройка целевых буферов вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІС‹РІРѕРґР°
 
     RenderTarget& render_target = application.RenderTarget ();
 
     render_target.SetScreen (&screen);
 
-      //загрузка ресурсов
+      //Р·Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 
     application.LoadResources ();
 
-      //установка idle-функции
+      //СѓСЃС‚Р°РЅРѕРІРєР° idle-С„СѓРЅРєС†РёРё
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
   }
@@ -82,7 +82,7 @@ struct Test
     current_angle += angle_delta;
   }
 
-    //обработчик главного цикла приложения
+    //РѕР±СЂР°Р±РѕС‚С‡РёРє РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
   void Idle ()
   {
     try
@@ -117,11 +117,11 @@ int main ()
 
   try
   {
-      //настройка протоколированиЯ
+      //РЅР°СЃС‚СЂРѕР№РєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРЇ
 
     common::LogFilter filter ("*", &log_print);
 
-      //запуск теста
+      //Р·Р°РїСѓСЃРє С‚РµСЃС‚Р°
 
     Test test;
 

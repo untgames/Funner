@@ -9,13 +9,13 @@ namespace
 {
 
 /*
-    Загрузчик эффектов
+    Р—Р°РіСЂСѓР·С‡РёРє СЌС„С„РµРєС‚РѕРІ
 */
 
 class EffectLoader
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     EffectLoader (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const char* name, const common::ParseNode& in_root, EffectLoaderLibrary& in_library)
       : root (in_root)
       , library (in_library)
@@ -39,7 +39,7 @@ class EffectLoader
     }
     
   private:
-///Печать лога
+///РџРµС‡Р°С‚СЊ Р»РѕРіР°
     void PrintLog ()
     {
       const common::ParseLog& parse_log = root.Log ();
@@ -51,11 +51,11 @@ class EffectLoader
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }      
     }
   
-///Разбор корня
+///Р Р°Р·Р±РѕСЂ РєРѕСЂРЅСЏ
     void ParseRoot (Parser::Iterator iter)
     {
       for_each_child (*iter, "blend",         xtl::bind (&EffectLoader::ParseBlendState, this, _1));
@@ -69,7 +69,7 @@ class EffectLoader
       for_each_child (*iter, "effect",        xtl::bind (&EffectLoader::ParseNamedEffect, this, _1));
     }
     
-///Разбор аргумента операции смешивания цветов
+///Р Р°Р·Р±РѕСЂ Р°СЂРіСѓРјРµРЅС‚Р° РѕРїРµСЂР°С†РёРё СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
     static BlendArgument ParseBlendArgument (const ParseNode& node, const char* value)
     {
       struct Tag2Value
@@ -104,7 +104,7 @@ class EffectLoader
       return BlendArgument_Zero;
     }
     
-///Разбор операции смешивания
+///Р Р°Р·Р±РѕСЂ РѕРїРµСЂР°С†РёРё СЃРјРµС€РёРІР°РЅРёСЏ
     void ParseBlendOperation (const ParseNode& node, Parser::AttributeIterator iter, BlendOperation& operation, BlendArgument& src_arg, BlendArgument& dst_arg)
     {
       const char* operation_tag = xtl::io::get<const char*> (iter);
@@ -125,7 +125,7 @@ class EffectLoader
       dst_arg = ParseBlendArgument (node, dst_arg_tag);      
     }
     
-///Разбор состояния уровня смешивания цветов
+///Р Р°Р·Р±РѕСЂ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
     void ParseBlendTargetState (Parser::Iterator iter, RenderTargetBlendDesc& desc)
     {
       desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable", "true"), "true") == 0;
@@ -204,7 +204,7 @@ class EffectLoader
       }
     }
     
-///Разбор режима сравнения
+///Р Р°Р·Р±РѕСЂ СЂРµР¶РёРјР° СЃСЂР°РІРЅРµРЅРёСЏ
     static CompareMode ParseCompareMode (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "");
@@ -237,7 +237,7 @@ class EffectLoader
       return CompareMode_AlwaysPass;
     }
     
-///Разбор операции стенсила
+///Р Р°Р·Р±РѕСЂ РѕРїРµСЂР°С†РёРё СЃС‚РµРЅСЃРёР»Р°
     static StencilOperation ParseStencilOperation (const ParseNode& node, const char* child_name)
     {
       ParseNode child = node.First (child_name);
@@ -276,7 +276,7 @@ class EffectLoader
       return StencilOperation_Keep;        
     }
     
-///Разбор состояния уровня отсечения
+///Р Р°Р·Р±РѕСЂ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ
     void ParseDepthStencilState (Parser::Iterator iter)
     {
       const char* id = get<const char*> (*iter, "");
@@ -302,14 +302,14 @@ class EffectLoader
         
         StencilDesc& stencil_desc = desc.stencil_desc [face_index];
         
-          //разбор параметров стенсила
+          //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ СЃС‚РµРЅСЃРёР»Р°
           
         stencil_desc.stencil_compare_mode   = stencil_iter->First ("stencil_compare_mode") ? ParseCompareMode (stencil_iter->First ("StencilCompareMode")) : CompareMode_AlwaysPass;
         stencil_desc.stencil_fail_operation = ParseStencilOperation (*stencil_iter, "stencil_fail_operation");
         stencil_desc.depth_fail_operation   = ParseStencilOperation (*stencil_iter, "depth_fail_operation");
         stencil_desc.stencil_pass_operation = ParseStencilOperation (*stencil_iter, "stencil_pass_operation");        
           
-          //дублирование данных
+          //РґСѓР±Р»РёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
           
         if (!xtl::xstrcmp (face, "front_and_back"))
           desc.stencil_desc [FaceMode_Back] = desc.stencil_desc [FaceMode_Front];
@@ -330,7 +330,7 @@ class EffectLoader
       }
     }
     
-///Разбор режима отображения граней
+///Р Р°Р·Р±РѕСЂ СЂРµР¶РёРјР° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РіСЂР°РЅРµР№
     static FillMode ParseFillMode (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "", "solid");
@@ -343,7 +343,7 @@ class EffectLoader
       return FillMode_Solid;
     }
     
-///Разбор режима отсечения граней
+///Р Р°Р·Р±РѕСЂ СЂРµР¶РёРјР° РѕС‚СЃРµС‡РµРЅРёСЏ РіСЂР°РЅРµР№
     static CullMode ParseCullMode (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "", "none");
@@ -357,7 +357,7 @@ class EffectLoader
       return CullMode_None;
     }
     
-///Разбор состояния уровня растеризации
+///Р Р°Р·Р±РѕСЂ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
     void ParseRasterizerState (Parser::Iterator iter)
     {
       const char* id = get<const char*> (*iter, "");
@@ -395,7 +395,7 @@ class EffectLoader
       }
     }
 
-///Разбор фильтра минимизации текстур
+///Р Р°Р·Р±РѕСЂ С„РёР»СЊС‚СЂР° РјРёРЅРёРјРёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂ
     static TexMinFilter ParseTexMinFilter (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "", "default");
@@ -427,7 +427,7 @@ class EffectLoader
       return TexMinFilter_Default;
     }
     
-///Разбор фильтра максимизации текстур
+///Р Р°Р·Р±РѕСЂ С„РёР»СЊС‚СЂР° РјР°РєСЃРёРјРёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂ
     static TexMagFilter ParseTexMagFilter (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "", "default");
@@ -441,7 +441,7 @@ class EffectLoader
       return TexMagFilter_Default;      
     }
     
-///Разбор свёртки текстурных координат
+///Р Р°Р·Р±РѕСЂ СЃРІС‘СЂС‚РєРё С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
     static TexcoordWrap ParseTexcoordWrap (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "", "repeat");
@@ -456,7 +456,7 @@ class EffectLoader
       return TexcoordWrap_Repeat;
     }
 
-///Разбор уровня детализацтии сэмплера
+///Р Р°Р·Р±РѕСЂ СѓСЂРѕРІРЅСЏ РґРµС‚Р°Р»РёР·Р°С†С‚РёРё СЃСЌРјРїР»РµСЂР°
     static float ParseSamplerLod (const ParseNode& node, const char* tag)
     {
       const char* value = get<const char*> (node, tag, "0");
@@ -467,7 +467,7 @@ class EffectLoader
       return get<float> (node, tag);
     }
 
-///Разбор состояния сэмплера
+///Р Р°Р·Р±РѕСЂ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃСЌРјРїР»РµСЂР°
     void ParseSamplerState (Parser::Iterator iter)
     {
       const char* id = get<const char*> (*iter, "");
@@ -507,7 +507,7 @@ class EffectLoader
       }
     }
     
-///Разбор формата пикселей
+///Р Р°Р·Р±РѕСЂ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     static low_level::PixelFormat ParsePixelFormat (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "");
@@ -553,7 +553,7 @@ class EffectLoader
       return low_level::PixelFormat_RGBA8; 
     }
     
-///Разбор размерности текстуры
+///Р Р°Р·Р±РѕСЂ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё С‚РµРєСЃС‚СѓСЂС‹
     static low_level::TextureDimension ParseTextureDimension (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "");
@@ -581,7 +581,7 @@ class EffectLoader
       return low_level::TextureDimension_2D;
     }
     
-///Разбор размера текстуры
+///Р Р°Р·Р±РѕСЂ СЂР°Р·РјРµСЂР° С‚РµРєСЃС‚СѓСЂС‹
     static math::vec3ui ParseTextureSize (const ParseNode& node)
     {
       math::vec3ui result = 1;
@@ -593,7 +593,7 @@ class EffectLoader
       return result;
     }
     
-///Разбор флагов биндинга
+///Р Р°Р·Р±РѕСЂ С„Р»Р°РіРѕРІ Р±РёРЅРґРёРЅРіР°
     static unsigned int ParseBindFlags (const ParseNode& node)
     {
       unsigned int flags = 0;
@@ -610,7 +610,7 @@ class EffectLoader
       return flags;
     }
     
-///Разбор описателя текстуры
+///Р Р°Р·Р±РѕСЂ РѕРїРёСЃР°С‚РµР»СЏ С‚РµРєСЃС‚СѓСЂС‹
     void ParseTextureDesc (Parser::Iterator iter)
     {
       const char* id = get<const char*> (*iter, "");
@@ -665,7 +665,7 @@ class EffectLoader
       }      
     }
     
-///Лог-функтор загрузки шейдеров
+///Р›РѕРі-С„СѓРЅРєС‚РѕСЂ Р·Р°РіСЂСѓР·РєРё С€РµР№РґРµСЂРѕРІ
     struct ShaderLoaderLog
     {
       ShaderLoaderLog (ParseNode& in_node, ParseLog& in_log) : node (in_node), log (in_log), node_printed (false) {}
@@ -687,7 +687,7 @@ class EffectLoader
       bool       node_printed;
     };
     
-///Разбор библиотеки шейдеров
+///Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё С€РµР№РґРµСЂРѕРІ
     void ParseShaderLibrary (Parser::Iterator iter)
     {
       const char* file_mask = get<const char*> (*iter, "");
@@ -699,7 +699,7 @@ class EffectLoader
       log.Printf ("Effect shaders library '%s' loaded (%u shaders loaded)", file_mask, library.Shaders ().Size ());
     }
     
-///Разбор настроек шэйдинга
+///Р Р°Р·Р±РѕСЂ РЅР°СЃС‚СЂРѕРµРє С€СЌР№РґРёРЅРіР°
     void ParseProgram (Parser::Iterator iter)
     {
       const char* id      = get<const char*> (*iter, "");
@@ -762,7 +762,7 @@ class EffectLoader
       }            
     }
     
-///Разбор списка тэгов
+///Р Р°Р·Р±РѕСЂ СЃРїРёСЃРєР° С‚СЌРіРѕРІ
     common::StringArray ParseTags (const ParseNode& node, const char* node_name, bool non_empty_requirement = true)
     {
       Parser::Iterator tags_node = node.First (node_name);
@@ -785,7 +785,7 @@ class EffectLoader
       return tags;
     }
     
-///Разбор прохода рендеринга
+///Р Р°Р·Р±РѕСЂ РїСЂРѕС…РѕРґР° СЂРµРЅРґРµСЂРёРЅРіР°
     static SortMode ParseSortMode (const ParseNode& node)
     {
       const char* value = get<const char*> (node, "sort", "default");
@@ -852,7 +852,7 @@ class EffectLoader
         LowLevelRasterizerStatePtr   rasterizer_scissor_state = *rasterizer_state_name ? library.RasterizerScissorStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
         ProgramPtr                   program                  = *program_name ? library.Programs ().Find (program_name) : ProgramPtr ();
 
-        //TODO проверять корректность заполнения полей
+        //TODO РїСЂРѕРІРµСЂСЏС‚СЊ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ Р·Р°РїРѕР»РЅРµРЅРёСЏ РїРѕР»РµР№
         
         EffectPassPtr pass (new EffectPass (device_manager), false);
 
@@ -876,7 +876,7 @@ class EffectLoader
       }
     }
     
-///Разбор эффекта рендеринга
+///Р Р°Р·Р±РѕСЂ СЌС„С„РµРєС‚Р° СЂРµРЅРґРµСЂРёРЅРіР°
     void ParseNamedEffect (Parser::Iterator iter)
     {
       const char* id = get<const char*> (*iter, "");
@@ -951,11 +951,11 @@ class EffectLoader
     }    
   
   private:
-    common::ParseNode    root;            //корневой узел
-    EffectLoaderLibrary& library;         //библиотека загрузки эффектов
-    render::manager::Log log;             //протокол рендера
-    DeviceManagerPtr     device_manager;  //менеджер устройства отрисовки
-    TextureManagerPtr    texture_manager; //менеджер текстур
+    common::ParseNode    root;            //РєРѕСЂРЅРµРІРѕР№ СѓР·РµР»
+    EffectLoaderLibrary& library;         //Р±РёР±Р»РёРѕС‚РµРєР° Р·Р°РіСЂСѓР·РєРё СЌС„С„РµРєС‚РѕРІ
+    render::manager::Log log;             //РїСЂРѕС‚РѕРєРѕР» СЂРµРЅРґРµСЂР°
+    DeviceManagerPtr     device_manager;  //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+    TextureManagerPtr    texture_manager; //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
 };
 
 }

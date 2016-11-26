@@ -4,14 +4,14 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer& buffer)
 {
   try
   {
-      //получение описания буфера
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ Р±СѓС„РµСЂР°
 
     D3D11_SHADER_BUFFER_DESC desc;
 
@@ -20,14 +20,14 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
     type        = desc.Type;
     buffer_size = desc.Size;
 
-      //получение списка параметров
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
 
     strings.Reserve (desc.Variables);
     params.reserve (desc.Variables);
 
     for (size_t i=0; i<desc.Variables; i++)
     {
-        //получение информации о переменной
+        //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РїРµСЂРµРјРµРЅРЅРѕР№
 
       ID3D11ShaderReflectionVariable* var = buffer.GetVariableByIndex (i);
 
@@ -47,7 +47,7 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
 
       check_errors ("ID3D11ShaderReflectionType::GetDesc", type->GetDesc (&type_desc));
 
-        //преобразование переменной в параметр шейдера      
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РІ РїР°СЂР°РјРµС‚СЂ С€РµР№РґРµСЂР°      
 
       ShaderParameter param;
 
@@ -149,23 +149,23 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
       param.count  = type_desc.Elements ? type_desc.Elements : 1;
       param.offset = desc.StartOffset;
 
-        //добавление параметра
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
 
       params.push_back (param);
     }
 
-      //расчёт хэша
+      //СЂР°СЃС‡С‘С‚ С…СЌС€Р°
 
     hash = common::crc32 (&params [0], sizeof (ShaderParameter) * params.size ());
 
-      //обновление имен
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РёРјРµРЅ
 
     const char** name = strings.Data ();
 
     for (ShaderParameterArray::iterator iter=params.begin (), end=params.end (); iter!=end; ++iter, ++name)
       iter->name = *name;
 
-      //обновление хэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
     hash = common::crc32 (strings.Buffer (), strings.BufferSize (), hash);
     hash = common::crc32 (&type, sizeof (type), hash);

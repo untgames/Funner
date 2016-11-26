@@ -14,21 +14,21 @@ namespace
 #endif
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* VERSION                         = LAUNCHER_VERSION;   //строка версии
-const char* DEFAULT_CONFIGURATION_FILE_NAME = "config.xml";       //имя конфигурационного файла по умолчанию
-const bool  DEFAULT_HAS_MAIN_LOOP           = true;               //наличие главного цикла приложения по умолчанию
-const char* STARTUP_ENV_VARS_FILE_NAME      = "/anonymous/system/startup_environment_variables.xml"; //имя файла с переменными среды при запуске
+const char* VERSION                         = LAUNCHER_VERSION;   //СЃС‚СЂРѕРєР° РІРµСЂСЃРёРё
+const char* DEFAULT_CONFIGURATION_FILE_NAME = "config.xml";       //РёРјСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅРѕРіРѕ С„Р°Р№Р»Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const bool  DEFAULT_HAS_MAIN_LOOP           = true;               //РЅР°Р»РёС‡РёРµ РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const char* STARTUP_ENV_VARS_FILE_NAME      = "/anonymous/system/startup_environment_variables.xml"; //РёРјСЏ С„Р°Р№Р»Р° СЃ РїРµСЂРµРјРµРЅРЅС‹РјРё СЃСЂРµРґС‹ РїСЂРё Р·Р°РїСѓСЃРєРµ
 
-const char* KEY_CONFIGURATION = "--config=";      //имя ключа конфигурационного файла
-const char* KEY_SEARCH_PATH   = "--search-path="; //путь к каталогу поиска файлов
-const char* KEY_NO_MAIN_LOOP  = "--no-main-loop"; //отключение главного цикла приложения
-const char* KEY_MAIN_LOOP     = "--main-loop";    //включение главного цикла приложения
-const char* KEY_VERSION       = "--version";      //вывод справки в стандартный поток вывода
-const char* KEY_VERSION_SHORT = "-v";             //вывод справки в стандартный поток вывода
-const char* KEY_HELP          = "--help";         //вывод справки в стандартный поток вывода
+const char* KEY_CONFIGURATION = "--config=";      //РёРјСЏ РєР»СЋС‡Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅРѕРіРѕ С„Р°Р№Р»Р°
+const char* KEY_SEARCH_PATH   = "--search-path="; //РїСѓС‚СЊ Рє РєР°С‚Р°Р»РѕРіСѓ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
+const char* KEY_NO_MAIN_LOOP  = "--no-main-loop"; //РѕС‚РєР»СЋС‡РµРЅРёРµ РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* KEY_MAIN_LOOP     = "--main-loop";    //РІРєР»СЋС‡РµРЅРёРµ РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* KEY_VERSION       = "--version";      //РІС‹РІРѕРґ СЃРїСЂР°РІРєРё РІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РїРѕС‚РѕРє РІС‹РІРѕРґР°
+const char* KEY_VERSION_SHORT = "-v";             //РІС‹РІРѕРґ СЃРїСЂР°РІРєРё РІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РїРѕС‚РѕРє РІС‹РІРѕРґР°
+const char* KEY_HELP          = "--help";         //РІС‹РІРѕРґ СЃРїСЂР°РІРєРё РІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РїРѕС‚РѕРє РІС‹РІРѕРґР°
 
 const char* HELP [] = {
   "Usage: app_name [flags] [source] ...\n",
@@ -42,13 +42,13 @@ const char* HELP [] = {
 };
 
 /*
-    Приложение
+    РџСЂРёР»РѕР¶РµРЅРёРµ
 */
 
 class Application: public IEngine
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Application ()
       : environment_variables_file ((size_t)0, common::FileMode_ReadWrite | common::FileMode_Create)
       , notification_connection (syslib::Application::RegisterNotificationHandler ("*", xtl::bind (&Application::OnNotification, this, _1)))
@@ -60,7 +60,7 @@ class Application: public IEngine
       need_print_help    = false;
     }
     
-    ///Установка базовой директории
+    ///РЈСЃС‚Р°РЅРѕРІРєР° Р±Р°Р·РѕРІРѕР№ РґРёСЂРµРєС‚РѕСЂРёРё
     void SetBaseDir (const char* dir_name)
     {
       try
@@ -74,7 +74,7 @@ class Application: public IEngine
       }      
     }
     
-    ///Получение базовой директории
+    ///РџРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕР№ РґРёСЂРµРєС‚РѕСЂРёРё
     const char* GetBaseDir ()
     {
       try
@@ -88,7 +88,7 @@ class Application: public IEngine
       }      
     }
         
-///Разбор параметров командой строки
+///Р Р°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРјР°РЅРґРѕР№ СЃС‚СЂРѕРєРё
     bool ParseCommandLine (unsigned int args_count, const char** args, const char** env)
     {
       try
@@ -133,7 +133,7 @@ class Application: public IEngine
           }
         }
 
-          //сохранение переменных среды при запуске
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С… СЃСЂРµРґС‹ РїСЂРё Р·Р°РїСѓСЃРєРµ
         
         common::FileSystem::Rename (environment_variables_file.Path (), STARTUP_ENV_VARS_FILE_NAME);
 
@@ -174,7 +174,7 @@ class Application: public IEngine
       return false;
     }
     
-///Создание окна
+///РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
     IWindow* CreateWindow (const char* name)
     {
       try
@@ -188,7 +188,7 @@ class Application: public IEngine
       }
     }
 
-///Выполнение приложения
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Run ()
     {
       try
@@ -198,7 +198,7 @@ class Application: public IEngine
 
         if (!need_print_help && !need_print_version)
         {
-            //загрузка лицензии
+            //Р·Р°РіСЂСѓР·РєР° Р»РёС†РµРЅР·РёРё
 
           common::Parser p (configuration_name.c_str ());
 
@@ -212,11 +212,11 @@ class Application: public IEngine
             fflush (stdout);
           }
             
-            //регистрация обработчика старта приложения
+            //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃС‚Р°СЂС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 
           syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));            
           
-            //запуск основного цикла
+            //Р·Р°РїСѓСЃРє РѕСЃРЅРѕРІРЅРѕРіРѕ С†РёРєР»Р°
 
           syslib::Application::Run ();          
         }
@@ -242,7 +242,7 @@ class Application: public IEngine
       }      
     }
 
-    ///Выполнение внешних комманд
+    ///Р’С‹РїРѕР»РЅРµРЅРёРµ РІРЅРµС€РЅРёС… РєРѕРјРјР°РЅРґ
     void Execute (const char* command)
     {
       if (syslib::Thread::GetCurrentThreadId () == main_thread_id)
@@ -251,7 +251,7 @@ class Application: public IEngine
         common::ActionQueue::PushAction (xtl::bind (&Application::ExecuteOnMainThread, this, stl::string (command)), common::ActionThread_Main);
     }
 
-    ///Посылка оповещения
+    ///РџРѕСЃС‹Р»РєР° РѕРїРѕРІРµС‰РµРЅРёСЏ
     void PostNotification (const char* notification)
     {
       try
@@ -273,7 +273,7 @@ class Application: public IEngine
       }
     }
 
-    ///Добавление слушателя сообщений
+    ///Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕРѕР±С‰РµРЅРёР№
     void AttachNotificationListener (const char* notification_wildcard, INotificationListener* listener)
     {
       try
@@ -298,7 +298,7 @@ class Application: public IEngine
       }
     }
 
-    ///Удаление слушателя сообщений
+    ///РЈРґР°Р»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕРѕР±С‰РµРЅРёР№
     void DetachNotificationListener (const char* notification_wildcard, INotificationListener* listener)
     {
       try
@@ -372,7 +372,7 @@ class Application: public IEngine
       }
     }
 
-    ///Удаление всех слушателей сообщений
+    ///РЈРґР°Р»РµРЅРёРµ РІСЃРµС… СЃР»СѓС€Р°С‚РµР»РµР№ СЃРѕРѕР±С‰РµРЅРёР№
     void DetachAllNotificationListeners ()
     {
       try
@@ -392,7 +392,7 @@ class Application: public IEngine
     }
 
   private:
-///Выполнение внешних комманд
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РІРЅРµС€РЅРёС… РєРѕРјРјР°РЅРґ
     void ExecuteImpl (const char* command)
     {
       try
@@ -416,7 +416,7 @@ class Application: public IEngine
       ExecuteImpl (command.c_str ());
     }
 
-///Обработчик оповещений приложения
+///РћР±СЂР°Р±РѕС‚С‡РёРє РѕРїРѕРІРµС‰РµРЅРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnNotification (const char* notification)
     {
       try
@@ -439,12 +439,12 @@ class Application: public IEngine
       }
     }
 
-///Обработчик старта приложения
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃС‚Р°СЂС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
     void StartupHandler (common::ParseNode config_node)
     {
       try
       {      
-          //если основного цикла нет - выход из приложения
+          //РµСЃР»Рё РѕСЃРЅРѕРІРЅРѕРіРѕ С†РёРєР»Р° РЅРµС‚ - РІС‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
 
         if (!has_main_loop)
           syslib::Application::Exit (0);            
@@ -508,23 +508,23 @@ class Application: public IEngine
     typedef stl::list<NotificationListenerDescPtr>       NotificationListeners;
 
   private:
-    SubsystemManager           manager;                    //менеджер подсистем
-    bool                       has_main_loop;              //есть ли главный цикл приложения
-    stl::string                configuration_name;         //имя конфигурации
-    bool                       need_print_version;         //нужно распечатать строку версии
-    bool                       need_print_help;            //нужно распечатать помощь по запуску приложения
-    common::StringArray        commands;                   //команды на выполнение подсистемами
-    common::StringArray        search_paths;               //пути поиска
-    common::MemFile            environment_variables_file; //файл с переменными среды, указанными при запуске
-    NotificationListeners      notification_listeners;     //слушатели оповещений приложения
-    xtl::auto_connection       notification_connection;    //соедениние оповещений приложения
-    syslib::Thread::threadid_t main_thread_id;             //идентификатор главной нити
+    SubsystemManager           manager;                    //РјРµРЅРµРґР¶РµСЂ РїРѕРґСЃРёСЃС‚РµРј
+    bool                       has_main_loop;              //РµСЃС‚СЊ Р»Рё РіР»Р°РІРЅС‹Р№ С†РёРєР» РїСЂРёР»РѕР¶РµРЅРёСЏ
+    stl::string                configuration_name;         //РёРјСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+    bool                       need_print_version;         //РЅСѓР¶РЅРѕ СЂР°СЃРїРµС‡Р°С‚Р°С‚СЊ СЃС‚СЂРѕРєСѓ РІРµСЂСЃРёРё
+    bool                       need_print_help;            //РЅСѓР¶РЅРѕ СЂР°СЃРїРµС‡Р°С‚Р°С‚СЊ РїРѕРјРѕС‰СЊ РїРѕ Р·Р°РїСѓСЃРєСѓ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    common::StringArray        commands;                   //РєРѕРјР°РЅРґС‹ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРјР°РјРё
+    common::StringArray        search_paths;               //РїСѓС‚Рё РїРѕРёСЃРєР°
+    common::MemFile            environment_variables_file; //С„Р°Р№Р» СЃ РїРµСЂРµРјРµРЅРЅС‹РјРё СЃСЂРµРґС‹, СѓРєР°Р·Р°РЅРЅС‹РјРё РїСЂРё Р·Р°РїСѓСЃРєРµ
+    NotificationListeners      notification_listeners;     //СЃР»СѓС€Р°С‚РµР»Рё РѕРїРѕРІРµС‰РµРЅРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    xtl::auto_connection       notification_connection;    //СЃРѕРµРґРµРЅРёРЅРёРµ РѕРїРѕРІРµС‰РµРЅРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    syslib::Thread::threadid_t main_thread_id;             //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РіР»Р°РІРЅРѕР№ РЅРёС‚Рё
 };
 
 }
 
 /*
-    Обёртки над обращениями к приложению
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РѕР±СЂР°С‰РµРЅРёСЏРјРё Рє РїСЂРёР»РѕР¶РµРЅРёСЋ
 */
 
 //extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA; 
@@ -552,7 +552,7 @@ FUNNER_C_API IEngine* FunnerInit ()
 }
 
 /*
-    Эмуляция запуска main функции
+    Р­РјСѓР»СЏС†РёСЏ Р·Р°РїСѓСЃРєР° main С„СѓРЅРєС†РёРё
 */
 
 FUNNER_C_API int FunnerMain (int argc, const char** argv, const char** env)

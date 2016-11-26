@@ -23,7 +23,7 @@
 using namespace common;
 
 /*
-    Файловая система, работающая через Cocoa
+    Р¤Р°Р№Р»РѕРІР°СЏ СЃРёСЃС‚РµРјР°, СЂР°Р±РѕС‚Р°СЋС‰Р°СЏ С‡РµСЂРµР· Cocoa
 */
 
 namespace
@@ -32,7 +32,7 @@ namespace
 class CocoaFileSystem: public StdioFileSystem
 {
   public:
-///Конструктор/деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     CocoaFileSystem ()
     {
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -117,7 +117,7 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
     }
 
-///Получение информации о файле
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
     bool IsFileExist (const char* file_name)
     {
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -163,7 +163,7 @@ class CocoaFileSystem: public StdioFileSystem
       return true;
     }
 
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
     filesize_t GetFreeSpace (const char* path)
     {
 #if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
@@ -226,7 +226,7 @@ class CocoaFileSystem: public StdioFileSystem
 #endif
     }
 
-///Файловые атрибуты
+///Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
     void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
     {
       if (setxattr (file_name, attribute, data, size, 0, 0))
@@ -270,7 +270,7 @@ class CocoaFileSystem: public StdioFileSystem
         throw xtl::format_operation_exception ("common::CocoaFileSystem::RemoveFileAttribute", "Can't remove attribute '%s' for file '%s', error '%s'", attribute, file_name, ::strerror (errno));
     }
 
-///Поиск файла
+///РџРѕРёСЃРє С„Р°Р№Р»Р°
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {
       stl::string dir_name = dir (wc_mask), mask = wc_mask + dir_name.size (), file_name;            
@@ -326,7 +326,7 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef  () {}
     void Release () {}
 
@@ -341,7 +341,7 @@ class CocoaFileSystem: public StdioFileSystem
 }
 
 /*
-    Получение файловой системы
+    РџРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјС‹
 */
 
 ICustomFileSystem* CocoaPlatform::GetFileSystem ()

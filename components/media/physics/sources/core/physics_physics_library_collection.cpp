@@ -3,7 +3,7 @@
 using namespace media::physics;
 
 /*
-   Реализация коллекции физической библиотеки
+   Р РµР°Р»РёР·Р°С†РёСЏ РєРѕР»Р»РµРєС†РёРё С„РёР·РёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class T>
@@ -16,7 +16,7 @@ struct PhysicsLibraryCollection<T>::Impl : public xtl::reference_counter
 
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -47,7 +47,7 @@ PhysicsLibraryCollection<T>& PhysicsLibraryCollection<T>::operator = (const Phys
 }
     
 /*
-   Количество элементов в библиотеке / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ Р±РёР±Р»РёРѕС‚РµРєРµ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -63,7 +63,7 @@ bool PhysicsLibraryCollection<T>::IsEmpty () const
 }
 
 /*
-   Перебор
+   РџРµСЂРµР±РѕСЂ
 */
 
 template <class T>
@@ -79,7 +79,7 @@ typename PhysicsLibraryCollection<T>::ConstIterator PhysicsLibraryCollection<T>:
 }
 
 /*
-   Получение идентификатора элемента библиотеки
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЌР»РµРјРµРЅС‚Р° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class T>
@@ -89,7 +89,7 @@ const char* PhysicsLibraryCollection<T>::ItemId (const ConstIterator& iter) cons
 }
 
 /*
-   Поиск элемента в библиотеке
+   РџРѕРёСЃРє СЌР»РµРјРµРЅС‚Р° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 */
 
 template <class T>
@@ -105,7 +105,7 @@ const typename PhysicsLibraryCollection<T>::Item* PhysicsLibraryCollection<T>::F
 }
 
 /*
-   Добавление / удаление элементов
+   Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class T>
@@ -127,7 +127,7 @@ void PhysicsLibraryCollection<T>::DetachAll ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>
@@ -149,7 +149,7 @@ template class PhysicsLibraryCollection <Shape>;
 template class PhysicsLibraryCollection <shapes::TriangleMesh>;
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>

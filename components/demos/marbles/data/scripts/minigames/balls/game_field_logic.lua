@@ -1,6 +1,6 @@
 BallsMinigameState = BallsMinigameState or {}
 
--- Ïàğàìåòğû ïîëÿ
+-- ĞŸĞ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ Ğ¿Ğ¾Ğ»Ñ
 BallsMinigameState.GAME_FIELD_CELLS_IN_ROW    = 5
 BallsMinigameState.GAME_FIELD_CELLS_IN_COLUMN = 15
 
@@ -23,17 +23,17 @@ local BALL_DEPTH_OFFSET          = -1
 local SELECTION_DEPTH_OFFSET     = -110
 local PARTICLE_NODE_DEPTH_OFFSET = -3
 
---Ôàçà îáğàáîòêè äâèæåíèÿ ìûøè
-local MOUSE_INPUT_PHASE_IDLE                   = 0                                              --ìûøü íå îáğàáàòûâàåòñÿ
-local MOUSE_INPUT_PHASE_WAITING_FOR_FIRST_MOVE = MOUSE_INPUT_PHASE_IDLE + 1                     --îæèäàíèå äâèæåíèÿ ïî îäíîé èç îñåé
-local MOUSE_INPUT_PHASE_FIRST_MOVE_TIMEOUT     = MOUSE_INPUT_PHASE_WAITING_FOR_FIRST_MOVE + 1   --ïåğåğûâ äëÿ îïğåäåëåíèÿ ïî êàêîé èç îñåé ïğîèçâîäèòü äâèæåíèå
-local MOUSE_INPUT_PHASE_MOVE                   = MOUSE_INPUT_PHASE_FIRST_MOVE_TIMEOUT + 1       --ââîä íåïîñğåäñòâåííî ïåğåäâèãàåò øàğèêè 
+--Ğ¤Ğ°Ğ·Ğ° Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºĞ¸ Ğ´Ğ²Ğ¸Ğ¶ĞµĞ½Ğ¸Ñ Ğ¼Ñ‹ÑˆĞ¸
+local MOUSE_INPUT_PHASE_IDLE                   = 0                                              --Ğ¼Ñ‹ÑˆÑŒ Ğ½Ğµ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ°Ñ‚Ñ‹Ğ²Ğ°ĞµÑ‚ÑÑ
+local MOUSE_INPUT_PHASE_WAITING_FOR_FIRST_MOVE = MOUSE_INPUT_PHASE_IDLE + 1                     --Ğ¾Ğ¶Ğ¸Ğ´Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ²Ğ¸Ğ¶ĞµĞ½Ğ¸Ñ Ğ¿Ğ¾ Ğ¾Ğ´Ğ½Ğ¾Ğ¹ Ğ¸Ğ· Ğ¾ÑĞµĞ¹
+local MOUSE_INPUT_PHASE_FIRST_MOVE_TIMEOUT     = MOUSE_INPUT_PHASE_WAITING_FOR_FIRST_MOVE + 1   --Ğ¿ĞµÑ€ĞµÑ€Ñ‹Ğ² Ğ´Ğ»Ñ Ğ¾Ğ¿Ñ€ĞµĞ´ĞµĞ»ĞµĞ½Ğ¸Ñ Ğ¿Ğ¾ ĞºĞ°ĞºĞ¾Ğ¹ Ğ¸Ğ· Ğ¾ÑĞµĞ¹ Ğ¿Ñ€Ğ¾Ğ¸Ğ·Ğ²Ğ¾Ğ´Ğ¸Ñ‚ÑŒ Ğ´Ğ²Ğ¸Ğ¶ĞµĞ½Ğ¸Ğµ
+local MOUSE_INPUT_PHASE_MOVE                   = MOUSE_INPUT_PHASE_FIRST_MOVE_TIMEOUT + 1       --Ğ²Ğ²Ğ¾Ğ´ Ğ½ĞµĞ¿Ğ¾ÑÑ€ĞµĞ´ÑÑ‚Ğ²ĞµĞ½Ğ½Ğ¾ Ğ¿ĞµÑ€ĞµĞ´Ğ²Ğ¸Ğ³Ğ°ĞµÑ‚ ÑˆĞ°Ñ€Ğ¸ĞºĞ¸ 
 
 local MOUSE_INPUT_DIRECTION_DETECTION_TIMEOUT = 0.05
 local MOUSE_INPUT_X_SCALE = 600
 local MOUSE_INPUT_Y_SCALE = MOUSE_INPUT_X_SCALE
 
--- Òèïû øàğîâ
+-- Ğ¢Ğ¸Ğ¿Ñ‹ ÑˆĞ°Ñ€Ğ¾Ğ²
 local NO_BALL 	   = 0
 local RED_BALL     = NO_BALL + 1
 local GREEN_BALL   = RED_BALL + 1
@@ -44,7 +44,7 @@ local COLORS_COUNT = BLACK_BALL
 
 local BALLS_DEPTH_WINDOW = 1
 
---Èíôîğìàöèÿ î òèïàõ øàğîâ
+--Ğ˜Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ Ğ¾ Ñ‚Ğ¸Ğ¿Ğ°Ñ… ÑˆĞ°Ñ€Ğ¾Ğ²
 local BallInfo = 
 {
   [RED_BALL] = 
@@ -78,12 +78,12 @@ local BallInfo =
   }
 }
 
---Çâóêè
+--Ğ—Ğ²ÑƒĞºĞ¸
 local MOVE_SOUND              = "Move"
 local CANT_MOVE_SOUND         = "Can't Move"
 local MATCH_THREE_BALLS_SOUND = "Match 3 Balls"
 
---Ïàğàìåòğû àíèìàöèè
+--ĞŸĞ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¸
 local BALL_STABILIZATION_ANIMATION_DURATION = 0.05
 local BALL_MOVE_ANIMATION_DURATION          = 0.1
 local BALL_MOVE_ANIMATION_X_RANGE           = 1 + CELL_HORIZONTAL_INDENT / CELL_WIDTH
@@ -206,26 +206,26 @@ function BallsMinigameState.GameField.Create ()
 
   game_field.mouse_input_phase         = MOUSE_INPUT_PHASE_IDLE
   game_field.mouse_middle_row_selected = false
-  game_field.mouse_column_selected     = nil                      --Íîìåğ âûäåëåííîé êîëîíêè
-  game_field.previous_cursor_x         = 0                        --Ïîñëåäíåå îáğàáîòàííîå ïîëîæåíèå ìûøè
+  game_field.mouse_column_selected     = nil                      --ĞĞ¾Ğ¼ĞµÑ€ Ğ²Ñ‹Ğ´ĞµĞ»ĞµĞ½Ğ½Ğ¾Ğ¹ ĞºĞ¾Ğ»Ğ¾Ğ½ĞºĞ¸
+  game_field.previous_cursor_x         = 0                        --ĞŸĞ¾ÑĞ»ĞµĞ´Ğ½ĞµĞµ Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°Ğ½Ğ½Ğ¾Ğµ Ğ¿Ğ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ¼Ñ‹ÑˆĞ¸
   game_field.previous_cursor_y         = 0  
-  game_field.cursor_x                  = 0                        --Ïîëîæåíèå ìûøè
+  game_field.cursor_x                  = 0                        --ĞŸĞ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ¼Ñ‹ÑˆĞ¸
   game_field.cursor_y                  = 0
 
-  game_field.field_change_blocked = 0                     --êîëè÷åñòâî áëîêèğîâàíèé ïåğåìåùåíèÿ øàğîâ ïîëüçîâàòåëåì (íà âğåìÿ àíèìàöèè)
-  game_field.removed_balls_count  = 0                     --êîëè÷åñòâî ñîêğàùåííûõ íà ïîñëåäíåì õîäó øàğîâ
+  game_field.field_change_blocked = 0                     --ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ Ğ±Ğ»Ğ¾ĞºĞ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğ¹ Ğ¿ĞµÑ€ĞµĞ¼ĞµÑ‰ĞµĞ½Ğ¸Ñ ÑˆĞ°Ñ€Ğ¾Ğ² Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¼ (Ğ½Ğ° Ğ²Ñ€ĞµĞ¼Ñ Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¸)
+  game_field.removed_balls_count  = 0                     --ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ ÑĞ¾ĞºÑ€Ğ°Ñ‰ĞµĞ½Ğ½Ñ‹Ñ… Ğ½Ğ° Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ½ĞµĞ¼ Ñ…Ğ¾Ğ´Ñƒ ÑˆĞ°Ñ€Ğ¾Ğ²
 
-  game_field.helper_ball               = Scene.Sprite.Create ()    --âñïîìîãàòåëüíûé øàğèê, èñïîëüçóåìûé ïğè àíèìàöèè ïğîêğóòêè öåíòğàëüíîé ëèíèè
+  game_field.helper_ball               = Scene.Sprite.Create ()    --Ğ²ÑĞ¿Ğ¾Ğ¼Ğ¾Ğ³Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ñ‹Ğ¹ ÑˆĞ°Ñ€Ğ¸Ğº, Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·ÑƒĞµĞ¼Ñ‹Ğ¹ Ğ¿Ñ€Ğ¸ Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¸ Ğ¿Ñ€Ğ¾ĞºÑ€ÑƒÑ‚ĞºĞ¸ Ñ†ĞµĞ½Ñ‚Ñ€Ğ°Ğ»ÑŒĞ½Ğ¾Ğ¹ Ğ»Ğ¸Ğ½Ğ¸Ğ¸
   game_field.helper_ball.Name          = "HelperBall"
   game_field.helper_ball.PivotPosition = -BALL_OFFSET
   game_field.helper_ball.Color         = vec4 (1, 1, 1, 1)   
 
-  game_field.animated_columns = {}                             --åñëè ïî èíäåêñó x çíà÷åíèå íå nil, çíà÷èò êîëîíêà õ â äàííûé ìîìåíò àíèìèğóåòñÿ
-  game_field.generate_balls_in_column_after_animation = {}     --êîëè÷åñòâî øàğîâ, êîòîğîå íåîáõîäèìî ñãåíåğèğîâàòü â êîëîíêå ïî îêîí÷àíèè àíèìàöèè
+  game_field.animated_columns = {}                             --ĞµÑĞ»Ğ¸ Ğ¿Ğ¾ Ğ¸Ğ½Ğ´ĞµĞºÑÑƒ x Ğ·Ğ½Ğ°Ñ‡ĞµĞ½Ğ¸Ğµ Ğ½Ğµ nil, Ğ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ ĞºĞ¾Ğ»Ğ¾Ğ½ĞºĞ° Ñ… Ğ² Ğ´Ğ°Ğ½Ğ½Ñ‹Ğ¹ Ğ¼Ğ¾Ğ¼ĞµĞ½Ñ‚ Ğ°Ğ½Ğ¸Ğ¼Ğ¸Ñ€ÑƒĞµÑ‚ÑÑ
+  game_field.generate_balls_in_column_after_animation = {}     --ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ ÑˆĞ°Ñ€Ğ¾Ğ², ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ¾Ğµ Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ğ¾ ÑĞ³ĞµĞ½ĞµÑ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ñ‚ÑŒ Ğ² ĞºĞ¾Ğ»Ğ¾Ğ½ĞºĞµ Ğ¿Ğ¾ Ğ¾ĞºĞ¾Ğ½Ñ‡Ğ°Ğ½Ğ¸Ğ¸ Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¸
 
-  game_field.middle_row_move_animations_list = List.Create ()  --ñïèñîê àíèìàöèé ïåğåìåùàşùèõñÿ øàğîâ â ñğåäíåé ëèíèè
-  game_field.remove_animations_list          = List.Create ()  --ñïèñîê àíèìàöèé ñîêğàùåíèÿ øàğîâ
-  game_field.collumns_move_animations_lists  = {}              --ìàññèâ ñïèñêîâ àíèìàöèé ïåğåìåùàşùèõñÿ øàğîâ â êîëîíêå
+  game_field.middle_row_move_animations_list = List.Create ()  --ÑĞ¿Ğ¸ÑĞ¾Ğº Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¹ Ğ¿ĞµÑ€ĞµĞ¼ĞµÑ‰Ğ°ÑÑ‰Ğ¸Ñ…ÑÑ ÑˆĞ°Ñ€Ğ¾Ğ² Ğ² ÑÑ€ĞµĞ´Ğ½ĞµĞ¹ Ğ»Ğ¸Ğ½Ğ¸Ğ¸
+  game_field.remove_animations_list          = List.Create ()  --ÑĞ¿Ğ¸ÑĞ¾Ğº Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¹ ÑĞ¾ĞºÑ€Ğ°Ñ‰ĞµĞ½Ğ¸Ñ ÑˆĞ°Ñ€Ğ¾Ğ²
+  game_field.collumns_move_animations_lists  = {}              --Ğ¼Ğ°ÑÑĞ¸Ğ² ÑĞ¿Ğ¸ÑĞºĞ¾Ğ² Ğ°Ğ½Ğ¸Ğ¼Ğ°Ñ†Ğ¸Ğ¹ Ğ¿ĞµÑ€ĞµĞ¼ĞµÑ‰Ğ°ÑÑ‰Ğ¸Ñ…ÑÑ ÑˆĞ°Ñ€Ğ¾Ğ² Ğ² ĞºĞ¾Ğ»Ğ¾Ğ½ĞºĞµ
 
   game_field.field = {}
   
@@ -803,7 +803,7 @@ function BallsMinigameState.GameField:GetTopBallRow (column) --private
   end
 end
 
--- Îáğàáîòêà ââîäà ñ ìûøè
+-- ĞĞ±Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºĞ° Ğ²Ğ²Ğ¾Ğ´Ğ° Ñ Ğ¼Ñ‹ÑˆĞ¸
 function BallsMinigameState.GameField:MouseDown ()
   if (self.field_change_blocked > 0) then
     return

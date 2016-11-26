@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с сенсорами невозможна
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ СЃРµРЅСЃРѕСЂР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР°
 */
 
 namespace
@@ -18,7 +18,7 @@ void raise (const char* method_name)
 }
 
 /*
-    Количество сенсоров
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 size_t DefaultSensorManager::GetSensorsCount ()
@@ -27,7 +27,7 @@ size_t DefaultSensorManager::GetSensorsCount ()
 }
 
 /*
-    Создание / удаление сенсора
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
 */
 
 sensor_t DefaultSensorManager::CreateSensor (size_t sensor_index)
@@ -42,7 +42,7 @@ void DefaultSensorManager::DestroySensor (sensor_t)
 }
 
 /*
-    Имя сенсора
+    РРјСЏ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string DefaultSensorManager::GetSensorName (sensor_t)
@@ -52,7 +52,7 @@ stl::string DefaultSensorManager::GetSensorName (sensor_t)
 }
 
 /*
-    Производитель сенсора
+    РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string DefaultSensorManager::GetSensorVendor (sensor_t)
@@ -62,7 +62,7 @@ stl::string DefaultSensorManager::GetSensorVendor (sensor_t)
 }
 
 /*
-    Тип устройства
+    РўРёРї СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 stl::string DefaultSensorManager::GetSensorType (sensor_t)
@@ -72,7 +72,7 @@ stl::string DefaultSensorManager::GetSensorType (sensor_t)
 }
 
 /*
-    Максимальное значение
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 */
 
 float DefaultSensorManager::GetSensorMaxRange (sensor_t)
@@ -82,7 +82,7 @@ float DefaultSensorManager::GetSensorMaxRange (sensor_t)
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void DefaultSensorManager::SetSensorUpdateRate (sensor_t, float rate)
@@ -97,7 +97,7 @@ float DefaultSensorManager::GetSensorUpdateRate (sensor_t)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* DefaultSensorManager::GetNativeSensorHandle (sensor_t)
@@ -107,7 +107,7 @@ const void* DefaultSensorManager::GetNativeSensorHandle (sensor_t)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void DefaultSensorManager::GetSensorProperties (sensor_t, common::PropertyMap& properties)
@@ -116,7 +116,7 @@ void DefaultSensorManager::GetSensorProperties (sensor_t, common::PropertyMap& p
 }
 
 /*
-    Чтение событий сенсора
+    Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
 */
 
 void DefaultSensorManager::StartSensorPolling (sensor_t, ISensorEventListener&)

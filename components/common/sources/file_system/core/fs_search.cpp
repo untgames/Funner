@@ -5,7 +5,7 @@ using namespace common;
 using namespace xtl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательный класс поиска файлов
+///Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class FileSearchHelper
 {  
@@ -29,7 +29,7 @@ class FileSearchHelper
 };
 
 /*
-    Поиск файла
+    РџРѕРёСЃРє С„Р°Р№Р»Р°
 */
 
 inline FileSearchHelper::FileSearchHelper (FileListBuilder& _builder,const char* _mask,size_t _search_flags)
@@ -116,7 +116,7 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
 
   FileListBuilder builder;
 
-    //базовый поиск в смонтированных файловых системах
+    //Р±Р°Р·РѕРІС‹Р№ РїРѕРёСЃРє РІ СЃРјРѕРЅС‚РёСЂРѕРІР°РЅРЅС‹С… С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРјР°С…
   
   if (src_prefix [0] == '/')
   {    
@@ -158,7 +158,7 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
       }
     }    
 
-      //поиск в паках
+      //РїРѕРёСЃРє РІ РїР°РєР°С…
       
     if (!(flags & FileSearch_NoPacks))
     {      

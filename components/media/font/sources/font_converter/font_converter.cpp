@@ -26,7 +26,7 @@ const size_t RESOLUTION = 72;
 
 const media::PixelFormat RESULT_IMAGE_FORMAT = media::PixelFormat_L8;
 
-const char* LOG_NAME = "media.font.font_converter"; //имя потока протоколирования
+const char* LOG_NAME = "media.font.font_converter"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 const char* get_free_type_error_name (int error)
 {
@@ -182,7 +182,7 @@ class FontFace
     xtl::uninitialized_storage<char> font_data;
 };
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k) 
 {
   if (!k)
@@ -228,7 +228,7 @@ namespace media
 {
 
 /*
-   Конвертация шрифта
+   РљРѕРЅРІРµСЂС‚Р°С†РёСЏ С€СЂРёС„С‚Р°
 */
 
 void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
@@ -261,7 +261,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     const AtlasBuilder::PackHandler& pack_handler = AtlasBuilderManager::GetPacker ("default");
 
-      //Установка данных шрифта
+      //РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С… С€СЂРёС„С‚Р°
 
     media::Font font;
 
@@ -271,7 +271,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     font.SetFirstGlyphCode (font_desc.first_glyph_code);
     font.SetFontSize (font_desc.glyph_size);
 
-      //Подготовка массива с размерами каждого глифа
+      //РџРѕРґРіРѕС‚РѕРІРєР° РјР°СЃСЃРёРІР° СЃ СЂР°Р·РјРµСЂР°РјРё РєР°Р¶РґРѕРіРѕ РіР»РёС„Р°
 
     size_t glyphs_count = 0;
 
@@ -392,7 +392,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
       FT_Done_Glyph (glyph);
     }
 
-      //Формирование позиций глифов
+      //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїРѕР·РёС†РёР№ РіР»РёС„РѕРІ
 
     size_t pack_flags = AtlasPackFlag_PowerOfTwoEdges;
 
@@ -433,14 +433,14 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     unsigned char* image_data = (unsigned char*)image.Bitmap ();
 
-      //Сброс цвета (чёрный, прозрачный)
+      //РЎР±СЂРѕСЃ С†РІРµС‚Р° (С‡С‘СЂРЅС‹Р№, РїСЂРѕР·СЂР°С‡РЅС‹Р№)
     
     size_t bytes_per_pixel = get_bytes_per_pixel (RESULT_IMAGE_FORMAT);
     size_t row_size = bytes_per_pixel * result_image_width;
 
     memset (image_data, 0, result_image_width * result_image_height * bytes_per_pixel);
 
-      //Формирование конечного изображения
+      //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєРѕРЅРµС‡РЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
   
     for (size_t i = 0; i < glyphs_count; i++)
     {
@@ -490,7 +490,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     FT_Stroker_Done (stroker);
 
-      //Формирование данных повторяющихся глифов
+      //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ РіР»РёС„РѕРІ
 
     for (DuplicateGlyphs::iterator iter = duplicate_glyphs.begin (), end = duplicate_glyphs.end (); iter != end; ++iter)
     {
@@ -503,7 +503,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     get_log ().Printf ("getting kernings...");
 
-      //Формирование кёрнингов
+      //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєС‘СЂРЅРёРЅРіРѕРІ
 
     for (size_t i = 0; i < font_desc.char_codes_count; i++)
     {

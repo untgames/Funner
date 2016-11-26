@@ -1,4 +1,4 @@
-//Тестирование алгоритма lexicographical_compare_3way (range1, range2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° lexicographical_compare_3way (range1, range2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

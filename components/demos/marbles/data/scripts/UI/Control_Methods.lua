@@ -1,9 +1,9 @@
--- добавление надписи к контролу -------------------------------------------------------------------
+-- РґРѕР±Р°РІР»РµРЅРёРµ РЅР°РґРїРёСЃРё Рє РєРѕРЅС‚СЂРѕР»Сѓ -------------------------------------------------------------------
 
 local function Control_SetCaption (control, caption_text)
   if caption_text then
     if not(control.Caption) then
-      --[[ если не создана строка для вывода надписи
+      --[[ РµСЃР»Рё РЅРµ СЃРѕР·РґР°РЅР° СЃС‚СЂРѕРєР° РґР»СЏ РІС‹РІРѕРґР° РЅР°РґРїРёСЃРё
       control.Caption=Scene.TextLine.Create()
       control.Caption:BindToParent(control.ForeNode)]]
       control.Caption=CreateMultiTextLine()
@@ -21,30 +21,30 @@ end
 UI.Control_SetCaption = Control_SetCaption
 
 
--- загрузка из XML ------------------------------------------------------------------------------------
+-- Р·Р°РіСЂСѓР·РєР° РёР· XML ------------------------------------------------------------------------------------
 function UI.Control_SetByXML (control, xml)
-  --устанавливает по XML общие параметры для контролов всех типов.
-  --результат используется для создания контрола конкретного типа
+  --СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїРѕ XML РѕР±С‰РёРµ РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РєРѕРЅС‚СЂРѕР»РѕРІ РІСЃРµС… С‚РёРїРѕРІ.
+  --СЂРµР·СѓР»СЊС‚Р°С‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РєРѕРЅС‚СЂРѕР»Р° РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ С‚РёРїР°
   assert(xml, "ERROR: SetControlByXML(control, xml) - xml is nil")
   assert(control, "ERROR: SetControlByXML(control, xml) - control is nil")
   
-  --установка имени и типа контрола
+  --СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё Рё С‚РёРїР° РєРѕРЅС‚СЂРѕР»Р°
   control.Name=xml.ReadStringByName ("Name")
     if  not(control.Name) then 
       control.Name="unnamed" 
     end
   control.ControlType=xml.ReadStringByName("Type")
   
-  -- название списка ресурсов контрола
+  -- РЅР°Р·РІР°РЅРёРµ СЃРїРёСЃРєР° СЂРµСЃСѓСЂСЃРѕРІ РєРѕРЅС‚СЂРѕР»Р°
   control.xreslist=xml.ReadStringByName("xreslist")
   
-  -- установка размера и положения
+  -- СѓСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂР° Рё РїРѕР»РѕР¶РµРЅРёСЏ
   control.SetWidthAndHeight(xml.ReadNumbersByName("Size"))
   control.Node.Position= xml.ReadVec3ByName("XY")
   local scale =xml.TryReadVec3ByName("Scale")
      if scale then control.Node.Scale=vec3 (scale.x, scale.y, 1) end
   
-  -- установка стиля отображения
+  -- СѓСЃС‚Р°РЅРѕРІРєР° СЃС‚РёР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
   control.Rect.SpecialMaterial=xml.ReadStringByName("SpecialMaterial")
   control.StyleSetName=xml.ReadStringByName("StyleSetName")
     control.Styles=WindowEditor.GetStyleSetByName(control.StyleSetName)
@@ -53,13 +53,13 @@ function UI.Control_SetByXML (control, xml)
 
   control.ArrowSelectable=xml.ReadBooleanByName("ArrowSelectable")
 
-  -- установка надписи
+  -- СѓСЃС‚Р°РЅРѕРІРєР° РЅР°РґРїРёСЃРё
   Control_SetCaption(control, xml.ReadStringByName("Caption"))
   control.CaptionPosition=xml.TryReadVec3ByName("CaptionPosition")
   control.CaptionRelativePosition=xml.TryReadVec3ByName("CaptionRelativePosition")
   control.CaptionAlignment=xml.TryReadVec3ByName("CaptionAlignment")
   control.CaptionMaxLength=xml.ReadNumberByName("CaptionMaxLength")
-  -- список дополнительных событий на которые может реагировать окно
+  -- СЃРїРёСЃРѕРє РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… СЃРѕР±С‹С‚РёР№ РЅР° РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РµС‚ СЂРµР°РіРёСЂРѕРІР°С‚СЊ РѕРєРЅРѕ
   local AdditionalEvents=xml.ReadStringByName("AdditionalEvents")
     if AdditionalEvents then 
       AdditionalEvents=UnpackString(AdditionalEvents,", ", true)
@@ -68,7 +68,7 @@ function UI.Control_SetByXML (control, xml)
       AdditionalEvents={}
     end
   
-  --загрузка скриптов обработки событий контрола
+  --Р·Р°РіСЂСѓР·РєР° СЃРєСЂРёРїС‚РѕРІ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РєРѕРЅС‚СЂРѕР»Р°
   local Events={"BeforeOpened",
                 "Opened",
                 "GotFocus",
@@ -85,15 +85,15 @@ function UI.Control_SetByXML (control, xml)
                 "BeforeClosed",
                 "Closed",
                 unpack(AdditionalEvents)}
-  LoadObjectEventScriptsFromXML(control, UIControlScript, xml, Events, control) --сам контрол является дополнительным параметром для обработчиков своих событий
+  LoadObjectEventScriptsFromXML(control, UIControlScript, xml, Events, control) --СЃР°Рј РєРѕРЅС‚СЂРѕР» СЏРІР»СЏРµС‚СЃСЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рј РїР°СЂР°РјРµС‚СЂРѕРј РґР»СЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРІРѕРёС… СЃРѕР±С‹С‚РёР№
 
-  --загрузка списка специальных позиций
+  --Р·Р°РіСЂСѓР·РєР° СЃРїРёСЃРєР° СЃРїРµС†РёР°Р»СЊРЅС‹С… РїРѕР·РёС†РёР№
   xml.ForEachChildByName("Position", function (position_xml)
     local pos = position_xml.ReadVec3ByName("XY")
     control.Positions[position_xml.ReadStringByName("Name")]=pos
   end)
   
-  --загрузка списка присоединенных спрайтов
+  --Р·Р°РіСЂСѓР·РєР° СЃРїРёСЃРєР° РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹С… СЃРїСЂР°Р№С‚РѕРІ
   control.SpriteAnimations={}
   control.SpritesAnimating=false
   xml.ForEachChildByName("Sprite", function (sprite_xml)
@@ -113,7 +113,7 @@ function UI.Control_SetByXML (control, xml)
 end
 
 
--- загрузка и выгрузка ресурсов ---------------------------------------------------------------------
+-- Р·Р°РіСЂСѓР·РєР° Рё РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ ---------------------------------------------------------------------
 function UI.Control_LoadResources(control)
   assert(control,"ERROR: LoadResourcesForControl(control) - control is nil")
   local res=control.xreslist
@@ -130,17 +130,17 @@ function UI.Control_UnloadResources(control)
   end
 end
 
--- включение и отключение анимации вложенных спрайтов --------------------------------------------------
+-- РІРєР»СЋС‡РµРЅРёРµ Рё РѕС‚РєР»СЋС‡РµРЅРёРµ Р°РЅРёРјР°С†РёРё РІР»РѕР¶РµРЅРЅС‹С… СЃРїСЂР°Р№С‚РѕРІ --------------------------------------------------
 function UI.Control_AnimateSprites(control, animate)
   assert(control,"ERROR: AnimateSpritesInControl(control, animate) - control is nil")
   if not(animate==false) then
     animate=true
   end
-  -- если анимация спрайтов уже как надо
+  -- РµСЃР»Рё Р°РЅРёРјР°С†РёСЏ СЃРїСЂР°Р№С‚РѕРІ СѓР¶Рµ РєР°Рє РЅР°РґРѕ
   if animate==control.SpritesAnimating then
     return
   end
-  -- если нет - включаем или отключаем анимацию по требованию 
+  -- РµСЃР»Рё РЅРµС‚ - РІРєР»СЋС‡Р°РµРј РёР»Рё РѕС‚РєР»СЋС‡Р°РµРј Р°РЅРёРјР°С†РёСЋ РїРѕ С‚СЂРµР±РѕРІР°РЅРёСЋ 
   ForEachInTable(control.SpriteAnimations, function (PeriodicCall)
     if animate==false then
       PeriodicCall.Pause()
@@ -167,21 +167,21 @@ function UI.Control_ShowSprite(control, SpriteName)
   sprite:BindToParent(control.ForeNode)
 end
   
--- перерисовка --------------------------------------------------------------------------------------------
+-- РїРµСЂРµСЂРёСЃРѕРІРєР° --------------------------------------------------------------------------------------------
 function UI.Control_Redraw (control)
-  -- нужно вызывать после любых изменений стиля, размера или надписи
+  -- РЅСѓР¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊ РїРѕСЃР»Рµ Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёР№ СЃС‚РёР»СЏ, СЂР°Р·РјРµСЂР° РёР»Рё РЅР°РґРїРёСЃРё
   assert(control.Style, "ERROR: "..control.Name.." .Redraw() - control style is nil")
   --print("RedrawControl: ",control.Name)
   if control.Style.Rect then
-    -- перерисовка прямоугольника
+    -- РїРµСЂРµСЂРёСЃРѕРІРєР° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
     control.Rect.Style=control.Style.Rect
   end
   control.Rect.Redraw()
   
   if control.Style.Text then
-    -- перерисовка надписи
+    -- РїРµСЂРµСЂРёСЃРѕРІРєР° РЅР°РґРїРёСЃРё
     if control.Caption then
-      --установка позиции надписи
+      --СѓСЃС‚Р°РЅРѕРІРєР° РїРѕР·РёС†РёРё РЅР°РґРїРёСЃРё
       if control.CaptionPosition then
         local pos=control.CaptionPosition
         control.Caption.Node:SetPosition( pos.x, pos.y, pos.z)
@@ -192,7 +192,7 @@ function UI.Control_Redraw (control)
         end
         control.Caption.Node:SetPosition(control.Rect.Width*pos.x,-control.Rect.Height*pos.y, pos.z)
       end
-      --установка выравнивания надписи
+      --СѓСЃС‚Р°РЅРѕРІРєР° РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ РЅР°РґРїРёСЃРё
       local Alignment=control.CaptionAlignment
       local AlignmentX=Scene.TextLineAlignment.Left
       local AlignmentY=Scene.TextLineAlignment.Top
@@ -211,7 +211,7 @@ function UI.Control_Redraw (control)
   control.HandleEvent("Redraw")
 end
 
---для изменения стиля ---------------------------------------------------------------------------
+--РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ ---------------------------------------------------------------------------
 
 
 function UI.Control_SetStyle(control, StyleName)
@@ -220,9 +220,9 @@ function UI.Control_SetStyle(control, StyleName)
     local style=control.Styles[StyleName]
     if style then
       control.Style=style
-      -- перерисовка нового состояния
+      -- РїРµСЂРµСЂРёСЃРѕРІРєР° РЅРѕРІРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
       control.Redraw()
-      --вывод звука
+      --РІС‹РІРѕРґ Р·РІСѓРєР°
       if (style.Sound) and (PlaySoundEffect) then
         PlaySoundEffect(style.Sound)
       end

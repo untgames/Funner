@@ -6,22 +6,22 @@ namespace
 {
 
 /*
-    Дескриптор формата пикселей контекста устройства
+    Р”РµСЃРєСЂРёРїС‚РѕСЂ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 struct DcPixelFormat
 {
-  HDC                                       dc;           //контекст устройства
-  int                                       pixel_format; //формат пикселей
-  PixelFormatManager::DescribePixelFormatFn describe;     //функция, описывающая формат пикселей
-  DcPixelFormat*                            prev;         //предыдущий дескриптор
-  DcPixelFormat*                            next;         //следующий дескриптор
+  HDC                                       dc;           //РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  int                                       pixel_format; //С„РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№
+  PixelFormatManager::DescribePixelFormatFn describe;     //С„СѓРЅРєС†РёСЏ, РѕРїРёСЃС‹РІР°СЋС‰Р°СЏ С„РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№
+  DcPixelFormat*                            prev;         //РїСЂРµРґС‹РґСѓС‰РёР№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  DcPixelFormat*                            next;         //СЃР»РµРґСѓСЋС‰РёР№ РґРµСЃРєСЂРёРїС‚РѕСЂ
 };
 
-DcPixelFormat*   first           = 0; //первый элемент в списке форматов пикселей
-IAdapterLibrary* default_library = 0; //библиотека, используемая для описания формата пикселей "по умолчанию"
+DcPixelFormat*   first           = 0; //РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РІ СЃРїРёСЃРєРµ С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
+IAdapterLibrary* default_library = 0; //Р±РёР±Р»РёРѕС‚РµРєР°, РёСЃРїРѕР»СЊР·СѓРµРјР°СЏ РґР»СЏ РѕРїРёСЃР°РЅРёСЏ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
-//перехват функции получения адреса
+//РїРµСЂРµС…РІР°С‚ С„СѓРЅРєС†РёРё РїРѕР»СѓС‡РµРЅРёСЏ Р°РґСЂРµСЃР°
 PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 {
   void* proc = (void*)GetProcAddress (module, name);
@@ -44,7 +44,7 @@ PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 }
 
 /*
-    Перенаправление вызовов
+    РџРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹Р·РѕРІРѕРІ
 */
 
 void PixelFormatManager::RedirectApiCalls (HMODULE module)
@@ -56,7 +56,7 @@ void PixelFormatManager::RedirectApiCalls (HMODULE module)
 }
 
 /*
-    Получение формата пикселей
+    РџРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 */
 
 int WINAPI PixelFormatManager::GetPixelFormat (HDC dc)
@@ -70,19 +70,19 @@ int WINAPI PixelFormatManager::GetPixelFormat (HDC dc)
 
 
 /*
-    Установка формата пикселей
+    РЈСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 */
 
 BOOL PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixelFormatFn describe)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!dc || !pixel_format || !describe)
       return FALSE;
 
-      //поиск дескриптора
+      //РїРѕРёСЃРє РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     for (DcPixelFormat* iter=first; iter; iter=iter->next)
       if (iter->dc == dc)
@@ -93,7 +93,7 @@ BOOL PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixel
         return FALSE;
       }
    
-      //добавление нового дескриптора
+      //РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     DcPixelFormat* desc = new DcPixelFormat;
 
@@ -111,7 +111,7 @@ BOOL PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixel
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
 
     return FALSE;
   }
@@ -132,18 +132,18 @@ BOOL PixelFormatManager::CopyPixelFormat (HDC src_dc, HDC dst_dc)
 }
 
 /*
-    Описание формата пикселей
+    РћРїРёСЃР°РЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 */
 
 int WINAPI PixelFormatManager::DescribePixelFormat (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd)
 {
-    //поиск вхождения контекста устройства
+    //РїРѕРёСЃРє РІС…РѕР¶РґРµРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
   DcPixelFormat* iter = first;
 
   for (;iter && iter->dc != dc; iter=iter->next);
 
-    //если контекст не найден - описание формата невозможно
+    //РµСЃР»Рё РєРѕРЅС‚РµРєСЃС‚ РЅРµ РЅР°Р№РґРµРЅ - РѕРїРёСЃР°РЅРёРµ С„РѕСЂРјР°С‚Р° РЅРµРІРѕР·РјРѕР¶РЅРѕ
 
   if (!iter)
   {
@@ -157,7 +157,7 @@ int WINAPI PixelFormatManager::DescribePixelFormat (HDC dc, int pixel_format, UI
 }
 
 /*
-    Очистка ресурсов контекста устройства
+    РћС‡РёСЃС‚РєР° СЂРµСЃСѓСЂСЃРѕРІ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void PixelFormatManager::ReleasePixelFormat (HDC dc)
@@ -180,7 +180,7 @@ void PixelFormatManager::ReleasePixelFormat (HDC dc)
 }
 
 /*
-    Установка библиотеки "по умолчанию"
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±РёР±Р»РёРѕС‚РµРєРё "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 */
 
 void PixelFormatManager::SetDefaultLibrary (IAdapterLibrary* library)

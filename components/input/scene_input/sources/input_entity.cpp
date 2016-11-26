@@ -6,12 +6,12 @@ using namespace input;
 namespace
 {
 
-const int RESERVE_TOUCHES_COUNT = 5; //резервируемое число одновременных нажатий для обработки
+const int RESERVE_TOUCHES_COUNT = 5; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РѕРґРЅРѕРІСЂРµРјРµРЅРЅС‹С… РЅР°Р¶Р°С‚РёР№ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputEntity::InputEntity (const scene_graph::InputZoneModel& in_zone, InputScene& in_scene)
@@ -32,7 +32,7 @@ InputEntity::~InputEntity ()
 }
 
 /*
-    Ведение таблицы нажатий
+    Р’РµРґРµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РЅР°Р¶Р°С‚РёР№
 */
 
 InputEntity::TouchDesc* InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
@@ -75,7 +75,7 @@ void InputEntity::RemoveTouch (InputPort& port, touch_t touch, int button)
 }
 
 /*
-    Удаление всех нажатий, связанных с указанной областью ввода
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РЅР°Р¶Р°С‚РёР№, СЃРІСЏР·Р°РЅРЅС‹С… СЃ СѓРєР°Р·Р°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚СЊСЋ РІРІРѕРґР°
 */
 
 void InputEntity::RemoveAllTouches (InputPort& port)
@@ -86,7 +86,7 @@ void InputEntity::RemoveAllTouches (InputPort& port)
 }
 
 /*
-    Оповещение
+    РћРїРѕРІРµС‰РµРЅРёРµ
 */
 
 void InputEntity::Notify (InputPort& input_port, InputZoneNotification notification, const InputZoneNotificationContext& context)
@@ -122,7 +122,7 @@ void InputEntity::Notify (InputPort& input_port, InputZoneNotification notificat
 }
 
 /*
-    Обработка события
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ
 */
 
 void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, size_t zone_index, const math::vec2f& touch_local_position)
@@ -133,7 +133,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 
     xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
 
-      //формирование контекста события
+      //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
       
     const InputZoneModel::ZoneDesc& desc = zone.ZoneDescs ()[zone_index];
     
@@ -147,7 +147,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     context.touch_world_position = touch_world_position;
     context.touch_local_position = desc.position + touch_local_position.x * desc.axis_x + touch_local_position.y * desc.axis_y;
 
-      //проверка: зафиксировано ли нажатие на зону
+      //РїСЂРѕРІРµСЂРєР°: Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅРѕ Р»Рё РЅР°Р¶Р°С‚РёРµ РЅР° Р·РѕРЅСѓ
 
     TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);    
     
@@ -225,7 +225,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
       
     xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
       
-      //подготовка контекста оповещения
+      //РїРѕРґРіРѕС‚РѕРІРєР° РєРѕРЅС‚РµРєСЃС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ
 
     InputZoneNotificationContext context;
 
@@ -233,7 +233,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
     context.button               = event.button;
     context.touch_world_position = touch_world_position;
     
-      //экранные оповещения
+      //СЌРєСЂР°РЅРЅС‹Рµ РѕРїРѕРІРµС‰РµРЅРёСЏ
 
     switch (event.state)
     {
@@ -250,7 +250,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
         break;
     }
     
-      //зависимые оповещения
+      //Р·Р°РІРёСЃРёРјС‹Рµ РѕРїРѕРІРµС‰РµРЅРёСЏ
       
     TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);
       
@@ -310,21 +310,21 @@ void InputEntity::UpdateBroadcasts ()
 }
 
 /*
-    Обновление списка оповещений
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР° РѕРїРѕРІРµС‰РµРЅРёР№
 */
 
 void InputEntity::UpdateNotifications ()
 {
   try
   {
-      //проверка наличия экранных обработчиков
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЌРєСЂР°РЅРЅС‹С… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
     
     has_screen_handlers  = false;
     has_screen_handlers |= zone.HasNotificationHandler (InputZoneNotification_OnScreenTouchDown);
     has_screen_handlers |= zone.HasNotificationHandler (InputZoneNotification_OnScreenTouchUp);
     has_screen_handlers |= zone.HasNotificationHandler (InputZoneNotification_OnScreenTouchMove);
 
-      //обновление подписки на броадкасты
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕРґРїРёСЃРєРё РЅР° Р±СЂРѕР°РґРєР°СЃС‚С‹
       
     UpdateBroadcasts ();
   }

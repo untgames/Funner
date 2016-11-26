@@ -1,4 +1,4 @@
-// ����஢���� �㭪樨 insert
+// Тестирование функции insert
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"

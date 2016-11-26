@@ -5,7 +5,7 @@
 */
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 inline message_exception_base::message_exception_base (const char* in_message)
@@ -39,7 +39,7 @@ inline message_exception_base::message_exception_base (const char* source, const
 }
 
 /*
-    Получение сообщения
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ
 */
 
 inline const char* message_exception_base::what () const throw ()
@@ -48,7 +48,7 @@ inline const char* message_exception_base::what () const throw ()
 }
 
 /*
-    Добавление информации о контексте выброса
+    Р”РѕР±Р°РІР»РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅС‚РµРєСЃС‚Рµ РІС‹Р±СЂРѕСЃР°
 */
 
 inline void message_exception_base::vtouch (const char* format, va_list args) throw ()
@@ -87,7 +87,7 @@ inline message_exception<BaseException>::message_exception (const char* source, 
   {}
 
 /*
-    Создание исключения с форматированным сообщением
+    РЎРѕР·РґР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅС‹Рј СЃРѕРѕР±С‰РµРЅРёРµРј
 */
 
 template <class Exception>

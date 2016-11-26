@@ -15,7 +15,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* RENDER_RECT_LIBRARY     = "Scene.Rect";
@@ -23,10 +23,10 @@ const char* RENDER_VIEWPORT_LIBRARY = "Scene.Viewport";
 const char* RENDER_SCREEN_LIBRARY   = "Scene.Screen";
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-///Получение параметров области экрана и области вывода
+///РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±Р»Р°СЃС‚Рё СЌРєСЂР°РЅР° Рё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 int          get_rect_left   (const Rect& rect)               { return rect.x; }
 int          get_rect_top    (const Rect& rect)               { return rect.y; }
 unsigned int get_rect_width  (const Rect& rect)               { return rect.width; }
@@ -38,7 +38,7 @@ void         set_rect_top    (Rect& rect, int param)          { rect.y      = pa
 void         set_rect_width  (Rect& rect, unsigned int param) { rect.width  = param; }
 void         set_rect_height (Rect& rect, unsigned int param) { rect.height = param; }
 
-///Создание прямоугольной области
+///РЎРѕР·РґР°РЅРёРµ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРѕР№ РѕР±Р»Р°СЃС‚Рё
 Rect create_empty_rect ()
 {
   return Rect ();
@@ -49,16 +49,16 @@ Rect create_rect (int left, int top, unsigned int width, unsigned int height)
   return Rect (left, top, width, height);
 }
 
-///Регистрация библиотеки работы с прямоугольными областями
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅС‹РјРё РѕР±Р»Р°СЃС‚СЏРјРё
 void bind_rect_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RENDER_RECT_LIBRARY);
   
-    //регистрация функции создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёРё СЃРѕР·РґР°РЅРёСЏ
     
   lib.Register ("Create", make_invoker (make_invoker (&create_rect), make_invoker (&create_empty_rect)));
   
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("get_Left",    make_invoker (&get_rect_left));
   lib.Register ("get_Top",     make_invoker (&get_rect_top));
@@ -74,22 +74,22 @@ void bind_rect_library (Environment& environment)
   environment.RegisterType<Rect> (RENDER_RECT_LIBRARY);
 }
 
-///Создание вьюпорта
+///РЎРѕР·РґР°РЅРёРµ РІСЊСЋРїРѕСЂС‚Р°
 Viewport create_viewport ()
 {
   return Viewport ();
 }
 
-///Регистрация библиотеки работы с вьюпортами
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РІСЊСЋРїРѕСЂС‚Р°РјРё
 void bind_viewport_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RENDER_VIEWPORT_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_viewport));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Name",            make_invoker (&Viewport::SetName));
   lib.Register ("get_Name",            make_invoker (&Viewport::Name));
@@ -131,22 +131,22 @@ void bind_viewport_library (Environment& environment)
   environment.RegisterType<Viewport> (RENDER_VIEWPORT_LIBRARY);
 }
 
-///Создание экрана
+///РЎРѕР·РґР°РЅРёРµ СЌРєСЂР°РЅР°
 Screen create_screen ()
 {
   return Screen ();
 }
 
-///Регистрация библиотеки работы с рабочими столами
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЂР°Р±РѕС‡РёРјРё СЃС‚РѕР»Р°РјРё
 void bind_screen_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RENDER_SCREEN_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_screen));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Name",            make_invoker (&Screen::SetName));
   lib.Register ("get_Name",            make_invoker (&Screen::Name));
@@ -175,12 +175,12 @@ void bind_screen_library (Environment& environment)
 }
 
 /*
-    Регистрация библиотеки рендера
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂРµРЅРґРµСЂР°
 */
 
 void bind_screen_viewport_library (Environment& environment)
 {
-    //регистрация библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
   
   bind_rect_library     (environment);
   bind_viewport_library (environment);

@@ -130,7 +130,7 @@ int main ()
     sprite->BindToScene (scene);
     sprite2->BindToScene (scene, scene_graph::NodeBindMode_AddRef);
 
-      //настройка области вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
     scene_graph::Viewport vp;
     

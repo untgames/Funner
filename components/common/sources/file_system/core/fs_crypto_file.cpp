@@ -3,37 +3,37 @@
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const size_t DEFAULT_BUFFER_SIZE = 4096; //размер буферов по умолчанию
+const size_t DEFAULT_BUFFER_SIZE = 4096; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 }
 
 /*
-    Описание реализации файла с шифрованием
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С„Р°Р№Р»Р° СЃ С€РёС„СЂРѕРІР°РЅРёРµРј
 */
 
 typedef xtl::uninitialized_storage<char> Buffer;
 
 struct CryptoFileImpl::Impl
 {
-  FileImplPtr   source_file;          //исходный файл
-  CryptoContext read_crypto_context;  //контекст шифрования
-  CryptoContext write_crypto_context; //контекст шифрования
-  Buffer        read_write_buffer;    //вспомогательный буфер для чтения / записи данных из исходного файла
-  Buffer        data_buffer;          //кэш с данными после шифрования
-  filepos_t     file_pos;             //файловая позиция
-  filesize_t    file_size;            //размер файла
-  filepos_t     data_start_pos;       //позиция начала данных
-  filepos_t     data_end_pos;         //позиция конца данных
-  filepos_t     dirty_start_pos;      //позиция начала данных, требующих записи
-  filepos_t     dirty_end_pos;        //позиция конца данных, требующих записи
+  FileImplPtr   source_file;          //РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р»
+  CryptoContext read_crypto_context;  //РєРѕРЅС‚РµРєСЃС‚ С€РёС„СЂРѕРІР°РЅРёСЏ
+  CryptoContext write_crypto_context; //РєРѕРЅС‚РµРєСЃС‚ С€РёС„СЂРѕРІР°РЅРёСЏ
+  Buffer        read_write_buffer;    //РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ / Р·Р°РїРёСЃРё РґР°РЅРЅС‹С… РёР· РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  Buffer        data_buffer;          //РєСЌС€ СЃ РґР°РЅРЅС‹РјРё РїРѕСЃР»Рµ С€РёС„СЂРѕРІР°РЅРёСЏ
+  filepos_t     file_pos;             //С„Р°Р№Р»РѕРІР°СЏ РїРѕР·РёС†РёСЏ
+  filesize_t    file_size;            //СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°
+  filepos_t     data_start_pos;       //РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РґР°РЅРЅС‹С…
+  filepos_t     data_end_pos;         //РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РґР°РЅРЅС‹С…
+  filepos_t     dirty_start_pos;      //РїРѕР·РёС†РёСЏ РЅР°С‡Р°Р»Р° РґР°РЅРЅС‹С…, С‚СЂРµР±СѓСЋС‰РёС… Р·Р°РїРёСЃРё
+  filepos_t     dirty_end_pos;        //РїРѕР·РёС†РёСЏ РєРѕРЅС†Р° РґР°РЅРЅС‹С…, С‚СЂРµР±СѓСЋС‰РёС… Р·Р°РїРёСЃРё
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const FileImplPtr& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, unsigned short key_bits)
     : source_file (in_source_file)
     , read_crypto_context (read_crypto_method, key, key_bits)
@@ -65,7 +65,7 @@ struct CryptoFileImpl::Impl
     read_write_buffer.resize (buffer_size);
   }
 
-///Корректировка размеров файла
+///РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° СЂР°Р·РјРµСЂРѕРІ С„Р°Р№Р»Р°
   filesize_t AdjustBlockSizeHigh (filesize_t size)
   {
     size_t block_size = write_crypto_context.BlockSize ();
@@ -83,7 +83,7 @@ struct CryptoFileImpl::Impl
     return size / block_size * block_size;
   }
 
-///Сброс буфера данных
+///РЎР±СЂРѕСЃ Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
   void FlushBuffer ()
   {
     try
@@ -128,7 +128,7 @@ struct CryptoFileImpl::Impl
     }
   }
 
-///Подготовка буфера данных
+///РџРѕРґРіРѕС‚РѕРІРєР° Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
   void PrepareData (filepos_t pos)
   {
     if (pos >= data_start_pos && pos < data_end_pos)
@@ -136,19 +136,19 @@ struct CryptoFileImpl::Impl
 
     try
     {
-        //сброс буфера данных
+        //СЃР±СЂРѕСЃ Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
 
       FlushBuffer ();
 
       try
       {
-          //расчёт файловой позиции начала буфера файла
+          //СЂР°СЃС‡С‘С‚ С„Р°Р№Р»РѕРІРѕР№ РїРѕР·РёС†РёРё РЅР°С‡Р°Р»Р° Р±СѓС„РµСЂР° С„Р°Р№Р»Р°
 
         size_t block_size = read_crypto_context.BlockSize ();
 
         data_start_pos = (pos / block_size) * block_size;
 
-          //изменение размеров буферов
+          //РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ Р±СѓС„РµСЂРѕРІ
 
         if (source_file->Mode () & FileMode_Read)
         {
@@ -165,7 +165,7 @@ struct CryptoFileImpl::Impl
 
           if (available_size)
           {
-              //чтение и шифрование данных
+              //С‡С‚РµРЅРёРµ Рё С€РёС„СЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
             if (source_file->Seek (data_start_pos) != data_start_pos)
               throw xtl::format_operation_exception ("", "Can't seek file");
@@ -207,7 +207,7 @@ struct CryptoFileImpl::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, unsigned short key_bits)
@@ -246,12 +246,12 @@ CryptoFileImpl::~CryptoFileImpl ()
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Получение пути к файлу
+    РџРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё Рє С„Р°Р№Р»Сѓ
 */
 
 const char* CryptoFileImpl::GetPath ()
@@ -260,7 +260,7 @@ const char* CryptoFileImpl::GetPath ()
 }
 
 /*
-    Управление файловым указателем
+    РЈРїСЂР°РІР»РµРЅРёРµ С„Р°Р№Р»РѕРІС‹Рј СѓРєР°Р·Р°С‚РµР»РµРј
 */
 
 filepos_t CryptoFileImpl::Tell ()
@@ -282,7 +282,7 @@ void CryptoFileImpl::Rewind ()
 }
 
 /*
-    Управление размером файла
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРј С„Р°Р№Р»Р°
 */
 
 filesize_t CryptoFileImpl::Size ()
@@ -309,7 +309,7 @@ bool CryptoFileImpl::Eof ()
 }
 
 /*
-    Размер внутреннего буфера
+    Р Р°Р·РјРµСЂ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 size_t CryptoFileImpl::GetBufferSize ()
@@ -318,14 +318,14 @@ size_t CryptoFileImpl::GetBufferSize ()
 }
 
 /*
-    Чтение / запись
+    Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ
 */
 
 size_t CryptoFileImpl::Read (void* buf, size_t size)
 {
   try
   {
-      //усечение файла при чтении
+      //СѓСЃРµС‡РµРЅРёРµ С„Р°Р№Р»Р° РїСЂРё С‡С‚РµРЅРёРё
 
     if ((size_t)(impl->file_size - impl->file_pos) < size)
       size = (size_t)(impl->file_size - impl->file_pos);
@@ -336,36 +336,36 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
     filepos_t pos = impl->file_pos;
     char*     dst = (char*)buf;
 
-      //последовательное чтение блоков данных
+      //РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРµ С‡С‚РµРЅРёРµ Р±Р»РѕРєРѕРІ РґР°РЅРЅС‹С…
 
     while (size)
     {
-        //подготовка буфера данных
+        //РїРѕРґРіРѕС‚РѕРІРєР° Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
 
       impl->PrepareData (pos);
 
-        //копирование данных
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
       filesize_t  offset         = pos - impl->data_start_pos;
       filesize_t  available_size = impl->data_end_pos - pos;
       filesize_t  read_size      = size < available_size ? size : available_size;
       const char* src            = impl->data_buffer.data () + offset;
 
-        //проверка возможности чтения
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё С‡С‚РµРЅРёСЏ
 
       if (!read_size)
         break; //end of file
 
       memcpy (dst, src, (size_t)read_size);
 
-        //переход к следующему блоку
+        //РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ Р±Р»РѕРєСѓ
 
       size -= (size_t)read_size;
       dst  += read_size;
       pos  += read_size;
     }
 
-      //обновление файлового указателя
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
 
     filesize_t result = pos - impl->file_pos;
 
@@ -393,15 +393,15 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
     filepos_t   pos = impl->file_pos;
     const char* src = (const char*)buf;
 
-      //последовательная запись блоков данных
+      //РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅР°СЏ Р·Р°РїРёСЃСЊ Р±Р»РѕРєРѕРІ РґР°РЅРЅС‹С…
 
     while (size)
     {
-        //подготовка буфера данных
+        //РїРѕРґРіРѕС‚РѕРІРєР° Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
 
       impl->PrepareData (pos);
 
-        //копирование данных
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
       filesize_t offset         = pos - impl->data_start_pos;
       filesize_t available_size = impl->data_end_pos - pos;
@@ -424,14 +424,14 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
         if ((filepos_t)(pos + write_size) > impl->dirty_end_pos) impl->dirty_end_pos   = pos + write_size;
       }
 
-        //переход к следующему блоку
+        //РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ Р±Р»РѕРєСѓ
 
       src  += write_size;
       pos  += write_size;
       size -= write_size;
     }
 
-      //обновление файлового указателя
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
 
     filesize_t result = pos - impl->file_pos;
 
@@ -453,11 +453,11 @@ void CryptoFileImpl::Flush ()
     if (impl->file_size > impl->source_file->Size ())
       impl->source_file->Resize (impl->AdjustBlockSizeHigh ((filesize_t)impl->file_size));
 
-      //запись буферов в исходный файл
+      //Р·Р°РїРёСЃСЊ Р±СѓС„РµСЂРѕРІ РІ РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р»
 
     impl->FlushBuffer ();
 
-      //сброс файловых буферов исходного файла
+      //СЃР±СЂРѕСЃ С„Р°Р№Р»РѕРІС‹С… Р±СѓС„РµСЂРѕРІ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 
     impl->source_file->Flush ();
   }

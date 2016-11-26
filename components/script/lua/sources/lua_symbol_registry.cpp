@@ -9,21 +9,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* INTERNAL_SYMBOL_PREFIX = "__internal_"; //префикс внутренних имём символов
+const char* INTERNAL_SYMBOL_PREFIX = "__internal_"; //РїСЂРµС„РёРєСЃ РІРЅСѓС‚СЂРµРЅРЅРёС… РёРјС‘Рј СЃРёРјРІРѕР»РѕРІ
 
 }
 
 /*
-    Символ - дескриптор внутреннего объекта луа (функции, мета-таблицы и т.п.)
+    РЎРёРјРІРѕР» - РґРµСЃРєСЂРёРїС‚РѕСЂ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РѕР±СЉРµРєС‚Р° Р»СѓР° (С„СѓРЅРєС†РёРё, РјРµС‚Р°-С‚Р°Р±Р»РёС†С‹ Рё С‚.Рї.)
 */
 
 class SymbolRegistry::Symbol: public ISymbol, public xtl::reference_counter
 {
   public:
-///конструктор
+///РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Symbol (SymbolRegistry* in_registry, void* in_symbol_handle, int index) 
       : registry (in_registry)
       , symbol_handle (in_symbol_handle)
@@ -45,7 +45,7 @@ class SymbolRegistry::Symbol: public ISymbol, public xtl::reference_counter
       }
     }
 
-///деструктор
+///РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Symbol ()
     {            
       if (!registry)
@@ -62,20 +62,20 @@ class SymbolRegistry::Symbol: public ISymbol, public xtl::reference_counter
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
       
       registry->RemoveSymbol (symbol_handle);
     }
 
-///получение имени символа
+///РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРёРјРІРѕР»Р°
     const char* Name () { return internal_name.c_str (); }
     
-///подсчёт ссылок
+///РїРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }        
     
-///оповещение об удалении скриптового состояния
+///РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЃРєСЂРёРїС‚РѕРІРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void ResetState ()
     {
       registry = 0;
@@ -88,7 +88,7 @@ class SymbolRegistry::Symbol: public ISymbol, public xtl::reference_counter
 };      
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SymbolRegistry::SymbolRegistry (lua_State* in_state)
@@ -98,41 +98,41 @@ SymbolRegistry::SymbolRegistry (lua_State* in_state)
 
 SymbolRegistry::~SymbolRegistry ()
 {
-    //оповещение всех символов об удалении скриптового состояния
+    //РѕРїРѕРІРµС‰РµРЅРёРµ РІСЃРµС… СЃРёРјРІРѕР»РѕРІ РѕР± СѓРґР°Р»РµРЅРёРё СЃРєСЂРёРїС‚РѕРІРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     
   for (SymbolMap::iterator iter=symbols.begin (), end=symbols.end (); iter!=end; ++iter)
     iter->second->ResetState ();
 }
 
 /*
-    Получение и удаление символа
+    РџРѕР»СѓС‡РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р°
 */
 
 ISymbol* SymbolRegistry::GetSymbol (int index)
 {
   try
   {
-      //получение идентификатора символа
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЃРёРјРІРѕР»Р°
 
     void* symbol_handle = (void*)lua_topointer (state, index);
 
     if (!symbol_handle)
       throw xtl::format_exception<ArgumentException> ("", "Null symbol at index %u in stack", index);
 
-      //поиск символа среди зарегистрированных
+      //РїРѕРёСЃРє СЃРёРјРІРѕР»Р° СЃСЂРµРґРё Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С…
 
     SymbolMap::iterator iter = symbols.find (symbol_handle);
 
     if (iter != symbols.end ())
     {
-        //символ уже зарегистрирован
+        //СЃРёРјРІРѕР» СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ
 
       iter->second->AddRef ();
 
       return iter->second;
     }
     
-      //регистрация нового символа
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ СЃРёРјРІРѕР»Р°
 
     xtl::com_ptr<Symbol> symbol (new Symbol (this, symbol_handle, index), false);    
 

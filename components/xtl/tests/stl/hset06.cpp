@@ -1,4 +1,4 @@
-// Тестирование функции equal_range
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё equal_range
 #include <stdio.h>
 #include <stl/hash_set>
 #include "test.h"

@@ -7,28 +7,28 @@ namespace
 {
 
 /*
-    Описание профиля
+    РћРїРёСЃР°РЅРёРµ РїСЂРѕС„РёР»СЏ
 */
 
 struct Profile
 {
-  const char* name;        //имя профиля
-  GLenum      shader_type; //тип шейдеров
+  const char* name;        //РёРјСЏ РїСЂРѕС„РёР»СЏ
+  GLenum      shader_type; //С‚РёРї С€РµР№РґРµСЂРѕРІ
 };
 
-//доступные профили
+//РґРѕСЃС‚СѓРїРЅС‹Рµ РїСЂРѕС„РёР»Рё
 Profile profiles [] = {
   {"glsl.ps", GL_FRAGMENT_SHADER},
   {"glsl.vs", GL_VERTEX_SHADER}
 };
 
-//количество профилей
+//РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС„РёР»РµР№
 const unsigned int PROFILES_COUNT = sizeof (profiles) / sizeof (*profiles);
 
 }
 
 /*
-    Конструктор / Деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 GlslShaderManager::GlslShaderManager (const ContextManager& manager)
@@ -41,7 +41,7 @@ GlslShaderManager::~GlslShaderManager ()
 }
 
 /*
-    Количество поддерживаемых профилей
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РїСЂРѕС„РёР»РµР№
 */
 
 size_t GlslShaderManager::GetProfilesCount ()
@@ -50,7 +50,7 @@ size_t GlslShaderManager::GetProfilesCount ()
 }
 
 /*
-    Имена поддерживаемых профилей
+    РРјРµРЅР° РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РїСЂРѕС„РёР»РµР№
 */
 
 const char* GlslShaderManager::GetProfile (size_t index)
@@ -62,19 +62,19 @@ const char* GlslShaderManager::GetProfile (size_t index)
 }
 
 /*
-    Создание шейдера
+    РЎРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂР°
 */
 
 IShader* GlslShaderManager::CreateShader (const ShaderDesc& desc, const LogFunction& error_log)
 {    
   static const char* METHOD_NAME = "render::low_level::opengl::GlslShaderManager::CreateShader";
 
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
   if (!desc.profile)
     throw xtl::make_null_argument_exception (METHOD_NAME, "desc.profile");
     
-    //определение типа шейдера
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° С€РµР№РґРµСЂР°
 
   GLenum type = 0;
   unsigned int i;
@@ -89,7 +89,7 @@ IShader* GlslShaderManager::CreateShader (const ShaderDesc& desc, const LogFunct
   if (i == PROFILES_COUNT)
     throw xtl::make_argument_exception (METHOD_NAME, "desc.profile", desc.profile);
 
-    //создание шейдера
+    //СЃРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂР°
 
   return new GlslShader (GetContextManager (), type, desc, error_log);
 }
@@ -112,7 +112,7 @@ namespace opengl
 {
 
 /*
-    Создание менеджера GLSL шейдера
+    РЎРѕР·РґР°РЅРёРµ РјРµРЅРµРґР¶РµСЂР° GLSL С€РµР№РґРµСЂР°
 */
 
 IShaderManager* create_glsl_shader_manager (const ContextManager& manager)

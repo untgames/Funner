@@ -9,7 +9,7 @@ class BatchingManager;
 template <class T> class DynamicPrimitiveBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вершина спрайта / вершина линии
+///Р’РµСЂС€РёРЅР° СЃРїСЂР°Р№С‚Р° / РІРµСЂС€РёРЅР° Р»РёРЅРёРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct DynamicPrimitiveVertex
 {
@@ -24,22 +24,22 @@ typedef DynamicPrimitiveBuffer<DynamicPrimitiveIndex>  DynamicIndexBuffer;
 typedef DynamicPrimitiveBuffer<DynamicPrimitiveVertex> DynamicVertexBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание примитива рендеринга
+///РћРїРёСЃР°РЅРёРµ РїСЂРёРјРёС‚РёРІР° СЂРµРЅРґРµСЂРёРЅРіР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitive
 {
-  MaterialImpl*                       material;         //материал
-  render::low_level::IStateBlock*     state_block;      //блок состояний примитива
-  bool                                indexed;          //является ли данный примитив индексированным или состоящим только из вершин без индексов
-  render::low_level::PrimitiveType    type;             //тип примитива
-  unsigned int                        first;            //индекс первой вершины/индекса
-  unsigned int                        count;            //количество примитивов
-  unsigned int                        base_vertex;      //индекс базовой вершины
-  size_t                              tags_count;       //количество тэгов материала
-  const size_t*                       tags;             //тэги материала
-  const DynamicPrimitiveIndex* const* dynamic_indices;  //указатель на массив динамических индексов
-  BatchingManager*                    batching_manager; //менеджер упаковки
-  size_t                              batching_hash;    //хэш пакета
+  MaterialImpl*                       material;         //РјР°С‚РµСЂРёР°Р»
+  render::low_level::IStateBlock*     state_block;      //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРёРјРёС‚РёРІР°
+  bool                                indexed;          //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґР°РЅРЅС‹Р№ РїСЂРёРјРёС‚РёРІ РёРЅРґРµРєСЃРёСЂРѕРІР°РЅРЅС‹Рј РёР»Рё СЃРѕСЃС‚РѕСЏС‰РёРј С‚РѕР»СЊРєРѕ РёР· РІРµСЂС€РёРЅ Р±РµР· РёРЅРґРµРєСЃРѕРІ
+  render::low_level::PrimitiveType    type;             //С‚РёРї РїСЂРёРјРёС‚РёРІР°
+  unsigned int                        first;            //РёРЅРґРµРєСЃ РїРµСЂРІРѕР№ РІРµСЂС€РёРЅС‹/РёРЅРґРµРєСЃР°
+  unsigned int                        count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ
+  unsigned int                        base_vertex;      //РёРЅРґРµРєСЃ Р±Р°Р·РѕРІРѕР№ РІРµСЂС€РёРЅС‹
+  size_t                              tags_count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ С‚СЌРіРѕРІ РјР°С‚РµСЂРёР°Р»Р°
+  const size_t*                       tags;             //С‚СЌРіРё РјР°С‚РµСЂРёР°Р»Р°
+  const DynamicPrimitiveIndex* const* dynamic_indices;  //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РґРёРЅР°РјРёС‡РµСЃРєРёС… РёРЅРґРµРєСЃРѕРІ
+  BatchingManager*                    batching_manager; //РјРµРЅРµРґР¶РµСЂ СѓРїР°РєРѕРІРєРё
+  size_t                              batching_hash;    //С…СЌС€ РїР°РєРµС‚Р°
 };
 
 inline size_t get_batching_hash (const RendererPrimitive& p)
@@ -48,16 +48,16 @@ inline size_t get_batching_hash (const RendererPrimitive& p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание группы примитивов рендеринга
+///РћРїРёСЃР°РЅРёРµ РіСЂСѓРїРїС‹ РїСЂРёРјРёС‚РёРІРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitiveGroup
 {
-  unsigned int             primitives_count; //количество примитивов в группе
-  const RendererPrimitive* primitives;       //примитивы
+  unsigned int             primitives_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ РІ РіСЂСѓРїРїРµ
+  const RendererPrimitive* primitives;       //РїСЂРёРјРёС‚РёРІС‹
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание группы динамических примитивов рендеринга
+///РћРїРёСЃР°РЅРёРµ РіСЂСѓРїРїС‹ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererDynamicPrimitiveGroup: public RendererPrimitiveGroup
 {
@@ -71,18 +71,18 @@ struct RendererDynamicPrimitiveGroup: public RendererPrimitiveGroup
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание операции рендеринга
+///РћРїРёСЃР°РЅРёРµ РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererOperation
 {
-  EntityImpl*                     entity;                   //объект
-  render::low_level::IStateBlock* state_block;              //блок состояний объекта
-  ProgramParametersLayout*        entity_parameters_layout; //расположение параметров объекта
-  const RendererPrimitive*        primitive;                //примитив
-  Program*                        program;                  //программа (с учетом опций шейдера, задаваемых в EntityImpl)
-  DynamicPrimitive*               dynamic_primitive;        //динамический примитив, соответствующий операции (может быть 0)
-  const BoxAreaImpl*              scissor;                  //область отсечения (может быть null)
-  size_t                          batching_hash;            //хэш пакета
+  EntityImpl*                     entity;                   //РѕР±СЉРµРєС‚
+  render::low_level::IStateBlock* state_block;              //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РѕР±СЉРµРєС‚Р°
+  ProgramParametersLayout*        entity_parameters_layout; //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±СЉРµРєС‚Р°
+  const RendererPrimitive*        primitive;                //РїСЂРёРјРёС‚РёРІ
+  Program*                        program;                  //РїСЂРѕРіСЂР°РјРјР° (СЃ СѓС‡РµС‚РѕРј РѕРїС†РёР№ С€РµР№РґРµСЂР°, Р·Р°РґР°РІР°РµРјС‹С… РІ EntityImpl)
+  DynamicPrimitive*               dynamic_primitive;        //РґРёРЅР°РјРёС‡РµСЃРєРёР№ РїСЂРёРјРёС‚РёРІ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РѕРїРµСЂР°С†РёРё (РјРѕР¶РµС‚ Р±С‹С‚СЊ 0)
+  const BoxAreaImpl*              scissor;                  //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ (РјРѕР¶РµС‚ Р±С‹С‚СЊ null)
+  size_t                          batching_hash;            //С…СЌС€ РїР°РєРµС‚Р°
 };
 
 inline size_t get_batching_hash (const RendererOperation& op)
@@ -95,10 +95,10 @@ inline size_t get_batching_hash (const RendererOperation& op)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание списка операций
+///РћРїРёСЃР°РЅРёРµ СЃРїРёСЃРєР° РѕРїРµСЂР°С†РёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererOperationList
 {
-  unsigned int             operations_count; //количество операций
-  const RendererOperation* operations;       //операции
+  unsigned int             operations_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїРµСЂР°С†РёР№
+  const RendererOperation* operations;       //РѕРїРµСЂР°С†РёРё
 };

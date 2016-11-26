@@ -6,7 +6,7 @@ const size_t DEFAULT_ITEMS_RESERVE = 8;
 }
 
 /*
-   Конструкторы / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Item, class BaseClass>
@@ -28,7 +28,7 @@ CollectionImpl<Item, BaseClass>& CollectionImpl<Item, BaseClass>::operator = (co
 }
 
 /*
-   Количество элементов / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class Item, class BaseClass>
@@ -44,7 +44,7 @@ bool CollectionImpl<Item, BaseClass>::IsEmpty () const
 }
 
 /*
-   Доступ к элементу по индексу
+   Р”РѕСЃС‚СѓРї Рє СЌР»РµРјРµРЅС‚Сѓ РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 template <class Item, class BaseClass>
@@ -63,7 +63,7 @@ Item& CollectionImpl<Item, BaseClass>::operator [] (size_t index)
 }
 
 /*
-   Доступ к элементу по имени (в случае отсутствия - исключение)
+   Р”РѕСЃС‚СѓРї Рє СЌР»РµРјРµРЅС‚Сѓ РїРѕ РёРјРµРЅРё (РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ - РёСЃРєР»СЋС‡РµРЅРёРµ)
 */
 
 template <class Item, class BaseClass>
@@ -87,7 +87,7 @@ const Item& CollectionImpl<Item, BaseClass>::operator [] (const char* name) cons
 }
 
 /*
-   Поиск элемента по имени (в случае отсутствия возвращает 0)
+   РџРѕРёСЃРє СЌР»РµРјРµРЅС‚Р° РїРѕ РёРјРµРЅРё (РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ 0)
 */
 
 template <class Item, class BaseClass>
@@ -122,7 +122,7 @@ const Item* CollectionImpl<Item, BaseClass>::Find (const char* name) const
 }
 
 /*
-   Получение итератора
+   РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class Item, class BaseClass>
@@ -138,7 +138,7 @@ typename CollectionImpl<Item, BaseClass>::ConstIterator CollectionImpl<Item, Bas
 }
 
 /*
-   Резервирование элементов
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Item, class BaseClass>
@@ -154,7 +154,7 @@ void CollectionImpl<Item, BaseClass>::Reserve (size_t count)
 }
 
 /*
-   Добавление элемента в коллекцию
+   Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РІ РєРѕР»Р»РµРєС†РёСЋ
 */
 
 template <class Item, class BaseClass>
@@ -166,7 +166,7 @@ size_t CollectionImpl<Item, BaseClass>::Add (const Item& item)
 }
 
 /*
-   Удаление элемента из коллекции
+   РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РёР· РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class Item, class BaseClass>
@@ -179,7 +179,7 @@ void CollectionImpl<Item, BaseClass>::Remove (size_t index)
 }
 
 /*
-   Очистка коллекции
+   РћС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class Item, class BaseClass>

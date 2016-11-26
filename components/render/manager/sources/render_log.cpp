@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* LOG_NAME = "render.manager";
@@ -20,13 +20,13 @@ namespace manager
 {
 
 /*
-    Описание реализации протокола
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРѕС‚РѕРєРѕР»Р°
 */
 
 class LogImpl: public xtl::reference_counter
 {
   public:
-    common::Log log; //протокол
+    common::Log log; //РїСЂРѕС‚РѕРєРѕР»
 
     LogImpl (const char* log_name) : log (log_name) {}
 };
@@ -39,7 +39,7 @@ namespace
 {
 
 /*
-    Хранилище для реализации протокола
+    РҐСЂР°РЅРёР»РёС‰Рµ РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРѕС‚РѕРєРѕР»Р°
 */
 
 struct ImplHolder
@@ -52,7 +52,7 @@ struct ImplHolder
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Log::Log ()
@@ -85,7 +85,7 @@ Log& Log::operator = (const Log& log)
 }
 
 /*
-    Печать сообщений
+    РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void Log::Print (const char* message) const

@@ -10,7 +10,7 @@ namespace xfl_loader
 
 const char* DOCUMENT_XML_NAME = "DOMDocument.xml";
 
-//загрузчик Xfl-файлов
+//Р·Р°РіСЂСѓР·С‡РёРє Xfl-С„Р°Р№Р»РѕРІ
 class XflLoaderComponent
 {
   public:

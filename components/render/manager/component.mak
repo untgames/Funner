@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := RENDER.MANAGER.SOURCES RENDER.MANAGER.TESTS
 
-#Цель №1 - RENDER system sources
+#Р¦РµР»СЊ в„–1 - RENDER system sources
 RENDER.MANAGER.SOURCES.TYPE                 := static-lib
 RENDER.MANAGER.SOURCES.NAME                 := funner.render.manager
 RENDER.MANAGER.SOURCES.SOURCE_DIRS          := sources
@@ -11,7 +11,7 @@ RENDER.MANAGER.SOURCES.IMPORTS              := compile.render.manager compile.me
                                                compile.media.rfx compile.system compile.render.low_level compile.math.bound_volumes
 RENDER.MANAGER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503                                               
 
-#Цель №2 - RENDER system tests
+#Р¦РµР»СЊ в„–2 - RENDER system tests
 RENDER.MANAGER.TESTS.TYPE             := test-suite
 RENDER.MANAGER.TESTS.INCLUDE_DIRS     := ../../xtl/include sources
 RENDER.MANAGER.TESTS.SOURCE_DIRS      := tests/public tests/internal

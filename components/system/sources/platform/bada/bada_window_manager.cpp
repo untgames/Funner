@@ -11,13 +11,13 @@ namespace
 {
 
 /*
-    Описание реализации окна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 */
 
 class WindowImpl: public Form
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WindowImpl (const WindowMessageHandler& in_message_handler, void* in_user_data)
       : message_handler (in_message_handler)
       , user_data (in_user_data)
@@ -33,7 +33,7 @@ class WindowImpl: public Form
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }*/
     }
 
@@ -43,7 +43,7 @@ class WindowImpl: public Form
 };
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void convert_rect (int x, int y, int width, int height, Rect& rect)
@@ -81,7 +81,7 @@ struct syslib::window_handle
 
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t BadaWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
@@ -101,11 +101,11 @@ window_t BadaWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     if (parent_handle)
       throw xtl::format_not_supported_exception ("", "Child windows are not supported");
       
-      //получение объекта приложения
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
       
     Osp::App::Application& app = get_application ();
       
-      //создание и инициализация окна
+      //СЃРѕР·РґР°РЅРёРµ Рё РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРєРЅР°
       
     stl::auto_ptr<window_handle> handle (new window_handle);
     
@@ -116,7 +116,7 @@ window_t BadaWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     if (IsFailed (res))
       raise ("Osp::Ui::Controls::Form::Construct", res);
       
-      //регистрация формы
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„РѕСЂРјС‹
       
     Frame* app_frame = app.GetAppFrame ()->GetFrame ();
     
@@ -147,7 +147,7 @@ void BadaWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* BadaWindowManager::GetNativeWindowHandle (window_t handle)
@@ -161,7 +161,7 @@ const void* BadaWindowManager::GetNativeDisplayHandle (window_t handle)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void BadaWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
@@ -198,7 +198,7 @@ void BadaWindowManager::GetWindowTitle (window_t handle, size_t buffer_size_in_c
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void BadaWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -254,7 +254,7 @@ void BadaWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void BadaWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -354,7 +354,7 @@ bool BadaWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void BadaWindowManager::InvalidateWindow (window_t handle)

@@ -15,15 +15,15 @@ inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
 }
 
 /*
-    Инициализация точек входа GLX
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР° GLX
 */
 
 void GlxExtensionsEntries::Init (ILibrary& library)
 {
-    //обнуление адресов точек входа
+    //РѕР±РЅСѓР»РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР°
 
   memset (this, 0, sizeof (GlxExtensionsEntries));
 
-    //получение адресов точек входа расширений OpenGL
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
 <<<GLXINIT>>>
 }

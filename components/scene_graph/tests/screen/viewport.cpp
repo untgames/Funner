@@ -1,6 +1,6 @@
 #include "shared.h"
 
-///Слушатель событий области вывода
+///РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 class MyViewportListener: public IViewportListener
 {
   public:
@@ -58,16 +58,16 @@ int main ()
   {
     MyViewportListener listener;
     
-      //создание камеры и области вывода
+      //СЃРѕР·РґР°РЅРёРµ РєР°РјРµСЂС‹ Рё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
     Viewport viewport;
     Camera::Pointer camera = OrthoCamera::Create ();
 
-      //присоединение слушателя к области вывода      
+      //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ Рє РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°      
 
     viewport.AttachListener (&listener);
 
-      //изменение параметров области вывода
+      //РёР·РјРµРЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
     viewport.SetName ("viewport1");
     viewport.SetZOrder (12);
@@ -80,17 +80,17 @@ int main ()
     viewport.SetMinDepth (0.5f);
     viewport.SetMaxDepth (0.75f);
     
-      //удаление камеры (проверка weak-reference области вывода)
+      //СѓРґР°Р»РµРЅРёРµ РєР°РјРµСЂС‹ (РїСЂРѕРІРµСЂРєР° weak-reference РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°)
 
     printf ("Delete camera\n");      
 
     camera = 0;
 
-      //изменение свойств
+      //РёР·РјРµРЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ
       
     viewport.SetProperties (common::PropertyMap ());
 
-      //печать свойств области вывода
+      //РїРµС‡Р°С‚СЊ СЃРІРѕР№СЃС‚РІ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
       
     printf ("Viewport '%s':\n", viewport.Name ());
     printf ("  z-order:     %d\n", viewport.ZOrder ());

@@ -7,13 +7,13 @@ namespace
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///DevIL картинка
+///DevIL РєР°СЂС‚РёРЅРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class DevILImageImpl: public ImageImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     DevILImageImpl  ();
     DevILImageImpl  (const DevILImageImpl&);
@@ -22,18 +22,18 @@ class DevILImageImpl: public ImageImpl
     ~DevILImageImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ImageImpl* Clone ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формат / преобразование формата
+///Р¤РѕСЂРјР°С‚ / РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PixelFormat Format  () { return format; }
     void        Convert (PixelFormat new_format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Размеры картинки / изменение размеров
+///Р Р°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё / РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int Width  () { return width; }
     unsigned int Height () { return height; }
@@ -41,14 +41,14 @@ class DevILImageImpl: public ImageImpl
     void         Resize (unsigned int width, unsigned int height, unsigned int depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с образом
+///Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void* Bitmap   (unsigned int z);
     void  PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
     void  GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сохранение
+///РЎРѕС…СЂР°РЅРµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Save (const char* file_name);
 
@@ -59,12 +59,12 @@ class DevILImageImpl: public ImageImpl
     }
 
   private:
-    ILuint      il_image;             //идентификатор картинки в DevIL
-    ILuint      width, height, depth; //кэшируемые размеры картинки
-    PixelFormat format;               //кэшируемый формат картинки
+    ILuint      il_image;             //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°СЂС‚РёРЅРєРё РІ DevIL
+    ILuint      width, height, depth; //РєСЌС€РёСЂСѓРµРјС‹Рµ СЂР°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё
+    PixelFormat format;               //РєСЌС€РёСЂСѓРµРјС‹Р№ С„РѕСЂРјР°С‚ РєР°СЂС‚РёРЅРєРё
 };
 
-//генерация DevIL исключения
+//РіРµРЅРµСЂР°С†РёСЏ DevIL РёСЃРєР»СЋС‡РµРЅРёСЏ
 void raise_devil_exception (const char* source, const char* format, ...)
 {
   va_list list;
@@ -75,7 +75,7 @@ void raise_devil_exception (const char* source, const char* format, ...)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формат пикселей DevIL
+///Р¤РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№ DevIL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct DevILPixelFormat
 {
@@ -86,7 +86,7 @@ struct DevILPixelFormat
      format (in_format), type (in_type), components (in_components) {}
 };
 
-//преобразование PixelFormat -> DevILPixelFormat
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ PixelFormat -> DevILPixelFormat
 DevILPixelFormat get_devil_format (PixelFormat format)
 {
   switch (format)
@@ -103,10 +103,10 @@ DevILPixelFormat get_devil_format (PixelFormat format)
     default:                 throw xtl::make_argument_exception ("media::get_devil_format", "format", format); break;
   }
 
-  return DevILPixelFormat (0, 0, 0); //для обхода предупреждений компилятора, данная точка недостижима
+  return DevILPixelFormat (0, 0, 0); //РґР»СЏ РѕР±С…РѕРґР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№ РєРѕРјРїРёР»СЏС‚РѕСЂР°, РґР°РЅРЅР°СЏ С‚РѕС‡РєР° РЅРµРґРѕСЃС‚РёР¶РёРјР°
 }
 
-//проверка DevIL ошибок
+//РїСЂРѕРІРµСЂРєР° DevIL РѕС€РёР±РѕРє
 void check_devil_errors (const char* source, const char* sub_source)
 {
   ILenum error = ilGetError ();
@@ -115,7 +115,7 @@ void check_devil_errors (const char* source, const char* sub_source)
     raise_devil_exception (source, "Internal DevIL error: %s (after call %s)", iluErrorString (error), sub_source);
 }
 
-//получение имени DevIL формата
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё DevIL С„РѕСЂРјР°С‚Р°
 const char* get_devil_format_name (ILenum format)
 {
   switch (format)
@@ -166,7 +166,7 @@ typedef common::Singleton<DevILLock> DevILLockSingleton;
 */
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DevILImageImpl::DevILImageImpl ()
@@ -346,7 +346,7 @@ DevILImageImpl::~DevILImageImpl ()
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 ImageImpl* DevILImageImpl::Clone ()
@@ -355,7 +355,7 @@ ImageImpl* DevILImageImpl::Clone ()
 }
 
 /*
-    Формат
+    Р¤РѕСЂРјР°С‚
 */
 
 void DevILImageImpl::Convert (PixelFormat new_format)
@@ -379,7 +379,7 @@ void DevILImageImpl::Convert (PixelFormat new_format)
 }
 
 /*
-    Размеры картинки
+    Р Р°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё
 */
 
 void DevILImageImpl::Resize (unsigned int in_width, unsigned int in_height, unsigned int in_depth)
@@ -402,7 +402,7 @@ void DevILImageImpl::Resize (unsigned int in_width, unsigned int in_height, unsi
 }
 
 /*
-    Работа с образом
+    Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј
 */
 
 void* DevILImageImpl::Bitmap (unsigned int z)
@@ -453,7 +453,7 @@ void DevILImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int z, u
 }
 
 /*
-    Сохранение
+    РЎРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void DevILImageImpl::Save (const char* file_name)
@@ -477,7 +477,7 @@ namespace media
 {
 
 /*
-    Создание реализаций картинок
+    РЎРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёР№ РєР°СЂС‚РёРЅРѕРє
 */
 
 ImageImpl* create_bitmap_image ()

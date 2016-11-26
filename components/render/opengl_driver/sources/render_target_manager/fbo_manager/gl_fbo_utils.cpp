@@ -11,7 +11,7 @@ namespace low_level
 namespace opengl
 {
 
-//проверка состояния текущего буфера кадра
+//РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 void check_frame_buffer_status (const char* source, GLenum status)
 {
   switch (status)

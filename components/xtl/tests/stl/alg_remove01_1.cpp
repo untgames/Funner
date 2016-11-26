@@ -1,4 +1,4 @@
-//Тестирование алгоритма remove_copy (first, last, result, value)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° remove_copy (first, last, result, value)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

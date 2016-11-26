@@ -7,13 +7,13 @@
 using namespace media::animation;
 
 /*
-    Описание реализации блендера анимаций
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±Р»РµРЅРґРµСЂР° Р°РЅРёРјР°С†РёР№
 */
 
 namespace
 {
 
-///Буфер событий
+///Р‘СѓС„РµСЂ СЃРѕР±С‹С‚РёР№
 class EventBuffer: public xtl::noncopyable
 {
   struct Event
@@ -26,7 +26,7 @@ class EventBuffer: public xtl::noncopyable
     static const size_t AVERAGE_EVENT_SIZE    = 16;
     static const size_t RESERVED_BUFFER_SIZE  = RESERVED_EVENTS_COUNT * (sizeof (Event) - sizeof (char) + AVERAGE_EVENT_SIZE);
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     EventBuffer ()
       : event_handler (xtl::bind (&EventBuffer::AddEvent, this, _1, _2))
     {
@@ -34,7 +34,7 @@ class EventBuffer: public xtl::noncopyable
       event_offsets.reserve (RESERVED_EVENTS_COUNT);
     }
     
-///Добавление события
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ
     void AddEvent (float time, const char* event_string)
     {
       size_t event_size   = strlen (event_string) + 1 + sizeof (Event) - sizeof (char);
@@ -56,14 +56,14 @@ class EventBuffer: public xtl::noncopyable
       events.GetEvents (previous_time, current_time, event_handler);
     }
     
-///Очистка буферов
+///РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂРѕРІ
     void Clear ()
     {
       buffer.resize (0u, false);
       event_offsets.clear ();
     }
     
-///Получение событий
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёР№
     void InvokeEvents (const AnimationBlender::EventTrackHandler& handler)
     {
       Sort ();
@@ -77,7 +77,7 @@ class EventBuffer: public xtl::noncopyable
     }
     
   private:
-///Сортировка
+///РЎРѕСЂС‚РёСЂРѕРІРєР°
     struct SortPredicate
     {
       char* base;
@@ -99,26 +99,26 @@ class EventBuffer: public xtl::noncopyable
     }
     
   private:
-    xtl::uninitialized_storage<char>    buffer;        //буфер событий
-    stl::vector<size_t>                 event_offsets; //смещения событий в буфере
-    AnimationBlender::EventTrackHandler event_handler; //обработчик добавления события
+    xtl::uninitialized_storage<char>    buffer;        //Р±СѓС„РµСЂ СЃРѕР±С‹С‚РёР№
+    stl::vector<size_t>                 event_offsets; //СЃРјРµС‰РµРЅРёСЏ СЃРѕР±С‹С‚РёР№ РІ Р±СѓС„РµСЂРµ
+    AnimationBlender::EventTrackHandler event_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє РґРѕР±Р°РІР»РµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ
 };
 
-///Цель анимации
+///Р¦РµР»СЊ Р°РЅРёРјР°С†РёРё
 struct Target: public xtl::reference_counter
 {
-  TargetBlender        blender;                     //блендер
-  stl::string          name;                        //имя цели
-  xtl::auto_connection on_empty_blender_connection; //соединение с сигналом опустошения блендера цели
+  TargetBlender        blender;                     //Р±Р»РµРЅРґРµСЂ
+  stl::string          name;                        //РёРјСЏ С†РµР»Рё
+  xtl::auto_connection on_empty_blender_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј РѕРїСѓСЃС‚РѕС€РµРЅРёСЏ Р±Р»РµРЅРґРµСЂР° С†РµР»Рё
 };
 
-///Анимация
+///РђРЅРёРјР°С†РёСЏ
 struct AnimationSource: public xtl::reference_counter
 {
-  EventTrack               events;                     //события анимации
-  AnimationStateImpl*      state;                      //состояние анимации
-  float                    prev_time;                  //предыдущее время анимации
-  xtl::auto_connection     on_state_remove_connection; //соединение с сигналом удаления анимационного состояния
+  EventTrack               events;                     //СЃРѕР±С‹С‚РёСЏ Р°РЅРёРјР°С†РёРё
+  AnimationStateImpl*      state;                      //СЃРѕСЃС‚РѕСЏРЅРёРµ Р°РЅРёРјР°С†РёРё
+  float                    prev_time;                  //РїСЂРµРґС‹РґСѓС‰РµРµ РІСЂРµРјСЏ Р°РЅРёРјР°С†РёРё
+  xtl::auto_connection     on_state_remove_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј СѓРґР°Р»РµРЅРёСЏ Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
   
   AnimationSource () : state (0), prev_time (0.0f) {}    
 };
@@ -134,17 +134,17 @@ struct AnimationBlender::Impl: public xtl::reference_counter
 {
   typedef xtl::signal<void (AnimationBlenderEvent, const char*, TargetBlender&)> Signal;
 
-  TargetMap          targets;                             //цели анимации
-  AnimationSourceMap sources;                             //исходные анимации
-  Signal             signals [AnimationBlenderEvent_Num]; //сигналы  
-  EventBuffer        event_buffer;                        //буфер событий
+  TargetMap          targets;                             //С†РµР»Рё Р°РЅРёРјР°С†РёРё
+  AnimationSourceMap sources;                             //РёСЃС…РѕРґРЅС‹Рµ Р°РЅРёРјР°С†РёРё
+  Signal             signals [AnimationBlenderEvent_Num]; //СЃРёРіРЅР°Р»С‹  
+  EventBuffer        event_buffer;                        //Р±СѓС„РµСЂ СЃРѕР±С‹С‚РёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
   }
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void Notify (AnimationBlenderEvent event, const char* target_name, TargetBlender& blender)
   {
     if (event < 0 || event >= AnimationBlenderEvent_Num)
@@ -156,21 +156,21 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   
-///Добавление анимации
+///Р”РѕР±Р°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРё
   AnimationState AddSource (const Animation& animation, const PropertyNameMap* name_map)
   {
-      //если анимация уже находится в блендере - возвращаем объект её состояния
+      //РµСЃР»Рё Р°РЅРёРјР°С†РёСЏ СѓР¶Рµ РЅР°С…РѕРґРёС‚СЃСЏ РІ Р±Р»РµРЅРґРµСЂРµ - РІРѕР·РІСЂР°С‰Р°РµРј РѕР±СЉРµРєС‚ РµС‘ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     
     AnimationSourceMap::iterator iter = sources.find (animation.Id ());
     
     if (iter != sources.end ())
       return AnimationState (*iter->second->state);
 
-      //добавление аимации в блендер
+      //РґРѕР±Р°РІР»РµРЅРёРµ Р°РёРјР°С†РёРё РІ Р±Р»РµРЅРґРµСЂ
 
     AnimationState state;
 
@@ -180,11 +180,11 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     source->state                      = &state.Impl ();
     source->on_state_remove_connection = get_trackable (state).connect_tracker (xtl::bind (&Impl::RemoveAnimation, this, animation.Id ()));
     
-      //сохранение анимации
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°РЅРёРјР°С†РёРё
 
     sources.insert_pair (animation.Id (), source);
 
-      //размещение целей анимации
+      //СЂР°Р·РјРµС‰РµРЅРёРµ С†РµР»РµР№ Р°РЅРёРјР°С†РёРё
       
     for (unsigned int i=0, count=animation.TargetsCount (); i<count; i++)
     {
@@ -194,7 +194,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
       if (!target_name)
         throw xtl::format_operation_exception ("", "Internal error: null animation target name");
         
-        //поиск или создание цели
+        //РїРѕРёСЃРє РёР»Рё СЃРѕР·РґР°РЅРёРµ С†РµР»Рё
       
       TargetMap::iterator iter = targets.find (target_name);
       
@@ -204,7 +204,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
       {
         target = iter->second;
         
-          //добавление каналов
+          //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
           
         for (unsigned int j=0; j<channels_count; j++)
           if (name_map) target->blender.AddSource (state, animation.Channel (i, j), *name_map);
@@ -212,7 +212,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
       }
       else
       {
-          //создание цели
+          //СЃРѕР·РґР°РЅРёРµ С†РµР»Рё
 
         target = TargetPtr (new Target, false);
 
@@ -223,13 +223,13 @@ struct AnimationBlender::Impl: public xtl::reference_counter
 
         try
         {
-            //добавление каналов
+            //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
           
           for (unsigned int j=0; j<channels_count; j++)
             if (name_map) target->blender.AddSource (state, animation.Channel (i, j), *name_map);
             else          target->blender.AddSource (state, animation.Channel (i, j));
             
-            //оповещение о появлении новой цели
+            //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕСЏРІР»РµРЅРёРё РЅРѕРІРѕР№ С†РµР»Рё
             
           Notify (AnimationBlenderEvent_OnTargetAdded, target_name, target->blender);
         }
@@ -244,13 +244,13 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     return state;
   }
 
-///Удаление анимации
+///РЈРґР°Р»РµРЅРёРµ Р°РЅРёРјР°С†РёРё
   void RemoveAnimation (size_t id)
   {
     sources.erase (id);
   }
   
-///Удаление цели
+///РЈРґР°Р»РµРЅРёРµ С†РµР»Рё
   void RemoveTarget (const stl::hash_key<const char*>& key)
   {
     TargetMap::iterator iter = targets.find (key);
@@ -263,7 +263,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     targets.erase (iter);
   }
   
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
   void Update (const EventTrackHandler* event_handler)
   {
     stl::auto_ptr<stl::string> error_string;
@@ -313,7 +313,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
       {
         try
         {
-            //формирование списка событий
+            //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР° СЃРѕР±С‹С‚РёР№
           
           for (AnimationSourceMap::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
           {
@@ -329,7 +329,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
             source.prev_time = time;
           }
           
-            //сортировка событий по времени и вызов обработчика
+            //СЃРѕСЂС‚РёСЂРѕРІРєР° СЃРѕР±С‹С‚РёР№ РїРѕ РІСЂРµРјРµРЅРё Рё РІС‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 
           event_buffer.InvokeEvents (*event_handler);
           event_buffer.Clear ();
@@ -354,7 +354,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AnimationBlender::AnimationBlender ()
@@ -380,7 +380,7 @@ AnimationBlender& AnimationBlender::operator = (const AnimationBlender& blender)
 }
 
 /*
-    Общее количество источников
+    РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 size_t AnimationBlender::SourcesCount () const
@@ -399,7 +399,7 @@ size_t AnimationBlender::SourceChannelsCount () const
 }
 
 /*
-    Добавление анимации
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРё
 */
 
 AnimationState AnimationBlender::AddSource (const Animation& animation, const PropertyNameMap& name_map)
@@ -443,7 +443,7 @@ void AnimationBlender::RemoveAllSources ()
 }
 
 /*
-    Количество анимируемых целей
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р°РЅРёРјРёСЂСѓРµРјС‹С… С†РµР»РµР№
 */
 
 size_t AnimationBlender::TargetsCount () const
@@ -452,7 +452,7 @@ size_t AnimationBlender::TargetsCount () const
 }
 
 /*
-    Перебор целей анимации
+    РџРµСЂРµР±РѕСЂ С†РµР»РµР№ Р°РЅРёРјР°С†РёРё
 */
 
 namespace
@@ -476,7 +476,7 @@ AnimationBlender::ConstTargetIterator AnimationBlender::CreateTargetIterator () 
 }
 
 /*
-    Получение имени цели
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С†РµР»Рё
 */
 
 const char* AnimationBlender::TargetId (const ConstTargetIterator& i) const
@@ -495,7 +495,7 @@ const char* AnimationBlender::TargetId (const ConstTargetIterator& i) const
 }
 
 /*
-    Обновление состояния
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void AnimationBlender::Update ()
@@ -525,7 +525,7 @@ void AnimationBlender::Update (const EventTrack::EventHandler& event_handler)
 }
 
 /*
-    Подписка на события блендера анимаций
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ Р±Р»РµРЅРґРµСЂР° Р°РЅРёРјР°С†РёР№
 */
 
 xtl::connection AnimationBlender::RegisterEventHandler (AnimationBlenderEvent event, const EventHandler& handler)
@@ -537,7 +537,7 @@ xtl::connection AnimationBlender::RegisterEventHandler (AnimationBlenderEvent ev
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void AnimationBlender::Swap (AnimationBlender& blender)

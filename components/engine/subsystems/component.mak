@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := ENGINE.SUBSYSTEMS.SOURCES ENGINE.SUBSYSTEMS.TESTS
 
-#Цель - sources
+#Р¦РµР»СЊ - sources
 ENGINE.SUBSYSTEMS.SOURCES.TYPE                    := static-lib
 ENGINE.SUBSYSTEMS.SOURCES.NAME                    := funner.engine.subsystems
 ENGINE.SUBSYSTEMS.SOURCES.SOURCE_DIRS             := sources/common
@@ -16,7 +16,7 @@ ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 ENGINE.SUBSYSTEMS.SOURCES.iphone.SOURCE_DIRS      := sources/iphone
 
-#Цель - tests
+#Р¦РµР»СЊ - tests
 ENGINE.SUBSYSTEMS.TESTS.TYPE                := test-suite
 ENGINE.SUBSYSTEMS.TESTS.SOURCE_DIRS         := tests
 ENGINE.SUBSYSTEMS.TESTS.INSTALLATION_FILES  := tests/config_window_manager_shell.xml tests/config_window_manager.xml tests/config_shell.xml tests/config_cursor.xml

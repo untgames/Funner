@@ -1,6 +1,6 @@
 /*
 
-    Конструктор и присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Рё РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class WordT>
@@ -27,7 +27,7 @@ inline bit_reference<WordT>& bit_reference<WordT>::operator = (const bit_referen
 }
 
 /*
-    Двоичные операции
+    Р”РІРѕРёС‡РЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
  
 template <class WordT>
@@ -74,7 +74,7 @@ inline bool bit_reference<WordT>::operator & (bool value) const
 }
 
 /*
-    Преобразование к bool
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Рє bool
 */
 
 template <class WordT>
@@ -84,7 +84,7 @@ inline bit_reference<WordT>::operator bool () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class WordT>
@@ -102,7 +102,7 @@ inline void swap (bit_reference<WordT>& x,bit_reference<WordT>& y)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class WordT>

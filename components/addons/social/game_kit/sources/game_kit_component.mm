@@ -6,14 +6,14 @@ using namespace social::game_kit;
 namespace
 {
 
-const char* COMPONENT_NAME    = "social.sessions.game_kit"; //имя компонента
-const char* SESSION_ID        = "GameKit";                  //идентификатор сессии
-const char* SESSION_NAME_MASK = "GameKit";                  //маска имен сессии
+const char* COMPONENT_NAME    = "social.sessions.game_kit"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* SESSION_ID        = "GameKit";                  //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРµСЃСЃРёРё
+const char* SESSION_NAME_MASK = "GameKit";                  //РјР°СЃРєР° РёРјРµРЅ СЃРµСЃСЃРёРё
 
 }
 
 /*
-   Компонент сессии
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРµСЃСЃРёРё
 */
 
 namespace components

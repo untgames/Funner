@@ -5,17 +5,17 @@ using namespace media::adobe::xfl;
 typedef media::CollectionImpl<Frame, ICollection<Frame> > FrameCollection;
 
 /*
-    Описание реализации слоя анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃР»РѕСЏ Р°РЅРёРјР°С†РёРё
 */
 
 struct Layer::Impl : public xtl::reference_counter
 {
-  stl::string     name;   //имя слоя
-  FrameCollection frames; //кадры
+  stl::string     name;   //РёРјСЏ СЃР»РѕСЏ
+  FrameCollection frames; //РєР°РґСЂС‹
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Layer::Layer ()
@@ -41,7 +41,7 @@ Layer& Layer::operator = (const Layer& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* Layer::Name () const
@@ -58,7 +58,7 @@ void Layer::SetName (const char* name)
 }
 
 /*
-   Кадры анимации слоя
+   РљР°РґСЂС‹ Р°РЅРёРјР°С†РёРё СЃР»РѕСЏ
 */
 
 Layer::FrameList& Layer::Frames ()
@@ -72,7 +72,7 @@ const Layer::FrameList& Layer::Frames () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Layer::Swap (Layer& layer)
@@ -90,7 +90,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Layer& layer1, Layer& layer2)

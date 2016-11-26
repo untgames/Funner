@@ -4,7 +4,7 @@ using namespace media::geometry;
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
@@ -15,19 +15,19 @@ const size_t DEFAULT_ATTRIBUTES_RESERVE_SIZE = 4;
 }
 
 /*
-    Описание реализации формата вершин
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅ
 */
 
 typedef stl::vector<VertexAttribute> VertexAttributeArray;
 
 struct VertexFormat::Impl
 {
-  VertexAttributeArray attributes;              //атрибуты вершины
-  StringArray          names;                   //имена атрибутов
-  size_t               attributes_hash;         //хэш от массива атрибутов
-  bool                 need_hash_update;        //необходим пересчёт хэша атрибутов
-  uint32_t             min_vertex_size;         //минимальный размер вершины
-  bool                 need_vertex_size_update; //необходим пересчёт размера вершины
+  VertexAttributeArray attributes;              //Р°С‚СЂРёР±СѓС‚С‹ РІРµСЂС€РёРЅС‹
+  StringArray          names;                   //РёРјРµРЅР° Р°С‚СЂРёР±СѓС‚РѕРІ
+  size_t               attributes_hash;         //С…СЌС€ РѕС‚ РјР°СЃСЃРёРІР° Р°С‚СЂРёР±СѓС‚РѕРІ
+  bool                 need_hash_update;        //РЅРµРѕР±С…РѕРґРёРј РїРµСЂРµСЃС‡С‘С‚ С…СЌС€Р° Р°С‚СЂРёР±СѓС‚РѕРІ
+  uint32_t             min_vertex_size;         //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РІРµСЂС€РёРЅС‹
+  bool                 need_vertex_size_update; //РЅРµРѕР±С…РѕРґРёРј РїРµСЂРµСЃС‡С‘С‚ СЂР°Р·РјРµСЂР° РІРµСЂС€РёРЅС‹
 
   Impl ()
     : need_hash_update (true) 
@@ -68,7 +68,7 @@ struct VertexFormat::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VertexFormat::VertexFormat ()
@@ -87,7 +87,7 @@ VertexFormat::~VertexFormat ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 VertexFormat& VertexFormat::operator = (const VertexFormat& vf)
@@ -98,7 +98,7 @@ VertexFormat& VertexFormat::operator = (const VertexFormat& vf)
 }
 
 /*
-    Клонирование
+    РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 VertexFormat VertexFormat::Clone () const
@@ -119,7 +119,7 @@ VertexFormat VertexFormat::Clone () const
 }
   
 /*
-    Количество атрибутов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 uint32_t VertexFormat::AttributesCount () const
@@ -128,7 +128,7 @@ uint32_t VertexFormat::AttributesCount () const
 }
 
 /*
-    Резервирование количества атрибутов
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 void VertexFormat::ReserveAttributes (uint32_t count, uint32_t name_buffer_size)
@@ -144,7 +144,7 @@ uint32_t VertexFormat::ReservedAttributesCount () const
 }
 
 /*
-    Получение массива атрибутов
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 const VertexAttribute* VertexFormat::Attributes () const
@@ -156,7 +156,7 @@ const VertexAttribute* VertexFormat::Attributes () const
 }
 
 /*
-    Получение атрибута
+    РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
 */
 
 const VertexAttribute& VertexFormat::Attribute (uint32_t index) const
@@ -176,7 +176,7 @@ const char* VertexFormat::AttributeName (uint32_t index) const
 }
 
 /*
-    Поиск атрибута по семантике
+    РџРѕРёСЃРє Р°С‚СЂРёР±СѓС‚Р° РїРѕ СЃРµРјР°РЅС‚РёРєРµ
 */
 
 const VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic, const VertexAttribute* after) const
@@ -209,7 +209,7 @@ const VertexAttribute* VertexFormat::FindAttribute (const char* name) const
 }
 
 /*
-    Добавление атрибутов
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset)
@@ -231,7 +231,7 @@ uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic s
   if (!*name && semantic == VertexAttributeSemantic_Custom)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Attribute with custom semantic must have name");
     
-    //проверка совместимости типа атрибута с его семантикой
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С‚РёРїР° Р°С‚СЂРёР±СѓС‚Р° СЃ РµРіРѕ СЃРµРјР°РЅС‚РёРєРѕР№
     
   if (!is_compatible (semantic, type))
   {
@@ -247,7 +247,7 @@ uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic s
     }
   }
 
-    //проверка наличия атрибута в формате
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р°С‚СЂРёР±СѓС‚Р° РІ С„РѕСЂРјР°С‚Рµ
 
   if (*name)
   {
@@ -263,7 +263,7 @@ uint32_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic s
   if (impl->attributes.size () == (uint32_t)-1)
     throw xtl::format_operation_exception (METHOD_NAME, "Attributes max count exceeded");
 
-    //добавление атрибута
+    //РґРѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
 
   size_t old_capacity        = impl->names.Capacity (),
          old_buffer_capacity = impl->names.BufferCapacity ();  
@@ -335,7 +335,7 @@ uint32_t VertexFormat::AddAttributes (const VertexFormat& format)
 }
 
 /*
-    Удаление атрибутов
+    РЈРґР°Р»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 void VertexFormat::RemoveAttribute (uint32_t position)
@@ -406,7 +406,7 @@ void VertexFormat::Clear ()
 }
 
 /*
-    Расчёт размера вершины
+    Р Р°СЃС‡С‘С‚ СЂР°Р·РјРµСЂР° РІРµСЂС€РёРЅС‹
 */
 
 uint32_t VertexFormat::GetMinimalVertexSize () const
@@ -433,7 +433,7 @@ uint32_t VertexFormat::GetMinimalVertexSize () const
 }
 
 /*
-    Расчёт хэша вершин
+    Р Р°СЃС‡С‘С‚ С…СЌС€Р° РІРµСЂС€РёРЅ
 */
 
 size_t VertexFormat::Hash () const
@@ -442,7 +442,7 @@ size_t VertexFormat::Hash () const
 }
 
 /*
-    Перегрузка операторов
+    РџРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂРѕРІ
 */
 
 VertexFormat& VertexFormat::operator += (const VertexFormat& format)
@@ -468,7 +468,7 @@ VertexFormat VertexFormat::operator - (const VertexFormat& format) const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 bool VertexFormat::operator == (const VertexFormat& vf) const
@@ -482,7 +482,7 @@ bool VertexFormat::operator != (const VertexFormat& vf) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void VertexFormat::Swap (VertexFormat& vf)

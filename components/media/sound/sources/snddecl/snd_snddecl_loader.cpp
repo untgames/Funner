@@ -5,7 +5,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Загрузка библиотеки деклараций звуков
+    Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё РґРµРєР»Р°СЂР°С†РёР№ Р·РІСѓРєРѕРІ
 */
 
 namespace components
@@ -78,13 +78,13 @@ void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& libra
 }
 
 /*
-   Компонент загрузки деклараций звука
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё РґРµРєР»Р°СЂР°С†РёР№ Р·РІСѓРєР°
 */
 
 class SnddeclLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     SnddeclLoaderComponent () 
     {
       SoundDeclarationManager::RegisterLoader ("snddecl", &snddecl_load_library);

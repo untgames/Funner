@@ -7,7 +7,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data, bool ignore_null_data)
@@ -15,11 +15,11 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1D::Texture1D";
 
-    //установка текстуры в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   Bind ();
   
-    //преобразование формата пикселей
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
   if (is_compressed (tex_desc.format))
     throw xtl::format_not_supported_exception (METHOD_NAME, "1D texture can't be compressed");
@@ -28,7 +28,7 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
          gl_format          = get_gl_format (tex_desc.format),
          gl_type            = get_gl_type (tex_desc.format);  
   
-    //проверка возможности создания текстуры
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
 /*  glTexImage1D (GL_PROXY_TEXTURE_1D, 1, gl_internal_format, tex_desc.width, 0, gl_format, gl_type, 0);
 
@@ -41,7 +41,7 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
     
   if (data || !ignore_null_data)
   {
-      //создание текстуры        
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹        
 
     TextureDataSelector data_selector (tex_desc, data);
 
@@ -59,13 +59,13 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
     }
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture1D::SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int, unsigned int width, unsigned int, GLenum format, GLenum type, const void* buffer)

@@ -28,7 +28,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* EGL_CLASS_NAME         = "com/google/android/gles_jni/EGLImpl";
@@ -38,7 +38,7 @@ const char* EGL_DISPLAY_CLASS_NAME = "com/google/android/gles_jni/EGLDisplayImpl
 }
 
 /*
-    Описание реализации поверхности
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 struct EglSurface::Impl
@@ -94,7 +94,7 @@ struct EglSurface::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EglSurface::EglSurface (EGLDisplay display, EGLConfig config, const void* window_handle)
@@ -147,7 +147,7 @@ EglSurface::EglSurface (EGLDisplay display, EGLConfig config, const void* window
     {
       jobject view = (jobject)window_handle;
 
-      //создание поверхности через JNI
+      //СЃРѕР·РґР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё С‡РµСЂРµР· JNI
       local_ref<jclass> egl_class (env.FindClass (EGL_CLASS_NAME), false);
       local_ref<jclass> egl_config_class (env.FindClass (EGL_CONFIG_CLASS_NAME), false);
       local_ref<jclass> egl_display_class (env.FindClass (EGL_DISPLAY_CLASS_NAME), false);
@@ -232,7 +232,7 @@ EglSurface::~EglSurface ()
 }
 
 /*
-    Поверхность
+    РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ
 */
 
 EGLSurface EglSurface::GetSurface () const

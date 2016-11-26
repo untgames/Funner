@@ -1,4 +1,4 @@
-//Тестирование алгоритма iter_swap (iter1,iter2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° iter_swap (iter1,iter2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

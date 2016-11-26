@@ -10,7 +10,7 @@ namespace
 {
 
 /*
-    Общие данные программы
+    РћР±С‰РёРµ РґР°РЅРЅС‹Рµ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 struct OptionsCacheCombinationKey                                                                      
@@ -41,11 +41,11 @@ typedef CacheMap<OptionsCacheCombinationKey, ProgramPtr, RemovePred>  ProgramMap
 
 struct DefaultSamplerHolder: public xtl::reference_counter, public CacheSource
 {
-  SamplerProxy            sampler;        //сэмплер текстуры
-  unsigned int            channel;        //номер канала
-  LowLevelSamplerStatePtr cached_sampler; //закэшированный сэмплер
+  SamplerProxy            sampler;        //СЃСЌРјРїР»РµСЂ С‚РµРєСЃС‚СѓСЂС‹
+  unsigned int            channel;        //РЅРѕРјРµСЂ РєР°РЅР°Р»Р°
+  LowLevelSamplerStatePtr cached_sampler; //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ СЃСЌРјРїР»РµСЂ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   DefaultSamplerHolder (CacheHolder& owner, const TextureManagerPtr& texture_manager, const char* name, unsigned int in_channel)
     : sampler (texture_manager->GetSamplerProxy (name))
     , channel (in_channel)
@@ -57,7 +57,7 @@ struct DefaultSamplerHolder: public xtl::reference_counter, public CacheSource
   using CacheSource::UpdateCache;
   using CacheSource::ResetCache;
 
-/// Работа с кэшем
+/// Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     cached_sampler = LowLevelSamplerStatePtr ();
@@ -76,24 +76,24 @@ typedef stl::vector<DefaultSamplerHolderPtr>     DefaultSamplerHolderArray;
 
 struct ProgramCommonData: public xtl::reference_counter, public CacheSource, public DebugIdHolder
 {
-  DeviceManagerPtr            device_manager;               //менеджер устройства отрисовки
-  TextureManagerPtr           texture_manager;              //менеджер текстур
-  stl::string                 name;                         //имя программы
-  ShaderArray                 shaders;                      //шейдеры
-  TexmapDescArray             texmaps;                      //текстурные карты
-  DefaultSamplerHolderArray   default_samplers;             //сэмплеры по умолчанию
-  stl::string                 static_options;               //статические опции компиляции шейдеров
-  stl::string                 dynamic_options;              //имена динамических опций
-  ShaderOptionsLayout         dynamic_options_layout;       //расположение динамических опций
-  Log                         log;                          //протокол
-  bool                        has_framemaps;                //программа ссылается на контекстные карты кадра
-  ProgramParametersLayoutPtr  parameters_layout;            //расположение параметров программы
-  PropertyBuffer              properties;                   //свойства программы
-  LowLevelStateBlockPtr       cached_state_block;           //блок данных параметров
-  size_t                      cached_state_block_mask_hash; //хэш закэшированной маски блока состояний программы
-  ProgramMap                  derived_programs;             //производные программы
+  DeviceManagerPtr            device_manager;               //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TextureManagerPtr           texture_manager;              //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+  stl::string                 name;                         //РёРјСЏ РїСЂРѕРіСЂР°РјРјС‹
+  ShaderArray                 shaders;                      //С€РµР№РґРµСЂС‹
+  TexmapDescArray             texmaps;                      //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹
+  DefaultSamplerHolderArray   default_samplers;             //СЃСЌРјРїР»РµСЂС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  stl::string                 static_options;               //СЃС‚Р°С‚РёС‡РµСЃРєРёРµ РѕРїС†РёРё РєРѕРјРїРёР»СЏС†РёРё С€РµР№РґРµСЂРѕРІ
+  stl::string                 dynamic_options;              //РёРјРµРЅР° РґРёРЅР°РјРёС‡РµСЃРєРёС… РѕРїС†РёР№
+  ShaderOptionsLayout         dynamic_options_layout;       //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РѕРїС†РёР№
+  Log                         log;                          //РїСЂРѕС‚РѕРєРѕР»
+  bool                        has_framemaps;                //РїСЂРѕРіСЂР°РјРјР° СЃСЃС‹Р»Р°РµС‚СЃСЏ РЅР° РєРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РєР°СЂС‚С‹ РєР°РґСЂР°
+  ProgramParametersLayoutPtr  parameters_layout;            //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
+  PropertyBuffer              properties;                   //СЃРІРѕР№СЃС‚РІР° РїСЂРѕРіСЂР°РјРјС‹
+  LowLevelStateBlockPtr       cached_state_block;           //Р±Р»РѕРє РґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+  size_t                      cached_state_block_mask_hash; //С…СЌС€ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅРѕР№ РјР°СЃРєРё Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРѕРіСЂР°РјРјС‹
+  ProgramMap                  derived_programs;             //РїСЂРѕРёР·РІРѕРґРЅС‹Рµ РїСЂРѕРіСЂР°РјРјС‹
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ProgramCommonData (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const char* in_name)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
@@ -117,7 +117,7 @@ struct ProgramCommonData: public xtl::reference_counter, public CacheSource, pub
     }
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ProgramCommonData ()
   {
     cached_state_block = LowLevelStateBlockPtr ();
@@ -130,7 +130,7 @@ struct ProgramCommonData: public xtl::reference_counter, public CacheSource, pub
   using CacheSource::ResetCache;
   using CacheSource::UpdateCache;
 
-///Работа с кэшем
+///Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     cached_state_block_mask_hash = 0;
@@ -219,16 +219,16 @@ typedef xtl::intrusive_ptr<ProgramCommonData> ProgramCommonDataPtr;
 }
 
 /*
-    Описание реализации программы
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРѕРіСЂР°РјРјС‹
 */
 
 struct Program::Impl: public DebugIdHolder
 {
-  ProgramCommonDataPtr common_data;       //общие данные программы
-  ShaderOptions        options;           //опции данного экземпляра программы
-  LowLevelProgramPtr   low_level_program; //низкоуровневая программа
+  ProgramCommonDataPtr common_data;       //РѕР±С‰РёРµ РґР°РЅРЅС‹Рµ РїСЂРѕРіСЂР°РјРјС‹
+  ShaderOptions        options;           //РѕРїС†РёРё РґР°РЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РїСЂРѕРіСЂР°РјРјС‹
+  LowLevelProgramPtr   low_level_program; //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІР°СЏ РїСЂРѕРіСЂР°РјРјР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const char* name, const char* static_options, const char* dynamic_options)
   {
     try
@@ -267,7 +267,7 @@ struct Program::Impl: public DebugIdHolder
       common_data->log.Printf ("Program '%s' created for options = '%s' (id=%u)", common_data->name.c_str (), options.options.c_str (), Id ());    
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     if (common_data->device_manager->Settings ().HasDebugLog ())
@@ -276,7 +276,7 @@ struct Program::Impl: public DebugIdHolder
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Program::Program (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const char* name, const char* static_options, const char* dynamic_options)
@@ -320,7 +320,7 @@ Program::~Program ()
 }
 
 /*
-   Имя программы
+   РРјСЏ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 const char* Program::Name ()
@@ -329,7 +329,7 @@ const char* Program::Name ()
 }
 
 /*
-    Шейдеры программы
+    РЁРµР№РґРµСЂС‹ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 void Program::Attach (const media::rfx::Shader& shader)
@@ -365,7 +365,7 @@ unsigned int Program::ShadersCount ()
 }
 
 /*
-    Опции данной программы
+    РћРїС†РёРё РґР°РЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 const char* Program::StaticOptions ()
@@ -379,7 +379,7 @@ const char* Program::DynamicOptions ()
 }
 
 /*
-    Отображение семантики текстурной карты на номер канала и имя параметра
+    РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРµРјР°РЅС‚РёРєРё С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹ РЅР° РЅРѕРјРµСЂ РєР°РЅР°Р»Р° Рё РёРјСЏ РїР°СЂР°РјРµС‚СЂР°
 */
 
 unsigned int Program::TexmapsCount ()
@@ -466,7 +466,7 @@ void Program::SetTexmap (unsigned int index, unsigned int channel, const char* s
 
   if (default_sampler != desc.default_sampler)
   {
-      //обновление дефолтного сэмплера
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґРµС„РѕР»С‚РЅРѕРіРѕ СЃСЌРјРїР»РµСЂР°
 
     DefaultSamplerHolderPtr default_sampler_holder = DefaultSamplerHolderPtr (new DefaultSamplerHolder (*impl->common_data, impl->common_data->texture_manager, default_sampler, channel), false);
 
@@ -537,7 +537,7 @@ void Program::RemoveAllTexmaps ()
 }
 
 /*
-    Получение производной программы
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 Program& Program::DerivedProgram (const ShaderOptions& options)
@@ -583,7 +583,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache)
 }
 
 /*
-    Получение низкоуровневой программы шейдинга
+    РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕР№ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
 */
 
 namespace
@@ -598,7 +598,7 @@ struct ShaderCompilerLog
   
   void operator () (const char* message)
   {
-      //отсечение стандартных сообщений об отсутствии ошибок
+      //РѕС‚СЃРµС‡РµРЅРёРµ СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РѕР± РѕС‚СЃСѓС‚СЃС‚РІРёРё РѕС€РёР±РѕРє
       
     static const char* IGNORE_MESSAGES [] = {
       "*: No errors.",
@@ -613,7 +613,7 @@ struct ShaderCompilerLog
       if (common::wcimatch (message, IGNORE_MESSAGES [i]))
         return;
       
-      //вывод сообщения
+      //РІС‹РІРѕРґ СЃРѕРѕР±С‰РµРЅРёСЏ
     
     static const char* LINKER_PREFIX        = "linker: ";
     static size_t      LINKER_PREFIX_LENGTH = strlen (LINKER_PREFIX);
@@ -687,7 +687,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
 }
 
 /*
-    Блок состояний материала
+    Р‘Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 LowLevelStateBlockPtr Program::StateBlock ()
@@ -706,7 +706,7 @@ LowLevelStateBlockPtr Program::StateBlock ()
 }
 
 /*
-    Получение объекта расположения параметров программы шейдинга
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
 */
 
 ProgramParametersLayoutPtr Program::ParametersLayout ()
@@ -725,14 +725,14 @@ ProgramParametersLayoutPtr Program::ParametersLayout ()
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void Program::UpdateCacheCore ()
 {
   impl->common_data->UpdateCache ();
 
-    //обновление зависимых кэшей (реакция на Impl::InvalidateCacheDependencies)
+    //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјС‹С… РєСЌС€РµР№ (СЂРµР°РєС†РёСЏ РЅР° Impl::InvalidateCacheDependencies)
 
   InvalidateCacheDependencies ();
 }

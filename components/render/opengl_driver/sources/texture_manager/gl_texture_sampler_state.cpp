@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Идентификаторы текстурных координат
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 */
 
 enum Texcoord
@@ -18,17 +18,17 @@ enum Texcoord
 };
 
 /*
-    Описание реализации текстурного сэмплера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂРЅРѕРіРѕ СЃСЌРјРїР»РµСЂР°
 */
 
 struct SamplerState::Impl
 {
-  SamplerDesc desc;                    //дескриптор сэмплера
-  size_t      desc_hash;               //хэш дескриптора
-  GLenum      gl_min_filter;           //фильтр минимизации
-  GLenum      gl_mag_filter;           //фильтр увеличения
-  GLenum      gl_wrap [Texcoord_Num];  //параметры отсечения текстурных координат
-  GLenum      gl_comparision_function; //функция сравнения depth-текстур
+  SamplerDesc desc;                    //РґРµСЃРєСЂРёРїС‚РѕСЂ СЃСЌРјРїР»РµСЂР°
+  size_t      desc_hash;               //С…СЌС€ РґРµСЃРєСЂРёРїС‚РѕСЂР°
+  GLenum      gl_min_filter;           //С„РёР»СЊС‚СЂ РјРёРЅРёРјРёР·Р°С†РёРё
+  GLenum      gl_mag_filter;           //С„РёР»СЊС‚СЂ СѓРІРµР»РёС‡РµРЅРёСЏ
+  GLenum      gl_wrap [Texcoord_Num];  //РїР°СЂР°РјРµС‚СЂС‹ РѕС‚СЃРµС‡РµРЅРёСЏ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
+  GLenum      gl_comparision_function; //С„СѓРЅРєС†РёСЏ СЃСЂР°РІРЅРµРЅРёСЏ depth-С‚РµРєСЃС‚СѓСЂ
 
   Impl () : desc_hash (0), gl_min_filter (GL_NEAREST), gl_mag_filter (GL_NEAREST), gl_comparision_function (GL_ALWAYS)
   {
@@ -42,7 +42,7 @@ struct SamplerState::Impl
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SamplerState::SamplerState (const ContextManager& manager, const SamplerDesc& in_desc) 
@@ -57,18 +57,18 @@ SamplerState::~SamplerState ()
 }
 
 /*
-   Выбор сэмплера в контекст OpenGL
+   Р’С‹Р±РѕСЂ СЃСЌРјРїР»РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SamplerState::Bind (GLenum tex_target, bool is_depth)
 {
-    //выбор текущего контекста
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
   const ContextCaps& caps = GetCaps ();
   
-    //установка параметров в контекст
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РІ РєРѕРЅС‚РµРєСЃС‚
 
   glTexParameteri (tex_target, GL_TEXTURE_MIN_FILTER, impl->gl_min_filter);
   glTexParameteri (tex_target, GL_TEXTURE_MAG_FILTER, impl->gl_mag_filter);
@@ -119,13 +119,13 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
 
 #endif
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::SamplerState::Bind");
 }
 
 /*
-    Получение дескриптора сэмплера и его хэша
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃСЌРјРїР»РµСЂР° Рё РµРіРѕ С…СЌС€Р°
 */
 
 void SamplerState::GetDesc (SamplerDesc& out_desc)
@@ -139,7 +139,7 @@ size_t SamplerState::GetDescHash ()
 }
 
 /*
-   Изменение дескриптора
+   РР·РјРµРЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void SamplerState::SetDesc (const SamplerDesc& in_desc)
@@ -147,7 +147,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   static const char* METHOD_NAME           = "render::low_level::opengl::SamplerState::SetDesc";
   static Extension   BUG_texture_no_mipmap = "GLBUG_texture_no_mipmap";
   
-    //проверка поддержки необхоимых расширений
+    //РїСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РЅРµРѕР±С…РѕРёРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
   const ContextCaps& caps = GetCaps ();
 
@@ -196,7 +196,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   if (in_desc.mip_lod_bias != 0.0f)
     throw xtl::format_not_supported_exception (METHOD_NAME, "desc.mip_lod_bias=%g not supported", in_desc.mip_lod_bias);    
 
-    //преобразование дескриптора сэмплера
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃСЌРјРїР»РµСЂР°
   
   GLenum gl_min_filter, gl_mag_filter, gl_wrap [Texcoord_Num], gl_comparision_function;
   
@@ -326,7 +326,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
 #endif
 
-    //сохранение параметров
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
   impl->desc                    = in_desc;
   impl->desc.max_anisotropy     = max_anisotropy;
@@ -338,7 +338,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   for (unsigned int i=0; i<Texcoord_Num; i++)
     impl->gl_wrap [i] = gl_wrap [i];
 
-    //оповещение о необходимости ребиндинга уровня
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 
   StageRebindNotify (Stage_TextureManager);
 }

@@ -10,7 +10,7 @@
 using namespace common;
 
 /*
-    Реализация таймер с минимальной погрешностью
+    Р РµР°Р»РёР·Р°С†РёСЏ С‚Р°Р№РјРµСЂ СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ РїРѕРіСЂРµС€РЅРѕСЃС‚СЊСЋ
 */
 
 namespace
@@ -29,15 +29,15 @@ struct TimerImpl: public xtl::reference_counter
   typedef Timer::time_t     time_t;
   typedef Timer::timeint_t  timeint_t;
 
-  TimeSource source;       //источник получения времени
-  bool       auto_update;  //обновляется ли время автоматически
-  time_t     time;         //текущее время  
-  time_t     precision;    //точность работы исходного таймера
-  timeint_t  start_time;   //стартовое время
-  timeint_t  current_time; //текущее время
-  bool       started;      //включен ли таймер
+  TimeSource source;       //РёСЃС‚РѕС‡РЅРёРє РїРѕР»СѓС‡РµРЅРёСЏ РІСЂРµРјРµРЅРё
+  bool       auto_update;  //РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ Р»Рё РІСЂРµРјСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
+  time_t     time;         //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ  
+  time_t     precision;    //С‚РѕС‡РЅРѕСЃС‚СЊ СЂР°Р±РѕС‚С‹ РёСЃС…РѕРґРЅРѕРіРѕ С‚Р°Р№РјРµСЂР°
+  timeint_t  start_time;   //СЃС‚Р°СЂС‚РѕРІРѕРµ РІСЂРµРјСЏ
+  timeint_t  current_time; //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ
+  bool       started;      //РІРєР»СЋС‡РµРЅ Р»Рё С‚Р°Р№РјРµСЂ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   TimerImpl (const TimeSource& in_source, time_t in_precision, bool in_auto_update)
     : source (in_source)
     , auto_update (in_auto_update)
@@ -49,7 +49,7 @@ struct TimerImpl: public xtl::reference_counter
   {
   }
   
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
   void Update ()
   {
     if (!started)
@@ -59,7 +59,7 @@ struct TimerImpl: public xtl::reference_counter
     time         = static_cast<long> (current_time) / precision;    
   }
   
-///Получение целочисленного времени
+///РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ РІСЂРµРјРµРЅРё
   timeint_t GetCurrentTimeInteger ()
   {
     if (auto_update)
@@ -68,7 +68,7 @@ struct TimerImpl: public xtl::reference_counter
     return current_time;
   }
   
-///Расчёт интервала времени
+///Р Р°СЃС‡С‘С‚ РёРЅС‚РµСЂРІР°Р»Р° РІСЂРµРјРµРЅРё
   timeint_t ComputeTimeInteger ()
   {
     return started ? source () - start_time : start_time;
@@ -81,7 +81,7 @@ namespace
 {
 
 /*
-    Источник отсчёта времени по умолчанию
+    РСЃС‚РѕС‡РЅРёРє РѕС‚СЃС‡С‘С‚Р° РІСЂРµРјРµРЅРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 struct DefaultTimeSource
@@ -97,7 +97,7 @@ struct DefaultTimeSource
 };
 
 /*
-    Обёртка над таймером для наследования управления временем
+    РћР±С‘СЂС‚РєР° РЅР°Рґ С‚Р°Р№РјРµСЂРѕРј РґР»СЏ РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ СѓРїСЂР°РІР»РµРЅРёСЏ РІСЂРµРјРµРЅРµРј
 */
 
 struct ParentTimeSource
@@ -115,7 +115,7 @@ struct ParentTimeSource
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Timer::Timer (bool is_auto_update)
@@ -152,7 +152,7 @@ Timer& Timer::operator = (const Timer& source)
 }
 
 /*
-    Установка значения таймера
+    РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ С‚Р°Р№РјРµСЂР°
 */
 
 void Timer::SetTime (time_t time)
@@ -169,7 +169,7 @@ Timer::time_t Timer::Time () const
 }
 
 /*
-    Обновление значения времени
+    РћР±РЅРѕРІР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РІСЂРµРјРµРЅРё
 */
 
 void Timer::Update ()
@@ -178,7 +178,7 @@ void Timer::Update ()
 }
 
 /*
-    Управление авто-обновляемыми таймерами
+    РЈРїСЂР°РІР»РµРЅРёРµ Р°РІС‚Рѕ-РѕР±РЅРѕРІР»СЏРµРјС‹РјРё С‚Р°Р№РјРµСЂР°РјРё
 */
 
 void Timer::SetAutoUpdate (bool state)
@@ -192,7 +192,7 @@ bool Timer::IsAutoUpdate () const
 }
 
 /*
-    Управление таймером
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚Р°Р№РјРµСЂРѕРј
 */
 
 void Timer::Start ()
@@ -229,7 +229,7 @@ bool Timer::IsStarted () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Timer::Swap (Timer& timer)
@@ -242,13 +242,13 @@ void Timer::Swap (Timer& timer)
 namespace common
 {
 
-//Обмен двух таймеров
+//РћР±РјРµРЅ РґРІСѓС… С‚Р°Р№РјРµСЂРѕРІ
 void swap (Timer& timer1, Timer& timer2)
 {
   timer1.Swap (timer2);
 }
 
-//Получение времени в миллисекундах от первого вызова milliseconds
+//РџРѕР»СѓС‡РµРЅРёРµ РІСЂРµРјРµРЅРё РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С… РѕС‚ РїРµСЂРІРѕРіРѕ РІС‹Р·РѕРІР° milliseconds
 size_t milliseconds ()
 {  
   return Platform::GetMilliseconds () - start_milliseconds_time;

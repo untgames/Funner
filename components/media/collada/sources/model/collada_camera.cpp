@@ -5,14 +5,14 @@ using namespace common;
 using namespace math;
 
 /*
-    Описание реализации камеры
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°РјРµСЂС‹
 */
 
 struct Camera::Impl: public xtl::reference_counter
 {
-  CameraType  type;                     //тип камеры
-  float       params [CameraParam_Num]; //параметры камеры
-  stl::string id;                       //идентификатор камеры
+  CameraType  type;                     //С‚РёРї РєР°РјРµСЂС‹
+  float       params [CameraParam_Num]; //РїР°СЂР°РјРµС‚СЂС‹ РєР°РјРµСЂС‹
+  stl::string id;                       //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°РјРµСЂС‹
   
   Impl () : type (CameraType_Perspective)
   {
@@ -22,7 +22,7 @@ struct Camera::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Camera::Camera ()
@@ -49,7 +49,7 @@ Camera& Camera::operator = (const Camera& camera)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Camera Camera::Clone () const
@@ -58,7 +58,7 @@ Camera Camera::Clone () const
 }
 
 /*
-    Идентификатор камеры
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°РјРµСЂС‹
 */
 
 const char* Camera::Id () const
@@ -75,7 +75,7 @@ void Camera::SetId (const char* id)
 }
   
 /*
-    Тип источника
+    РўРёРї РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 CameraType Camera::Type () const
@@ -99,7 +99,7 @@ void Camera::SetType (CameraType type)
 }
 
 /*
-    Параметры камеры
+    РџР°СЂР°РјРµС‚СЂС‹ РєР°РјРµСЂС‹
 */
 
 void Camera::SetParam (CameraParam param, float value)

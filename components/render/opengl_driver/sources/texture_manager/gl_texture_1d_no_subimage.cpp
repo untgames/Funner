@@ -7,7 +7,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
@@ -17,7 +17,7 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture1DNoSubimage::SetUncompressedData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int, unsigned int width, unsigned int, GLenum format, GLenum type, const void* buffer)

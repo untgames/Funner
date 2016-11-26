@@ -8,11 +8,11 @@ namespace
 
 void display_reconfiguration_callback (CGDirectDisplayID display, CGDisplayChangeSummaryFlags flags, void *userInfo);
 
-//Класс для работы с экранами
+//РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЌРєСЂР°РЅР°РјРё
 class ScreenManagerImpl
 {
   public:
-    //Конструктор/деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ScreenManagerImpl ()
     {
       try
@@ -45,7 +45,7 @@ class ScreenManagerImpl
       CGDisplayRemoveReconfigurationCallback (display_reconfiguration_callback, 0);
     }
 
-    //Обновление экрана
+    //РћР±РЅРѕРІР»РµРЅРёРµ СЌРєСЂР°РЅР°
     void UpdateScreen (CGDirectDisplayID display)
     {
       try
@@ -81,7 +81,7 @@ class ScreenManagerImpl
       }
     }
 
-    //Получение экранов
+    //РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
     CarbonScreen GetScreen (size_t screen_index)
     {
       try
@@ -135,16 +135,16 @@ class ScreenManagerImpl
       return screens.size ();
     }
 
-    ///Поиск экрана вмещающего окно
+    ///РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
     screen_t FindContainingScreen (const void* window)
     {
-        //получение границ окна
+        //РїРѕР»СѓС‡РµРЅРёРµ РіСЂР°РЅРёС† РѕРєРЅР°
       ::Rect window_rect;
 
       if (GetWindowBounds ((WindowRef)window, kWindowStructureRgn, &window_rect) != noErr)
         return 0;
 
-        //поиск максимального перекрытия
+        //РїРѕРёСЃРє РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РїРµСЂРµРєСЂС‹С‚РёСЏ
       size_t            max_intersection_size = 0;
       CGDirectDisplayID best_output           = 0;
 
@@ -226,7 +226,7 @@ void display_reconfiguration_callback (CGDirectDisplayID display, CGDisplayChang
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t MacOsScreenManager::CreateScreen  (size_t screen_index)
@@ -248,7 +248,7 @@ void MacOsScreenManager::DestroyScreen (screen_t)
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t MacOsScreenManager::GetScreensCount ()
@@ -265,7 +265,7 @@ size_t MacOsScreenManager::GetScreensCount ()
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* MacOsScreenManager::GetScreenName (screen_t screen)
@@ -282,7 +282,7 @@ const char* MacOsScreenManager::GetScreenName (screen_t screen)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t MacOsScreenManager::GetScreenModesCount (screen_t screen)
@@ -312,7 +312,7 @@ void MacOsScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Scre
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void MacOsScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenModeDesc& mode_desc)
@@ -345,7 +345,7 @@ void MacOsScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& 
 {
   try
   {
-    ScreenManagerSingleton::Instance ()->GetScreen (screen).GetDefaultMode (mode_desc); //Проверить придет ли нотификация при изменении в настройках
+    ScreenManagerSingleton::Instance ()->GetScreen (screen).GetDefaultMode (mode_desc); //РџСЂРѕРІРµСЂРёС‚СЊ РїСЂРёРґРµС‚ Р»Рё РЅРѕС‚РёС„РёРєР°С†РёСЏ РїСЂРё РёР·РјРµРЅРµРЅРёРё РІ РЅР°СЃС‚СЂРѕР№РєР°С…
   }
   catch (xtl::exception& e)
   {
@@ -355,7 +355,7 @@ void MacOsScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& 
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void MacOsScreenManager::SetScreenGammaRamp (screen_t screen, const Color3f table [256])
@@ -400,7 +400,7 @@ void MacOsScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [256
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t MacOsScreenManager::FindContainingScreen (const void* window)
@@ -417,7 +417,7 @@ screen_t MacOsScreenManager::FindContainingScreen (const void* window)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* MacOsScreenManager::GetNativeScreenHandle (screen_t screen)
@@ -434,14 +434,14 @@ const void* MacOsScreenManager::GetNativeScreenHandle (screen_t screen)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void MacOsScreenManager::GetScreenProperties (screen_t screen, common::PropertyMap& properties)
 {
   try
   {
-    ScreenManagerSingleton::Instance ()->GetScreen (screen);  //Проверка что экран существует
+    ScreenManagerSingleton::Instance ()->GetScreen (screen);  //РџСЂРѕРІРµСЂРєР° С‡С‚Рѕ СЌРєСЂР°РЅ СЃСѓС‰РµСЃС‚РІСѓРµС‚
   }
   catch (xtl::exception& e)
   {

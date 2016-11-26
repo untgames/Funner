@@ -6,11 +6,11 @@ using namespace render::scene::client;
 namespace
 {
 
-/// Источник света
+/// РСЃС‚РѕС‡РЅРёРє СЃРІРµС‚Р°
 class Light: public Entity
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Light (scene_graph::PointLight& light, SceneManager& manager)
       : Entity (light, manager, interchange::NodeType_PointLight)
       , type (Type ())
@@ -30,7 +30,7 @@ class Light: public Entity
     }
 
   protected:
-///Реализация синхронизации
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
     void UpdateCore (client::Context& context)
     {
       try
@@ -81,7 +81,7 @@ class Light: public Entity
     }
 
   private:
-    interchange::NodeType type; //тип источника света
+    interchange::NodeType type; //С‚РёРї РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 };
 
 }

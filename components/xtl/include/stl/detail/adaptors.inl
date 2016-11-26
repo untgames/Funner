@@ -1,5 +1,5 @@
 /*
-    Адаптеры вызовов
+    РђРґР°РїС‚РµСЂС‹ РІС‹Р·РѕРІРѕРІ
 */
 
 template <class Arg,class Ret>
@@ -243,7 +243,7 @@ inline Ret call
 }
 
 /*
-    Базовые классы
+    Р‘Р°Р·РѕРІС‹Рµ РєР»Р°СЃСЃС‹
 */
 
 template <class Arg,class Ret,class Fn>
@@ -362,7 +362,7 @@ inline bool pentanary_recall<Arg1,Arg2,Arg3,Arg4,Arg5,Ret,Fn>::operator != (cons
 }
 
 /*
-    Производные классы
+    РџСЂРѕРёР·РІРѕРґРЅС‹Рµ РєР»Р°СЃСЃС‹
 */
 
 template <class Arg,class Ret>
@@ -491,7 +491,7 @@ inline const_mem_fun4_ref_t<Ret,T,Arg1,Arg2,Arg3,Arg4>::const_mem_fun4_ref_t (Re
   { }
 
 /*
-    "Конструкторы" адаптеров вызова
+    "РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹" Р°РґР°РїС‚РµСЂРѕРІ РІС‹Р·РѕРІР°
 */
 
 template <class Arg,class Ret>

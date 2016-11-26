@@ -4,7 +4,7 @@ size_t get_nodes_count1 (const ParseNode& node, const char* name)
 {
   size_t count = strcmp (node.Name (), name) == 0;
 
-  for (ParseNamesakeIterator iter=node.First (name); ! ! iter; ++iter) // ! ! - для проверки работы 'operator !'
+  for (ParseNamesakeIterator iter=node.First (name); ! ! iter; ++iter) // ! ! - РґР»СЏ РїСЂРѕРІРµСЂРєРё СЂР°Р±РѕС‚С‹ 'operator !'
     count++;
 
   return count;

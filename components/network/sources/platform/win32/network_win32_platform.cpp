@@ -5,7 +5,7 @@ using namespace network;
 namespace
 {
 
-//Класс инициализирующий и прекращающий работу с WinSock 2 dll
+//РљР»Р°СЃСЃ РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ Рё РїСЂРµРєСЂР°С‰Р°СЋС‰РёР№ СЂР°Р±РѕС‚Сѓ СЃ WinSock 2 dll
 class WinSockInitializer
 {
   public:
@@ -41,7 +41,7 @@ void init_networking ()
 
 
 /*
-   Получение ip-адреса по имени хоста
+   РџРѕР»СѓС‡РµРЅРёРµ ip-Р°РґСЂРµСЃР° РїРѕ РёРјРµРЅРё С…РѕСЃС‚Р°
 */
 
 void Win32Platform::GetAddressByHostName (const char* host_name, size_t& address_size, unsigned char (&address) [16])

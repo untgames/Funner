@@ -1,4 +1,4 @@
-// Тестирование operator =
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ operator =
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

@@ -3,13 +3,13 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации менеджера материалов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 struct MaterialManager::Impl
 {
-  ClientImpl& client;  //ссылка на клиента
-  Context&    context; //ссылка на контекст
+  ClientImpl& client;  //СЃСЃС‹Р»РєР° РЅР° РєР»РёРµРЅС‚Р°
+  Context&    context; //СЃСЃС‹Р»РєР° РЅР° РєРѕРЅС‚РµРєСЃС‚
 
   Impl (ClientImpl& in_client, Context& in_context)
     : client (in_client)
@@ -19,7 +19,7 @@ struct MaterialManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MaterialManager::MaterialManager (ClientImpl& client, Context& context)
@@ -32,7 +32,7 @@ MaterialManager::~MaterialManager ()
 }
 
 /*
-    Создание ресурсов
+    РЎРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 MaterialPtr MaterialManager::CreateMaterial (const char* name, const char* prototype, bool remove_on_destroy)

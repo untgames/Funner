@@ -17,23 +17,23 @@ namespace shell_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "Shell";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.Shell"; //имя компонента
+const char* SUBSYSTEM_NAME = "Shell";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.Shell"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 /*
-    Подсистема скриптового интерпретатора
+    РџРѕРґСЃРёСЃС‚РµРјР° СЃРєСЂРёРїС‚РѕРІРѕРіРѕ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
 */
 
 class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ShellSubsystem (common::ParseNode& node, SubsystemManager& manager)
     {
-        //чтение конфигурации
+        //С‡С‚РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
       const char *interpreter         = get<const char*> (node, "Interpreter"),
                  *libraries           = get<const char*> (node, "Libraries", ""),
@@ -55,12 +55,12 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       StringArray lib_list = split (libraries),
                   src_list = split (sources);                  
 
-        //загрузка библиотек
+        //Р·Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє
 
       for (size_t i=0; i<lib_list.Size (); i++)
         environment.BindLibraries (lib_list [i]);
 
-        //регистрация менеджера подсистем
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїРѕРґСЃРёСЃС‚РµРј
 
       InvokerRegistry engine_lib = environment.Library ("Engine");
       InvokerRegistry global_lib = environment.Library ("global");
@@ -69,22 +69,22 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       engine_lib.Register ("get_SubsystemManager", make_const (&manager));
       global_lib.Register ("searchpaths", make_const (search_paths));
 
-        //создание интерпретатора
+        //СЃРѕР·РґР°РЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
 
       Shell (interpreter, environment).Swap (shell);
 
-        //загрузка и исполнение исходных файлов
+        //Р·Р°РіСЂСѓР·РєР° Рё РёСЃРїРѕР»РЅРµРЅРёРµ РёСЃС…РѕРґРЅС‹С… С„Р°Р№Р»РѕРІ
 
       for (size_t i=0; i<src_list.Size (); i++)
         shell.ExecuteFileList (src_list [i]);
 
-        //исполнение команды
+        //РёСЃРїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
 
       if (*command)
         shell.Execute (command);
     }
     
-///Выполнение команды
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
     void Execute (const char* command)
     {
       if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac") && !wcimatch (command, "lua:*"))
@@ -113,17 +113,17 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
   private:
-    Environment environment; //скриптовое окружение
-    Shell       shell;       //скриптовый интерпретатор
+    Environment environment; //СЃРєСЂРёРїС‚РѕРІРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ
+    Shell       shell;       //СЃРєСЂРёРїС‚РѕРІС‹Р№ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ
 };
 
 /*
-    Компонент регистрации
+    РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё
 */
 
 class Component

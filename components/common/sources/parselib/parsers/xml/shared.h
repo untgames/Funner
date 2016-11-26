@@ -22,83 +22,83 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексема грамматического разбора Xml-файлов
+///Р›РµРєСЃРµРјР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР° Xml-С„Р°Р№Р»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum XmlLexem
 {
-  XmlLexem_Undefined,               //не определена
-  XmlLexem_Equal,                   //равенство
-  XmlLexem_Keyword,                 //ключевое слово
-  XmlLexem_CData,                   //раздел CDATA
-  XmlLexem_SectorBeginBracket,      //открывающая скобка раздела
-  XmlLexem_SectorEndBracket,        //закрывающая скобка раздела
-  XmlLexem_TagBeginBracket,         //открывающая скобка тега
-  XmlLexem_TagEndBracket,           //закрывающая скобка тега
-  XmlLexem_TagClose,                //закрытие тега '/>'
-  XmlLexem_TagCloseFrame,           //закрытие тега '</'
-  XmlLexem_EndOfFile,               //конец файла
-  XmlLexem_Token,                   //идентификатор, начинающийся с цифры
-  XmlLexem_Identifier,              //идентификатор
-  XmlLexem_String,                  //строка
-  XmlLexem_InstructionBeginBracket, //открывающая скобка инструкции по обработке
-  XmlLexem_InstructionEndBracket,   //закрывающая скобка инструкции по обработке
+  XmlLexem_Undefined,               //РЅРµ РѕРїСЂРµРґРµР»РµРЅР°
+  XmlLexem_Equal,                   //СЂР°РІРµРЅСЃС‚РІРѕ
+  XmlLexem_Keyword,                 //РєР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ
+  XmlLexem_CData,                   //СЂР°Р·РґРµР» CDATA
+  XmlLexem_SectorBeginBracket,      //РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° СЂР°Р·РґРµР»Р°
+  XmlLexem_SectorEndBracket,        //Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° СЂР°Р·РґРµР»Р°
+  XmlLexem_TagBeginBracket,         //РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° С‚РµРіР°
+  XmlLexem_TagEndBracket,           //Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° С‚РµРіР°
+  XmlLexem_TagClose,                //Р·Р°РєСЂС‹С‚РёРµ С‚РµРіР° '/>'
+  XmlLexem_TagCloseFrame,           //Р·Р°РєСЂС‹С‚РёРµ С‚РµРіР° '</'
+  XmlLexem_EndOfFile,               //РєРѕРЅРµС† С„Р°Р№Р»Р°
+  XmlLexem_Token,                   //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ, РЅР°С‡РёРЅР°СЋС‰РёР№СЃСЏ СЃ С†РёС„СЂС‹
+  XmlLexem_Identifier,              //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  XmlLexem_String,                  //СЃС‚СЂРѕРєР°
+  XmlLexem_InstructionBeginBracket, //РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° РёРЅСЃС‚СЂСѓРєС†РёРё РїРѕ РѕР±СЂР°Р±РѕС‚РєРµ
+  XmlLexem_InstructionEndBracket,   //Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° РёРЅСЃС‚СЂСѓРєС†РёРё РїРѕ РѕР±СЂР°Р±РѕС‚РєРµ
 
   XmlLexem_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Состояние лексического анализатора Xml-файлов
+///РЎРѕСЃС‚РѕСЏРЅРёРµ Р»РµРєСЃРёС‡РµСЃРєРѕРіРѕ Р°РЅР°Р»РёР·Р°С‚РѕСЂР° Xml-С„Р°Р№Р»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum XmlLexerStatus
 {
-  XmlLexerStatus_NoError,                    //нет ошибки
-  XmlLexerStatus_UnclosedComment,            //незакрытый коментарий
-  XmlLexerStatus_UnclosedString,             //незакрытая строка
-  XmlLexerStatus_UnclosedCData,              //незакрытый раздел CDATA
-  XmlLexerStatus_WrongChar,                  //неверный символ
-  XmlLexerStatus_WrongIdentifier,            //неверный идентификатор
-  XmlLexerStatus_InvalidCharacterReference,  //неверная ссылка на символ
+  XmlLexerStatus_NoError,                    //РЅРµС‚ РѕС€РёР±РєРё
+  XmlLexerStatus_UnclosedComment,            //РЅРµР·Р°РєСЂС‹С‚С‹Р№ РєРѕРјРµРЅС‚Р°СЂРёР№
+  XmlLexerStatus_UnclosedString,             //РЅРµР·Р°РєСЂС‹С‚Р°СЏ СЃС‚СЂРѕРєР°
+  XmlLexerStatus_UnclosedCData,              //РЅРµР·Р°РєСЂС‹С‚С‹Р№ СЂР°Р·РґРµР» CDATA
+  XmlLexerStatus_WrongChar,                  //РЅРµРІРµСЂРЅС‹Р№ СЃРёРјРІРѕР»
+  XmlLexerStatus_WrongIdentifier,            //РЅРµРІРµСЂРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  XmlLexerStatus_InvalidCharacterReference,  //РЅРµРІРµСЂРЅР°СЏ СЃСЃС‹Р»РєР° РЅР° СЃРёРјРІРѕР»
 
   XmlLexerStatus_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексический анализатор
+///Р›РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class XmlLexer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     XmlLexer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка буфера разбора
+///РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Reset (char* buf);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сканирование следующей лексемы
+///РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р»РµРєСЃРµРјС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     XmlLexem NextLexem (bool content = false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Состояние разбора
+///РЎРѕСЃС‚РѕСЏРЅРёРµ СЂР°Р·Р±РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    XmlLexem       Lexem        () const { return current_lexem; }           //текущая лексема
-    XmlLexerStatus Status       () const { return current_status; }          //текущий статус разбора
-    size_t         LineNumber   () const { return line_number; }             //текущая строка
-    size_t         LinePosition () const { return cursor - line_start + 1; } //смещение от начала строки
-    const char*    Token        () const { return current_token; }           //текущий токен
-    char           CurrentChar  () const { return cursor == erased_char_position ? erased_char : *cursor; } //текущий символ
+    XmlLexem       Lexem        () const { return current_lexem; }           //С‚РµРєСѓС‰Р°СЏ Р»РµРєСЃРµРјР°
+    XmlLexerStatus Status       () const { return current_status; }          //С‚РµРєСѓС‰РёР№ СЃС‚Р°С‚СѓСЃ СЂР°Р·Р±РѕСЂР°
+    size_t         LineNumber   () const { return line_number; }             //С‚РµРєСѓС‰Р°СЏ СЃС‚СЂРѕРєР°
+    size_t         LinePosition () const { return cursor - line_start + 1; } //СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+    const char*    Token        () const { return current_token; }           //С‚РµРєСѓС‰РёР№ С‚РѕРєРµРЅ
+    char           CurrentChar  () const { return cursor == erased_char_position ? erased_char : *cursor; } //С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР»
 
   private:
     void Skip ();
     void SkipBlockComment ();
     void NextLine ();
     void ReadContentString ();
-    void ReadString (char border, char* terminators = 0, size_t terminators_count = 0, bool content = false);  //если встречается border - он заменяется нулем и текущая позиция переводится на следующий символ, если встречается терминатор - разбор строки останавливается
+    void ReadString (char border, char* terminators = 0, size_t terminators_count = 0, bool content = false);  //РµСЃР»Рё РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ border - РѕРЅ Р·Р°РјРµРЅСЏРµС‚СЃСЏ РЅСѓР»РµРј Рё С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РїРµСЂРµРІРѕРґРёС‚СЃСЏ РЅР° СЃР»РµРґСѓСЋС‰РёР№ СЃРёРјРІРѕР», РµСЃР»Рё РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ С‚РµСЂРјРёРЅР°С‚РѕСЂ - СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ
     void ReadSymbolReference (char*& write_position);
     void ReadCData ();
     void ReadIdentifier (bool identifier);

@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -17,40 +17,40 @@ void raise (const char* method_name)
 
 }
 
-//создание исключающего семафора
+//СЃРѕР·РґР°РЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 mutex_t DefaultThreadManager::CreateMutex ()
 {
   raise ("syslib::DefaultThreadManager::CreateMutex");
   return 0;
 }
 
-//удаление исключающего семафора
+//СѓРґР°Р»РµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void DefaultThreadManager::DestroyMutex (mutex_t handle)
 {
   raise ("syslib::DefaultThreadManager::DestroyMutex");
 }
 
-//захват исключающего семафора
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void DefaultThreadManager::LockMutex (mutex_t handle)
 {
   raise ("syslib::DefaultThreadManager::LockMutex");
 }
 
-//захват исключающего семафора с указанием максимального времени ожидания
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР° СЃ СѓРєР°Р·Р°РЅРёРµРј РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РІСЂРµРјРµРЅРё РѕР¶РёРґР°РЅРёСЏ
 bool DefaultThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   raise ("syslib::DefaultThreadManager::LockMutex");
   return false;
 }
 
-//попытка захвата исключающего семафора
+//РїРѕРїС‹С‚РєР° Р·Р°С…РІР°С‚Р° РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 bool DefaultThreadManager::TryLockMutex (mutex_t handle)
 {
   raise ("syslib::DefaultThreadManager::TryLockMutex");
   return false;
 }
 
-//освобождение исключающего семафора
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void DefaultThreadManager::UnlockMutex (mutex_t handle)
 {
   raise ("syslib::DefaultThreadManager::UnlockMutex");

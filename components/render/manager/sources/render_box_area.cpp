@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 BoxAreaImpl::BoxAreaImpl ()
@@ -16,7 +16,7 @@ BoxAreaImpl::BoxAreaImpl (const render::manager::Box& in_box)
 }
     
 /*
-    Размеры области
+    Р Р°Р·РјРµСЂС‹ РѕР±Р»Р°СЃС‚Рё
 */
 
 void BoxAreaImpl::SetBox (const render::manager::Box& in_box)

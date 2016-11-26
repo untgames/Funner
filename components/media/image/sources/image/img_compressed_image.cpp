@@ -7,13 +7,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPRESSED_IMAGE_COMPONENT_MASK = "media.compressed_image.*"; //маска имён компонентов загрузки сжатых изображений
+const char* COMPRESSED_IMAGE_COMPONENT_MASK = "media.compressed_image.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р·Р°РіСЂСѓР·РєРё СЃР¶Р°С‚С‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
 
 /*
-    Сжатое изображение по умолчанию
+    РЎР¶Р°С‚РѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 class DefaultCompressedImage: public ICustomCompressedImage
@@ -35,18 +35,18 @@ class DefaultCompressedImage: public ICustomCompressedImage
 }
 
 /*
-    Описание реализации CompressedImage
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё CompressedImage
 */
 
 typedef stl::auto_ptr<ICustomCompressedImage> CompressedImagePtr;
 
 struct CompressedImage::Impl: public xtl::reference_counter
 {
-  CompressedImagePtr image; //реализация сжатого изображения
+  CompressedImagePtr image; //СЂРµР°Р»РёР·Р°С†РёСЏ СЃР¶Р°С‚РѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 CompressedImage::CompressedImage ()
@@ -107,7 +107,7 @@ CompressedImage& CompressedImage::operator = (const CompressedImage& image)
 }
 
 /*
-    Размеры картинки в пикселях
+    Р Р°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё РІ РїРёРєСЃРµР»СЏС…
 */
 
 unsigned int CompressedImage::Width () const
@@ -137,7 +137,7 @@ unsigned int CompressedImage::Height () const
 }
 
 /*
-    Количество слоёв / mip-уровней / блоков
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‘РІ / mip-СѓСЂРѕРІРЅРµР№ / Р±Р»РѕРєРѕРІ
 */
 
 unsigned int CompressedImage::LayersCount () const
@@ -180,7 +180,7 @@ unsigned int CompressedImage::BlocksCount () const
 }
 
 /*
-    Формат
+    Р¤РѕСЂРјР°С‚
 */
 
 const char* CompressedImage::Format () const
@@ -197,7 +197,7 @@ const char* CompressedImage::Format () const
 }
 
 /*
-    Получение данных
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 const void* CompressedImage::Data () const
@@ -227,7 +227,7 @@ const CompressedImageBlockDesc* CompressedImage::Blocks () const
 }
 
 /*
-    Размер образа / получение битовой карты
+    Р Р°Р·РјРµСЂ РѕР±СЂР°Р·Р° / РїРѕР»СѓС‡РµРЅРёРµ Р±РёС‚РѕРІРѕР№ РєР°СЂС‚С‹
 */
 
 unsigned int CompressedImage::BitmapSize (unsigned int layer, unsigned int mip_level) const
@@ -281,7 +281,7 @@ const void* CompressedImage::Bitmap (unsigned int layer, unsigned int mip_level)
 }
 
 /*
-    Загрузка
+    Р—Р°РіСЂСѓР·РєР°
 */
 
 void CompressedImage::Load (const char* file_name)
@@ -298,7 +298,7 @@ void CompressedImage::Load (const char* file_name)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void CompressedImage::Swap (CompressedImage& image)
@@ -317,7 +317,7 @@ void swap (CompressedImage& image1, CompressedImage& image2)
 }
 
 /*
-    Регистрация сериализаторов по умолчанию
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void CompressedImage::RegisterDefaultLoaders ()

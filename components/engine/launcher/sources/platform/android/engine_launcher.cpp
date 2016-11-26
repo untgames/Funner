@@ -6,7 +6,7 @@
 
 using namespace engine;
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [], const char* env [])
 {
   stl::auto_ptr<IEngine> funner (FunnerInit ());

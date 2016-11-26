@@ -3,17 +3,17 @@ function GetScriptByName(ScriptStore, name, UseWrapper)
   assert(name, "ERROR: GetScriptByName(ScriptStore, name, UseWrapper) - name is nil")
   assert(type(ScriptStore)=="table", "ERROR: GetScriptByName(ScriptStore, name, UseWrapper) - ScriptStore is not a table")
   local script=ScriptStore[name]
-  --оболочка скрипта позволяет получать и использовать скрипт в до того как он был объявлен в массиве скриптов, не вызывая ошибок в программе
+  --РѕР±РѕР»РѕС‡РєР° СЃРєСЂРёРїС‚Р° РїРѕР·РІРѕР»СЏРµС‚ РїРѕР»СѓС‡Р°С‚СЊ Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃРєСЂРёРїС‚ РІ РґРѕ С‚РѕРіРѕ РєР°Рє РѕРЅ Р±С‹Р» РѕР±СЉСЏРІР»РµРЅ РІ РјР°СЃСЃРёРІРµ СЃРєСЂРёРїС‚РѕРІ, РЅРµ РІС‹Р·С‹РІР°СЏ РѕС€РёР±РѕРє РІ РїСЂРѕРіСЂР°РјРјРµ
   local function ScriptWrapper(...)
     if script then
       script(...)
     else
-      --если скрипт до сих пор не был получен - новая попытка получить его
+      --РµСЃР»Рё СЃРєСЂРёРїС‚ РґРѕ СЃРёС… РїРѕСЂ РЅРµ Р±С‹Р» РїРѕР»СѓС‡РµРЅ - РЅРѕРІР°СЏ РїРѕРїС‹С‚РєР° РїРѕР»СѓС‡РёС‚СЊ РµРіРѕ
       script=ScriptStore[name]
       if script then
         script(...)
       else
-        --если скрипт не получилось вызвать - выводим сообщение о том, что такой скрипт не существует
+        --РµСЃР»Рё СЃРєСЂРёРїС‚ РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РІС‹Р·РІР°С‚СЊ - РІС‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ Рѕ С‚РѕРј, С‡С‚Рѕ С‚Р°РєРѕР№ СЃРєСЂРёРїС‚ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
         myprint("SCRIPT WARNING: Unknown script: ", name)
       end
     end
@@ -22,10 +22,10 @@ function GetScriptByName(ScriptStore, name, UseWrapper)
     return ScriptWrapper
   else
     if script then
-      --возвращатся уже обьявленный скрипт без оболочки
+      --РІРѕР·РІСЂР°С‰Р°С‚СЃСЏ СѓР¶Рµ РѕР±СЊСЏРІР»РµРЅРЅС‹Р№ СЃРєСЂРёРїС‚ Р±РµР· РѕР±РѕР»РѕС‡РєРё
       return script
     else
-      --если скрипт не обьявлен - приходится использовать оболочку
+      --РµСЃР»Рё СЃРєСЂРёРїС‚ РЅРµ РѕР±СЊСЏРІР»РµРЅ - РїСЂРёС…РѕРґРёС‚СЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕР±РѕР»РѕС‡РєСѓ
       myprint("SCRIPT WARNING: ", name," - used ScriptWrapper!")
       return ScriptWrapper
     end

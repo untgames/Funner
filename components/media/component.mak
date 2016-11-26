@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := MEDIALIB_COMPONENTS
 
-#Цель №1 - MediaLib components
+#Р¦РµР»СЊ в„–1 - MediaLib components
 MEDIALIB_COMPONENTS.TYPE       := package
 MEDIALIB_COMPONENTS.COMPONENTS := image sound font video geometry rfx animation physics collada rms players adobe
 

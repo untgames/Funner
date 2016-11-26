@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* SCENE_STATIC_INPUT_TRANSFORM_SPACE = "Scene.InputTransformSpace";
@@ -17,7 +17,7 @@ const char* COMPONENT_NAME                     = "script.binds.SceneInput";
 const char* BINDER_NAME                        = "SceneInput";
 
 /*
-    Бинды InputTransformSpace
+    Р‘РёРЅРґС‹ InputTransformSpace
 */
 
 void bind_scene_input_transform_space_library (script::Environment& env)
@@ -30,7 +30,7 @@ void bind_scene_input_transform_space_library (script::Environment& env)
 }
 
 /*
-    Бинды SceneInputManager
+    Р‘РёРЅРґС‹ SceneInputManager
 */
 
 SceneInputManager create_manager ()
@@ -72,7 +72,7 @@ namespace scene_input_script_binds
 {
 
 /*
-     омпонент
+     РѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

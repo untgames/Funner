@@ -4,19 +4,19 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Реализация текстуры
+    Р РµР°Р»РёР·Р°С†РёСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 struct Texture::Impl: public xtl::reference_counter
 {
-  float       amount;     //вес текстуры
-  stl::string image_name; //имя картинки
-  stl::string texcoord;   //имя канала текстурных координат
-  math::mat4f transform;  //матрица преобразований текстурных координат
+  float       amount;     //РІРµСЃ С‚РµРєСЃС‚СѓСЂС‹
+  stl::string image_name; //РёРјСЏ РєР°СЂС‚РёРЅРєРё
+  stl::string texcoord;   //РёРјСЏ РєР°РЅР°Р»Р° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
+  math::mat4f transform;  //РјР°С‚СЂРёС†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Texture::Texture ()
@@ -46,7 +46,7 @@ Texture& Texture::operator = (const Texture& texture)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Texture Texture::Clone () const
@@ -55,7 +55,7 @@ Texture Texture::Clone () const
 }
 
 /*
-    Имя картинки связанной с текстурой
+    РРјСЏ РєР°СЂС‚РёРЅРєРё СЃРІСЏР·Р°РЅРЅРѕР№ СЃ С‚РµРєСЃС‚СѓСЂРѕР№
 */
 
 const char* Texture::Image () const
@@ -72,7 +72,7 @@ void Texture::SetImage (const char* image_name)
 }
 
 /*
-    Имя канала текстурных координат
+    РРјСЏ РєР°РЅР°Р»Р° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 */
 
 const char* Texture::TexcoordChannel () const
@@ -89,7 +89,7 @@ void Texture::SetTexcoordChannel (const char* name)
 }
 
 /*
-    Вес текстуры
+    Р’РµСЃ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 float Texture::Amount () const
@@ -103,7 +103,7 @@ void Texture::SetAmount (float amount) const
 }
 
 /*
-    Матрица преобразования текстурных координат
+    РњР°С‚СЂРёС†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 */
 
 const math::mat4f& Texture::Transform () const

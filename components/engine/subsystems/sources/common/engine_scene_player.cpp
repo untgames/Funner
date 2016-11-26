@@ -20,22 +20,22 @@ namespace scene_player_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "ScenePlayer";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.ScenePlayer"; //имя компонента
-const char* LOG_NAME       = COMPONENT_NAME;                  //имя лога
+const char* SUBSYSTEM_NAME = "ScenePlayer";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.ScenePlayer"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* LOG_NAME       = COMPONENT_NAME;                  //РёРјСЏ Р»РѕРіР°
 
 /*
-   Подсистема рендера сцены
+   РџРѕРґСЃРёСЃС‚РµРјР° СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
 */
 
 class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Listener>,
   public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ScenePlayerSubsystem (common::ParseNode& node)
       : attachment (get<const char*> (node, "Listener")),
         log (LOG_NAME),
@@ -71,7 +71,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
       AttachmentRegistry::Detach<scene_graph::Listener> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-///События установки / удаления слушателя
+///РЎРѕР±С‹С‚РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё / СѓРґР°Р»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
     void OnRegisterAttachment (const char* attachment_name, scene_graph::Listener& listener)
     {
       if (attachment == attachment_name)
@@ -84,7 +84,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
         scene_player.SetListener (0);
     }
 
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
       //??????: do this !!!!!!!!!
@@ -132,7 +132,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -149,13 +149,13 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 };
 
 /*
-   Компонент регистрации проигрывателя сцены
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ СЃС†РµРЅС‹
 */
 
 class ScenePlayerComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     ScenePlayerComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

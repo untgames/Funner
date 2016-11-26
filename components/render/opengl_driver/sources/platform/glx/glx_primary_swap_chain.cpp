@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
 /*
-    Описание реализации первичной цепочки обмена
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРµСЂРІРёС‡РЅРѕР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
@@ -13,18 +13,18 @@ typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log                  log;                     //протокол
-  AdapterPtr           adapter;                 //адаптер, которому принадлежит устройство
-  AdapterLibraryPtr    library;                 //библиотека адаптера
-  GlxExtensionsEntries glx_extensions_entries;  //таблица WGL-расширений
-  int                  pixel_format_index;      //индекс формата пикселей устройства вывода
-  SwapChainDesc        desc;                    //дескриптор цепочки обмена
-  Display*             display;                 //соединение с дисплеем
-  Window               window;                  //окно
-  GLXFBConfig          glx_fb_config;           //конфигурация буфера кадра
-  PropertyList         properties;              //свойства цепочки обмена
+  Log                  log;                     //РїСЂРѕС‚РѕРєРѕР»
+  AdapterPtr           adapter;                 //Р°РґР°РїС‚РµСЂ, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ
+  AdapterLibraryPtr    library;                 //Р±РёР±Р»РёРѕС‚РµРєР° Р°РґР°РїС‚РµСЂР°
+  GlxExtensionsEntries glx_extensions_entries;  //С‚Р°Р±Р»РёС†Р° WGL-СЂР°СЃС€РёСЂРµРЅРёР№
+  int                  pixel_format_index;      //РёРЅРґРµРєСЃ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+  SwapChainDesc        desc;                    //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  Display*             display;                 //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  Window               window;                  //РѕРєРЅРѕ
+  GLXFBConfig          glx_fb_config;           //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
+  PropertyList         properties;              //СЃРІРѕР№СЃС‚РІР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
     : adapter (pixel_format.adapter)
     , library (&adapter->GetLibrary ())
@@ -34,7 +34,7 @@ struct PrimarySwapChain::Impl
   {
     try
     {
-        //инициализация таблицы расширений
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ СЂР°СЃС€РёСЂРµРЅРёР№
 
       if (pixel_format.glx_extensions_entries)
       {
@@ -45,7 +45,7 @@ struct PrimarySwapChain::Impl
         memset (&glx_extensions_entries, 0, sizeof glx_extensions_entries);
       }
 
-        //установка состояния FullScreen
+        //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ FullScreen
 
       if (in_desc.fullscreen)
       {
@@ -54,11 +54,11 @@ struct PrimarySwapChain::Impl
         SetFullscreenState (true);
       }
       
-        //инициализация конфигурации буфера кадра
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё Р±СѓС„РµСЂР° РєР°РґСЂР°
         
       glx_fb_config = pixel_format.config;
             
-        //инициализация дескриптора цепочки обмена
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
         
       desc.frame_buffer.width        = XWidthOfScreen (get_screen (window));
       desc.frame_buffer.height       = XHeightOfScreen (get_screen (window));
@@ -79,13 +79,13 @@ struct PrimarySwapChain::Impl
     }
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     log.Printf ("...release resources");
   }
   
-///Получение устройства вывода с максимальным размером области перекрытия
+///РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
   IOutput* GetContainingOutput ()
   {
     return adapter->GetOutputForWindow (window).get ();
@@ -167,7 +167,7 @@ struct PrimarySwapChain::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& sc_desc, const PixelFormatDesc& pf_desc)
@@ -190,7 +190,7 @@ PrimarySwapChain::~PrimarySwapChain ()
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* PrimarySwapChain::GetAdapter ()
@@ -204,7 +204,7 @@ Adapter* PrimarySwapChain::GetAdapterImpl ()
 }
 
 /*
-    Устройство отображения для текущего контекста
+    РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 Display* PrimarySwapChain::GetDisplay ()
@@ -213,7 +213,7 @@ Display* PrimarySwapChain::GetDisplay ()
 }
 
 /*
-    Окно отрисовки
+    РћРєРЅРѕ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 Window PrimarySwapChain::GetWindow ()
@@ -222,7 +222,7 @@ Window PrimarySwapChain::GetWindow ()
 }
 
 /*
-    Включена ли вертикальная синхронизация
+    Р’РєР»СЋС‡РµРЅР° Р»Рё РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
 */
 
 bool PrimarySwapChain::HasVSync ()
@@ -231,7 +231,7 @@ bool PrimarySwapChain::HasVSync ()
 }
 
 /*
-    Получение таблицы GLX-расширений
+    РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ GLX-СЂР°СЃС€РёСЂРµРЅРёР№
 */
 
 const GlxExtensionsEntries& PrimarySwapChain::GetGlxExtensionsEntries ()
@@ -240,7 +240,7 @@ const GlxExtensionsEntries& PrimarySwapChain::GetGlxExtensionsEntries ()
 }
 
 /*
-    Конфигурация буфера кадра
+    РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 GLXFBConfig PrimarySwapChain::GetFBConfig ()
@@ -249,7 +249,7 @@ GLXFBConfig PrimarySwapChain::GetFBConfig ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -258,7 +258,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
@@ -267,7 +267,7 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PrimarySwapChain::SetFullscreenState (bool state)
@@ -281,7 +281,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PrimarySwapChain::Present ()
@@ -290,7 +290,7 @@ void PrimarySwapChain::Present ()
 }
 
 /*
-    Список свойств устройства вывода
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 IPropertyList* PrimarySwapChain::GetProperties ()

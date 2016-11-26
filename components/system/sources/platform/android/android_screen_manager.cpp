@@ -3,7 +3,7 @@
 using namespace syslib;
 
 /*
-    Генерация исключения: работа с экранами невозможна на системе по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ СЌРєСЂР°РЅР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР° РЅР° СЃРёСЃС‚РµРјРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -12,17 +12,17 @@ namespace
 const int   MAIN_SCREEN      = 1;
 const char* MAIN_SCREEN_NAME = "MainScreen";
 
-//Менеджер экранов
+//РњРµРЅРµРґР¶РµСЂ СЌРєСЂР°РЅРѕРІ
 class ScreenManagerImpl
 {
   public:
-    //Конструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ScreenManagerImpl ()
     {
       memset (&mode, 0, sizeof (mode));
     }
 
-    //Установка режима экрана
+    //РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
     void SetScreenMode (jint width, jint height, jint refresh_rate, jint xdpi, jint ydpi)
     {
       mode.width        = width;
@@ -32,7 +32,7 @@ class ScreenManagerImpl
       mode.ydpi         = ydpi;
     }
 
-    //Получение режима экрана
+    //РџРѕР»СѓС‡РµРЅРёРµ СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
     void GetScreenMode (ScreenModeDesc& mode_desc)
     {
       mode_desc = mode;
@@ -44,7 +44,7 @@ class ScreenManagerImpl
 
 typedef common::Singleton <ScreenManagerImpl> ScreenManagerSingleton;
 
-//Установка режима экрана
+//РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 void set_screen_mode (JNIEnv& env, jobject activity, jint width, jint height, jint refresh_rate, jint xdpi, jint ydpi)
 {
   ScreenManagerSingleton::Instance ()->SetScreenMode (width, height, refresh_rate, xdpi, ydpi);
@@ -53,7 +53,7 @@ void set_screen_mode (JNIEnv& env, jobject activity, jint width, jint height, ji
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t AndroidScreenManager::GetScreensCount ()
@@ -62,7 +62,7 @@ size_t AndroidScreenManager::GetScreensCount ()
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t AndroidScreenManager::CreateScreen  (size_t screen_index)
@@ -79,7 +79,7 @@ void AndroidScreenManager::DestroyScreen (screen_t)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* AndroidScreenManager::GetScreenName (screen_t screen)
@@ -91,7 +91,7 @@ const char* AndroidScreenManager::GetScreenName (screen_t screen)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t AndroidScreenManager::GetScreenModesCount (screen_t screen)
@@ -116,7 +116,7 @@ void AndroidScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Sc
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void AndroidScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenModeDesc& mode_desc)
@@ -147,7 +147,7 @@ void AndroidScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void AndroidScreenManager::SetScreenGammaRamp (screen_t, const Color3f table [256])
@@ -168,7 +168,7 @@ void AndroidScreenManager::GetScreenGammaRamp (screen_t, Color3f table [256])
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t AndroidScreenManager::FindContainingScreen (const void*)
@@ -177,7 +177,7 @@ screen_t AndroidScreenManager::FindContainingScreen (const void*)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* AndroidScreenManager::GetNativeScreenHandle (screen_t)
@@ -186,7 +186,7 @@ const void* AndroidScreenManager::GetNativeScreenHandle (screen_t)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void AndroidScreenManager::GetScreenProperties (screen_t screen, common::PropertyMap& properties)
@@ -201,7 +201,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация методов обратного вызова screen manager
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° screen manager
 void register_screen_callbacks (JNIEnv* env, jclass activity_class)
 {
   try

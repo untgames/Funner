@@ -1,4 +1,4 @@
-//Тестирование алгоритма sort (first, last, comp)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° sort (first, last, comp)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

@@ -1,25 +1,25 @@
 struct BindableProgramContext;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Программа, устанавливаемая в контекст
+///РџСЂРѕРіСЂР°РјРјР°, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјР°СЏ РІ РєРѕРЅС‚РµРєСЃС‚
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class BindableProgram: public DeviceObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     BindableProgram  (ShaderLibrary& library, const Program& program, const ProgramParametersLayout* layout);
     ~BindableProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение программы и лэйаута
+///РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ Рё Р»СЌР№Р°СѓС‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const Program&                 GetProgram                 () const { return program; }
     const ProgramParametersLayout* GetProgramParametersLayout () const { return parameters_layout; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг в контекст
+///Р‘РёРЅРґРёРЅРі РІ РєРѕРЅС‚РµРєСЃС‚
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind (ID3D11DeviceContext&          context,
                ShaderLibrary&                library,
@@ -31,30 +31,30 @@ class BindableProgram: public DeviceObject
     typedef stl::vector<TargetConstantBufferPrototypePtr> BufferPrototypeArray;
     
   private:
-    const Program&                 program;           //исходная программа
-    const ProgramParametersLayout* parameters_layout; //лэйаут параметров программы (может быть нулевым)
-    BufferPrototypeArray           buffer_prototypes; //прототипы буферов
+    const Program&                 program;           //РёСЃС…РѕРґРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°
+    const ProgramParametersLayout* parameters_layout; //Р»СЌР№Р°СѓС‚ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅСѓР»РµРІС‹Рј)
+    BufferPrototypeArray           buffer_prototypes; //РїСЂРѕС‚РѕС‚РёРїС‹ Р±СѓС„РµСЂРѕРІ
 };
 
 typedef xtl::intrusive_ptr<BindableProgram> BindableProgramPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Контекст приклепляемой программы
+///РљРѕРЅС‚РµРєСЃС‚ РїСЂРёРєР»РµРїР»СЏРµРјРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct BindableProgramContext
 {
-  bool             has_dirty_buffers;                                  //присутствуют грязные буферы
-  bool             program_binded;                                     //программа установлена в контекст
-  bool             dirty_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //"грязные" буферы
-  DxInputLayoutPtr input_layout;                                       //входной лэйаут  
+  bool             has_dirty_buffers;                                  //РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‚ РіСЂСЏР·РЅС‹Рµ Р±СѓС„РµСЂС‹
+  bool             program_binded;                                     //РїСЂРѕРіСЂР°РјРјР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР° РІ РєРѕРЅС‚РµРєСЃС‚
+  bool             dirty_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //"РіСЂСЏР·РЅС‹Рµ" Р±СѓС„РµСЂС‹
+  DxInputLayoutPtr input_layout;                                       //РІС…РѕРґРЅРѕР№ Р»СЌР№Р°СѓС‚  
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   BindableProgramContext ()
   {
     Reset ();
   }
 
-/// Сброс контекста
+/// РЎР±СЂРѕСЃ РєРѕРЅС‚РµРєСЃС‚Р°
   void Reset ()
   {
     program_binded    = false;

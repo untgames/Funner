@@ -5,7 +5,7 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 BasicRenderer::BasicRenderer (server::RenderManager& in_manager, const char* effect_name)
@@ -24,11 +24,11 @@ BasicRenderer::BasicRenderer (server::RenderManager& in_manager, const char* eff
 {
   try
   {
-      //задание эффекта
+      //Р·Р°РґР°РЅРёРµ СЌС„С„РµРєС‚Р°
 
     frame.SetEffect (effect_name);
 
-      //задание начальных свойств кадра
+      //Р·Р°РґР°РЅРёРµ РЅР°С‡Р°Р»СЊРЅС‹С… СЃРІРѕР№СЃС‚РІ РєР°РґСЂР°
 
     frame_properties.SetProperty ("ViewMatrix",       math::mat4f (1.0f));
     frame_properties.SetProperty ("ProjectionMatrix", math::mat4f (1.0f));
@@ -36,7 +36,7 @@ BasicRenderer::BasicRenderer (server::RenderManager& in_manager, const char* eff
     view_matrix_property_index = frame_properties.IndexOf ("ViewMatrix");
     proj_matrix_property_index = frame_properties.IndexOf ("ProjectionMatrix");
 
-      //задание начальных свойств для пар frame-entity
+      //Р·Р°РґР°РЅРёРµ РЅР°С‡Р°Р»СЊРЅС‹С… СЃРІРѕР№СЃС‚РІ РґР»СЏ РїР°СЂ frame-entity
 
     frame_entity_properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
     frame_entity_properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
@@ -49,7 +49,7 @@ BasicRenderer::BasicRenderer (server::RenderManager& in_manager, const char* eff
     frame.SetEntityDependentProperties (frame_entity_properties);
     frame.SetEntityDrawHandler         (xtl::bind (&BasicRenderer::EntityDrawHandler, this, _1, _2, _3, _4));
 
-      //задание свойств фрейма
+      //Р·Р°РґР°РЅРёРµ СЃРІРѕР№СЃС‚РІ С„СЂРµР№РјР°
 
     frame.SetProperties (frame_properties);
   }
@@ -65,14 +65,14 @@ BasicRenderer::~BasicRenderer ()
 }
 
 /*
-    Обновление кадра
+    РћР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР°
 */
 
 void BasicRenderer::ConfigureFrame (RenderingContext& parent_context)
 {
   try
   {
-      //обновление параметров камеры
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РєР°РјРµСЂС‹
 
     if (view_proj_transaction_id != parent_context.Camera ().ViewProjectionMatrixTransactionId ())
     {
@@ -97,7 +97,7 @@ void BasicRenderer::ConfigureFrame (RenderingContext& parent_context)
       frame_properties.SetProperty (proj_matrix_property_index, parent_context.Camera ().ProjectionMatrix ());
     }
       
-      //обновление свойств объект-кадр (для рендеринга спрайтов)
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚-РєР°РґСЂ (РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР° СЃРїСЂР°Р№С‚РѕРІ)
 
     frame_entity_properties.SetProperty (mv_matrix_property_index,  view_proj_tm);
     frame_entity_properties.SetProperty (mvp_matrix_property_index, view_proj_tm);
@@ -143,17 +143,17 @@ void BasicRenderer::DrawVisualModels (RenderingContext& parent_context)
 {
   try
   {
-      //построение списка моделей на отрисовку
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РјРѕРґРµР»РµР№ РЅР° РѕС‚СЂРёСЃРѕРІРєСѓ
 
     TraverseResult& result = parent_context.TraverseResult ();
     
-      //обновление визуализируемых объектов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РІРёР·СѓР°Р»РёР·РёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ
 
     RenderingContext context (parent_context, frame);
 
     Draw (context, result.visual_models, 0);
 
-      //добавление дочернего кадра
+      //РґРѕР±Р°РІР»РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ РєР°РґСЂР°
 
     parent_context.Frame ().AddFrame (frame);
   }
@@ -168,11 +168,11 @@ void BasicRenderer::Draw (RenderingContext& parent_context)
 {
   try
   {
-      //настройка кадра
+      //РЅР°СЃС‚СЂРѕР№РєР° РєР°РґСЂР°
 
     ConfigureFrame (parent_context);
 
-      //отрисовка моделей
+      //РѕС‚СЂРёСЃРѕРІРєР° РјРѕРґРµР»РµР№
 
     DrawVisualModels (parent_context);
   }
@@ -184,7 +184,7 @@ void BasicRenderer::Draw (RenderingContext& parent_context)
 }
 
 /*
-    Обработчик отрисовки объектов
+    РћР±СЂР°Р±РѕС‚С‡РёРє РѕС‚СЂРёСЃРѕРІРєРё РѕР±СЉРµРєС‚РѕРІ
 */
 
 void BasicRenderer::EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, void*, manager::EntityDrawParams& out_params)

@@ -3,7 +3,7 @@
 using namespace media::rms;
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Progress::Progress (AsyncOperation* in_impl)
@@ -33,7 +33,7 @@ Progress& Progress::operator = (const Progress& progress)
 }
 
 /*
-    Состояние загрузки
+    РЎРѕСЃС‚РѕСЏРЅРёРµ Р·Р°РіСЂСѓР·РєРё
 */
 
 void Progress::SetState (ProgressState state)
@@ -70,7 +70,7 @@ const char* Progress::Stage () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Progress::Swap (Progress& progress)

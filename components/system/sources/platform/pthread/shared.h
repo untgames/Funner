@@ -35,13 +35,13 @@ struct mutex_handle
   pthread_mutex_t mutex;
 };
 
-//генерация исключения с кодом ошибки
+//╨И╥Р┬н╥Р╨░┬а╨╢╨Б╨┐ ╨Б╨▒╨Д┬л╨╛╨╖╥Р┬н╨Б╨┐ ╨▒ ╨Д┬о┬д┬о┬м ┬о╨╕╨Б╨О╨Д╨Б
 void pthread_raise_error (const char* source, int status);
 
 #if defined (_WIN32) || defined (ANDROID)
 
-void thread_init ();      //функция инициализации библиотеки
-void thread_done (void*); //функция деинициализации библиотеки
+void thread_init ();      //╨┤╨│┬н╨Д╨╢╨Б╨┐ ╨Б┬н╨Б╨╢╨Б┬а┬л╨Б┬з┬а╨╢╨Б╨Б ╨О╨Б╨О┬л╨Б┬о╨▓╥Р╨Д╨Б
+void thread_done (void*); //╨┤╨│┬н╨Д╨╢╨Б╨┐ ┬д╥Р╨Б┬н╨Б╨╢╨Б┬а┬л╨Б┬з┬а╨╢╨Б╨Б ╨О╨Б╨О┬л╨Б┬о╨▓╥Р╨Д╨Б
 
 #else
 

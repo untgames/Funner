@@ -23,7 +23,7 @@ namespace pvr_loader
 {
 
 /*
-    Описание формата PVR
+    РћРїРёСЃР°РЅРёРµ С„РѕСЂРјР°С‚Р° PVR
 */
 
 static char PVR_VERSION [] = { 0x50, 0x56, 0x52, 0x03 };
@@ -73,13 +73,13 @@ struct PACKED_STRUCTURE PVRMetaDataHeader
 #endif
 
 /*
-    Изображение, сжатое в формате PVR
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ, СЃР¶Р°С‚РѕРµ РІ С„РѕСЂРјР°С‚Рµ PVR
 */
 
 class PvrCompressedImage: public ICustomCompressedImage
 {
   public:
-///Загрузка изображения
+///Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     PvrCompressedImage (const char* file_name)
     {
       xtl::compile_time_assert<sizeof (uint64_t) == 8> ();
@@ -91,7 +91,7 @@ class PvrCompressedImage: public ICustomCompressedImage
 
         InputFile file (file_name);
 
-          //разбор заголовка файла
+          //СЂР°Р·Р±РѕСЂ Р·Р°РіРѕР»РѕРІРєР° С„Р°Р№Р»Р°
         
         PVRTexHeader header;
         
@@ -125,7 +125,7 @@ class PvrCompressedImage: public ICustomCompressedImage
         this->width  = width;
         this->height = height;
 
-          //чтение данных
+          //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
           
         unsigned int data_length = (unsigned int)(file.Size () - file.Tell ());
 
@@ -188,31 +188,31 @@ class PvrCompressedImage: public ICustomCompressedImage
       }
     }
   
-///Ширина изображения
+///РЁРёСЂРёРЅР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     unsigned int Width ()
     {
       return width;
     }
     
-///Высота изображения
+///Р’С‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     unsigned int Height ()
     {
       return height;
     }
 
-///Количество слоёв
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‘РІ
     unsigned int LayersCount ()
     {
-      return layers_count; //формат поддерживает только однослойные изображения
+      return layers_count; //С„РѕСЂРјР°С‚ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ С‚РѕР»СЊРєРѕ РѕРґРЅРѕСЃР»РѕР№РЅС‹Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     }
 
-///Количество мип-уровней
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РјРёРї-СѓСЂРѕРІРЅРµР№
     unsigned int MipsCount ()
     {
       return (unsigned int)mip_levels.size ();
     }
     
-///Формат изображения
+///Р¤РѕСЂРјР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     const char* Format ()
     {
       switch (format)
@@ -225,13 +225,13 @@ class PvrCompressedImage: public ICustomCompressedImage
       }
     }
 
-///Возвращение буфера данных
+///Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
     const void* Data ()
     {
       return data.data ();
     }
 
-///Возвращение блоков
+///Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р±Р»РѕРєРѕРІ
     const CompressedImageBlockDesc* Blocks ()
     {
       return &mip_levels [0];
@@ -242,16 +242,16 @@ class PvrCompressedImage: public ICustomCompressedImage
     typedef stl::vector<CompressedImageBlockDesc> MipLevelArray;
 
   private:
-    uint32_t      format;       //формат изображения
-    uint32_t      width;        //ширина изображения
-    uint32_t      height;       //высота изображения
-    uint32_t      layers_count; //количество слоев
-    Buffer        data;         //данные изображения
-    MipLevelArray mip_levels;   //мип-уровни
+    uint32_t      format;       //С„РѕСЂРјР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    uint32_t      width;        //С€РёСЂРёРЅР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    uint32_t      height;       //РІС‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    uint32_t      layers_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕРµРІ
+    Buffer        data;         //РґР°РЅРЅС‹Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    MipLevelArray mip_levels;   //РјРёРї-СѓСЂРѕРІРЅРё
 };
 
 /*
-   Компонент
+   РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

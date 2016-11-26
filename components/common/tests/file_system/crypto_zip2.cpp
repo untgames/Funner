@@ -40,24 +40,24 @@ int main ()
   
   try
   {
-      //копирование файла в текущую папку
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р° РІ С‚РµРєСѓС‰СѓСЋ РїР°РїРєСѓ
 
     FileSystem::CopyFile (SOURCE_CRYPTO_FILE_NAME, DESTINATION_CRYPTO_FILE_NAME);
 
-      //преобразование ключа
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР»СЋС‡Р°
       
     FileCryptoParameters crypto_params (DECRYPT_METHOD, ENCRYPT_METHOD, KEY_STRING);
     
-      //установка параметров шифрования
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ
 
     FileSystem::SetCryptoParameters (DESTINATION_CRYPTO_FILE_NAME, crypto_params);
     FileSystem::AddSearchPath (SEARCH_PATH, &PrintLog);
 
-      //чтение файла
+      //С‡С‚РµРЅРёРµ С„Р°Р№Р»Р°
       
     ReadFileContent (SOURCE_FILE);    
 
-      //удаление скопированного файла
+      //СѓРґР°Р»РµРЅРёРµ СЃРєРѕРїРёСЂРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
       
     FileSystem::RemoveSearchPath (SEARCH_PATH);
 

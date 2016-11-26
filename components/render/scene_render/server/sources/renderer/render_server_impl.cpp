@@ -4,21 +4,21 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Описание реализации сервера рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРµСЂРІРµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct ServerImpl::Impl
 {
-  stl::string             server_name;      //имя сервера
-  server::RenderManager   render_manager;   //менеджер рендеринга
-  server::WindowManager   window_manager;   //менеджер окон
-  server::ViewportManager viewport_manager; //менеджер областей вывода
-  server::ScreenManager   screen_manager;   //менеджер экранов
-  server::SceneManager    scene_manager;    //менеджер сцены
-  server::ResourceManager resource_manager; //менеджер ресурсов
-  server::MaterialManager material_manager; //менеджер материалов
+  stl::string             server_name;      //РёРјСЏ СЃРµСЂРІРµСЂР°
+  server::RenderManager   render_manager;   //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  server::WindowManager   window_manager;   //РјРµРЅРµРґР¶РµСЂ РѕРєРѕРЅ
+  server::ViewportManager viewport_manager; //РјРµРЅРµРґР¶РµСЂ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+  server::ScreenManager   screen_manager;   //РјРµРЅРµРґР¶РµСЂ СЌРєСЂР°РЅРѕРІ
+  server::SceneManager    scene_manager;    //РјРµРЅРµРґР¶РµСЂ СЃС†РµРЅС‹
+  server::ResourceManager resource_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµСЃСѓСЂСЃРѕРІ
+  server::MaterialManager material_manager; //РјРµРЅРµРґР¶РµСЂ РјР°С‚РµСЂРёР°Р»РѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* name)
     : server_name (name)
     , render_manager (name)
@@ -33,7 +33,7 @@ struct ServerImpl::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ServerImpl::ServerImpl (const char* name)
@@ -57,7 +57,7 @@ ServerImpl::~ServerImpl ()
 }
 
 /*
-    Поток отладочного протоколирования
+    РџРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 common::Log& ServerImpl::Log ()
@@ -66,7 +66,7 @@ common::Log& ServerImpl::Log ()
 }
 
 /*
-    Менеджеры
+    РњРµРЅРµРґР¶РµСЂС‹
 */
 
 render::manager::RenderManager& ServerImpl::RenderManager ()

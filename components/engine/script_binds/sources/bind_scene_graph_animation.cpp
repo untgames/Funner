@@ -9,7 +9,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* SCENE_ANIMATION_LIBRARY            = "Scene.Controllers.Animation";
@@ -19,7 +19,7 @@ const char* SCENE_ANIMATION_EVENT_LIBRARY      = "Scene.Controllers.AnimationEve
 const char* SCENE_ANIMATION_SEEK_MODE_LIBRARY  = "Scene.Controllers.AnimationSeekMode";
 
 /*
-    Вспомогательные функции
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 */
 
 void bind_animation_event_library (Environment& environment)
@@ -57,7 +57,7 @@ void bind_animation_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_ANIMATION_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("get_Name", make_invoker (&Animation::Name));
   lib.Register ("Play", make_invoker (&Animation::Play));
@@ -78,7 +78,7 @@ void bind_animation_library (Environment& environment)
   lib.Register ("CreateEventHandler", make_callback_invoker<Animation::EventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (&Animation::RegisterEventHandler));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<Animation> (SCENE_ANIMATION_LIBRARY);
 }
@@ -87,11 +87,11 @@ void bind_animation_controller_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_ANIMATION_CONTROLLER_LIBRARY);
   
-    //регистрация порождающей функции
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕСЂРѕР¶РґР°СЋС‰РµР№ С„СѓРЅРєС†РёРё
     
   lib.Register ("Create", make_invoker (&AnimationController::Create));
 
-    //регистрация операций  
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№  
     
   lib.Register ("get_AnimationsCount", make_invoker (&AnimationController::AnimationsCount));
   lib.Register ("Animation", make_invoker (&AnimationController::Animation));
@@ -104,7 +104,7 @@ void bind_animation_controller_library (Environment& environment)
   lib.Register ("CreateEventHandler", make_callback_invoker<AnimationController::EventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (&AnimationController::RegisterEventHandler));
     
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<AnimationController> (SCENE_ANIMATION_CONTROLLER_LIBRARY);
 }
@@ -118,11 +118,11 @@ void bind_animation_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_ANIMATION_MANAGER_LIBRARY);
   
-    //регистрация порождающей функции
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕСЂРѕР¶РґР°СЋС‰РµР№ С„СѓРЅРєС†РёРё
     
   lib.Register ("Create", make_invoker (&create_animation_manager));
 
-    //регистрация операций  
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№  
     
   lib.Register ("CreateAnimation", make_invoker (&AnimationManager::CreateAnimation));
   lib.Register ("PlayAnimation", make_invoker (
@@ -132,7 +132,7 @@ void bind_animation_manager_library (Environment& environment)
   lib.Register ("LoadResource", make_invoker (&AnimationManager::LoadResource));
   lib.Register ("UnloadResource", make_invoker (&AnimationManager::UnloadResource));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<AnimationManager> (SCENE_ANIMATION_MANAGER_LIBRARY);
 }

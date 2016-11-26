@@ -1,4 +1,4 @@
-//Тестирование алгоритма mismatch (first1, last1, first2, pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° mismatch (first1, last1, first2, pred)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

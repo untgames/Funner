@@ -1,4 +1,4 @@
-//Тестирование алгоритма lower_bound (first, last, value, less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° lower_bound (first, last, value, less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

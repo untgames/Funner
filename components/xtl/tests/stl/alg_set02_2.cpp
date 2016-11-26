@@ -1,4 +1,4 @@
-//Тестирование алгоритма set_union (range1,range2,result,less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° set_union (range1,range2,result,less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

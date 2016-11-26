@@ -112,7 +112,7 @@ class AndroidPlatformImpl
       }
     }
 
-    //Проверка, установлено ли приложение facebook
+    //РџСЂРѕРІРµСЂРєР°, СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ Р»Рё РїСЂРёР»РѕР¶РµРЅРёРµ facebook
     bool IsFacebookAppInstalled ()
     {
       if (!IsFacebookSDKSupported ())
@@ -228,7 +228,7 @@ class AndroidPlatformImpl
       login_handler (true, OperationStatus_Canceled, "", "");
     }
 
-    //Проверка, поддерживается ли Facebook SDK
+    //РџСЂРѕРІРµСЂРєР°, РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ Р»Рё Facebook SDK
     bool IsFacebookSDKSupported ()
     {
       return session_class;
@@ -303,7 +303,7 @@ void AndroidPlatform::LogOut ()
 }
 
 /*
-   Проверка, установлено ли приложение facebook
+   РџСЂРѕРІРµСЂРєР°, СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ Р»Рё РїСЂРёР»РѕР¶РµРЅРёРµ facebook
 */
 
 bool AndroidPlatform::IsFacebookAppInstalled ()

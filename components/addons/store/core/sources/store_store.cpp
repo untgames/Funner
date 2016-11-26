@@ -3,7 +3,7 @@
 using namespace store;
 
 /*
-   Реализация магазина
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°РіР°Р·РёРЅР°
 */
 
 struct Store::Impl : public xtl::reference_counter
@@ -12,11 +12,11 @@ struct Store::Impl : public xtl::reference_counter
   typedef stl::hash_map<size_t, Transaction>      TransactionsMap;
   typedef xtl::signal<void (const Transaction&)>  StoreSignal;
 
-  IStore*              store;                         //магазин
-  BuyProductCallbacks  buy_product_callbacks;         //колбеки обновления транзакций по продуктам
-  StoreSignal          store_signal;                  //сигнал событий от магазина
-  TransactionsMap      updated_transactions;          //транзакции, обновленные за время работы приложения
-  xtl::auto_connection transaction_update_connection; //соединение оповещения о обновлениях транзакций
+  IStore*              store;                         //РјР°РіР°Р·РёРЅ
+  BuyProductCallbacks  buy_product_callbacks;         //РєРѕР»Р±РµРєРё РѕР±РЅРѕРІР»РµРЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёР№ РїРѕ РїСЂРѕРґСѓРєС‚Р°Рј
+  StoreSignal          store_signal;                  //СЃРёРіРЅР°Р» СЃРѕР±С‹С‚РёР№ РѕС‚ РјР°РіР°Р·РёРЅР°
+  TransactionsMap      updated_transactions;          //С‚СЂР°РЅР·Р°РєС†РёРё, РѕР±РЅРѕРІР»РµРЅРЅС‹Рµ Р·Р° РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
+  xtl::auto_connection transaction_update_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ РѕР±РЅРѕРІР»РµРЅРёСЏС… С‚СЂР°РЅР·Р°РєС†РёР№
 
   Impl (const char* store_name)
     : store (0)
@@ -112,7 +112,7 @@ struct Store::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Store::Store (const char* store_name, const OnInitializedCallback& callback)
@@ -150,7 +150,7 @@ Store& Store::operator = (const Store& source)
 }
 
 /*
-   Описание
+   РћРїРёСЃР°РЅРёРµ
 */
 
 const char* Store::Description () const
@@ -159,7 +159,7 @@ const char* Store::Description () const
 }
 
 /*
-   Можно ли осуществлять покупки
+   РњРѕР¶РЅРѕ Р»Рё РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊ РїРѕРєСѓРїРєРё
 */
 
 bool Store::CanBuyProducts () const
@@ -168,8 +168,8 @@ bool Store::CanBuyProducts () const
 }
 
 /*
-   Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-   products ответа может содержать не все запрошенные продукты)
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРІР°СЂР°С… (products_ids - СЂР°Р·РґРµР»РµРЅРЅС‹Р№ РїСЂРѕР±РµР»Р°РјРё СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїСЂРѕРґСѓРєС‚РѕРІ,
+   products РѕС‚РІРµС‚Р° РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРµ РІСЃРµ Р·Р°РїСЂРѕС€РµРЅРЅС‹Рµ РїСЂРѕРґСѓРєС‚С‹)
 */
 
 void Store::LoadProducts (const char* product_ids, const LoadProductsCallback& callback) const
@@ -181,7 +181,7 @@ void Store::LoadProducts (const char* product_ids, const LoadProductsCallback& c
 }
 
 /*
-   Покупка / восстановление покупок
+   РџРѕРєСѓРїРєР° / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕРєСѓРїРѕРє
 */
 
 xtl::connection Store::RegisterTransactionUpdateHandler (const PurchaseCallback& callback)
@@ -205,7 +205,7 @@ void Store::RestorePurchases (const OnPurchasesRestoredCallback& finish_callback
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Store::Swap (Store& source)
@@ -217,7 +217,7 @@ namespace store
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 void swap (Store& store1, Store& store2)
 {

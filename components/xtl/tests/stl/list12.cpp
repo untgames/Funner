@@ -1,4 +1,4 @@
-// Тестирование remove
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ remove
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

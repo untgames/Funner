@@ -1,4 +1,4 @@
-//Тестирование алгоритма uninitialized_fill (first, last, val)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° uninitialized_fill (first, last, val)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

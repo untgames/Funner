@@ -8,18 +8,18 @@ namespace
 using detail::Attachment;
 using detail::BasicAttachment;
 
-/// Реализация внутрипроцессного хранилища
+/// Р РµР°Р»РёР·Р°С†РёСЏ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅРѕРіРѕ С…СЂР°РЅРёР»РёС‰Р°
 class InprocessExchangeStorageImpl
 {
   public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     InprocessExchangeStorageImpl ()
       : current_owner_id (1)
       , current_object_id (1)
     {
     }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~InprocessExchangeStorageImpl ()
     {
       while (!attachments.empty ())
@@ -30,7 +30,7 @@ class InprocessExchangeStorageImpl
       }
     }
 
-///Выделение идентификатора владельца
+///Р’С‹РґРµР»РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РІР»Р°РґРµР»СЊС†Р°
     object_id_t AllocateOwnerId ()
     {
       if (!current_owner_id)
@@ -39,7 +39,7 @@ class InprocessExchangeStorageImpl
       return current_owner_id++;
     }
 
-/// Регистрация объекта
+/// Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЉРµРєС‚Р°
     object_id_t Attach (stl::auto_ptr<BasicAttachment>& attachment)
     {
       if (!current_object_id)
@@ -109,7 +109,7 @@ typedef common::Singleton<InprocessExchangeStorageImpl> InprocessExchangeStorage
 }
 
 /*
-    Обертки над вызовами
+    РћР±РµСЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё
 */
 
 object_id_t InprocessExchangeStorage::AllocateOwnerId ()

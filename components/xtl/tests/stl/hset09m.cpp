@@ -1,4 +1,4 @@
-// Тестирование swap ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ swap ()
 #include <stdio.h>
 #include <stl/hash_set>
 #include <stl/algorithm>

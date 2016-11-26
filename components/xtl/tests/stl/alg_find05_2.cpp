@@ -1,4 +1,4 @@
-//Тестирование алгоритма search (range1, range2, pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° search (range1, range2, pred)
 #include <stdio.h>
 #include <ctype.h>
 #include <stl/algorithm>

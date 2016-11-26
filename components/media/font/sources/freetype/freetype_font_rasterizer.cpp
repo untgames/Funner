@@ -19,17 +19,17 @@ namespace freetype
 {
 
 /*
-   Растеризатор шрифта
+   Р Р°СЃС‚РµСЂРёР·Р°С‚РѕСЂ С€СЂРёС„С‚Р°
 */
 
 struct FreetypeFontRasterizer::Impl
 {
-  FreetypeRasterizedFont rasterized_font; //растеризованный шрифт
-  media::PixelFormat     image_format;    //формат атласа
-  RasterizedGlyphsBuffer glyphs;          //информация о символах
-  media::AtlasBuilder    atlas_builder;   //построитель атласа
+  FreetypeRasterizedFont rasterized_font; //СЂР°СЃС‚РµСЂРёР·РѕРІР°РЅРЅС‹Р№ С€СЂРёС„С‚
+  media::PixelFormat     image_format;    //С„РѕСЂРјР°С‚ Р°С‚Р»Р°СЃР°
+  RasterizedGlyphsBuffer glyphs;          //РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРёРјРІРѕР»Р°С…
+  media::AtlasBuilder    atlas_builder;   //РїРѕСЃС‚СЂРѕРёС‚РµР»СЊ Р°С‚Р»Р°СЃР°
 
-  ///Конструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RasterizedFontCreationParams& params, const FreetypeRasterizedFont& in_rasterized_font)
     : rasterized_font (in_rasterized_font)
     , image_format (params.image_format)
@@ -87,7 +87,7 @@ struct FreetypeFontRasterizer::Impl
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FreetypeFontRasterizer::FreetypeFontRasterizer (const RasterizedFontCreationParams& params, const FreetypeRasterizedFont& rasterized_font)
@@ -100,7 +100,7 @@ FreetypeFontRasterizer::~FreetypeFontRasterizer ()
 }
 
 /*
-   Получение информации о растрированных символах
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЂР°СЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… СЃРёРјРІРѕР»Р°С…
 */
 
 const RasterizedGlyphInfo* FreetypeFontRasterizer::RasterizedGlyphs ()
@@ -109,7 +109,7 @@ const RasterizedGlyphInfo* FreetypeFontRasterizer::RasterizedGlyphs ()
 }
 
 /*
-   Построение картинок
+   РџРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚РёРЅРѕРє
 */
 
 unsigned int FreetypeFontRasterizer::ImagesCount ()

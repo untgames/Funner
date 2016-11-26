@@ -1,4 +1,4 @@
-//тестирование swap
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ swap
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

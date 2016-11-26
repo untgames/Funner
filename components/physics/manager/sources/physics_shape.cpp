@@ -10,7 +10,7 @@ const float SCALE_EQUAL_EPS = 0.001f;
 }
 
 /*
-   Геометрическое тело
+   Р“РµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ С‚РµР»Рѕ
 */
 
 struct Shape::Impl : public xtl::reference_counter
@@ -28,7 +28,7 @@ struct Shape::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Shape::Shape (Impl* source_impl)
@@ -54,7 +54,7 @@ Shape& Shape::operator = (const Shape& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Shape::Id () const
@@ -63,7 +63,7 @@ size_t Shape::Id () const
 }
 
 /*
-   Толщина полей
+   РўРѕР»С‰РёРЅР° РїРѕР»РµР№
 */
 
 void Shape::SetMargin (float value)
@@ -77,7 +77,7 @@ float Shape::Margin () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Shape::Swap (Shape& shape)
@@ -89,7 +89,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Shape& shape1, Shape& shape2)
@@ -100,7 +100,7 @@ void swap (Shape& shape1, Shape& shape2)
 }
 
 /*
-   Создание
+   РЎРѕР·РґР°РЅРёРµ
 */
 
 Shape ShapeImplProvider::CreateShape (ShapePtr shape)
@@ -232,7 +232,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
 }
 
 /*
-   Получение низкоуровневого тела
+   РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ С‚РµР»Р°
 */
 
 physics::low_level::IShape* ShapeImplProvider::LowLevelShape (const Shape& shape)

@@ -1,4 +1,4 @@
-// Тестирование функции lower_bound
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё lower_bound
 #include <stdio.h>
 #include <stl/map>
 #include "test.h"

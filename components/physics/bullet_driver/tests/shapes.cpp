@@ -98,7 +98,7 @@ int main ()
     dump_body_position (box_body.get ());
     printf ("sphere body state:\n");
     dump_body_position (sphere_body.get ());
-    printf ("capsule body state:\n");               //разные результаты на mac и windows
+    printf ("capsule body state:\n");               //СЂР°Р·РЅС‹Рµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РЅР° mac Рё windows
     dump_body_position (capsule_body.get ());
     printf ("convex body state:\n");
     dump_body_position (convex_body.get ());

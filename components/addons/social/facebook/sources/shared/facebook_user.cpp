@@ -4,7 +4,7 @@ using namespace social;
 using namespace social::facebook;
 
 /*
-   Получение залогиненного пользователя
+   РџРѕР»СѓС‡РµРЅРёРµ Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 User& FacebookSessionImpl::CurrentUser ()
@@ -16,7 +16,7 @@ User& FacebookSessionImpl::CurrentUser ()
 }
 
 /*
-   Загрузка пользователя по идентификатору
+   Р—Р°РіСЂСѓР·РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
 */
 
 void FacebookSessionImpl::LoadUser (const char* user_id, const LoadUserCallback& callback, const common::PropertyMap& properties)
@@ -77,7 +77,7 @@ void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& s
 }
 
 /*
-   Аватар
+   РђРІР°С‚Р°СЂ
 */
 
 void FacebookSessionImpl::LoadUserPicture (const User& user, const LoadUserPictureCallback& callback, const common::PropertyMap& properties)
@@ -94,7 +94,7 @@ void FacebookSessionImpl::LoadUserPicture (const User& user, const LoadUserPictu
 }
 
 /*
-   Друзья
+   Р”СЂСѓР·СЊСЏ
 */
 
 void FacebookSessionImpl::LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties)

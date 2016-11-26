@@ -3,22 +3,22 @@
 using namespace store;
 
 /*
-   Реализация транзакции
+   Р РµР°Р»РёР·Р°С†РёСЏ С‚СЂР°РЅР·Р°РєС†РёРё
 */
 
 struct Transaction::Impl : xtl::reference_counter
 {
-  FinishTransactionHandler         finish_handler;              //обработчик завершения транзакции
-  TransactionState                 state;                       //состояние
-  stl::string                      status;                      //описание состояния
-  stl::string                      product_id;                  //идентификатор продукта
-  size_t                           quantity;                    //количество
-  xtl::uninitialized_storage<char> receipt;                     //данные чека
-  stl::string                      receipt_base64;              //base 64 данные чека
-  bool                             receipt_base64_needs_update; //нужно ли обновлять данные чека в base64
-  common::PropertyMap              properties;                  //другие свойства
-  const void*                      handle;                      //низкоуровневый дескриптор
-  ReleaseHandleFunction            handle_release_function;     //функция, вызываемая при освобождении дескриптора
+  FinishTransactionHandler         finish_handler;              //РѕР±СЂР°Р±РѕС‚С‡РёРє Р·Р°РІРµСЂС€РµРЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёРё
+  TransactionState                 state;                       //СЃРѕСЃС‚РѕСЏРЅРёРµ
+  stl::string                      status;                      //РѕРїРёСЃР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
+  stl::string                      product_id;                  //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРґСѓРєС‚Р°
+  size_t                           quantity;                    //РєРѕР»РёС‡РµСЃС‚РІРѕ
+  xtl::uninitialized_storage<char> receipt;                     //РґР°РЅРЅС‹Рµ С‡РµРєР°
+  stl::string                      receipt_base64;              //base 64 РґР°РЅРЅС‹Рµ С‡РµРєР°
+  bool                             receipt_base64_needs_update; //РЅСѓР¶РЅРѕ Р»Рё РѕР±РЅРѕРІР»СЏС‚СЊ РґР°РЅРЅС‹Рµ С‡РµРєР° РІ base64
+  common::PropertyMap              properties;                  //РґСЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
+  const void*                      handle;                      //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction            handle_release_function;     //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl (const FinishTransactionHandler& in_finish_handler)
     : finish_handler (in_finish_handler)
@@ -36,7 +36,7 @@ struct Transaction::Impl : xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Transaction::Transaction (const FinishTransactionHandler& finish_handler)
@@ -62,7 +62,7 @@ Transaction& Transaction::operator = (const Transaction& source)
 }
 
 /*
-   Идентификатор транзакции
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚СЂР°РЅР·Р°РєС†РёРё
 */
 
 size_t Transaction::Id () const
@@ -71,7 +71,7 @@ size_t Transaction::Id () const
 }
 
 /*
-   Состояние
+   РЎРѕСЃС‚РѕСЏРЅРёРµ
 */
 
 TransactionState Transaction::State () const
@@ -85,7 +85,7 @@ void Transaction::SetState (TransactionState state)
 }
 
 /*
-   Статус
+   РЎС‚Р°С‚СѓСЃ
 */
 
 const char* Transaction::Status () const
@@ -102,7 +102,7 @@ void Transaction::SetStatus (const char* status)
 }
 
 /*
-   Идентификатор продукта
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРѕРґСѓРєС‚Р°
 */
 
 const char* Transaction::ProductId () const
@@ -119,7 +119,7 @@ void Transaction::SetProductId (const char* id)
 }
 
 /*
-   Количество покупаемых экземпляров продукта
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРєСѓРїР°РµРјС‹С… СЌРєР·РµРјРїР»СЏСЂРѕРІ РїСЂРѕРґСѓРєС‚Р°
 */
 
 size_t Transaction::Quantity () const
@@ -133,7 +133,7 @@ void Transaction::SetQuantity (size_t quantity)
 }
 
 /*
-   Чек покупки
+   Р§РµРє РїРѕРєСѓРїРєРё
 */
 
 size_t Transaction::ReceiptSize () const
@@ -173,7 +173,7 @@ void Transaction::SetReceipt (size_t size, const void* data)
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& Transaction::Properties () const
@@ -192,7 +192,7 @@ void Transaction::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Низкоуровневый дескриптора
+   РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 const void* Transaction::Handle () const
@@ -210,7 +210,7 @@ void Transaction::SetHandle (const void* handle, const ReleaseHandleFunction& re
 }
 
 /*
-   Завершение транзакции (вызывать после окончания обработки транзакции для состояний Purchased, Failed и Restored)
+   Р—Р°РІРµСЂС€РµРЅРёРµ С‚СЂР°РЅР·Р°РєС†РёРё (РІС‹Р·С‹РІР°С‚СЊ РїРѕСЃР»Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ РѕР±СЂР°Р±РѕС‚РєРё С‚СЂР°РЅР·Р°РєС†РёРё РґР»СЏ СЃРѕСЃС‚РѕСЏРЅРёР№ Purchased, Failed Рё Restored)
 */
 
 void Transaction::Finish (const OnFinishedCallback& callback)
@@ -219,7 +219,7 @@ void Transaction::Finish (const OnFinishedCallback& callback)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Transaction::Swap (Transaction& source)
@@ -231,7 +231,7 @@ namespace store
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Transaction& transaction1, Transaction& transaction2)

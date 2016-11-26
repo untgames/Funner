@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t WindowsScreenManager::GetScreensCount ()
@@ -13,7 +13,7 @@ size_t WindowsScreenManager::GetScreensCount ()
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t WindowsScreenManager::CreateScreen  (size_t screen_index)
@@ -29,7 +29,7 @@ void WindowsScreenManager::DestroyScreen (screen_t)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* WindowsScreenManager::GetScreenName (screen_t)
@@ -40,7 +40,7 @@ const char* WindowsScreenManager::GetScreenName (screen_t)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t WindowsScreenManager::GetScreenModesCount (screen_t)
@@ -56,7 +56,7 @@ void WindowsScreenManager::GetScreenMode (screen_t, size_t mode_index, ScreenMod
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void WindowsScreenManager::SetScreenCurrentMode (screen_t, const ScreenModeDesc&)
@@ -75,7 +75,7 @@ void WindowsScreenManager::GetScreenDefaultMode (screen_t, ScreenModeDesc&)
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void WindowsScreenManager::SetScreenGammaRamp (screen_t, const Color3f table [256])
@@ -89,7 +89,7 @@ void WindowsScreenManager::GetScreenGammaRamp (screen_t, Color3f table [256])
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t WindowsScreenManager::FindContainingScreen (const void*)
@@ -100,7 +100,7 @@ screen_t WindowsScreenManager::FindContainingScreen (const void*)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* WindowsScreenManager::GetNativeScreenHandle (screen_t)
@@ -111,7 +111,7 @@ const void* WindowsScreenManager::GetNativeScreenHandle (screen_t)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void WindowsScreenManager::GetScreenProperties (screen_t, common::PropertyMap& properties)

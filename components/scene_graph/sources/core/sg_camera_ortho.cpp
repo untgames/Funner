@@ -8,21 +8,21 @@ using namespace bound_volumes;
 const float EPS = 1e-6f;
 
 /*
-    Описание реализации OrthoCamera
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё OrthoCamera
 */
 
 struct OrthoCamera::Impl: public xtl::instance_counter<OrthoCamera>
 {
-  float left;   //левая граница камеры
-  float right;  //правая граница камеры
-  float top;    //верхняя граница камеры
-  float bottom; //нижняя граница камеры
-  float z_near; //ближняя плоскость отсечения
-  float z_far;  //дальняя плоскость отсечения
+  float left;   //Р»РµРІР°СЏ РіСЂР°РЅРёС†Р° РєР°РјРµСЂС‹
+  float right;  //РїСЂР°РІР°СЏ РіСЂР°РЅРёС†Р° РєР°РјРµСЂС‹
+  float top;    //РІРµСЂС…РЅСЏСЏ РіСЂР°РЅРёС†Р° РєР°РјРµСЂС‹
+  float bottom; //РЅРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° РєР°РјРµСЂС‹
+  float z_near; //Р±Р»РёР¶РЅСЏСЏ РїР»РѕСЃРєРѕСЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  float z_far;  //РґР°Р»СЊРЅСЏСЏ РїР»РѕСЃРєРѕСЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OrthoCamera::OrthoCamera ()
@@ -42,7 +42,7 @@ OrthoCamera::~OrthoCamera ()
 }
 
 /*
-    Создание камеры
+    РЎРѕР·РґР°РЅРёРµ РєР°РјРµСЂС‹
 */
 
 OrthoCamera::Pointer OrthoCamera::Create ()
@@ -51,7 +51,7 @@ OrthoCamera::Pointer OrthoCamera::Create ()
 }
 
 /*
-    Параметры
+    РџР°СЂР°РјРµС‚СЂС‹
 */
 
 void OrthoCamera::SetLeft (float left)
@@ -143,7 +143,7 @@ void OrthoCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void OrthoCamera::UpdateBoundsCore ()
@@ -153,7 +153,7 @@ void OrthoCamera::UpdateBoundsCore ()
 }
 
 /*
-    Динамическая диспетчеризация    
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ    
 */
 
 void OrthoCamera::AcceptCore (Visitor& visitor)
@@ -163,7 +163,7 @@ void OrthoCamera::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void OrthoCamera::BindProperties (common::PropertyBindingMap& bindings)

@@ -17,14 +17,14 @@ namespace freetype
 {
 
 /*
-   Библиотека freetype
+   Р‘РёР±Р»РёРѕС‚РµРєР° freetype
 */
 
 struct FreetypeLibrary::Impl : public common::Lockable, public xtl::reference_counter
 {
-  FT_Library library; //freetype библиотека, создаем каждый раз новую для возможной работы со шрифтами в разных нитях
+  FT_Library library; //freetype Р±РёР±Р»РёРѕС‚РµРєР°, СЃРѕР·РґР°РµРј РєР°Р¶РґС‹Р№ СЂР°Р· РЅРѕРІСѓСЋ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕР№ СЂР°Р±РѕС‚С‹ СЃРѕ С€СЂРёС„С‚Р°РјРё РІ СЂР°Р·РЅС‹С… РЅРёС‚СЏС…
 
-  ///Конструктор / деструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : library (0)
   {
@@ -67,7 +67,7 @@ struct FreetypeLibrary::Impl : public common::Lockable, public xtl::reference_co
 }
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 FreetypeLibrary::FreetypeLibrary ()
@@ -216,7 +216,7 @@ void FreetypeLibrary::FT_Stroker_Set (FT_Stroker stroker, FT_Fixed radius, FT_St
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FreetypeLibrary::Swap (FreetypeLibrary& source)

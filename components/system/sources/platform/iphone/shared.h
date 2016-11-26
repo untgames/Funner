@@ -43,7 +43,7 @@ namespace syslib
 namespace iphone
 {
 
-bool is_in_run_loop (); //запущен ли главный цикл
+bool is_in_run_loop (); //Р·Р°РїСѓС‰РµРЅ Р»Рё РіР»Р°РІРЅС‹Р№ С†РёРєР»
 
 typedef stl::vector <IWindowListener*> WindowListenerArray;
 
@@ -55,7 +55,7 @@ struct WindowImpl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Делегат приложения
+///Р”РµР»РµРіР°С‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @class ApplicationDelegateInternal;
 
@@ -71,16 +71,16 @@ struct WindowImpl;
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Распределитель событий окна
+///Р Р°СЃРїСЂРµРґРµР»РёС‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface UIWindowWrapper : UIWindow
 {
   @private
-    syslib::iphone::WindowListenerArray *listeners;            //подписчика на события
-    syslib::iphone::WindowImpl          *window_impl;          //окно
-    syslib::WindowEventContext          *event_context;        //контекст, передаваемый обработчикам событий
-    UIViewController                    *root_view_controller; //корневой контроллер
-    int                                 allowed_orientations;  //разрешенные ориентации окна
+    syslib::iphone::WindowListenerArray *listeners;            //РїРѕРґРїРёСЃС‡РёРєР° РЅР° СЃРѕР±С‹С‚РёСЏ
+    syslib::iphone::WindowImpl          *window_impl;          //РѕРєРЅРѕ
+    syslib::WindowEventContext          *event_context;        //РєРѕРЅС‚РµРєСЃС‚, РїРµСЂРµРґР°РІР°РµРјС‹Р№ РѕР±СЂР°Р±РѕС‚С‡РёРєР°Рј СЃРѕР±С‹С‚РёР№
+    UIViewController                    *root_view_controller; //РєРѕСЂРЅРµРІРѕР№ РєРѕРЅС‚СЂРѕР»Р»РµСЂ
+    int                                 allowed_orientations;  //СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ РѕСЂРёРµРЅС‚Р°С†РёРё РѕРєРЅР°
 }
 
 -(void)onCharInput:(wchar_t)char_code;

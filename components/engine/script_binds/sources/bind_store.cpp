@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* BINDER_NAME               = "Store";
@@ -127,7 +127,7 @@ namespace store_script_binds
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

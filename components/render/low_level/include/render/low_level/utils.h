@@ -11,7 +11,7 @@ namespace low_level
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение строковых описаний элементов перечислений
+///РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРѕРІС‹С… РѕРїРёСЃР°РЅРёР№ СЌР»РµРјРµРЅС‚РѕРІ РїРµСЂРµС‡РёСЃР»РµРЅРёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_name (CompareMode);
 const char* get_name (UsageMode);
@@ -39,30 +39,30 @@ const char* get_name (PrimitiveType);
 const char* get_name (QueryType);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение информации о формате пикселей
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„РѕСЂРјР°С‚Рµ РїРёРєСЃРµР»РµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//получение размеров несжатого текселя и размера изображения в указанном формате
+//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РЅРµСЃР¶Р°С‚РѕРіРѕ С‚РµРєСЃРµР»СЏ Рё СЂР°Р·РјРµСЂР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ СѓРєР°Р·Р°РЅРЅРѕРј С„РѕСЂРјР°С‚Рµ
 unsigned int get_texel_size (PixelFormat format);
 unsigned int get_image_size (unsigned int width, PixelFormat format);
 unsigned int get_image_size (unsigned int width, unsigned int height, PixelFormat format);
 unsigned int get_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format);
 
-//получение размеров распакованного текселя и размера изображения после распаковки
+//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ СЂР°СЃРїР°РєРѕРІР°РЅРЅРѕРіРѕ С‚РµРєСЃРµР»СЏ Рё СЂР°Р·РјРµСЂР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РїРѕСЃР»Рµ СЂР°СЃРїР°РєРѕРІРєРё
 unsigned int get_uncompressed_texel_size (PixelFormat format);
 unsigned int get_uncompressed_image_size (unsigned int width, PixelFormat format);
 unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, PixelFormat format);
 unsigned int get_uncompressed_image_size (unsigned int width, unsigned int height, unsigned int depth, PixelFormat format);
 
-bool is_compressed    (PixelFormat); //является ли формат сжатым
-bool is_uncompressed  (PixelFormat); //является ли формат несжатым
-bool is_depth_stencil (PixelFormat); //проверка на форматы буфера глубина-трафарет
-bool is_color         (PixelFormat); //является ли формат "цветовым"
+bool is_compressed    (PixelFormat); //СЏРІР»СЏРµС‚СЃСЏ Р»Рё С„РѕСЂРјР°С‚ СЃР¶Р°С‚С‹Рј
+bool is_uncompressed  (PixelFormat); //СЏРІР»СЏРµС‚СЃСЏ Р»Рё С„РѕСЂРјР°С‚ РЅРµСЃР¶Р°С‚С‹Рј
+bool is_depth_stencil (PixelFormat); //РїСЂРѕРІРµСЂРєР° РЅР° С„РѕСЂРјР°С‚С‹ Р±СѓС„РµСЂР° РіР»СѓР±РёРЅР°-С‚СЂР°С„Р°СЂРµС‚
+bool is_color         (PixelFormat); //СЏРІР»СЏРµС‚СЃСЏ Р»Рё С„РѕСЂРјР°С‚ "С†РІРµС‚РѕРІС‹Рј"
 
-PixelFormat get_uncompressed_format (PixelFormat); //возвращает распакованный эквивалент переданного формата
+PixelFormat get_uncompressed_format (PixelFormat); //РІРѕР·РІСЂР°С‰Р°РµС‚ СЂР°СЃРїР°РєРѕРІР°РЅРЅС‹Р№ СЌРєРІРёРІР°Р»РµРЅС‚ РїРµСЂРµРґР°РЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение количества mip-уровней
+///РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° mip-СѓСЂРѕРІРЅРµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 unsigned int get_mips_count (unsigned int size);
 unsigned int get_mips_count (unsigned int width, unsigned int height);

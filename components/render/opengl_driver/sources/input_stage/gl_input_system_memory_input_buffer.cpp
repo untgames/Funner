@@ -7,7 +7,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SystemMemoryInputBuffer::SystemMemoryInputBuffer (const ContextManager& context_manager, GLenum in_target, const BufferDesc& in_desc)
@@ -16,7 +16,7 @@ SystemMemoryInputBuffer::SystemMemoryInputBuffer (const ContextManager& context_
   {}
 
 /*
-    Установка буфера в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SystemMemoryInputBuffer::Bind ()
@@ -37,13 +37,13 @@ void SystemMemoryInputBuffer::Bind ()
     CheckErrors ("render::low_level::opengl::SystemMemoryInputBuffer::Bind");
   }
 
-    //установка кэш-переменной
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅРѕР№
 
   SetContextCacheValue (CacheEntry_BindedVboBuffer, 0);
 }
 
 /*
-    Установка данных после отсечения
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С… РїРѕСЃР»Рµ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void SystemMemoryInputBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)

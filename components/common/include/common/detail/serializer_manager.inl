@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Интерфейс и реализация хранилища сериализатора
+    РРЅС‚РµСЂС„РµР№СЃ Рё СЂРµР°Р»РёР·Р°С†РёСЏ С…СЂР°РЅРёР»РёС‰Р° СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 */
 
 class ISerializerHolder
@@ -31,7 +31,7 @@ class SerializerHolder: public ISerializerHolder
 */
 
 /*
-    Регистрация сериализаторов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ
 */
 
 template <class Signature>
@@ -63,7 +63,7 @@ inline void SerializerManager::UnregisterAll ()
 }
 
 /*
-    Поиск сериализатора
+    РџРѕРёСЃРє СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 */
 
 template <class Signature>
@@ -87,7 +87,7 @@ inline const xtl::function<Signature>* SerializerManager::Find (const char* name
 */
 
 /*
-    Регистрация функций загрузки и сохранения
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ Р·Р°РіСЂСѓР·РєРё Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ
 */
 
 template <class LoaderSignature, class SaverSignature>
@@ -134,7 +134,7 @@ inline void ResourceSerializerManager<LoaderSignature, SaverSignature>::Unregist
 }
 
 /*
-    Поиск сериализатора
+    РџРѕРёСЃРє СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 */
 
 template <class LoaderSignature, class SaverSignature>

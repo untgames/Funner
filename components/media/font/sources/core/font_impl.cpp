@@ -33,7 +33,7 @@ namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация гарнитуры
+///Р РµР°Р»РёР·Р°С†РёСЏ РіР°СЂРЅРёС‚СѓСЂС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FontImpl::Impl
 {
@@ -45,21 +45,21 @@ struct FontImpl::Impl
   typedef xtl::uninitialized_storage<GlyphInfo>      GlyphsArray;
   typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
 
-  unsigned int                   first_glyph_code;  //char-код первоunsigned intфа
-  unsigned int                   font_size;         //размер шрифта
-  stl::string                    file_name;         //имя исходного файла
-  stl::string                    name;              //имя гарнитуры
-  stl::string                    family_name;       //имя семейства гарнитуры
-  stl::string                    style_name;        //имя стиля гарнитуры
-  GlyphsArray                    glyphs;            //глифы
-  KerningsMap                    kernings;          //кернинги
-  FontBuilder::RasterizerHandler rasterizer;        //растеризатор
+  unsigned int                   first_glyph_code;  //char-РєРѕРґ РїРµСЂРІРѕunsigned intС„Р°
+  unsigned int                   font_size;         //СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р°
+  stl::string                    file_name;         //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  stl::string                    name;              //РёРјСЏ РіР°СЂРЅРёС‚СѓСЂС‹
+  stl::string                    family_name;       //РёРјСЏ СЃРµРјРµР№СЃС‚РІР° РіР°СЂРЅРёС‚СѓСЂС‹
+  stl::string                    style_name;        //РёРјСЏ СЃС‚РёР»СЏ РіР°СЂРЅРёС‚СѓСЂС‹
+  GlyphsArray                    glyphs;            //РіР»РёС„С‹
+  KerningsMap                    kernings;          //РєРµСЂРЅРёРЅРіРё
+  FontBuilder::RasterizerHandler rasterizer;        //СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂ
 };
 
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FontImpl::FontImpl ()
@@ -72,7 +72,7 @@ FontImpl::~FontImpl ()
 }
 
 /*
-   Получение / изменение имени исходного файла
+   РџРѕР»СѓС‡РµРЅРёРµ / РёР·РјРµРЅРµРЅРёРµ РёРјРµРЅРё РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 */
 
 const char* FontImpl::Source () const
@@ -89,7 +89,7 @@ void FontImpl::SetSource (const char* new_source)
 }
 
 /*
-   Получение/изменение имени / семейства / стиля шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ РёРјРµРЅРё / СЃРµРјРµР№СЃС‚РІР° / СЃС‚РёР»СЏ С€СЂРёС„С‚Р°
 */
 
 const char* FontImpl::Name () const
@@ -132,7 +132,7 @@ void FontImpl::SetStyleName (const char* new_style_name)
 }
 
 /*
-   Получение/изменение размера таблицы глифов
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С‚Р°Р±Р»РёС†С‹ РіР»РёС„РѕРІ
 */
 
 void FontImpl::SetGlyphsCount (unsigned int new_glyphs_count)
@@ -146,7 +146,7 @@ unsigned int FontImpl::GlyphsCount () const
 }
 
 /*
-   Получение/изменение кода первого глифа
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ РєРѕРґР° РїРµСЂРІРѕРіРѕ РіР»РёС„Р°
 */
 
 void FontImpl::SetFirstGlyphCode (unsigned int new_first_glyph_code)
@@ -160,7 +160,7 @@ unsigned int FontImpl::FirstGlyphCode () const
 }
 
 /*
-   Получение/изменение размера шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°
 */
 
 void FontImpl::SetFontSize (unsigned int new_font_size)
@@ -174,7 +174,7 @@ unsigned int FontImpl::FontSize () const
 }
 
 /*
-   Доступ к данным о глифах
+   Р”РѕСЃС‚СѓРї Рє РґР°РЅРЅС‹Рј Рѕ РіР»РёС„Р°С…
 */
 
 const GlyphInfo* FontImpl::Glyphs () const
@@ -188,7 +188,7 @@ GlyphInfo* FontImpl::Glyphs ()
 }
 
 /*
-   Добавление/получение/удаление информации о кёрнингах
+   Р”РѕР±Р°РІР»РµРЅРёРµ/РїРѕР»СѓС‡РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєС‘СЂРЅРёРЅРіР°С…
 */
 
 void FontImpl::InsertKerning (unsigned int left_glyph_index, unsigned int right_glyph_index, const KerningInfo& kerning_info)
@@ -232,7 +232,7 @@ bool FontImpl::HasKerning (unsigned int left_glyph_index, unsigned int right_gly
 
 
 /*
-   Установка растеризатора
+   РЈСЃС‚Р°РЅРѕРІРєР° СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
 */
 
 void FontImpl::SetRasterizer (const FontBuilder::RasterizerHandler& new_rasterizer)

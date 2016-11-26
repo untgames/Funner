@@ -6,26 +6,26 @@ using namespace render::low_level::dx11;
 namespace
 {
 
-///Äåñêğèïòîğ mip-óğîâíÿ òåêñòóğû
+///Ğ”ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€ mip-ÑƒÑ€Ğ¾Ğ²Ğ½Ñ Ñ‚ĞµĞºÑÑ‚ÑƒÑ€Ñ‹
 struct MipLevelDesc
 {
-  size_t width, height; //øèğèíà / âûñîòà èçîáğàæåíèÿ íà óğîâíå
+  size_t width, height; //ÑˆĞ¸Ñ€Ğ¸Ğ½Ğ° / Ğ²Ñ‹ÑĞ¾Ñ‚Ğ° Ğ¸Ğ·Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ Ğ½Ğ° ÑƒÑ€Ğ¾Ğ²Ğ½Ğµ
 };
 
 }
 
 /*
-    Îïèñàíèå ğåàëèçàöèè
+    ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ Ñ€ĞµĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸
 */
 
 struct Texture::Impl
 {
-  TextureDesc             desc;       //äåñêğèïòîğ òåêñòóğû
-  DxResourcePtr           texture;    //ğåñóğñ
-  DxShaderResourceViewPtr view;       //îòîáğàæåíèå
-  size_t                  mips_count; //êîëè÷åñòâî ìèï-óğîâíåé
+  TextureDesc             desc;       //Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€ Ñ‚ĞµĞºÑÑ‚ÑƒÑ€Ñ‹
+  DxResourcePtr           texture;    //Ñ€ĞµÑÑƒÑ€Ñ
+  DxShaderResourceViewPtr view;       //Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ
+  size_t                  mips_count; //ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ Ğ¼Ğ¸Ğ¿-ÑƒÑ€Ğ¾Ğ²Ğ½ĞµĞ¹
 
-/// Êîíñòğóêòîğ
+/// ĞšĞ¾Ğ½ÑÑ‚Ñ€ÑƒĞºÑ‚Ğ¾Ñ€
   Impl (const TextureDesc& in_desc, const DxResourcePtr& in_texture = DxResourcePtr ())
     : desc (in_desc)
     , texture (in_texture)
@@ -33,7 +33,7 @@ struct Texture::Impl
   {
   }
 
-/// Ïîëó÷åíèå äåñêğèïòîğà óğîâíÿ òåêñòóğû
+/// ĞŸĞ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ğµ Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€Ğ° ÑƒÑ€Ğ¾Ğ²Ğ½Ñ Ñ‚ĞµĞºÑÑ‚ÑƒÑ€Ñ‹
   void GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc) const
   {
     size_t level_width  = desc.width >> mip_level,
@@ -48,7 +48,7 @@ struct Texture::Impl
 };
 
 /*
-    Êîíñòğóêòîğ
+    ĞšĞ¾Ğ½ÑÑ‚Ñ€ÑƒĞºÑ‚Ğ¾Ñ€
 */
 
 Texture::Texture (const DeviceManager& manager, const TextureDesc& in_desc, const DxResourcePtr& in_texture)
@@ -57,7 +57,7 @@ Texture::Texture (const DeviceManager& manager, const TextureDesc& in_desc, cons
 {
   static const char* METHOD_NAME = "render::low_level::dx11::Texture::Texture(const DeviceManager&,const TextureDesc&,const DxResourcePtr&)";
 
-    //ïğîâåğêà êîğğåêòíîñòè äåñêğèïòîğà
+    //Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° ĞºĞ¾Ñ€Ñ€ĞµĞºÑ‚Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€Ğ°
 
   if (!impl->texture)
     throw xtl::make_null_argument_exception (METHOD_NAME, "resource");
@@ -292,7 +292,7 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, 
         throw xtl::make_argument_exception ("", "TextureDesc::dimension", desc.dimension);
     }
 
-      //ïğèíóäèòåëüíîå ñîçäàíèå îòîáğàæåíèÿ
+      //Ğ¿Ñ€Ğ¸Ğ½ÑƒĞ´Ğ¸Ñ‚ĞµĞ»ÑŒĞ½Ğ¾Ğµ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ğµ Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ
 
 //    GetShaderResourceView ();    
   }
@@ -308,7 +308,7 @@ Texture::~Texture ()
 }
 
 /*
-    Ïîëó÷åíèå äåñêğèïòîğà
+    ĞŸĞ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ğµ Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€Ğ°
 */
 
 void Texture::GetDesc (TextureDesc& out_desc)
@@ -317,7 +317,7 @@ void Texture::GetDesc (TextureDesc& out_desc)
 }
 
 /*
-    Ïîëó÷åíèå íèçêîóğîâíåâîãî äåñêğèïòîğà
+    ĞŸĞ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ğµ Ğ½Ğ¸Ğ·ĞºĞ¾ÑƒÑ€Ğ¾Ğ²Ğ½ĞµĞ²Ğ¾Ğ³Ğ¾ Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€Ğ°
 */
 
 ID3D11Resource& Texture::GetHandle ()
@@ -332,13 +332,13 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
     if (impl->view)
       return *impl->view;
 
-      //ïîëó÷åíèå ğàçìåğíîñòè ğåñóğñà
+      //Ğ¿Ğ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ğµ Ñ€Ğ°Ğ·Ğ¼ĞµÑ€Ğ½Ğ¾ÑÑ‚Ğ¸ Ñ€ĞµÑÑƒÑ€ÑĞ°
 
     D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
 
     impl->texture->GetType (&dimension);
 
-      //ñîçäàíèå îòîáğàæåíèÿ
+      //ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ğµ Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ
 
     D3D11_SHADER_RESOURCE_VIEW_DESC view_desc;
 
@@ -410,19 +410,19 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
 }
 
 /*
-    Ğàáîòà ñ äàííûìè
+    Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ° Ñ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğ¼Ğ¸
 */
 
 void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat format, const void* buffer, IDeviceContext* context)
 {
   try
   {
-      //ïğîâåğêà âîçìîæíîñòè çàïèñè
+      //Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ·Ğ°Ğ¿Ğ¸ÑĞ¸
     
     if (!(impl->desc.access_flags & AccessFlag_Write))
       throw xtl::format_operation_exception ("", "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
 
-      //ïğîâåğêà êîğğåêòíîñòè íîìåğîâ ñëîÿ è mip-óğîâíÿ
+      //Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° ĞºĞ¾Ñ€Ñ€ĞµĞºÑ‚Ğ½Ğ¾ÑÑ‚Ğ¸ Ğ½Ğ¾Ğ¼ĞµÑ€Ğ¾Ğ² ÑĞ»Ğ¾Ñ Ğ¸ mip-ÑƒÑ€Ğ¾Ğ²Ğ½Ñ
 
     if (layer >= impl->desc.layers)
       throw xtl::make_range_exception ("", "layer", layer, impl->desc.layers);
@@ -430,18 +430,18 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
     if (mip_level >= impl->mips_count)
       throw xtl::make_range_exception ("", "mip_level", mip_level, impl->mips_count);
 
-      //ñîõğàíåíèå íåîòñå÷åííûõ ğàçìåğîâ
+      //ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¸Ğµ Ğ½ĞµĞ¾Ñ‚ÑĞµÑ‡ĞµĞ½Ğ½Ñ‹Ñ… Ñ€Ğ°Ğ·Ğ¼ĞµÑ€Ğ¾Ğ²
 
     size_t unclamped_width  = width,
            unclamped_height = height;
 
-      //ïîëó÷åíèå äåñêğèïòîğà mip-óğîâíÿ è èíôîğìàöèè î ñëîå òåêñòóğû
+      //Ğ¿Ğ¾Ğ»ÑƒÑ‡ĞµĞ½Ğ¸Ğµ Ğ´ĞµÑĞºÑ€Ğ¸Ğ¿Ñ‚Ğ¾Ñ€Ğ° mip-ÑƒÑ€Ğ¾Ğ²Ğ½Ñ Ğ¸ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ğ¸ Ğ¾ ÑĞ»Ğ¾Ğµ Ñ‚ĞµĞºÑÑ‚ÑƒÑ€Ñ‹
 
     MipLevelDesc level_desc;
 
     impl->GetMipLevelDesc (mip_level, level_desc);
 
-      //îòñå÷åíèå
+      //Ğ¾Ñ‚ÑĞµÑ‡ĞµĞ½Ğ¸Ğµ
 
     if (x >= level_desc.width || y >= level_desc.height)
       return;
@@ -458,7 +458,7 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
     if (!buffer)
       throw xtl::make_null_argument_exception ("", "buffer");    
 
-      //ïğîâåğêà ñîâìåñòèìîñòè ôîğìàòîâ
+      //Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° ÑĞ¾Ğ²Ğ¼ĞµÑÑ‚Ğ¸Ğ¼Ğ¾ÑÑ‚Ğ¸ Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ‚Ğ¾Ğ²
 
     bool is_depth_stencil_source_format = is_depth_stencil (format),
          is_depth_stencil_tex_format    = is_depth_stencil (impl->desc.format),
@@ -473,11 +473,11 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
     if (!is_compatible)
       throw xtl::format_not_supported_exception ("", "Texture format %s incompatible with source_format %s", get_name (impl->desc.format), get_name (format));   
 
-      //ïğåîáğàçîâàíèå êîíòåêñòà
+      //Ğ¿Ñ€ĞµĞ¾Ğ±Ñ€Ğ°Ğ·Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ ĞºĞ¾Ğ½Ñ‚ĞµĞºÑÑ‚Ğ°
 
     ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
 
-      //îòîáğàæåíèå äàííûõ
+      //Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ…
 
     D3D11_MAPPED_SUBRESOURCE subresource;
 
@@ -490,7 +490,7 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
 
     try
     {
-        //êîïèğîâàíèå äàííûõ
+        //ĞºĞ¾Ğ¿Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ…
 
       if (is_compressed (format))
       {
@@ -511,7 +511,7 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
         copy (width, height, get_image_size (width, format), format, buffer, subresource.RowPitch, impl->desc.format, dst);
       }
 
-        //îòìåíà îòîáğàæåíèÿ
+        //Ğ¾Ñ‚Ğ¼ĞµĞ½Ğ° Ğ¾Ñ‚Ğ¾Ğ±Ñ€Ğ°Ğ¶ĞµĞ½Ğ¸Ñ
 
       dx_context.Unmap (impl->texture.get (), mip_level);
     }

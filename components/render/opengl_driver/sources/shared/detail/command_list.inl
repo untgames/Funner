@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Абстрактный класс команды
+    РђР±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ РєРѕРјР°РЅРґС‹
 */
 
 class ICommand
@@ -14,12 +14,12 @@ class ICommand
 };
 
 /*
-    Реализация команд
+    Р РµР°Р»РёР·Р°С†РёСЏ РєРѕРјР°РЅРґ
 */
 
 template <class Fn, class T1=void, class T2=void, class T3=void, class T4=void> class Command;
 
-//команда без аргументов
+//РєРѕРјР°РЅРґР° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Fn>
 class Command<Fn>: public ICommand
 {
@@ -32,7 +32,7 @@ class Command<Fn>: public ICommand
     Fn fn;
 };
 
-//команда с одним аргументом
+//РєРѕРјР°РЅРґР° СЃ РѕРґРЅРёРј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Fn, class T1>
 class Command<Fn, T1>: public ICommand
 {
@@ -46,7 +46,7 @@ class Command<Fn, T1>: public ICommand
     T1 arg1;
 };
 
-//команда с двумя аргументами
+//РєРѕРјР°РЅРґР° СЃ РґРІСѓРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Fn, class T1, class T2>
 class Command<Fn, T1, T2>: public ICommand
 {
@@ -61,7 +61,7 @@ class Command<Fn, T1, T2>: public ICommand
     T2 arg2;
 };
 
-//команда с тремя аргументами
+//РєРѕРјР°РЅРґР° СЃ С‚СЂРµРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Fn, class T1, class T2, class T3>
 class Command<Fn, T1, T2, T3>: public ICommand
 {
@@ -78,7 +78,7 @@ class Command<Fn, T1, T2, T3>: public ICommand
     T3 arg3;
 };
 
-//команда с 4-мя аргументами
+//РєРѕРјР°РЅРґР° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Fn, class T1, class T2, class T3, class T4>
 class Command: public ICommand
 {
@@ -99,7 +99,7 @@ class Command: public ICommand
 }
 
 /*
-    Добавление команды
+    Р”РѕР±Р°РІР»РµРЅРёРµ РєРѕРјР°РЅРґС‹
 */
 
 template <class Fn>

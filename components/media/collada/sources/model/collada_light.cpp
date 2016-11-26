@@ -5,16 +5,16 @@ using namespace common;
 using namespace math;
 
 /*
-    Описание реализации источника света
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 struct Light::Impl: public xtl::reference_counter
 {
-  LightType   type;                    //тип источника света
-  float       params [LightParam_Num]; //параметры источника света
-  vec3f       color;                   //цвет источника
-  float       intensity;               //интенсивность источника
-  stl::string id;                      //идентификатор источника
+  LightType   type;                    //С‚РёРї РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+  float       params [LightParam_Num]; //РїР°СЂР°РјРµС‚СЂС‹ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+  vec3f       color;                   //С†РІРµС‚ РёСЃС‚РѕС‡РЅРёРєР°
+  float       intensity;               //РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РёСЃС‚РѕС‡РЅРёРєР°
+  stl::string id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёСЃС‚РѕС‡РЅРёРєР°
   
   Impl () : type (LightType_Point), intensity (1.0f)
   {
@@ -24,7 +24,7 @@ struct Light::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Light::Light ()
@@ -51,7 +51,7 @@ Light& Light::operator = (const Light& light)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Light Light::Clone () const
@@ -60,7 +60,7 @@ Light Light::Clone () const
 }
 
 /*
-    Идентификатор источника
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 const char* Light::Id () const
@@ -77,7 +77,7 @@ void Light::SetId (const char* id)
 }
   
 /*
-    Тип источника
+    РўРёРї РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 LightType Light::Type () const
@@ -103,7 +103,7 @@ void Light::SetType (LightType type)
 }
 
 /*
-    Цвет источника
+    Р¦РІРµС‚ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 const vec3f& Light::Color () const
@@ -117,7 +117,7 @@ void Light::SetColor (const vec3f& color)
 }
 
 /*
-    Интенсивность источника
+    РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 float Light::Intensity () const
@@ -131,7 +131,7 @@ void Light::SetIntensity (float value)
 }
 
 /*
-    Параметры источника
+    РџР°СЂР°РјРµС‚СЂС‹ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void Light::SetParam (LightParam param, float value)

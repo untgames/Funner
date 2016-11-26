@@ -3,7 +3,7 @@
 using namespace physics;
 
 /*
-   Материал
+   РњР°С‚РµСЂРёР°Р»
 */
 
 typedef xtl::com_ptr<physics::low_level::IDriver>   DriverPtr;
@@ -37,7 +37,7 @@ struct Material::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Material::Material (const Material& source)
@@ -63,7 +63,7 @@ Material& Material::operator = (const Material& source)
 }
     
 /*
-   Клонирование
+   РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 Material Material::Clone () const
@@ -72,7 +72,7 @@ Material Material::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Material::Id () const
@@ -81,7 +81,7 @@ size_t Material::Id () const
 }
 
 /*
-   Управление линейной/угловой аммортизацией
+   РЈРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРµР№РЅРѕР№/СѓРіР»РѕРІРѕР№ Р°РјРјРѕСЂС‚РёР·Р°С†РёРµР№
 */
 
 float Material::LinearDamping () const
@@ -105,7 +105,7 @@ void Material::SetAngularDamping (float value)
 }
 
 /*
-   Управление трением
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚СЂРµРЅРёРµРј
 */
 
 float Material::Friction () const
@@ -129,7 +129,7 @@ void Material::SetAnisotropicFriction (const math::vec3f& value)
 }
 
 /*
-   Управление упругостью
+   РЈРїСЂР°РІР»РµРЅРёРµ СѓРїСЂСѓРіРѕСЃС‚СЊСЋ
 */
 
 float Material::Restitution () const
@@ -143,7 +143,7 @@ void Material::SetRestitution (float value)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Material::Swap (Material& source)
@@ -162,7 +162,7 @@ void swap (Material& material1, Material& material2)
 }
 
 /*
-   Создание
+   РЎРѕР·РґР°РЅРёРµ
 */
 
 Material MaterialImplProvider::CreateMaterial (physics::low_level::IDriver* driver)
@@ -184,7 +184,7 @@ Material MaterialImplProvider::CreateMaterial (physics::low_level::IDriver* driv
 }
 
 /*
-   Получение низкоуровневого материала
+   РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 physics::low_level::IMaterial* MaterialImplProvider::LowLevelMaterial (const Material& material)

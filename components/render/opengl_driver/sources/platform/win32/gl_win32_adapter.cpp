@@ -8,13 +8,13 @@ namespace
 {
 
 /*
-    Макетный контекст OpenGL, необходимый для корректной инициализации WGL
+    РњР°РєРµС‚РЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚ OpenGL, РЅРµРѕР±С…РѕРґРёРјС‹Р№ РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё WGL
 */
 
 class DummyContext
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DummyContext (HWND parent_window, const AdapterLibraryPtr& in_library)
       : library (in_library),
         window (parent_window),
@@ -58,7 +58,7 @@ class DummyContext
       }              
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~DummyContext ()
     {
       library->MakeCurrent        (0, 0);
@@ -68,50 +68,50 @@ class DummyContext
     }
 
   private:
-    AdapterLibraryPtr library; //библиотека адаптера
-    DummyWindow       window;  //макетное окно
-    HDC               dc;      //контекст устройства отрисовки
-    HGLRC             context; //контекст OpenGL
+    AdapterLibraryPtr library; //Р±РёР±Р»РёРѕС‚РµРєР° Р°РґР°РїС‚РµСЂР°
+    DummyWindow       window;  //РјР°РєРµС‚РЅРѕРµ РѕРєРЅРѕ
+    HDC               dc;      //РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+    HGLRC             context; //РєРѕРЅС‚РµРєСЃС‚ OpenGL
 };
 
 }
 
 /*
-    Описание реализации адаптера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґР°РїС‚РµСЂР°
 */
 
 struct Adapter::Impl
 {
-  Log               log;               //протокол
-  OutputManager     output_manager;    //менеджер устройств вывода
-  AdapterLibraryPtr library;           //библиотека адаптера
-  stl::string       name;              //имя адаптера
-  PropertyList      properties;        //свойства адаптера
-  Acceleration      max_acceleration; //максимальное значение ускорения
+  Log               log;               //РїСЂРѕС‚РѕРєРѕР»
+  OutputManager     output_manager;    //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
+  AdapterLibraryPtr library;           //Р±РёР±Р»РёРѕС‚РµРєР° Р°РґР°РїС‚РµСЂР°
+  stl::string       name;              //РёРјСЏ Р°РґР°РїС‚РµСЂР°
+  PropertyList      properties;        //СЃРІРѕР№СЃС‚РІР° Р°РґР°РїС‚РµСЂР°
+  Acceleration      max_acceleration; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёСЏ
 
-///Разбор строки инициализации
+///Р Р°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)
     : library (LibraryManager::LoadLibrary (in_dll_path))
     , name (in_name)
     , max_acceleration (Acceleration_ICD)
   {
-      //разбор строки инициализации
+      //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 
-    stl::string bugs_string; //строка багов адаптера      
+    stl::string bugs_string; //СЃС‚СЂРѕРєР° Р±Р°РіРѕРІ Р°РґР°РїС‚РµСЂР°      
 
     common::parse_init_string (init_string, xtl::bind (&Impl::SetProperty, this, _1, _2, xtl::ref (bugs_string)));
 
-      //регистрация известных багов адаптера
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РёР·РІРµСЃС‚РЅС‹С… Р±Р°РіРѕРІ Р°РґР°РїС‚РµСЂР°
 
     properties.AddProperty ("bugs", bugs_string.c_str ());
   }
 
-///Установка свойства
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР°
   void SetProperty (const char* name, const char* value, stl::string& bugs_string)
   {
     if (!xtl::xstrcmp (name, "bugs"))
     {
-        //фильтрация строки багов адаптера
+        //С„РёР»СЊС‚СЂР°С†РёСЏ СЃС‚СЂРѕРєРё Р±Р°РіРѕРІ Р°РґР°РїС‚РµСЂР°
       
       common::StringArray tokens = common::split (value);
 
@@ -151,14 +151,14 @@ struct Adapter::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Adapter::Adapter (const char* name, const char* dll_path, const char* init_string)
 {
   try
   {
-      //проверка корректности аргументов    
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ    
     
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -169,7 +169,7 @@ Adapter::Adapter (const char* name, const char* dll_path, const char* init_strin
     if (!init_string)
       throw xtl::make_null_argument_exception ("", "init_string");
 
-      //создание реализации
+      //СЃРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 
     impl = new Impl (name, dll_path, init_string);
 
@@ -194,7 +194,7 @@ Adapter::~Adapter ()
 }
 
 /*
-    Имя адаптера / путь к модулю / описание
+    РРјСЏ Р°РґР°РїС‚РµСЂР° / РїСѓС‚СЊ Рє РјРѕРґСѓР»СЋ / РѕРїРёСЃР°РЅРёРµ
 */
 
 const char* Adapter::GetName ()
@@ -213,7 +213,7 @@ const char* Adapter::GetDescription ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t Adapter::GetOutputsCount ()
@@ -232,7 +232,7 @@ Output* Adapter::FindContainingOutput (HWND window)
 }
 
 /*
-    Получение интерфейса библиотеки OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° Р±РёР±Р»РёРѕС‚РµРєРё OpenGL
 */
 
 IAdapterLibrary& Adapter::GetLibrary ()
@@ -241,7 +241,7 @@ IAdapterLibrary& Adapter::GetLibrary ()
 }
 
 /*
-    Перечисление доступных форматов пикселей
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
 */
 
 void Adapter::EnumPixelFormats
@@ -250,23 +250,23 @@ void Adapter::EnumPixelFormats
   PixelFormatArray&         pixel_formats,
   WglExtensionEntriesArray& wgl_extension_entries_array)
 {
-    //получение базовых параметров
+    //РїРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
-  WglExtensionEntries* wgl_extension_entries = 0;      //таблица WGL-расширений        
-  bool                 has_pbuffer           = false,  //наличие WGL_ARB_pbuffer
-                       has_multisample       = false;  //наличие WGL_ARB_multisample        
+  WglExtensionEntries* wgl_extension_entries = 0;      //С‚Р°Р±Р»РёС†Р° WGL-СЂР°СЃС€РёСЂРµРЅРёР№        
+  bool                 has_pbuffer           = false,  //РЅР°Р»РёС‡РёРµ WGL_ARB_pbuffer
+                       has_multisample       = false;  //РЅР°Р»РёС‡РёРµ WGL_ARB_multisample        
 
-    //попытка получить точки входа для перечисления форматов с использованием расширений
+    //РїРѕРїС‹С‚РєР° РїРѕР»СѓС‡РёС‚СЊ С‚РѕС‡РєРё РІС…РѕРґР° РґР»СЏ РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ С„РѕСЂРјР°С‚РѕРІ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј СЂР°СЃС€РёСЂРµРЅРёР№
     
   try
   {
-      //создание макетного контекста        
+      //СЃРѕР·РґР°РЅРёРµ РјР°РєРµС‚РЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°        
       
     impl->log.Printf (".....create dummy context");
 
     DummyContext context (window, impl->library);
 
-      //инициализация расширений
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°СЃС€РёСЂРµРЅРёР№
       
     impl->log.Printf (".....initialize WGL extensions");
 
@@ -278,7 +278,7 @@ void Adapter::EnumPixelFormats
 
       wgl_extension_entries->Init (*impl->library);
 
-        //проверка наличия расширений WGL_ARB_pbuffer и WGL_ARB_multisample
+        //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЂР°СЃС€РёСЂРµРЅРёР№ WGL_ARB_pbuffer Рё WGL_ARB_multisample
 
       stl::string extensions = get_wgl_extensions_string (*wgl_extension_entries, device_context);
 
@@ -302,7 +302,7 @@ void Adapter::EnumPixelFormats
 
   PixelFormatDesc out_desc;
 
-    //попытка перечисления с использованием расширеня WGL_ARB_pixel_format/WGL_EXT_pixel_format
+    //РїРѕРїС‹С‚РєР° РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј СЂР°СЃС€РёСЂРµРЅСЏ WGL_ARB_pixel_format/WGL_EXT_pixel_format
 
   PFNWGLGETPIXELFORMATATTRIBIVARBPROC fGetPixelFormatAttribiv = 0;
   
@@ -325,14 +325,14 @@ void Adapter::EnumPixelFormats
 
   if (fGetPixelFormatAttribiv)
   {
-      //определение максимального формата пикселей      
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№      
 
     int name = WGL_NUMBER_PIXEL_FORMATS_ARB, max_pixel_format = 0;
     
     if (!fGetPixelFormatAttribiv (device_context, 1, 0, 1, &name, &max_pixel_format))
       max_pixel_format = 0;
 
-      //перечисление форматов
+      //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ С„РѕСЂРјР°С‚РѕРІ
 
     impl->log.Printf (".....%u formats found", max_pixel_format);
 
@@ -360,13 +360,13 @@ void Adapter::EnumPixelFormats
       if (!fGetPixelFormatAttribiv (device_context, current_pixel_format, 0, BASIC_NAMES_COUNT, basic_names, value_buffer))
         continue;
 
-      if (!*iter++) //форматы без поддержки OpenGL игнорируются
+      if (!*iter++) //С„РѕСЂРјР°С‚С‹ Р±РµР· РїРѕРґРґРµСЂР¶РєРё OpenGL РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         continue;
 
-      if (!*iter++) //форматы без поддержки рисования в окно игнорируются
+      if (!*iter++) //С„РѕСЂРјР°С‚С‹ Р±РµР· РїРѕРґРґРµСЂР¶РєРё СЂРёСЃРѕРІР°РЅРёСЏ РІ РѕРєРЅРѕ РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         continue;
 
-      if (*iter++ == PFD_TYPE_COLORINDEX) //палитровые форматы игнорируются
+      if (*iter++ == PFD_TYPE_COLORINDEX) //РїР°Р»РёС‚СЂРѕРІС‹Рµ С„РѕСЂРјР°С‚С‹ РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
         continue;
 
       out_desc.adapter                 = this;
@@ -431,7 +431,7 @@ void Adapter::EnumPixelFormats
           out_desc.samples_count = size_t (value);
       }
 
-        //добавление дескриптора в массив
+        //РґРѕР±Р°РІР»РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° РІ РјР°СЃСЃРёРІ
 
       pixel_formats.push_back (out_desc);          
     }
@@ -439,11 +439,11 @@ void Adapter::EnumPixelFormats
     return;
   }
 
-    //перечисление без использования расширений
+    //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ Р±РµР· РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЂР°СЃС€РёСЂРµРЅРёР№
 
   PIXELFORMATDESCRIPTOR pfd;
   
-    //определение максимального формата пикселей
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     
   impl->log.Printf (".....enumerate using DescribePixelFormat");
 
@@ -456,13 +456,13 @@ void Adapter::EnumPixelFormats
     if (!impl->library->DescribePixelFormat (device_context, current_pixel_format, sizeof (pfd), &pfd))
       continue;
 
-    if (!(pfd.dwFlags & PFD_SUPPORT_OPENGL)) //форматы без поддержки OpenGL игнорируются
+    if (!(pfd.dwFlags & PFD_SUPPORT_OPENGL)) //С„РѕСЂРјР°С‚С‹ Р±РµР· РїРѕРґРґРµСЂР¶РєРё OpenGL РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
       continue;
 
-    if (pfd.iPixelType == PFD_TYPE_COLORINDEX) //палитровые форматы игнорируются
+    if (pfd.iPixelType == PFD_TYPE_COLORINDEX) //РїР°Р»РёС‚СЂРѕРІС‹Рµ С„РѕСЂРјР°С‚С‹ РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
       continue;
       
-    if (!(pfd.dwFlags & PFD_DRAW_TO_WINDOW)) //форматы без рисования в окно игнорируются
+    if (!(pfd.dwFlags & PFD_DRAW_TO_WINDOW)) //С„РѕСЂРјР°С‚С‹ Р±РµР· СЂРёСЃРѕРІР°РЅРёСЏ РІ РѕРєРЅРѕ РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
       continue;
 
     out_desc.adapter                 = this;
@@ -494,14 +494,14 @@ void Adapter::EnumPixelFormats
     if (out_desc.acceleration > impl->max_acceleration)
       out_desc.acceleration = impl->max_acceleration;
 
-      //добавление дескриптора в массив
+      //РґРѕР±Р°РІР»РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° РІ РјР°СЃСЃРёРІ
 
     pixel_formats.push_back (out_desc);
   }
 }
 
 /*
-    Список свойств адаптера
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ Р°РґР°РїС‚РµСЂР°
 */
 
 IPropertyList* Adapter::GetProperties ()

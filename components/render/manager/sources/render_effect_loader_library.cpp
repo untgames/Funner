@@ -22,11 +22,11 @@ struct EffectLoaderLibrary::Library<Ptr>::Impl
 
   typedef stl::hash_map<stl::hash_key<const char*>, Entry> ItemMap;
   
-  ItemMap items; //элементы библиотеки
+  ItemMap items; //СЌР»РµРјРµРЅС‚С‹ Р±РёР±Р»РёРѕС‚РµРєРё
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Ptr>
@@ -41,7 +41,7 @@ EffectLoaderLibrary::Library<Ptr>::~Library ()
 }
 
 /*
-    Количество элементов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Ptr>
@@ -51,7 +51,7 @@ size_t EffectLoaderLibrary::Library<Ptr>::Size ()
 }
 
 /*
-    Добавление / удаление элементов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Ptr>
@@ -87,7 +87,7 @@ void EffectLoaderLibrary::Library<Ptr>::Clear ()
 }
 
 /*
-    Поиск элемента
+    РџРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°
 */
 
 template <class Ptr>
@@ -106,7 +106,7 @@ typename EffectLoaderLibrary::Library<Ptr>::Item EffectLoaderLibrary::Library<Pt
 }
 
 /*
-    Обход библиотеки
+    РћР±С…РѕРґ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 template <class Ptr>
@@ -119,7 +119,7 @@ void EffectLoaderLibrary::Library<Ptr>::ForEach (const VisitFunction& fn)
 }
 
 /*
-    Инстанцирование
+    РРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРёРµ
 */
 
 template class EffectLoaderLibrary::Library<LowLevelRasterizerStatePtr>;
@@ -139,20 +139,20 @@ template class EffectLoaderLibrary::Library<EffectPtr>;
 
 struct EffectLoaderLibrary::Impl
 {
-  RasterizerStateLibrary     rasterizer_states;           //библиотека состояний растеризатора
-  RasterizerStateLibrary     rasterizer_scissor_states;   //библиотека состояний растеризатора с включенным тестом отсечения
-  BlendStateLibrary          blend_states;                //библиотека состояний уровня смешивания цветов
-  DepthStencilStateLibrary   depth_stencil_states;        //библиотека состояний уровня отсечения
-  SamplerStateLibrary        sampler_states;              //библиотека состояний текстурных сэмплеров
-  TextureDescLibrary         texture_descs;               //библиотека описателей текстур
-  ProgramLibrary             programs;                    //библиотека программ
-  media::rfx::ShaderLibrary  shaders;                     //библиотека шейдеров
-  EffectPassLibrary          effect_passes;               //библиотека проходов эффекта
-  EffectLibrary              effects;                     //библиотека эффектов
+  RasterizerStateLibrary     rasterizer_states;           //Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
+  RasterizerStateLibrary     rasterizer_scissor_states;   //Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР° СЃ РІРєР»СЋС‡РµРЅРЅС‹Рј С‚РµСЃС‚РѕРј РѕС‚СЃРµС‡РµРЅРёСЏ
+  BlendStateLibrary          blend_states;                //Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ СѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
+  DepthStencilStateLibrary   depth_stencil_states;        //Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ СѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ
+  SamplerStateLibrary        sampler_states;              //Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ С‚РµРєСЃС‚СѓСЂРЅС‹С… СЃСЌРјРїР»РµСЂРѕРІ
+  TextureDescLibrary         texture_descs;               //Р±РёР±Р»РёРѕС‚РµРєР° РѕРїРёСЃР°С‚РµР»РµР№ С‚РµРєСЃС‚СѓСЂ
+  ProgramLibrary             programs;                    //Р±РёР±Р»РёРѕС‚РµРєР° РїСЂРѕРіСЂР°РјРј
+  media::rfx::ShaderLibrary  shaders;                     //Р±РёР±Р»РёРѕС‚РµРєР° С€РµР№РґРµСЂРѕРІ
+  EffectPassLibrary          effect_passes;               //Р±РёР±Р»РёРѕС‚РµРєР° РїСЂРѕС…РѕРґРѕРІ СЌС„С„РµРєС‚Р°
+  EffectLibrary              effects;                     //Р±РёР±Р»РёРѕС‚РµРєР° СЌС„С„РµРєС‚РѕРІ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EffectLoaderLibrary::EffectLoaderLibrary ()
@@ -165,7 +165,7 @@ EffectLoaderLibrary::~EffectLoaderLibrary ()
 }
 
 /*
-    Доступные библиотеки
+    Р”РѕСЃС‚СѓРїРЅС‹Рµ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 EffectLoaderLibrary::RasterizerStateLibrary& EffectLoaderLibrary::RasterizerStates ()

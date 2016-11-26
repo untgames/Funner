@@ -20,7 +20,7 @@ namespace theora_decoder
 const char* LOG_NAME = "media.TheoraDecoder";
 
 const long OGG_BUFFER_SIZE       = 1024 * 256;
-const long LAST_PACKET_SEEK_STEP = -128;        //шаг для поиска страницы по файлу в обратном направлении
+const long LAST_PACKET_SEEK_STEP = -128;        //С€Р°Рі РґР»СЏ РїРѕРёСЃРєР° СЃС‚СЂР°РЅРёС†С‹ РїРѕ С„Р°Р№Р»Сѓ РІ РѕР±СЂР°С‚РЅРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё
 
 unsigned char clamp_to_unsigned_char (int x)
 {
@@ -60,11 +60,11 @@ void process_theora_YCbCr (void *ret_frame, const th_ycbcr_buffer ycbcr_buffer, 
   }
 }
 
-///Декодера theora видео
+///Р”РµРєРѕРґРµСЂР° theora РІРёРґРµРѕ
 class TheoraDecoderImpl : public IVideoDecoder
 {
   public:
-///Конструктор/деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     TheoraDecoderImpl (const char* file_name, VideoQuality quality)
       : log (LOG_NAME), video_file (file_name), th_data_setup_info (0), th_decoding_context (0),
         first_video_packet_index (0), total_frames_count (0), buffer_frame_number (-1),
@@ -153,7 +153,7 @@ class TheoraDecoderImpl : public IVideoDecoder
       ogg_sync_clear   (&ogg_data_sync_state);
     }
 
-///Операции
+///РћРїРµСЂР°С†РёРё
     float GetFramesPerSecond ()
     {
       return th_data_info.fps_numerator / (float)th_data_info.fps_denominator;;
@@ -202,7 +202,7 @@ class TheoraDecoderImpl : public IVideoDecoder
       {
         try
         {
-          if (decoded_frame_number >= 0)  //первый пакет прочитан во время инициализации
+          if (decoded_frame_number >= 0)  //РїРµСЂРІС‹Р№ РїР°РєРµС‚ РїСЂРѕС‡РёС‚Р°РЅ РІРѕ РІСЂРµРјСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
             GetOggPacket ();
 
           int decode_result = th_decode_packetin (th_decoding_context, &ogg_data_packet, 0);
@@ -218,7 +218,7 @@ class TheoraDecoderImpl : public IVideoDecoder
               throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame, error '%s' code %d", GetTheoraErrorName (decode_result), decode_result);
           }
         }
-        catch (xtl::exception& e) //подавление исключений декодирования связанных с некорректными данными
+        catch (xtl::exception& e) //РїРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ СЃРІСЏР·Р°РЅРЅС‹С… СЃ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹РјРё РґР°РЅРЅС‹РјРё
         {
           log.Printf ("Exception while decoding frame %d: '%s'\n", decoded_frame_number + 1, e.what ());
         }
@@ -246,7 +246,7 @@ class TheoraDecoderImpl : public IVideoDecoder
             buffer_frame_number = decoded_frame_number;
           }
         }
-        catch (xtl::exception& e) //подавление исключений декодирования связанных с некорректными данными
+        catch (xtl::exception& e) //РїРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ СЃРІСЏР·Р°РЅРЅС‹С… СЃ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹РјРё РґР°РЅРЅС‹РјРё
         {
           log.Printf ("Exception while getting decoded frame %d: '%s'\n", decoded_frame_number, e.what ());
         }
@@ -274,7 +274,7 @@ class TheoraDecoderImpl : public IVideoDecoder
     }
 
   private:
-//Работа с theora
+//Р Р°Р±РѕС‚Р° СЃ theora
     void InitVideoDecoding (VideoQuality quality)
     {
       static const char* METHOD_NAME = "media::TheoraDecoderImpl::InitVideoDecoding";
@@ -349,7 +349,7 @@ class TheoraDecoderImpl : public IVideoDecoder
       ycbcr_buffer.resize (th_data_info.frame_width * th_data_info.frame_height);
     }
 
-//Работа с контейнером
+//Р Р°Р±РѕС‚Р° СЃ РєРѕРЅС‚РµР№РЅРµСЂРѕРј
     void ReadDataToOgg ()
     {
       static const char* METHOD_NAME = "media::TheoraDecoderInternal::ReadDataToOgg";
@@ -543,13 +543,13 @@ IVideoDecoder* theora_loader (const char* file_name, VideoQuality quality)
 }
 
 /*
-   Компонент декодирования theora видео
+   РљРѕРјРїРѕРЅРµРЅС‚ РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏ theora РІРёРґРµРѕ
 */
 
 class TheoraDecoderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     TheoraDecoderComponent ()
     {
       VideoStreamManager::RegisterLoader ("ogv", &theora_loader);

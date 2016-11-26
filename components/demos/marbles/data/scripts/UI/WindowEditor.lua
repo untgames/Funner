@@ -1,9 +1,9 @@
 
 
 --[[
-  редактор окон нужен для удобства их создания и редактирования.
-  возможности:
-  последовательное создание нескольких окон или кнопок с использованием единого набора стилей (темы)
+  СЂРµРґР°РєС‚РѕСЂ РѕРєРѕРЅ РЅСѓР¶РµРЅ РґР»СЏ СѓРґРѕР±СЃС‚РІР° РёС… СЃРѕР·РґР°РЅРёСЏ Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ.
+  РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё:
+  РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРµ СЃРѕР·РґР°РЅРёРµ РЅРµСЃРєРѕР»СЊРєРёС… РѕРєРѕРЅ РёР»Рё РєРЅРѕРїРѕРє СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј РµРґРёРЅРѕРіРѕ РЅР°Р±РѕСЂР° СЃС‚РёР»РµР№ (С‚РµРјС‹)
 ]]
 
 function InitWindowEditor()
@@ -11,27 +11,27 @@ function InitWindowEditor()
 
   WindowEditor={}
   
-  local StyleSets={} --наборы стилей отображения по именам
+  local StyleSets={} --РЅР°Р±РѕСЂС‹ СЃС‚РёР»РµР№ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РїРѕ РёРјРµРЅР°Рј
 
   --------------------------------------------------------------------------------------------------
-  -- загрузка/сохранение стилей окон и кнопок
+  -- Р·Р°РіСЂСѓР·РєР°/СЃРѕС…СЂР°РЅРµРЅРёРµ СЃС‚РёР»РµР№ РѕРєРѕРЅ Рё РєРЅРѕРїРѕРє
   --------------------------------------------------------------------------------------------------
   
   local function LoadStyleSetFromFile (StyleSetName)
-    --загружает набор стилей и хранит его в редакторе
+    --Р·Р°РіСЂСѓР¶Р°РµС‚ РЅР°Р±РѕСЂ СЃС‚РёР»РµР№ Рё С…СЂР°РЅРёС‚ РµРіРѕ РІ СЂРµРґР°РєС‚РѕСЂРµ
     assert(StyleSetName, "ERROR: WindowEditor.LoadStyleSetFromFile (StyleSetName) - FileName is nil")
     
-    --создание пустого набора стилей и регистрация в массиве наборов стилей
+    --СЃРѕР·РґР°РЅРёРµ РїСѓСЃС‚РѕРіРѕ РЅР°Р±РѕСЂР° СЃС‚РёР»РµР№ Рё СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІ РјР°СЃСЃРёРІРµ РЅР°Р±РѕСЂРѕРІ СЃС‚РёР»РµР№
     local StyleSet={}
     StyleSets[StyleSetName]=StyleSet
     StyleSet.Name=StyleSetName
     
     local function LoadSimpleStyleSetByName(SetName)
-      --загрузка XML с набором стилей
+      --Р·Р°РіСЂСѓР·РєР° XML СЃ РЅР°Р±РѕСЂРѕРј СЃС‚РёР»РµР№
       local xml=CreateXML()
       xml.Load("data/UI/Styles/"..SetName..".xml")
       xml.ForEachChildByName("Style", function(style_xml) 
-        --наполенение набора стилей стилями из XML
+        --РЅР°РїРѕР»РµРЅРµРЅРёРµ РЅР°Р±РѕСЂР° СЃС‚РёР»РµР№ СЃС‚РёР»СЏРјРё РёР· XML
         local style_name=style_xml.ReadStringByName("Name")
         local style=StyleSet[style_name]
           if not(style) then 
@@ -59,11 +59,11 @@ function InitWindowEditor()
   end
   
   --------------------------------------------------------------------------------------------------
-  -- создание специальных кнопок
+  -- СЃРѕР·РґР°РЅРёРµ СЃРїРµС†РёР°Р»СЊРЅС‹С… РєРЅРѕРїРѕРє
   --------------------------------------------------------------------------------------------------
   
   local function AddCloseButtonToWindow (window, button)
-    --если задана кнопка, то функция закрытия окна будет привязана к ней
+    --РµСЃР»Рё Р·Р°РґР°РЅР° РєРЅРѕРїРєР°, С‚Рѕ С„СѓРЅРєС†РёСЏ Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР° Р±СѓРґРµС‚ РїСЂРёРІСЏР·Р°РЅР° Рє РЅРµР№
     assert(window~=nil,"ERROR: WindowEditor.AddCloseButtonToWindow - window is nil")
     assert(WindowManager~=nil,"ERROR: WindowEditor.AddCloseButtonToWindow - WindowManager is nil")
     if button==nil then
@@ -75,11 +75,11 @@ function InitWindowEditor()
   end
     
   --------------------------------------------------------------------------------------------------
-  -- сохранение и загрузка окон
+  -- СЃРѕС…СЂР°РЅРµРЅРёРµ Рё Р·Р°РіСЂСѓР·РєР° РѕРєРѕРЅ
   --------------------------------------------------------------------------------------------------
   
  
-  --массив функций для создания контролов по заданному типу
+  --РјР°СЃСЃРёРІ С„СѓРЅРєС†РёР№ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РєРѕРЅС‚СЂРѕР»РѕРІ РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ С‚РёРїСѓ
   local CreateControlFunctionsByType={}
         CreateControlFunctionsByType["Button"]=UI.MakeButton
         CreateControlFunctionsByType["Flag"]=UI.MakeFlag
@@ -92,11 +92,11 @@ function InitWindowEditor()
     assert(xml~=nil, "ERROR: WindowEditor.LoadControlFromXML (xml) - xml is nil")
     local control=CreateControl()
     control.SetControlByXML(xml)
-    --создание конкретного контрола по его типу
+    --СЃРѕР·РґР°РЅРёРµ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р° РїРѕ РµРіРѕ С‚РёРїСѓ
     local F_Create=CreateControlFunctionsByType[control.ControlType]
     assert(F_Create, "ERROR: WindowEditor.LoadControlFromXML (xml) - Creation function for control type: "..control.ControlType.." not found")
     F_Create(control)
-    --установка параметров контрола в соответствии с xml
+    --СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРЅС‚СЂРѕР»Р° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ xml
     control.SetByXML(xml)
     return control
   end
@@ -114,7 +114,7 @@ function InitWindowEditor()
     window.AnimatedOpening=xml.ReadBooleanByName("AnimatedOpening", true)
     window.AlwaysOverWindow=xml.ReadStringByName("AlwaysOverWindow")
     
-    --загрузка контролов окна
+    --Р·Р°РіСЂСѓР·РєР° РєРѕРЅС‚СЂРѕР»РѕРІ РѕРєРЅР°
     xml.ForEachChildByName("Control", function(control_xml)
       local control=LoadControlFromXML(control_xml)
       window.AddControl(control)

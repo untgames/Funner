@@ -1,5 +1,5 @@
 /*
-    Базовые функции распределения памяти 
+    Р‘Р°Р·РѕРІС‹Рµ С„СѓРЅРєС†РёРё СЂР°СЃРїСЂРµРґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё 
 */
 
 template <class T>
@@ -25,14 +25,14 @@ inline void deallocate (T* buf,size_t)
     Default allocator
 */
 
-//присваивание (копирования не происходит)
+//РїСЂРёСЃРІР°РёРІР°РЅРёРµ (РєРѕРїРёСЂРѕРІР°РЅРёСЏ РЅРµ РїСЂРѕРёСЃС…РѕРґРёС‚)
 template <class T> template <class Other>
 inline allocator<T>& allocator<T>::operator = (const allocator<Other>&)
 {
   return *this;
 }
 
-//функции общего назначения
+//С„СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 template <class T>
 inline typename allocator<T>::pointer allocator<T>::address (reference x) const
 {
@@ -51,7 +51,7 @@ inline typename allocator<T>::size_type allocator<T>::max_size () const throw ()
   return size_type (-1) / sizeof (T);
 }
 
-//заказ / освобождение памяти
+//Р·Р°РєР°Р· / РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
 template <class T>
 inline typename allocator<T>::pointer allocator<T>::allocate (size_type count,const void* hint)
 {
@@ -64,7 +64,7 @@ inline void allocator<T>::deallocate (pointer ptr,size_type count)
   stl::deallocate (ptr,count);
 }
 
-//конструирование / разрушение объектов
+//РєРѕРЅСЃС‚СЂСѓРёСЂРѕРІР°РЅРёРµ / СЂР°Р·СЂСѓС€РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ
 template <class T>
 inline void allocator<T>::construct (pointer ptr,const value_type& x)
 {

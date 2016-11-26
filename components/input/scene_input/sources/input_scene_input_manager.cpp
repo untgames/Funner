@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Описание реализации менеджера ввода сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РІРІРѕРґР° СЃС†РµРЅС‹
 */
 
 namespace
@@ -40,24 +40,24 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
 {
   class InputPortIterator;
 
-  scene_graph::Screen* screen;                    //присоединенный экран
-  InputPortList        input_ports;               //области ввода
-  bool                 need_reorder;              //требуется сортировка областей ввода
-  stl::string          event_tokens_buffer;       //буфер токенов
-  TokenList            event_tokens;              //токены
-  math::vec2f          mouse_position;            //положение курсора мыши
-  math::vec2f          screen_size;               //размеры экрана
-  math::vec2f          screen_offset;             //смещение от начала экрана
-  float                touch_size;                //размер тача
-  InputTransformSpace  touch_size_space;          //система координат размеров тача
-  InputPortIterator*   first_input_port_iterator; //первый итератор перебора областей вывода
-  TouchDescArray       touches;                   //текущие нажатия
+  scene_graph::Screen* screen;                    //РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Р№ СЌРєСЂР°РЅ
+  InputPortList        input_ports;               //РѕР±Р»Р°СЃС‚Рё РІРІРѕРґР°
+  bool                 need_reorder;              //С‚СЂРµР±СѓРµС‚СЃСЏ СЃРѕСЂС‚РёСЂРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІРІРѕРґР°
+  stl::string          event_tokens_buffer;       //Р±СѓС„РµСЂ С‚РѕРєРµРЅРѕРІ
+  TokenList            event_tokens;              //С‚РѕРєРµРЅС‹
+  math::vec2f          mouse_position;            //РїРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР° РјС‹С€Рё
+  math::vec2f          screen_size;               //СЂР°Р·РјРµСЂС‹ СЌРєСЂР°РЅР°
+  math::vec2f          screen_offset;             //СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° СЌРєСЂР°РЅР°
+  float                touch_size;                //СЂР°Р·РјРµСЂ С‚Р°С‡Р°
+  InputTransformSpace  touch_size_space;          //СЃРёСЃС‚РµРјР° РєРѕРѕСЂРґРёРЅР°С‚ СЂР°Р·РјРµСЂРѕРІ С‚Р°С‡Р°
+  InputPortIterator*   first_input_port_iterator; //РїРµСЂРІС‹Р№ РёС‚РµСЂР°С‚РѕСЂ РїРµСЂРµР±РѕСЂР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+  TouchDescArray       touches;                   //С‚РµРєСѓС‰РёРµ РЅР°Р¶Р°С‚РёСЏ
   
-  /// Итератор областей ввода
+  /// РС‚РµСЂР°С‚РѕСЂ РѕР±Р»Р°СЃС‚РµР№ РІРІРѕРґР°
   class InputPortIterator: public xtl::noncopyable
   {
     public:
-      ///Конструктор
+      ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
       InputPortIterator (Impl* in_impl)
         : impl (in_impl)
         , iter (impl->input_ports.begin ())
@@ -66,13 +66,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
         impl->first_input_port_iterator = this;
       }
       
-      ///Деструктор
+      ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
       ~InputPortIterator ()
       {
         impl->first_input_port_iterator = next_iterator;
       }
 
-      ///Получение текущего элемента и перемемещение к следующему
+      ///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Рё РїРµСЂРµРјРµРјРµС‰РµРЅРёРµ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ
       InputPortDesc* Next ()
       {
         if (iter == impl->input_ports.end ())
@@ -85,10 +85,10 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
         return result;
       }
       
-      ///Следующий итератор
+      ///РЎР»РµРґСѓСЋС‰РёР№ РёС‚РµСЂР°С‚РѕСЂ
       InputPortIterator* NextIterator () { return next_iterator; }
       
-      ///Оповещение об удалении области ввода
+      ///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё РѕР±Р»Р°СЃС‚Рё РІРІРѕРґР°
       void OnRemove (const InputPortList::iterator& entry)
       {
         if (entry != iter)
@@ -97,7 +97,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
         Next ();
       }
       
-      ///Оповещение о добавлении области ввода
+      ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РґРѕР±Р°РІР»РµРЅРёРё РѕР±Р»Р°СЃС‚Рё РІРІРѕРґР°
       void OnAdd ()
       {
         if (iter != impl->input_ports.end () || impl->input_ports.empty () || iter != impl->input_ports.end ())
@@ -114,7 +114,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       InputPortIterator*      next_iterator;
   };  
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : screen ()
     , need_reorder (false)
@@ -133,13 +133,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     touches.reserve (RESERVE_TOUCHES_COUNT);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     SetScreen (0);
   }
   
-///Добавление тача
+///Р”РѕР±Р°РІР»РµРЅРёРµ С‚Р°С‡Р°
   void AddTouch (touch_t touch, int button)
   {
     for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
@@ -149,7 +149,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     touches.push_back (TouchDesc (touch, button));    
   }
 
-///Удаление тача
+///РЈРґР°Р»РµРЅРёРµ С‚Р°С‡Р°
   void RemoveTouch (touch_t touch, int button)
   {
     for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
@@ -160,7 +160,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       }    
   }
   
-///Изменение экрана
+///РР·РјРµРЅРµРЅРёРµ СЌРєСЂР°РЅР°
   void SetScreen (scene_graph::Screen* in_screen)
   {
     if (in_screen == screen)
@@ -168,7 +168,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     
     if (screen)
     {
-        //отсоединение текущего экрана
+        //РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЌРєСЂР°РЅР°
        
       input_ports.clear ();
       
@@ -179,7 +179,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       screen = 0;
     }
     
-      //присоединение нового экрана
+      //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РЅРѕРІРѕРіРѕ СЌРєСЂР°РЅР°
       
     if (in_screen)
     {
@@ -209,14 +209,14 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     }
   }
   
-///Изменение размеров экрана
+///РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ СЌРєСЂР°РЅР°
   void OnScreenChangeArea (const Rect& rect)
   {
     screen_size   = math::vec2f (float (rect.right () - rect.left ()), float (rect.bottom () - rect.top ()));
     screen_offset = math::vec2f (float (rect.left ()), float (rect.top ()));
   }  
   
-///Присоединена область вывода
+///РџСЂРёСЃРѕРµРґРёРЅРµРЅР° РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
   void OnScreenAttachViewport (Viewport& viewport)
   {
     try
@@ -239,7 +239,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     }
   }
 
-///Отсоединена область вывода
+///РћС‚СЃРѕРµРґРёРЅРµРЅР° РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
   void OnScreenDetachViewport (Viewport& viewport)
   {    
     size_t viewport_id = viewport.Id ();
@@ -256,13 +256,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       }
   }
 
-///Экран удален
+///Р­РєСЂР°РЅ СѓРґР°Р»РµРЅ
   void OnScreenDestroy ()
   {
     SetScreen (0);
   }
 
-///Сортировка областей ввода
+///РЎРѕСЂС‚РёСЂРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІРІРѕРґР°
   struct InputPortComparator
   {
     bool operator () (const InputPortDesc& desc1, const InputPortDesc& desc2) const
@@ -387,7 +387,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     return false;
   }
   
-///Обработка события ввода
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РІРІРѕРґР°
   void ProcessInputEvent (const char* event_string)
   {
     xtl::intrusive_ptr<Impl> self_lock (this);
@@ -395,14 +395,14 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     if (!screen)
       return;      
       
-      //парсинг входящего события
+      //РїР°СЂСЃРёРЅРі РІС…РѕРґСЏС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
 
     TouchEvent event;
 
     if (!ParseInputEvent (event_string, event))
       return;
       
-      //обновление таблицы нажатий
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РЅР°Р¶Р°С‚РёР№
             
     switch (event.state)
     {
@@ -417,21 +417,21 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
         break;
     }
       
-      //подготовка областей ввода
+      //РїРѕРґРіРѕС‚РѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІРІРѕРґР°
 
     if (need_reorder)
       Sort ();      
       
-      //диспетчеризация события
+      //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ СЃРѕР±С‹С‚РёСЏ
 
     TouchProcessingContext touch_context (event);
 
-      //поиск зоны
+      //РїРѕРёСЃРє Р·РѕРЅС‹
 
     for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)    
       iter->port->FindTouch (touch_context, iter->last_touch_world_position);
 
-      //оповещение
+      //РѕРїРѕРІРµС‰РµРЅРёРµ
       
     InputPortIterator iter (this);
     
@@ -457,7 +457,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SceneInputManager::SceneInputManager ()
@@ -492,7 +492,7 @@ SceneInputManager& SceneInputManager::operator = (const SceneInputManager& manag
 }
 
 /*
-    Присоединенный экран
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Р№ СЌРєСЂР°РЅ
 */
 
 Screen* SceneInputManager::Screen ()
@@ -511,7 +511,7 @@ void SceneInputManager::SetScreen (scene_graph::Screen* screen)
 }
 
 /*
-    Обработка события ввода
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РІРІРѕРґР°
 */
 
 void SceneInputManager::ProcessEvent (const char* event)
@@ -531,7 +531,7 @@ void SceneInputManager::ProcessEvent (const char* event)
 }
 
 /*
-    Сброс состояния обработки ввода
+    РЎР±СЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЂР°Р±РѕС‚РєРё РІРІРѕРґР°
 */
 
 void SceneInputManager::Reset ()
@@ -551,7 +551,7 @@ void SceneInputManager::Reset ()
 }
 
 /*
-    Размер тача
+    Р Р°Р·РјРµСЂ С‚Р°С‡Р°
 */
 
 void SceneInputManager::SetTouchSize (float size, InputTransformSpace space)
@@ -587,7 +587,7 @@ InputTransformSpace SceneInputManager::TouchSizeSpace () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SceneInputManager::Swap (SceneInputManager& manager)

@@ -11,13 +11,13 @@ namespace
 const char* CONFIG_PATH = "/anonymous/platform_config.xml";
 
 /*
-   Компонент сохранения параметров платформы в файле
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РїР»Р°С‚С„РѕСЂРјС‹ РІ С„Р°Р№Р»Рµ
 */
 
 class PlatformConfigurationComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     PlatformConfigurationComponent ()
       : config_file ((size_t)0, common::FileMode_ReadWrite | common::FileMode_Create)
     {

@@ -8,13 +8,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* SCENE_MANAGER_LIBRARY = "Scene.SceneManager";
 
 /*
-    Вспомогательные функции
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 */
 
 SceneManager create_scene_manager ()
@@ -34,11 +34,11 @@ void bind_scene_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_MANAGER_LIBRARY);
   
-    //регистрация порождающей функции
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕСЂРѕР¶РґР°СЋС‰РµР№ С„СѓРЅРєС†РёРё
     
   lib.Register ("Create", make_invoker (&create_scene_manager));
 
-    //регистрация операций  
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№  
     
   lib.Register ("LoadScene", make_invoker (
     make_invoker<void (SceneManager&, const char*, const char*, const SceneManager::LogHandler&)> (xtl::bind (xtl::implicit_cast<void (SceneManager::*)(const char*, const char*, const SceneManager::LogHandler&)> (&SceneManager::LoadScene), _1, _2, _3, _4)),
@@ -53,7 +53,7 @@ void bind_scene_manager_library (Environment& environment)
   lib.Register ("CreateScene", make_invoker (xtl::implicit_cast<Node::Pointer (SceneManager::*)(const char*) const> (&SceneManager::CreateScene)));
   lib.Register ("CreateLogHandler", make_callback_invoker<SceneManager::LogHandler::signature_type> ());
     
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<SceneManager> (SCENE_MANAGER_LIBRARY);
 }

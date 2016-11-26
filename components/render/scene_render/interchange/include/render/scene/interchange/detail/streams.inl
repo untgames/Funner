@@ -14,7 +14,7 @@ inline RawArray<T>::RawArray (const T* in_data, uint32 in_size)
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 inline OutputStream::OutputStream ()
@@ -28,7 +28,7 @@ inline OutputStream::~OutputStream ()
 }
 
 /*
-    Идентификатор владельца для внутрипроцессного обмена
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РІР»Р°РґРµР»СЊС†Р° РґР»СЏ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅРѕРіРѕ РѕР±РјРµРЅР°
 */
 
 inline void OutputStream::SetInprocessOwnerId (object_id_t id)
@@ -42,7 +42,7 @@ inline object_id_t OutputStream::InprocessOwnerId () const
 }
 
 /*
-    Сброс
+    РЎР±СЂРѕСЃ
 */
 
 inline void OutputStream::Reset (const CommandBuffer& in_buffer)
@@ -55,7 +55,7 @@ inline void OutputStream::Reset (const CommandBuffer& in_buffer)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 inline void OutputStream::Swap (CommandBuffer& in_buffer)
@@ -87,7 +87,7 @@ inline size_t aligned_size (size_t size)
 }
 
 /*
-    Сериализация заголовка и конца команды
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ Р·Р°РіРѕР»РѕРІРєР° Рё РєРѕРЅС†Р° РєРѕРјР°РЅРґС‹
 */
 
 inline void OutputStream::BeginCommand (command_id_t id)
@@ -112,7 +112,7 @@ inline void OutputStream::EndCommand ()
 }
 
 /*
-    Подготовка достаточного места в буфере для записи
+    РџРѕРґРіРѕС‚РѕРІРєР° РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ РјРµСЃС‚Р° РІ Р±СѓС„РµСЂРµ РґР»СЏ Р·Р°РїРёСЃРё
 */
 
 inline void OutputStream::EnsureSpaceAvailable (size_t size)
@@ -135,7 +135,7 @@ inline void OutputStream::Resize (size_t new_size)
 }
 
 /*
-    Запись блока данных
+    Р—Р°РїРёСЃСЊ Р±Р»РѕРєР° РґР°РЅРЅС‹С…
 */
 
 inline void OutputStream::WriteData (const void* data, size_t size)
@@ -166,7 +166,7 @@ template <class T> inline void OutputStream::Write (const T& value)
 }
 
 /*
-    Пропуск
+    РџСЂРѕРїСѓСЃРє
 */
 
 inline void OutputStream::Skip (size_t size)
@@ -180,7 +180,7 @@ inline void OutputStream::Skip (size_t size)
 }
 
 /*
-   Проверка наличия данных
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґР°РЅРЅС‹С…
 */
 
 inline bool OutputStream::IsEmpty () const
@@ -189,7 +189,7 @@ inline bool OutputStream::IsEmpty () const
 }
 
 /*
-    Позиция потока
+    РџРѕР·РёС†РёСЏ РїРѕС‚РѕРєР°
 */
 
 inline void OutputStream::SetPosition (size_t position)
@@ -210,7 +210,7 @@ inline size_t OutputStream::Position () const
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 inline InputStream::InputStream ()
@@ -223,7 +223,7 @@ inline InputStream::~InputStream ()
 }
 
 /*
-    Сброс
+    РЎР±СЂРѕСЃ
 */
 
 inline void InputStream::Reset (const CommandBuffer& in_buffer)
@@ -235,7 +235,7 @@ inline void InputStream::Reset (const CommandBuffer& in_buffer)
 }
 
 /*
-    Количество доступных для считывания данных
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ СЃС‡РёС‚С‹РІР°РЅРёСЏ РґР°РЅРЅС‹С…
 */
 
 inline size_t InputStream::Available () const
@@ -244,7 +244,7 @@ inline size_t InputStream::Available () const
 }
 
 /*
-    Чтение блока данных
+    Р§С‚РµРЅРёРµ Р±Р»РѕРєР° РґР°РЅРЅС‹С…
 */
 
 inline void InputStream::ReadData (void* data, size_t size)
@@ -307,7 +307,7 @@ template <class T> inline const T& InputStream::Read ()
 }
 
 /*
-    Пропуск
+    РџСЂРѕРїСѓСЃРє
 */
 
 inline void InputStream::Skip (size_t size)
@@ -323,7 +323,7 @@ inline void InputStream::Skip (size_t size)
 }
 
 /*
-    Позиция потока
+    РџРѕР·РёС†РёСЏ РїРѕС‚РѕРєР°
 */
 
 inline void InputStream::SetPosition (size_t position)
@@ -340,7 +340,7 @@ inline size_t InputStream::Position () const
 }
 
 /*
-    Сериализация базовых типов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ Р±Р°Р·РѕРІС‹С… С‚РёРїРѕРІ
 */
 
 inline void write (OutputStream& s, bool value)                  { s.Write (static_cast<bool8> (value)); }

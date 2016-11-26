@@ -11,19 +11,19 @@ namespace xphys_saver
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* FLOAT_FORMAT = ".000"; //количество знаков после запятой при выводе вещественных чисел
+const char* FLOAT_FORMAT = ".000"; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ РїСЂРё РІС‹РІРѕРґРµ РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… С‡РёСЃРµР»
 
 /*
-    Класс, сохраняющий физическую библиотеку в Xml-формате
+    РљР»Р°СЃСЃ, СЃРѕС…СЂР°РЅСЏСЋС‰РёР№ С„РёР·РёС‡РµСЃРєСѓСЋ Р±РёР±Р»РёРѕС‚РµРєСѓ РІ Xml-С„РѕСЂРјР°С‚Рµ
 */
 
 class XmlPhysicsLibrarySaver
 {
   private:
-    //Сохранение материала
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р°
     void Save (const Material& material)
     {
       XmlWriter::Scope library_scope (writer, "material");
@@ -36,7 +36,7 @@ class XmlPhysicsLibrarySaver
       writer.WriteAttribute ("restitution", material.Restitution (), FLOAT_FORMAT);
     }
 
-    //Сохранение сетки
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРµС‚РєРё
     void Save (const TriangleMesh& mesh)
     {
       XmlWriter::Scope library_scope (writer, "triangle_mesh");
@@ -77,7 +77,7 @@ class XmlPhysicsLibrarySaver
       }
     }
 
-    //Сохранение описания геометрического тела
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
     void SaveShapeData (const Box& box)
     {
       writer.WriteAttribute ("half_dimensions", box.half_dimensions, FLOAT_FORMAT);
@@ -117,7 +117,7 @@ class XmlPhysicsLibrarySaver
       }
     }
 
-    //Сохранение геометрического тела
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
     void Save (const Shape& shape)
     {
       XmlWriter::Scope library_scope (writer, "shape");
@@ -151,7 +151,7 @@ class XmlPhysicsLibrarySaver
       }
     }
 
-    //Сохранение твердого тела
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РІРµСЂРґРѕРіРѕ С‚РµР»Р°
     void Save (const RigidBody& body)
     {
       if (!xtl::xstrlen (body.Shape ().Name ()))
@@ -198,7 +198,7 @@ class XmlPhysicsLibrarySaver
         writer.WriteAttribute ("collision_group", body.CollisionGroup ());
     }
 
-    //Сохранение сцены
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ СЃС†РµРЅС‹
     void Save (const Scene& scene)
     {
       XmlWriter::Scope library_scope (writer, "scene");
@@ -210,7 +210,7 @@ class XmlPhysicsLibrarySaver
       SaveCollisionFilters (scene.CollisionFilters ());
     }
 
-    //Сохранение фильтра коллизий
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ С„РёР»СЊС‚СЂР° РєРѕР»Р»РёР·РёР№
     void Save (const CollisionFilter& filter)
     {
       XmlWriter::Scope library_scope (writer, "collision_filter");
@@ -220,7 +220,7 @@ class XmlPhysicsLibrarySaver
       writer.WriteAttribute ("collides", filter.IsCollides () ? "1" : "0");
     }
 
-    //Сохранение коллекции
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РєРѕР»Р»РµРєС†РёРё
     template <class T>
     void SavePhysicsLibraryCollection (const T& collection)
     {
@@ -228,7 +228,7 @@ class XmlPhysicsLibrarySaver
         Save (*iter);
     }
 
-    //Сохранение материалов
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
     void SaveMaterials (const PhysicsLibrary::MaterialCollection& materials)
     {
       XmlWriter::Scope library_scope (writer, "materials");
@@ -236,7 +236,7 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (materials);
     }
     
-    //Сохранение сеток
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРµС‚РѕРє
     void SaveTriangleMeshes (const PhysicsLibrary::TriangleMeshCollection& meshes, const PhysicsLibrary::SaveOptions& options)
     {
       if (options.separate_meshes_file)
@@ -266,7 +266,7 @@ class XmlPhysicsLibrarySaver
       }
     }
 
-    //Сохранение геометрических тел
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёС… С‚РµР»
     void SaveShapes (const PhysicsLibrary::ShapeCollection& shapes)
     {
       XmlWriter::Scope library_scope (writer, "shapes");
@@ -274,7 +274,7 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (shapes);
     }
 
-    //Сохранение твердых тел
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РІРµСЂРґС‹С… С‚РµР»
     void SaveRigidBodies (const PhysicsLibrary::RigidBodyCollection& bodies)
     {
       XmlWriter::Scope library_scope (writer, "rigid_bodies");
@@ -282,7 +282,7 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (bodies);
     }
 
-    //Сохранение сцен
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ СЃС†РµРЅ
     void SaveScenes (const PhysicsLibrary::SceneCollection& scenes)
     {
       XmlWriter::Scope library_scope (writer, "scenes");
@@ -290,7 +290,7 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (scenes);
     }
 
-    //Сохранение фильтров коллизий
+    //РЎРѕС…СЂР°РЅРµРЅРёРµ С„РёР»СЊС‚СЂРѕРІ РєРѕР»Р»РёР·РёР№
     void SaveCollisionFilters (const Scene::CollisionFilterCollection& filters)
     {
       XmlWriter::Scope library_scope (writer, "collision_filters");
@@ -299,12 +299,12 @@ class XmlPhysicsLibrarySaver
     }
 
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     XmlPhysicsLibrarySaver (const char* file_name, const PhysicsLibrary::SaveOptions& options, const PhysicsLibrary& library) : writer (file_name)
     {
       XmlWriter::Scope library_scope (writer, "physics_library");
 
-        //построение коллекции triangle_meshes
+        //РїРѕСЃС‚СЂРѕРµРЅРёРµ РєРѕР»Р»РµРєС†РёРё triangle_meshes
       PhysicsLibrary::TriangleMeshCollection triangle_meshes = library.TriangleMeshes (), all_triangle_meshes;
 
 
@@ -332,11 +332,11 @@ class XmlPhysicsLibrarySaver
     }
 
   private:
-    XmlWriter writer; //сериализатор Xml
+    XmlWriter writer; //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ Xml
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XPhysSaverComponent

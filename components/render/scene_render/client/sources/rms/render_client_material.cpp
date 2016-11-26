@@ -3,14 +3,14 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации материала
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct Material::Impl
 {
-  Context&    context;           //контекст
-  stl::string name;              //имя текстуры
-  bool        remove_on_destroy; //удалять ли в деструкторе
+  Context&    context;           //РєРѕРЅС‚РµРєСЃС‚
+  stl::string name;              //РёРјСЏ С‚РµРєСЃС‚СѓСЂС‹
+  bool        remove_on_destroy; //СѓРґР°Р»СЏС‚СЊ Р»Рё РІ РґРµСЃС‚СЂСѓРєС‚РѕСЂРµ
 
   Impl (Context& in_context, const char* in_name, bool in_remove_on_destroy)
     : context (in_context)
@@ -21,7 +21,7 @@ struct Material::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Material::Material (Context& context, const char* name, const char* prototype, bool remove_on_destroy)
@@ -56,7 +56,7 @@ Material::~Material ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* Material::Name ()
@@ -65,7 +65,7 @@ const char* Material::Name ()
 }
 
 /*
-    Обновление текстурной карты на стороне сервера (копии на стороне клиента не сохраняются)
+    РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹ РЅР° СЃС‚РѕСЂРѕРЅРµ СЃРµСЂРІРµСЂР° (РєРѕРїРёРё РЅР° СЃС‚РѕСЂРѕРЅРµ РєР»РёРµРЅС‚Р° РЅРµ СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ)
 */
 
 void Material::SetTexmapImage (const char* semantic, const char* image_name)

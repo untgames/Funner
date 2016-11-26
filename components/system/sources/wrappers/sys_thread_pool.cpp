@@ -14,17 +14,17 @@ namespace thread_pool
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t FINISH_BACKGROUND_THREAD_TIME = 2 * 60 * 1000;        //время самоуничтожения нити при отсутствии активных задач
-const size_t NEW_THREAD_WAIT_ACTIONS_COUNT = 5;                    //количество ожидающих задач, при котором создаётся новая нить
-const size_t BACKGROUND_MIN_PAUSE_TIME     = 50;                   //минимальная пауза в работе фоновой нити
-const size_t BACKGROUND_MAX_PAUSE_TIME     = 200;                  //максимальная пауза в работе фоновой нити
-const char*  LOG_NAME                      = "system.thread_pool"; //имя потока протоколирования
+const size_t FINISH_BACKGROUND_THREAD_TIME = 2 * 60 * 1000;        //РІСЂРµРјСЏ СЃР°РјРѕСѓРЅРёС‡С‚РѕР¶РµРЅРёСЏ РЅРёС‚Рё РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё Р°РєС‚РёРІРЅС‹С… Р·Р°РґР°С‡
+const size_t NEW_THREAD_WAIT_ACTIONS_COUNT = 5;                    //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР¶РёРґР°СЋС‰РёС… Р·Р°РґР°С‡, РїСЂРё РєРѕС‚РѕСЂРѕРј СЃРѕР·РґР°С‘С‚СЃСЏ РЅРѕРІР°СЏ РЅРёС‚СЊ
+const size_t BACKGROUND_MIN_PAUSE_TIME     = 50;                   //РјРёРЅРёРјР°Р»СЊРЅР°СЏ РїР°СѓР·Р° РІ СЂР°Р±РѕС‚Рµ С„РѕРЅРѕРІРѕР№ РЅРёС‚Рё
+const size_t BACKGROUND_MAX_PAUSE_TIME     = 200;                  //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РїР°СѓР·Р° РІ СЂР°Р±РѕС‚Рµ С„РѕРЅРѕРІРѕР№ РЅРёС‚Рё
+const char*  LOG_NAME                      = "system.thread_pool"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Предварительные объявления
+    РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рµ РѕР±СЉСЏРІР»РµРЅРёСЏ
 */
 
 class ThreadPool;
@@ -32,24 +32,24 @@ class ThreadPool;
 void create_new_background_thread (ThreadPool*);
 
 /*
-    Пул потоков
+    РџСѓР» РїРѕС‚РѕРєРѕРІ
 */
 
 class ThreadPool: public xtl::reference_counter, public Lockable
 {
   public:    
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ThreadPool ()
     {
       threads_count = 0;
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ThreadPool ()
     {
     }
   
-///Обработка добавления события в очередь
+///РћР±СЂР°Р±РѕС‚РєР° РґРѕР±Р°РІР»РµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ РІ РѕС‡РµСЂРµРґСЊ
     void ProcessNewEvent (ActionThread thread_type, Action& action)
     {
       if (thread_type != ActionThread_Background)
@@ -63,7 +63,7 @@ class ThreadPool: public xtl::reference_counter, public Lockable
       }
     }
     
-///Регистрация новой нити
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕР№ РЅРёС‚Рё
     void IncThreadsCounter ()
     {
       threads_count++;
@@ -82,13 +82,13 @@ typedef xtl::intrusive_ptr<ThreadPool>           ThreadPoolPtr;
 typedef xtl::lock_ptr<ThreadPool, ThreadPoolPtr> ThreadPoolLockPtr;
 
 /*
-    Поток обработки фоновых задач
+    РџРѕС‚РѕРє РѕР±СЂР°Р±РѕС‚РєРё С„РѕРЅРѕРІС‹С… Р·Р°РґР°С‡
 */
 
 class BackgroundThread: public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BackgroundThread (const ThreadPoolPtr& in_pool)
       : log (LOG_NAME)
       , pool (in_pool)
@@ -98,7 +98,7 @@ class BackgroundThread: public xtl::reference_counter
       ThreadPoolLockPtr (pool)->IncThreadsCounter ();
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~BackgroundThread ()
     {
       log.Printf ("Finish background worker thread %u", thread_id);
@@ -107,7 +107,7 @@ class BackgroundThread: public xtl::reference_counter
     }
 
   private:
-///Функция нити
+///Р¤СѓРЅРєС†РёСЏ РЅРёС‚Рё
     int Run ()
     {
       thread_id = syslib::Platform::GetCurrentThreadId ();      
@@ -158,12 +158,12 @@ class BackgroundThread: public xtl::reference_counter
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }        
 
         if (!processed_actions)
         {
-            //отмена нити              
+            //РѕС‚РјРµРЅР° РЅРёС‚Рё              
 
           if (common::milliseconds () - last_perform > FINISH_BACKGROUND_THREAD_TIME)
           {
@@ -176,7 +176,7 @@ class BackgroundThread: public xtl::reference_counter
             }
           }
 
-            //ожидание задачи
+            //РѕР¶РёРґР°РЅРёРµ Р·Р°РґР°С‡Рё
 
           syslib::Platform::Sleep (BACKGROUND_MIN_PAUSE_TIME + stl::random_number (BACKGROUND_MAX_PAUSE_TIME-BACKGROUND_MIN_PAUSE_TIME));
         }
@@ -197,7 +197,7 @@ void create_new_background_thread (ThreadPool* pool)
 }
 
 /*
-    Компонент запуска пула нитей
+    РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РїСѓСЃРєР° РїСѓР»Р° РЅРёС‚РµР№
 */
 
 class Component

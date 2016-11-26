@@ -1,5 +1,5 @@
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 #ifndef XTL_UTILITY_HEADER
@@ -18,17 +18,17 @@ namespace xtl
 {
 
 /*
-    Типы-селекторы
+    РўРёРїС‹-СЃРµР»РµРєС‚РѕСЂС‹
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Типы позволяющие делать выбор в compile-time по размеру структуры
+///РўРёРїС‹ РїРѕР·РІРѕР»СЏСЋС‰РёРµ РґРµР»Р°С‚СЊ РІС‹Р±РѕСЂ РІ compile-time РїРѕ СЂР°Р·РјРµСЂСѓ СЃС‚СЂСѓРєС‚СѓСЂС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef char                       no_type;
 typedef struct { char dummy [2]; } yes_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательный шаблонный класс описывающий целочисленную константу
+///Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ С€Р°Р±Р»РѕРЅРЅС‹Р№ РєР»Р°СЃСЃ РѕРїРёСЃС‹РІР°СЋС‰РёР№ С†РµР»РѕС‡РёСЃР»РµРЅРЅСѓСЋ РєРѕРЅСЃС‚Р°РЅС‚Сѓ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, T v> struct integral_constant
 {
@@ -37,7 +37,7 @@ template <class T, T v> struct integral_constant
   typedef integral_constant<T, v> type; 
 };
 
-//вспомогательные классы для наиболее распространённых целочисленных костант
+//РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹ РґР»СЏ РЅР°РёР±РѕР»РµРµ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅС‘РЅРЅС‹С… С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… РєРѕСЃС‚Р°РЅС‚
 template <bool value> struct bool_constant: public integral_constant<bool, value> {};
 template <int value>  struct int_constant:  public integral_constant<int, value> {};
 
@@ -45,12 +45,12 @@ typedef bool_constant<true>  true_type;
 typedef bool_constant<false> false_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Терминальный тип, используемый для индикации завершения списка
+///РўРµСЂРјРёРЅР°Р»СЊРЅС‹Р№ С‚РёРї, РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РґР»СЏ РёРЅРґРёРєР°С†РёРё Р·Р°РІРµСЂС€РµРЅРёСЏ СЃРїРёСЃРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace mpl { struct null_type {}; }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-///Типизированный NULL
+///РўРёРїРёР·РёСЂРѕРІР°РЅРЅС‹Р№ NULL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct null_ptr_type
 {
@@ -79,18 +79,18 @@ null_ptr_type null;
 
 
 /*
-    Управляющие шаблоны
+    РЈРїСЂР°РІР»СЏСЋС‰РёРµ С€Р°Р±Р»РѕРЅС‹
 */
 
-template <bool condition, class TrueType, class FalseType> struct select;              //выбор из двух типов по условию condition
-template <bool condition>                                  struct compile_time_assert; //аналог assert во время компиляции
+template <bool condition, class TrueType, class FalseType> struct select;              //РІС‹Р±РѕСЂ РёР· РґРІСѓС… С‚РёРїРѕРІ РїРѕ СѓСЃР»РѕРІРёСЋ condition
+template <bool condition>                                  struct compile_time_assert; //Р°РЅР°Р»РѕРі assert РІРѕ РІСЂРµРјСЏ РєРѕРјРїРёР»СЏС†РёРё
 
 /*
-    Обобщение tuple на stl::pair
+    РћР±РѕР±С‰РµРЅРёРµ tuple РЅР° stl::pair
 */
 
-template <class Tuple>           struct tuple_size;    //размер кортежа
-template <size_t I, class Tuple> struct tuple_element; //выбор типа элемента кортежа
+template <class Tuple>           struct tuple_size;    //СЂР°Р·РјРµСЂ РєРѕСЂС‚РµР¶Р°
+template <size_t I, class Tuple> struct tuple_element; //РІС‹Р±РѕСЂ С‚РёРїР° СЌР»РµРјРµРЅС‚Р° РєРѕСЂС‚РµР¶Р°
 
 template <size_t I, class T1, class T2>
 typename tuple_element<I, stl::pair<T1, T2> >::type& get (stl::pair<T1, T2>&);
@@ -98,7 +98,7 @@ typename tuple_element<I, stl::pair<T1, T2> >::type& get (stl::pair<T1, T2>&);
 template <size_t I, class T1, class T2>
 const typename tuple_element<I, stl::pair<T1, T2> >::type& get (const stl::pair<T1, T2>&);
 
-namespace noncopyable_namespace  //защита от ADL
+namespace noncopyable_namespace  //Р·Р°С‰РёС‚Р° РѕС‚ ADL
 {
   class noncopyable
   {
@@ -115,7 +115,7 @@ namespace noncopyable_namespace  //защита от ADL
 typedef noncopyable_namespace::noncopyable noncopyable;
 
 /*
-    Враперы
+    Р’СЂР°РїРµСЂС‹
 */
 
 template <class T> const T& make_const_ref (const T& x);

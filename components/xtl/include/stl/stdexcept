@@ -25,7 +25,7 @@ namespace stl
 using std::exception;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Базовый класс именованого исключения
+///Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РёРјРµРЅРѕРІР°РЅРѕРіРѕ РёСЃРєР»СЋС‡РµРЅРёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class named_exception: public exception
 {
@@ -41,7 +41,7 @@ class named_exception: public exception
 };
 
 /*
-    Логические ошибки
+    Р›РѕРіРёС‡РµСЃРєРёРµ РѕС€РёР±РєРё
 */
 
 class logic_error:      public named_exception { public: logic_error (const char*); };
@@ -51,7 +51,7 @@ class length_error:     public logic_error     { public: length_error (const cha
 class out_of_range:     public logic_error     { public: out_of_range (const char*); };
 
 /*
-    Ошибки времени выполнения
+    РћС€РёР±РєРё РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ
 */
 
 class runtime_error:   public named_exception { public: runtime_error (const char*); };
@@ -60,7 +60,7 @@ class overflow_error:  public runtime_error   { public: overflow_error (const ch
 class underflow_error: public runtime_error   { public: underflow_error (const char*); };
 
 /*
-    Возбуждение исключения
+    Р’РѕР·Р±СѓР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 template <class Container> void stl_raise_length_error (const Container&,size_t new_size, size_t old_size);

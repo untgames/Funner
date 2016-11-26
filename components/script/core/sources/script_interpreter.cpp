@@ -4,7 +4,7 @@ namespace script
 {
 
 /*
-    Объект, оповещающий об удалении IInterpreter
+    РћР±СЉРµРєС‚, РѕРїРѕРІРµС‰Р°СЋС‰РёР№ РѕР± СѓРґР°Р»РµРЅРёРё IInterpreter
 */
 
 xtl::trackable& get_trackable (IInterpreter& interpreter)

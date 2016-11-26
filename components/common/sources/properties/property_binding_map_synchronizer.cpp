@@ -7,15 +7,15 @@ using namespace common;
 #endif
 
 /*
-    Описание реализации синхронизатора
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂР°
 */
 
 struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
 {
   struct BindingDesc
   {
-    PropertyBinding binding;        //связывание
-    size_t          property_index; //индекс свойства в карте свойств
+    PropertyBinding binding;        //СЃРІСЏР·С‹РІР°РЅРёРµ
+    size_t          property_index; //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РІ РєР°СЂС‚Рµ СЃРІРѕР№СЃС‚РІ
     
     BindingDesc (const PropertyBinding& in_binding, size_t in_property_index)
       : binding (in_binding)
@@ -26,14 +26,14 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
   
   typedef stl::vector<BindingDesc> BindingDescArray;
 
-  BindingDescArray      bindings;                        //связывания
-  PropertyBindingMap    binding_map;                     //карта связываний
-  PropertyMap           property_map;                    //карта свойств
-  bool                  need_update_indices;             //требуется обновление индексов
-  xtl::auto_connection  binding_map_update_connection;   //соединение с оповещением об обновлении карты связываний
-  xtl::auto_connection  property_map_update_connection;  //соединение с оповещением об обновлении карты свойств
+  BindingDescArray      bindings;                        //СЃРІСЏР·С‹РІР°РЅРёСЏ
+  PropertyBindingMap    binding_map;                     //РєР°СЂС‚Р° СЃРІСЏР·С‹РІР°РЅРёР№
+  PropertyMap           property_map;                    //РєР°СЂС‚Р° СЃРІРѕР№СЃС‚РІ
+  bool                  need_update_indices;             //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ
+  xtl::auto_connection  binding_map_update_connection;   //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕРїРѕРІРµС‰РµРЅРёРµРј РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РєР°СЂС‚С‹ СЃРІСЏР·С‹РІР°РЅРёР№
+  xtl::auto_connection  property_map_update_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕРїРѕРІРµС‰РµРЅРёРµРј РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (PropertyBindingMap& in_binding_map, PropertyMap& in_property_map)
     : binding_map (in_binding_map)
     , property_map (in_property_map)
@@ -43,17 +43,17 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
   {
   }
   
-///Обновление индексов
+///РћР±РЅРѕРІР»РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ
   void Update ()
   {
     if (!need_update_indices)
       return;
       
-      //очистка кэша
+      //РѕС‡РёСЃС‚РєР° РєСЌС€Р°
       
     bindings.clear ();
     
-      //расчёт размера кэша
+      //СЂР°СЃС‡С‘С‚ СЂР°Р·РјРµСЂР° РєСЌС€Р°
       
     size_t bindings_count = 0;
     
@@ -65,7 +65,7 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
         bindings_count++;
     }        
     
-      //заполнение кэша
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РєСЌС€Р°
       
     bindings.reserve (bindings_count);
           
@@ -83,13 +83,13 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
     need_update_indices = false;
   }
   
-///Обновление карты связываний или карты свойств
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°СЂС‚С‹ СЃРІСЏР·С‹РІР°РЅРёР№ РёР»Рё РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
   void OnUpdate ()
   {
     need_update_indices = true;
   }
   
-///Синхронизация
+///РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
   struct SyncFromPropertyMap { void operator () (common::PropertyBinding& binding, const common::PropertyMap& map, size_t index) const { binding.CopyFromPropertyMap (map, index); } };
   struct SyncToPropertyMap   { void operator () (const common::PropertyBinding& binding, common::PropertyMap& map, size_t index) const { binding.CopyToPropertyMap (map, index); } };  
 
@@ -132,7 +132,7 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы/ деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹/ РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyBindingMapSynchronizer::PropertyBindingMapSynchronizer (PropertyBindingMap& binding_map, PropertyMap& property_map)
@@ -159,7 +159,7 @@ PropertyBindingMapSynchronizer& PropertyBindingMapSynchronizer::operator = (cons
 }
 
 /*
-    Синхронизация с картой свойств
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃ РєР°СЂС‚РѕР№ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyBindingMapSynchronizer::CopyFromPropertyMap () const
@@ -189,7 +189,7 @@ void PropertyBindingMapSynchronizer::CopyToPropertyMap () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyBindingMapSynchronizer::Swap (PropertyBindingMapSynchronizer& sync)

@@ -78,7 +78,7 @@ struct stat_counter::counter_container
 #endif
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T, class Tag>
@@ -95,7 +95,7 @@ inline stat_counter::stat_counter (xtl::type<T>, xtl::type<Tag>)
 }
 
 /*
-    Значение счётчика
+    Р—РЅР°С‡РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР°
 */
 
 inline stat_counter::value_type stat_counter::value () const
@@ -104,7 +104,7 @@ inline stat_counter::value_type stat_counter::value () const
 }
 
 /*
-    Имя счётчика и имя группы
+    РРјСЏ СЃС‡С‘С‚С‡РёРєР° Рё РёРјСЏ РіСЂСѓРїРїС‹
 */
 
 inline const char* stat_counter::name () const
@@ -118,7 +118,7 @@ inline const char* stat_counter::group_name () const
 }
 
 /*
-    Изменение значения счётчика
+    РР·РјРµРЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ СЃС‡С‘С‚С‡РёРєР°
 */
 
 inline stat_counter& stat_counter::operator += (value_type value)
@@ -144,7 +144,7 @@ inline stat_counter& stat_counter::operator -= (value_type value)
 }
 
 /*
-    Следующий счётчик
+    РЎР»РµРґСѓСЋС‰РёР№ СЃС‡С‘С‚С‡РёРє
 */
 
 inline stat_counter* stat_counter::next  () const
@@ -167,7 +167,7 @@ inline stat_counter* stat_counter::first ()
 }
 
 /*
-    Получение счетчика по типу и тэгу
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‡РµС‚С‡РёРєР° РїРѕ С‚РёРїСѓ Рё С‚СЌРіСѓ
 */
 
 template <class T, class Tag>
@@ -207,7 +207,7 @@ inline instance_counter<T, Tag>::~instance_counter ()
 */
 
 /*
-    Конструкторы / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 inline stat_counter_iterator::stat_counter_iterator (bool is_last)
@@ -228,7 +228,7 @@ inline stat_counter_iterator& stat_counter_iterator::operator = (const stat_coun
 }
     
 /*
-    Проверка на корректность
+    РџСЂРѕРІРµСЂРєР° РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ
 */
 
 inline stat_counter_iterator::operator unspecified_bool_type () const
@@ -245,7 +245,7 @@ inline bool stat_counter_iterator::operator ! () const
 }
 
 /*
-    Селекторы
+    РЎРµР»РµРєС‚РѕСЂС‹
 */
 
 inline stat_counter_iterator::reference stat_counter_iterator::operator * () const
@@ -259,7 +259,7 @@ inline stat_counter_iterator::pointer stat_counter_iterator::operator -> () cons
 }
 
 /*
-    Инкремент / декремент
+    РРЅРєСЂРµРјРµРЅС‚ / РґРµРєСЂРµРјРµРЅС‚
 */
 
 inline stat_counter_iterator& stat_counter_iterator::operator ++ ()
@@ -280,7 +280,7 @@ inline stat_counter_iterator stat_counter_iterator::operator ++ (int)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 inline bool stat_counter_iterator::operator == (const stat_counter_iterator& i) const
@@ -294,7 +294,7 @@ inline bool stat_counter_iterator::operator != (const stat_counter_iterator& i) 
 }
 
 /*
-    Получение итераторов на начало и конец списка групп
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ РЅР° РЅР°С‡Р°Р»Рѕ Рё РєРѕРЅРµС† СЃРїРёСЃРєР° РіСЂСѓРїРї
 */
 
 inline stat_counter_iterator get_first_stat_counter ()
@@ -308,7 +308,7 @@ inline stat_counter_iterator get_last_stat_counter ()
 }
 
 /*
-    Получение счётчиков
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‡С‘С‚С‡РёРєРѕРІ
 */
 
 template <class T, class Tag>

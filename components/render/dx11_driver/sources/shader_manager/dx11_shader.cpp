@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderLibrary& library)
@@ -19,7 +19,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
     ID3D11Device& device = GetDevice ();
 
-      //компиляция шейдера
+      //РєРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂР°
 
     switch (type)
     {
@@ -105,7 +105,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
         throw xtl::make_argument_exception ("", "shader_type");
     }
 
-      //получение информации о шейдере
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С€РµР№РґРµСЂРµ
 
     ID3D11ShaderReflection* reflector = 0;
    
@@ -118,7 +118,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
     check_errors ("ID3D11ShaderReflection::GetDesc", reflector->GetDesc (&desc));
 
-      //получение информации о константных буферах
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅСЃС‚Р°РЅС‚РЅС‹С… Р±СѓС„РµСЂР°С…
 
     buffer_layouts.reserve (desc.ConstantBuffers);
 
@@ -148,7 +148,7 @@ Shader::~Shader ()
 }
 
 /*
-    Перечисление константных буферов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅС‹С… Р±СѓС„РµСЂРѕРІ
 */
 
 ConstantBufferLayoutPtr Shader::GetConstantBufferLayout (size_t index) const

@@ -1,5 +1,5 @@
 /*
-    Поиск методов и полей
+    РџРѕРёСЃРє РјРµС‚РѕРґРѕРІ Рё РїРѕР»РµР№
 */
 
 inline jmethodID find_static_method (JNIEnv* env, jclass class_, const char* name, const char* signature)

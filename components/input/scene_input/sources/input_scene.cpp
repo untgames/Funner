@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -47,7 +47,7 @@ InputScene::~InputScene ()
 }
 
 /*
-    Сброс состояния нажатий
+    РЎР±СЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РЅР°Р¶Р°С‚РёР№
 */
 
 void InputScene::ResetTouchState ()
@@ -56,7 +56,7 @@ void InputScene::ResetTouchState ()
 }
 
 /*
-    Получение объекта ввода
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РІРІРѕРґР°
 */
 
 InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
@@ -91,7 +91,7 @@ InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
 }
 
 /*
-    Оповещение о создании зоны ввода
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР·РґР°РЅРёРё Р·РѕРЅС‹ РІРІРѕРґР°
 */
 
 void InputScene::OnInputZoneCreated (Node& node)
@@ -113,7 +113,7 @@ void InputScene::OnInputZoneCreated (Node& node)
 }
 
 /*
-    Оповещение об удалении зоны ввода
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё Р·РѕРЅС‹ РІРІРѕРґР°
 */
 
 void InputScene::OnInputZoneDestroyed (const scene_graph::InputZoneModel* zone)
@@ -122,7 +122,7 @@ void InputScene::OnInputZoneDestroyed (const scene_graph::InputZoneModel* zone)
 }
 
 /*
-    Обработка события нажатия
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РЅР°Р¶Р°С‚РёСЏ
 */
 
 namespace
@@ -234,7 +234,7 @@ void InputScene::FindTouch (InputPort& input_port, const math::vec3f& touch_worl
     if (touch_context.touch_catched)
       return;
    
-      //поиск зоны, пересекаемой областью луча
+      //РїРѕРёСЃРє Р·РѕРЅС‹, РїРµСЂРµСЃРµРєР°РµРјРѕР№ РѕР±Р»Р°СЃС‚СЊСЋ Р»СѓС‡Р°
 
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
   
@@ -274,19 +274,19 @@ void InputScene::OnTouch (InputPort& input_port, const math::vec3f& touch_world_
   {        
     if (touch_context.input_port == &input_port && touch_context.input_zone)
     {
-        //получение объекта, соответствующего зоне
+        //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р°, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ Р·РѕРЅРµ
 
       InputEntityPtr entity = GetEntity (*touch_context.input_zone);
 
       if (entity)
       {          
-          //передача события соответствующему объекту
+          //РїРµСЂРµРґР°С‡Р° СЃРѕР±С‹С‚РёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРјСѓ РѕР±СЉРµРєС‚Сѓ
 
         entity->OnTouch (input_port, touch_context.event, touch_world_position, touch_context.input_zone_index, touch_context.intersection_point);
       }
     }
 
-      //оповещение
+      //РѕРїРѕРІРµС‰РµРЅРёРµ
 
     BroadcastTouch (input_port, touch_context.event, touch_world_position);        
   }
@@ -298,7 +298,7 @@ void InputScene::OnTouch (InputPort& input_port, const math::vec3f& touch_world_
 }
     
 /*
-    Регистрация слушателей оповещений
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃР»СѓС€Р°С‚РµР»РµР№ РѕРїРѕРІРµС‰РµРЅРёР№
 */
 
 void InputScene::RegisterBroadcastListener (InputEventListener& listener)
@@ -307,7 +307,7 @@ void InputScene::RegisterBroadcastListener (InputEventListener& listener)
 }
 
 /*
-    Удаление всех нажатий, связанных с указанной областью ввода
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РЅР°Р¶Р°С‚РёР№, СЃРІСЏР·Р°РЅРЅС‹С… СЃ СѓРєР°Р·Р°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚СЊСЋ РІРІРѕРґР°
 */
 
 void InputScene::RemoveAllTouches (InputPort& input_port)

@@ -6,10 +6,10 @@ typedef xtl::uninitialized_storage<char> Buffer;
 
 struct MemFileImpl::Impl
 {
-  char*  start;            //указатель на начало буфера
-  char*  finish;           //указатель на конец буфера
-  char*  pos;              //указатель на текущую позицию внутри буфера
-  Buffer buffer;           //буфер
+  char*  start;            //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ Р±СѓС„РµСЂР°
+  char*  finish;           //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕРЅРµС† Р±СѓС„РµСЂР°
+  char*  pos;              //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰СѓСЋ РїРѕР·РёС†РёСЋ РІРЅСѓС‚СЂРё Р±СѓС„РµСЂР°
+  Buffer buffer;           //Р±СѓС„РµСЂ
   
   void resize (size_t new_size)
   {

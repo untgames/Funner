@@ -11,7 +11,7 @@ using namespace common;
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, RenderTargetType target_type, ISwapChain* in_swap_chain)
@@ -23,7 +23,7 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
 {
   try
   {
-      //проверка корректности переданных параметров
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїРµСЂРµРґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
@@ -50,7 +50,7 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
 {
   try
   {
-      //проверка корректности переданных параметров
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїРµСЂРµРґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
@@ -69,7 +69,7 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
 }
 
 /*
-    Установка активного буфера кадра
+    РЈСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 void SwapChainRenderBuffer::SetFrameBuffer (GLenum buffer_type)
@@ -92,7 +92,7 @@ void SwapChainRenderBuffer::SetFrameBuffer (GLenum buffer_type)
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainColorBuffer::SwapChainColorBuffer
@@ -105,7 +105,7 @@ SwapChainColorBuffer::SwapChainColorBuffer
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
   
-    //проверка корректности переданных параметров
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїРµСЂРµРґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
   SwapChainDesc swap_chain_desc;
 
@@ -114,7 +114,7 @@ SwapChainColorBuffer::SwapChainColorBuffer
   if (buffer_index >= swap_chain_desc.buffers_count)
     throw xtl::make_range_exception (METHOD_NAME, "buffer_index", buffer_index, swap_chain_desc.buffers_count);
     
-    //получение целевого буфера цвета
+    //РїРѕР»СѓС‡РµРЅРёРµ С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР° С†РІРµС‚Р°
 
   switch (buffer_index)
   {
@@ -122,7 +122,7 @@ SwapChainColorBuffer::SwapChainColorBuffer
     default: buffer_type = GL_BACK;  break;
   }
   
-    //изменение размеров буфера
+    //РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ Р±СѓС„РµСЂР°
     
   SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);
 }
@@ -133,7 +133,7 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManagerPtr& manager
     buffer_type (GL_FRONT),
     is_shadow (true)
 {
-    //установка индекса буфера
+    //СѓСЃС‚Р°РЅРѕРІРєР° РёРЅРґРµРєСЃР° Р±СѓС„РµСЂР°
     
   SwapChainDesc swap_chain_desc;
 
@@ -149,7 +149,7 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManagerPtr& manager
 }
 
 /*
-    Установка в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SwapChainColorBuffer::Bind ()
@@ -172,7 +172,7 @@ void SwapChainColorBuffer::Bind ()
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManagerPtr& manager, ISwapChain* swap_chain)
@@ -180,7 +180,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
 {
   try
   {
-      //установка размеров буфера
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂРѕРІ Р±СѓС„РµСЂР°
 
     SwapChainDesc swap_chain_desc;    
 
@@ -200,7 +200,7 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
 {
   try
   {
-      //проверка переданных параметров
+      //РїСЂРѕРІРµСЂРєР° РїРµСЂРµРґР°РЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     SwapChainDesc swap_chain_desc;
 
@@ -226,7 +226,7 @@ SwapChainDepthStencilBuffer::~SwapChainDepthStencilBuffer ()
 }
    
 /*
-    Установка в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SwapChainDepthStencilBuffer::Bind ()
@@ -249,7 +249,7 @@ void SwapChainDepthStencilBuffer::Bind ()
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer (const ContextManager& manager, const TextureDesc& in_desc)
@@ -258,7 +258,7 @@ SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer (const ContextM
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFakeDepthStencilBuffer::SwapChainFakeDepthStencilBuffer";
 
-    //проверка корректности дескриптора
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   switch (desc.format)
   {
@@ -336,7 +336,7 @@ SwapChainFakeDepthStencilBuffer::~SwapChainFakeDepthStencilBuffer ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void SwapChainFakeDepthStencilBuffer::GetDesc (TextureDesc& out_desc)
@@ -345,7 +345,7 @@ void SwapChainFakeDepthStencilBuffer::GetDesc (TextureDesc& out_desc)
 }
 
 /*
-    Работа с данными
+    Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё
 */
 
 void SwapChainFakeDepthStencilBuffer::SetData (unsigned int layer, unsigned int mip_level, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, IDeviceContext*)

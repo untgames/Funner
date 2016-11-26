@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChain::SwapChain (const DxFactoryPtr& factory, const AdapterPtr& in_adapter, const DxDevicePtr& device, const SwapChainDesc& src_desc)
@@ -102,7 +102,7 @@ SwapChain::~SwapChain ()
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* SwapChain::GetAdapter ()
@@ -111,7 +111,7 @@ IAdapter* SwapChain::GetAdapter ()
 }
 
 /*
-    Низкоуровневый дескриптор
+    РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
 */
 
 IDXGISwapChain& SwapChain::GetHandle ()
@@ -120,7 +120,7 @@ IDXGISwapChain& SwapChain::GetHandle ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void SwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -129,7 +129,7 @@ void SwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* SwapChain::GetContainingOutput ()
@@ -153,7 +153,7 @@ IOutput* SwapChain::GetContainingOutput ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void SwapChain::SetFullscreenState (bool state)
@@ -194,7 +194,7 @@ bool SwapChain::GetFullscreenState ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void SwapChain::Present ()
@@ -211,7 +211,7 @@ void SwapChain::Present ()
 }
 
 /*
-    Список свойств цепочки обмена
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 IPropertyList* SwapChain::GetProperties ()

@@ -1,24 +1,24 @@
 /*
    Class: BoundVolumes.Corner 
  
-   Угол ограничивающего объема.
+   РЈРіРѕР» РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉРµРјР°.
  */
 
 /*
-   Group: Значения
+   Group: Р—РЅР°С‡РµРЅРёСЏ
  
  */
 
 /*
    Property: nxnynz
  
-   (Negative X, Negative Y, Negative Z). Негативная экстента (минимальная).
+   (Negative X, Negative Y, Negative Z). РќРµРіР°С‚РёРІРЅР°СЏ СЌРєСЃС‚РµРЅС‚Р° (РјРёРЅРёРјР°Р»СЊРЅР°СЏ).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 nxnynz
 
@@ -27,11 +27,11 @@ nxnynz
  
    (Positive X, Negative Y, Negative Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 pxnynz
 
@@ -40,11 +40,11 @@ pxnynz
  
    (Negative X, Positive Y, Negative Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 nxpynz
 
@@ -53,11 +53,11 @@ nxpynz
  
    (Positive X, Positive Y, Negative Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 pxpynz
 
@@ -66,11 +66,11 @@ pxpynz
  
    (Negative X, Negative Y, Positive Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 nxnypz
 
@@ -79,11 +79,11 @@ nxnypz
  
    (Positive X, Negative Y, Positive Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 pxnypz
 
@@ -92,23 +92,23 @@ pxnypz
  
    (Negative X, Positive Y, Positive Z).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 nxpypz
 
 /*
    Property: pxpypz
  
-   (Positive X, Positive Y, Positive Z). Позитивная экстента (максимальная).
+   (Positive X, Positive Y, Positive Z). РџРѕР·РёС‚РёРІРЅР°СЏ СЌРєСЃС‚РµРЅС‚Р° (РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ).
 
-   Тип:
+   РўРёРї:
      number
  
-   Доступ:
-     Получение.
+   Р”РѕСЃС‚СѓРї:
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 pxpypz

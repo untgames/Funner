@@ -3,22 +3,22 @@
 using namespace render::manager;
 using namespace render::low_level;
 
-//TODO: расчет вершинного буфера для спрайтов для каждого кадра
-//TODO: реакция отдельных спрайтов на события материала
+//TODO: СЂР°СЃС‡РµС‚ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР° РґР»СЏ СЃРїСЂР°Р№С‚РѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ РєР°РґСЂР°
+//TODO: СЂРµР°РєС†РёСЏ РѕС‚РґРµР»СЊРЅС‹С… СЃРїСЂР°Р№С‚РѕРІ РЅР° СЃРѕР±С‹С‚РёСЏ РјР°С‚РµСЂРёР°Р»Р°
 
 /*
-    Описание реализации примитива
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРёРјРёС‚РёРІР°
 */
 
 namespace
 {
 
-///Общие данные мешей
+///РћР±С‰РёРµ РґР°РЅРЅС‹Рµ РјРµС€РµР№
 struct MeshCommonData
 {
-  DeviceManagerPtr   device_manager; //менеджер устройства отрисовки
-  LowLevelBufferPtr  index_buffer;   //индексный буфер
-  stl::string        name;           //имя мэша  
+  DeviceManagerPtr   device_manager; //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  LowLevelBufferPtr  index_buffer;   //РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
+  stl::string        name;           //РёРјСЏ РјСЌС€Р°  
   
   MeshCommonData (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -28,25 +28,25 @@ struct MeshCommonData
   }
 };
 
-///Примитив меша
+///РџСЂРёРјРёС‚РёРІ РјРµС€Р°
 struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
-  MeshCommonData&                  common_data;                  //общие данные для примитива
-  unsigned int                     primitive_index;              //индекс примитива в меше
-  render::low_level::PrimitiveType type;                         //тип примитива
-  VertexBufferPtr                  vertex_buffer;                //вершинный буфер
-  LowLevelInputLayoutPtr           layout;                       //лэйаут примитива
-  unsigned int                     first;                        //индекс первой вершины/индекса
-  unsigned int                     count;                        //количество примитивов
-  unsigned int                     base_vertex;                  //индекс базовой вершины
-  MaterialProxy                    material;                     //материал
-  Log                              log;                          //поток протоколирования
-  MaterialPtr                      cached_material;              //закэшированный материал
-  RendererPrimitive                cached_primitive;             //примитив закэшированный для рендеринга
-  size_t                           cached_state_block_mask_hash; //хэш маски закэшированного блока состояний
-  LowLevelStateBlockPtr            cached_state_block;           //закэшированный блок состояний  
+  MeshCommonData&                  common_data;                  //РѕР±С‰РёРµ РґР°РЅРЅС‹Рµ РґР»СЏ РїСЂРёРјРёС‚РёРІР°
+  unsigned int                     primitive_index;              //РёРЅРґРµРєСЃ РїСЂРёРјРёС‚РёРІР° РІ РјРµС€Рµ
+  render::low_level::PrimitiveType type;                         //С‚РёРї РїСЂРёРјРёС‚РёРІР°
+  VertexBufferPtr                  vertex_buffer;                //РІРµСЂС€РёРЅРЅС‹Р№ Р±СѓС„РµСЂ
+  LowLevelInputLayoutPtr           layout;                       //Р»СЌР№Р°СѓС‚ РїСЂРёРјРёС‚РёРІР°
+  unsigned int                     first;                        //РёРЅРґРµРєСЃ РїРµСЂРІРѕР№ РІРµСЂС€РёРЅС‹/РёРЅРґРµРєСЃР°
+  unsigned int                     count;                        //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ
+  unsigned int                     base_vertex;                  //РёРЅРґРµРєСЃ Р±Р°Р·РѕРІРѕР№ РІРµСЂС€РёРЅС‹
+  MaterialProxy                    material;                     //РјР°С‚РµСЂРёР°Р»
+  Log                              log;                          //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+  MaterialPtr                      cached_material;              //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ РјР°С‚РµСЂРёР°Р»
+  RendererPrimitive                cached_primitive;             //РїСЂРёРјРёС‚РёРІ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР°
+  size_t                           cached_state_block_mask_hash; //С…СЌС€ РјР°СЃРєРё Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅРѕРіРѕ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№
+  LowLevelStateBlockPtr            cached_state_block;           //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№  
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   MeshPrimitive (CacheHolder& parent_holder, unsigned int in_primitive_index, const MaterialProxy& in_material, MeshCommonData& in_common_data)
     : common_data (in_common_data)
     , primitive_index (in_primitive_index)
@@ -67,10 +67,10 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       log.Printf ("Mesh '%s' primitive #%u created (id=%u)", common_data.name.c_str (), primitive_index, Id ());
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~MeshPrimitive ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёСЏ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РїРѕСЂСЏРґРѕРє СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РґРѕ Рё РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ    
     
     cached_material              = MaterialPtr ();
     cached_state_block           = LowLevelStateBlockPtr ();
@@ -80,7 +80,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       log.Printf ("Mesh '%s' primitive #%u destroyed (id=%u)", common_data.name.c_str (), primitive_index, Id ());    
   }
   
-///Сброс кэша
+///РЎР±СЂРѕСЃ РєСЌС€Р°
   void ResetCacheCore ()
   {
     if (common_data.device_manager->Settings ().HasDebugLog ())
@@ -91,7 +91,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     cached_state_block_mask_hash = 0;
   }
   
-///Обновление кэша
+///РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
   void UpdateCacheCore ()
   {
     try
@@ -103,7 +103,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
       memset (&cached_primitive, 0, sizeof (cached_primitive));
       
-        //запрос состояния материала
+        //Р·Р°РїСЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°
       
       cached_material = material.Resource ();
       
@@ -120,7 +120,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
         material_state_block->GetMask (mask);
       }
       
-        //установка вершинных/индексного буфера
+        //СѓСЃС‚Р°РЅРѕРІРєР° РІРµСЂС€РёРЅРЅС‹С…/РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       mask.is_index_buffer = true; //0 index buffer is need to be set
       mask.is_layout       = true;
@@ -137,7 +137,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       context.ISSetInputLayout  (layout.get ());
       context.ISSetIndexBuffer  (common_data.index_buffer.get ());
       
-        //обновление блока состояний примитива
+        //РѕР±РЅРѕРІР»РµРЅРёРµ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРёРјРёС‚РёРІР°
       
       size_t mask_hash = mask.Hash ();
       
@@ -152,7 +152,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
       cached_state_block->Capture (&context);
       
-        //кэширование параметров примитива для отрисовки
+        //РєСЌС€РёСЂРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРёРјРёС‚РёРІР° РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё
       
       cached_primitive.material      = cached_material.get ();
       cached_primitive.state_block   = cached_state_block.get ();
@@ -164,7 +164,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       cached_primitive.tags_count    = cached_material ? cached_material->TagsCount () : 0;
       cached_primitive.tags          = cached_material ? cached_material->Tags () : (const size_t*)0;
       
-        //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+        //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№ РІСЃРµРіРґР°, РїРѕСЃРєРѕР»СЊРєСѓ Р»СЋР±С‹Рµ РёР·РјРµРЅРµРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°/РїСЂРёРјРёС‚РёРІР° РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕС‚РѕР±СЂР°Р¶РµРЅС‹ РЅР° Р·Р°РІРёСЃРёРјС‹Рµ РєСЌС€Рё
         
       InvalidateCacheDependencies ();
       
@@ -186,15 +186,15 @@ typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
 typedef stl::vector<MeshPrimitivePtr>     MeshPrimitiveArray;
 typedef stl::vector<RendererPrimitive>    RendererPrimitiveArray;
 
-///Мэш
+///РњСЌС€
 struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheHolder, public DebugIdHolder
 {
-  MeshPrimitiveArray     primitives;         //список примитивов мэша
-  RendererPrimitiveArray cached_primitives;  //закэшированные примитивы
-  RendererPrimitiveGroup cached_group;       //группы закэшированных примитивов
-  Log                    log;                //поток протоколирования
+  MeshPrimitiveArray     primitives;         //СЃРїРёСЃРѕРє РїСЂРёРјРёС‚РёРІРѕРІ РјСЌС€Р°
+  RendererPrimitiveArray cached_primitives;  //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Рµ РїСЂРёРјРёС‚РёРІС‹
+  RendererPrimitiveGroup cached_group;       //РіСЂСѓРїРїС‹ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹С… РїСЂРёРјРёС‚РёРІРѕРІ
+  Log                    log;                //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Mesh (CacheHolder& parent_holder, const char* in_name, const DeviceManagerPtr& device_manager)
     : MeshCommonData (device_manager)    
   {
@@ -209,10 +209,10 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       log.Printf ("Mesh '%s' created (id=%u)", name.c_str (), Id ());
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Mesh ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёСЏ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РїРѕСЂСЏРґРѕРє СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РґРѕ Рё РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ
       
     memset (&cached_group, 0, sizeof (cached_group));      
 
@@ -223,7 +223,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       log.Printf ("Mesh '%s' destroyed (id=%u)", name.c_str (), Id ());    
   }
   
-///Сброс кэша
+///РЎР±СЂРѕСЃ РєСЌС€Р°
   void ResetCacheCore ()
   {
     if (device_manager->Settings ().HasDebugLog ())
@@ -232,7 +232,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     cached_primitives.clear ();   
   }
   
-///Обновление кэша
+///РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
   void UpdateCacheCore ()
   {
     try
@@ -262,7 +262,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       if (!cached_primitives.empty ())
         cached_group.primitives = &cached_primitives [0];
         
-        //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+        //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№ РІСЃРµРіРґР°, РїРѕСЃРєРѕР»СЊРєСѓ Р»СЋР±С‹Рµ РёР·РјРµРЅРµРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°/РїСЂРёРјРёС‚РёРІР° РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕС‚РѕР±СЂР°Р¶РµРЅС‹ РЅР° Р·Р°РІРёСЃРёРјС‹Рµ РєСЌС€Рё
         
       InvalidateCacheDependencies ();        
         
@@ -312,20 +312,20 @@ typedef stl::vector<SimplePrimitiveListDesc> SimplePrimitiveListArray;
 
 struct PrimitiveImpl::Impl: public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;                               //менеджер устройства
-  MaterialManagerPtr         material_manager;                             //менеджер материалов
-  BuffersPtr                 buffers;                                      //буферы примитива
-  MeshArray                  meshes;                                       //меши
-  SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
-  SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
-  RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не зависящие от объекта
-  unsigned int               line_lists_count;                             //количество списков с линиями
-  unsigned int               sprite_lists_count;                           //количество списков со спрайтами
-  stl::string                name;                                         //имя примитива
-  RenderPrimitiveGroupsArray render_groups;                                //группы
-  Log                        log;                                          //поток протоколирования
+  DeviceManagerPtr           device_manager;                               //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  MaterialManagerPtr         material_manager;                             //РјРµРЅРµРґР¶РµСЂ РјР°С‚РµСЂРёР°Р»РѕРІ
+  BuffersPtr                 buffers;                                      //Р±СѓС„РµСЂС‹ РїСЂРёРјРёС‚РёРІР°
+  MeshArray                  meshes;                                       //РјРµС€Рё
+  SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //СЃРїРёСЃРєРё РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
+  SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //СЃРїРёСЃРєРё РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
+  RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Рµ РґРёРЅР°РјРёС‡РµСЃРєРёРµ РїСЂРёРјРёС‚РёРІС‹ РЅРµ Р·Р°РІРёСЃСЏС‰РёРµ РѕС‚ РѕР±СЉРµРєС‚Р°
+  unsigned int               line_lists_count;                             //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїРёСЃРєРѕРІ СЃ Р»РёРЅРёСЏРјРё
+  unsigned int               sprite_lists_count;                           //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїРёСЃРєРѕРІ СЃРѕ СЃРїСЂР°Р№С‚Р°РјРё
+  stl::string                name;                                         //РёРјСЏ РїСЂРёРјРёС‚РёРІР°
+  RenderPrimitiveGroupsArray render_groups;                                //РіСЂСѓРїРїС‹
+  Log                        log;                                          //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
@@ -350,10 +350,10 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
       log.Printf ("Primitive '%s' created (id=%u)", name.c_str (), Id ());
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёСЏ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РїРѕСЂСЏРґРѕРє СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РґРѕ Рё РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ    
     
     meshes.clear ();
     render_groups.clear ();
@@ -364,7 +364,7 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager, const BuffersPtr& buffers, const char* name)
@@ -385,7 +385,7 @@ PrimitiveImpl::~PrimitiveImpl ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* PrimitiveImpl::Name ()
@@ -405,7 +405,7 @@ void PrimitiveImpl::SetName (const char* name)
 }
 
 /*
-    Буферы примитива
+    Р‘СѓС„РµСЂС‹ РїСЂРёРјРёС‚РёРІР°
 */
 
 const PrimitiveImpl::BuffersPtr& PrimitiveImpl::Buffers ()
@@ -414,7 +414,7 @@ const PrimitiveImpl::BuffersPtr& PrimitiveImpl::Buffers ()
 }
 
 /*
-    Работа с мешами
+    Р Р°Р±РѕС‚Р° СЃ РјРµС€Р°РјРё
 */
 
 size_t PrimitiveImpl::MeshesCount ()
@@ -428,7 +428,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
   {
     MeshPtr mesh (new Mesh (*this, source.Name (), impl->device_manager), false);
     
-      //конвертация вершинных буферов
+      //РєРѕРЅРІРµСЂС‚Р°С†РёСЏ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
              
     stl::vector<VertexBufferPtr> vertex_buffers;
     
@@ -437,7 +437,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     for (unsigned int i=0, count=source.VertexBuffersCount (); i<count; i++)
       vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage));
 
-      //конвертация индексного буфера (если он есть)
+      //РєРѕРЅРІРµСЂС‚Р°С†РёСЏ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР° (РµСЃР»Рё РѕРЅ РµСЃС‚СЊ)
       
     InputDataType index_type = InputDataType_UShort;
     
@@ -461,7 +461,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       }
     }
 
-      //конвертация примитивов
+      //РєРѕРЅРІРµСЂС‚Р°С†РёСЏ РїСЂРёРјРёС‚РёРІРѕРІ
     
     mesh->primitives.reserve (source.PrimitivesCount ());
     
@@ -510,7 +510,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       mesh->primitives.push_back (dst_primitive);
     }
     
-      //добавление меша      
+      //РґРѕР±Р°РІР»РµРЅРёРµ РјРµС€Р°      
       
     impl->meshes.push_back (mesh);
     
@@ -546,7 +546,7 @@ void PrimitiveImpl::RemoveAllMeshes ()
 }
 
 /*
-    Работа со спрайтами
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРїСЂР°Р№С‚Р°РјРё
 */
 
 size_t PrimitiveImpl::SpriteListsCount ()
@@ -639,7 +639,7 @@ void PrimitiveImpl::RemoveAllSpriteLists ()
 }
 
 /*
-    Работа с линиями
+    Р Р°Р±РѕС‚Р° СЃ Р»РёРЅРёСЏРјРё
 */
 
 size_t PrimitiveImpl::LineListsCount ()
@@ -710,7 +710,7 @@ void PrimitiveImpl::RemoveAllLineLists ()
 }
 
 /*
-    Группы римитивов рендеринга
+    Р“СЂСѓРїРїС‹ СЂРёРјРёС‚РёРІРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 size_t PrimitiveImpl::RendererPrimitiveGroupsCount ()
@@ -731,7 +731,7 @@ RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
 }
 
 /*
-    Получение динамических примитивов
+    РџРѕР»СѓС‡РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& storage)
@@ -763,7 +763,7 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
 }
 
 /*
-    Регистрация динамических примитивов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void PrimitiveImpl::AddSimplePrimitiveList (SimplePrimitiveListImplBase* list, int type)
@@ -852,7 +852,7 @@ void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void PrimitiveImpl::UpdateCacheCore ()

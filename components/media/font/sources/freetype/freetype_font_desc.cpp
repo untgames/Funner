@@ -19,18 +19,18 @@ namespace freetype
 {
 
 /*
-   Шрифт
+   РЁСЂРёС„С‚
 */
 
 struct FreetypeFontDesc::Impl
 {
-  common::Log     log;       //протокол
-  DataBufferPtr   font_data; //данные файла шрифта
-  FreetypeLibrary library;   //freetype библиотека, создаем каждый раз новую для возможной работы со шрифтами в разных нитях
-  FacesArray      faces;     //шрифты
-  stl::string     source;    //исходный файл
+  common::Log     log;       //РїСЂРѕС‚РѕРєРѕР»
+  DataBufferPtr   font_data; //РґР°РЅРЅС‹Рµ С„Р°Р№Р»Р° С€СЂРёС„С‚Р°
+  FreetypeLibrary library;   //freetype Р±РёР±Р»РёРѕС‚РµРєР°, СЃРѕР·РґР°РµРј РєР°Р¶РґС‹Р№ СЂР°Р· РЅРѕРІСѓСЋ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕР№ СЂР°Р±РѕС‚С‹ СЃРѕ С€СЂРёС„С‚Р°РјРё РІ СЂР°Р·РЅС‹С… РЅРёС‚СЏС…
+  FacesArray      faces;     //С€СЂРёС„С‚С‹
+  stl::string     source;    //РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р»
 
-  ///Конструктор / деструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* file_name)
     : log (LOG_NAME)
     , source (file_name)
@@ -72,7 +72,7 @@ struct FreetypeFontDesc::Impl
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FreetypeFontDesc::FreetypeFontDesc (const char* file_name)
@@ -85,7 +85,7 @@ FreetypeFontDesc::~FreetypeFontDesc ()
 }
 
 /*
-   Количество шрифтов в наборе
+   РљРѕР»РёС‡РµСЃС‚РІРѕ С€СЂРёС„С‚РѕРІ РІ РЅР°Р±РѕСЂРµ
 */
 
 unsigned int FreetypeFontDesc::FontsCount ()
@@ -94,7 +94,7 @@ unsigned int FreetypeFontDesc::FontsCount ()
 }
 
 /*
-   Имя гарнитуры / имя семейства / имя стиля
+   РРјСЏ РіР°СЂРЅРёС‚СѓСЂС‹ / РёРјСЏ СЃРµРјРµР№СЃС‚РІР° / РёРјСЏ СЃС‚РёР»СЏ
 */
 
 const char* FreetypeFontDesc::FamilyName (unsigned int index)
@@ -114,7 +114,7 @@ const char* FreetypeFontDesc::StyleName (unsigned int index)
 }
 
 /*
-   Создание шрифта
+   РЎРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 */
 
 Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams& params)
@@ -236,7 +236,7 @@ Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams&
             continue;
           }
 
-          //TODO проверить, есть ли прирост скорости, если сохрянать глифы и для рендеринга использовать FT_Glyph_To_Bitmap
+          //TODO РїСЂРѕРІРµСЂРёС‚СЊ, РµСЃС‚СЊ Р»Рё РїСЂРёСЂРѕСЃС‚ СЃРєРѕСЂРѕСЃС‚Рё, РµСЃР»Рё СЃРѕС…СЂСЏРЅР°С‚СЊ РіР»РёС„С‹ Рё РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР° РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ FT_Glyph_To_Bitmap
 
           current_glyph->width     = face_handle->glyph->metrics.width / 64.f;
           current_glyph->height    = face_handle->glyph->metrics.height / 64.f;
@@ -246,7 +246,7 @@ Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams&
           current_glyph->advance_y = 0;
         }
 
-          //Формирование кёрнингов
+          //Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєС‘СЂРЅРёРЅРіРѕРІ
 
         for (unsigned int i = 0; i < charset_size; i++)
         {

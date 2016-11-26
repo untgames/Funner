@@ -28,16 +28,16 @@ struct PropertyMapHeader
 */
 
 /*
-    Описание реализации синхронизатора карты свойств
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂР° РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 struct PropertyMapWriter::Impl: public xtl::trackable
 {
   struct LayoutDesc: public xtl::reference_counter
   {
-    IndexArray    string_indices; //индексы строк в лэйауте
-    object_id_t   id;             //индентификатор лэйаута
-    size_t        hash;           //хэш лэйаута
+    IndexArray    string_indices; //РёРЅРґРµРєСЃС‹ СЃС‚СЂРѕРє РІ Р»СЌР№Р°СѓС‚Рµ
+    object_id_t   id;             //РёРЅРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р»СЌР№Р°СѓС‚Р°
+    size_t        hash;           //С…СЌС€ Р»СЌР№Р°СѓС‚Р°
 
     LayoutDesc (object_id_t in_id) : id (in_id), hash () {}
   };
@@ -47,8 +47,8 @@ struct PropertyMapWriter::Impl: public xtl::trackable
 
   struct MapDesc: public xtl::reference_counter
   {
-    LayoutDescPtr layout; //лэйаут
-    size_t        hash;   //хэш карты
+    LayoutDescPtr layout; //Р»СЌР№Р°СѓС‚
+    size_t        hash;   //С…СЌС€ РєР°СЂС‚С‹
 
     MapDesc () : hash () {}
   };
@@ -56,23 +56,23 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
   typedef stl::hash_map<object_id_t, MapDescPtr> MapDescMap;
 
-  IPropertyMapWriterListener* listener;      //слушатель событий
-  LayoutMap                   layouts;       //синхронизированные лэйауты
-  MapDescMap                  property_maps; //синхронизированные карты свойств
+  IPropertyMapWriterListener* listener;      //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№
+  LayoutMap                   layouts;       //СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹Рµ Р»СЌР№Р°СѓС‚С‹
+  MapDescMap                  property_maps; //СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹Рµ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (IPropertyMapWriterListener* in_listener)
     : listener (in_listener)
   {
   }
 
-/// Запись лэйаута
+/// Р—Р°РїРёСЃСЊ Р»СЌР№Р°СѓС‚Р°
 /// (exception safe instead of stream writing)
   void WriteLayout (OutputStream& stream, const common::PropertyLayout& layout, LayoutDescPtr& out_desc)
   {
     try
     {
-        //создание лэйаута
+        //СЃРѕР·РґР°РЅРёРµ Р»СЌР№Р°СѓС‚Р°
 
       LayoutDescPtr desc = out_desc;
 
@@ -83,11 +83,11 @@ struct PropertyMapWriter::Impl: public xtl::trackable
         desc = LayoutDescPtr (new LayoutDesc (layout.Id ()), false);
       }
 
-        //синхронизация идентификатора лэйаута
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р»СЌР№Р°СѓС‚Р°
 
       write (stream, static_cast<object_id_t> (layout.Id ()));
 
-        //синхронизация описаний свойств
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РѕРїРёСЃР°РЅРёР№ СЃРІРѕР№СЃС‚РІ
 
       const common::PropertyDesc* property = layout.Properties ();
 
@@ -106,7 +106,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
           strings_count++;
       }
 
-        //синхронизация строк
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃС‚СЂРѕРє
 
       desc->string_indices.reserve (strings_count); //clear after reserve for exception safeness
       desc->string_indices.clear ();
@@ -119,11 +119,11 @@ struct PropertyMapWriter::Impl: public xtl::trackable
           desc->string_indices.push_back (i);
       }
 
-        //обновление хэша
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
       desc->hash = layout.Hash ();
 
-        //обновление таблицы лэйаутов
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ Р»СЌР№Р°СѓС‚РѕРІ
 
       if (!out_desc)
         layouts.insert_pair (layout.Id (), desc);
@@ -137,7 +137,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
     }
   }
 
-/// Удаление лэйаута
+/// РЈРґР°Р»РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
   void RemoveLayout (object_id_t id)
   {
     layouts.erase (id);
@@ -152,7 +152,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
     }
   }
 
-/// Удаление карты свойств
+/// РЈРґР°Р»РµРЅРёРµ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
   void RemovePropertyMap (object_id_t id)
   {
     property_maps.erase (id);
@@ -169,7 +169,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PropertyMapWriter::PropertyMapWriter (IPropertyMapWriterListener* listener)
@@ -182,7 +182,7 @@ PropertyMapWriter::~PropertyMapWriter ()
 }
 
 /*
-    Синхронизация карты свойств (exception safe)
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ (exception safe)
 */
 
 void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& properties)
@@ -193,7 +193,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
   {
     bool need_send_layout_id = false;
 
-      //поиск карты и лэйаута
+      //РїРѕРёСЃРє РєР°СЂС‚С‹ Рё Р»СЌР№Р°СѓС‚Р°
 
     const common::PropertyLayout& layout = properties.Layout ();
 
@@ -227,7 +227,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
         layout_desc = layout_iter->second;
     }
 
-      //синхронизация идентификатора карты
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РєР°СЂС‚С‹
 
     PropertyMapHeader header = {static_cast<object_id_t> (properties.Id ()), false, false};
 
@@ -244,7 +244,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
 
     stream.Write (header);
 
-      //синхронизация лэйаута
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р»СЌР№Р°СѓС‚Р°
 
     if (header.has_layout)
     {
@@ -256,7 +256,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
       write (stream, static_cast<object_id_t> (layout.Id ()));
     }
 
-      //создание объекта слежения за картой свойств
+      //СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃР»РµР¶РµРЅРёСЏ Р·Р° РєР°СЂС‚РѕР№ СЃРІРѕР№СЃС‚РІ
 
     bool need_add_new_map = !map_desc;
 
@@ -266,18 +266,18 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
       map_desc->layout = layout_desc;
     }
 
-      //синхронизация буфера карты свойств
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р±СѓС„РµСЂР° РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
     write (stream, static_cast<uint32> (properties.BufferSize ()));
 
     stream.WriteData (properties.BufferData (), properties.BufferSize ());
 
-      //синхронизация строк
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃС‚СЂРѕРє
 
     for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
       write (stream, properties.GetString (*iter));
 
-      //обновление полей и карт
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕР»РµР№ Рё РєР°СЂС‚
 
     if (need_add_new_map)
     {
@@ -289,11 +289,11 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
     if (map_desc->layout != layout_desc)
       map_desc->layout = layout_desc;
 
-      //обновление хэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
     map_desc->hash = properties.Hash ();
 
-      //закрытие команды
+      //Р·Р°РєСЂС‹С‚РёРµ РєРѕРјР°РЅРґС‹
 
     stream.EndCommand ();
   }
@@ -319,16 +319,16 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
 */
 
 /*
-    Описание реализации парсера карты свойств
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїР°СЂСЃРµСЂР° РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 struct PropertyMapReader::Impl
 {
   struct LayoutDesc: public xtl::reference_counter
   {
-    object_id_t            source_id;      //идентификатор исходного лэйаута
-    common::PropertyLayout layout;         //расположение свойств
-    IndexArray             string_indices; //индексы строк в лэйауте
+    object_id_t            source_id;      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёСЃС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
+    common::PropertyLayout layout;         //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
+    IndexArray             string_indices; //РёРЅРґРµРєСЃС‹ СЃС‚СЂРѕРє РІ Р»СЌР№Р°СѓС‚Рµ
   };
 
   typedef xtl::intrusive_ptr<LayoutDesc>             LayoutDescPtr;
@@ -336,9 +336,9 @@ struct PropertyMapReader::Impl
 
   struct MapDesc: public xtl::reference_counter
   {
-    common::PropertyMap properties;   //карта свойств
-    LayoutDescPtr       layout;       //расположение свойств
-    size_t              layout_hash;  //хэш лэйаута
+    common::PropertyMap properties;   //РєР°СЂС‚Р° СЃРІРѕР№СЃС‚РІ
+    LayoutDescPtr       layout;       //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
+    size_t              layout_hash;  //С…СЌС€ Р»СЌР№Р°СѓС‚Р°
 
     MapDesc (const LayoutDescPtr& desc) : properties (desc->layout), layout (desc), layout_hash (layout->layout.Hash ()) {}
   };
@@ -346,22 +346,22 @@ struct PropertyMapReader::Impl
   typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
   typedef stl::hash_map<object_id_t, MapDescPtr> MapDescMap;
 
-  LayoutMap  layouts;       //расположения свойств
-  MapDescMap property_maps; //карты свойств
+  LayoutMap  layouts;       //СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  MapDescMap property_maps; //РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
-/// Чтение лэйаута
-/// (базовая гарантия безопасности)
+/// Р§С‚РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
+/// (Р±Р°Р·РѕРІР°СЏ РіР°СЂР°РЅС‚РёСЏ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё)
   LayoutDescPtr ReadLayout (InputStream& stream)
   {
     Impl::LayoutDescPtr desc;
 
     try
     {
-        //чтение идентификатора лэйаута
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р»СЌР№Р°СѓС‚Р°
 
       object_id_t layout_id = read (stream, xtl::type<object_id_t> ());
 
-        //получение лэйаута
+        //РїРѕР»СѓС‡РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
 
       Impl::LayoutMap::iterator iter = layouts.find (layout_id);
 
@@ -374,7 +374,7 @@ struct PropertyMapReader::Impl
         desc = iter->second;
       }
 
-        //чтение лэйаута
+        //С‡С‚РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
 
       common::PropertyLayout& layout = desc->layout;
 
@@ -402,7 +402,7 @@ struct PropertyMapReader::Impl
           strings_count++;
       }
 
-        //синхронизация строк
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃС‚СЂРѕРє
 
       desc->string_indices.reserve (strings_count);
 
@@ -414,7 +414,7 @@ struct PropertyMapReader::Impl
           desc->string_indices.push_back (i);
       }      
 
-        //добавление лэйаута в карту лэйаутов
+        //РґРѕР±Р°РІР»РµРЅРёРµ Р»СЌР№Р°СѓС‚Р° РІ РєР°СЂС‚Сѓ Р»СЌР№Р°СѓС‚РѕРІ
 
       desc->source_id = layout_id;
 
@@ -449,7 +449,7 @@ struct PropertyMapReader::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PropertyMapReader::PropertyMapReader ()
@@ -462,7 +462,7 @@ PropertyMapReader::~PropertyMapReader ()
 }
 
 /*
-    Получение карты свойств
+    РџРѕР»СѓС‡РµРЅРёРµ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 common::PropertyMap PropertyMapReader::GetProperties (object_id_t id) const
@@ -489,7 +489,7 @@ bool PropertyMapReader::HasProperties (object_id_t id) const
 }
 
 /*
-    Обновление карты (базовая гарантия безопасности)
+    РћР±РЅРѕРІР»РµРЅРёРµ РєР°СЂС‚С‹ (Р±Р°Р·РѕРІР°СЏ РіР°СЂР°РЅС‚РёСЏ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё)
 */
 
 void PropertyMapReader::Read (InputStream& stream)
@@ -498,7 +498,7 @@ void PropertyMapReader::Read (InputStream& stream)
   {
     const PropertyMapHeader& header = stream.Read<PropertyMapHeader> ();
 
-      //синхронизация лэйаута
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р»СЌР№Р°СѓС‚Р°
 
     Impl::LayoutDescPtr layout_desc;
 
@@ -514,7 +514,7 @@ void PropertyMapReader::Read (InputStream& stream)
       layout_id = read (stream, xtl::type<object_id_t> ());
     }
 
-      //синхронизация карты свойств
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
     Impl::MapDescMap::iterator map_iter = impl->property_maps.find (header.id);
 
@@ -537,7 +537,7 @@ void PropertyMapReader::Read (InputStream& stream)
 
         layout_desc = iter->second;
 
-          //обновление лэйаута существующей карты
+          //РѕР±РЅРѕРІР»РµРЅРёРµ Р»СЌР№Р°СѓС‚Р° СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµР№ РєР°СЂС‚С‹
 
         const common::PropertyLayout& layout = layout_desc->layout;
 
@@ -549,7 +549,7 @@ void PropertyMapReader::Read (InputStream& stream)
     }
     else
     {
-        //поиск лэйаута
+        //РїРѕРёСЃРє Р»СЌР№Р°СѓС‚Р°
 
       Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
 
@@ -558,18 +558,18 @@ void PropertyMapReader::Read (InputStream& stream)
 
       layout_desc = iter->second;
 
-        //новая карта свойств
+        //РЅРѕРІР°СЏ РєР°СЂС‚Р° СЃРІРѕР№СЃС‚РІ
 
       map_desc = Impl::MapDescPtr (new Impl::MapDesc (layout_desc), false);
     }
 
-      //синхронизация карты свойств
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
     common::PropertyMap& properties = map_desc->properties;
 
     try
     {
-        //синхронизация буфера карты свойств
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р±СѓС„РµСЂР° РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 
       size_t      src_buffer_size = stream.Read<uint32> ();
       const void* src_buffer      = stream.ReadData (src_buffer_size);
@@ -579,7 +579,7 @@ void PropertyMapReader::Read (InputStream& stream)
 
       properties.SetBufferData (src_buffer);
 
-        //синхронизация строк
+        //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃС‚СЂРѕРє
 
       for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
       {
@@ -603,7 +603,7 @@ void PropertyMapReader::Read (InputStream& stream)
       throw;
     }
 
-      //обновление структур данных
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С…
 
     if (map_iter == impl->property_maps.end ())
       impl->property_maps.insert_pair (header.id, map_desc);
@@ -616,7 +616,7 @@ void PropertyMapReader::Read (InputStream& stream)
 }
 
 /*
-    Удаление карты свойств и лэйаута
+    РЈРґР°Р»РµРЅРёРµ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ Рё Р»СЌР№Р°СѓС‚Р°
 */
 
 void PropertyMapReader::RemoveProperties (object_id_t id)

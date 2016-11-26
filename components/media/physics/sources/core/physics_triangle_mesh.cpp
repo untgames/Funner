@@ -3,7 +3,7 @@
 using namespace media::physics::shapes;
 
 /*
-   Реализация сетки
+   Р РµР°Р»РёР·Р°С†РёСЏ СЃРµС‚РєРё
 */
 
 typedef xtl::uninitialized_storage<math::vec3f>     VerticesArray;
@@ -11,10 +11,10 @@ typedef xtl::uninitialized_storage<TriangleIndices> TrianglesArray;
 
 struct TriangleMesh::Impl : public xtl::reference_counter
 {
-  stl::string    name;      //имя сетки
-  bool           is_convex; //является ли выпуклым многогранником
-  VerticesArray  vertices;  //вершины
-  TrianglesArray triangles; //индексы треугольников
+  stl::string    name;      //РёРјСЏ СЃРµС‚РєРё
+  bool           is_convex; //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РІС‹РїСѓРєР»С‹Рј РјРЅРѕРіРѕРіСЂР°РЅРЅРёРєРѕРј
+  VerticesArray  vertices;  //РІРµСЂС€РёРЅС‹
+  TrianglesArray triangles; //РёРЅРґРµРєСЃС‹ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ
 
   Impl ()
     : is_convex (true)
@@ -22,7 +22,7 @@ struct TriangleMesh::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 TriangleMesh::TriangleMesh ()
@@ -54,7 +54,7 @@ TriangleMesh& TriangleMesh::operator = (const TriangleMesh& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 TriangleMesh TriangleMesh::Clone () const
@@ -63,7 +63,7 @@ TriangleMesh TriangleMesh::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t TriangleMesh::Id () const
@@ -72,7 +72,7 @@ size_t TriangleMesh::Id () const
 }
 
 /*
-   Имя сетки
+   РРјСЏ СЃРµС‚РєРё
 */
 
 const char* TriangleMesh::Name () const
@@ -89,7 +89,7 @@ void TriangleMesh::Rename (const char* name)
 }
 
 /*
-   Является ли выпуклым многогранником
+   РЇРІР»СЏРµС‚СЃСЏ Р»Рё РІС‹РїСѓРєР»С‹Рј РјРЅРѕРіРѕРіСЂР°РЅРЅРёРєРѕРј
 */
 
 bool TriangleMesh::IsConvex () const
@@ -103,7 +103,7 @@ void TriangleMesh::SetConvex (bool convex)
 }
 
 /*
-   Работа с вершинами
+   Р Р°Р±РѕС‚Р° СЃ РІРµСЂС€РёРЅР°РјРё
 */
 
 unsigned int TriangleMesh::VerticesCount () const
@@ -127,7 +127,7 @@ math::vec3f* TriangleMesh::Vertices ()
 }
 
 /*
-   Работа с индексами
+   Р Р°Р±РѕС‚Р° СЃ РёРЅРґРµРєСЃР°РјРё
 */
 
 unsigned int TriangleMesh::TrianglesCount () const
@@ -151,7 +151,7 @@ TriangleIndices* TriangleMesh::Triangles ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void TriangleMesh::Swap (TriangleMesh& source)
@@ -166,7 +166,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (TriangleMesh& mesh1, TriangleMesh& mesh2)

@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Реализация точки привязки
+    Р РµР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 */
 
 class IBasicAttachment
@@ -10,14 +10,14 @@ class IBasicAttachment
   public:
     virtual ~IBasicAttachment () {}
 
-///Тип точки привязки
+///РўРёРї С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     virtual const std::type_info& GetType () = 0;
 };
 
 template <class T> class IAttachment: public IBasicAttachment
 {
   public:
-///Получение точки привязки
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     virtual T& GetValue () = 0;
 };
 
@@ -62,7 +62,7 @@ template <class T> class RefAttachment: public BasicAttachmentImpl<T>
 };
 
 /*
-    Создание точек привязки
+    РЎРѕР·РґР°РЅРёРµ С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 */
 
 template <class T>
@@ -98,7 +98,7 @@ inline IAttachment<T>* make_attachment (const xtl::com_ptr<T>& ptr)
 }
 
 /*
-    Слушатель событий реестра точек привязки
+    РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ СЂРµРµСЃС‚СЂР° С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 */
 
 template <class T>
@@ -114,7 +114,7 @@ void IAttachmentRegistryListener<T>::OnUnregisterAttachmentCore (const char* nam
 }
 
 /*
-    Реестр точек привязки
+    Р РµРµСЃС‚СЂ С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 */
 
 template <class T>

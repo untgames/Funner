@@ -5,16 +5,16 @@ using namespace render::manager;
 namespace
 {
 
-//TODO: ошибка при наложении имен ресурсов: выгрузка библиотеки не проверяет является ли она текущим владельцем ресурса
+//TODO: РѕС€РёР±РєР° РїСЂРё РЅР°Р»РѕР¶РµРЅРёРё РёРјРµРЅ СЂРµСЃСѓСЂСЃРѕРІ: РІС‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё РЅРµ РїСЂРѕРІРµСЂСЏРµС‚ СЏРІР»СЏРµС‚СЃСЏ Р»Рё РѕРЅР° С‚РµРєСѓС‰РёРј РІР»Р°РґРµР»СЊС†РµРј СЂРµСЃСѓСЂСЃР°
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* RFX_FILE_SUFFIX = ".rfx"; //суффикс имени файла описания библиотеки эффектов
+const char* RFX_FILE_SUFFIX = ".rfx"; //СЃСѓС„С„РёРєСЃ РёРјРµРЅРё С„Р°Р№Р»Р° РѕРїРёСЃР°РЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ
 
 /*
-    Описание библиотеки эффектов
+    РћРїРёСЃР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ
 */
 
 typedef stl::vector<EffectProxy>      EffectProxyList;
@@ -24,18 +24,18 @@ typedef stl::vector<TextureDescProxy> TextureDescProxyList;
 
 struct EffectLibraryEntry: public xtl::reference_counter
 {
-  stl::string          resource_name;      //имя ресурса
-  common::ParseNode    root_node;          //корневой узел описания библиотеки эффектов
-  common::ParseNode    resolved_root_node; //корневой узел описания библиотеки эффектов после разрешения ссылок
-  EffectProxyList      effects;            //эффекты библиотеки
-  SamplerProxyList     samplers;           //сэмплеры библиотеки
-  TextureDescProxyList texture_descs;      //описатели текстур
-  ProgramProxyList     programs;           //программы библиотеки
+  stl::string          resource_name;      //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+  common::ParseNode    root_node;          //РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» РѕРїРёСЃР°РЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ
+  common::ParseNode    resolved_root_node; //РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» РѕРїРёСЃР°РЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ РїРѕСЃР»Рµ СЂР°Р·СЂРµС€РµРЅРёСЏ СЃСЃС‹Р»РѕРє
+  EffectProxyList      effects;            //СЌС„С„РµРєС‚С‹ Р±РёР±Р»РёРѕС‚РµРєРё
+  SamplerProxyList     samplers;           //СЃСЌРјРїР»РµСЂС‹ Р±РёР±Р»РёРѕС‚РµРєРё
+  TextureDescProxyList texture_descs;      //РѕРїРёСЃР°С‚РµР»Рё С‚РµРєСЃС‚СѓСЂ
+  ProgramProxyList     programs;           //РїСЂРѕРіСЂР°РјРјС‹ Р±РёР±Р»РёРѕС‚РµРєРё
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   EffectLibraryEntry () {}
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~EffectLibraryEntry ()
   {
     Clear (effects);
@@ -44,7 +44,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     Clear (programs);
   }
   
-///Добавление эффекта
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЌС„С„РµРєС‚Р°
   void AddEffect (const char* id, const EffectPtr& effect, EffectProxyManager& proxy_manager)
   {
     EffectProxy proxy = proxy_manager.GetProxy (id);
@@ -54,7 +54,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     effects.push_back (proxy);
   }
   
-///Добавление программы
+///Р”РѕР±Р°РІР»РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
   void AddProgram (const char* id, const ProgramPtr& program, const ProgramManagerPtr& program_manager)
   {
     ProgramProxy proxy = program_manager->GetProgramProxy (id);
@@ -64,7 +64,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     programs.push_back (proxy);
   }
   
-///Добавление сэмплера
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃСЌРјРїР»РµСЂР°
   void AddSampler (const char* id, const LowLevelSamplerStatePtr& sampler, const TextureManagerPtr& texture_manager)
   {
     SamplerProxy proxy = texture_manager->GetSamplerProxy (id);
@@ -74,7 +74,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     samplers.push_back (proxy);
   }
 
-///Добавление описателя текстуры
+///Р”РѕР±Р°РІР»РµРЅРёРµ РѕРїРёСЃР°С‚РµР»СЏ С‚РµРєСЃС‚СѓСЂС‹
   void AddTextureDesc (const char* id, const LowLevelTextureDescPtr& texture_desc, const TextureManagerPtr& texture_manager)
   {
     TextureDescProxy proxy = texture_manager->GetTextureDescProxy (id);
@@ -84,7 +84,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     texture_descs.push_back (proxy);
   }
     
-///Очистка коллекции
+///РћС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёРё
   template <class T> void Clear (stl::vector<ResourceProxy<T> >& items)
   {
     while (!items.empty ())
@@ -101,22 +101,22 @@ typedef stl::list<EffectLibraryEntryPtr>       EffectLibraryList;
 }
 
 /*
-    Описание реализации менеджера эффектов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЌС„С„РµРєС‚РѕРІ
 */
 
 struct EffectManager::Impl
 {
-  DeviceManagerPtr        device_manager;            //менеджер устройства отрисовки
-  TextureManagerPtr       texture_manager;           //менеджер текстур
-  ProgramManagerPtr       program_manager;           //менеджер программ
-  EffectProxyManager      proxy_manager;             //менеджер прокси эффектов
-  EffectLibraryList       loaded_libraries;          //список загруженных библиотек
-  common::PropertyMap     settings;                  //настройки
-  common::ParseNode       configuration;             //конфигурация рендеринга
-  bool                    need_update_configuration; //конфигураци рендеринга должна быть обновлена
-  IEffectManagerListener* listener;                  //слушатель событий менеджера эффектов
+  DeviceManagerPtr        device_manager;            //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TextureManagerPtr       texture_manager;           //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+  ProgramManagerPtr       program_manager;           //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРіСЂР°РјРј
+  EffectProxyManager      proxy_manager;             //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё СЌС„С„РµРєС‚РѕРІ
+  EffectLibraryList       loaded_libraries;          //СЃРїРёСЃРѕРє Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… Р±РёР±Р»РёРѕС‚РµРє
+  common::PropertyMap     settings;                  //РЅР°СЃС‚СЂРѕР№РєРё
+  common::ParseNode       configuration;             //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЂРµРЅРґРµСЂРёРЅРіР°
+  bool                    need_update_configuration; //РєРѕРЅС„РёРіСѓСЂР°С†Рё СЂРµРЅРґРµСЂРёРЅРіР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РѕР±РЅРѕРІР»РµРЅР°
+  IEffectManagerListener* listener;                  //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РјРµРЅРµРґР¶РµСЂР° СЌС„С„РµРєС‚РѕРІ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, IEffectManagerListener* in_listener)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
@@ -134,7 +134,7 @@ struct EffectManager::Impl
       throw xtl::make_null_argument_exception ("", "program_manager");
   }
   
-///Оповещение о необходимости обновления конфигурации
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
   void UpdateConfigurationNotify ()
   {
     if (need_update_configuration)
@@ -146,7 +146,7 @@ struct EffectManager::Impl
       listener->OnConfigurationChanged ();    
   }
   
-///Обновление библиотеки ресурсов
+///РћР±РЅРѕРІР»РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё СЂРµСЃСѓСЂСЃРѕРІ
   void UpdateLibrary (const EffectLibraryEntryPtr& entry)
   {
     EffectLoaderLibrary library;
@@ -161,7 +161,7 @@ struct EffectManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EffectManager::EffectManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, IEffectManagerListener* listener)
@@ -182,7 +182,7 @@ EffectManager::~EffectManager ()
 }
 
 /*
-    Проверка: является ли ресурс библиотекой эффектов
+    РџСЂРѕРІРµСЂРєР°: СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЂРµСЃСѓСЂСЃ Р±РёР±Р»РёРѕС‚РµРєРѕР№ СЌС„С„РµРєС‚РѕРІ
 */
 
 bool EffectManager::IsEffectLibraryResource (const char* file_name)
@@ -194,7 +194,7 @@ bool EffectManager::IsEffectLibraryResource (const char* file_name)
 }
 
 /*
-    Загрузка / выгрузка эффектов
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° СЌС„С„РµРєС‚РѕРІ
 */
 
 void EffectManager::LoadEffectLibrary (const char* name)
@@ -204,7 +204,7 @@ void EffectManager::LoadEffectLibrary (const char* name)
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
       
-      //проверка повторной загрузки
+      //РїСЂРѕРІРµСЂРєР° РїРѕРІС‚РѕСЂРЅРѕР№ Р·Р°РіСЂСѓР·РєРё
     
     for (EffectLibraryList::iterator iter=impl->loaded_libraries.begin (), end=impl->loaded_libraries.end (); iter!=end; ++iter)
     {
@@ -214,7 +214,7 @@ void EffectManager::LoadEffectLibrary (const char* name)
         throw xtl::format_operation_exception ("", "Effect library '%s' has been alredy loaded", name);
     }
 
-      //создание новой библиотеки
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 
     common::Parser parser (name, "wxf");
 
@@ -226,11 +226,11 @@ void EffectManager::LoadEffectLibrary (const char* name)
     
     impl->UpdateLibrary (entry);
 
-      //регистрация библиотеки
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
       
     impl->loaded_libraries.push_back (entry);
     
-      //обновление конфигурации
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
       
     impl->UpdateConfigurationNotify ();
   }
@@ -262,7 +262,7 @@ void EffectManager::UnloadEffectLibrary (const char* name)
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 EffectProxy EffectManager::GetEffectProxy (const char* name)
@@ -271,7 +271,7 @@ EffectProxy EffectManager::GetEffectProxy (const char* name)
 }
 
 /*
-    Поиск загруженного эффекта
+    РџРѕРёСЃРє Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ СЌС„С„РµРєС‚Р°
 */
 
 EffectPtr EffectManager::FindEffect (const char* name)
@@ -280,7 +280,7 @@ EffectPtr EffectManager::FindEffect (const char* name)
 }
 
 /*
-    Установка эффекта по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° СЌС„С„РµРєС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void EffectManager::SetDefaultEffect (const EffectPtr& effect)
@@ -294,14 +294,14 @@ EffectPtr EffectManager::DefaultEffect ()
 }
 
 /*
-    Применение настроек / получение конфигурации ренедринга эффектов
+    РџСЂРёРјРµРЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє / РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЂРµРЅРµРґСЂРёРЅРіР° СЌС„С„РµРєС‚РѕРІ
 */
 
 void EffectManager::ChangeSettings (const common::PropertyMap& settings)
 {
   try
   {
-      //разрешение ссылок
+      //СЂР°Р·СЂРµС€РµРЅРёРµ СЃСЃС‹Р»РѕРє
     
     stl::vector<common::ParseNode> resolved_nodes;
 
@@ -315,7 +315,7 @@ void EffectManager::ChangeSettings (const common::PropertyMap& settings)
     for (EffectLibraryList::iterator iter=impl->loaded_libraries.begin (), end=impl->loaded_libraries.end (); iter!=end; ++iter, ++index)
       (*iter)->resolved_root_node = resolved_nodes [index];
       
-      //перезагрузка библиотеки
+      //РїРµСЂРµР·Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
       
     for (EffectLibraryList::iterator iter=impl->loaded_libraries.begin (), end=impl->loaded_libraries.end (); iter!=end; ++iter)
     {
@@ -330,11 +330,11 @@ void EffectManager::ChangeSettings (const common::PropertyMap& settings)
       *iter = entry;
     }
 
-      //замена настроек
+      //Р·Р°РјРµРЅР° РЅР°СЃС‚СЂРѕРµРє
 
     impl->settings = settings;
     
-      //оповещеие об изменении настроек
+      //РѕРїРѕРІРµС‰РµРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РЅР°СЃС‚СЂРѕРµРє
       
     impl->UpdateConfigurationNotify ();
   }

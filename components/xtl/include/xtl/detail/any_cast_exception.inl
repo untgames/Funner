@@ -3,7 +3,7 @@
 */
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 inline bad_any_cast::bad_any_cast ()
@@ -15,7 +15,7 @@ inline bad_any_cast::bad_any_cast (const std::type_info& in_source_type, const s
   {}
 
 /*
-    Исходный и целевой типы
+    РСЃС…РѕРґРЅС‹Р№ Рё С†РµР»РµРІРѕР№ С‚РёРїС‹
 */
 
 inline const std::type_info& bad_any_cast::source_type () const
@@ -33,7 +33,7 @@ inline const std::type_info& bad_any_cast::target_type () const
 */
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 inline bad_cv_any_cast::bad_cv_any_cast ()

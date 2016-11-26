@@ -17,7 +17,7 @@ struct Test
 
   Test ()
   {
-      //создание сцены
+      //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
     sprite = Sprite::Create ();
     
@@ -40,7 +40,7 @@ struct Test
     camera->SetZNear    (0);
     camera->SetZFar     (20);
 
-      //создание областей вывода
+      //СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     Viewport vp;
 
@@ -57,34 +57,34 @@ struct Test
 
     screen.Attach (vp);
 
-      //настройка целевых буферов вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІС‹РІРѕРґР°
 
     RenderTarget& render_target = application.RenderTarget ();
 
     render_target.SetScreen (&screen);
 
-      //настройка запросов рендеринга
+      //РЅР°СЃС‚СЂРѕР№РєР° Р·Р°РїСЂРѕСЃРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 
     application.Render ().SetMaxDrawDepth (3);
 
 //    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
 
-      //загрузка ресурсов
+      //Р·Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 
     application.LoadResources ();
 
-      //установка idle-функции
+      //СѓСЃС‚Р°РЅРѕРІРєР° idle-С„СѓРЅРєС†РёРё
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
   }
 
-    //настройка динамического целевого буфера рендеринга
+    //РЅР°СЃС‚СЂРѕР№РєР° РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
   void SetupDynamicRenderTarget (RenderTarget& render_target, const char*)
   {
     render_target.SetScreen (&screen);
   }
 
-    //обработчик главного цикла приложени¤
+    //РѕР±СЂР°Р±РѕС‚С‡РёРє РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёВ¤
   void Idle ()
   {
     try
@@ -118,11 +118,11 @@ int main ()
 
   try
   {
-      //настройка протоколирования
+      //РЅР°СЃС‚СЂРѕР№РєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
     common::LogFilter filter ("*", &log_print);
 
-      //запуск теста
+      //Р·Р°РїСѓСЃРє С‚РµСЃС‚Р°
 
     Test test;
 

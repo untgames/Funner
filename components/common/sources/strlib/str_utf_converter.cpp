@@ -45,13 +45,13 @@ size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*&
   {
     T* wchar_src = (T*)src;
 
-    if ((*wchar_src > 0xD7FF) && (*wchar_src < 0xE000))                                    //некорректный символ
+    if ((*wchar_src > 0xD7FF) && (*wchar_src < 0xE000))                                    //РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃРёРјРІРѕР»
       xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X00", '?');
-    else if (*wchar_src < 0x10000)                                                         //16-битный символ
+    else if (*wchar_src < 0x10000)                                                         //16-Р±РёС‚РЅС‹Р№ СЃРёРјРІРѕР»
       xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X%02X", src[0], src[1]);
-    else if (*wchar_src < 0x110000)                                                        //32-битный символ
+    else if (*wchar_src < 0x110000)                                                        //32-Р±РёС‚РЅС‹Р№ СЃРёРјРІРѕР»
     {
-      if (dst_count == 1)   //не хватает места для записи двойного символа
+      if (dst_count == 1)   //РЅРµ С…РІР°С‚Р°РµС‚ РјРµСЃС‚Р° РґР»СЏ Р·Р°РїРёСЃРё РґРІРѕР№РЅРѕРіРѕ СЃРёРјРІРѕР»Р°
         return i;
 
       size_t subtract         = *wchar_src - 0x10000,
@@ -67,7 +67,7 @@ size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*&
       if (src_count > 1)
         src_count--;
     }
-    else                                                                                   // некорректный символ
+    else                                                                                   // РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃРёРјРІРѕР»
     {
       xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X00", '?');
     }
@@ -116,11 +116,11 @@ size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t
 
     T utf_code = (T)strtoul (decompressed_buffer, &dummy_ptr, 16);
 
-    if ((utf_code < 0xD800) || (utf_code > 0xDFFF)) //16-битный символ
+    if ((utf_code < 0xD800) || (utf_code > 0xDFFF)) //16-Р±РёС‚РЅС‹Р№ СЃРёРјРІРѕР»
       *dst = utf_code;
-    else if (utf_code < 0xDC00)                     //32-битный символ
+    else if (utf_code < 0xDC00)                     //32-Р±РёС‚РЅС‹Р№ СЃРёРјРІРѕР»
     {
-      if (count == 1)                               //нет необходимого последующего символа
+      if (count == 1)                               //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ СЃРёРјРІРѕР»Р°
       {
         *dst = '?';
         continue;
@@ -136,12 +136,12 @@ size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t
 
       T second_surrogate_code = (T)strtoul (decompressed_buffer, &dummy_ptr, 16);
 
-      if ((second_surrogate_code < 0xDC00) || (second_surrogate_code > 0xDFFF)) //некорректный символ
+      if ((second_surrogate_code < 0xDC00) || (second_surrogate_code > 0xDFFF)) //РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃРёРјРІРѕР»
         *dst = '?';
 
       *dst = (((0x3FF & utf_code) << 10) | (0x3FF & second_surrogate_code)) + 0x10000;
     }
-    else                                            //некорректный символ
+    else                                            //РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃРёРјРІРѕР»
     {
       *dst = '?';
     }
@@ -156,7 +156,7 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработчики отдельных символов
+///РћР±СЂР°Р±РѕС‚С‡РёРєРё РѕС‚РґРµР»СЊРЅС‹С… СЃРёРјРІРѕР»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<Encoding encoding>
 bool decoder (const void*&, size_t&, void*&, size_t&)
@@ -171,7 +171,7 @@ bool encoder (const void*&, size_t&, void*&, size_t&)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Декодирование
+///Р”РµРєРѕРґРёСЂРѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
 bool decoder<Encoding_ASCII7> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
@@ -363,7 +363,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
   return true;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Кодирование
+///РљРѕРґРёСЂРѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
 bool encoder<Encoding_ASCII7> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
@@ -561,7 +561,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Диспетчеры
+///Р”РёСЃРїРµС‚С‡РµСЂС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<Encoding source_encoding, Encoding destination_encoding>
 void convert_dispatcher2 (const void*&   source,
@@ -652,7 +652,7 @@ void convert_dispatcher0(Encoding       source_encoding,
   }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование кодировок
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРґРёСЂРѕРІРѕРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void convert_encoding(Encoding       source_encoding,
                       const void*&   source,
@@ -676,7 +676,7 @@ void convert_encoding(Encoding       source_encoding,
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование строк
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 stl::wstring towstring (const char* string, size_t length)
 {
@@ -755,7 +755,7 @@ stl::string tostring (const stl::wstring& string)
 }
 
 /*
-   Сжатие wchar_t строк
+   РЎР¶Р°С‚РёРµ wchar_t СЃС‚СЂРѕРє
 */
 
 size_t wchar_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length)

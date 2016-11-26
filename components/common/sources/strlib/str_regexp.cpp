@@ -14,7 +14,7 @@ using namespace stl;
 namespace common
 {
 
-const int MAX_TOKENS = 128; //максимальное количество токенов при разбиении
+const int MAX_TOKENS = 128; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РѕРєРµРЅРѕРІ РїСЂРё СЂР°Р·Р±РёРµРЅРёРё
 
 static const char*          loc_name  = NULL;
 static const unsigned char* loc_tables = NULL;
@@ -80,7 +80,7 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
   if (!find_all)
     return matches;
     
-    //поиск всех вхождений
+    //РїРѕРёСЃРє РІСЃРµС… РІС…РѕР¶РґРµРЅРёР№
     
   int* offset      = offset_buf;
   int  all_matches = matches;
@@ -93,7 +93,7 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
     max_buf_size -= matches * 2;
     offset       += matches * 2;    
 
-      //проверка ну пустоту предыдущего совпадения
+      //РїСЂРѕРІРµСЂРєР° РЅСѓ РїСѓСЃС‚РѕС‚Сѓ РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЃРѕРІРїР°РґРµРЅРёСЏ
       
     if (start_offset == offset [-2])
     {      

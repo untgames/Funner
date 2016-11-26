@@ -1,4 +1,4 @@
-//Тестирование алгоритма median (a,b,c)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° median (a,b,c)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

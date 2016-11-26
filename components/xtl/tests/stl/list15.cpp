@@ -1,4 +1,4 @@
-// Тестирование merge
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ merge
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

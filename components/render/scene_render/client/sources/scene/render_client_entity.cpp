@@ -4,7 +4,7 @@ using namespace render::scene;
 using namespace render::scene::client;
 
 /*
-    Описание реализации сущности
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃСѓС‰РЅРѕСЃС‚Рё
 */
 
 struct Entity::Impl
@@ -17,7 +17,7 @@ struct Entity::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Entity::Entity (scene_graph::Entity& entity, SceneManager& manager, interchange::NodeType node_type)
@@ -31,7 +31,7 @@ Entity::~Entity ()
 }
 
 /*
-    Реализация синхронизации
+    Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 */
 
 void Entity::UpdateCore (client::Context& context)
@@ -42,7 +42,7 @@ void Entity::UpdateCore (client::Context& context)
 
     scene_graph::Entity& entity = SourceNode ();
 
-      //синхронизация видимости
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІРёРґРёРјРѕСЃС‚Рё
 
     bool is_visible = entity.IsVisible ();
 
@@ -53,7 +53,7 @@ void Entity::UpdateCore (client::Context& context)
       impl->is_visible = is_visible;
     }
 
-      //синхронизация ограничивающего объема
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉРµРјР°
 
     bool   is_infinite       = entity.IsInfiniteBounds ();
     size_t world_bounds_hash = entity.WorldBoundBoxHash ();

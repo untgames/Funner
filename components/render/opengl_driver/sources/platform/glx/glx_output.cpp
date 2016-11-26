@@ -8,15 +8,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const int GAMMA_RAMP_SIZE = 256; //базовый размер гаммы
+const int GAMMA_RAMP_SIZE = 256; //Р±Р°Р·РѕРІС‹Р№ СЂР°Р·РјРµСЂ РіР°РјРјС‹
 
 }
 
 /*
-    Описание реализации устройства вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
@@ -24,14 +24,14 @@ typedef stl::vector<OutputModeDesc> OutputModeArray;
 
 struct Output::Impl
 {
-  Log               log;                         //протокол графического драйвера
-  OutputModeArray   modes;                       //режимы работы устройства
-  Display*          display;                     //соединение с дисплеем
-  int               screen_number;               //номер экрана дисплея
-  stl::string       name;                        //имя
+  Log               log;                         //РїСЂРѕС‚РѕРєРѕР» РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РґСЂР°Р№РІРµСЂР°
+  OutputModeArray   modes;                       //СЂРµР¶РёРјС‹ СЂР°Р±РѕС‚С‹ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  Display*          display;                     //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  int               screen_number;               //РЅРѕРјРµСЂ СЌРєСЂР°РЅР° РґРёСЃРїР»РµСЏ
+  stl::string       name;                        //РёРјСЏ
   OutputModeDesc    default_mode_desc;
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Display* in_display, int in_screen_number)
     : display (in_display)
     , screen_number (in_screen_number)
@@ -89,14 +89,14 @@ struct Output::Impl
 #endif    
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Output::Output (Display* display, int screen_number)
@@ -132,7 +132,7 @@ Output::~Output ()
 }
 
 /*
-    Получение имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
 */
 
 const char* Output::GetName ()
@@ -141,7 +141,7 @@ const char* Output::GetName ()
 }
 
 /*
-    Получение номера экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° СЌРєСЂР°РЅР°
 */
 
 int Output::GetScreenNumber ()
@@ -150,7 +150,7 @@ int Output::GetScreenNumber ()
 }
 
 /*
-    Получение списка видео-режимов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Output::GetModesCount ()
@@ -167,7 +167,7 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 }
 
 /*
-    Установка текущего видео-режима
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 namespace
@@ -184,31 +184,31 @@ void raise_format_not_supported_exception (const OutputModeDesc& mode_desc)
 void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 {
 #ifdef HAS_XRANDR
-  // блокировка дисплея
+  // Р±Р»РѕРєРёСЂРѕРІРєР° РґРёСЃРїР»РµСЏ
 
   DisplayLock lock (impl->display);
 
-  // получение корневого окна
+  // РїРѕР»СѓС‡РµРЅРёРµ РєРѕСЂРЅРµРІРѕРіРѕ РѕРєРЅР°
   
   Window root = RootWindow (impl->display, impl->screen_number);
   
-  // получение конфигурации экрана
+  // РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЌРєСЂР°РЅР°
   
   XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
   
-  // получение текущего разрешения и ориентации экрана
+  // РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЂР°Р·СЂРµС€РµРЅРёСЏ Рё РѕСЂРёРµРЅС‚Р°С†РёРё СЌРєСЂР°РЅР°
   
   Rotation original_rotation = 0;
   SizeID   original_size_id  = XRRConfigCurrentConfiguration (conf, &original_rotation);
   short    original_rate     = XRRConfigCurrentRate (conf);
   
-  // получение всех доступных расрешений
+  // РїРѕР»СѓС‡РµРЅРёРµ РІСЃРµС… РґРѕСЃС‚СѓРїРЅС‹С… СЂР°СЃСЂРµС€РµРЅРёР№
 
   int            sizes_count = 0;
   SizeID         size_id     = 0;
   XRRScreenSize* sizes       = XRRSizes (impl->display, impl->screen_number, &sizes_count);
 
-  // поиск запрашиваемого разрешения в списке доступных
+  // РїРѕРёСЃРє Р·Р°РїСЂР°С€РёРІР°РµРјРѕРіРѕ СЂР°Р·СЂРµС€РµРЅРёСЏ РІ СЃРїРёСЃРєРµ РґРѕСЃС‚СѓРїРЅС‹С…
   
   for (size_id=0; size_id<sizes_count; size_id++)
   {
@@ -216,22 +216,22 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
       break;
   }
 
-  // если не нашли, то выбрасываем исключение
+  // РµСЃР»Рё РЅРµ РЅР°С€Р»Рё, С‚Рѕ РІС‹Р±СЂР°СЃС‹РІР°РµРј РёСЃРєР»СЋС‡РµРЅРёРµ
   
   if (size_id == sizes_count)
     raise_format_not_supported_exception (mode_desc);
     
-  // получение всех доступных частот для запрашиваемого разрешения
+  // РїРѕР»СѓС‡РµРЅРёРµ РІСЃРµС… РґРѕСЃС‚СѓРїРЅС‹С… С‡Р°СЃС‚РѕС‚ РґР»СЏ Р·Р°РїСЂР°С€РёРІР°РµРјРѕРіРѕ СЂР°Р·СЂРµС€РµРЅРёСЏ
   
   int    rates_count = 0, rate_id = 0;
   short *rates       = XRRRates (impl->display, impl->screen_number, size_id, &rates_count);
 
-  // если доступных частот нет, то выбрасываем исключение
+  // РµСЃР»Рё РґРѕСЃС‚СѓРїРЅС‹С… С‡Р°СЃС‚РѕС‚ РЅРµС‚, С‚Рѕ РІС‹Р±СЂР°СЃС‹РІР°РµРј РёСЃРєР»СЋС‡РµРЅРёРµ
   
   if (!rates_count)
     raise_format_not_supported_exception (mode_desc);
  
-  // поиск запрашиваемой частоты
+  // РїРѕРёСЃРє Р·Р°РїСЂР°С€РёРІР°РµРјРѕР№ С‡Р°СЃС‚РѕС‚С‹
 
   for (rate_id=0; rate_id<rates_count; rate_id++)
   {
@@ -239,24 +239,24 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
       break;
   }
   
-  // если частота не найдена, то выбрасываем исключение
+  // РµСЃР»Рё С‡Р°СЃС‚РѕС‚Р° РЅРµ РЅР°Р№РґРµРЅР°, С‚Рѕ РІС‹Р±СЂР°СЃС‹РІР°РµРј РёСЃРєР»СЋС‡РµРЅРёРµ
   
   if (rate_id == rates_count)
     raise_format_not_supported_exception (mode_desc);
     
-  // глубина цвета окна указывается при его создании и не может быть изменена
-  // возможный вариант установки глубины цвета - пересоздание корневого или клиентского окна
+  // РіР»СѓР±РёРЅР° С†РІРµС‚Р° РѕРєРЅР° СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РїСЂРё РµРіРѕ СЃРѕР·РґР°РЅРёРё Рё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РёР·РјРµРЅРµРЅР°
+  // РІРѕР·РјРѕР¶РЅС‹Р№ РІР°СЂРёР°РЅС‚ СѓСЃС‚Р°РЅРѕРІРєРё РіР»СѓР±РёРЅС‹ С†РІРµС‚Р° - РїРµСЂРµСЃРѕР·РґР°РЅРёРµ РєРѕСЂРЅРµРІРѕРіРѕ РёР»Рё РєР»РёРµРЅС‚СЃРєРѕРіРѕ РѕРєРЅР°
   
-  // если текущие разрешение и частота совпадают с запрашиваемыми, то ничего не делаем
+  // РµСЃР»Рё С‚РµРєСѓС‰РёРµ СЂР°Р·СЂРµС€РµРЅРёРµ Рё С‡Р°СЃС‚РѕС‚Р° СЃРѕРІРїР°РґР°СЋС‚ СЃ Р·Р°РїСЂР°С€РёРІР°РµРјС‹РјРё, С‚Рѕ РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј
   
   if (original_size_id == size_id && original_rate == rates [rate_id])
     return;
     
-  // установка конфигурации экрана
+  // СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЌРєСЂР°РЅР°
 
   Status status = XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
   
-  // если установка завершилась с ошибкой, то выбрасываем исключение
+  // РµСЃР»Рё СѓСЃС‚Р°РЅРѕРІРєР° Р·Р°РІРµСЂС€РёР»Р°СЃСЊ СЃ РѕС€РёР±РєРѕР№, С‚Рѕ РІС‹Р±СЂР°СЃС‹РІР°РµРј РёСЃРєР»СЋС‡РµРЅРёРµ
 
   if (status < Success)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");*/
@@ -280,11 +280,11 @@ void Output::RestoreDefaultMode ()
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  // блокировка дисплея
+  // Р±Р»РѕРєРёСЂРѕРІРєР° РґРёСЃРїР»РµСЏ
 
   DisplayLock lock (impl->display);                                               
   
-  // получение конфигурации экрана  
+  // РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЌРєСЂР°РЅР°  
 
   mode_desc.width       = DisplayWidth  (impl->display, impl->screen_number);
   mode_desc.height      = DisplayHeight (impl->display, impl->screen_number);
@@ -301,7 +301,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 }
 
 /*
-    Управление гамма-коррекцией
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
@@ -309,7 +309,7 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 #ifdef HAS_X86VMODE
   int error_base;
   
-  // запрос расширения XF86VidMode
+  // Р·Р°РїСЂРѕСЃ СЂР°СЃС€РёСЂРµРЅРёСЏ XF86VidMode
   
   if (XF86VidModeQueryExtension (impl->display, &event_base, &error_base) == 0)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
@@ -319,7 +319,7 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
   stl::vector<unsigned short> green (GAMMA_RAMP_SIZE);
   stl::vector<unsigned short> blue  (GAMMA_RAMP_SIZE);
   
-  // преобразование гаммы
+  // РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РіР°РјРјС‹
   
   for (int i=0; i<GAMMA_RAMP_SIZE; i++)
   {
@@ -328,7 +328,7 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
     blue  [i] = (unsigned short)(table [i].blue  * 65535.f);
   }
   
-  // установка гаммы
+  // СѓСЃС‚Р°РЅРѕРІРєР° РіР°РјРјС‹
 
   XF86VidModeSetGammaRamp (impl->display, impl->screen_number, GAMMA_RAMP_SIZE, &red[0], &green[0], &blue[0]);*/
 #else
@@ -339,7 +339,7 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
 {
 #ifdef HAS_X86VMODE
-  // блокировка дисплея
+  // Р±Р»РѕРєРёСЂРѕРІРєР° РґРёСЃРїР»РµСЏ
 
   DisplayLock lock (impl->display);                                               
 
@@ -347,25 +347,25 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
   int event_base;
   int error_base;
   
-  // запрос расширения XF86VidMode
+  // Р·Р°РїСЂРѕСЃ СЂР°СЃС€РёСЂРµРЅРёСЏ XF86VidMode
   
   if (XF86VidModeQueryExtension (impl->display, &event_base, &error_base) == 0)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "XF86VidModeQueryExtension missing");
       
-  // получение размера гаммы
+  // РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РіР°РјРјС‹
     
   if (!XF86VidModeGetGammaRampSize(impl->display, impl->screen_number, &size))
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "failed to get XF86VidModeGetGammaRampSize");
       
-  // проверка корректности размера гаммы
+  // РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂР°Р·РјРµСЂР° РіР°РјРјС‹
       
   if (size != GAMMA_RAMP_SIZE)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "bad gamma ramp size: %d", size);
 
-  // получение гаммы
+  // РїРѕР»СѓС‡РµРЅРёРµ РіР°РјРјС‹
   
   stl::vector<unsigned short> red   (size);
   stl::vector<unsigned short> green (size);
@@ -373,7 +373,7 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
 
   XF86VidModeGetGammaRamp (impl->display, impl->screen_number, size, &red[0], &green[0], &blue[0]);
   
-  // преобразование гаммы
+  // РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РіР°РјРјС‹
   
   for (int i=0; i<size; i++)
   {

@@ -1,7 +1,7 @@
-//размер кортежа
+//СЂР°Р·РјРµСЂ РєРѕСЂС‚РµР¶Р°
 template <class T1, class T2> struct tuple_size<stl::pair<T1, T2> > : public int_constant<2> {};
 
-//выбор типа элемента кортежа
+//РІС‹Р±РѕСЂ С‚РёРїР° СЌР»РµРјРµРЅС‚Р° РєРѕСЂС‚РµР¶Р°
 template <class T1, class T2> struct tuple_element<0, stl::pair<T1, T2> > { typedef T1 type; };
 template <class T1, class T2> struct tuple_element<1, stl::pair<T1, T2> > { typedef T2 type; };
 

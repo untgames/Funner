@@ -26,22 +26,22 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Регистрация библиотеки работы с контроллером воды
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРј РІРѕРґС‹
 */
 
 void bind_controller_water_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_WATER_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&Water::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("set_Viscosity", make_invoker (&Water::SetViscosity));
   lib.Register ("get_Viscosity", make_invoker (&Water::Viscosity));
@@ -56,28 +56,28 @@ void bind_controller_water_library (Environment& environment)
                                    make_invoker<void (Water&, const math::vec3f&)> (xtl::bind (&Water::PutWorldStorm, _1, _2, 0.0005f, 0.05f))
   ));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<Water> (SCENE_CONTROLLER_WATER_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки работы с контроллером передвижения
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРј РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
 */
 
 void bind_controller_move_to_node_point_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&MoveToNodePoint::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_AccelerationHandler", make_invoker<void (MoveToNodePoint::*) (const LinearAccelerationEvaluator&)> (&MoveToNodePoint::SetAccelerationHandler));
   lib.Register ("set_TransformSpace",      make_invoker (&MoveToNodePoint::SetTransformSpace));
@@ -85,61 +85,61 @@ void bind_controller_move_to_node_point_library (Environment& environment)
   lib.Register ("Start",                   make_invoker (&MoveToNodePoint::Start));
   lib.Register ("Stop",                    make_invoker (&MoveToNodePoint::Stop));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<MoveToNodePoint> (SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки работы с контроллером слежения
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРј СЃР»РµР¶РµРЅРёСЏ
 */
 
 void bind_controller_look_to_node_point_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&LookToNodePoint::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_AccelerationHandler", make_invoker<void (LookToNodePoint::*) (const LinearAccelerationEvaluator&)> (&LookToNodePoint::SetAccelerationHandler));
   lib.Register ("Start",                   make_invoker (&LookToNodePoint::Start));
   lib.Register ("Stop",                    make_invoker (&LookToNodePoint::Stop));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<LookToNodePoint> (SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки работы с контроллером выравнивания
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРј РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ
 */
 
 void bind_controller_align_with_node_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&AlignWithNode::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_AccelerationHandler", make_invoker<void (AlignWithNode::*) (const LinearAccelerationEvaluator&)> (&AlignWithNode::SetAccelerationHandler));
   lib.Register ("Start",                   make_invoker (&AlignWithNode::Start));
   lib.Register ("Stop",                    make_invoker (&AlignWithNode::Stop));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY);
 }
@@ -148,7 +148,7 @@ void bind_controller_sync_physics_to_node_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
 

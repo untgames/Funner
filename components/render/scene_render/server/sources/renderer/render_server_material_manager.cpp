@@ -6,7 +6,7 @@ using namespace render;
 using namespace render::scene::server;
 
 /*
-    Описание реализации менеджера материалов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 typedef stl::hash_map<stl::string, manager::Texture>  TextureMap;
@@ -14,9 +14,9 @@ typedef stl::hash_map<stl::string, manager::Material> MaterialMap;
 
 struct MaterialManager::Impl
 {
-  RenderManager render_manager; //менеджер рендеринга
-  TextureMap    textures;       //карта текстур
-  MaterialMap   materials;      //карта материалов
+  RenderManager render_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  TextureMap    textures;       //РєР°СЂС‚Р° С‚РµРєСЃС‚СѓСЂ
+  MaterialMap   materials;      //РєР°СЂС‚Р° РјР°С‚РµСЂРёР°Р»РѕРІ
 
   Impl (const RenderManager& in_render_manager)
     : render_manager (in_render_manager)
@@ -36,7 +36,7 @@ struct MaterialManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MaterialManager::MaterialManager (const RenderManager& render_manager)
@@ -49,7 +49,7 @@ MaterialManager::~MaterialManager ()
 }
 
 /*
-    Управление текстурами
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂР°РјРё
 */
 
 void MaterialManager::CreateTexture (const char* texture_name, const media::Image& image, manager::TextureDimension dimension, bool create_mips)
@@ -114,7 +114,7 @@ void MaterialManager::RemoveTexture (const char* texture_name)
 }
 
 /*
-    Управление материалами
+    РЈРїСЂР°РІР»РµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р°РјРё
 */
 
 void MaterialManager::CloneMaterial (const char* material_name, const char* prototype_name)

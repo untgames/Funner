@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Описание интерфейса итерируемого объекта
+    РћРїРёСЃР°РЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° РёС‚РµСЂРёСЂСѓРµРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 template <class T> struct iterator_interface
@@ -23,7 +23,7 @@ template <class T> struct iterator_interface
 };
 
 /*
-    Операции итератора
+    РћРїРµСЂР°С†РёРё РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class Iter> void iterator_next (Iter& iter, stl::input_iterator_tag)
@@ -47,7 +47,7 @@ template <class Iter> void iterator_prev (Iter& iter, stl::bidirectional_iterato
 }
 
 /*
-    Хранилище для итератора
+    РҐСЂР°РЅРёР»РёС‰Рµ РґР»СЏ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>, private reference_counter
@@ -87,7 +87,7 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
 };
 
 /*
-    Реализация обычного итератора
+    Р РµР°Р»РёР·Р°С†РёСЏ РѕР±С‹С‡РЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T, class Iter, class Fn> class iterator_impl: public iterator_base<T, Iter, Fn>
@@ -116,7 +116,7 @@ template <class T, class Iter, class Fn> class iterator_impl: public iterator_ba
 };
 
 /*
-    Реализация интервального итератора
+    Р РµР°Р»РёР·Р°С†РёСЏ РёРЅС‚РµСЂРІР°Р»СЊРЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T, class Iter, class Fn> class range_iterator_impl: public iterator_base<T, Iter, Fn>
@@ -160,7 +160,7 @@ template <class T, class Iter, class Fn> class range_iterator_impl: public itera
 };
 
 /*
-    Пустой итератор
+    РџСѓСЃС‚РѕР№ РёС‚РµСЂР°С‚РѕСЂ
 */
 
 template <class T> struct empty_iterator_impl: public iterator_interface<T>
@@ -183,7 +183,7 @@ template <class T> struct empty_iterator_impl: public iterator_interface<T>
 };
 
 /*
-    Селектор по умолчанию
+    РЎРµР»РµРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 template <class T>
@@ -200,7 +200,7 @@ struct default_iterator_selector
 */
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -242,7 +242,7 @@ inline iterator<T>::~iterator ()
 }  
 
 /*
-    Диспетчер создания итератора    
+    Р”РёСЃРїРµС‚С‡РµСЂ СЃРѕР·РґР°РЅРёСЏ РёС‚РµСЂР°С‚РѕСЂР°    
 */
 
 template <class T> template <class Iter>
@@ -262,7 +262,7 @@ inline typename iterator<T>::iterator_interface* iterator<T>::create_dispatch (c
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -280,7 +280,7 @@ inline iterator<T>& iterator<T>::operator = (Iter i)
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 template <class T>
@@ -290,7 +290,7 @@ inline void iterator<T>::clear ()
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -300,7 +300,7 @@ inline bool iterator<T>::empty () const
 }
 
 /*
-    Селекторы
+    РЎРµР»РµРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -316,7 +316,7 @@ inline typename iterator<T>::pointer iterator<T>::operator -> () const
 }
 
 /*
-    Инкремент / декремент
+    РРЅРєСЂРµРјРµРЅС‚ / РґРµРєСЂРµРјРµРЅС‚
 */
 
 template <class T>
@@ -362,7 +362,7 @@ inline iterator<T> iterator<T>::operator -- (int)
 }
 
 /*
-    Определение типа хранимого итератора и возвращение указателя на него
+    РћРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° С…СЂР°РЅРёРјРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР° Рё РІРѕР·РІСЂР°С‰РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РЅРµРіРѕ
 */
 
 template <class T>
@@ -384,7 +384,7 @@ inline const Iter* iterator<T>::target () const
 }
 
 /*
-    Проверка хранится ли итератор эквивалентный заданному
+    РџСЂРѕРІРµСЂРєР° С…СЂР°РЅРёС‚СЃСЏ Р»Рё РёС‚РµСЂР°С‚РѕСЂ СЌРєРІРёРІР°Р»РµРЅС‚РЅС‹Р№ Р·Р°РґР°РЅРЅРѕРјСѓ
 */
 
 template <class T> template <class Iter>
@@ -402,7 +402,7 @@ inline bool iterator<T>::contains (const Iter& i) const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -466,7 +466,7 @@ inline bool operator != (const iterator<const T>& i1, const iterator<T>& i2)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>
@@ -484,7 +484,7 @@ inline void swap (iterator<T>& i1, iterator<T>& i2)
 }
 
 /*
-    Создание итератора
+    РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T, class Iter>

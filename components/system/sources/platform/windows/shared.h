@@ -25,7 +25,7 @@
 #include <process.h>
 
 #ifndef WINRT
-#define _WIN32_WINNT 0x0600 //для использования WM_MOUSEWHEEL
+#define _WIN32_WINNT 0x0600 //РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ WM_MOUSEWHEEL
 #endif
 
 #include <windows.h>
@@ -49,16 +49,16 @@ WINGDIAPI  HGDIOBJ   WINAPI SelectObject(HDC,HGDIOBJ);
 namespace syslib
 {
 
-//проверка ошибок использования WinAPI и генерация исключения в случае их наличия
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ WinAPI Рё РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ РёС… РЅР°Р»РёС‡РёСЏ
 void check_errors    (const char* source);
 void raise_error     (const char* source);
 void raise_com_error (const char* source, const char* message, HRESULT result);
 
-//получение строки с сообщением об ошибке
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ СЃРѕРѕР±С‰РµРЅРёРµРј РѕР± РѕС€РёР±РєРµ
 stl::string get_error_message     (DWORD error_code);
 stl::string get_com_error_message (HRESULT result);
 
-//очистка tls нити
+//РѕС‡РёСЃС‚РєР° tls РЅРёС‚Рё
 void cleanup_tls ();
 
 }

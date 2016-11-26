@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::macosx;
 
 /*
-    Описание реализации контекста OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° OpenGL
 */
 
 typedef xtl::com_ptr<Library>          LibraryPtr;
@@ -13,27 +13,27 @@ typedef stl::vector<IContextListener*> ListenerArray;
 
 struct Context::Impl
 {
-  Log                         log;                   //протокол
-  AGLContext                  context;               //контекст OpenGL
-  AGLPixelFormat              pixel_format;          //формат пикселей
-  ISwapChain*                 swap_chain;            //текущая цепочка обмена
-  xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
-  ListenerArray               listeners;             //слушатели событий контекста
-  LibraryPtr                  opengl_library;        //библиотека фунций OpenGL
-  static Impl*                current_context;       //текущий контекст
+  Log                         log;                   //РїСЂРѕС‚РѕРєРѕР»
+  AGLContext                  context;               //РєРѕРЅС‚РµРєСЃС‚ OpenGL
+  AGLPixelFormat              pixel_format;          //С„РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№
+  ISwapChain*                 swap_chain;            //С‚РµРєСѓС‰Р°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  xtl::trackable::slot_type   on_destroy_swap_chain; //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  ListenerArray               listeners;             //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РєРѕРЅС‚РµРєСЃС‚Р°
+  LibraryPtr                  opengl_library;        //Р±РёР±Р»РёРѕС‚РµРєР° С„СѓРЅС†РёР№ OpenGL
+  static Impl*                current_context;       //С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚
 
   Impl (Library* in_library)
     : context (0), pixel_format (0), swap_chain (0),
       on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)), opengl_library (in_library)
     {}
 
-///Обработчик удаления цепочки обмена
+///РћР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
   void OnDestroySwapChain ()
   {
     swap_chain = 0;
   }
 
-///Оповещение о потере контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕС‚РµСЂРµ РєРѕРЅС‚РµРєСЃС‚Р°
   void LostCurrentNotify ()
   {
     try
@@ -43,11 +43,11 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Оповещение об установке текущего контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void SetCurrentNotify ()
   {
     try
@@ -57,7 +57,7 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
@@ -65,7 +65,7 @@ struct Context::Impl
 Context::Impl* Context::Impl::current_context = 0;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Context::Context (ISwapChain* in_swap_chain, Library* library)
@@ -73,7 +73,7 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
@@ -83,14 +83,14 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
 
     ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
 
-      //получение формата пикселей
+      //РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
     impl->pixel_format = swap_chain->GetPixelFormat ();
 
     if (!impl->pixel_format)
       throw xtl::format_operation_exception ("", "Null pixel format");
 
-      //создание контекста
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->context = aglCreateContext (impl->pixel_format, 0);
 
@@ -114,7 +114,7 @@ Context::~Context ()
   {
     impl->log.Printf ("Destroy context (id=%u)...", GetId ());
 
-      //отмена текущего контекста
+      //РѕС‚РјРµРЅР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     if (Impl::current_context == impl.get ())
     {
@@ -122,7 +122,7 @@ Context::~Context ()
       Impl::current_context = 0;
     }
 
-      //удаление контекста
+      //СѓРґР°Р»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->log.Printf ("...delete context (handle=%08X)", impl->context);
 
@@ -133,12 +133,12 @@ Context::~Context ()
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Установка текущего контектса
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєС‚СЃР°
 */
 
 void Context::MakeCurrent (ISwapChain* swap_chain)
@@ -150,13 +150,13 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
     if (swap_chain != impl->swap_chain)
     {
-        //изменение текущей цепочки обмена
+        //РёР·РјРµРЅРµРЅРёРµ С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
 
       casted_swap_chain->SetContext (this);
 
-        //подписка на событие удаления цепочки обмена
+        //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
@@ -168,14 +168,14 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
     Impl::current_context = 0;
 
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     if (!aglSetCurrentContext (impl->context))
       raise_agl_error ("::aglSetCurrentContext");
 
     Impl::current_context = impl.get ();
 
-      //оповещение об установке текущего контекста
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->SetCurrentNotify ();
   }
@@ -187,7 +187,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 }
 
 /*
-   Проверка совместимости цепочки обмена с контекстом
+   РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 bool Context::IsCompatible (ISwapChain* in_swap_chain)
@@ -206,7 +206,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
 }
 
 /*
-    Получение интерфейса библиотеки OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° Р±РёР±Р»РёРѕС‚РµРєРё OpenGL
 */
 
 ILibrary& Context::GetLibrary ()
@@ -215,7 +215,7 @@ ILibrary& Context::GetLibrary ()
 }
 
 /*
-    Подписка на события контекста
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void Context::AttachListener (IContextListener* listener)
@@ -232,7 +232,7 @@ void Context::DetachListener (IContextListener* listener)
 }
 
 /*
-   Получение AGL контекста
+   РџРѕР»СѓС‡РµРЅРёРµ AGL РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 AGLContext Context::GetAGLContext ()

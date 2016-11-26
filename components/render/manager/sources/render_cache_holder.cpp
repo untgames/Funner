@@ -52,7 +52,7 @@ struct CacheHolder::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CacheHolder::CacheHolder ()
@@ -68,7 +68,7 @@ CacheHolder::~CacheHolder ()
 }
 
 /*
-    Состояние
+    РЎРѕСЃС‚РѕСЏРЅРёРµ
 */
 
 CacheState CacheHolder::State ()
@@ -77,7 +77,7 @@ CacheState CacheHolder::State ()
 }
 
 /*
-    Построение списка связанных хранителей кэша
+    РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° СЃРІСЏР·Р°РЅРЅС‹С… С…СЂР°РЅРёС‚РµР»РµР№ РєСЌС€Р°
 */
 
 void CacheHolder::AttachCacheSource (CacheHolder& source)
@@ -135,7 +135,7 @@ void CacheHolder::DetachAllCacheSources ()
 }
 
 /*
-    Является ли данный объект родительским по отношению к переданному
+    РЇРІР»СЏРµС‚СЃСЏ Р»Рё РґР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёРј РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє РїРµСЂРµРґР°РЅРЅРѕРјСѓ
 */
 
 bool CacheHolder::IsParentOf (CacheHolder& child)
@@ -153,7 +153,7 @@ bool CacheHolder::IsParentOf (CacheHolder& child)
 }
 
 /*
-    Установка флага необходимости обновления кэша / зависимых кэшей
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РєСЌС€Р° / Р·Р°РІРёСЃРёРјС‹С… РєСЌС€РµР№
 */
 
 void CacheHolder::InvalidateFlags ()
@@ -191,7 +191,7 @@ void CacheHolder::InvalidateCache (bool invalidate_dependencies)
 }
 
 /*
-    Сброс кэша
+    РЎР±СЂРѕСЃ РєСЌС€Р°
 */
 
 void CacheHolder::ResetCache ()
@@ -259,7 +259,7 @@ void CacheHolder::UpdateCacheAfterReset ()
 }
 
 /*
-    Обновление кэша. Необходимо вызывать перед каждым использованием ресурса
+    РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°. РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р·С‹РІР°С‚СЊ РїРµСЂРµРґ РєР°Р¶РґС‹Рј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј СЂРµСЃСѓСЂСЃР°
 */
 
 void CacheHolder::UpdateCache ()
@@ -306,7 +306,7 @@ void CacheHolder::UpdateCache ()
 */
 
 /*
-    Кэшируемый источник требует обновления кэша
+    РљСЌС€РёСЂСѓРµРјС‹Р№ РёСЃС‚РѕС‡РЅРёРє С‚СЂРµР±СѓРµС‚ РѕР±РЅРѕРІР»РµРЅРёСЏ РєСЌС€Р°
 */
 
 void CacheSource::UpdateCacheCore ()

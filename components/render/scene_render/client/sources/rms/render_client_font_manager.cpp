@@ -3,16 +3,16 @@
 using namespace render::scene::client;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const char*  DEFAULT_SEMANTIC            = "image";     //имя семантики по умолчанию
-const char*  FONT_RESOURCE_PREFIX        = "font:";     //префикс имени шрифта
-const char*  FONT_RESOURCE_WILDCARD      = "font:*";    //маска имени шрифта
-const size_t FONT_RESOURCE_PREFIX_LENGTH = strlen (FONT_RESOURCE_PREFIX); //длина префикса шрифта
+const char*  DEFAULT_SEMANTIC            = "image";     //РёРјСЏ СЃРµРјР°РЅС‚РёРєРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const char*  FONT_RESOURCE_PREFIX        = "font:";     //РїСЂРµС„РёРєСЃ РёРјРµРЅРё С€СЂРёС„С‚Р°
+const char*  FONT_RESOURCE_WILDCARD      = "font:*";    //РјР°СЃРєР° РёРјРµРЅРё С€СЂРёС„С‚Р°
+const size_t FONT_RESOURCE_PREFIX_LENGTH = strlen (FONT_RESOURCE_PREFIX); //РґР»РёРЅР° РїСЂРµС„РёРєСЃР° С€СЂРёС„С‚Р°
 
 struct RasterizedFontCreationParamsImpl: public media::RasterizedFontCreationParams
 {
@@ -30,28 +30,28 @@ RasterizedFontCreationParamsImpl rasterized_font_creation_params;
 }
 
 /*
-    Описание реализации менеджера шрифтов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С€СЂРёС„С‚РѕРІ
 */
 
 namespace
 {
 
-/// Дескриптор шрифта
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ С€СЂРёС„С‚Р°
 struct FontDesc
 {
-  Font*                font;       //шрифт
-  xtl::auto_connection on_destroy; //соединение с обработчиком удаления шрифта
+  Font*                font;       //С€СЂРёС„С‚
+  xtl::auto_connection on_destroy; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРј СѓРґР°Р»РµРЅРёСЏ С€СЂРёС„С‚Р°
 
   FontDesc (Font* in_font) : font (in_font) {}
 };
 
 typedef stl::hash_map<size_t, FontDesc> FontMap;
 
-/// Дескриптор материала шрифта
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚Р°
 struct FontMaterialDesc
 {
-  FontMaterial*        font_material; //материал шрифта
-  xtl::auto_connection on_destroy;    //соединение с обработчиком удаления материала шрифта
+  FontMaterial*        font_material; //РјР°С‚РµСЂРёР°Р» С€СЂРёС„С‚Р°
+  xtl::auto_connection on_destroy;    //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРј СѓРґР°Р»РµРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚Р°
 
   FontMaterialDesc (FontMaterial* in_font_material)
     : font_material (in_font_material)
@@ -62,11 +62,11 @@ struct FontMaterialDesc
 typedef stl::hash_map<size_t, FontMaterialDesc> FontMaterialMap;
 typedef stl::list<media::FontLibrary>           FontLibraryList;
 
-/// Кэш материалов шрифтов
+/// РљСЌС€ РјР°С‚РµСЂРёР°Р»РѕРІ С€СЂРёС„С‚РѕРІ
 struct FontMaterialCacheEntry
 {
-  media::Font     font;          //базовый шрифт
-  FontMaterialPtr font_material; //материал шрифта
+  media::Font     font;          //Р±Р°Р·РѕРІС‹Р№ С€СЂРёС„С‚
+  FontMaterialPtr font_material; //РјР°С‚РµСЂРёР°Р» С€СЂРёС„С‚Р°
 
   FontMaterialCacheEntry (const media::Font& in_font, const FontMaterialPtr& in_font_material)
     : font (in_font)
@@ -81,12 +81,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, FontMaterialCacheEntry> FontMa
 
 struct FontManager::Impl
 {
-  MaterialManager&          material_manager;     //менеджер материалов
-  FontMap                   fonts;                //шрифты
-  FontMaterialMap           font_materials;       //материалы шрифтов
-  FontLibraryList           font_libraries;       //библиотеки шрифтов
-  FontMaterialCache         font_material_cache;  //кэш шрифтов
-  FontRenderingTempCachePtr font_rendering_cache; //кэш рендеринга шрифтов
+  MaterialManager&          material_manager;     //РјРµРЅРµРґР¶РµСЂ РјР°С‚РµСЂРёР°Р»РѕРІ
+  FontMap                   fonts;                //С€СЂРёС„С‚С‹
+  FontMaterialMap           font_materials;       //РјР°С‚РµСЂРёР°Р»С‹ С€СЂРёС„С‚РѕРІ
+  FontLibraryList           font_libraries;       //Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
+  FontMaterialCache         font_material_cache;  //РєСЌС€ С€СЂРёС„С‚РѕРІ
+  FontRenderingTempCachePtr font_rendering_cache; //РєСЌС€ СЂРµРЅРґРµСЂРёРЅРіР° С€СЂРёС„С‚РѕРІ
 
   Impl (MaterialManager& in_material_manager) : material_manager (in_material_manager) {}
 
@@ -102,7 +102,7 @@ struct FontManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FontManager::FontManager (MaterialManager& material_manager)
@@ -115,7 +115,7 @@ FontManager::~FontManager ()
 }
 
 /*
-    Создание шрифта / материала шрифта
+    РЎРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р° / РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚Р°
 */
 
 FontPtr FontManager::CreateFont (const media::Font& font)
@@ -159,7 +159,7 @@ FontMaterialPtr FontManager::CreateFontMaterial (const media::Font& font, const 
     if (!*semantic)
       semantic = DEFAULT_SEMANTIC;
 
-      //поиск материала
+      //РїРѕРёСЃРє РјР°С‚РµСЂРёР°Р»Р°
 
     static char SEPARATOR = '#';
 
@@ -171,11 +171,11 @@ FontMaterialPtr FontManager::CreateFontMaterial (const media::Font& font, const 
     if (iter != impl->font_materials.end ())
       return iter->second.font_material;
 
-      //создание шрифта
+      //СЃРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 
     FontPtr new_font = CreateFont (font);
 
-      //создание нового материала
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 
     FontMaterialPtr new_font_material (new FontMaterial (impl->material_manager, new_font, material, semantic), false);
 
@@ -195,7 +195,7 @@ FontMaterialPtr FontManager::CreateFontMaterial (const media::Font& font, const 
 }
 
 /*
-    Присоединение библиотеки шрифтов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
 */
 
 void FontManager::AttachFontLibrary (const media::FontLibrary& library)
@@ -235,7 +235,7 @@ void FontManager::DetachAllFontLibraries ()
 }
 
 /*
-    Предварительный рендеринг шрифтов
+    РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂРµРЅРґРµСЂРёРЅРі С€СЂРёС„С‚РѕРІ
 */
 
 void FontManager::LoadFont (const char* id, const char* name, const media::FontCreationParams& params, const char* material, const char* semantic)
@@ -248,14 +248,14 @@ void FontManager::LoadFont (const char* id, const char* name, const media::FontC
     if (!name)
       throw xtl::format_operation_exception ("", "name");
 
-      //проверка повторной регистрации
+      //РїСЂРѕРІРµСЂРєР° РїРѕРІС‚РѕСЂРЅРѕР№ СЂРµРіРёСЃС‚СЂР°С†РёРё
 
     FontMaterialCache::iterator iter = impl->font_material_cache.find (id);
 
     if (iter != impl->font_material_cache.end ())
       throw xtl::make_argument_exception ("", "Font '%s' has been already loaded", id);
 
-      //создание шрифта
+      //СЃРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 
     for (FontLibraryList::iterator iter=impl->font_libraries.begin (), end=impl->font_libraries.end (); iter!=end; ++iter)
     {
@@ -266,11 +266,11 @@ void FontManager::LoadFont (const char* id, const char* name, const media::FontC
 
       media::Font font = library.CreateFont (name, params);
 
-        //создание материала шрифтов
+        //СЃРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚РѕРІ
 
       FontMaterialPtr font_material = CreateFontMaterial (font, material, semantic);
 
-        //регистрация записи в кэше
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р·Р°РїРёСЃРё РІ РєСЌС€Рµ
 
       impl->font_material_cache.insert_pair (id, FontMaterialCacheEntry (font, font_material));
 
@@ -331,7 +331,7 @@ void FontManager::LoadFont (const char* init_string)
     if (!strncmp (FONT_RESOURCE_PREFIX, init_string, FONT_RESOURCE_PREFIX_LENGTH))
       init_string += FONT_RESOURCE_PREFIX_LENGTH;
 
-      //разбор строки инициализации
+      //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 
     common::PropertyMap properties = common::parse_init_string (init_string);
 
@@ -356,7 +356,7 @@ void FontManager::LoadFont (const char* init_string)
 
       //TODO: horizontal & vertical DPI support
     
-      //загрузка шрифта
+      //Р·Р°РіСЂСѓР·РєР° С€СЂРёС„С‚Р°
 
     LoadFont (init_string, font_name, creation_params, material, semantic);
   }
@@ -379,7 +379,7 @@ void FontManager::UnloadFont (const char* id)
 }
 
 /*
-    Проверка соответствия имени ресурса параметрам настройки кэша шрифтов
+    РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРµРЅРё СЂРµСЃСѓСЂСЃР° РїР°СЂР°РјРµС‚СЂР°Рј РЅР°СЃС‚СЂРѕР№РєРё РєСЌС€Р° С€СЂРёС„С‚РѕРІ
 */
 
 bool FontManager::IsFontParams (const char* resource)
@@ -388,7 +388,7 @@ bool FontManager::IsFontParams (const char* resource)
 }
 
 /*
-    Кэш рендеринга шрифтов
+    РљСЌС€ СЂРµРЅРґРµСЂРёРЅРіР° С€СЂРёС„С‚РѕРІ
 */
 
 void FontManager::SetFontRenderingTempCache (const FontRenderingTempCachePtr& cache)

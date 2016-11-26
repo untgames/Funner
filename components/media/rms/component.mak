@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := MEDIA.RMS.SOURCES MEDIA.RMS.TESTS
 
-#Цель №1 - sources
+#Р¦РµР»СЊ в„–1 - sources
 MEDIA.RMS.SOURCES.TYPE             := static-lib
 MEDIA.RMS.SOURCES.NAME             := funner.media.rms
 MEDIA.RMS.SOURCES.INCLUDE_DIRS     :=
@@ -14,7 +14,7 @@ MEDIA.RMS.SOURCES.COMPILER_CFLAGS  :=
 MEDIA.RMS.SOURCES.COMPILER_DEFINES :=
 MEDIA.RMS.SOURCES.IMPORTS          := compile.media.rms compile.common
 
-#Цель №3 - tests
+#Р¦РµР»СЊ в„–3 - tests
 MEDIA.RMS.TESTS.TYPE             := test-suite
 MEDIA.RMS.TESTS.INCLUDE_DIRS     :=
 MEDIA.RMS.TESTS.SOURCE_DIRS      := tests

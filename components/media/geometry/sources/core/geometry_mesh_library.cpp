@@ -5,19 +5,19 @@ using namespace media;
 using namespace common;
 
 /*
-    Описание реализации библиотек мешей
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРє РјРµС€РµР№
 */
 
 typedef ResourceLibrary<Mesh> MeshLibraryHolder;
 
 struct MeshLibrary::Impl
 {
-  stl::string       name;   //имя модели
-  MeshLibraryHolder meshes; //библиотека мешей
+  stl::string       name;   //РёРјСЏ РјРѕРґРµР»Рё
+  MeshLibraryHolder meshes; //Р±РёР±Р»РёРѕС‚РµРєР° РјРµС€РµР№
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MeshLibrary::MeshLibrary ()
@@ -40,7 +40,7 @@ MeshLibrary::~MeshLibrary ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 MeshLibrary& MeshLibrary::operator = (const MeshLibrary& model)
@@ -50,7 +50,7 @@ MeshLibrary& MeshLibrary::operator = (const MeshLibrary& model)
 }
 
 /*
-    Имя библиотеки
+    РРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 const char* MeshLibrary::Name () const
@@ -67,7 +67,7 @@ void MeshLibrary::Rename (const char* name)
 }
 
 /*
-    Количество мешей / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РјРµС€РµР№ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 uint32_t MeshLibrary::Size () const
@@ -81,7 +81,7 @@ bool MeshLibrary::IsEmpty () const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 MeshLibrary::Iterator MeshLibrary::CreateIterator ()
@@ -95,7 +95,7 @@ MeshLibrary::ConstIterator MeshLibrary::CreateIterator () const
 }
 
 /*
-    Идентификатор меша в библиотеке
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјРµС€Р° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 */
 
 const char* MeshLibrary::ItemId (const ConstIterator& i) const
@@ -104,7 +104,7 @@ const char* MeshLibrary::ItemId (const ConstIterator& i) const
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 Mesh* MeshLibrary::Find (const char* name)
@@ -118,7 +118,7 @@ const Mesh* MeshLibrary::Find (const char* name) const
 }
 
 /*
-    Присоединение мешей
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РјРµС€РµР№
 */
 
 void MeshLibrary::Attach (const char* name, Mesh& mesh)
@@ -140,7 +140,7 @@ void MeshLibrary::DetachAll ()
 }
 
 /*
-    Очистка библиотеки
+    РћС‡РёСЃС‚РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 void MeshLibrary::Clear ()
@@ -151,7 +151,7 @@ void MeshLibrary::Clear ()
 }
 
 /*
-    Загрузка / сохранение
+    Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void MeshLibrary::Load (const char* file_name)
@@ -191,7 +191,7 @@ void MeshLibrary::Save (const char* file_name)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void MeshLibrary::Swap (MeshLibrary& model)
@@ -215,7 +215,7 @@ void swap (MeshLibrary& model1, MeshLibrary& model2)
 }
 
 /*
-    Регистрация сериализаторов по умолчанию
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void MeshLibrary::RegisterDefaultSavers ()

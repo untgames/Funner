@@ -6,16 +6,16 @@ using namespace store::android_store;
 namespace
 {
 
-const char* COMPONENT_NAME              = "store.stores.android_store";                        //имя компонента
-const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.android_store"; //имя компонента обработчика загрузки приложения
-const char* LOAD_HANDLER_ID             = "AndroidStore";                                      //идентификатор обработчика загрузки приложения
-const char* STORE_ID                    = "AndroidStore";                                      //идентификатор магазина
-const char* STORE_NAME_MASK             = "AndroidStore";                                      //маска имен магазинов
+const char* COMPONENT_NAME              = "store.stores.android_store";                        //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.android_store"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р° РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* LOAD_HANDLER_ID             = "AndroidStore";                                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* STORE_ID                    = "AndroidStore";                                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјР°РіР°Р·РёРЅР°
+const char* STORE_NAME_MASK             = "AndroidStore";                                      //РјР°СЃРєР° РёРјРµРЅ РјР°РіР°Р·РёРЅРѕРІ
 
 }
 
 /*
-   Компонент магазина
+   РљРѕРјРїРѕРЅРµРЅС‚ РјР°РіР°Р·РёРЅР°
 */
 
 namespace components

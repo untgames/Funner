@@ -6,7 +6,7 @@ using namespace syslib;
   #undef CreateMutex
 #endif
 
-//создание исключающего семафора
+//СЃРѕР·РґР°РЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 mutex_t WindowsThreadManager::CreateMutex ()
 {
   try
@@ -27,7 +27,7 @@ mutex_t WindowsThreadManager::CreateMutex ()
   }
 }
 
-//удаление исключающего семафора
+//СѓРґР°Р»РµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void WindowsThreadManager::DestroyMutex (mutex_t handle)
 {
   if (!handle || !handle->mutex)
@@ -38,13 +38,13 @@ void WindowsThreadManager::DestroyMutex (mutex_t handle)
   delete handle;
 }
 
-//захват исключающего семафора
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void WindowsThreadManager::LockMutex (mutex_t handle)
 {
   LockMutex (handle, INFINITE);
 }
 
-//захват исключающего семафора с указанием максимального времени ожидания
+//Р·Р°С…РІР°С‚ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР° СЃ СѓРєР°Р·Р°РЅРёРµРј РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РІСЂРµРјРµРЅРё РѕР¶РёРґР°РЅРёСЏ
 bool WindowsThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   try
@@ -69,7 +69,7 @@ bool WindowsThreadManager::LockMutex (mutex_t handle, size_t wait_in_millisecond
   }
 }
 
-//попытка захвата исключающего семафора
+//РїРѕРїС‹С‚РєР° Р·Р°С…РІР°С‚Р° РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 bool WindowsThreadManager::TryLockMutex (mutex_t handle)
 {
   try
@@ -96,7 +96,7 @@ bool WindowsThreadManager::TryLockMutex (mutex_t handle)
   }
 }
 
-//освобождение исключающего семафора
+//РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡Р°СЋС‰РµРіРѕ СЃРµРјР°С„РѕСЂР°
 void WindowsThreadManager::UnlockMutex (mutex_t handle)
 {
   try

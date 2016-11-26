@@ -111,7 +111,7 @@ void Primitive::RemoveAllLineLists ()
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void Primitive::UpdateCache ()

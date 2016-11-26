@@ -3,13 +3,13 @@
 using namespace social;
 
 /*
-   Реализация менеджера сессий
+   Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° СЃРµСЃСЃРёР№
 */
 
 namespace
 {
 
-const char* COMPONENTS_MASK = "social.sessions.*"; //маска имён компонентов низкоуровневых драйверов отрисовки
+const char* COMPONENTS_MASK = "social.sessions.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹С… РґСЂР°Р№РІРµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
 struct SessionDesc
 {
@@ -30,7 +30,7 @@ struct SessionManagerImpl::Impl
 
   SessionDescMap session_creators;
 
-  ///Регистрация создателей сессий
+  ///Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ СЃРµСЃСЃРёР№
   void RegisterSession (const char* id, const char* session_name_mask, const social::SessionManager::CreateSessionHandler& handler)
   {
     static const char* METHOD_NAME = "social::SessionManager::RegisterSession";
@@ -62,7 +62,7 @@ struct SessionManagerImpl::Impl
     session_creators.clear ();
   }
 
-  ///Поиск сессии
+  ///РџРѕРёСЃРє СЃРµСЃСЃРёРё
   SessionDescMap::iterator FindSessionDesc (const char* session_name)
   {
     for (SessionDescMap::iterator iter = session_creators.begin (), end = session_creators.end (); iter != end; ++iter)
@@ -74,7 +74,7 @@ struct SessionManagerImpl::Impl
     return session_creators.end ();
   }
 
-  ///Проверка наличия сессии
+  ///РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРµСЃСЃРёРё
   bool IsSessionRegistered (const char* session_name)
   {
     if (!session_name)
@@ -85,7 +85,7 @@ struct SessionManagerImpl::Impl
     return FindSessionDesc (session_name) != session_creators.end ();
   }
 
-  ///Создание сессии
+  ///РЎРѕР·РґР°РЅРёРµ СЃРµСЃСЃРёРё
   social::ISessionManager* CreateSession (const char* session_name)
   {
     static const char* METHOD_NAME = "social::SessionManagerImpl::CreateSession";
@@ -103,7 +103,7 @@ struct SessionManagerImpl::Impl
     return iter->second.handler (session_name);
   }
 
-  ///Загрузка сессий по умолчанию
+  ///Р—Р°РіСЂСѓР·РєР° СЃРµСЃСЃРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   void LoadDefaultSessions ()
   {
     static common::ComponentLoader loader (COMPONENTS_MASK);
@@ -111,7 +111,7 @@ struct SessionManagerImpl::Impl
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SessionManagerImpl::SessionManagerImpl ()
@@ -124,7 +124,7 @@ SessionManagerImpl::~SessionManagerImpl ()
 }
 
 /*
-   Регистрация создателей сессий
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ СЃРµСЃСЃРёР№
 */
 
 void SessionManagerImpl::RegisterSession (const char* id, const char* session_name_mask, const social::SessionManager::CreateSessionHandler& handler)
@@ -143,7 +143,7 @@ void SessionManagerImpl::UnregisterAllSessions ()
 }
 
 /*
-   Проверка наличия сессии
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРµСЃСЃРёРё
 */
 
 bool SessionManagerImpl::IsSessionRegistered (const char* session_name)
@@ -152,7 +152,7 @@ bool SessionManagerImpl::IsSessionRegistered (const char* session_name)
 }
 
 /*
-   Создание сессии
+   РЎРѕР·РґР°РЅРёРµ СЃРµСЃСЃРёРё
 */
 
 social::ISessionManager* SessionManagerImpl::CreateSession (const char* session_name)
@@ -161,7 +161,7 @@ social::ISessionManager* SessionManagerImpl::CreateSession (const char* session_
 }
 
 /*
-   Регистрация создателей сессий
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ СЃРµСЃСЃРёР№
 */
 
 void SessionManager::RegisterSession (const char* id, const char* session_name_mask, const CreateSessionHandler& handler)
@@ -180,7 +180,7 @@ void SessionManager::UnregisterAllSessions ()
 }
 
 /*
-   Проверка наличия сессии
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃРµСЃСЃРёРё
 */
     
 bool SessionManager::IsSessionRegistered (const char* session_name)

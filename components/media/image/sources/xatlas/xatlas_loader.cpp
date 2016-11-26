@@ -5,7 +5,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Загрузка карты картинок
+    Р—Р°РіСЂСѓР·РєР° РєР°СЂС‚С‹ РєР°СЂС‚РёРЅРѕРє
 */
 
 namespace components
@@ -88,13 +88,13 @@ void xatlas_load (const char* file_name, Atlas& atlas)
 }
 
 /*
-   Компонент загрузки карт картинок
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё РєР°СЂС‚ РєР°СЂС‚РёРЅРѕРє
 */
 
 class XAtlasLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     XAtlasLoaderComponent () 
     {
       AtlasManager::RegisterLoader ("xatlas", &xatlas_load);

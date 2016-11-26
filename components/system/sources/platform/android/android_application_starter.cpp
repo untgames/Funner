@@ -14,25 +14,25 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* THREAD_NAME                             = "system.android.launcher";                                    //имя нити приложения
-const char* ENGINE_UTILS_CLASS_NAME                 = "com/untgames/funner/application/EngineUtils";                //имя класса java утилит
-const char* ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME = "com/untgames/funner/application/EngineSensorEventListener";  //имя класса слушателя событий сенсора
-const char* APK_FULL_PATH                           = "APK_FULL_PATH";                                              //имя переменной пути к APK-файлу
-const char* SEARCH_PATHS                            = "SEARCH_PATHS";                                               //имя переменной списка путей поиска файлов
+const char* THREAD_NAME                             = "system.android.launcher";                                    //РёРјСЏ РЅРёС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* ENGINE_UTILS_CLASS_NAME                 = "com/untgames/funner/application/EngineUtils";                //РёРјСЏ РєР»Р°СЃСЃР° java СѓС‚РёР»РёС‚
+const char* ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME = "com/untgames/funner/application/EngineSensorEventListener";  //РёРјСЏ РєР»Р°СЃСЃР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
+const char* APK_FULL_PATH                           = "APK_FULL_PATH";                                              //РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РїСѓС‚Рё Рє APK-С„Р°Р№Р»Сѓ
+const char* SEARCH_PATHS                            = "SEARCH_PATHS";                                               //РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃРїРёСЃРєР° РїСѓС‚РµР№ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
 
-/// Контекст запуска приложения
+/// РљРѕРЅС‚РµРєСЃС‚ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 ApplicationContext application_context;
 
-/// Защита activity
+/// Р—Р°С‰РёС‚Р° activity
 Mutex current_activity_mutex;
 
-/// Текущее activity
+/// РўРµРєСѓС‰РµРµ activity
 global_ref<jobject> current_activity;
 
-/// Параметры запуска приложения
+/// РџР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 struct ApplicationStartArgs
 {
   common::StringArray args;
@@ -42,18 +42,18 @@ struct ApplicationStartArgs
   {
     env_vars = common::parse_init_string (in_env_vars);
     
-      //разбор параметров запуска
+      //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСѓСЃРєР°
       
     args.Add (program_name);
     args.Add (common::split (in_args));    
   }
 };
 
-/// Нить приложения
+/// РќРёС‚СЊ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class ApplicationThread: private ApplicationStartArgs
 {
   public:
-/// Метод запуска нити приложения
+/// РњРµС‚РѕРґ Р·Р°РїСѓСЃРєР° РЅРёС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ
     static void Start (const char* program_name, const char* args, const char* env_vars)
     {
       static stl::auto_ptr<ApplicationThread> instance;
@@ -65,7 +65,7 @@ class ApplicationThread: private ApplicationStartArgs
     }
 
   private:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationThread (const char* program_name, const char* in_args, const char* in_env_vars)
       : ApplicationStartArgs (program_name, in_args, in_env_vars)
       , thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
@@ -73,12 +73,12 @@ class ApplicationThread: private ApplicationStartArgs
 //      thread.SetPriority (syslib::ThreadPriority_High);
     }
     
-/// Функция нити
+/// Р¤СѓРЅРєС†РёСЏ РЅРёС‚Рё
     int ThreadRoutine ()
     {
       try
       {
-          //получение окружения
+          //РїРѕР»СѓС‡РµРЅРёРµ РѕРєСЂСѓР¶РµРЅРёСЏ
         
         JNIEnv* env = 0;
         
@@ -87,13 +87,13 @@ class ApplicationThread: private ApplicationStartArgs
         if (status)
           throw xtl::format_operation_exception ("", "JavaVM::AttachCurrentThread failed (status=%d)", status);          
 
-          //передача управления программе
+          //РїРµСЂРµРґР°С‡Р° СѓРїСЂР°РІР»РµРЅРёСЏ РїСЂРѕРіСЂР°РјРјРµ
         
         int exit_code = 0;
         
         try
         {
-            //формирование окружения
+            //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕРєСЂСѓР¶РµРЅРёСЏ
 
           for (size_t i=0, count=env_vars.Size (); i<count; i++)
           {
@@ -104,11 +104,11 @@ class ApplicationThread: private ApplicationStartArgs
               throw xtl::format_operation_exception ("", "::setenv failed for '%s=%s'", name, value);
           }
 
-            //предварительные действия
+            //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ
 
           Preinit ();
 
-            //запуск
+            //Р·Р°РїСѓСЃРє
 
           exit_code = main (args.Size (), args.Data (), environ);          
           
@@ -136,14 +136,14 @@ class ApplicationThread: private ApplicationStartArgs
       return 0;
     }
     
-/// Посылка сообщения JavaVM о необходимости остановки приложения
+/// РџРѕСЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёСЏ JavaVM Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕСЃС‚Р°РЅРѕРІРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       exit (code);
     }
     
   private:
-///Предварительные действия
+///РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ
     void Preinit ()
     {
       try
@@ -207,12 +207,12 @@ namespace syslib
 namespace android
 {
 
-/// точка входа в приложение
+/// С‚РѕС‡РєР° РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ
 void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args, const char* env_vars)
 {
   static const char* METHOD_NAME = "syslib::android::start_application";
   
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!vm)
     throw xtl::make_null_argument_exception (METHOD_NAME, "vm");
@@ -229,7 +229,7 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
   if (!env_vars)
     throw xtl::make_null_argument_exception (METHOD_NAME, "env_vars"); 
     
-    //сохранение контекста запуска приложения
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 
   application_context.vm = vm;
   
@@ -246,18 +246,18 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 
   Application::RegisterNotificationHandler ("*", &on_application_notification);
 
-    //запуск нити приложения
+    //Р·Р°РїСѓСЃРє РЅРёС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ
     
   ApplicationThread::Start (program_name, args, env_vars);
 }
 
-/// получение контекста запуска приложения
+/// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 const ApplicationContext& get_context ()
 {
   return application_context;
 }
 
-/// изменение activity
+/// РёР·РјРµРЅРµРЅРёРµ activity
 void set_activity (jobject activity)
 {
   Lock lock (current_activity_mutex);
@@ -265,7 +265,7 @@ void set_activity (jobject activity)
   current_activity = activity;
 }
 
-/// получение activity
+/// РїРѕР»СѓС‡РµРЅРёРµ activity
 jobject get_activity ()
 {
   Lock lock (current_activity_mutex);
@@ -273,13 +273,13 @@ jobject get_activity ()
   return current_activity.get ();
 }
 
-/// получение виртуальной машины
+/// РїРѕР»СѓС‡РµРЅРёРµ РІРёСЂС‚СѓР°Р»СЊРЅРѕР№ РјР°С€РёРЅС‹
 JavaVM* get_vm ()
 {
   return application_context.vm;
 }
 
-/// получение окружения текущей нити
+/// РїРѕР»СѓС‡РµРЅРёРµ РѕРєСЂСѓР¶РµРЅРёСЏ С‚РµРєСѓС‰РµР№ РЅРёС‚Рё
 JNIEnv& get_env ()
 {
   JNIEnv* env = 0;

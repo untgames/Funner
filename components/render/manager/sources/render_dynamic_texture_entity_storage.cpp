@@ -3,19 +3,19 @@
 using namespace render::manager;
 
 /*
-    Описание реализации хранилища динамических текстур объекта
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С…СЂР°РЅРёР»РёС‰Р° РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ РѕР±СЉРµРєС‚Р°
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, DynamicTexturePtr> DynamicTextureMap;
 
 struct DynamicTextureEntityStorage::Impl
 {
-  DynamicTextureMap dynamic_textures; //карта динамических текстур
-  Log               log;              //протокол рендеринга
+  DynamicTextureMap dynamic_textures; //РєР°СЂС‚Р° РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ
+  Log               log;              //РїСЂРѕС‚РѕРєРѕР» СЂРµРЅРґРµСЂРёРЅРіР°
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DynamicTextureEntityStorage::DynamicTextureEntityStorage ()
@@ -28,7 +28,7 @@ DynamicTextureEntityStorage::~DynamicTextureEntityStorage ()
 }
 
 /*
-    Обновление текстур
+    РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂ
 */
 
 void DynamicTextureEntityStorage::Update (const FramePtr& frame)
@@ -64,7 +64,7 @@ void DynamicTextureEntityStorage::Update (const FramePtr& frame)
 }
 
 /*
-    Добавление / поиск динамических текстур
+    Р”РѕР±Р°РІР»РµРЅРёРµ / РїРѕРёСЃРє РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ
 */
 
 void DynamicTextureEntityStorage::AddTexture (const char* name, const DynamicTexturePtr& dynamic_texture)
@@ -99,7 +99,7 @@ DynamicTexturePtr DynamicTextureEntityStorage::FindTexture (const char* name)
 }
 
 /*
-    Сброс неиспользуемых ресурсов
+    РЎР±СЂРѕСЃ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void DynamicTextureEntityStorage::FlushUnusedTextures ()

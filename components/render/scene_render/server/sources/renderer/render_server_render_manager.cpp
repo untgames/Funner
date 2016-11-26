@@ -4,13 +4,13 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 32; //резервируемое количество слушателей
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 32; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»СѓС€Р°С‚РµР»РµР№
 
 /*
-    Описание реализации менеджера рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 namespace
@@ -18,7 +18,7 @@ namespace
 
 struct ServerLog
 {
-  common::Log log; //поток отладочного протоколирования
+  common::Log log; //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
   ServerLog (const char* name)
     : log (common::format ("render.server.%s", name).c_str ())
@@ -38,13 +38,13 @@ typedef stl::vector<IRenderManagerListener*> ListenerArray;
 
 struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
 {
-  manager::RenderManager  render_manager;                   //менеджер рендеринга
-  server::BatchingManager batching_manager;                 //менеджер пакетирования
-  TraverseResult          traverse_result_storage;          //хранилище результатов обхода сцены
-  xtl::auto_connection    configuration_changed_connection; //соединение с обработчиком изменения конфигурации
-  ListenerArray           listeners;                        //слушатели событий
+  manager::RenderManager  render_manager;                   //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  server::BatchingManager batching_manager;                 //РјРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
+  TraverseResult          traverse_result_storage;          //С…СЂР°РЅРёР»РёС‰Рµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РѕР±С…РѕРґР° СЃС†РµРЅС‹
+  xtl::auto_connection    configuration_changed_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРј РёР·РјРµРЅРµРЅРёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+  ListenerArray           listeners;                        //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* name)
     : ServerLog (name)
     , batching_manager (render_manager, log)
@@ -54,7 +54,7 @@ struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
 
-///Обработчик изменения конфигурации
+///РћР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
   void OnConfigurationChanged ()
   {
     common::ParseNode configuration = render_manager.Configuration ();
@@ -75,7 +75,7 @@ struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderManager::RenderManager (const char* name)
@@ -115,7 +115,7 @@ RenderManager& RenderManager::operator = (const RenderManager& manager)
 }
 
 /*
-    Поток отладочного протоколирования
+    РџРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 common::Log& RenderManager::Log ()
@@ -124,7 +124,7 @@ common::Log& RenderManager::Log ()
 }
 
 /*
-    Менеджер
+    РњРµРЅРµРґР¶РµСЂ
 */
 
 render::manager::RenderManager& RenderManager::Manager ()
@@ -133,7 +133,7 @@ render::manager::RenderManager& RenderManager::Manager ()
 }
 
 /*
-    Менеджер пакетирования
+    РњРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 */
 
 BatchingManager& RenderManager::BatchingManager ()
@@ -142,7 +142,7 @@ BatchingManager& RenderManager::BatchingManager ()
 }
 
 /*
-    Результат обхода сцены
+    Р РµР·СѓР»СЊС‚Р°С‚ РѕР±С…РѕРґР° СЃС†РµРЅС‹
 */
 
 TraverseResult& RenderManager::TraverseResultStorage ()
@@ -151,7 +151,7 @@ TraverseResult& RenderManager::TraverseResultStorage ()
 }
 
 /*
-    Подписка на события менеджера
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРµРЅРµРґР¶РµСЂР°
 */
 
 void RenderManager::AttachListener (IRenderManagerListener* listener)

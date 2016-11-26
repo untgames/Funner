@@ -9,7 +9,7 @@ namespace lua_overridescript_bind
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
@@ -17,7 +17,7 @@ const char* LOG_NAME       = "engine.lua";
 const char* BINDER_NAME    = "LuaOverride";
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
 struct LuaLogHolder
@@ -152,7 +152,7 @@ struct RequireOverride
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component
@@ -168,7 +168,7 @@ class Component
     {
       InvokerRegistry lib = environment.Library ("global");
 
-        //регистрация операций
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
       lib.Register ("print",  make_invoker (&print_override));
       lib.Register ("error",  make_invoker (&error_override));

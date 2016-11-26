@@ -48,7 +48,7 @@ using namespace xtl;
 using namespace bound_volumes;
 
 /*
-    Тестовый объект
+    РўРµСЃС‚РѕРІС‹Р№ РѕР±СЉРµРєС‚
 */
 
 class TestEntity: public Entity
@@ -93,7 +93,7 @@ float prepare_float (float v)
 }
 
 /*
-    Вспомогательные утилиты вывода состояния объекта
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СѓС‚РёР»РёС‚С‹ РІС‹РІРѕРґР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 inline void dump (const vec3f& v)

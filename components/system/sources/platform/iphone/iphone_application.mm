@@ -87,7 +87,7 @@ void ns_object_to_json (id obj, stl::string& output)
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationDelegateImpl ()
       : log (LOG_NAME)
       , idle_enabled (false)
@@ -100,7 +100,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
         application_delegate = 0;
     }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       static const char* METHOD_NAME = "syslib::iPhonePlatform::ApplicationDelegateImpl::ApplicationDelegateImpl::Run";
@@ -124,25 +124,25 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       throw xtl::format_not_supported_exception ("Application exit not supported on iphone platform");
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (syslib::IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
 
-///События приложения
+///РЎРѕР±С‹С‚РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnIdle ()
     {
       if (idle_enabled && listener)
@@ -179,7 +179,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       }
     }
 
-///Подписка на обновления системных свойств
+///РџРѕРґРїРёСЃРєР° РЅР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
     void RegisterForSystemPropertiesUpdates (common::PropertyMap& system_properties)
     {
       system_properties_update_connection = system_properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&ApplicationDelegateImpl::OnSystemPropertiesUpdated, this, system_properties));
@@ -190,7 +190,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       system_properties_update_connection.disconnect ();
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -202,7 +202,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
     }
 
   private:
-///Обработка обновления системных свойств
+///РћР±СЂР°Р±РѕС‚РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
     void OnSystemPropertiesUpdated (const common::PropertyMap& property_map)
     {
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -214,10 +214,10 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
     }
 
   private:
-    common::Log                   log;                                 //протокол
-    bool                          idle_enabled;                        //необходимо ли вызывать события idle
-    syslib::IApplicationListener* listener;                            //слушатель событий
-    xtl::auto_connection          system_properties_update_connection; //соединение обновления системных свойств
+    common::Log                   log;                                 //РїСЂРѕС‚РѕРєРѕР»
+    bool                          idle_enabled;                        //РЅРµРѕР±С…РѕРґРёРјРѕ Р»Рё РІС‹Р·С‹РІР°С‚СЊ СЃРѕР±С‹С‚РёСЏ idle
+    syslib::IApplicationListener* listener;                            //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№
+    xtl::auto_connection          system_properties_update_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 };
 
 }
@@ -227,12 +227,12 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 @interface ApplicationDelegateInternal : NSObject
 {
   @private
-    ListenerArray             *listeners;                     //слушатели событий
-    CADisplayLink             *idle_timer;                    //таймер вызова OnIdle
-    NSTimer                   *background_idle_timer;         //таймер вызова OnIdle в неактивном состоянии
-    NSDictionary              *launch_options;                //параметры запуска приложения
-    bool                      main_view_visible;              //виден ли главный view приложения
-    ApplicationBackgroundMode background_mode;                //режим фоновой работы приложения
+    ListenerArray             *listeners;                     //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№
+    CADisplayLink             *idle_timer;                    //С‚Р°Р№РјРµСЂ РІС‹Р·РѕРІР° OnIdle
+    NSTimer                   *background_idle_timer;         //С‚Р°Р№РјРµСЂ РІС‹Р·РѕРІР° OnIdle РІ РЅРµР°РєС‚РёРІРЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё
+    NSDictionary              *launch_options;                //РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    bool                      main_view_visible;              //РІРёРґРµРЅ Р»Рё РіР»Р°РІРЅС‹Р№ view РїСЂРёР»РѕР¶РµРЅРёСЏ
+    ApplicationBackgroundMode background_mode;                //СЂРµР¶РёРј С„РѕРЅРѕРІРѕР№ СЂР°Р±РѕС‚С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
 }
 
 @property (nonatomic, readonly) ListenerArray*            listeners;
@@ -497,7 +497,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 }
 
 /*
-   Добавление/удаление подписчиков
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРѕРґРїРёСЃС‡РёРєРѕРІ
 */
 
 -(void) attachListener:(syslib::iphone::IApplicationListener*)listener
@@ -528,7 +528,7 @@ namespace syslib
 namespace iphone
 {
 
-bool is_in_run_loop () //запущен ли главный цикл
+bool is_in_run_loop () //Р·Р°РїСѓС‰РµРЅ Р»Рё РіР»Р°РІРЅС‹Р№ С†РёРєР»
 {
   return application_launched;
 }
@@ -538,11 +538,11 @@ bool is_in_run_loop () //запущен ли главный цикл
 }
 
 /*
-   Менеджер приложения
+   РњРµРЅРµРґР¶РµСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 /*
-   Добавление/удаление подписчиков на события приложения
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРѕРґРїРёСЃС‡РёРєРѕРІ РЅР° СЃРѕР±С‹С‚РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 void ApplicationManager::AttachApplicationListener (syslib::iphone::IApplicationListener* listener)
@@ -565,7 +565,7 @@ void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplication
 }
 
 /*
-   Получение параметров запуска приложения
+   РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 NSDictionary* ApplicationManager::GetLaunchOptions ()
@@ -577,7 +577,7 @@ NSDictionary* ApplicationManager::GetLaunchOptions ()
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* IPhoneApplicationManager::CreateDefaultApplicationDelegate ()
@@ -586,7 +586,7 @@ IApplicationDelegate* IPhoneApplicationManager::CreateDefaultApplicationDelegate
 }
 
 /*
-   Открытие URL во внешнем браузере
+   РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void IPhoneApplicationManager::OpenUrl (const char* url)
@@ -603,7 +603,7 @@ void IPhoneApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-   Управление режимом работы в фоне
+   РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј СЂР°Р±РѕС‚С‹ РІ С„РѕРЅРµ
 */
 
 void IPhoneApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
@@ -617,7 +617,7 @@ syslib::ApplicationBackgroundMode IPhoneApplicationManager::GetApplicationBackgr
 }
 
 /*
-   Управление энергосбережением
+   РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void IPhoneApplicationManager::SetScreenSaverState (bool state)
@@ -631,7 +631,7 @@ bool IPhoneApplicationManager::GetScreenSaverState ()
 }
 
 /*
-   Получение системных свойств
+   РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& properties)

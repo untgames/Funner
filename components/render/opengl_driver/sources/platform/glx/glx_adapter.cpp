@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Получение информации о конфигурации буфера кадра
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅС„РёРіСѓСЂР°С†РёРё Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig config, int attribute)
@@ -27,20 +27,20 @@ int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig
 }
 
 /*
-    Описание реализации адаптера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґР°РїС‚РµСЂР°
 */
 
 typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
-  Log                  log;               //протокол работы OpenGL
-  OutputManager        output_manager;    //менеджер устройств вывода
-  AdapterLibraryPtr    library;           //библиотека адаптера
-  stl::string          name;              //имя адаптера
+  Log                  log;               //РїСЂРѕС‚РѕРєРѕР» СЂР°Р±РѕС‚С‹ OpenGL
+  OutputManager        output_manager;    //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
+  AdapterLibraryPtr    library;           //Р±РёР±Р»РёРѕС‚РµРєР° Р°РґР°РїС‚РµСЂР°
+  stl::string          name;              //РёРјСЏ Р°РґР°РїС‚РµСЂР°
   GlxExtensionsEntries glx_entries;
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)  
     : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
@@ -50,14 +50,14 @@ struct Adapter::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Adapter::Adapter (const char* name, const char* dll_path, const char* init_string)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -68,7 +68,7 @@ Adapter::Adapter (const char* name, const char* dll_path, const char* init_strin
     if (!init_string)
       init_string = "";
 
-      //создание реализации
+      //СЃРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
     
     impl = new Impl (name, dll_path, init_string);
     
@@ -94,7 +94,7 @@ Adapter::~Adapter ()
 }
 
 /*
-    Имя адаптера / путь к модулю / описание
+    РРјСЏ Р°РґР°РїС‚РµСЂР° / РїСѓС‚СЊ Рє РјРѕРґСѓР»СЋ / РѕРїРёСЃР°РЅРёРµ
 */
 
 const char* Adapter::GetName ()
@@ -113,7 +113,7 @@ const char* Adapter::GetDescription ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t Adapter::GetOutputsCount ()
@@ -127,7 +127,7 @@ IOutput* Adapter::GetOutput (size_t index)
 }
 
 /*
-    Запрос устройства вывода
+    Р—Р°РїСЂРѕСЃ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 Output::Pointer Adapter::GetOutputForWindow (Window window)
@@ -136,7 +136,7 @@ Output::Pointer Adapter::GetOutputForWindow (Window window)
 }
 
 /*
-    Библиотека
+    Р‘РёР±Р»РёРѕС‚РµРєР°
 */
 
 AdapterLibrary& Adapter::GetLibrary ()
@@ -145,12 +145,12 @@ AdapterLibrary& Adapter::GetLibrary ()
 }
 
 /*
-    Перечисление доступных форматов пикселей
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
 */
 
 void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionsEntriesArray& entries)
 {
-    // блокировка дисплея
+    // Р±Р»РѕРєРёСЂРѕРІРєР° РґРёСЃРїР»РµСЏ
     
   Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
 
@@ -179,7 +179,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
   {
     GLXFBConfig config = configs [i];
     
-      // исключаем все конфигурации с индексным цветом
+      // РёСЃРєР»СЋС‡Р°РµРј РІСЃРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃ РёРЅРґРµРєСЃРЅС‹Рј С†РІРµС‚РѕРј
     
     if (!(get_fb_config_attrib (lib, display, config, GLX_RENDER_TYPE) & GLX_RGBA_BIT))
       continue;

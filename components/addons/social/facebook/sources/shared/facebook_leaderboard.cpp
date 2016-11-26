@@ -4,7 +4,7 @@ using namespace social;
 using namespace social::facebook;
 
 /*
-   Таблицы рекордов
+   РўР°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ
 */
 
 void FacebookSessionImpl::LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties)
@@ -23,7 +23,7 @@ void FacebookSessionImpl::LoadLeaderboard (const char* leaderboard_id, const cha
 }
 
 /*
-   Публикация
+   РџСѓР±Р»РёРєР°С†РёСЏ
 */
 
 void FacebookSessionImpl::SendScore (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties)

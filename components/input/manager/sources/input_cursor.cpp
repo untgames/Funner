@@ -3,17 +3,17 @@
 using namespace input;
 
 /*
-    Описание реализации курсора
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСѓСЂСЃРѕСЂР°
 */
 
 typedef stl::list<ICursorListener*> ListenerList;
 
 struct Cursor::Impl: public xtl::reference_counter
 {
-  math::vec2f  position;   //положение курсора
-  ListenerList listeners;  //слушатели событий курсора
-  bool         visible;    //видим ли курсор
-  stl::string  image_name; //имя картинки
+  math::vec2f  position;   //РїРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
+  ListenerList listeners;  //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РєСѓСЂСЃРѕСЂР°
+  bool         visible;    //РІРёРґРёРј Р»Рё РєСѓСЂСЃРѕСЂ
+  stl::string  image_name; //РёРјСЏ РєР°СЂС‚РёРЅРєРё
   
   Impl () : visible (true) {}
   
@@ -27,14 +27,14 @@ struct Cursor::Impl: public xtl::reference_counter
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
   }  
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Cursor::Cursor ()
@@ -61,7 +61,7 @@ Cursor& Cursor::operator = (const Cursor& cursor)
 }
 
 /*
-    Установка положения курсора
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»РѕР¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР°
 */
 
 void Cursor::SetPosition (float x, float y)
@@ -84,7 +84,7 @@ void Cursor::SetPosition (const math::vec2f& position)
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 }
@@ -105,7 +105,7 @@ float Cursor::GetY () const
 }
 
 /*
-    Управление видимостью курсора
+    РЈРїСЂР°РІР»РµРЅРёРµ РІРёРґРёРјРѕСЃС‚СЊСЋ РєСѓСЂСЃРѕСЂР°
 */
 
 bool Cursor::IsVisible () const
@@ -128,13 +128,13 @@ void Cursor::SetVisible (bool state)
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 }
 
 /*
-    Установка изображения курсора
+    РЈСЃС‚Р°РЅРѕРІРєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР°
 */
 
 void Cursor::SetImage (const char* image_name)
@@ -152,7 +152,7 @@ void Cursor::SetImage (const char* image_name)
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }  
 }
@@ -163,7 +163,7 @@ const char* Cursor::Image () const
 }
 
 /*
-    Добавление слушателей событий курсора
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»РµР№ СЃРѕР±С‹С‚РёР№ РєСѓСЂСЃРѕСЂР°
 */
 
 void Cursor::Attach (ICursorListener* listener)
@@ -177,7 +177,7 @@ void Cursor::Detach (ICursorListener* listener)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Cursor::Swap (Cursor& cursor)

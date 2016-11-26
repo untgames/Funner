@@ -11,13 +11,13 @@ using namespace common;
 namespace
 {
 
-const char*        LOG_NAME                           = "sound::low_level::openal";                                      //имя потока протоколирования
-const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY); //период обновления буферов источника в тиках
+const char*        LOG_NAME                           = "sound::low_level::openal";                                      //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY); //РїРµСЂРёРѕРґ РѕР±РЅРѕРІР»РµРЅРёСЏ Р±СѓС„РµСЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° РІ С‚РёРєР°С…
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OpenALSource::OpenALSource (OpenALDevice& in_device)
@@ -54,12 +54,12 @@ OpenALSource::~OpenALSource ()
   }
   catch (...)
   {
-    //подаваляем все исключения
+    //РїРѕРґР°РІР°Р»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Работа со списком активных источников
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРєРѕРј Р°РєС‚РёРІРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 void OpenALSource::Activate ()
@@ -120,7 +120,7 @@ void OpenALSource::Deactivate ()
 }
 
 /*
-    Оповещения об обновлениях
+    РћРїРѕРІРµС‰РµРЅРёСЏ РѕР± РѕР±РЅРѕРІР»РµРЅРёСЏС…
 */
 
 void OpenALSource::UpdateSourceNotify ()
@@ -138,7 +138,7 @@ void OpenALSource::UpdateSampleNotify ()
 }
 
 /*
-   Установка параметров источника
+   РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void OpenALSource::SetSource (const Source& in_source)
@@ -149,7 +149,7 @@ void OpenALSource::SetSource (const Source& in_source)
 }
 
 /*
-   Установка текущего проигрываемого звука
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РїСЂРѕРёРіСЂС‹РІР°РµРјРѕРіРѕ Р·РІСѓРєР°
 */
 
 void OpenALSource::SetSample (OpenALSample* sample)
@@ -219,7 +219,7 @@ OpenALSample* OpenALSource::GetSample () const
 }
 
 /*
-    Получение позиции в миллисекундах
+    РџРѕР»СѓС‡РµРЅРёРµ РїРѕР·РёС†РёРё РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С…
 */
 
 unsigned int OpenALSource::TellInMilliseconds () const
@@ -228,7 +228,7 @@ unsigned int OpenALSource::TellInMilliseconds () const
 }
 
 /*
-   Управление проигрыванием
+   РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµРј
 */
 
 void OpenALSource::Play (bool looping)
@@ -271,7 +271,7 @@ void OpenALSource::Stop ()
 }
 
 /*
-    Позиционирование
+    РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 float OpenALSource::Tell () const
@@ -331,7 +331,7 @@ bool OpenALSource::IsPlaying () const
 }
 
 /*
-    Чтение данных в OpenAL буфер с учётом цикличности проигрывания
+    Р§С‚РµРЅРёРµ РґР°РЅРЅС‹С… РІ OpenAL Р±СѓС„РµСЂ СЃ СѓС‡С‘С‚РѕРј С†РёРєР»РёС‡РЅРѕСЃС‚Рё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 void OpenALSource::FillBuffer (ALuint al_buffer)
@@ -418,7 +418,7 @@ void OpenALSource::FillBuffers ()
 
   if (!queued_buffers_count)
   {
-      //первоначальное заполнение буферов
+      //РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅРѕРµ Р·Р°РїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 
     for (unsigned int i=0; i<SOURCE_BUFFERS_COUNT; i++)
       FillBuffer (al_buffers [i]);
@@ -437,7 +437,7 @@ void OpenALSource::FillBuffers ()
 }
 
 /*
-    Обновление источника
+    РћР±РЅРѕРІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void OpenALSource::BufferUpdate ()
@@ -449,7 +449,7 @@ void OpenALSource::BufferUpdate ()
   {
     OpenALContext& context = device.Context ();
 
-      //определение состояния проигрывания
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 
     int status = AL_STOPPED;
 
@@ -459,7 +459,7 @@ void OpenALSource::BufferUpdate ()
 
     context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
 
-      //возобновление прекращенного проигрывания / установка флага, сигнализирующего о конце проигрывания
+      //РІРѕР·РѕР±РЅРѕРІР»РµРЅРёРµ РїСЂРµРєСЂР°С‰РµРЅРЅРѕРіРѕ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ / СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР°, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰РµРіРѕ Рѕ РєРѕРЅС†Рµ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 
     if (status != AL_PLAYING)
     {
@@ -467,13 +467,13 @@ void OpenALSource::BufferUpdate ()
       else              is_playing         = false;
     }
 
-      //добавление / удаление источника в список активных, заказ буферов
+      //РґРѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° РІ СЃРїРёСЃРѕРє Р°РєС‚РёРІРЅС‹С…, Р·Р°РєР°Р· Р±СѓС„РµСЂРѕРІ
 
     if (is_playing != is_active)
     {
       if (is_playing)
         Activate ();
-      else                                      //проигрывание завершено
+      else                                      //РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРѕ
       {
         Deactivate ();
 
@@ -481,13 +481,13 @@ void OpenALSource::BufferUpdate ()
       }
     }
 
-      //обновление буферов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 
     if (sample_need_update)
     {
       sample_need_update = false;
 
-        //останавливаем проигрывание
+        //РѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 
       context.alSourceStop (al_source);
 
@@ -513,7 +513,7 @@ void OpenALSource::BufferUpdate ()
   }
 }
 
-//обновление параметров источника
+//РѕР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР°
 void OpenALSource::PropertiesUpdate ()
 {
   if (!is_playing || !source_need_update)

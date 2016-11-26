@@ -1,5 +1,5 @@
 /*
-    Вспомогательный класс, гарантирующий конструирование объекта до main в случае наличия в коде singleton::instance
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ, РіР°СЂР°РЅС‚РёСЂСѓСЋС‰РёР№ РєРѕРЅСЃС‚СЂСѓРёСЂРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґРѕ main РІ СЃР»СѓС‡Р°Рµ РЅР°Р»РёС‡РёСЏ РІ РєРѕРґРµ singleton::instance
 */
 
 namespace detail
@@ -17,7 +17,7 @@ template <class T, bool need_destroy> struct singleton_default_object_creator
 template <class T, bool need_destroy> singleton_default_object_creator<T, need_destroy> singleton_default_object_creator<T, need_destroy>::creator;
 
 /*
-    Получение экземпляра объекта
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° РѕР±СЉРµРєС‚Р°
 */
 
 template <class T, bool need_destroy> struct singleton_default_instance

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-const size_t MAX_ARGUMENTS_COUNT = 9; //максимальное количество аргументов
+const size_t MAX_ARGUMENTS_COUNT = 9; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
 void print_block_comment (const char* format,...)
 {
@@ -17,12 +17,12 @@ void print_arguments_count_comment (size_t arguments_count)
 {
   switch (arguments_count)
   {
-    case 0:  printf ("без аргументов"); break;
-    case 1:  printf ("с 1-м аргументом"); break;
+    case 0:  printf ("Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ"); break;
+    case 1:  printf ("СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј"); break;
     default:
-      if (arguments_count < 5)        printf ("с %d-мя аргументами");
-      else if (arguments_count <= 20) printf ("с %d-ю аргументами");
-      else                            printf ("с %d аргументами");
+      if (arguments_count < 5)        printf ("СЃ %d-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё");
+      else if (arguments_count <= 20) printf ("СЃ %d-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё");
+      else                            printf ("СЃ %d Р°СЂРіСѓРјРµРЅС‚Р°РјРё");
       
       break;
   }
@@ -30,11 +30,11 @@ void print_arguments_count_comment (size_t arguments_count)
 
 void generate_signature_description (size_t arguments_count,bool ellipses)
 {
-  printf ("//специализация для сигнатуры ");
+  printf ("//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ ");
   print_arguments_count_comment (arguments_count);
   
   if (ellipses)
-    printf (" и многоточием");
+    printf (" Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј");
   
   printf ("\ntemplate <");
   
@@ -75,11 +75,11 @@ void generate_signature_description (size_t arguments_count,bool ellipses)
 
 void generate_ptrfun_description (size_t arguments_count,bool ellipses,const char* modifier="")
 {
-  printf ("//специализация для указателя на функцию ");
+  printf ("//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ ");
   print_arguments_count_comment (arguments_count);
   
   if (ellipses)
-    printf (" и многоточием");
+    printf (" Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј");
 
   printf ("\ntemplate <");
   
@@ -120,11 +120,11 @@ void generate_ptrfun_description (size_t arguments_count,bool ellipses,const cha
 
 void generate_memfun_description (size_t arguments_count,bool ellipses,const char* qualifier,const char* modifier="")
 {
-  printf ("//специализация для указателя на функцию-член класса %s%sT ",qualifier,*qualifier?" ":"");
+  printf ("//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° %s%sT ",qualifier,*qualifier?" ":"");
   print_arguments_count_comment (arguments_count);
   
   if (ellipses)
-    printf (" и многоточием");
+    printf (" Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј");
 
   printf ("\ntemplate <class T,");
   
@@ -165,8 +165,8 @@ void generate_memfun_description (size_t arguments_count,bool ellipses,const cha
 
 void generate_ptrfun_descriptions (const char* modifier)
 {
-  if (*modifier) print_block_comment ("Специализации для указателей на функцию с модификатором %s",modifier);
-  else           print_block_comment ("Специализации для указателей на функцию");
+  if (*modifier) print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј %s",modifier);
+  else           print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ");
 
   for (size_t i=0;i<=MAX_ARGUMENTS_COUNT;i++)
   {
@@ -181,8 +181,8 @@ void generate_memfun_descriptions (const char* modifier)
 {
   const char* memfun_qualifiers [] = {"","const","volatile","const volatile"};
   
-  if (*modifier) print_block_comment ("Специализации для указателей на функцию-член класса с модификатором %s",modifier);
-  else           print_block_comment ("Специализации для указателей на функцию-член класса");  
+  if (*modifier) print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј %s",modifier);
+  else           print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР°");  
   
   for (size_t i=0;i<=MAX_ARGUMENTS_COUNT;i++)
   {
@@ -198,26 +198,26 @@ void generate_memfun_descriptions (const char* modifier)
 
 void generate_base_types ()
 {
-  print_block_comment ("Таблица конфигурации функционального объекта");
+  print_block_comment ("РўР°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°");
   printf ("template <class Fn> struct functional_traits\n{\n");
   printf ("  enum {\n    is_function  = false,\n    is_memfun    = false,\n    is_ptrfun    = false,\n    has_ellipses = false\n  };\n};\n\n");
   
-  print_block_comment ("Специализации для различных видов квалификаторов");
+  print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СЂР°Р·Р»РёС‡РЅС‹С… РІРёРґРѕРІ РєРІР°Р»РёС„РёРєР°С‚РѕСЂРѕРІ");
   
   printf ("template <class Fn> struct functional_traits<const Fn>:          public functional_traits<Fn> {};\n");
   printf ("template <class Fn> struct functional_traits<volatile Fn>:       public functional_traits<Fn> {};\n");
   printf ("template <class Fn> struct functional_traits<const volatile Fn>: public functional_traits<Fn> {};\n\n");
 
-  print_block_comment ("Таблицы конфигурации аргументов функции и типа возвращаемого значения");
+  print_block_comment ("РўР°Р±Р»РёС†С‹ РєРѕРЅС„РёРіСѓСЂР°С†РёРё Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё Рё С‚РёРїР° РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ");
 
-  printf ("//тип используемый в качестве индикатора отсутствия аргумента, аналогичен void\n");
+  printf ("//С‚РёРї РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РІ РєР°С‡РµСЃС‚РІРµ РёРЅРґРёРєР°С‚РѕСЂР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ Р°СЂРіСѓРјРµРЅС‚Р°, Р°РЅР°Р»РѕРіРёС‡РµРЅ void\n");
   printf ("struct void_argument {};\n\n");
   
-  printf ("//обёртка указывающая на наличие многоточия в списке аргументов функции\n");
+  printf ("//РѕР±С‘СЂС‚РєР° СѓРєР°Р·С‹РІР°СЋС‰Р°СЏ РЅР° РЅР°Р»РёС‡РёРµ РјРЅРѕРіРѕС‚РѕС‡РёСЏ РІ СЃРїРёСЃРєРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё\n");
   printf ("template <class Traits>\nstruct ellipses_functional_traits: public Traits\n{\n");      
   printf ("  enum { has_ellipses = true };\n};\n\n");
   
-  printf ("//таблица конфигурации для сигнатур на функции\n");
+  printf ("//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СЃРёРіРЅР°С‚СѓСЂ РЅР° С„СѓРЅРєС†РёРё\n");
   printf ("template <size_t ArgumentsCount, class Ret");
   
   for (size_t i=0;i<MAX_ARGUMENTS_COUNT;i++)
@@ -245,7 +245,7 @@ void generate_base_types ()
   printf ("      typedef typename mpl::at<argument_list, number-1>::type type;\n    };\n");  
   printf ("};\n\n");  
   
-  printf ("//таблица конфигурации для указателей на функции\n");
+  printf ("//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёРё\n");
   printf ("template <size_t ArgumentsCount, class Ret");
 
   for (size_t i=0;i<MAX_ARGUMENTS_COUNT;i++)
@@ -259,7 +259,7 @@ void generate_base_types ()
   printf (">\n{\n");
   printf ("  enum { is_ptrfun = true, is_function = false };\n};\n\n");
   
-  printf ("//таблица конфигурации для указателей на функции-члены\n");
+  printf ("//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёРё-С‡Р»РµРЅС‹\n");
   printf ("template <size_t ArgumentsCount, class T, class Ret");
 
   for (size_t i=0;i<MAX_ARGUMENTS_COUNT;i++)
@@ -275,7 +275,7 @@ void generate_base_types ()
 
 int main ()
 {
-  print_block_comment ("Этот код был сгенерирован автоматически. Не исправляйте его вручную");
+  print_block_comment ("Р­С‚РѕС‚ РєРѕРґ Р±С‹Р» СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. РќРµ РёСЃРїСЂР°РІР»СЏР№С‚Рµ РµРіРѕ РІСЂСѓС‡РЅСѓСЋ");
   printf              ("#ifndef XTL_FUNCTIONAL_TRAITS_HEADER\n");
   printf              ("#define XTL_FUNCTIONAL_TRAITS_HEADER\n\n");  
   printf              ("#include <cstddef>\n\n");
@@ -291,7 +291,7 @@ int main ()
   
   generate_base_types ();  
   
-  print_block_comment ("Специализации для сигнатур функций");
+  print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СЃРёРіРЅР°С‚СѓСЂ С„СѓРЅРєС†РёР№");
   
   for (size_t i=0;i<=MAX_ARGUMENTS_COUNT;i++)
   {
@@ -309,7 +309,7 @@ int main ()
 
   const char* modifiers [] = {"__fastcall","__stdcall", "__cdecl"};
   
-  print_block_comment ("Специализации для компилятора MSVC");  
+  print_block_comment ("РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РєРѕРјРїРёР»СЏС‚РѕСЂР° MSVC");  
   
   for (size_t i=0;i<sizeof (modifiers)/sizeof (*modifiers);i++)
   {

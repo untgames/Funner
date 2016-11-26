@@ -38,7 +38,7 @@ inline void push_argument (script::IStack& stack, Node& node)
 }
 
 /*
-    Взаимодействие math::angle со стеком аргументов
+    Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ math::angle СЃРѕ СЃС‚РµРєРѕРј Р°СЂРіСѓРјРµРЅС‚РѕРІ
 */
 
 namespace script
@@ -76,7 +76,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 extern const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY;
@@ -121,7 +121,7 @@ extern const char* SCENE_STATIC_MESH_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
 
 /*
-    Функции биндинга библиотек
+    Р¤СѓРЅРєС†РёРё Р±РёРЅРґРёРЅРіР° Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void bind_scene_library                           (script::Environment&);

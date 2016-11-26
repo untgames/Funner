@@ -44,7 +44,7 @@
 using namespace render::low_level;
 
 /*
-    Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ РїРѕР»СЏ РІ СЃС‚СЂСѓРєС‚СѓСЂРµ (Р°РЅР°Р»РѕРі offsetof, РєРѕРјРїРёР»РёСЂСѓРµРјС‹Р№ Р±РµР· РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№ РЅР° gcc)
 */
 
 #ifdef _MSC_VER
@@ -68,7 +68,7 @@ typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
-//протокол теста
+//РїСЂРѕС‚РѕРєРѕР» С‚РµСЃС‚Р°
 struct TestLogFilter
 {
   common::LogFilter log_filter;
@@ -84,7 +84,7 @@ struct TestLogFilter
 
 typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
 
-//тестовое приложение
+//С‚РµСЃС‚РѕРІРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ
 struct Test
 {
   typedef xtl::function<void (Test&)> CallbackFn;
@@ -98,7 +98,7 @@ struct Test
     window (syslib::WindowStyle_Overlapped, 800, 600),
     redraw (in_redraw)
   {
-    TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
+    TestLogFilterSingleton::Instance (); //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С„РёР»СЊС‚СЂР° РїСЂРѕС‚РѕРєРѕР»СЊРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 
     window.SetTitle (title);
     window.Maximize ();
@@ -195,7 +195,7 @@ struct Test
   }
 };
 
-//чтение ихсодного текста шейдера в строку
+//С‡С‚РµРЅРёРµ РёС…СЃРѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° С€РµР№РґРµСЂР° РІ СЃС‚СЂРѕРєСѓ
 stl::string read_shader (const char* file_name)
 {
   common::InputFile file (file_name);

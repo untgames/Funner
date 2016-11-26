@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации карты высот
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹ РІС‹СЃРѕС‚
 */
 
 typedef stl::vector<HeightMap::VertexDesc>             VertexArray;
@@ -11,17 +11,17 @@ typedef xtl::signal<void (HeightMap&, HeightMapEvent)> HeightMapSignal;
 
 struct HeightMap::Impl: public xtl::instance_counter<HeightMap>
 {
-  VertexArray     vertices;                     //вершины карты высот
-  size_t          rows_count;                   //количество строк
-  size_t          columns_count;                //количество столбцов
-  HeightMapSignal signals [HeightMapEvent_Num]; //сигналы
-  stl::string     material;                     //имя материала
+  VertexArray     vertices;                     //РІРµСЂС€РёРЅС‹ РєР°СЂС‚С‹ РІС‹СЃРѕС‚
+  size_t          rows_count;                   //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє
+  size_t          columns_count;                //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚РѕР»Р±С†РѕРІ
+  HeightMapSignal signals [HeightMapEvent_Num]; //СЃРёРіРЅР°Р»С‹
+  stl::string     material;                     //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
   
   Impl () : rows_count (0), columns_count (0) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 HeightMap::HeightMap ()
@@ -34,7 +34,7 @@ HeightMap::~HeightMap ()
 }
 
 /*
-    Создание карты
+    РЎРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹
 */
 
 HeightMap::Pointer HeightMap::Create ()
@@ -43,7 +43,7 @@ HeightMap::Pointer HeightMap::Create ()
 }
 
 /*
-    Размеры карты
+    Р Р°Р·РјРµСЂС‹ РєР°СЂС‚С‹
 */
 
 void HeightMap::SetRowsCount (size_t rows_count)
@@ -126,7 +126,7 @@ size_t HeightMap::ColumnsCount () const
 }
 
 /*
-    Материал
+    РњР°С‚РµСЂРёР°Р»
 */
 
 void HeightMap::SetMaterial (const char* material)
@@ -145,7 +145,7 @@ const char* HeightMap::Material () const
 }
 
 /*
-    Работа с вершинами
+    Р Р°Р±РѕС‚Р° СЃ РІРµСЂС€РёРЅР°РјРё
 */
 
 const HeightMap::VertexDesc* HeightMap::Vertices () const
@@ -177,7 +177,7 @@ HeightMap::VertexDesc& HeightMap::Vertex (size_t row, size_t column)
 }
 
 /*
-   Групповые операции
+   Р“СЂСѓРїРїРѕРІС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 void HeightMap::SetVerticesHeight (float height)
@@ -199,7 +199,7 @@ void HeightMap::SetVerticesColor (const math::vec4f& color)
 }
 
 /*
-    Оповещение об обновлении вершин
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РІРµСЂС€РёРЅ
 */
 
 void HeightMap::UpdateVerticesNotify ()
@@ -217,7 +217,7 @@ void HeightMap::UpdateVerticesNotify ()
 }
 
 /*
-    Регистрация обработчиков событий
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
 */
 
 xtl::connection HeightMap::RegisterEventHandler (HeightMapEvent event, const EventHandler& handler)
@@ -235,7 +235,7 @@ xtl::connection HeightMap::RegisterEventHandler (HeightMapEvent event, const Eve
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void HeightMap::AcceptCore (Visitor& visitor)

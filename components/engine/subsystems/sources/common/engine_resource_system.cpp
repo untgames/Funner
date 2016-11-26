@@ -11,21 +11,21 @@ namespace resource_system
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "ResourceSystem";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.ResourceSystem"; //имя компонента
+const char* SUBSYSTEM_NAME = "ResourceSystem";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.ResourceSystem"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 const char* LOG_NAME       = COMPONENT_NAME;
 
 /*
-   Подсистема управления ресурсами
+   РџРѕРґСЃРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 class ResourceSystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ResourceSystem (common::ParseNode& node)
     {
       for (Parser::NamesakeIterator iter=node.First ("Server"); iter; ++iter)
@@ -47,7 +47,7 @@ class ResourceSystem : public ISubsystem, public xtl::reference_counter
     {
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -59,13 +59,13 @@ class ResourceSystem : public ISubsystem, public xtl::reference_counter
 };
 
 /*
-   Компонент
+   РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class ResourceSystemComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     ResourceSystemComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

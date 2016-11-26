@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки картинок
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РєР°СЂС‚РёРЅРѕРє
 */
 
 void DaeParser::ParseLibraryImages (Parser::Iterator iter)
@@ -20,14 +20,14 @@ void DaeParser::ParseImage (Parser::Iterator iter)
   const char *id   = get<const char*> (*iter, "id"),
              *path = get<const char*> (iter->First ("init_from"), "#text");
 
-    //создание картинки
+    //СЃРѕР·РґР°РЅРёРµ РєР°СЂС‚РёРЅРєРё
 
   Image image;
 
   image.SetId   (id);
   image.SetPath (path);
 
-    //добавление эффекта в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ СЌС„С„РµРєС‚Р° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
   model.Images ().Insert (id, image);
 }

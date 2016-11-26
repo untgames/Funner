@@ -1,5 +1,5 @@
 /*
-    Получение dynamic_cast_root
+    РџРѕР»СѓС‡РµРЅРёРµ dynamic_cast_root
 */
 
 inline dynamic_cast_root* get_root (dynamic_cast_root& root)

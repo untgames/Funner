@@ -47,37 +47,37 @@ using namespace syslib::macosx;
 namespace
 {
 
-const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
-const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
-const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
-const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //указатель на реализацию данного окна
-const OSType BACKGROUND_COLOR_PROPERTY   = 'bgcl';  //цвет фона окна
-const OSType BACKGROUND_STATE_PROPERTY   = 'bgst';  //включен ли специальный фон окна
-//const UInt32 UNTGS_EVENT_CLASS           = 'untg';  //класс событий приложения
-//const UInt32 DELETE_WINDOW_EVENT         = 'dwnd';  //событие удаления окна
+const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //С‚РµРі РїСЂРёР»РѕР¶РµРЅРёСЏ
+const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //С‚РµРі СЃРІРѕР№СЃС‚РІР° РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕСЃС‚Рё
+const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //С‚РµРі РІРёРґРёРјРѕСЃС‚Рё РєСѓСЂСЃРѕСЂР° (РµСЃР»Рё РёСЃС‚РёРЅР° - РєСѓСЂСЃРѕСЂ РІРёРґРµРЅ)
+const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРµР°Р»РёР·Р°С†РёСЋ РґР°РЅРЅРѕРіРѕ РѕРєРЅР°
+const OSType BACKGROUND_COLOR_PROPERTY   = 'bgcl';  //С†РІРµС‚ С„РѕРЅР° РѕРєРЅР°
+const OSType BACKGROUND_STATE_PROPERTY   = 'bgst';  //РІРєР»СЋС‡РµРЅ Р»Рё СЃРїРµС†РёР°Р»СЊРЅС‹Р№ С„РѕРЅ РѕРєРЅР°
+//const UInt32 UNTGS_EVENT_CLASS           = 'untg';  //РєР»Р°СЃСЃ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+//const UInt32 DELETE_WINDOW_EVENT         = 'dwnd';  //СЃРѕР±С‹С‚РёРµ СѓРґР°Р»РµРЅРёСЏ РѕРєРЅР°
 
-const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного имени символа
+const size_t CHAR_CODE_BUFFER_SIZE = 4;  //СЂР°Р·РјРµСЂ Р±СѓС„С„РµСЂР° РґР»СЏ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅРѕРіРѕ РёРјРµРЅРё СЃРёРјРІРѕР»Р°
 
 /*
-    Описание реализации окна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 */
 
 struct WindowImpl
 {
-  void*                user_data;                               //указатель на пользовательские данные
-  WindowMessageHandler message_handler;                         //функция обработки сообщений окна
-  EventHandlerRef      carbon_window_event_handler;             //обработчик сообщений окна
-  EventHandlerUPP      carbon_window_event_handler_proc;        //обработчик сообщений окна
-  EventHandlerRef      carbon_application_event_handler;        //обработчик сообщений приложения
-  EventHandlerUPP      carbon_application_event_handler_proc;   //обработчик сообщений приложения
-  WindowRef            carbon_window;                           //окно
-  UniChar              char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
-  bool                 is_cursor_in_window;                     //находится ли курсор в окне
-  NSCursor             *cursor;                                 //курсор отображаемый над окном
+  void*                user_data;                               //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+  WindowMessageHandler message_handler;                         //С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  EventHandlerRef      carbon_window_event_handler;             //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  EventHandlerUPP      carbon_window_event_handler_proc;        //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  EventHandlerRef      carbon_application_event_handler;        //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+  EventHandlerUPP      carbon_application_event_handler_proc;   //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+  WindowRef            carbon_window;                           //РѕРєРЅРѕ
+  UniChar              char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //Р±СѓС„С„РµСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РёРјРµРЅРё РІРІРµРґРµРЅРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
+  bool                 is_cursor_in_window;                     //РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РєСѓСЂСЃРѕСЂ РІ РѕРєРЅРµ
+  NSCursor             *cursor;                                 //РєСѓСЂСЃРѕСЂ РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹Р№ РЅР°Рґ РѕРєРЅРѕРј
   WindowGroupRef       window_group;
-  bool                 is_maximized;                            //окно находится в полноэкранном режиме
-  bool                 is_multitouch_enabled;                   //включен ли multitouch
-  bool                 collapsed_by_user;                       //было ли окно свернуто пользователем
+  bool                 is_maximized;                            //РѕРєРЅРѕ РЅР°С…РѕРґРёС‚СЃСЏ РІ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРј СЂРµР¶РёРјРµ
+  bool                 is_multitouch_enabled;                   //РІРєР»СЋС‡РµРЅ Р»Рё multitouch
+  bool                 collapsed_by_user;                       //Р±С‹Р»Рѕ Р»Рё РѕРєРЅРѕ СЃРІРµСЂРЅСѓС‚Рѕ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј
 
   WindowImpl (WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -109,7 +109,7 @@ struct WindowImpl
     if (carbon_application_event_handler_proc)
       DisposeEventHandlerUPP (carbon_application_event_handler_proc);
 
-    if (carbon_window) //удаление окна по таймеру, так как если удалить окно во время деактивации к нему идет обращение со стороны системы
+    if (carbon_window) //СѓРґР°Р»РµРЅРёРµ РѕРєРЅР° РїРѕ С‚Р°Р№РјРµСЂСѓ, С‚Р°Рє РєР°Рє РµСЃР»Рё СѓРґР°Р»РёС‚СЊ РѕРєРЅРѕ РІРѕ РІСЂРµРјСЏ РґРµР°РєС‚РёРІР°С†РёРё Рє РЅРµРјСѓ РёРґРµС‚ РѕР±СЂР°С‰РµРЅРёРµ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ СЃРёСЃС‚РµРјС‹
     {
       WindowDisposer *disposer = [[WindowDisposer alloc] initWithCarbonWindow:carbon_window];
 
@@ -136,7 +136,7 @@ struct WindowImpl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
@@ -163,7 +163,7 @@ bool check_fullscreen (WindowRef window)
 }
 
 /*
-    Получение / установка области окна
+    РџРѕР»СѓС‡РµРЅРёРµ / СѓСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°
 */
 
 void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const char* source)
@@ -173,7 +173,7 @@ void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const
   check_window_manager_error (GetWindowBounds (wnd, region, &window_rect), source,
                               "Can't get window rect, ::GetWindowBounds error");
 
-  if (check_fullscreen (wnd))  //в полноэкранном режиме окно имеет смещенные координаты, хотя и отображается правильно
+  if (check_fullscreen (wnd))  //РІ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРј СЂРµР¶РёРјРµ РѕРєРЅРѕ РёРјРµРµС‚ СЃРјРµС‰РµРЅРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹, С…РѕС‚СЏ Рё РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РїСЂР°РІРёР»СЊРЅРѕ
   {
     rect.top    = 0;
     rect.left   = 0;
@@ -198,7 +198,7 @@ void set_rect (WindowRef wnd, WindowRegionCode region, const syslib::Rect& rect,
 }
 
 /*
-   Возвращает истину, если курсор находится в клиентской области окна.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РёСЃС‚РёРЅСѓ, РµСЃР»Рё РєСѓСЂСЃРѕСЂ РЅР°С…РѕРґРёС‚СЃСЏ РІ РєР»РёРµРЅС‚СЃРєРѕР№ РѕР±Р»Р°СЃС‚Рё РѕРєРЅР°.
 */
 
 bool is_cursor_in_client_region (WindowRef wnd)
@@ -218,7 +218,7 @@ bool is_cursor_in_client_region (WindowRef wnd)
 }
 
 /*
-    Маски кнопок мыши
+    РњР°СЃРєРё РєРЅРѕРїРѕРє РјС‹С€Рё
 */
 
 enum MouseKey
@@ -229,7 +229,7 @@ enum MouseKey
 };
 
 /*
-    Получение контекста события
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
 */
 
 void GetEventContext (WindowRef wnd, WindowEventContext& context)
@@ -253,7 +253,7 @@ void GetEventContext (WindowRef wnd, WindowEventContext& context)
 }
 
 /*
-    Преобразование виртуальных кодов клавиш в syslib::Key
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРёСЂС‚СѓР°Р»СЊРЅС‹С… РєРѕРґРѕРІ РєР»Р°РІРёС€ РІ syslib::Key
 */
 
 Key VirtualKey2SystemKey (size_t vkey)
@@ -301,7 +301,7 @@ Key VirtualKey2SystemKey (size_t vkey)
 }
 
 /*
-    Обработка событий окна
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 */
 
 OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, EventRef event, void* impl)
@@ -315,7 +315,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
   try
   {
-    //получение контекста события
+    //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
 
     WindowEventContext context;
 
@@ -370,10 +370,10 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
           case kEventWindowExpanded:
             window_impl->collapsed_by_user = false;
             break;
-          case kEventWindowClose: //попытка закрытия окна
+          case kEventWindowClose: //РїРѕРїС‹С‚РєР° Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
             window_impl->Notify (window_handle, WindowEvent_OnClose, context);
             break;
-          case kEventWindowDispose: //окно закрыто
+          case kEventWindowDispose: //РѕРєРЅРѕ Р·Р°РєСЂС‹С‚Рѕ
           {
 /*            EventRef delete_window_event = 0;
 
@@ -403,10 +403,10 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
             break;
           }
-          case kEventWindowDrawContent: //перерисовка окна
+          case kEventWindowDrawContent: //РїРµСЂРµСЂРёСЃРѕРІРєР° РѕРєРЅР°
             window_impl->Notify (window_handle, WindowEvent_OnPaint, context);
             break;
-          case kEventWindowActivated: //окно стало активным
+          case kEventWindowActivated: //РѕРєРЅРѕ СЃС‚Р°Р»Рѕ Р°РєС‚РёРІРЅС‹Рј
             if (window_impl->is_maximized)
               check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
 
@@ -421,21 +421,21 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
             window_impl->Notify (window_handle, WindowEvent_OnActivate, context);
             break;
-          case kEventWindowDeactivated: //окно стало неактивным
+          case kEventWindowDeactivated: //РѕРєРЅРѕ СЃС‚Р°Р»Рѕ РЅРµР°РєС‚РёРІРЅС‹Рј
             if (window_impl->is_maximized)
               check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
 
             window_impl->Notify (window_handle, WindowEvent_OnDeactivate, context);
             break;
-          case kEventWindowShown: //окно стало видимым
+          case kEventWindowShown: //РѕРєРЅРѕ СЃС‚Р°Р»Рѕ РІРёРґРёРјС‹Рј
             window_impl->is_cursor_in_window = is_cursor_in_client_region (wnd);
             window_impl->Notify (window_handle, WindowEvent_OnShow, context);
             break;
-          case kEventWindowHidden: //окно стало невидимым
+          case kEventWindowHidden: //РѕРєРЅРѕ СЃС‚Р°Р»Рѕ РЅРµРІРёРґРёРјС‹Рј
             window_impl->is_cursor_in_window = false;
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
-          case kEventWindowBoundsChanged: //окно изменило размеры или положение
+          case kEventWindowBoundsChanged: //РѕРєРЅРѕ РёР·РјРµРЅРёР»Рѕ СЂР°Р·РјРµСЂС‹ РёР»Рё РїРѕР»РѕР¶РµРЅРёРµ
             CarbonWindowManager::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
@@ -443,12 +443,12 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 #ifdef MACOSX_10_5_SUPPORTED
           case kEventWindowFocusRestored:
 #endif
-          case kEventWindowFocusAcquired: //окно получило фокус
+          case kEventWindowFocusAcquired: //РѕРєРЅРѕ РїРѕР»СѓС‡РёР»Рѕ С„РѕРєСѓСЃ
             window_impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
             break;
           case kEventWindowFocusRelinquish:
 #ifdef MACOSX_10_5_SUPPORTED
-          case kEventWindowFocusLost:       //окно потеряло фокус
+          case kEventWindowFocusLost:       //РѕРєРЅРѕ РїРѕС‚РµСЂСЏР»Рѕ С„РѕРєСѓСЃ
 #endif
             window_impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
             break;
@@ -469,7 +469,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
         switch (event_kind)
         {
-          case kEventRawKeyDown: //нажатие клавиши клавиатуры
+          case kEventRawKeyDown: //РЅР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё РєР»Р°РІРёР°С‚СѓСЂС‹
           {
             UInt32 key_modifiers = GetCurrentEventKeyModifiers ();
 
@@ -498,10 +498,10 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
             break;
           }
-          case kEventRawKeyRepeat: //удержание клавиши клавиатуры
+          case kEventRawKeyRepeat: //СѓРґРµСЂР¶Р°РЅРёРµ РєР»Р°РІРёС€Рё РєР»Р°РІРёР°С‚СѓСЂС‹
             window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
             break;
-          case kEventRawKeyUp: //отжатие клавиши клавиатуры
+          case kEventRawKeyUp: //РѕС‚Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё РєР»Р°РІРёР°С‚СѓСЂС‹
             window_impl->Notify (window_handle, WindowEvent_OnKeyUp, context);
             break;
           default:
@@ -518,7 +518,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
         switch (event_kind)
         {
-          case kEventMouseDown: //нажатие клавиши мыши
+          case kEventMouseDown: //РЅР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё РјС‹С€Рё
           {
             if (!mouse_in_client_rect)
               break;
@@ -557,7 +557,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
             break;
           }
-          case kEventMouseUp: //отжатие клавиши мыши
+          case kEventMouseUp: //РѕС‚Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё РјС‹С€Рё
           {
             if (!mouse_in_client_rect)
               break;
@@ -583,11 +583,11 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             break;
           }
           case kEventMouseDragged:
-          case kEventMouseMoved: //перемещение мыши
+          case kEventMouseMoved: //РїРµСЂРµРјРµС‰РµРЅРёРµ РјС‹С€Рё
             if (!mouse_in_client_rect)
               break;
 
-            if (!CarbonWindowManager::GetCursorVisible (window_handle) && CGCursorIsVisible ()) //если курсор невидим - прячем его при входе в окно
+            if (!CarbonWindowManager::GetCursorVisible (window_handle) && CGCursorIsVisible ()) //РµСЃР»Рё РєСѓСЂСЃРѕСЂ РЅРµРІРёРґРёРј - РїСЂСЏС‡РµРј РµРіРѕ РїСЂРё РІС…РѕРґРµ РІ РѕРєРЅРѕ
               check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
             else
               [window_impl->cursor set];
@@ -597,7 +597,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnMouseMove, context);
 
             break;
-          case kEventMouseWheelMoved: //изменение положения колеса мыши
+          case kEventMouseWheelMoved: //РёР·РјРµРЅРµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ РєРѕР»РµСЃР° РјС‹С€Рё
           {
             EventMouseWheelAxis moved_axis;
 
@@ -664,7 +664,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 }
 
 /*
-    Обработка событий приложения
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref, EventRef event, void* impl)
@@ -695,14 +695,14 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
 
         break;*/
       case kEventClassMouse:
-        if (window_impl->is_cursor_in_window)  //обработка выхода мышки за пределы окна
+        if (window_impl->is_cursor_in_window)  //РѕР±СЂР°Р±РѕС‚РєР° РІС‹С…РѕРґР° РјС‹С€РєРё Р·Р° РїСЂРµРґРµР»С‹ РѕРєРЅР°
         {
           switch (event_kind)
           {
             case kEventMouseMoved:
             case kEventMouseDragged:
             {
-              //получение контекста события
+              //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
 
               WindowEventContext context;
 
@@ -715,7 +715,7 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
                 window_impl->is_cursor_in_window = false;
                 window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
 
-                if (!CarbonWindowManager::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
+                if (!CarbonWindowManager::GetCursorVisible (window_handle)) //РµСЃР»Рё РєСѓСЂСЃРѕСЂ РЅРµРІРёРґРёРј - РїРѕРєР°Р·С‹РІР°РµРј РµРіРѕ РїСЂРё РІС‹С…РѕРґРµ РёР· РѕРєРЅР°
                   while (!CGCursorIsVisible ())
                     CGDisplayShowCursor (kCGDirectMainDisplay);
 
@@ -791,7 +791,7 @@ UInt32 get_window_attributes (WindowStyle style)
 
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
@@ -805,7 +805,7 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
 
     try
     {
-        //Создание окна
+        //РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
 
       WindowRef new_window;
 
@@ -825,7 +825,7 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
 
       RepositionWindow (new_window, 0, kWindowCenterOnMainScreen);
 
-        //Установка обработчика событий окна
+        //РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 
       EventHandlerRef window_event_handler;
 
@@ -866,7 +866,7 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
       window_impl->carbon_window_event_handler = window_event_handler;
       window_impl->carbon_window_event_handler_proc = window_event_handler_proc;
 
-        //Установка обработчика событий приложения (для обработки событий мыши в полноэкранном режиме)
+        //РЈСЃС‚Р°РЅРѕРІРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ (РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РјС‹С€Рё РІ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРј СЂРµР¶РёРјРµ)
 
       EventHandlerRef application_event_handler;
 
@@ -984,7 +984,7 @@ void CarbonWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-   Попытка изменения стиля окна (может быть проигнорирована)
+   РџРѕРїС‹С‚РєР° РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ РѕРєРЅР° (РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСЂРѕРёРіРЅРѕСЂРёСЂРѕРІР°РЅР°)
 */
 
 bool CarbonWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
@@ -1010,7 +1010,7 @@ bool CarbonWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* CarbonWindowManager::GetNativeWindowHandle (window_t handle)
@@ -1024,7 +1024,7 @@ const void* CarbonWindowManager::GetNativeDisplayHandle (window_t)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void CarbonWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
@@ -1099,7 +1099,7 @@ void CarbonWindowManager::GetWindowTitle (window_t handle, size_t buffer_size_in
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void CarbonWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -1128,7 +1128,7 @@ void CarbonWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -1139,13 +1139,13 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
   {
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
         state ? ShowWindow (wnd) : HideWindow (wnd);
         break;
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         check_window_manager_error (ActivateWindow (wnd, state), "::ActivateWindow", "Can't activate/deactivate window");
         break;
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
         check_window_manager_error (SetUserFocusWindow (state ? wnd : kUserFocusAuto), "::SetUserFocusWindow", "Can't set focus window");
         break;
       case WindowFlag_Maximized:
@@ -1243,7 +1243,7 @@ bool CarbonWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void CarbonWindowManager::SetParentWindowHandle (window_t child, const void* parent)
@@ -1287,7 +1287,7 @@ const void* CarbonWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void CarbonWindowManager::InvalidateWindow (window_t handle)
@@ -1308,7 +1308,7 @@ void CarbonWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 void CarbonWindowManager::SetCursorPosition (const Point& position)
@@ -1394,7 +1394,7 @@ syslib::Point CarbonWindowManager::GetCursorPosition (window_t handle)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 void CarbonWindowManager::SetCursorVisible (window_t handle, bool state)
@@ -1436,7 +1436,7 @@ bool CarbonWindowManager::GetCursorVisible (window_t handle)
 }
 
 /*
-    Изображение курсора
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 cursor_t CarbonWindowManager::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
@@ -1533,7 +1533,7 @@ void CarbonWindowManager::SetCursor (window_t handle, cursor_t cursor)
 }
 
 /*
-   Установка/получение multitouch режима
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ multitouch СЂРµР¶РёРјР°
 */
 
 void CarbonWindowManager::SetMultitouchEnabled (window_t handle, bool state)
@@ -1563,7 +1563,7 @@ bool CarbonWindowManager::IsMultitouchEnabled (window_t handle)
 }
 
 /*
-   Цвет фона
+   Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void CarbonWindowManager::SetBackgroundColor (window_t handle, const Color& color)

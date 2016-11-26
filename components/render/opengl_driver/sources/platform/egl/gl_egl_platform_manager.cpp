@@ -8,36 +8,36 @@ namespace
 {
 
 /*
-    Реализация менеджера платформы EGL
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїР»Р°С‚С„РѕСЂРјС‹ EGL
 */
 
 class PlatformManagerImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     PlatformManagerImpl ()
       : adapter (new Adapter, false)
     {
     }
 
-///Создание адаптера
+///РЎРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
     IAdapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
       throw xtl::format_not_supported_exception ("render::low_level::opengl::egl::PlatformManagerImpl::CreateAdapter", "Custom adapters not supported");
     }
 
-///Перечисление адаптеров по умолчанию
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ Р°РґР°РїС‚РµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
       handler (adapter.get ());
     }
 
-///Создание цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     ISwapChain* CreateSwapChain (size_t adapters_count, IAdapter** adapters, const SwapChainDesc& desc)
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (adapters_count && !adapters)
           throw xtl::make_null_argument_exception ("", "adapters");
@@ -52,7 +52,7 @@ class PlatformManagerImpl
 
         log.Printf ("Create primary swap chain...");
 
-          //создание цепочки обмена
+          //СЃРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
         return new PrimarySwapChain (adapter, desc);
       }
@@ -63,13 +63,13 @@ class PlatformManagerImpl
       }      
     }
 
-///Создание внеэкранного буфера
+///РЎРѕР·РґР°РЅРёРµ РІРЅРµСЌРєСЂР°РЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc* pbuffer_desc)
     {
       throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PlatformManagerImpl::CreatePBuffer");
     }
 
-///Создание контекста
+///РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     render::low_level::opengl::IContext* CreateContext (ISwapChain* swap_chain)
     {
       try
@@ -87,8 +87,8 @@ class PlatformManagerImpl
     typedef xtl::com_ptr<Adapter> AdapterPtr;
     
   private:
-    Log        log;      //протокол драйвера отрисовки
-    AdapterPtr adapter;  //адаптер по умолчанию
+    Log        log;      //РїСЂРѕС‚РѕРєРѕР» РґСЂР°Р№РІРµСЂР° РѕС‚СЂРёСЃРѕРІРєРё
+    AdapterPtr adapter;  //Р°РґР°РїС‚РµСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
@@ -96,7 +96,7 @@ typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
 }
 
 /*
-    Обёртки над менеджером платформы
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РјРµРЅРµРґР¶РµСЂРѕРј РїР»Р°С‚С„РѕСЂРјС‹
 */
 
 IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path, const char* init_string)

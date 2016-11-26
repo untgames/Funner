@@ -3,7 +3,7 @@
 using namespace media::collada;
 
 /*
-    Вспомогательные структуры данных
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹ РґР°РЅРЅС‹С…
 */
 
 namespace media
@@ -13,7 +13,7 @@ namespace collada
 {
 
 /*
-    Класс для безопасного чтения NaN
+    РљР»Р°СЃСЃ РґР»СЏ Р±РµР·РѕРїР°СЃРЅРѕРіРѕ С‡С‚РµРЅРёСЏ NaN
 */
 
 #ifdef _MSC_VER
@@ -57,31 +57,31 @@ bool read (xtl::io::token_iterator<const char*>& iter, safe_float& result_value)
 typedef stl::vector<float> FloatBuffer;
 
 /*
-    Источник данных меша
+    РСЃС‚РѕС‡РЅРёРє РґР°РЅРЅС‹С… РјРµС€Р°
 */
 
 struct MeshSource
 {
-  FloatBuffer  data;   //данные
-  stl::string  params; //параметры
-  unsigned int count;  //количество элементов
-  unsigned int stride; //шаг
+  FloatBuffer  data;   //РґР°РЅРЅС‹Рµ
+  stl::string  params; //РїР°СЂР°РјРµС‚СЂС‹
+  unsigned int count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
+  unsigned int stride; //С€Р°Рі
 };
 
 /*
-    Карта отображения имени источника в указатель на него
+    РљР°СЂС‚Р° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРјРµРЅРё РёСЃС‚РѕС‡РЅРёРєР° РІ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅРµРіРѕ
 */
 
 class MeshSourceMap
 {
   public:
-///Создание источника данных меша
+///РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° РґР°РЅРЅС‹С… РјРµС€Р°
     MeshSource* Create (const char* name) { return &sources [name]; }
 
-///Удаление источника данных меша
+///РЈРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° РґР°РЅРЅС‹С… РјРµС€Р°
     void Remove (const char* name) { sources.erase (name); }
     
-///Поиск источника данных меша
+///РџРѕРёСЃРє РёСЃС‚РѕС‡РЅРёРєР° РґР°РЅРЅС‹С… РјРµС€Р°
     MeshSource* Find (const char* name)
     {
       Sources::iterator iter = sources.find (name);
@@ -99,21 +99,21 @@ class MeshSourceMap
 };
 
 /*
-    Канал данных меша
+    РљР°РЅР°Р» РґР°РЅРЅС‹С… РјРµС€Р°
 */
 
 struct MeshInput
 {
-  ParseNode    node;   //узел дерева разбора
-  MeshSource*  source; //источник данных
-  unsigned int offset; //смещение в массиве индексов
+  ParseNode    node;   //СѓР·РµР» РґРµСЂРµРІР° СЂР°Р·Р±РѕСЂР°
+  MeshSource*  source; //РёСЃС‚РѕС‡РЅРёРє РґР°РЅРЅС‹С…
+  unsigned int offset; //СЃРјРµС‰РµРЅРёРµ РІ РјР°СЃСЃРёРІРµ РёРЅРґРµРєСЃРѕРІ
 
   MeshInput (const ParseNode& in_node, MeshSource* in_source, unsigned int in_offset) :
     node (in_node), source (in_source), offset (in_offset) {}
 };
 
 /*
-    Класс, создающий каналы данных меша
+    РљР»Р°СЃСЃ, СЃРѕР·РґР°СЋС‰РёР№ РєР°РЅР°Р»С‹ РґР°РЅРЅС‹С… РјРµС€Р°
 */
 
 class MeshInputBuilder
@@ -125,7 +125,7 @@ class MeshInputBuilder
   };
   
   public:   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MeshInputBuilder ()
       : max_offset (0)
     {       
@@ -133,14 +133,14 @@ class MeshInputBuilder
       sets.reserve (DEFAULT_SETS_RESERVE);
     }
     
-///Добавление канала данных меша
+///Р”РѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»Р° РґР°РЅРЅС‹С… РјРµС€Р°
     bool AddChannel (const char* semantic, unsigned int set, const ParseNode& node, MeshSource* source, unsigned int offset)
     {
       size_t                 hash = strhash (semantic, set);
       MeshInputMap::iterator iter = input_map.find (hash);
 
       if (iter != input_map.end ())
-        return false; //этот канал уже был зарегистрирован
+        return false; //СЌС‚РѕС‚ РєР°РЅР°Р» СѓР¶Рµ Р±С‹Р» Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ
 
       inputs.push_back (MeshInput (node, source, offset));
 
@@ -162,7 +162,7 @@ class MeshInputBuilder
       }      
     }
     
-///Поиск канала
+///РџРѕРёСЃРє РєР°РЅР°Р»Р°
     const MeshInput* FindChannel (const char* semantic, unsigned int set=0)
     {
       size_t                 hash = strhash (semantic, set);
@@ -171,16 +171,16 @@ class MeshInputBuilder
       return iter != input_map.end () ? &inputs [iter->second] : 0;
     }
     
-///Получение количества каналов данных
+///РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РєР°РЅР°Р»РѕРІ РґР°РЅРЅС‹С…
     unsigned int GetChannelsCount  () const { return (unsigned int)inputs.size (); }
     
-///Количество подмножеств
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРјРЅРѕР¶РµСЃС‚РІ
     unsigned int GetSetsCount () const { return (unsigned int)sets.size (); }
     
-///Максимальное смещение канала
+///РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РєР°РЅР°Р»Р°
     unsigned int GetMaxOffset () const { return max_offset; }
 
-///Получение значения подмножества
+///РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґРјРЅРѕР¶РµСЃС‚РІР°
     unsigned int GetSetValue (unsigned int index) const { return sets [index]; }
 
   private:
@@ -206,7 +206,7 @@ class MeshInputBuilder
 };
 
 /*
-    Вершинный буфер меша
+    Р’РµСЂС€РёРЅРЅС‹Р№ Р±СѓС„РµСЂ РјРµС€Р°
 */
 
 struct VertexKey
@@ -228,7 +228,7 @@ size_t hash (const VertexKey& key)
 class MeshVertexBuffer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MeshVertexBuffer (unsigned int in_inputs_count, unsigned int reserve_vertices_count)
     {
       inputs_count = in_inputs_count;
@@ -236,19 +236,19 @@ class MeshVertexBuffer
       vertices.reserve (reserve_vertices_count);
     }
     
-///Добавление вершины
+///Р”РѕР±Р°РІР»РµРЅРёРµ РІРµСЂС€РёРЅС‹
     unsigned int AddVertex (unsigned int* inputs)
     {
       VertexKey key (inputs, inputs_count);
       
-        //проверка: существует ли такая вершина в буфере вершин
+        //РїСЂРѕРІРµСЂРєР°: СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё С‚Р°РєР°СЏ РІРµСЂС€РёРЅР° РІ Р±СѓС„РµСЂРµ РІРµСЂС€РёРЅ
 
       VertexBufferMap::iterator search_iter = vertices_map.find (key);
 
       if (search_iter != vertices_map.end ())
         return search_iter->second;
 
-        //если вершины нет в буфере - добавление её в буфер вершин и карту вершин
+        //РµСЃР»Рё РІРµСЂС€РёРЅС‹ РЅРµС‚ РІ Р±СѓС„РµСЂРµ - РґРѕР±Р°РІР»РµРЅРёРµ РµС‘ РІ Р±СѓС„РµСЂ РІРµСЂС€РёРЅ Рё РєР°СЂС‚Сѓ РІРµСЂС€РёРЅ
 
       unsigned int vertex_index = (unsigned int)vertices.size ();
 
@@ -267,10 +267,10 @@ class MeshVertexBuffer
       }      
     }
     
-///Количество вершин в буфере
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ Р±СѓС„РµСЂРµ
     unsigned int GetVerticesCount () const { return (unsigned int)vertices.size (); }
     
-///Получение массива вершин
+///РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° РІРµСЂС€РёРЅ
     unsigned int** GetVertices () { return &vertices [0]; }
 
   private:
@@ -283,7 +283,7 @@ class MeshVertexBuffer
 };
 
 /*
-    Информация для создания поверхности
+    РРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 struct SurfaceInfo
@@ -295,13 +295,13 @@ struct SurfaceInfo
 };
 
 /*
-    Класс упрощающий чтение каналов вершинных данных
+    РљР»Р°СЃСЃ СѓРїСЂРѕС‰Р°СЋС‰РёР№ С‡С‚РµРЅРёРµ РєР°РЅР°Р»РѕРІ РІРµСЂС€РёРЅРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 class VertexStreamReader
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     VertexStreamReader (const ParseNode&  in_surface_node,
                         MeshInputBuilder& in_inputs,
                         MeshVertexBuffer& in_vertex_buffer)
@@ -309,21 +309,21 @@ class VertexStreamReader
          inputs (in_inputs),
          vertex_buffer (in_vertex_buffer) {}
 
-///Чтение канала данных в поле, определеяемое указателем на член-класса
+///Р§С‚РµРЅРёРµ РєР°РЅР°Р»Р° РґР°РЅРЅС‹С… РІ РїРѕР»Рµ, РѕРїСЂРµРґРµР»РµСЏРµРјРѕРµ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С‡Р»РµРЅ-РєР»Р°СЃСЃР°
     template <class T, class Field>
     void Read (const char* semantic, unsigned int set, const char* params, T* buffer, Field T::* field)
     {
       ReadCore (semantic, set, params, buffer, field_selector<T, Field> (field));
     }
 
-///Непосредственное чтение канала данных
+///РќРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕРµ С‡С‚РµРЅРёРµ РєР°РЅР°Р»Р° РґР°РЅРЅС‹С…
     template <class T>
     void Read (const char* semantic, unsigned int set, const char* params, T* buffer)
     {
       ReadCore (semantic, set, params, buffer, identity_selector ());
     }    
     
-///Чтение массива индексов вершин
+///Р§С‚РµРЅРёРµ РјР°СЃСЃРёРІР° РёРЅРґРµРєСЃРѕРІ РІРµСЂС€РёРЅ
     void ReadVertexIndices (unsigned int* buffer)
     {
       const MeshInput* input = inputs.FindChannel ("VERTEX");
@@ -352,7 +352,7 @@ class VertexStreamReader
     }
     
   private:
-///Функтор возвращающий член класса
+///Р¤СѓРЅРєС‚РѕСЂ РІРѕР·РІСЂР°С‰Р°СЋС‰РёР№ С‡Р»РµРЅ РєР»Р°СЃСЃР°
     template <class T, class Field> struct field_selector
     {
       field_selector (Field T::* in_field) : field (in_field) {}
@@ -362,13 +362,13 @@ class VertexStreamReader
       Field T::* field;
     };
     
-///Функтор возвращающий сам элемент
+///Р¤СѓРЅРєС‚РѕСЂ РІРѕР·РІСЂР°С‰Р°СЋС‰РёР№ СЃР°Рј СЌР»РµРјРµРЅС‚
     struct identity_selector
     {
       template <class T> T& operator () (T& object) const { return object; }
     };
   
-      //чтение канала данных
+      //С‡С‚РµРЅРёРµ РєР°РЅР°Р»Р° РґР°РЅРЅС‹С…
     template <class T, class Fn>  
     void ReadCore (const char* semantic, unsigned int set, const char* params, T* buffer, Fn fn)
     {
@@ -405,7 +405,7 @@ class VertexStreamReader
     }  
     
   private:
-///Чтение вектора
+///Р§С‚РµРЅРёРµ РІРµРєС‚РѕСЂР°
     template <unsigned int N>
     void SetField (const float* src, math::vector<float, N>& res)
     {
@@ -424,7 +424,7 @@ class VertexStreamReader
 }
 
 /*
-    Разбор меша
+    Р Р°Р·Р±РѕСЂ РјРµС€Р°
 */
 
 void DaeParser::ParseMesh (Parser::Iterator iter, Mesh& mesh)
@@ -435,13 +435,13 @@ void DaeParser::ParseMesh (Parser::Iterator iter, Mesh& mesh)
   if (!iter->First ("vertices.input"))
     raise_parser_exception (*iter, "Incorrect vertices information, 'input' URL not found");
 
-    //чтение источников данных
+    //С‡С‚РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ РґР°РЅРЅС‹С…
 
   MeshSourceMap sources;
 
   for_each_child (*iter, "source", bind (&DaeParser::ParseMeshSource, this, _1, ref (sources)));
 
-    //чтение поверхностей
+    //С‡С‚РµРЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 
   for_each_child (*iter, "polygons",  bind (&DaeParser::ParsePolygonSurface, this, _1));
   for_each_child (*iter, "polylist",  bind (&DaeParser::ParsePolygonSurface, this, _1));
@@ -453,7 +453,7 @@ void DaeParser::ParseMesh (Parser::Iterator iter, Mesh& mesh)
 }
 
 /*
-    Разбор источника
+    Р Р°Р·Р±РѕСЂ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
@@ -500,7 +500,7 @@ void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
 }
 
 /*
-    Разбор поверхностей
+    Р Р°Р·Р±РѕСЂ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 */
 
 void DaeParser::ParsePolygonSurface (Parser::Iterator iter)
@@ -520,21 +520,21 @@ void DaeParser::ParseSurface
   surface_info.mesh           = &mesh;
   surface_info.primitive_type = primitive_type;
   
-    //получение имени материала
+    //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
     
   surface_info.material_name = get<const char*> (*iter, "material");
 
-    //загрузка каналов данных поверхности
+    //Р·Р°РіСЂСѓР·РєР° РєР°РЅР°Р»РѕРІ РґР°РЅРЅС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
   for_each_child (*iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, mesh_iter, ref (sources), ref (surface_info.inputs)));
   
-    //загрузка буферов поверхности
+    //Р·Р°РіСЂСѓР·РєР° Р±СѓС„РµСЂРѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
   for_each_child (*iter, "p", bind (&DaeParser::ParseSurfaceBuffers, this, _1, iter, ref (surface_info)));
 }
 
 /*
-    Разбор входных каналов данных поверхности
+    Р Р°Р·Р±РѕСЂ РІС…РѕРґРЅС‹С… РєР°РЅР°Р»РѕРІ РґР°РЅРЅС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 void DaeParser::ParseSurfaceInput
@@ -548,7 +548,7 @@ void DaeParser::ParseSurfaceInput
 
   unsigned int offset = get<unsigned int> (*iter, "offset");
 
-  source_name++; //избавляемся от префиксного '#'
+  source_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
 
   MeshSource* source = 0;
 
@@ -559,7 +559,7 @@ void DaeParser::ParseSurfaceInput
     if (!source)
       raise_parser_exception (*iter, "No 'source' tag with id='%s' referenced in surface input node", source_name);
   }
-  else //добавление канала вершин
+  else //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»Р° РІРµСЂС€РёРЅ
   {
     for (Parser::NamesakeIterator verts_iter=mesh_iter->First ("vertices"); verts_iter; ++verts_iter)
     {
@@ -573,7 +573,7 @@ void DaeParser::ParseSurfaceInput
         if (::strcmp (semantic, "POSITION"))
           raise_parser_exception (*verts_iter, "Wrong semantic '%s' in vertices input node. Must be 'POSITION'", semantic);
 
-        source_name++; //избавляемся от префиксного '#'
+        source_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
         
         source = sources.Find (source_name);
 
@@ -586,7 +586,7 @@ void DaeParser::ParseSurfaceInput
       raise_parser_exception (*iter, "No 'vertices' tag with id='%s' referenced in input surface node", source_name);
   }
   
-    //регистрация канала данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєР°РЅР°Р»Р° РґР°РЅРЅС‹С…
 
   unsigned int set = get<unsigned int> (*iter, "set", 0);
     
@@ -595,17 +595,17 @@ void DaeParser::ParseSurfaceInput
 }
 
 /*
-    Построение буферов поверхности
-      Данная функция строит вершинный и индексный буферы поверхности на основе входных каналов данных
+    РџРѕСЃС‚СЂРѕРµРЅРёРµ Р±СѓС„РµСЂРѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
+      Р”Р°РЅРЅР°СЏ С„СѓРЅРєС†РёСЏ СЃС‚СЂРѕРёС‚ РІРµСЂС€РёРЅРЅС‹Р№ Рё РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂС‹ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РЅР° РѕСЃРЅРѕРІРµ РІС…РѕРґРЅС‹С… РєР°РЅР°Р»РѕРІ РґР°РЅРЅС‹С…
 */
 
 void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator surface_iter, SurfaceInfo& surface_info)
 {  
-    //получение количества индексов
+    //РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РёРЅРґРµРєСЃРѕРІ
 
   unsigned int indices_count = get<unsigned int> (*surface_iter, "count");
 
-    //преобразование количества индексов
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РёРЅРґРµРєСЃРѕРІ
 
   switch (surface_info.primitive_type)
   {
@@ -626,7 +626,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
       raise_parser_exception (*surface_iter, "Internal error: invalid primitive_type=%d", surface_info.primitive_type);
   }  
 
-    //чтение исходного буфера индексов
+    //С‡С‚РµРЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР° РёРЅРґРµРєСЃРѕРІ
 
   typedef stl::vector<unsigned int> IndexBuffer;
 
@@ -639,12 +639,12 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
   read (*p_iter, "#text", &input_indices [0], input_indices_count);
 
-    //построение исходного вершинного буфера (каждый элемент - указатель на массив индексов во входных каналах данных)
-    //резервирование максимально возможного размера буфера вершин и буфера индексов
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР° (РєР°Р¶РґС‹Р№ СЌР»РµРјРµРЅС‚ - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РёРЅРґРµРєСЃРѕРІ РІРѕ РІС…РѕРґРЅС‹С… РєР°РЅР°Р»Р°С… РґР°РЅРЅС‹С…)
+    //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° РІРµСЂС€РёРЅ Рё Р±СѓС„РµСЂР° РёРЅРґРµРєСЃРѕРІ
 
   MeshVertexBuffer vertex_buffer (inputs_count, input_indices_count);
 
-    //построение результирующего буфера индексов и исходный буфер вершин
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР° РёРЅРґРµРєСЃРѕРІ Рё РёСЃС…РѕРґРЅС‹Р№ Р±СѓС„РµСЂ РІРµСЂС€РёРЅ
 
   IndexBuffer output_indices;
   
@@ -658,30 +658,30 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     *index = vertex_buffer.AddVertex (&*index_iter);
   }  
 
-    //создание поверхности
+    //СЃРѕР·РґР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     
   Surface surface (surface_info.primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
   
-    //установка имени материала
+    //СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
 
   surface.SetMaterial (surface_info.material_name);
 
-    //копирование буфера индексов
+    //РєРѕРїРёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂР° РёРЅРґРµРєСЃРѕРІ
 
   stl::copy (output_indices.begin (), output_indices.end (), surface.Indices ());
 
-    //создание объекта, читающего каналы вершинных данных
+    //СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р°, С‡РёС‚Р°СЋС‰РµРіРѕ РєР°РЅР°Р»С‹ РІРµСЂС€РёРЅРЅС‹С… РґР°РЅРЅС‹С…
 
   VertexStreamReader stream_reader (*surface_iter, surface_info.inputs, vertex_buffer);
  
-    //построение результирующего буфера вершин
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР° РІРµСЂС€РёРЅ
     
   Vertex* vertices = surface.Vertices ();
   
   stream_reader.Read ("VERTEX", 0, "XYZ", vertices, &Vertex::coord);
   stream_reader.Read ("NORMAL", 0, "XYZ", vertices, &Vertex::normal);
 
-    //построение каналов текстурных координат
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ РєР°РЅР°Р»РѕРІ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
     
   for (unsigned int i=0; i<surface_info.inputs.GetSetsCount (); i++)
   {
@@ -713,7 +713,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     }
   }
   
-    //построение массива вершинных индексов
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° РІРµСЂС€РёРЅРЅС‹С… РёРЅРґРµРєСЃРѕРІ
     
   VertexIndexMapPtr vertex_index_map = GetVertexIndicesMap (surface_info.mesh->Id (), surface_info.mesh->Surfaces ().Size ());
   
@@ -721,7 +721,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
   stream_reader.ReadVertexIndices (vertex_index_map->Indices ());
 
-    //присоединение поверхности к мешу
+    //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё Рє РјРµС€Сѓ
 
   surface_info.mesh->Surfaces ().Add (surface);
 }

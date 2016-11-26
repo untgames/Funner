@@ -26,7 +26,7 @@ ContextState::ContextState (const DeviceManager& manager)
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InitialResources& initial_resources, const DefaultResources& default_resources)
@@ -69,7 +69,7 @@ Context::~Context ()
 }
 
 /*
-    Получение низкоуровневого дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 ID3D11DeviceContext& Context::GetHandle ()
@@ -78,7 +78,7 @@ ID3D11DeviceContext& Context::GetHandle ()
 }
 
 /*
-    Управление входным уровнем (input-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (input-stage)
 */
 
 void Context::ISSetInputLayout (IInputLayout* in_state)
@@ -163,7 +163,7 @@ IBuffer* Context::ISGetIndexBuffer ()
 }
 
 /*
-    Управление уровнем вывода вершин
+    РЈРїСЂР°РІР»РµРЅРёРµ СѓСЂРѕРІРЅРµРј РІС‹РІРѕРґР° РІРµСЂС€РёРЅ
 */
 
 void Context::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
@@ -219,7 +219,7 @@ size_t Context::SOGetTargetOffset (size_t stream_output_slot)
 }
 
 /*
-    Управление шейдерными уровнями (shader-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ С€РµР№РґРµСЂРЅС‹РјРё СѓСЂРѕРІРЅСЏРјРё (shader-stage)
 */
 
 void Context::SSSetProgram (IProgram* program)
@@ -301,7 +301,7 @@ IBuffer* Context::SSGetConstantBuffer (size_t buffer_slot)
 }
 
 /*
-    Управление текстурами
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂР°РјРё
 */
 
 void Context::SSSetSampler (size_t sampler_slot, ISamplerState* state)
@@ -357,7 +357,7 @@ ITexture* Context::SSGetTexture (size_t sampler_slot)
 }
 
 /*
-    Управление растеризатором (rasterizer-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂРѕРј (rasterizer-stage)
 */
 
 void Context::RSSetState (IRasterizerState* state)
@@ -443,7 +443,7 @@ const Rect& Context::RSGetScissor (size_t render_target_slot)
 }
 
 /*
-    Управление выходным уровнем (output-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС‹С…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (output-stage)
 */
 
 void Context::OSSetBlendState (IBlendState* state)
@@ -525,7 +525,7 @@ size_t Context::OSGetStencilReference ()
 }
 
 /*
-    Управление менеджером целевых буферов отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РјРµРЅРµРґР¶РµСЂРѕРј С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void Context::OSSetRenderTargets (size_t count, IView** render_target_views, IView* depth_stencil_view)
@@ -648,7 +648,7 @@ void Context::ClearViews (size_t clear_flags, size_t views_count, const size_t* 
 }
 
 /*
-   Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+   Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
 */
 
 void Context::GenerateMips (ITexture* texture)
@@ -665,7 +665,7 @@ void Context::GenerateMips (ITexture* texture)
 }
 
 /*
-    Управление предикатами отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void Context::SetPredication (IPredicate* predicate, bool predicate_value)
@@ -708,7 +708,7 @@ bool Context::GetPredicateValue ()
 }
 
 /*
-    Работа со списками команд
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРєР°РјРё РєРѕРјР°РЅРґ
 */
 
 ICommandList* Context::FinishCommandList (bool restore_state)
@@ -722,7 +722,7 @@ void Context::ExecuteCommandList (ICommandList* list, bool restore_state)
 }
 
 /*
-    Установка состояния подуровней в контекст
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅРµР№ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 void Context::Bind ()
@@ -744,7 +744,7 @@ void Context::Bind ()
 }
 
 /*
-    Рисование примитивов
+    Р РёСЃРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 namespace
@@ -857,7 +857,7 @@ void Context::DrawAuto (PrimitiveType primitive_type)
 }
 
 /*
-    Ожидание завершения выполнения буфера команд
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р±СѓС„РµСЂР° РєРѕРјР°РЅРґ
 */
 
 void Context::Flush ()
@@ -874,7 +874,7 @@ void Context::Flush ()
 }
 
 /*
-    Копирование состояний
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 void Context::Capture (const StateBlockMask& mask, ContextState& state) const

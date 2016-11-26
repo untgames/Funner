@@ -571,7 +571,7 @@ psd_status psd_get_image_data(psd_context * context)
 			break;
 
 		// RLE compressed the image data starts with the byte counts for all the
-		// scan lines (rows * color_channels), with each count stored as a two®Cbyte value.
+		// scan lines (rows * color_channels), with each count stored as a two–ÅCbyte value.
 		// The RLE compressed data follows, with each scan line compressed
 		// separately. The RLE compression is the same compression algorithm
 		// used by the Macintosh ROM routine PackBits, and the TIFF standard.

@@ -1,4 +1,4 @@
-//Тестирование алгоритма partial_sort_copy (range1, range2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° partial_sort_copy (range1, range2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

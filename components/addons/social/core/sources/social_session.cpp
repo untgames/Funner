@@ -10,13 +10,13 @@ const char* NOT_LOGGED_IN_SESSION_DESCRIPTION = "NotLoggedInSession";
 }
 
 /*
-   Реализация сессии
+   Р РµР°Р»РёР·Р°С†РёСЏ СЃРµСЃСЃРёРё
 */
 
 struct Session::Impl : public xtl::reference_counter
 {
-  stl::string      name;    //имя сессии
-  ISessionManager* manager; //менеджер сессии
+  stl::string      name;    //РёРјСЏ СЃРµСЃСЃРёРё
+  ISessionManager* manager; //РјРµРЅРµРґР¶РµСЂ СЃРµСЃСЃРёРё
 
   Impl (const char* in_name)
   {
@@ -32,7 +32,7 @@ struct Session::Impl : public xtl::reference_counter
     delete manager;
   }
 
-  ///Логин
+  ///Р›РѕРіРёРЅ
   void LogIn (const LoginCallback& callback, const common::PropertyMap& config)
   {
     try
@@ -59,7 +59,7 @@ struct Session::Impl : public xtl::reference_counter
     manager->LogOut ();
   }
 
-  ///Загрузка произвольных запросов
+  ///Р—Р°РіСЂСѓР·РєР° РїСЂРѕРёР·РІРѕР»СЊРЅС‹С… Р·Р°РїСЂРѕСЃРѕРІ
   void PerformRequest (const char* request, const RequestCallback& callback, const common::PropertyMap& properties)
   {
     try
@@ -79,7 +79,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Показ стандартных окон
+  ///РџРѕРєР°Р· СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РѕРєРѕРЅ
   void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties)
   {
     try
@@ -99,7 +99,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Получение залогиненного пользователя
+  ///РџРѕР»СѓС‡РµРЅРёРµ Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
   User& CurrentUser ()
   {
     try
@@ -129,7 +129,7 @@ struct Session::Impl : public xtl::reference_counter
     return user_manager;
   }
 
-  ///Загрузка пользователя по идентификатору
+  ///Р—Р°РіСЂСѓР·РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
   void LoadUser (const char* id, const LoadUserCallback& callback, const common::PropertyMap& properties)
   {
     try
@@ -143,7 +143,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Аватар
+  ///РђРІР°С‚Р°СЂ
   void LoadUserPicture (const User& user, const LoadUserPictureCallback& callback, const common::PropertyMap& properties)
   {
     try
@@ -157,7 +157,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Друзья
+  ///Р”СЂСѓР·СЊСЏ
   void LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties)
   {
     try
@@ -184,7 +184,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Достижения
+  ///Р”РѕСЃС‚РёР¶РµРЅРёСЏ
   IAchievementManager* GetAchievementManager ()
   {
     if (!manager->IsUserLoggedIn ())
@@ -237,7 +237,7 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  ///Таблицы рекордов
+  ///РўР°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ
   ILeaderboardManager* GetLeaderboardManager ()
   {
     if (!manager->IsUserLoggedIn ())
@@ -305,7 +305,7 @@ struct Session::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Session::Session (const char* session_name)
@@ -331,7 +331,7 @@ Session& Session::operator = (const Session& source)
 }
 
 /*
-   Описание сессии
+   РћРїРёСЃР°РЅРёРµ СЃРµСЃСЃРёРё
 */
 
 const char* Session::Description () const
@@ -343,7 +343,7 @@ const char* Session::Description () const
 }
 
 /*
-   Логин
+   Р›РѕРіРёРЅ
 */
 
 void Session::LogIn (const LoginCallback& callback, const common::PropertyMap& config)
@@ -362,7 +362,7 @@ bool Session::IsUserLoggedIn () const
 }
 
 /*
-   Загрузка произвольных запросов
+   Р—Р°РіСЂСѓР·РєР° РїСЂРѕРёР·РІРѕР»СЊРЅС‹С… Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 void Session::PerformRequest (const char* request, const RequestCallback& callback, const common::PropertyMap& properties) const
@@ -371,7 +371,7 @@ void Session::PerformRequest (const char* request, const RequestCallback& callba
 }
 
 /*
-   Показ стандартных окон
+   РџРѕРєР°Р· СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РѕРєРѕРЅ
 */
 
 void Session::ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties) const
@@ -380,7 +380,7 @@ void Session::ShowWindow (const char* window_name, const WindowCallback& callbac
 }
 
 /*
-   Получение залогиненного пользователя
+   РџРѕР»СѓС‡РµРЅРёРµ Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 User& Session::CurrentUser ()
@@ -394,7 +394,7 @@ const User& Session::CurrentUser () const
 }
 
 /*
-   Загрузка пользователя по идентификатору
+   Р—Р°РіСЂСѓР·РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
 */
 
 void Session::LoadUser (const char* id, const LoadUserCallback& callback, const common::PropertyMap& properties) const
@@ -403,7 +403,7 @@ void Session::LoadUser (const char* id, const LoadUserCallback& callback, const 
 }
 
 /*
-   Аватар
+   РђРІР°С‚Р°СЂ
 */
 
 void Session::LoadUserPicture (const User& user, const LoadUserPictureCallback& callback, const common::PropertyMap& properties) const
@@ -412,7 +412,7 @@ void Session::LoadUserPicture (const User& user, const LoadUserPictureCallback& 
 }
 
 /*
-   Друзья
+   Р”СЂСѓР·СЊСЏ
 */
 
 void Session::LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties) const
@@ -426,7 +426,7 @@ void Session::LoadFriends (const User& user, const LoadFriendsCallback& callback
 }
 
 /*
-   Достижения
+   Р”РѕСЃС‚РёР¶РµРЅРёСЏ
 */
 
 void Session::LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties) const
@@ -445,7 +445,7 @@ void Session::SendAchievement (const Achievement& achievement, const SendAchieve
 }
 
 /*
-   Таблицы рекордов
+   РўР°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ
 */
 
 void Session::LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties) const
@@ -469,7 +469,7 @@ void Session::SendScore (const Score& score, const SendScoreCallback& callback, 
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Session::Swap (Session& source)
@@ -481,7 +481,7 @@ namespace social
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Session& session1, Session& session2)

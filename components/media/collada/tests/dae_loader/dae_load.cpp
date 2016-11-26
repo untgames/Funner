@@ -27,7 +27,7 @@ const char* get_name (AnimationChannelSemantic semantic)
   }
 }
 
-//печать строки пробелов (отступ)
+//РїРµС‡Р°С‚СЊ СЃС‚СЂРѕРєРё РїСЂРѕР±РµР»РѕРІ (РѕС‚СЃС‚СѓРї)
 void print_space (int count)
 {
   count *= 2;
@@ -35,7 +35,7 @@ void print_space (int count)
   for (int i = 0; i < count; i++) printf(" ");
 }
 
-//печать числа с плавающей точкой
+//РїРµС‡Р°С‚СЊ С‡РёСЃР»Р° СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
 void print (float value)
 {
   static float EPS = 0.001f;
@@ -46,7 +46,7 @@ void print (float value)
     printf ("%+.3f", value);
 }
 
-//печать вектора
+//РїРµС‡Р°С‚СЊ РІРµРєС‚РѕСЂР°
 template <class T, unsigned int N>
 void print (const math::vector<T, N>& v)
 {
@@ -61,7 +61,7 @@ void print (const math::vector<T, N>& v)
   printf (" ]");
 }
 
-//печать матрицы
+//РїРµС‡Р°С‚СЊ РјР°С‚СЂРёС†С‹
 template <class T, unsigned int N>
 void print (const math::matrix<T, N>& v)
 {
@@ -76,7 +76,7 @@ void print (const math::matrix<T, N>& v)
   printf (" ]");
 }
 
-//печать текстуры
+//РїРµС‡Р°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹
 void dump (const char* name, Texture& texture, int level, Model& model)
 {
   print_space (level++);  
@@ -93,7 +93,7 @@ void dump (const char* name, Texture& texture, int level, Model& model)
   printf      ("\n");
 }
 
-//печать эффекта
+//РїРµС‡Р°С‚СЊ СЌС„С„РµРєС‚Р°
 void dump (Effect& effect, int level, Model& model)
 {
   print_space (level++);
@@ -134,7 +134,7 @@ void dump (Effect& effect, int level, Model& model)
     }    
 }
 
-//печать материала
+//РїРµС‡Р°С‚СЊ РјР°С‚РµСЂРёР°Р»Р°
 void dump (Material& material, int level, Model& model)
 {
   print_space (level++);
@@ -143,7 +143,7 @@ void dump (Material& material, int level, Model& model)
   printf      ("effect: '%s'\n", material.Effect ());
 }
 
-//печать вершины
+//РїРµС‡Р°С‚СЊ РІРµСЂС€РёРЅС‹
 void print (const Vertex& v)
 {
   printf ("coord=");
@@ -152,7 +152,7 @@ void print (const Vertex& v)
   print  (v.normal);
 }
 
-//печать текстурированной вершины
+//РїРµС‡Р°С‚СЊ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРЅРѕР№ РІРµСЂС€РёРЅС‹
 void print (const TexVertex& tv)
 {
   printf ("coord=");
@@ -163,13 +163,13 @@ void print (const TexVertex& tv)
   print  (tv.binormal);  
 }
 
-//печать вершинного веса
+//РїРµС‡Р°С‚СЊ РІРµСЂС€РёРЅРЅРѕРіРѕ РІРµСЃР°
 void print (const VertexInfluence& influence)
 {
   printf ("first=%u count=%u", influence.first_weight, influence.weights_count);
 }
 
-//печать поверхности
+//РїРµС‡Р°С‚СЊ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 void dump (Surface& surface, int level, Model& model)
 {
   print_space (level++);
@@ -258,7 +258,7 @@ void dump (Surface& surface, int level, Model& model)
   printf ("\n");
 }
 
-//печать меша
+//РїРµС‡Р°С‚СЊ РјРµС€Р°
 void dump (Mesh& mesh, int level, Model& model)
 {
   print_space (level++);
@@ -268,14 +268,14 @@ void dump (Mesh& mesh, int level, Model& model)
     dump (mesh.Surfaces () [i], level, model);
 }
 
-//печать картинки
+//РїРµС‡Р°С‚СЊ РєР°СЂС‚РёРЅРєРё
 void dump (Image& image, int level, Model& model)
 {
   print_space (level);
   printf      ("Image '%s', path = '%s'\n", image.Id (), image.Path ());
 }
 
-//печать анимации
+//РїРµС‡Р°С‚СЊ Р°РЅРёРјР°С†РёРё
 void dump (const AnimationChannel& channel, int level)
 {
   print_space (level++);
@@ -315,14 +315,14 @@ void dump (const Animation& animation, int level)
   }
 }
 
-//печать цели морфа
+//РїРµС‡Р°С‚СЊ С†РµР»Рё РјРѕСЂС„Р°
 void dump (MorphTarget& morph_target, int level)
 {
   print_space (level);
   printf      ("Mesh '%s', weight = %f\n", morph_target.Mesh (), morph_target.Weight ());
 }
 
-//печать морфа
+//РїРµС‡Р°С‚СЊ РјРѕСЂС„Р°
 void dump (Morph& morph, int level, Model& model)
 {
   print_space (level++);
@@ -343,7 +343,7 @@ void dump (Morph& morph, int level, Model& model)
     dump (morph.Targets () [i], level);
 }
 
-//печать скина
+//РїРµС‡Р°С‚СЊ СЃРєРёРЅР°
 void dump (Skin& skin, int level, Model& model)
 {
   print_space (level++);
@@ -374,7 +374,7 @@ void dump (Skin& skin, int level, Model& model)
   }
 }
 
-//вывод источника света
+//РІС‹РІРѕРґ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 void dump (Light& light, int level, Model& model)
 {
   print_space (level++);
@@ -437,7 +437,7 @@ void dump (Camera& camera, int level, Model& model)
   printf      ("ymag: %g\n", camera.Param (CameraParam_YMagnitude));
 }
 
-//вывод инстанцированного меша
+//РІС‹РІРѕРґ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РјРµС€Р°
 void dump (InstanceMesh& imesh, int level, Model& model)
 {
   Mesh* mesh = model.Meshes ().Find (imesh.Mesh ());
@@ -484,7 +484,7 @@ void dump (InstanceMesh& imesh, int level, Model& model)
   }
 }
 
-//вывод инстанцированного контроллера
+//РІС‹РІРѕРґ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 void dump (InstanceController& icontroller, int level, Model& model)
 {  
   Mesh* mesh = model.Meshes ().Find (icontroller.FindBaseMesh (model));
@@ -540,7 +540,7 @@ void dump (InstanceController& icontroller, int level, Model& model)
   }
 }
 
-//вывод коллекции
+//РІС‹РІРѕРґ РєРѕР»Р»РµРєС†РёРё
 template <class Item> void dump (const char* name, ICollection<Item>& collection, int level)
 {
   print_space (level++);
@@ -562,7 +562,7 @@ void dump (const char* name, AnimationList& animations, int level)
     dump (animations [i], level);
 }
 
-//печать узла
+//РїРµС‡Р°С‚СЊ СѓР·Р»Р°
 void dump (Node& node, int level, Model& model)
 {
   print_space (level++);
@@ -602,13 +602,13 @@ void dump (Node& node, int level, Model& model)
     dump (node.Nodes () [i], level, model);
 }
 
-//печать элемента библиотеки
+//РїРµС‡Р°С‚СЊ СЌР»РµРјРµРЅС‚Р° Р±РёР±Р»РёРѕС‚РµРєРё
 template <class Item> void dump_item (Item& item, int level, Model& model)
 {
   dump (item, level, model);
 }
 
-//печать библиотеки
+//РїРµС‡Р°С‚СЊ Р±РёР±Р»РёРѕС‚РµРєРё
 template <class Item> void dump (const char* library_name, ILibrary<Item>& library, int level, Model& model)
 {
   print_space (level++);
@@ -618,7 +618,7 @@ template <class Item> void dump (const char* library_name, ILibrary<Item>& libra
     dump (*i, level, model);
 }
 
-//функция протоколирования ошибок разбора модели
+//С„СѓРЅРєС†РёСЏ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ РѕС€РёР±РѕРє СЂР°Р·Р±РѕСЂР° РјРѕРґРµР»Рё
 void log_print (const char* message)
 {
   printf ("%s\n", message);

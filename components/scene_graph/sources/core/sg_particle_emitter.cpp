@@ -3,14 +3,14 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации ParticleEmitter
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё ParticleEmitter
 */
 
 struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 {
-  stl::string          declaration_name;                     //имя системы частиц
-  Node*                particles_parent;                     //узел, в системе координат которого генерируются частицы
-  xtl::auto_connection particles_parent_destroy_connection;  //соединение обработки удаления базового узла
+  stl::string          declaration_name;                     //РёРјСЏ СЃРёСЃС‚РµРјС‹ С‡Р°СЃС‚РёС†
+  Node*                particles_parent;                     //СѓР·РµР», РІ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ РєРѕС‚РѕСЂРѕРіРѕ РіРµРЅРµСЂРёСЂСѓСЋС‚СЃСЏ С‡Р°СЃС‚РёС†С‹
+  xtl::auto_connection particles_parent_destroy_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±СЂР°Р±РѕС‚РєРё СѓРґР°Р»РµРЅРёСЏ Р±Р°Р·РѕРІРѕРіРѕ СѓР·Р»Р°
 
   Impl (const char* in_declaration_name, Node::Pointer in_particles_parent)
     : declaration_name (in_declaration_name), particles_parent (in_particles_parent.get ())
@@ -28,7 +28,7 @@ struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ParticleEmitter::ParticleEmitter (const char* declaration_name, Node::Pointer particles_parent)
@@ -41,7 +41,7 @@ ParticleEmitter::~ParticleEmitter ()
 }
 
 /*
-    Создание эмиттера
+    РЎРѕР·РґР°РЅРёРµ СЌРјРёС‚С‚РµСЂР°
 */
 
 ParticleEmitter::Pointer ParticleEmitter::Create (const char* declaration_name, Node::Pointer particles_parent)
@@ -50,7 +50,7 @@ ParticleEmitter::Pointer ParticleEmitter::Create (const char* declaration_name, 
 }
 
 /*
-   Имя системы частиц
+   РРјСЏ СЃРёСЃС‚РµРјС‹ С‡Р°СЃС‚РёС†
 */
 
 const char* ParticleEmitter::DeclarationName () const
@@ -59,7 +59,7 @@ const char* ParticleEmitter::DeclarationName () const
 }
 
 /*
-   Узел, в системе координат которого генерируются частицы
+   РЈР·РµР», РІ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ РєРѕС‚РѕСЂРѕРіРѕ РіРµРЅРµСЂРёСЂСѓСЋС‚СЃСЏ С‡Р°СЃС‚РёС†С‹
 */
 
 Node::Pointer ParticleEmitter::ParticlesParent () const
@@ -68,7 +68,7 @@ Node::Pointer ParticleEmitter::ParticlesParent () const
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void ParticleEmitter::AcceptCore (Visitor& visitor)

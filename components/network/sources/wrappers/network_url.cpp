@@ -3,14 +3,14 @@
 using namespace network;
 
 /*
-    Описание реализации URL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё URL
 */
 
 struct Url::Impl: public xtl::reference_counter
 {
   stl::string address;
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_address)
     : address (in_address)
   {
@@ -18,7 +18,7 @@ struct Url::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Url::Url (const char* address)
@@ -66,7 +66,7 @@ Url& Url::operator = (const Url& url)
 }
 
 /*
-    Параметры URL
+    РџР°СЂР°РјРµС‚СЂС‹ URL
 */
 
 const char* Url::Protocol () const
@@ -95,7 +95,7 @@ const char* Url::Query () const
 }
 
 /*
-    Параметры запроса
+    РџР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСЂРѕСЃР°
 */
 
 size_t Url::RequestPropertiesCount () const
@@ -144,7 +144,7 @@ void Url::RemoveAllRequestProperties ()
 }
 
 /*
-    Приведение к строке
+    РџСЂРёРІРµРґРµРЅРёРµ Рє СЃС‚СЂРѕРєРµ
 */
 
 const char* Url::ToString () const
@@ -153,7 +153,7 @@ const char* Url::ToString () const
 }
 
 /*
-    Сравнение двух URL
+    РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… URL
 */
 
 bool Url::operator == (const Url& url) const
@@ -167,7 +167,7 @@ bool Url::operator != (const Url& url) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Url::Swap (Url& url)

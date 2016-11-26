@@ -13,47 +13,47 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t STRING_OFFSETS_RESERVE_SIZE = 16;  //резервируемое при инициализации число строк
-const size_t STRING_BUFFER_RESERVE_SIZE  = 256; //резервируемый размер буфера строк
+const size_t STRING_OFFSETS_RESERVE_SIZE = 16;  //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё С‡РёСЃР»Рѕ СЃС‚СЂРѕРє
+const size_t STRING_BUFFER_RESERVE_SIZE  = 256; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЃС‚СЂРѕРє
 
 }
 
 /*
-    Реализация массива строк
+    Р РµР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР° СЃС‚СЂРѕРє
 */
 
 template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl () : need_update_pointers (false)
     {
       offsets.reserve (STRING_OFFSETS_RESERVE_SIZE);
       string_buffer.reserve (STRING_BUFFER_RESERVE_SIZE);
     }
 
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
     Impl (const Impl& buffer) :
       string_buffer (buffer.string_buffer),
       offsets (buffer.offsets),
       need_update_pointers (true) { }      
 
-///Количество строк
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє
     size_t Size () { return offsets.size (); }
 
-///Зарезервированное число строк
+///Р—Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅРѕРµ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє
     size_t Capacity () { return offsets.capacity (); }
 
-///Размер буфера строк
+///Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР° СЃС‚СЂРѕРє
     size_t BufferSize () { return string_buffer.size (); }
     
-///Зарезервированный размер буфера строк
+///Р—Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЃС‚СЂРѕРє
     size_t BufferCapacity () { return string_buffer.capacity (); }
 
-///Добавление строк
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРє
     void Insert (size_t index, size_t count, const Char** strings)
     {
       if (count && !strings)
@@ -106,7 +106,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
       return old_strings_count;
     }
     
-///Обновление строки
+///РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂРѕРєРё
     void Set (size_t index, const Char* string)
     {
       static const char* METHOD_NAME = "common::BasicStringArray<Char>::Set";
@@ -132,7 +132,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
         offsets [i] += diff;
     }
     
-///Удаление строк
+///РЈРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРє
     void Remove (size_t first, size_t count)
     {
       if (first >= offsets.size () || !offsets.size ())
@@ -156,7 +156,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
       need_update_pointers = true;
     }
     
-///Очистка
+///РћС‡РёСЃС‚РєР°
     void Clear ()
     {
       string_buffer.clear ();
@@ -166,7 +166,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
       need_update_pointers = false;
     }
     
-///Получение строки
+///РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё
     const Char* Item (size_t index)
     {
       if (index >= offsets.size ())
@@ -175,7 +175,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
       return string_buffer.c_str () + offsets [index];
     }
     
-///Получение массива строк
+///РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° СЃС‚СЂРѕРє
    const Char** Items ()
    {
      if (offsets.empty ())
@@ -203,10 +203,10 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
      return &pointers [0];
    }
    
-///Получение буфера
+///РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР°
    const Char* Buffer () { return string_buffer.c_str (); }
 
-///Резервирование числа строк
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ С‡РёСЃР»Р° СЃС‚СЂРѕРє
     void Reserve (size_t string_count)
     {
       size_t* old_start = &offsets [0];
@@ -217,7 +217,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
         need_update_pointers = true;
     }
 
-///Резервирование места в буфере строк
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РІ Р±СѓС„РµСЂРµ СЃС‚СЂРѕРє
     void ReserveBuffer (size_t size)
     {
       const Char* old_start = string_buffer.c_str ();
@@ -233,14 +233,14 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
     typedef stl::vector<const Char*> PointerBuffer;
 
   private:
-    stl::basic_string<Char> string_buffer;        //буфер символов строк
-    OffsetBuffer            offsets;              //смещения строк в буфере
-    PointerBuffer           pointers;             //массив указателей на строки
-    bool                    need_update_pointers; //нужно обновить массив указателей на строки
+    stl::basic_string<Char> string_buffer;        //Р±СѓС„РµСЂ СЃРёРјРІРѕР»РѕРІ СЃС‚СЂРѕРє
+    OffsetBuffer            offsets;              //СЃРјРµС‰РµРЅРёСЏ СЃС‚СЂРѕРє РІ Р±СѓС„РµСЂРµ
+    PointerBuffer           pointers;             //РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° СЃС‚СЂРѕРєРё
+    bool                    need_update_pointers; //РЅСѓР¶РЅРѕ РѕР±РЅРѕРІРёС‚СЊ РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° СЃС‚СЂРѕРєРё
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Char>
@@ -276,7 +276,7 @@ BasicStringArray<Char>::~BasicStringArray ()
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class Char>
@@ -286,7 +286,7 @@ BasicStringArray<Char> BasicStringArray<Char>::Clone () const
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Char>
@@ -298,7 +298,7 @@ BasicStringArray<Char>& BasicStringArray<Char>::operator = (const BasicStringArr
 }
 
 /*
-    Количество строк / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class Char>
@@ -332,7 +332,7 @@ size_t BasicStringArray<Char>::BufferCapacity () const
 }
 
 /*
-    Резервирование числа строк / резервирование места в буфере строк
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ С‡РёСЃР»Р° СЃС‚СЂРѕРє / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РІ Р±СѓС„РµСЂРµ СЃС‚СЂРѕРє
 */
 
 template <class Char>
@@ -348,7 +348,7 @@ void BasicStringArray<Char>::ReserveBuffer (size_t buffer_size)
 }
 
 /*
-    Получение строки / массива строк
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё / РјР°СЃСЃРёРІР° СЃС‚СЂРѕРє
 */
 
 template <class Char>
@@ -370,7 +370,7 @@ const typename BasicStringArray<Char>::value_type* BasicStringArray<Char>::Buffe
 }
 
 /*
-    Добавление строк
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРє
 */
 
 template <class Char>
@@ -458,7 +458,7 @@ void BasicStringArray<Char>::Insert (size_t index, const BasicStringArray& sa)
 }
 
 /*
-    Обновление строк
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂРѕРє
 */
 
 template <class Char>
@@ -476,7 +476,7 @@ void BasicStringArray<Char>::Set (size_t index, const value_type* string)
 }
 
 /*
-    Удаление строк
+    РЈРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРє
 */
 
 template <class Char>
@@ -498,7 +498,7 @@ void BasicStringArray<Char>::Clear ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class Char>
@@ -521,7 +521,7 @@ void swap (WStringArray& sa1, WStringArray& sa2)
 }
 
 /*
-    Принудительная генерация кода для StringArray, WStringArray
+    РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ РєРѕРґР° РґР»СЏ StringArray, WStringArray
 */
 
 template class BasicStringArray<char>;

@@ -15,7 +15,7 @@ namespace script
 namespace lua
 {
 
-const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";   //Имя вариантного типа данных по умолчанию
+const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";   //РРјСЏ РІР°СЂРёР°РЅС‚РЅРѕРіРѕ С‚РёРїР° РґР°РЅРЅС‹С… РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 }
 
@@ -24,14 +24,14 @@ const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";   //Имя вариантног
 namespace
 {
 
-const char* INTERPRETER_LUA_NAME = "__funner_interpreter"; //Имя поля, хранящего указатель на интерпретатор
+const char* INTERPRETER_LUA_NAME = "__funner_interpreter"; //РРјСЏ РїРѕР»СЏ, С…СЂР°РЅСЏС‰РµРіРѕ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ
 const char* PROFILER_LIBRARY     = "Profiler";
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-//функция обработки ошибок lua
+//С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РѕС€РёР±РѕРє lua
 int error_handler (lua_State* state)
 {
   throw xtl::format_exception<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
@@ -57,7 +57,7 @@ Interpreter::LuaHookProfile::LuaHookProfile ()
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Interpreter::Interpreter (const script::Environment& in_environment)
@@ -65,18 +65,18 @@ Interpreter::Interpreter (const script::Environment& in_environment)
     symbol_registry (State ()),
     stack (state, *this)
 {
-    //инициализация стандартных библиотек
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… Р±РёР±Р»РёРѕС‚РµРє
 
   luaopen_base   (state);
   luaopen_string (state);
   luaopen_table  (state);
   luaopen_math   (state);
 
-    //регистрация функции обработки ошибок
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚РєРё РѕС€РёР±РѕРє
 
   lua_atpanic (state, &error_handler);
 
-    //регистрация обработчиков пользовательского типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ С‚РёРїР° РґР°РЅРЅС‹С…
 
   static const luaL_reg user_data_meta_table [] = {
     {"__gc",       &variant_destroy},
@@ -96,7 +96,7 @@ Interpreter::Interpreter (const script::Environment& in_environment)
 
   luaL_openlib (state, 0, user_data_meta_table, 0);
 
-    //регистрация обработчиков событий создания/удаления библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ СЃРѕР·РґР°РЅРёСЏ/СѓРґР°Р»РµРЅРёСЏ Р±РёР±Р»РёРѕС‚РµРє
 
   on_create_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
     xtl::bind (&Interpreter::RegisterLibrary, this, _2, _3));
@@ -104,16 +104,16 @@ Interpreter::Interpreter (const script::Environment& in_environment)
   on_remove_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
     xtl::bind (&Interpreter::UnregisterLibrary, this, _2));
 
-    //регистрация библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 
   for (Environment::LibraryIterator i=environment.CreateLibraryIterator (); i; ++i)
     RegisterLibrary (environment.LibraryId (i), *i);
 
-    //очистка стека
+    //РѕС‡РёСЃС‚РєР° СЃС‚РµРєР°
 
   lua_settop (state, 0);
 
-    //Регистрация функций профилирования
+    //Р РµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ РїСЂРѕС„РёР»РёСЂРѕРІР°РЅРёСЏ
 
   stack.Push (this);
   lua_setglobal (state, INTERPRETER_LUA_NAME);
@@ -138,7 +138,7 @@ Interpreter::~Interpreter ()
 }
 
 /*
-    Имя интерпретатора
+    РРјСЏ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР°
 */
 
 const char* Interpreter::Name ()
@@ -147,7 +147,7 @@ const char* Interpreter::Name ()
 }
 
 /*
-    Скриптовое окружение / реестр символов / стек аргументов
+    РЎРєСЂРёРїС‚РѕРІРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ / СЂРµРµСЃС‚СЂ СЃРёРјРІРѕР»РѕРІ / СЃС‚РµРє Р°СЂРіСѓРјРµРЅС‚РѕРІ
 */
 
 Environment& Interpreter::Environment ()
@@ -166,7 +166,7 @@ IStack& Interpreter::Stack ()
 }
 
 /*
-    Проверка наличия функции
+    РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„СѓРЅРєС†РёРё
 */
 
 bool Interpreter::HasFunction (const char* name)
@@ -184,12 +184,12 @@ bool Interpreter::HasFunction (const char* name)
 }
 
 /*
-    Выполнение буфера интерпретации луа
+    Р’С‹РїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР° РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёРё Р»СѓР°
 */
 
 void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size)
 {
-    //загружаем буфер команд в контекст луа
+    //Р·Р°РіСЂСѓР¶Р°РµРј Р±СѓС„РµСЂ РєРѕРјР°РЅРґ РІ РєРѕРЅС‚РµРєСЃС‚ Р»СѓР°
 
   if (luaL_loadbuffer (state, (const char*)buffer, buffer_size, buffer_name))
     raise_error (state, "script::Interpreter::DoCommands[compile]");
@@ -199,7 +199,7 @@ void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_
 }
 
 /*
-    Вызов функции луа
+    Р’С‹Р·РѕРІ С„СѓРЅРєС†РёРё Р»СѓР°
 */
 
 void Interpreter::Invoke (unsigned int arguments_count, unsigned int results_count)
@@ -209,7 +209,7 @@ void Interpreter::Invoke (unsigned int arguments_count, unsigned int results_cou
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Interpreter::AddRef ()
@@ -223,7 +223,7 @@ void Interpreter::Release ()
 }
 
 /*
-    Регистрация / удаление библиотек
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ / СѓРґР°Р»РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void Interpreter::RegisterLibrary (const char* name, InvokerRegistry& registry)
@@ -243,7 +243,7 @@ void Interpreter::UnregisterLibrary (const char* name)
 }
 
 /*
-   Профилирование
+   РџСЂРѕС„РёР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void Interpreter::LuaHook (lua_Debug* ar)
@@ -359,7 +359,7 @@ namespace lua_interpreter
 {
 
 /*
-    Создание интерпретатора lua
+    РЎРѕР·РґР°РЅРёРµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР° lua
 */
 
 IInterpreter* create_lua_interpreter (const Environment& environment)
@@ -368,13 +368,13 @@ IInterpreter* create_lua_interpreter (const Environment& environment)
 }
 
 /*
-   Компонент создания интерпретатора lua
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕР·РґР°РЅРёСЏ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂР° lua
 */
 
 class LuaInterpreterComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     LuaInterpreterComponent ()
     {
       InterpreterManager::RegisterInterpreter ("lua", &create_lua_interpreter);

@@ -16,15 +16,15 @@ namespace
 
 struct RenderTargetDesc
 {
-  ViewPtr         view;                      //текущее отображение буферов цвета
-  Viewport        viewport;                  //область вывода
-  Rect            scissor;                   //область отсечения
-  mutable size_t  viewport_hash;             //хеш области вывода
-  mutable size_t  scissor_hash;              //хэш области отсечения
-  mutable bool    need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
-  mutable bool    need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
+  ViewPtr         view;                      //С‚РµРєСѓС‰РµРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂРѕРІ С†РІРµС‚Р°
+  Viewport        viewport;                  //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
+  Rect            scissor;                   //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  mutable size_t  viewport_hash;             //С…РµС€ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  mutable size_t  scissor_hash;              //С…СЌС€ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
+  mutable bool    need_recalc_viewport_hash; //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  mutable bool    need_recalc_scissor_hash;  //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   RenderTargetDesc () 
     : viewport_hash ()
     , scissor_hash ()
@@ -35,7 +35,7 @@ struct RenderTargetDesc
     memset (&scissor, 0, sizeof scissor);
   }
 
-///Получение хэша области вывода
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   size_t GetViewportHash () const
   {
     if (need_recalc_viewport_hash)
@@ -47,7 +47,7 @@ struct RenderTargetDesc
     return viewport_hash;
   }
 
-///Получение хэша области отсечения
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
   size_t GetScissorHash () const
   {
     if (need_recalc_scissor_hash)
@@ -64,21 +64,21 @@ struct RenderTargetDesc
 
 struct RenderTargetContextState::Impl: public DeviceObject
 {
-  RenderTargetDesc render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //дескрипторы целей рендеринга
-  ViewPtr          depth_stencil_view;                                //текущее отображение буфера попиксельного отсечения
-  bool             is_dirty;                                          //флаг "грязности"
+  RenderTargetDesc render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //РґРµСЃРєСЂРёРїС‚РѕСЂС‹ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
+  ViewPtr          depth_stencil_view;                                //С‚РµРєСѓС‰РµРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
+  bool             is_dirty;                                          //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
     , is_dirty (true)
   {
   }
 
-/// Десктруктор
+/// Р”РµСЃРєС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl () {}
 
-/// Получение цели
+/// РџРѕР»СѓС‡РµРЅРёРµ С†РµР»Рё
   RenderTargetDesc& GetRenderTarget (size_t view_index, const char* source)
   {
     if (view_index >= DEVICE_RENDER_TARGET_SLOTS_COUNT)
@@ -87,19 +87,19 @@ struct RenderTargetContextState::Impl: public DeviceObject
     return render_targets [view_index];
   }
 
-/// Оповещение об изменении состояния
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ
   void UpdateNotify ()
   {
     is_dirty = true;
   }
 
-///Получение хэша области вывода
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   size_t GetViewportHash (size_t view_index)
   {
     return GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetViewportHash").GetViewportHash ();
   }
 
-///Получение хэша области отсечения
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
   size_t GetScissorHash (size_t view_index)
   {
     return GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetScissorHash").GetScissorHash ();
@@ -107,7 +107,7 @@ struct RenderTargetContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetContextState::RenderTargetContextState (const DeviceManager& manager)
@@ -125,7 +125,7 @@ RenderTargetContextState::~RenderTargetContextState ()
 }
 
 /*
-    Получение реализации
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 RenderTargetContextState::Impl& RenderTargetContextState::GetImpl () const
@@ -134,7 +134,7 @@ RenderTargetContextState::Impl& RenderTargetContextState::GetImpl () const
 }
 
 /*
-    Выбор целевых отображений
+    Р’С‹Р±РѕСЂ С†РµР»РµРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void RenderTargetContextState::SetRenderTargetView (size_t view_index, IView* render_target_view)
@@ -202,7 +202,7 @@ void RenderTargetContextState::HasRenderTargetViews (bool states [DEVICE_RENDER_
 }
 
 /*
-    Настройка подуровня растеризации
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 */
 
 void RenderTargetContextState::SetViewport (size_t view_index, const Viewport& viewport)
@@ -236,7 +236,7 @@ const Rect& RenderTargetContextState::GetScissor (size_t view_index) const
 }
 
 /*
-    Захват / восстановление состояния
+    Р—Р°С…РІР°С‚ / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void RenderTargetContextState::CopyTo (const StateBlockMask& mask, RenderTargetContextState& dst_state) const
@@ -299,12 +299,12 @@ void RenderTargetContextState::CopyTo (const StateBlockMask& mask, RenderTargetC
 namespace
 {
 
-/// Кэш цели рендеринга
+/// РљСЌС€ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 struct RenderTargetCache
 {
-  ID3D11RenderTargetView* view;             //отображение
-  size_t                  viewport_hash;    //хэш области вывода
-  size_t                  scissor_hash;     //хэш области отсечения
+  ID3D11RenderTargetView* view;             //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ
+  size_t                  viewport_hash;    //С…СЌС€ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  size_t                  scissor_hash;     //С…СЌС€ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
   RenderTargetCache ()
     : view ()
@@ -318,11 +318,11 @@ struct RenderTargetCache
 
 struct RenderTargetContext::Impl: public RenderTargetContextState::Impl
 {
-  DxContextPtr            context;                                                 //контекст
-  RenderTargetCache       render_target_caches [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //кэши целей рендеринга
-  ID3D11DepthStencilView* depth_stencil_view_cache;                                //кэш отображения depth/stencil
+  DxContextPtr            context;                                                 //РєРѕРЅС‚РµРєСЃС‚
+  RenderTargetCache       render_target_caches [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //РєСЌС€Рё С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
+  ID3D11DepthStencilView* depth_stencil_view_cache;                                //РєСЌС€ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ depth/stencil
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager, const DxContextPtr& in_context)
     : RenderTargetContextState::Impl (device_manager)
     , context (in_context)
@@ -334,7 +334,7 @@ struct RenderTargetContext::Impl: public RenderTargetContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetContext::RenderTargetContext (const DeviceManager& device_manager, const DxContextPtr& context)
@@ -347,7 +347,7 @@ RenderTargetContext::~RenderTargetContext ()
 }
 
 /*
-    Получение реализации
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 RenderTargetContext::Impl& RenderTargetContext::GetImpl () const
@@ -356,7 +356,7 @@ RenderTargetContext::Impl& RenderTargetContext::GetImpl () const
 }
 
 /*
-    Очистка буферов отрисовки
+    РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void RenderTargetContext::ClearRenderTargetView (size_t render_target_slot, const Color4f& color)
@@ -392,18 +392,18 @@ void RenderTargetContext::ClearViews (size_t clear_flags, size_t views_count, co
 {
   try
   {
-      //установка целей рендеринга и активного контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР° Рё Р°РєС‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     Bind ();
 
-      //очистка целей рендеринга
+      //РѕС‡РёСЃС‚РєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
     Impl&                impl    = GetImpl ();
     ID3D11DeviceContext& context = *impl.context;
 
     if (clear_flags & ClearFlag_RenderTarget)
     {
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (views_count && !view_indices)
         throw xtl::make_null_argument_exception ("", "render_target_indices");
@@ -419,7 +419,7 @@ void RenderTargetContext::ClearViews (size_t clear_flags, size_t views_count, co
           throw xtl::format_exception<xtl::bad_range> ("", "Argument <view_indices[%u]>=%u is out of range [%u;%u)", i, view_index, 0, DEVICE_RENDER_TARGET_SLOTS_COUNT);
       }
 
-        //очистка целей рендеринга
+        //РѕС‡РёСЃС‚РєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
       for (size_t i=0; i<views_count; i++)
       {
@@ -437,7 +437,7 @@ void RenderTargetContext::ClearViews (size_t clear_flags, size_t views_count, co
       }
     }
 
-      //очистка depth/stencil
+      //РѕС‡РёСЃС‚РєР° depth/stencil
 
     if (impl.depth_stencil_view && (clear_flags & (ClearFlag_Depth | ClearFlag_Stencil)))
     {
@@ -459,7 +459,7 @@ void RenderTargetContext::ClearViews (size_t clear_flags, size_t views_count, co
 }
 
 /*
-    Биндинг
+    Р‘РёРЅРґРёРЅРі
 */
 
 void RenderTargetContext::Bind ()
@@ -471,11 +471,11 @@ void RenderTargetContext::Bind ()
     if (!impl.is_dirty)
       return;
 
-      //очистка целей рендеринга
+      //РѕС‡РёСЃС‚РєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
     ID3D11DeviceContext& context = *impl.context;
 
-      //преобразование целей
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С†РµР»РµР№
 
     bool need_update_render_targets = false, need_update_viewports = false, need_update_scissors = false;
 
@@ -526,7 +526,7 @@ void RenderTargetContext::Bind ()
       dst_scissor.bottom = src_scissor.y + src_scissor.height;
     }
 
-      //установка в контекст
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚
 
     ID3D11DepthStencilView* depth_stencil_view = impl.depth_stencil_view ? static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ()) : (ID3D11DepthStencilView*)0;
 
@@ -539,7 +539,7 @@ void RenderTargetContext::Bind ()
     if (need_update_scissors)
       context.RSSetScissorRects (DEVICE_RENDER_TARGET_SLOTS_COUNT, scissors);
 
-      //обновление кэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
 
     for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
     {
@@ -552,7 +552,7 @@ void RenderTargetContext::Bind ()
 
     impl.depth_stencil_view_cache = static_cast<ID3D11DepthStencilView*> (depth_stencil_view);
 
-      //очистка флага грязности состояния
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° РіСЂСЏР·РЅРѕСЃС‚Рё СЃРѕСЃС‚РѕСЏРЅРёСЏ
 
     impl.is_dirty = false;
   }

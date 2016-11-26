@@ -1,5 +1,5 @@
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 inline reference_counter::reference_counter (size_t start_counter)
@@ -16,7 +16,7 @@ inline reference_counter& reference_counter::operator = (const reference_counter
 }
 
 /*
-    Количество ссылок
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃСЃС‹Р»РѕРє
 */
 
 inline size_t reference_counter::use_count () const
@@ -25,7 +25,7 @@ inline size_t reference_counter::use_count () const
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 inline bool reference_counter::empty () const
@@ -34,7 +34,7 @@ inline bool reference_counter::empty () const
 }
 
 /*
-    Увеличение / уменьшение количества ссылок с вызовом пользовательского функтора при потере ссылок
+    РЈРІРµР»РёС‡РµРЅРёРµ / СѓРјРµРЅСЊС€РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЃСЃС‹Р»РѕРє СЃ РІС‹Р·РѕРІРѕРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ С„СѓРЅРєС‚РѕСЂР° РїСЂРё РїРѕС‚РµСЂРµ СЃСЃС‹Р»РѕРє
 */
 
 inline void addref (reference_counter& rc)
@@ -79,7 +79,7 @@ inline void release (const Ptr& ptr, Deleter deleter)
 }
 
 /*
-    Взаимодействие с intrusive_ptr
+    Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ СЃ intrusive_ptr
 */
 
 template <class T>

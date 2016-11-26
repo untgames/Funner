@@ -38,21 +38,21 @@ struct syslib::thread_handle
 };
 
 /*
-    Создание / удаление нити
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ РЅРёС‚Рё
 */
 
 BadaThreadManager::thread_t BadaThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
-      //проверка корректности аргументов, захват объекта обслуживания нити
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ, Р·Р°С…РІР°С‚ РѕР±СЉРµРєС‚Р° РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ РЅРёС‚Рё
 
     if (!in_callback)
       throw xtl::make_null_argument_exception ("", "callback");
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
 
-      //создание нити
+      //СЃРѕР·РґР°РЅРёРµ РЅРёС‚Рё
 
     stl::auto_ptr<thread_handle> handle (new thread_handle);
 
@@ -86,7 +86,7 @@ void BadaThreadManager::DestroyThread (thread_t thread)
 }
 
 /*
-    Ожидание завершения нити
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РЅРёС‚Рё
 */
 
 void BadaThreadManager::JoinThread (thread_t thread)
@@ -109,7 +109,7 @@ void BadaThreadManager::JoinThread (thread_t thread)
 }
 
 /*
-   Получение идентификатора нити
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РЅРёС‚Рё
 */
 
 size_t BadaThreadManager::GetThreadId (thread_t thread)

@@ -27,7 +27,7 @@ const char* COMPONENT_NAME = LOG_NAME;
 const size_t DEFAULT_DEVICE_PROPERTIES_COUNT = 4;
 
 /*
-   Подсистема менеджера ввода
+   РџРѕРґСЃРёСЃС‚РµРјР° РјРµРЅРµРґР¶РµСЂР° РІРІРѕРґР°
 */
 
 typedef xtl::function<void (const char*)> InputHandler;
@@ -35,7 +35,7 @@ typedef xtl::function<void (const char*)> InputHandler;
 class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListener<const InputHandler>, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     InputManagerSubsystem (ParseNode& node)
       : translation_map_registry (get<const char*> (node, "TranslationMapRegistry")),
         log (LOG_NAME)
@@ -65,7 +65,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
       AttachmentRegistry::Detach (this);
     }
 
-///Обработчик события добавления точек привязки событий ввода
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РґРѕР±Р°РІР»РµРЅРёСЏ С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
     void OnRegisterAttachment (const char* attachment_name, const InputHandler& handler)
     {
       if (!attachment_name)
@@ -138,13 +138,13 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
       attachments[attachment_name] = new_attachment;
     }
 
-///Обработчик события удаления точек привязки событий ввода
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
     void OnUnregisterAttachment (const char* attachment_name, const InputHandler&)
     {
       attachments.erase (attachment_name);
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -276,7 +276,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 };
 
 /*
-   Компонент менеджера ввода
+   РљРѕРјРїРѕРЅРµРЅС‚ РјРµРЅРµРґР¶РµСЂР° РІРІРѕРґР°
 */
 
 class InputManagerComponent

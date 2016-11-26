@@ -1,11 +1,11 @@
 /*
-    Проверка приведения из From в To
+    РџСЂРѕРІРµСЂРєР° РїСЂРёРІРµРґРµРЅРёСЏ РёР· From РІ To
 */
 
 namespace detail
 {
 
-//вспомогательный класс позволяющий определить приводимость из From в To
+//РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РїРѕР·РІРѕР»СЏСЋС‰РёР№ РѕРїСЂРµРґРµР»РёС‚СЊ РїСЂРёРІРѕРґРёРјРѕСЃС‚СЊ РёР· From РІ To
 template <class From, class To> struct is_convertible_basic_impl
 { 
   static no_type  test (...);
@@ -25,7 +25,7 @@ template <class From, class To> struct is_convertible_basic_impl
 #endif  
 };
 
-//в отличие от предыдущего класса проверяет частные случаи: приведение в void, и к массиву
+//РІ РѕС‚Р»РёС‡РёРµ РѕС‚ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РєР»Р°СЃСЃР° РїСЂРѕРІРµСЂСЏРµС‚ С‡Р°СЃС‚РЅС‹Рµ СЃР»СѓС‡Р°Рё: РїСЂРёРІРµРґРµРЅРёРµ РІ void, Рё Рє РјР°СЃСЃРёРІСѓ
 template <class From, class To> struct is_convertible_impl
 {
   typedef typename add_reference<From>::type reference_type;
@@ -33,7 +33,7 @@ template <class From, class To> struct is_convertible_impl
   enum { value = (is_convertible_basic_impl<reference_type, To>::value || is_void<To>::value) && !is_array<To>::value };
 };
 
-//определение приведения с учётом проверки арифметических и абстрактный типов данных
+//РѕРїСЂРµРґРµР»РµРЅРёРµ РїСЂРёРІРµРґРµРЅРёСЏ СЃ СѓС‡С‘С‚РѕРј РїСЂРѕРІРµСЂРєРё Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёС… Рё Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 template <bool trivial_from, bool trivial_to, bool abstract_to> struct is_convertible_impl_select
 {
   template <class From, class To> struct rebind
@@ -76,7 +76,7 @@ template <class From, class To> struct is_convertible_helper
 
 template <class From, class To> struct is_convertible: public detail::is_convertible_helper<From, To>::type {};
 
-//специализации для типа void
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ С‚РёРїР° void
 template <class From> struct is_convertible<From, void>:                               public true_type {};
 template <class From> struct is_convertible<From, const void>:                         public true_type {};
 template <class From> struct is_convertible<From, volatile void>:                      public true_type {};
@@ -103,14 +103,14 @@ template <>           struct is_convertible<const volatile void, volatile void>:
 template <>           struct is_convertible<const volatile void, const volatile void>: public true_type {};
 
 /*
-    Проверка являются ли T и U одним и тем же типом
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏСЋС‚СЃСЏ Р»Рё T Рё U РѕРґРЅРёРј Рё С‚РµРј Р¶Рµ С‚РёРїРѕРј
 */
 
 template <class T, class U> struct is_same:       public false_type {};
 template <class T>          struct is_same<T, T>: public true_type {};
 
 /*
-    Проверка является ли Base базовым для Derived
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё Base Р±Р°Р·РѕРІС‹Рј РґР»СЏ Derived
 */
 
 namespace detail
@@ -161,7 +161,7 @@ template <typename B, typename D> struct is_base_and_derived_impl
 template <class Base, class Derived>
 struct is_base_of: public bool_constant<detail::is_base_and_derived_impl<Base, Derived>::value> {};
 
-//специализации для ссылочных типов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СЃСЃС‹Р»РѕС‡РЅС‹С… С‚РёРїРѕРІ
 template <class Base, class Derived> struct is_base_of<Base&, Derived>:  public false_type {};
 template <class Base, class Derived> struct is_base_of<Base, Derived&>:  public false_type {};
 template <class Base, class Derived> struct is_base_of<Base&, Derived&>: public false_type {};

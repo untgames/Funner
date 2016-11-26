@@ -3,7 +3,7 @@
 using namespace media;
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Font::Font (FontImpl* in_impl)
@@ -31,7 +31,7 @@ Font& Font::operator = (const Font& source)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Font::Id () const
@@ -40,7 +40,7 @@ size_t Font::Id () const
 }
 
 /*
-   Имя файла
+   РРјСЏ С„Р°Р№Р»Р°
 */
 
 const char* Font::Source () const
@@ -49,7 +49,7 @@ const char* Font::Source () const
 }
 
 /*
-   Имя гарнитуры / имя семейства / имя стиля
+   РРјСЏ РіР°СЂРЅРёС‚СѓСЂС‹ / РёРјСЏ СЃРµРјРµР№СЃС‚РІР° / РёРјСЏ СЃС‚РёР»СЏ
 */
 
 const char* Font::Name () const
@@ -68,7 +68,7 @@ const char* Font::StyleName () const
 }
 
 /*
-   Размер таблицы глифов
+   Р Р°Р·РјРµСЂ С‚Р°Р±Р»РёС†С‹ РіР»РёС„РѕРІ
 */
 
 unsigned int Font::GlyphsCount () const
@@ -77,7 +77,7 @@ unsigned int Font::GlyphsCount () const
 }
 
 /*
-   Код первого глифа
+   РљРѕРґ РїРµСЂРІРѕРіРѕ РіР»РёС„Р°
 */
 
 unsigned int Font::FirstGlyphCode () const
@@ -86,7 +86,7 @@ unsigned int Font::FirstGlyphCode () const
 }
 
 /*
-   Размер шрифта
+   Р Р°Р·РјРµСЂ С€СЂРёС„С‚Р°
 */
 
 unsigned int Font::FontSize () const
@@ -95,7 +95,7 @@ unsigned int Font::FontSize () const
 }
 
 /*
-   Доступ к данным о глифах
+   Р”РѕСЃС‚СѓРї Рє РґР°РЅРЅС‹Рј Рѕ РіР»РёС„Р°С…
 */
 
 const GlyphInfo* Font::Glyphs () const
@@ -104,7 +104,7 @@ const GlyphInfo* Font::Glyphs () const
 }
 
 /*
-   Информация о кёрнингах
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РєС‘СЂРЅРёРЅРіР°С…
 */
 
 KerningInfo Font::Kerning (unsigned int left_glyph_index, unsigned int right_glyph_index) const
@@ -118,7 +118,7 @@ bool Font::HasKerning (unsigned int left_glyph_index, unsigned int right_glyph_i
 }
 
 /*
-   Создание растеризованного шрифта
+   РЎРѕР·РґР°РЅРёРµ СЂР°СЃС‚РµСЂРёР·РѕРІР°РЅРЅРѕРіРѕ С€СЂРёС„С‚Р°
 */
 
 RasterizedFont Font::CreateRasterizedFont (const RasterizedFontCreationParams& params) const
@@ -135,7 +135,7 @@ RasterizedFont Font::CreateRasterizedFont (const RasterizedFontCreationParams& p
 }
 
 /*
-    Получение объекта-события оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р°-СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& Font::GetTrackable () const
@@ -154,7 +154,7 @@ xtl::trackable& get_trackable (Font& font)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Font::Swap (Font& source)
@@ -166,7 +166,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Font& font1, Font& font2)

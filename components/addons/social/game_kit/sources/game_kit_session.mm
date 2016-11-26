@@ -74,7 +74,7 @@ void on_authentificated (const char* source, NSError* error, common::Log log, Us
 }
 
 /*
-   Конструктор / Деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 GameKitSessionImpl::GameKitSessionImpl ()
@@ -95,7 +95,7 @@ GameKitSessionImpl::~GameKitSessionImpl ()
 }
 
 /*
-   Описание сессии
+   РћРїРёСЃР°РЅРёРµ СЃРµСЃСЃРёРё
 */
 
 const char* GameKitSessionImpl::GetDescription ()
@@ -104,7 +104,7 @@ const char* GameKitSessionImpl::GetDescription ()
 }
 
 /*
-   Показ стандартных окон
+   РџРѕРєР°Р· СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РѕРєРѕРЅ
 */
 
 void GameKitSessionImpl::ShowWindow (const char* window_name, const common::PropertyMap& properties)
@@ -201,7 +201,7 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
 }
 
 /*
-   Завершился ли процесс логина
+   Р—Р°РІРµСЂС€РёР»СЃСЏ Р»Рё РїСЂРѕС†РµСЃСЃ Р»РѕРіРёРЅР°
 */
 
 bool GameKitSessionImpl::IsUserLoggedIn ()
@@ -210,7 +210,7 @@ bool GameKitSessionImpl::IsUserLoggedIn ()
 }
 
 /*
-   Проверка наличия в PropertyMap неизвестных полей
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІ PropertyMap РЅРµРёР·РІРµСЃС‚РЅС‹С… РїРѕР»РµР№
 */
 
 void GameKitSessionImpl::CheckUnknownProperties (const char* source, const common::PropertyMap& properties,

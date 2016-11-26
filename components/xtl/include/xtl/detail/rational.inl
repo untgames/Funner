@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class I>
@@ -26,7 +26,7 @@ inline rational<I>::rational (int_type in_n, int_type in_d)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class I>
@@ -51,7 +51,7 @@ inline rational<I>& rational<I>::assign (int_type in_n, int_type in_d)
 }
 
 /*
-    Получение данных
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 template <class I>
@@ -67,7 +67,7 @@ inline typename rational<I>::int_type rational<I>::denominator () const
 }
 
 /*
-    Арифметические операции
+    РђСЂРёС„РјРµС‚РёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class I>
@@ -227,7 +227,7 @@ inline rational<I> operator / (I value, const rational<II>& r)
 }
 
 /*
-    Инкремент / декремент
+    РРЅРєСЂРµРјРµРЅС‚ / РґРµРєСЂРµРјРµРЅС‚
 */
 
 template <class I>
@@ -243,7 +243,7 @@ inline const rational<I>& rational<I>::operator -- ()
 }
 
 /*
-    Унарные операции
+    РЈРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class I>
@@ -271,7 +271,7 @@ inline rational<I>::operator unspecified_bool_type () const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class I>
@@ -361,7 +361,7 @@ inline bool rational<I>::operator >= (int_type r) const
 }
 
 /*
-    Получение абсолютного значения
+    РџРѕР»СѓС‡РµРЅРёРµ Р°Р±СЃРѕР»СЋС‚РЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class I>
@@ -374,7 +374,7 @@ inline rational<I> abs (const rational<I>& r)
 }
 
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class I> template <class T>

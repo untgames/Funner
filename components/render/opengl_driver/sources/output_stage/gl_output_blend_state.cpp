@@ -1,7 +1,7 @@
 #include "shared.h"
 
-//добавить GL_NV_blend_squaring (gl 1.4)
-//добавить blend-constant-color (gl 1.4)
+//РґРѕР±Р°РІРёС‚СЊ GL_NV_blend_squaring (gl 1.4)
+//РґРѕР±Р°РІРёС‚СЊ blend-constant-color (gl 1.4)
 //TODO: MRT
 
 using namespace render::low_level;
@@ -9,7 +9,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 BlendState::BlendState (const ContextManager& context_manager, const BlendDesc& in_desc)
@@ -24,7 +24,7 @@ BlendState::~BlendState ()
 }
 
 /*
-    Установка / изменение дескриптора
+    РЈСЃС‚Р°РЅРѕРІРєР° / РёР·РјРµРЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 namespace
@@ -133,20 +133,20 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
 
     //TODO: MRT
 
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (in_desc.independent_blend_enable)
     throw xtl::format_not_supported_exception (METHOD_NAME, "MRT not supported. Please check BlendDesc::independent_blend_enable field");
   
-    //выбор контекста
+    //РІС‹Р±РѕСЂ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
   
-    //определение поддержки расширений OpenGL
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
     
   const ContextCaps& caps = GetCaps ();
 
-    //преобразование данных дескриптора
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   const RenderTargetBlendDesc& blend_desc = in_desc.render_target [0];
 
@@ -227,7 +227,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   if (!caps.has_arb_multisample && in_desc.sample_alpha_to_coverage) 
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't enable sample alpha to coverage mode (GL_ARB_multisample extension not supported)");
 
-    //проверка поддержки расширений
+    //РїСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№
     
   if (blend_desc.blend_enable && (blend_desc.color_write_mask & ColorWriteFlag_All))
   {  
@@ -252,7 +252,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     check_blend_operation (blend_desc.blend_alpha_operation, caps, METHOD_NAME, "desc.blend_alpha_operation");    
   }
 
-    //запись команд в контексте OpenGL
+    //Р·Р°РїРёСЃСЊ РєРѕРјР°РЅРґ РІ РєРѕРЅС‚РµРєСЃС‚Рµ OpenGL
     
   CommandListBuilder cmd_list;    
   
@@ -282,21 +282,21 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     else                                  cmd_list.Add (glDisable, GL_SAMPLE_ALPHA_TO_COVERAGE);
   }  
   
-    //создание исполнителя команд    
+    //СЃРѕР·РґР°РЅРёРµ РёСЃРїРѕР»РЅРёС‚РµР»СЏ РєРѕРјР°РЅРґ    
 
   ExecuterPtr new_executer = cmd_list.Finish ();  
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
   
-    //сохранение параметров
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
   desc      = in_desc;
   desc_hash = crc32 (&desc, sizeof desc);
   executer  = new_executer;
 
-    //оповещение о необходимости ребиндинга уровня
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 
   StageRebindNotify (Stage_Output);
 }
@@ -307,7 +307,7 @@ void BlendState::GetDesc (BlendDesc& out_desc)
 }
 
 /*
-    Установка состояния в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void BlendState::Bind ()
@@ -316,7 +316,7 @@ void BlendState::Bind ()
 
   static const char* METHOD_NAME = "render::low_level::opengl::BlendState::Bind";
 
-    //проверка необходимости биндинга (кэширование состояния)
+    //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР° (РєСЌС€РёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ)
 
   const size_t current_desc_hash        = GetContextCacheValue (CacheEntry_BlendStateHash),
                current_color_write_mask = GetContextCacheValue (CacheEntry_ColorWriteMask0);
@@ -324,19 +324,19 @@ void BlendState::Bind ()
   if (current_desc_hash == desc_hash && current_color_write_mask == desc.render_target [0].color_write_mask)
     return;
 
-    //установка состояния в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   MakeContextCurrent ();  
   
-    //выполнение команд 
+    //РІС‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ 
 
   executer->ExecuteCommands ();
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //установка кэш-переменных
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   SetContextCacheValue (CacheEntry_BlendStateHash, desc_hash);
   SetContextCacheValue (CacheEntry_ColorWriteMask0, desc.render_target [0].color_write_mask);

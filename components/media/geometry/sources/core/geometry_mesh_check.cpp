@@ -10,7 +10,7 @@ namespace
 const float EPS = 1e-06f;
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 class Log
@@ -40,17 +40,17 @@ class Log
 };
 
 /*
-    Проверка корректности вершинного потока
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
 */
 
 struct CheckContext
 {
-  const VertexStream&        stream;              //вершинный массив
-  const VertexWeightStream&  weights;             //веса
-  unsigned int               vertex_buffer_index; //номер вершинного буфера
-  unsigned int               stream_index;        //номер вершинного массива
-  unsigned int               weights_count;       //количество весов
-  unsigned int               vertex_index;        //номер вершины
+  const VertexStream&        stream;              //РІРµСЂС€РёРЅРЅС‹Р№ РјР°СЃСЃРёРІ
+  const VertexWeightStream&  weights;             //РІРµСЃР°
+  unsigned int               vertex_buffer_index; //РЅРѕРјРµСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
+  unsigned int               stream_index;        //РЅРѕРјРµСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°
+  unsigned int               weights_count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЃРѕРІ
+  unsigned int               vertex_index;        //РЅРѕРјРµСЂ РІРµСЂС€РёРЅС‹
   const VertexAttribute*     attribute;
   
   CheckContext (const VertexBuffer& vb, unsigned int in_vertex_buffer_index, unsigned int in_stream_index) :
@@ -234,7 +234,7 @@ void check_indices (unsigned int count, const T* index, unsigned int verts_count
 }
 
 /*
-    Проверка корректности меша
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РјРµС€Р°
 */
 
 namespace media
@@ -251,7 +251,7 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
   {
     const IndexBuffer& index_buffer = mesh.IndexBuffer ();
     
-      //проверка примитивов
+      //РїСЂРѕРІРµСЂРєР° РїСЂРёРјРёС‚РёРІРѕРІ
     
     bool has_indices = mesh.IndexBuffer ().Size () != 0;
 
@@ -301,7 +301,7 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
         continue;
       }
       
-        //проверка корректности индексов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РёРЅРґРµРєСЃРѕРІ
         
       unsigned int verts_count = vertex_buffer.VerticesCount ();
       
@@ -322,11 +322,11 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
       }
     }
         
-      //проверка вершинных буферов
+      //РїСЂРѕРІРµСЂРєР° РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
       
     for (unsigned int i=0, count=mesh.VertexBuffersCount (); i<count; i++)
     {
-        //проверка вершинных массивов
+        //РїСЂРѕРІРµСЂРєР° РІРµСЂС€РёРЅРЅС‹С… РјР°СЃСЃРёРІРѕРІ
 
       const VertexBuffer& vertex_buffer = mesh.VertexBuffer (i);
 
@@ -337,7 +337,7 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
         check_stream (log, check_context);
       }
 
-        //проверка массива весов
+        //РїСЂРѕРІРµСЂРєР° РјР°СЃСЃРёРІР° РІРµСЃРѕРІ
         
       const VertexWeight* weight = vertex_buffer.Weights ().Data ();
         

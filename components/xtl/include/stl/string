@@ -19,7 +19,7 @@ namespace stl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Строка
+///РЎС‚СЂРѕРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Traits,class Allocator>
 class basic_string: private Allocator::template rebind<T>::other
@@ -42,7 +42,7 @@ class basic_string: private Allocator::template rebind<T>::other
     static const size_type npos = (size_type)-1;   
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     struct _reserve {};
 
@@ -68,12 +68,12 @@ class basic_string: private Allocator::template rebind<T>::other
              ~basic_string ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Аллокатор
+///РђР»Р»РѕРєР°С‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     allocator_type get_allocator () const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Размер строки / макс. возможный размер / объём / проверка на пустоту
+///Р Р°Р·РјРµСЂ СЃС‚СЂРѕРєРё / РјР°РєСЃ. РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ / РѕР±СЉС‘Рј / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     size_type size     () const;
     size_type length   () const { return size (); }
@@ -82,7 +82,7 @@ class basic_string: private Allocator::template rebind<T>::other
     bool      empty    () const;  
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Операции доступа
+///РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////           
     const value_type* c_str () const;
     const value_type* data  () const { return c_str (); }
@@ -94,7 +94,7 @@ class basic_string: private Allocator::template rebind<T>::other
     const_reference at (size_type) const; //[] with range check
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение итераторов
+///РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////    
     iterator               begin  ();
     iterator               end    ();
@@ -106,21 +106,21 @@ class basic_string: private Allocator::template rebind<T>::other
     const_reverse_iterator rend   () const;     
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Изменение размера
+///РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////    
     void resize  (size_type new_size,value_type c);
     void resize  (size_type new_size);
     void reserve (size_type size=0);
 
-    void fast_resize (size_type new_size); //быстрое изменение размера строки (при наличии специализации в char_traits)
+    void fast_resize (size_type new_size); //Р±С‹СЃС‚СЂРѕРµ РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃС‚СЂРѕРєРё (РїСЂРё РЅР°Р»РёС‡РёРё СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РІ char_traits)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение подстроки
+///РџРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃС‚СЂРѕРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////    
     basic_string substr (size_type pos = 0,size_type n = npos) const;
  
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Присваивание
+///РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     basic_string& assign (const basic_string&);
     basic_string& assign (const basic_string&,size_type pos,size_type n);
@@ -136,7 +136,7 @@ class basic_string: private Allocator::template rebind<T>::other
     basic_string& operator = (value_type);  
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Вставка
+///Р’СЃС‚Р°РІРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     basic_string& insert (size_type pos,const basic_string&);
     basic_string& insert (size_type pos,const basic_string& s,size_type offs, size_type n);
@@ -149,13 +149,13 @@ class basic_string: private Allocator::template rebind<T>::other
     template <class Iter> void insert (iterator pos,Iter first,Iter last);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление / удаление элементов
+///Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////                                        
     void push_back (value_type);
     void pop_back  ();  
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Конкатенация  
+///РљРѕРЅРєР°С‚РµРЅР°С†РёСЏ  
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     basic_string& append (const basic_string&);
     basic_string& append (const basic_string&,size_type pos,size_type n);
@@ -174,7 +174,7 @@ class basic_string: private Allocator::template rebind<T>::other
     basic_string operator + (value_type) const;              
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление
+///РЈРґР°Р»РµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////                                              
     basic_string& erase (size_type pos = 0,size_type n = npos);
     iterator      erase (iterator pos);
@@ -182,7 +182,7 @@ class basic_string: private Allocator::template rebind<T>::other
     void          clear ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Замена (erase + insert)
+///Р—Р°РјРµРЅР° (erase + insert)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////                                                  
     basic_string& replace (size_type pos,size_type n,const basic_string& s);
     basic_string& replace (size_type pos1,size_type n1,const basic_string& s,size_type pos2,size_type n2);
@@ -197,13 +197,13 @@ class basic_string: private Allocator::template rebind<T>::other
     template <class Iter> basic_string& replace (iterator first1,iterator last1,Iter first2,Iter last2);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен и копирование строки в буфер
+///РћР±РјРµРЅ Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ Р±СѓС„РµСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void      swap (basic_string&);
     size_type copy (value_type* dst,size_type buf_size,size_type pos = 0) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск (от начала строки)
+///РџРѕРёСЃРє (РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     size_type find (const basic_string&,size_type from_pos = 0) const; 
     size_type find (const value_type*,size_type from_pos = 0) const; 
@@ -211,7 +211,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type find (value_type c,size_type from_pos = 0) const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск (от конца строки)
+///РџРѕРёСЃРє (РѕС‚ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////  
     size_type rfind (const basic_string&,size_type from_pos = npos) const;
     size_type rfind (const value_type*,size_type from_pos = npos) const;
@@ -219,7 +219,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type rfind (value_type c,size_type from_pos = npos) const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого символа присутствующего в подстроке (от начала строки)
+///РџРѕРёСЃРє РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РµРіРѕ РІ РїРѕРґСЃС‚СЂРѕРєРµ (РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     size_type find_first_of (const basic_string&,size_type from_pos = 0) const; 
     size_type find_first_of (const value_type*,size_type from_pos = 0) const;
@@ -227,7 +227,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type find_first_of (value_type c,size_type from_pos = 0) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого символа присутствующего в подстроке (от конца строки)
+///РџРѕРёСЃРє РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РµРіРѕ РІ РїРѕРґСЃС‚СЂРѕРєРµ (РѕС‚ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     size_type find_last_of (const basic_string&,size_type from_pos = npos) const;
     size_type find_last_of (const value_type*,size_type from_pos = npos) const;
@@ -235,7 +235,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type find_last_of (value_type c,size_type from_pos = npos) const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого символа отсутствующего в подстроке (от начала строки)
+///РџРѕРёСЃРє РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРіРѕ РІ РїРѕРґСЃС‚СЂРѕРєРµ (РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////  
     size_type find_first_not_of (const basic_string&,size_type from_pos = 0) const;
     size_type find_first_not_of (const value_type*,size_type from_pos = 0) const;
@@ -243,7 +243,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type find_first_not_of (value_type c,size_type from_pos = 0) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск первого символа отсутствующего в подстроке (от конца строки)
+///РџРѕРёСЃРє РїРµСЂРІРѕРіРѕ СЃРёРјРІРѕР»Р° РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РµРіРѕ РІ РїРѕРґСЃС‚СЂРѕРєРµ (РѕС‚ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////    
     size_type find_last_not_of (const basic_string&,size_type from_pos = npos) const;
     size_type find_last_not_of (const value_type*,size_type from_pos = npos) const;
@@ -251,7 +251,7 @@ class basic_string: private Allocator::template rebind<T>::other
     size_type find_last_not_of (value_type c,size_type from_pos = npos) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексикографическое сравнение
+///Р›РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРµ СЃСЂР°РІРЅРµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     int compare (const basic_string&) const;
     int compare (size_type pos,size_type n,const basic_string& s) const;    
@@ -278,7 +278,7 @@ class basic_string: private Allocator::template rebind<T>::other
     typedef stl::eq_traits<traits_type> eq_traits;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательные функции
+///Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     void construct_null (value_type*);
     void terminate_string ();
@@ -294,7 +294,7 @@ class basic_string: private Allocator::template rebind<T>::other
     bool      is_valid         (size_type pos,size_type count) const;  
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Диспетчеры вызовов (по категориям итераторов)
+///Р”РёСЃРїРµС‚С‡РµСЂС‹ РІС‹Р·РѕРІРѕРІ (РїРѕ РєР°С‚РµРіРѕСЂРёСЏРј РёС‚РµСЂР°С‚РѕСЂРѕРІ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
                           void _init    (size_type,value_type);
     template <class Iter> void _init    (Iter,Iter);
@@ -316,7 +316,7 @@ class basic_string: private Allocator::template rebind<T>::other
     static int _compare (const value_type*,const value_type*,const value_type*,const value_type*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление памятью
+///РЈРїСЂР°РІР»РµРЅРёРµ РїР°РјСЏС‚СЊСЋ
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool    is_static        () const;
     void    allocate_block   (size_type);
@@ -324,7 +324,7 @@ class basic_string: private Allocator::template rebind<T>::other
     pointer allocate         (size_type,size_type&);
     void    deallocate       (pointer,size_type);
 
-    static const size_t BUF_SIZE = 20 / sizeof (value_type) < 1 ? 1 : 20 / sizeof (value_type); //размер внутреннего буфера
+    static const size_t BUF_SIZE = 20 / sizeof (value_type) < 1 ? 1 : 20 / sizeof (value_type); //СЂР°Р·РјРµСЂ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ Р±СѓС„РµСЂР°
 
   protected:
     pointer    start, finish, end_of_storage;
@@ -332,7 +332,7 @@ class basic_string: private Allocator::template rebind<T>::other
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-///Внешние операторы
+///Р’РЅРµС€РЅРёРµ РѕРїРµСЂР°С‚РѕСЂС‹
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Traits,class Allocator> 
 basic_string<T,Traits,Allocator> operator + (const T*,const basic_string<T,Traits,Allocator>&);
@@ -348,13 +348,13 @@ template <class T,class Traits,class Allocator> bool operator <= (const T*,const
 template <class T,class Traits,class Allocator> bool operator >= (const T*,const basic_string<T,Traits,Allocator>&);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен содержимого двух строк
+///РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… СЃС‚СЂРѕРє
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Traits,class Allocator> 
 void swap (basic_string<T,Traits,Allocator>&,basic_string<T,Traits,Allocator>&);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-///Функтор хэширования
+///Р¤СѓРЅРєС‚РѕСЂ С…СЌС€РёСЂРѕРІР°РЅРёСЏ
 //////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Traits,class Allocator>
 struct hash_fun<basic_string<T,Traits,Allocator> >

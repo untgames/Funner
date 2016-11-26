@@ -4,12 +4,12 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации Line
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Line
 */
 
 struct Line::Impl: public xtl::instance_counter<Line>
 {
-  LineDesc line_desc; //описание спрайта
+  LineDesc line_desc; //РѕРїРёСЃР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
   
   Impl ()
   {
@@ -24,7 +24,7 @@ struct Line::Impl: public xtl::instance_counter<Line>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Line::Line ()
@@ -38,7 +38,7 @@ Line::~Line ()
 }
 
 /*
-    Создание спрайта
+    РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
 */
 
 Line::Pointer Line::Create ()
@@ -47,7 +47,7 @@ Line::Pointer Line::Create ()
 }
 
 /*
-    Цвет спрайта
+    Р¦РІРµС‚ СЃРїСЂР°Р№С‚Р°
 */
 
 namespace
@@ -118,7 +118,7 @@ float Line::Alpha (size_t point_index) const
 }
 
 /*
-    Текстурные координаты
+    РўРµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹
 */
 
 void Line::SetTexOffset (size_t point_index, const math::vec2f& offset)
@@ -141,7 +141,7 @@ const math::vec2f& Line::TexOffset (size_t point_index) const
 
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Line::AcceptCore (Visitor& visitor)
@@ -151,7 +151,7 @@ void Line::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Реализация получения количества спрайтов и массива спрайтов
+    Р РµР°Р»РёР·Р°С†РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЃРїСЂР°Р№С‚РѕРІ Рё РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t Line::LineDescsCountCore ()
@@ -170,7 +170,7 @@ const LineDesc* Line::LineDescsCore ()
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 namespace

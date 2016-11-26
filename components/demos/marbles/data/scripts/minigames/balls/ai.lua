@@ -123,14 +123,14 @@ function BallsMinigameState.AI.Create (game_field, ai_level)
   
   setmetatable (ai, BallsMinigameState.AI)
   
-  ai.game_field         = game_field   --поле для игры
-  ai.idle_time          = 0            --текущее время "обдумывания следующего хода"
+  ai.game_field         = game_field   --РїРѕР»Рµ РґР»СЏ РёРіСЂС‹
+  ai.idle_time          = 0            --С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ "РѕР±РґСѓРјС‹РІР°РЅРёСЏ СЃР»РµРґСѓСЋС‰РµРіРѕ С…РѕРґР°"
   
   local difficulty = math.min (ai_level, MAXIMUM_DIFFICULTY) / MAXIMUM_DIFFICULTY
   
-  ai.speed_variation = MAXIMUM_LEVEL_RANGE - (MAXIMUM_LEVEL_RANGE - MINIMUM_LEVEL_RANGE) * difficulty  --вариативность скорости
-  ai.speed           = MINIMUM_SPEED - (MINIMUM_SPEED - MAXIMUM_SPEED) * difficulty                    --базовая скорость
-  ai.next_step_time  = get_next_step_time (ai.speed, ai.speed_variation)   --время следующего хода
+  ai.speed_variation = MAXIMUM_LEVEL_RANGE - (MAXIMUM_LEVEL_RANGE - MINIMUM_LEVEL_RANGE) * difficulty  --РІР°СЂРёР°С‚РёРІРЅРѕСЃС‚СЊ СЃРєРѕСЂРѕСЃС‚Рё
+  ai.speed           = MINIMUM_SPEED - (MINIMUM_SPEED - MAXIMUM_SPEED) * difficulty                    --Р±Р°Р·РѕРІР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+  ai.next_step_time  = get_next_step_time (ai.speed, ai.speed_variation)   --РІСЂРµРјСЏ СЃР»РµРґСѓСЋС‰РµРіРѕ С…РѕРґР°
 
   return ai
 end

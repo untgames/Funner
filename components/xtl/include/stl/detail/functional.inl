@@ -1,5 +1,5 @@
 /*
-    Арифметичесие операции
+    РђСЂРёС„РјРµС‚РёС‡РµСЃРёРµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Arg1,class Arg2,class Result>
@@ -69,7 +69,7 @@ inline Result negate<Arg,Result>::operator () (const Arg& a) const
 }
 
 /*
-    Логичесике операции
+    Р›РѕРіРёС‡РµСЃРёРєРµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Arg1,class Arg2>
@@ -127,7 +127,7 @@ inline bool logical_not<Arg>::operator () (const Arg& a) const
 }
 
 /*
-    Поразрядные операции
+    РџРѕСЂР°Р·СЂСЏРґРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Arg1,class Arg2,class Result>
@@ -197,7 +197,7 @@ inline Result assign_radix_right_shift<Arg1,Arg2,Result>::operator () (Arg1& a,c
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Arg1,class Arg2,class Result>
@@ -207,7 +207,7 @@ inline Result assign<Arg1,Arg2,Result>::operator () (Arg1& a,const Arg2& b) cons
 }
 
 /*
-    Отрицание предиката
+    РћС‚СЂРёС†Р°РЅРёРµ РїСЂРµРґРёРєР°С‚Р°
 */
 
 template <class Predicate>
@@ -245,7 +245,7 @@ inline binary_negate<Predicate> not2 (const Predicate& p)
 }
 
 /*
-    Подстановки и проекции
+    РџРѕРґСЃС‚Р°РЅРѕРІРєРё Рё РїСЂРѕРµРєС†РёРё
 */
 
 template <class Fn> 
@@ -368,7 +368,7 @@ inline constant_binary_fun<Ret,Ret,Ret> constant2 (const Ret& val)
 }
 
 /*
-    Суперпозиция функций
+    РЎСѓРїРµСЂРїРѕР·РёС†РёСЏ С„СѓРЅРєС†РёР№
 */
 
 template <class Fn1,class Fn2>
@@ -406,7 +406,7 @@ inline binary_compose<Fn1,Fn2,Fn3> compose2 (const Fn1& fn1,const Fn2& fn2,const
 }
 
 /*
-    Получение "начального" элемента для операций
+    РџРѕР»СѓС‡РµРЅРёРµ "РЅР°С‡Р°Р»СЊРЅРѕРіРѕ" СЌР»РµРјРµРЅС‚Р° РґР»СЏ РѕРїРµСЂР°С†РёР№
 */
 
 template <class Arg1,class Arg2,class Result>

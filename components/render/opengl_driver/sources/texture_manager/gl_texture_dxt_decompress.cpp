@@ -62,7 +62,7 @@ void unpack (unsigned int width, unsigned int height, const Block* dxt_data, Pix
 }
 
 /*
-   Работа с DXT форматом при остутствии аппаратной поддержки
+   Р Р°Р±РѕС‚Р° СЃ DXT С„РѕСЂРјР°С‚РѕРј РїСЂРё РѕСЃС‚СѓС‚СЃС‚РІРёРё Р°РїРїР°СЂР°С‚РЅРѕР№ РїРѕРґРґРµСЂР¶РєРё
 */
 
 namespace render

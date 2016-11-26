@@ -16,7 +16,7 @@ inline SwapChainFrameBuffer::RenderTarget::RenderTarget ()
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainFrameBuffer::SwapChainFrameBuffer (const FrameBufferManagerPtr& manager, View* color_view, View* depth_stencil_view)
@@ -41,30 +41,30 @@ SwapChainFrameBuffer::SwapChainFrameBuffer (const FrameBufferManagerPtr& manager
 }
 
 /*
-    Инициализация целевых отображений
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РµР»РµРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void SwapChainFrameBuffer::SetColorView (View* view)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::SetColorView";  
 
-    //проверка наличия буфера цвета
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р±СѓС„РµСЂР° С†РІРµС‚Р°
 
   if (!view)
     return;    
   
-    //проверка совместимости хранимой в отображении текстуры и буфера кадра
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С…СЂР°РЅРёРјРѕР№ РІ РѕС‚РѕР±СЂР°Р¶РµРЅРёРё С‚РµРєСЃС‚СѓСЂС‹ Рё Р±СѓС„РµСЂР° РєР°РґСЂР°
     
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
     throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
   
-    //установка флага активности буфера цвета
+    //СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° Р°РєС‚РёРІРЅРѕСЃС‚Рё Р±СѓС„РµСЂР° С†РІРµС‚Р°
 
   is_color_buffer_active = true;
 
-    //обработка случая рендеринга в текстуру
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ С‚РµРєСЃС‚СѓСЂСѓ
     
   if (IRenderTargetTexture* texture = dynamic_cast<IRenderTargetTexture*> (base_texture))
   {
@@ -110,7 +110,7 @@ void SwapChainFrameBuffer::SetColorView (View* view)
     return;
   }
   
-    //обработка случая рендеринга в SwapChainColorBuffer
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ SwapChainColorBuffer
       
   if (SwapChainColorBuffer* buffer = dynamic_cast<SwapChainColorBuffer*> (base_texture))
   {
@@ -119,7 +119,7 @@ void SwapChainFrameBuffer::SetColorView (View* view)
     return;
   }
   
-    //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
+    //РµСЃР»Рё С†РµР»РµРІР°СЏ С‚РµРєСЃС‚СѓСЂР° РёРјРµРµС‚ РЅРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї - СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР° РЅРµРІРѕР·РјРѕР¶РЅРѕ
 
   throw xtl::format_operation_exception (METHOD_NAME, "Color-view texture has unknown type %s", view->GetTextureTypeName ());
 }
@@ -128,19 +128,19 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::SetDepthStencilView";
 
-    //проверка наличия буфера попиксельного отсечения
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 
   if (!view)
     return;
 
-    //проверка совместимости хранимой в отображении текстуры и буфера кадра
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С…СЂР°РЅРёРјРѕР№ РІ РѕС‚РѕР±СЂР°Р¶РµРЅРёРё С‚РµРєСЃС‚СѓСЂС‹ Рё Р±СѓС„РµСЂР° РєР°РґСЂР°
 
   ITexture* base_texture = view->GetTexture ();
   
   if (!base_texture)
     throw xtl::format_operation_exception (METHOD_NAME, "Internal error: view with null texture");
 
-    //обработка случая рендеринга в текстуру
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ С‚РµРєСЃС‚СѓСЂСѓ
 
   if (IRenderTargetTexture* texture = dynamic_cast<IRenderTargetTexture*> (base_texture))
   {
@@ -186,7 +186,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
     return;
   }
 
-    //обработка случая рендеринга в SwapChainDepthStencilBuffer
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ SwapChainDepthStencilBuffer
 
   if (SwapChainDepthStencilBuffer* buffer = dynamic_cast<SwapChainDepthStencilBuffer*> (base_texture))
   {
@@ -195,7 +195,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
     return;
   }
   
-    //обработка случая рендеринга во вспомогательный буфер
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃР»СѓС‡Р°СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІРѕ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ Р±СѓС„РµСЂ
     
   if (SwapChainFakeDepthStencilBuffer* buffer = dynamic_cast<SwapChainFakeDepthStencilBuffer*> (base_texture))
   {
@@ -204,7 +204,7 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
     return;
   }
 
-    //если целевая текстура имеет неизвестный тип - создание буфера кадра невозможно
+    //РµСЃР»Рё С†РµР»РµРІР°СЏ С‚РµРєСЃС‚СѓСЂР° РёРјРµРµС‚ РЅРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї - СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР° РЅРµРІРѕР·РјРѕР¶РЅРѕ
 
   throw xtl::format_operation_exception (METHOD_NAME, "Depth-stencil-view texture has unknown type %s", view->GetTextureTypeName ());
 }
@@ -213,7 +213,7 @@ void SwapChainFrameBuffer::FinishInitialization ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::FinishInitialization";
 
-    //если оба буфера проинициализированы - проверка совместимости
+    //РµСЃР»Рё РѕР±Р° Р±СѓС„РµСЂР° РїСЂРѕРёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅС‹ - РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 
   if (color_buffer && depth_stencil_buffer)
   {
@@ -223,7 +223,7 @@ void SwapChainFrameBuffer::FinishInitialization ()
     return;
   }
   
-    //проверка взаимодействия со вспомогательным буфером попиксельного отсечения
+    //РїСЂРѕРІРµСЂРєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃРѕ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рј Р±СѓС„РµСЂРѕРј РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 
   if (fake_depth_stencil_buffer && color_buffer)
   {
@@ -240,11 +240,11 @@ void SwapChainFrameBuffer::FinishInitialization ()
     return;
   }
 
-    //проверка случаев отсутствия одного из буферов  
+    //РїСЂРѕРІРµСЂРєР° СЃР»СѓС‡Р°РµРІ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РѕРґРЅРѕРіРѕ РёР· Р±СѓС„РµСЂРѕРІ  
 
   if (color_buffer && !depth_stencil_buffer)
   {
-      //отсутствует буфер попиксельного отсечения, но присутствует буфер цвета
+      //РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р±СѓС„РµСЂ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ, РЅРѕ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ Р±СѓС„РµСЂ С†РІРµС‚Р°
 
     depth_stencil_buffer = frame_buffer_manager->GetShadowBuffer (color_buffer.get ());
 
@@ -253,20 +253,20 @@ void SwapChainFrameBuffer::FinishInitialization ()
   
   if (!color_buffer && depth_stencil_buffer)
   {
-      //отсутствует буфер цвета, но присутствует буфер попиксельного отсечения
+      //РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р±СѓС„РµСЂ С†РІРµС‚Р°, РЅРѕ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ Р±СѓС„РµСЂ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 
     color_buffer = frame_buffer_manager->GetShadowBuffer (depth_stencil_buffer.get ());    
     
     return;
   }
 
-    //отсутствуют оба буфера (рендеринг в обе целевые текстуры)    
+    //РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РѕР±Р° Р±СѓС„РµСЂР° (СЂРµРЅРґРµСЂРёРЅРі РІ РѕР±Рµ С†РµР»РµРІС‹Рµ С‚РµРєСЃС‚СѓСЂС‹)    
 
   frame_buffer_manager->GetShadowBuffers (color_buffer, depth_stencil_buffer);    
 }
 
 /*
-    Установка буфера в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SwapChainFrameBuffer::Bind ()
@@ -285,7 +285,7 @@ void SwapChainFrameBuffer::Bind ()
 }
 
 /*
-    Оповещение об отрисовке в целевые буферы
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕС‚СЂРёСЃРѕРІРєРµ РІ С†РµР»РµРІС‹Рµ Р±СѓС„РµСЂС‹
 */
 
 void SwapChainFrameBuffer::InvalidateRenderTargets (unsigned int render_target_slot, const Rect& update_rect)
@@ -332,23 +332,23 @@ void SwapChainFrameBuffer::InvalidateRenderTargets (unsigned int render_target_s
 }
 
 /*
-    Обновление целевых текстур
+    РћР±РЅРѕРІР»РµРЅРёРµ С†РµР»РµРІС‹С… С‚РµРєСЃС‚СѓСЂ
 */
 
 void SwapChainFrameBuffer::UpdateRenderTargets ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBuffer::UpdateRenderTargets";
 
-    //если целевые текстуры отсутствуют или область обновления пуста, то обновление не нужно
+    //РµСЃР»Рё С†РµР»РµРІС‹Рµ С‚РµРєСЃС‚СѓСЂС‹ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РёР»Рё РѕР±Р»Р°СЃС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ РїСѓСЃС‚Р°, С‚Рѕ РѕР±РЅРѕРІР»РµРЅРёРµ РЅРµ РЅСѓР¶РЅРѕ
 
   if (!has_texture_targets || !dirty_rect.width || !dirty_rect.height)
     return;
 
-    //установка активного буфера кадра
+    //СѓСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
   Bind ();
   
-    //копирование изображений из различных целевых буферов в текстуру
+    //РєРѕРїРёСЂРѕРІР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёР№ РёР· СЂР°Р·Р»РёС‡РЅС‹С… С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІ С‚РµРєСЃС‚СѓСЂСѓ
         
   for (unsigned int i=0; i<RenderTargetType_Num; i++)
   {
@@ -357,13 +357,13 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     if (!render_target.target_texture)
       continue;
 
-      //получение параметров целевой текстуры
+      //РїРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С†РµР»РµРІРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 
     const ViewDesc&                view_desc      = render_target.view_desc;
     const MipLevelDesc&            mip_level_desc = render_target.mip_level_desc;
     const RenderTargetTextureDesc& texture_desc   = render_target.texture_desc;
 
-      //отсечение
+      //РѕС‚СЃРµС‡РµРЅРёРµ
       
     unsigned int x      = dirty_rect.x,
                  y      = dirty_rect.y,
@@ -382,11 +382,11 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
     if (!width || !height)
       continue;
 
-      //установка текущей текстуры
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ С‚РµРєСЃС‚СѓСЂС‹
 
     render_target.target_texture->Bind ();
 
-      //копирование изображения в текстуру
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ С‚РµРєСЃС‚СѓСЂСѓ
       
     GLenum tex_target = texture_desc.target;
 
@@ -424,11 +424,11 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
 #endif    
   }
   
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
   
   CheckErrors (METHOD_NAME);
 
-    //очистка области обновления
+    //РѕС‡РёСЃС‚РєР° РѕР±Р»Р°СЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ
 
   memset (&dirty_rect, 0, sizeof dirty_rect);
 }

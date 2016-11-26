@@ -6,15 +6,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESOURCE_ARRAY_RESERVE_SIZE = 128;   //резервируемое число ресурсов в группе ресурсов
-const size_t SERVER_ARRAY_RESERVE_SIZE   = 8;     //резервируемое число серверов в группе серверов
-const bool   DEFAULT_CACHE_STATE         = false; //состояние кэша ресурсов по умолчанию
+const size_t RESOURCE_ARRAY_RESERVE_SIZE = 128;   //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ СЂРµСЃСѓСЂСЃРѕРІ РІ РіСЂСѓРїРїРµ СЂРµСЃСѓСЂСЃРѕРІ
+const size_t SERVER_ARRAY_RESERVE_SIZE   = 8;     //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ СЃРµСЂРІРµСЂРѕРІ РІ РіСЂСѓРїРїРµ СЃРµСЂРІРµСЂРѕРІ
+const bool   DEFAULT_CACHE_STATE         = false; //СЃРѕСЃС‚РѕСЏРЅРёРµ РєСЌС€Р° СЂРµСЃСѓСЂСЃРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 /*
-    Интерфейс оповещения об удалении ресурса
+    РРЅС‚РµСЂС„РµР№СЃ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё СЂРµСЃСѓСЂСЃР°
 */
 
 class IResourceDestroyListener
@@ -27,7 +27,7 @@ class IResourceDestroyListener
 };
 
 /*
-    Работа со списокм серверов ресурсов
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРѕРєРј СЃРµСЂРІРµСЂРѕРІ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 template <class Fn> void do_query (ICustomServer** servers, size_t count, const char* resource_name, const Fn& fn, bool ignore_exceptions, bool reverse_order = false)
@@ -44,7 +44,7 @@ template <class Fn> void do_query (ICustomServer** servers, size_t count, const 
         }
         catch (...)
         {
-          //игнорирование исключений
+          //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }      
     }
@@ -58,7 +58,7 @@ template <class Fn> void do_query (ICustomServer** servers, size_t count, const 
         }
         catch (...)
         {
-          //игнорирование исключений
+          //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }
     }
@@ -91,45 +91,45 @@ template <class Fn> void do_query (ICustomServer** servers, size_t count, const 
 }
 
 /*
-    Описание ресурса
+    РћРїРёСЃР°РЅРёРµ СЂРµСЃСѓСЂСЃР°
 */
 
 enum ResourceState
 {
-  ResourceState_Unloaded,   //ресурс выгружен
-  ResourceState_Prefetched, //ресурс предвыбран
-  ResourceState_Loaded      //ресурс загружен
+  ResourceState_Unloaded,   //СЂРµСЃСѓСЂСЃ РІС‹РіСЂСѓР¶РµРЅ
+  ResourceState_Prefetched, //СЂРµСЃСѓСЂСЃ РїСЂРµРґРІС‹Р±СЂР°РЅ
+  ResourceState_Loaded      //СЂРµСЃСѓСЂСЃ Р·Р°РіСЂСѓР¶РµРЅ
 };
 
 class Resource: public xtl::noncopyable, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Resource (const char* in_name, IResourceDestroyListener* in_destroy_listener)
       : name (in_name)
       , state (ResourceState_Unloaded)
       , destroy_listener (in_destroy_listener)
     {}
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Resource ()
     {
       if (destroy_listener)
         destroy_listener->OnDestroyResource (name.c_str ());
     }
 
-///Имя ресурса
+///РРјСЏ СЂРµСЃСѓСЂСЃР°
     const char* Name () const { return name.c_str (); }
 
-///Состояние ресурса
+///РЎРѕСЃС‚РѕСЏРЅРёРµ СЂРµСЃСѓСЂСЃР°
     ResourceState State () const { return state; }
 
     void SetState (ResourceState new_state) { state = new_state; }
 
   private:
-    stl::string               name;             //имя ресурса
-    ResourceState             state;            //состояние ресурса
-    IResourceDestroyListener* destroy_listener; //слушатель удаления ресурса
+    stl::string               name;             //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+    ResourceState             state;            //СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµСЃСѓСЂСЃР°
+    IResourceDestroyListener* destroy_listener; //СЃР»СѓС€Р°С‚РµР»СЊ СѓРґР°Р»РµРЅРёСЏ СЂРµСЃСѓСЂСЃР°
 };
 
 typedef xtl::intrusive_ptr<Resource>                         ResourcePtr;
@@ -137,7 +137,7 @@ typedef stl::vector<ResourcePtr>                             ResourceArray;
 typedef stl::hash_map<stl::hash_key<const char*>, Resource*> ResourceMap; //weak-ref
 
 /*
-    Связывание с группой ресурсов
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃ РіСЂСѓРїРїРѕР№ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 class GroupBinding;
@@ -148,26 +148,26 @@ typedef stl::vector<ICustomServer*> ServerList;
 class GroupBinding: public ICustomBinding, public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     GroupBinding (ServerList& in_servers, ResourceArray& in_resources, GroupBindingList& in_group_bindings)
       : servers (in_servers),
         group_bindings (in_group_bindings)
     {
-        //инициализация массива ресурсов группы
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР° СЂРµСЃСѓСЂСЃРѕРІ РіСЂСѓРїРїС‹
 
       resources.swap (in_resources);
 
-        //добавление в список групп связывания
+        //РґРѕР±Р°РІР»РµРЅРёРµ РІ СЃРїРёСЃРѕРє РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
 
       group_bindings_pos = group_bindings.insert (group_bindings.end (), this);
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~GroupBinding ()
     {
       try
       {
-          //оповещение о групповой выгрузке ресурсов со ссылкой только на данную группу
+          //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РіСЂСѓРїРїРѕРІРѕР№ РІС‹РіСЂСѓР·РєРµ СЂРµСЃСѓСЂСЃРѕРІ СЃРѕ СЃСЃС‹Р»РєРѕР№ С‚РѕР»СЊРєРѕ РЅР° РґР°РЅРЅСѓСЋ РіСЂСѓРїРїСѓ
         for (ResourceArray::reverse_iterator iter=resources.rbegin (); iter!=resources.rend (); ++iter)
         {
           Resource& resource = **iter;
@@ -181,15 +181,15 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
 
-        //удаление из списка групп связывания
+        //СѓРґР°Р»РµРЅРёРµ РёР· СЃРїРёСЃРєР° РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
 
       group_bindings.erase (group_bindings_pos);
     }    
 
-///Загрузка группы ресурсов
+///Р—Р°РіСЂСѓР·РєР° РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
     void AsyncLoad (AsyncOperation& async_operation)
     {
       async_operation.AddEstimateSteps (resources.size () * 2);
@@ -198,7 +198,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       async_operation.AddTask (CreateTask (ResourceState_Loaded));
     }
 
-///Выгрузка группы ресурсов
+///Р’С‹РіСЂСѓР·РєР° РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
     void AsyncUnload (AsyncOperation& async_operation)
     {
       async_operation.AddEstimateSteps (resources.size ());
@@ -206,7 +206,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       async_operation.AddTask (CreateTask (ResourceState_Unloaded));
     }
     
-///Синхронная выгрузка ресурсов
+///РЎРёРЅС…СЂРѕРЅРЅР°СЏ РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
     void SyncUnload ()
     {      
       for (ResourceArray::reverse_iterator iter=resources.rbegin (), end=resources.rend ();iter != end; ++iter)
@@ -228,14 +228,14 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       }
     }
 
-///Получение массива ресурсов
+///РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° СЂРµСЃСѓСЂСЃРѕРІ
     ResourceArray& Resources () { return resources; }
     
-///Оповещение об удалении
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё
     xtl::trackable* GetTrackable () { return this; }
     
   private:      
-///Обработчик загрузки ресурсов
+///РћР±СЂР°Р±РѕС‚С‡РёРє Р·Р°РіСЂСѓР·РєРё СЂРµСЃСѓСЂСЃРѕРІ
     template <class Fn, class Pred, class Iter> class AsyncResourceProcessing
     {
       public:
@@ -338,29 +338,29 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
     }
 
   private:
-    ServerList&                servers;            //список серверов ресурсов
-    ResourceArray              resources;          //ресурсы
-    GroupBindingList&          group_bindings;     //список групп связывания
-    GroupBindingList::iterator group_bindings_pos; //положение в списке групп связывания
+    ServerList&                servers;            //СЃРїРёСЃРѕРє СЃРµСЂРІРµСЂРѕРІ СЂРµСЃСѓСЂСЃРѕРІ
+    ResourceArray              resources;          //СЂРµСЃСѓСЂСЃС‹
+    GroupBindingList&          group_bindings;     //СЃРїРёСЃРѕРє РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
+    GroupBindingList::iterator group_bindings_pos; //РїРѕР»РѕР¶РµРЅРёРµ РІ СЃРїРёСЃРєРµ РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
 };
 
 }
 
 /*
-    Описание реализации сервера ресурсов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРµСЂРІРµСЂР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupInstance, public xtl::reference_counter
 {
-  ServerList          servers;         //сервер управления ресурсами (ссылка без владения)
-  stl::string         name;            //имя сервера
-  stl::string         filters_string;  //строка, содержащая фильтры обрабатываемых ресурсов
-  common::StringArray filters;         //массив фильтров новых ресурсов
-  ResourceMap         resources;       //ресурсы
-  GroupBindingList    group_bindings;  //список групп связывания
-  bool                cache_state;     //используется ли кэш ресурсов
+  ServerList          servers;         //СЃРµСЂРІРµСЂ СѓРїСЂР°РІР»РµРЅРёСЏ СЂРµСЃСѓСЂСЃР°РјРё (СЃСЃС‹Р»РєР° Р±РµР· РІР»Р°РґРµРЅРёСЏ)
+  stl::string         name;            //РёРјСЏ СЃРµСЂРІРµСЂР°
+  stl::string         filters_string;  //СЃС‚СЂРѕРєР°, СЃРѕРґРµСЂР¶Р°С‰Р°СЏ С„РёР»СЊС‚СЂС‹ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
+  common::StringArray filters;         //РјР°СЃСЃРёРІ С„РёР»СЊС‚СЂРѕРІ РЅРѕРІС‹С… СЂРµСЃСѓСЂСЃРѕРІ
+  ResourceMap         resources;       //СЂРµСЃСѓСЂСЃС‹
+  GroupBindingList    group_bindings;  //СЃРїРёСЃРѕРє РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
+  bool                cache_state;     //РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р»Рё РєСЌС€ СЂРµСЃСѓСЂСЃРѕРІ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_name)
     : name (in_name)
     , cache_state (DEFAULT_CACHE_STATE)
@@ -372,10 +372,10 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     ResourceManagerSingleton::Instance ()->RegisterServerGroup (name.c_str (), this);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
-      //отмена регистрации в менеджере ресурсов
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІ РјРµРЅРµРґР¶РµСЂРµ СЂРµСЃСѓСЂСЃРѕРІ
 
     try
     {
@@ -385,7 +385,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     {
     }
 
-      //досрочное принудительное удаление групп связывания
+      //РґРѕСЃСЂРѕС‡РЅРѕРµ РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РіСЂСѓРїРї СЃРІСЏР·С‹РІР°РЅРёСЏ
 
     while (!group_bindings.empty ())
     {
@@ -396,12 +396,12 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
       delete binding;
     }
 
-      //сброс кэша ресурсов
+      //СЃР±СЂРѕСЃ РєСЌС€Р° СЂРµСЃСѓСЂСЃРѕРІ
 
     FlushUnusedResources ();    
   }
 
-///Обновление массива фильтров новых ресурсов
+///РћР±РЅРѕРІР»РµРЅРёРµ РјР°СЃСЃРёРІР° С„РёР»СЊС‚СЂРѕРІ РЅРѕРІС‹С… СЂРµСЃСѓСЂСЃРѕРІ
   void UpdateFilters (const char* str)
   {
     common::StringArray new_filters = common::split (str);
@@ -411,7 +411,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     filters.Swap (new_filters);
   }
 
-///Оповещение об удалении ресурса
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЂРµСЃСѓСЂСЃР°
   void OnDestroyResource (const char* name)
   {
     ResourceMap::iterator iter = resources.find (name);
@@ -429,14 +429,14 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
     resources.erase (iter);
   }
 
-///Сброс неиспользуемых ресурсов
+///РЎР±СЂРѕСЃ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
   struct AsyncFlushUnusedResourcesProcessing
   {
     AsyncFlushUnusedResourcesProcessing (Impl* in_impl)
@@ -449,12 +449,12 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     {
       async_operation.SetStage ("Flushing");
       
-      if (!impl->cache_state) //работа метода имеет смысл только в случае включенного кэширования неиспользуемых ресурсов
+      if (!impl->cache_state) //СЂР°Р±РѕС‚Р° РјРµС‚РѕРґР° РёРјРµРµС‚ СЃРјС‹СЃР» С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ РІРєР»СЋС‡РµРЅРЅРѕРіРѕ РєСЌС€РёСЂРѕРІР°РЅРёСЏ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
         return true;
       
       if (!initialized)
       {
-          //построение массива обрабатываемых ресурсов
+          //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
         
         resources.reserve (impl->resources.size ());
         
@@ -462,7 +462,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
         {
           Resource& resource = *iter->second;
 
-          if (resource.use_count () == 1) //если ресурс находится только в кеше
+          if (resource.use_count () == 1) //РµСЃР»Рё СЂРµСЃСѓСЂСЃ РЅР°С…РѕРґРёС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ РєРµС€Рµ
             resources.push_back (&resource);
         }
 
@@ -491,7 +491,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }
 
@@ -513,10 +513,10 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     async_operation.AddTask (AsyncFlushUnusedResourcesProcessing (this));
   }
 
-///Синхронная версия метода выгрузки неиспользуемых ресурсов
+///РЎРёРЅС…СЂРѕРЅРЅР°СЏ РІРµСЂСЃРёСЏ РјРµС‚РѕРґР° РІС‹РіСЂСѓР·РєРё РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
   void FlushUnusedResources ()
   {
-      //работа метода имеет смысл только в случае включенного кэширования неиспользуемых ресурсов
+      //СЂР°Р±РѕС‚Р° РјРµС‚РѕРґР° РёРјРµРµС‚ СЃРјС‹СЃР» С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ РІРєР»СЋС‡РµРЅРЅРѕРіРѕ РєСЌС€РёСЂРѕРІР°РЅРёСЏ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 
     if (!cache_state)
       return;
@@ -525,7 +525,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     {
       Resource& resource = *iter->second;      
 
-      if (resource.use_count () == 1) //если ресурс находится только в кеше
+      if (resource.use_count () == 1) //РµСЃР»Рё СЂРµСЃСѓСЂСЃ РЅР°С…РѕРґРёС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ РєРµС€Рµ
       {
         ResourceMap::reverse_iterator next = iter;        
 
@@ -539,24 +539,24 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     }
   }
   
-///Имя группы
+///РРјСЏ РіСЂСѓРїРїС‹
   const char* Name ()
   {
     return name.c_str ();
   }
   
-///Создание связывания
+///РЎРѕР·РґР°РЅРёРµ СЃРІСЏР·С‹РІР°РЅРёСЏ
   Binding CreateBinding (const Group& group)
   {
     try
     {
-        //создание массива ресурсов группы
+        //СЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° СЂРµСЃСѓСЂСЃРѕРІ РіСЂСѓРїРїС‹
 
       ResourceArray group_resources;
 
       group_resources.reserve (RESOURCE_ARRAY_RESERVE_SIZE);
 
-          //создание группы ресурсов
+          //СЃРѕР·РґР°РЅРёРµ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ
 
       for (size_t i=0, group_count=group.Size (); i<group_count; i++)
       {
@@ -569,42 +569,42 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
           if (!common::wcimatch (resource_name, filter))
             continue;
 
-            //имя ресурса соответствует фильтру
+            //РёРјСЏ СЂРµСЃСѓСЂСЃР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РёР»СЊС‚СЂСѓ
 
-            //поиск ресурса среди уже зарегистрированных
+            //РїРѕРёСЃРє СЂРµСЃСѓСЂСЃР° СЃСЂРµРґРё СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С…
 
           ResourceMap::iterator iter = resources.find (resource_name);
 
           if (iter != resources.end ())
           {
-              //ресурс уже присутствует в карте - добавление ресурса в группу
+              //СЂРµСЃСѓСЂСЃ СѓР¶Рµ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РІ РєР°СЂС‚Рµ - РґРѕР±Р°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР° РІ РіСЂСѓРїРїСѓ
 
             group_resources.push_back (iter->second);
           }
           else
           {
-              //создание ресурса
+              //СЃРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃР°
 
             ResourcePtr resource (new Resource (resource_name, this), false);
 
-              //добавление ресурса в группу
+              //РґРѕР±Р°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР° РІ РіСЂСѓРїРїСѓ
 
             group_resources.push_back (resource);
 
-              //регистрация ресурса
+              //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЂРµСЃСѓСЂСЃР°
 
             resources.insert_pair (resource_name, resource.get ());
           }
         }
       }
 
-        //создание группы связывания
+        //СЃРѕР·РґР°РЅРёРµ РіСЂСѓРїРїС‹ СЃРІСЏР·С‹РІР°РЅРёСЏ
 
       GroupBinding* group_binding = new GroupBinding (servers, group_resources, group_bindings);
 
       Binding binding (group_binding);
 
-        //дополнительное увеличение числа ссылок новых ресурсов для возможности кэширования
+        //РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ СѓРІРµР»РёС‡РµРЅРёРµ С‡РёСЃР»Р° СЃСЃС‹Р»РѕРє РЅРѕРІС‹С… СЂРµСЃСѓСЂСЃРѕРІ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РєСЌС€РёСЂРѕРІР°РЅРёСЏ
 
       if (cache_state)
       {
@@ -612,9 +612,9 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
         {
           Resource& resource = **iter;
 
-          if (resource.use_count () == 1) //если ресурс захвачен только новой группой
+          if (resource.use_count () == 1) //РµСЃР»Рё СЂРµСЃСѓСЂСЃ Р·Р°С…РІР°С‡РµРЅ С‚РѕР»СЊРєРѕ РЅРѕРІРѕР№ РіСЂСѓРїРїРѕР№
           {
-              //увеличиваем число ссылок на ресурс для возможности сохранения ресурса в кеше после удаления
+              //СѓРІРµР»РёС‡РёРІР°РµРј С‡РёСЃР»Рѕ СЃСЃС‹Р»РѕРє РЅР° СЂРµСЃСѓСЂСЃ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµСЃСѓСЂСЃР° РІ РєРµС€Рµ РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ
 
             addref (resource);
           }
@@ -630,13 +630,13 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     }    
   }
   
-///Получение экземпляра
+///РџРѕР»СѓС‡РµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
   ServerGroup Instance ()
   {
     return this;
   }
   
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
   void AddRef ()
   {
     addref (this);
@@ -649,7 +649,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ServerGroup::ServerGroup (Impl* in_impl)
@@ -704,7 +704,7 @@ ServerGroup& ServerGroup::operator = (const ServerGroup& group)
 }
 
 /*
-    Имя группы
+    РРјСЏ РіСЂСѓРїРїС‹
 */
 
 const char* ServerGroup::Name () const
@@ -729,20 +729,20 @@ void ServerGroup::SetName (const char* name)
 }
 
 /*
-    Добавление / удаление серверов ресурсов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРµСЂРІРµСЂРѕРІ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ServerGroup::Attach (ICustomServer& server)
 {
   try
   {
-      //проверка повторного добавления
+      //РїСЂРѕРІРµСЂРєР° РїРѕРІС‚РѕСЂРЅРѕРіРѕ РґРѕР±Р°РІР»РµРЅРёСЏ
 
     for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
       if (*iter == &server)
         return;
 
-      //восстановление состояния ресурсов
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂРµСЃСѓСЂСЃРѕРІ
       
     ICustomServer* server_ptr = &server;      
 
@@ -754,7 +754,7 @@ void ServerGroup::Attach (ICustomServer& server)
         do_query (&server_ptr, 1, resource.Name (), &ICustomServer::LoadResource, false);
     }
 
-      //добавление сервера
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЃРµСЂРІРµСЂР°
 
     impl->servers.push_back (&server);
   }
@@ -770,7 +770,7 @@ void ServerGroup::Detach (ICustomServer& server)
   for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
     if (*iter == &server)
     {
-        //выгрузка ресурсов с сервера
+        //РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ СЃ СЃРµСЂРІРµСЂР°
         
       ICustomServer* server_ptr = &server;        
              
@@ -782,7 +782,7 @@ void ServerGroup::Detach (ICustomServer& server)
           do_query (&server_ptr, 1, resource.Name (), &ICustomServer::UnloadResource, true);
       }
 
-        //удаление сервера из списка серверов
+        //СѓРґР°Р»РµРЅРёРµ СЃРµСЂРІРµСЂР° РёР· СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ
       
       impl->servers.erase (iter);
 
@@ -791,7 +791,7 @@ void ServerGroup::Detach (ICustomServer& server)
 }
 
 /*
-    Фильтры имён обрабатываемых ресурсов
+    Р¤РёР»СЊС‚СЂС‹ РёРјС‘РЅ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 const char* ServerGroup::Filters () const
@@ -824,7 +824,7 @@ void ServerGroup::ResetFilters ()
 }
 
 /*
-    Создание связывания с группой ресурсов
+    РЎРѕР·РґР°РЅРёРµ СЃРІСЏР·С‹РІР°РЅРёСЏ СЃ РіСЂСѓРїРїРѕР№ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 Binding ServerGroup::CreateBinding (const Group& group)
@@ -841,7 +841,7 @@ Binding ServerGroup::CreateBinding (const Group& group)
 }
 
 /*
-    Управление кэшированием ресурсов
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ServerGroup::SetCacheState (bool state)
@@ -851,7 +851,7 @@ void ServerGroup::SetCacheState (bool state)
 
   if (impl->cache_state)
   {
-      //отключение кэша - сбрасываем кэш ресурсов, уменьшаем число ссылок всех оставшихся ресурсов
+      //РѕС‚РєР»СЋС‡РµРЅРёРµ РєСЌС€Р° - СЃР±СЂР°СЃС‹РІР°РµРј РєСЌС€ СЂРµСЃСѓСЂСЃРѕРІ, СѓРјРµРЅСЊС€Р°РµРј С‡РёСЃР»Рѕ СЃСЃС‹Р»РѕРє РІСЃРµС… РѕСЃС‚Р°РІС€РёС…СЃСЏ СЂРµСЃСѓСЂСЃРѕРІ
 
     impl->FlushUnusedResources ();    
 
@@ -866,7 +866,7 @@ void ServerGroup::SetCacheState (bool state)
   }
   else
   {
-      //включение кэша - увеличиваем число ссылок всех ресурсов
+      //РІРєР»СЋС‡РµРЅРёРµ РєСЌС€Р° - СѓРІРµР»РёС‡РёРІР°РµРј С‡РёСЃР»Рѕ СЃСЃС‹Р»РѕРє РІСЃРµС… СЂРµСЃСѓСЂСЃРѕРІ
 
     for (ResourceMap::iterator iter=impl->resources.begin (), end=impl->resources.end (); iter!=end; ++iter)
       addref (iter->second);
@@ -881,7 +881,7 @@ bool ServerGroup::CacheState () const
 }
 
 /*
-    Сброс неиспользуемых ресурсов
+    РЎР±СЂРѕСЃ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ServerGroup::FlushUnusedResources ()
@@ -898,7 +898,7 @@ void ServerGroup::FlushUnusedResources ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ServerGroup::Swap (ServerGroup& group)

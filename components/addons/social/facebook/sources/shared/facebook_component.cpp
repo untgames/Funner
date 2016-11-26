@@ -6,14 +6,14 @@ using namespace social::facebook;
 namespace
 {
 
-const char* COMPONENT_NAME    = "social.sessions.facebook"; //имя компонента
-const char* SESSION_ID        = "Facebook";                 //идентификатор сессии
-const char* SESSION_NAME_MASK = "Facebook";                 //маска имен сессии
+const char* COMPONENT_NAME    = "social.sessions.facebook"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* SESSION_ID        = "Facebook";                 //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРµСЃСЃРёРё
+const char* SESSION_NAME_MASK = "Facebook";                 //РјР°СЃРєР° РёРјРµРЅ СЃРµСЃСЃРёРё
 
 }
 
 /*
-   Компонент сессии
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРµСЃСЃРёРё
 */
 
 namespace components

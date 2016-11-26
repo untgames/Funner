@@ -6,15 +6,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4; //резервируемый размер массива областей вывода
+const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
 }
 
 /*
-    Описание реализации рабочего стола
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂР°Р±РѕС‡РµРіРѕ СЃС‚РѕР»Р°
 */
 
 typedef stl::vector<Viewport>       ViewportArray;
@@ -22,12 +22,12 @@ typedef stl::list<IScreenListener*> ListenerList;
 
 struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter<Screen>
 {
-  stl::string   name;             //имя рабочего стола
-  Rect          area;             //рабочая область
-  math::vec4f   background_color; //цвет фона
-  bool          has_background;   //есть ли фон
-  ViewportArray viewports;        //области вывода
-  ListenerList  listeners;        //слушатели
+  stl::string   name;             //РёРјСЏ СЂР°Р±РѕС‡РµРіРѕ СЃС‚РѕР»Р°
+  Rect          area;             //СЂР°Р±РѕС‡Р°СЏ РѕР±Р»Р°СЃС‚СЊ
+  math::vec4f   background_color; //С†РІРµС‚ С„РѕРЅР°
+  bool          has_background;   //РµСЃС‚СЊ Р»Рё С„РѕРЅ
+  ViewportArray viewports;        //РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  ListenerList  listeners;        //СЃР»СѓС€Р°С‚РµР»Рё
 
   Impl () : area (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), has_background (true)
   {
@@ -54,7 +54,7 @@ struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
 
       iter = next;
@@ -93,7 +93,7 @@ struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Screen::Screen ()
@@ -120,7 +120,7 @@ Screen& Screen::operator = (const Screen& screen)
 }
 
 /*
-    Идентификатор рабочего стола
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЂР°Р±РѕС‡РµРіРѕ СЃС‚РѕР»Р°
 */
 
 size_t Screen::Id () const
@@ -129,7 +129,7 @@ size_t Screen::Id () const
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 void Screen::SetName (const char* name)
@@ -151,7 +151,7 @@ const char* Screen::Name () const
 }
 
 /*
-    Рабочая область
+    Р Р°Р±РѕС‡Р°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void Screen::SetArea (const Rect& rect)
@@ -195,7 +195,7 @@ const Rect& Screen::Area () const
 }
 
 /*
-    Управление фоном
+    РЈРїСЂР°РІР»РµРЅРёРµ С„РѕРЅРѕРј
 */
 
 void Screen::SetBackgroundColor (const math::vec4f& color)
@@ -234,7 +234,7 @@ bool Screen::BackgroundState () const
 }
 
 /*
-    Добавление / удаление областей вывода
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 */
 
 void Screen::Attach (const scene_graph::Viewport& viewport)
@@ -243,7 +243,7 @@ void Screen::Attach (const scene_graph::Viewport& viewport)
 
   for (ViewportArray::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
     if (iter->Id () == viewport_id)
-      return; //область вывода уже добавлена
+      return; //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР° СѓР¶Рµ РґРѕР±Р°РІР»РµРЅР°
 
   impl->viewports.push_back (viewport);
 
@@ -273,7 +273,7 @@ void Screen::DetachAllViewports ()
 }
 
 /*
-    Количество областей вывода
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 */
 
 size_t Screen::ViewportsCount () const
@@ -282,7 +282,7 @@ size_t Screen::ViewportsCount () const
 }
 
 /*
-    Получение области вывода
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 scene_graph::Viewport& Screen::Viewport (size_t index)
@@ -299,7 +299,7 @@ const scene_graph::Viewport& Screen::Viewport (size_t index) const
 }
 
 /*
-    Работа со слушателями
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃР»СѓС€Р°С‚РµР»СЏРјРё
 */
 
 void Screen::AttachListener (IScreenListener* listener) const
@@ -324,7 +324,7 @@ void Screen::DetachAllListeners () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Screen::Swap (Screen& screen)

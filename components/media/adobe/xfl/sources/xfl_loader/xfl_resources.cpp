@@ -11,7 +11,7 @@ const size_t DEFAULT_RESOURCES_COUNT = 1024;
 }
 
 /*
-    Разбор библиотеки ресурсов
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void XflParser::ParseResources (common::Parser::Iterator iter)
@@ -29,7 +29,7 @@ void XflParser::ParseResources (common::Parser::Iterator iter)
 }
 
 /*
-    Разбор картинки
+    Р Р°Р·Р±РѕСЂ РєР°СЂС‚РёРЅРєРё
 */
 
 void XflParser::ParseBitmap (Parser::Iterator iter, Resource& resource)

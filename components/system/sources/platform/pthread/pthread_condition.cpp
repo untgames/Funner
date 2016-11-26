@@ -7,7 +7,7 @@ struct syslib::condition_handle
   pthread_cond_t condition;
 };
 
-//создание условиЯ
+//СЃРѕР·РґР°РЅРёРµ СѓСЃР»РѕРІРёРЇ
 condition_t PThreadManager::CreateCondition ()
 {
   try
@@ -30,7 +30,7 @@ condition_t PThreadManager::CreateCondition ()
   }
 }
 
-//удаление условиЯ
+//СѓРґР°Р»РµРЅРёРµ СѓСЃР»РѕРІРёРЇ
 void PThreadManager::DestroyCondition (condition_t handle)
 {
   try

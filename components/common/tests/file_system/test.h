@@ -17,7 +17,7 @@
 using namespace common;
 
 /*
-    Вывод основной информации о файле
+    Р’С‹РІРѕРґ РѕСЃРЅРѕРІРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 */
 
 inline void PrintFileInfo (const char* file_name)

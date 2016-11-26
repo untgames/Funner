@@ -19,7 +19,7 @@ bool AllocNode::SetParent (AllocNode* new_parent)
 
   for (AllocNode* node=new_parent;node;node=node->parent)
     if (node == this)
-      return false; //new_parent ï¢«ï¥âáï ¯®â®¬ª®¬ ¤ ­­®£® ã§« 
+      return false; //new_parent Ð¿ÑžÂ«Ð¿ÒÐ²Ð±Ð¿ Ð‡Â®Ð²Â®Â¬Ð„Â®Â¬ Â¤Â Â­Â­Â®ÐˆÂ® Ð³Â§Â«Â 
       
   if (next)        next->prev          = prev;
   if (prev)        prev->next          = next;

@@ -32,8 +32,8 @@ const char* file_name2 = "data/sound2.ogg";
 
 const char* LOG_FILTER_MASK = "sound::low_level::openal";
 
-const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
-const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
+const size_t SOURCE_UPDATE_TIME = 100;   //РїРµСЂРёРѕРґ РѕР±РЅРѕРІР»РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° Р·РІСѓРєР° (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…)
+const size_t TEST_WORK_TIME     = 8000;  //РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ С‚РµСЃС‚Р° (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…)
 
 float        source_angle = 0;
 Source       source;
@@ -45,13 +45,13 @@ void log_print (const char* log_name, const char* message)
   printf ("Log '%s': '%s'\n", log_name, message);
 }
 
-//печать числа с плавающей точкой
+//РїРµС‡Р°С‚СЊ С‡РёСЃР»Р° СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
 void print (float value)
 {
   printf ("%+.3f", value);
 }
 
-//печать вектора
+//РїРµС‡Р°С‚СЊ РІРµРєС‚РѕСЂР°
 template <class T, unsigned int N>
 void print (const math::vector<T, N>& v)
 {

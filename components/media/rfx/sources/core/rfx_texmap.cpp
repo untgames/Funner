@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Реестр повторяющихся строк
+    Р РµРµСЃС‚СЂ РїРѕРІС‚РѕСЂСЏСЋС‰РёС…СЃСЏ СЃС‚СЂРѕРє
 */
 
 struct SharedString;
@@ -57,18 +57,18 @@ struct SharedString: public xtl::reference_counter
 }
 
 /*
-    Описание реализации текстурной карты
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹
 */
 
 struct Texmap::Impl: public xtl::reference_counter
 {
-  stl::string     image;    //имя текстуры
-  SharedStringPtr sampler;  //имя сэмплера
-  SharedStringPtr semantic; //имя семантики 
+  stl::string     image;    //РёРјСЏ С‚РµРєСЃС‚СѓСЂС‹
+  SharedStringPtr sampler;  //РёРјСЏ СЃСЌРјРїР»РµСЂР°
+  SharedStringPtr semantic; //РёРјСЏ СЃРµРјР°РЅС‚РёРєРё 
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Texmap::Texmap ()
@@ -100,7 +100,7 @@ Texmap& Texmap::operator = (const Texmap& map)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Texmap::Id () const
@@ -109,7 +109,7 @@ size_t Texmap::Id () const
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Texmap Texmap::Clone () const
@@ -126,7 +126,7 @@ Texmap Texmap::Clone () const
 }
 
 /*
-    Имя текстуры
+    РРјСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void Texmap::SetImage (const char* name)
@@ -143,7 +143,7 @@ const char* Texmap::Image () const
 }
 
 /*
-    Имя сэмплера
+    РРјСЏ СЃСЌРјРїР»РµСЂР°
 */
 
 void Texmap::SetSampler (const char* name)
@@ -160,7 +160,7 @@ const char* Texmap::Sampler () const
 }
 
 /*
-    Имя семантики
+    РРјСЏ СЃРµРјР°РЅС‚РёРєРё
 */
 
 void Texmap::SetSemantic (const char* name)
@@ -177,7 +177,7 @@ const char* Texmap::Semantic () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Texmap::Swap (Texmap& map)

@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Реализация слота
+    Р РµР°Р»РёР·Р°С†РёСЏ СЃР»РѕС‚Р°
 */
 
 template <class Signature> class slot_impl: public connection_impl
@@ -10,7 +10,7 @@ template <class Signature> class slot_impl: public connection_impl
   public:
     typedef xtl::function<Signature> function_type;
   
-      //конструкторы / деструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     slot_impl () : lock_count (0), wait_next_slot (0), is_blocked (false)
     {
       prev_slot = this;
@@ -34,14 +34,14 @@ template <class Signature> class slot_impl: public connection_impl
       prev_slot->next_slot = next_slot;      
     }
 
-      //функция-обработчик сигнала
+      //С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРёРіРЅР°Р»Р°
     function_type& function () { return fn; }
 
-      //предудущий и следующий слот
+      //РїСЂРµРґСѓРґСѓС‰РёР№ Рё СЃР»РµРґСѓСЋС‰РёР№ СЃР»РѕС‚
     slot_impl* previos () { return prev_slot; }
     slot_impl* next    () { return next_slot; }
 
-      //связывание слотов цепочки
+      //СЃРІСЏР·С‹РІР°РЅРёРµ СЃР»РѕС‚РѕРІ С†РµРїРѕС‡РєРё
     void connect (slot_impl* new_next_slot)
     {
       if (new_next_slot == next_slot)
@@ -53,21 +53,21 @@ template <class Signature> class slot_impl: public connection_impl
         return;
       }
     
-        //захватываем слот
+        //Р·Р°С…РІР°С‚С‹РІР°РµРј СЃР»РѕС‚
 
       addref ();
 
-        //отсоединяем слот из текущей цепочки
+        //РѕС‚СЃРѕРµРґРёРЅСЏРµРј СЃР»РѕС‚ РёР· С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё
     
-      if (next_slot != this) //требуется отсоединение слота из цепочки
+      if (next_slot != this) //С‚СЂРµР±СѓРµС‚СЃСЏ РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ СЃР»РѕС‚Р° РёР· С†РµРїРѕС‡РєРё
       {
         prev_slot->next_slot = next_slot;
         next_slot->prev_slot = prev_slot;
 
-        release (); //отсоединение слота от цепочки сопровождается уменьшением числа ссылок
+        release (); //РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ СЃР»РѕС‚Р° РѕС‚ С†РµРїРѕС‡РєРё СЃРѕРїСЂРѕРІРѕР¶РґР°РµС‚СЃСЏ СѓРјРµРЅСЊС€РµРЅРёРµРј С‡РёСЃР»Р° СЃСЃС‹Р»РѕРє
       }
 
-        //присоединяем слот к новой цепочке
+        //РїСЂРёСЃРѕРµРґРёРЅСЏРµРј СЃР»РѕС‚ Рє РЅРѕРІРѕР№ С†РµРїРѕС‡РєРµ
 
       if (new_next_slot != this)
       {
@@ -82,12 +82,12 @@ template <class Signature> class slot_impl: public connection_impl
         next_slot = prev_slot = this;        
       }
 
-        //освобождаем слот
+        //РѕСЃРІРѕР±РѕР¶РґР°РµРј СЃР»РѕС‚
 
       release ();
     }
     
-      //отсоединение
+      //РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ
     void disconnect ()
     {
       if (prev_slot == this)
@@ -96,13 +96,13 @@ template <class Signature> class slot_impl: public connection_impl
       connect (this);        
     }
 
-      //проверка соединения
+      //РїСЂРѕРІРµСЂРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ
     bool connected () { return prev_slot != this; }
 
-      //заблокирован ли слот
+      //Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ Р»Рё СЃР»РѕС‚
     bool locked () { return lock_count != 0; }
 
-      //блокировка слота от пересоединений
+      //Р±Р»РѕРєРёСЂРѕРІРєР° СЃР»РѕС‚Р° РѕС‚ РїРµСЂРµСЃРѕРµРґРёРЅРµРЅРёР№
     void lock ()
     {    
       lock_count++;
@@ -110,7 +110,7 @@ template <class Signature> class slot_impl: public connection_impl
       addref ();
     } 
     
-      //снятие блокировки слота от пересоединений
+      //СЃРЅСЏС‚РёРµ Р±Р»РѕРєРёСЂРѕРІРєРё СЃР»РѕС‚Р° РѕС‚ РїРµСЂРµСЃРѕРµРґРёРЅРµРЅРёР№
     void unlock ()
     {        
       if (!--lock_count && wait_next_slot)
@@ -123,28 +123,28 @@ template <class Signature> class slot_impl: public connection_impl
       release ();
     }
     
-      //блокировка соединения
+      //Р±Р»РѕРєРёСЂРѕРІРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ
     void block ()
     {
       is_blocked = true;
     }
     
-      //снятие блокировки соединения
+      //СЃРЅСЏС‚РёРµ Р±Р»РѕРєРёСЂРѕРІРєРё СЃРѕРµРґРёРЅРµРЅРёСЏ
     void unblock ()
     {
       is_blocked = false;
     }
     
-      //проверка блокировки соединения
+      //РїСЂРѕРІРµСЂРєР° Р±Р»РѕРєРёСЂРѕРІРєРё СЃРѕРµРґРёРЅРµРЅРёСЏ
     bool blocked () { return is_blocked; }
     
-      //увеличение числа ссылок слотов
+      //СѓРІРµР»РёС‡РµРЅРёРµ С‡РёСЃР»Р° СЃСЃС‹Р»РѕРє СЃР»РѕС‚РѕРІ
     void slot_addref ()
     {
       addref ();
     }
     
-      //уменьшение числа ссылок слотов
+      //СѓРјРµРЅСЊС€РµРЅРёРµ С‡РёСЃР»Р° СЃСЃС‹Р»РѕРє СЃР»РѕС‚РѕРІ
     void slot_release ()
     {
       if (use_count () == 2 && prev_slot != this)
@@ -166,7 +166,7 @@ template <class Signature> class slot_impl: public connection_impl
 };
 
 /*
-    Соединение
+    РЎРѕРµРґРёРЅРµРЅРёРµ
 */
 
 class slot_connection: public connection
@@ -178,7 +178,7 @@ class slot_connection: public connection
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Signature>
@@ -213,7 +213,7 @@ inline slot<Signature>::~slot ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Signature>
@@ -231,7 +231,7 @@ inline slot<Signature>& slot<Signature>::operator = (const function_type& fn)
 }
 
 /*
-    Функция-обработчик сигнала
+    Р¤СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРёРіРЅР°Р»Р°
 */
 
 template <class Signature>
@@ -241,7 +241,7 @@ inline const typename slot<Signature>::function_type& slot<Signature>::function 
 }
 
 /*
-    Соединение, связанное со слотом
+    РЎРѕРµРґРёРЅРµРЅРёРµ, СЃРІСЏР·Р°РЅРЅРѕРµ СЃРѕ СЃР»РѕС‚РѕРј
 */
 
 template <class Signature>
@@ -251,7 +251,7 @@ inline xtl::connection slot<Signature>::connection () const
 }
 
 /*
-    Предудущий и следующий слот
+    РџСЂРµРґСѓРґСѓС‰РёР№ Рё СЃР»РµРґСѓСЋС‰РёР№ СЃР»РѕС‚
 */
 
 template <class Signature>
@@ -267,7 +267,7 @@ inline slot<Signature> slot<Signature>::next () const
 }
 
 /*
-    Связывание слотов
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃР»РѕС‚РѕРІ
 */
 
 
@@ -284,7 +284,7 @@ inline bool slot<Signature>::connected () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class Signature>

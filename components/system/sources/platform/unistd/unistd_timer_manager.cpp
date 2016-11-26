@@ -16,16 +16,16 @@
 using namespace syslib;
 
 /*
-    Описание таймера
+    РћРїРёСЃР°РЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 struct syslib::timer_handle
 {
-  size_t       next_raise_time;        //время следующего срабатывания
-  size_t       period_in_milliseconds; //период срабатывания
-  TimerHandler handler;                //обработчик
-  void*        user_data;              //пользовательские данные
-  bool         need_delete;            //таймер требует удаления
+  size_t       next_raise_time;        //РІСЂРµРјСЏ СЃР»РµРґСѓСЋС‰РµРіРѕ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+  size_t       period_in_milliseconds; //РїРµСЂРёРѕРґ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ
+  TimerHandler handler;                //РѕР±СЂР°Р±РѕС‚С‡РёРє
+  void*        user_data;              //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+  bool         need_delete;            //С‚Р°Р№РјРµСЂ С‚СЂРµР±СѓРµС‚ СѓРґР°Р»РµРЅРёСЏ
   
   timer_handle (size_t in_period, TimerHandler in_handler, void* in_user_data)
     : next_raise_time (common::milliseconds () + in_period)
@@ -41,13 +41,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "system.unistd"; //имя потока протоколирования
+const char* LOG_NAME = "system.unistd"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Менеджер таймеров
+    РњРµРЅРµРґР¶РµСЂ С‚Р°Р№РјРµСЂРѕРІ
 */
 
 class TimerManager: public MessageQueue::Handler
@@ -55,7 +55,7 @@ class TimerManager: public MessageQueue::Handler
   public:
     typedef syslib::timer_t timer_t;
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     TimerManager ()
       : message_queue (*MessageQueueSingleton::Instance ())
       , log (LOG_NAME)
@@ -88,7 +88,7 @@ class TimerManager: public MessageQueue::Handler
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~TimerManager ()
     {
       try
@@ -101,11 +101,11 @@ class TimerManager: public MessageQueue::Handler
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
   
-///Создание таймера
+///РЎРѕР·РґР°РЅРёРµ С‚Р°Р№РјРµСЂР°
     timer_t CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
     {
       try
@@ -133,7 +133,7 @@ class TimerManager: public MessageQueue::Handler
       }
     }
     
-///Удаление таймера
+///РЈРґР°Р»РµРЅРёРµ С‚Р°Р№РјРµСЂР°
     void KillTimer (timer_t timer)
     {
       try
@@ -165,7 +165,7 @@ class TimerManager: public MessageQueue::Handler
     }
 
   private:
-///Завершение нити обработки таймеров
+///Р—Р°РІРµСЂС€РµРЅРёРµ РЅРёС‚Рё РѕР±СЂР°Р±РѕС‚РєРё С‚Р°Р№РјРµСЂРѕРІ
     void CloseTimersThread ()
     {
       {
@@ -179,13 +179,13 @@ class TimerManager: public MessageQueue::Handler
       thread.Join ();      
     }
     
-///Удаление всех таймеров
+///РЈРґР°Р»РµРЅРёРµ РІСЃРµС… С‚Р°Р№РјРµСЂРѕРІ
     void UnregisterAllTimers ()
     {      
       condition.NotifyOne ();
     }
     
-///Сообщение таймера
+///РЎРѕРѕР±С‰РµРЅРёРµ С‚Р°Р№РјРµСЂР°
     struct Message: public MessageQueue::Message
     {
       TimerManager& manager;
@@ -201,7 +201,7 @@ class TimerManager: public MessageQueue::Handler
       }
     };
     
-///Диспетчеризация вызова таймера
+///Р”РёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ РІС‹Р·РѕРІР° С‚Р°Р№РјРµСЂР°
     void DispatchTimer (timer_t timer)
     {
       Lock lock (mutex);
@@ -218,14 +218,14 @@ class TimerManager: public MessageQueue::Handler
         }
     }
   
-///Нить обработки таймеров
+///РќРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєРё С‚Р°Р№РјРµСЂРѕРІ
     int TimersRoutine ()
     {
       while (loop)
       {
         Lock lock (mutex);
         
-          //ожидание срабатывания таймеров
+          //РѕР¶РёРґР°РЅРёРµ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ С‚Р°Р№РјРµСЂРѕРІ
         
         while (loop)
         {
@@ -265,7 +265,7 @@ class TimerManager: public MessageQueue::Handler
           condition.TryWait (mutex, wait_time);
         }                
         
-          //вызов обработчиков таймеров
+          //РІС‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ С‚Р°Р№РјРµСЂРѕРІ
           
         size_t time = common::milliseconds ();
         
@@ -296,7 +296,7 @@ class TimerManager: public MessageQueue::Handler
         
         kill_lock = false;
         
-          //удаление таймеров
+          //СѓРґР°Р»РµРЅРёРµ С‚Р°Р№РјРµСЂРѕРІ
           
         for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end;)
         {
@@ -312,15 +312,15 @@ class TimerManager: public MessageQueue::Handler
     typedef stl::vector<timer_t> TimerList;
 
   private:
-    MessageQueue& message_queue;   //очередь собщений
-    common::Log   log;             //поток протоколирования
-    bool          loop;            //менеджер находится в состоянии обработки таймеров
-    bool          kill_lock;       //таймеры заблокированы от удаления    
-    Mutex         mutex;           //мьютекс работы с менеджером таймеров
-    Condition     condition;       //событие появления нового таймера
+    MessageQueue& message_queue;   //РѕС‡РµСЂРµРґСЊ СЃРѕР±С‰РµРЅРёР№
+    common::Log   log;             //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    bool          loop;            //РјРµРЅРµРґР¶РµСЂ РЅР°С…РѕРґРёС‚СЃСЏ РІ СЃРѕСЃС‚РѕСЏРЅРёРё РѕР±СЂР°Р±РѕС‚РєРё С‚Р°Р№РјРµСЂРѕРІ
+    bool          kill_lock;       //С‚Р°Р№РјРµСЂС‹ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅС‹ РѕС‚ СѓРґР°Р»РµРЅРёСЏ    
+    Mutex         mutex;           //РјСЊСЋС‚РµРєСЃ СЂР°Р±РѕС‚С‹ СЃ РјРµРЅРµРґР¶РµСЂРѕРј С‚Р°Р№РјРµСЂРѕРІ
+    Condition     condition;       //СЃРѕР±С‹С‚РёРµ РїРѕСЏРІР»РµРЅРёСЏ РЅРѕРІРѕРіРѕ С‚Р°Р№РјРµСЂР°
     size_t        new_timers_count;
-    Thread        thread;          //нить обработки таймеров
-    TimerList     timers;          //список зарегистрированных таймеров
+    Thread        thread;          //РЅРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєРё С‚Р°Р№РјРµСЂРѕРІ
+    TimerList     timers;          //СЃРїРёСЃРѕРє Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… С‚Р°Р№РјРµСЂРѕРІ
 };
 
 typedef common::Singleton<TimerManager> TimerManagerSingleton;
@@ -328,7 +328,7 @@ typedef common::Singleton<TimerManager> TimerManagerSingleton;
 }
 
 /*
-    Создание / уничтожение таймера
+    РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 syslib::timer_t UnistdTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)

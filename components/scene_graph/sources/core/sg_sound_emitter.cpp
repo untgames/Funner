@@ -5,18 +5,18 @@ using namespace xtl;
 using namespace common;
 
 /*
-    Описание реализации SoundEmitter
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё SoundEmitter
 */
 
 typedef xtl::signal<void (SoundEmitter& sender, SoundEmitterEvent event)> SoundEmitterSignal;
 
 struct SoundEmitter::Impl: public xtl::instance_counter<SoundEmitter>
 {
-  stl::string        sound_declaration_name;                   //имя описания звука
-  SoundEmitterSignal signals [SoundEmitterEvent_Num];          //сигналы
-  bool               signal_process [SoundEmitterEvent_Num];   //флаги обработки сигналов
-  float              gain;                                     //громкость
-  float              play_start_offset;                        //смещение при начале проигрывания
+  stl::string        sound_declaration_name;                   //РёРјСЏ РѕРїРёСЃР°РЅРёСЏ Р·РІСѓРєР°
+  SoundEmitterSignal signals [SoundEmitterEvent_Num];          //СЃРёРіРЅР°Р»С‹
+  bool               signal_process [SoundEmitterEvent_Num];   //С„Р»Р°РіРё РѕР±СЂР°Р±РѕС‚РєРё СЃРёРіРЅР°Р»РѕРІ
+  float              gain;                                     //РіСЂРѕРјРєРѕСЃС‚СЊ
+  float              play_start_offset;                        //СЃРјРµС‰РµРЅРёРµ РїСЂРё РЅР°С‡Р°Р»Рµ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 
   Impl (const char* in_sound_declaration_name)
     : sound_declaration_name (in_sound_declaration_name)
@@ -27,32 +27,32 @@ struct SoundEmitter::Impl: public xtl::instance_counter<SoundEmitter>
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Оповещение клиентов о наступлении события
+///РћРїРѕРІРµС‰РµРЅРёРµ РєР»РёРµРЅС‚РѕРІ Рѕ РЅР°СЃС‚СѓРїР»РµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Notify (SoundEmitter& emitter, SoundEmitterEvent event);
 };
 
 /*
-    Оповещение клиентов о наступлении события
+    РћРїРѕРІРµС‰РµРЅРёРµ РєР»РёРµРЅС‚РѕРІ Рѕ РЅР°СЃС‚СѓРїР»РµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 */
 
 void SoundEmitter::Impl::Notify (SoundEmitter& emitter, SoundEmitterEvent event)
 {
-    //если обработчиков нет - оповещение игнорируется
+    //РµСЃР»Рё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РЅРµС‚ - РѕРїРѕРІРµС‰РµРЅРёРµ РёРіРЅРѕСЂРёСЂСѓРµС‚СЃСЏ
     
   if (!signals [event])
     return;
 
-    //проверяем нет ли рекурсивного вызова
+    //РїСЂРѕРІРµСЂСЏРµРј РЅРµС‚ Р»Рё СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ РІС‹Р·РѕРІР°
 
   if (signal_process [event])
     return;
     
-    //устанавливаем флаг обработки события
+    //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
 
   signal_process [event] = true;
   
-    //вызываем обработчики событий
+    //РІС‹Р·С‹РІР°РµРј РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
 
   try
   {
@@ -60,16 +60,16 @@ void SoundEmitter::Impl::Notify (SoundEmitter& emitter, SoundEmitterEvent event)
   }
   catch (...)
   {
-    //все исключения клиентских обработчиков событий узла поглощаются
+    //РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ РєР»РёРµРЅС‚СЃРєРёС… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ СѓР·Р»Р° РїРѕРіР»РѕС‰Р°СЋС‚СЃСЏ
   }
   
-    //снимаем флаг обработки события
+    //СЃРЅРёРјР°РµРј С„Р»Р°Рі РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
   
   signal_process [event] = false;
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SoundEmitter::SoundEmitter (const char* sound_declaration_name)
@@ -82,7 +82,7 @@ SoundEmitter::~SoundEmitter ()
 }
 
 /*
-    Создание слушателя
+    РЎРѕР·РґР°РЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 SoundEmitter::Pointer SoundEmitter::Create (const char* sound_declaration_name)
@@ -91,7 +91,7 @@ SoundEmitter::Pointer SoundEmitter::Create (const char* sound_declaration_name)
 }
 
 /*
-   Имя звука
+   РРјСЏ Р·РІСѓРєР°
 */
 
 const char* SoundEmitter::SoundDeclarationName () const
@@ -100,7 +100,7 @@ const char* SoundEmitter::SoundDeclarationName () const
 }
 
 /*
-   Проигрывание
+   РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 */
 
 void SoundEmitter::Play (float play_start_offset)
@@ -121,7 +121,7 @@ void SoundEmitter::Stop ()
 }
 
 /*
-   Управление громкостью
+   РЈРїСЂР°РІР»РµРЅРёРµ РіСЂРѕРјРєРѕСЃС‚СЊСЋ
 */
 
 void SoundEmitter::SetGain (float gain)
@@ -140,7 +140,7 @@ float SoundEmitter::Gain ()
 }
 
 /*
-   Подписка на события SoundEmitter
+   РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ SoundEmitter
 */
 
 xtl::connection SoundEmitter::RegisterEventHandler (SoundEmitterEvent event, const EventHandler& handler) const
@@ -152,7 +152,7 @@ xtl::connection SoundEmitter::RegisterEventHandler (SoundEmitterEvent event, con
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void SoundEmitter::AcceptCore (Visitor& visitor)
@@ -162,7 +162,7 @@ void SoundEmitter::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void SoundEmitter::BindProperties (common::PropertyBindingMap& bindings)

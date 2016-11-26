@@ -31,7 +31,7 @@ Dx11Exception::Dx11Exception (const char* source, HRESULT in_result)
 }
 
 /*
-    Проверка ошибок
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 */
 
 void check_errors (const char* source, HRESULT result)

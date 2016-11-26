@@ -13,9 +13,9 @@ function DelayedAction(CallDelay, func, ...)
   local DataBank=Action.DataBank
   
   Action.Stop=function()
-    --эта функция позволит отменить отложенное действие еще до его выполнения
+    --СЌС‚Р° С„СѓРЅРєС†РёСЏ РїРѕР·РІРѕР»РёС‚ РѕС‚РјРµРЅРёС‚СЊ РѕС‚Р»РѕР¶РµРЅРЅРѕРµ РґРµР№СЃС‚РІРёРµ РµС‰Рµ РґРѕ РµРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ
     Action.connection:Disconnect()
-    TempGlobals[Action]=nil --это позволит сборщику мусора сделать свое дело :)
+    TempGlobals[Action]=nil --СЌС‚Рѕ РїРѕР·РІРѕР»РёС‚ СЃР±РѕСЂС‰РёРєСѓ РјСѓСЃРѕСЂР° СЃРґРµР»Р°С‚СЊ СЃРІРѕРµ РґРµР»Рѕ :)
   end
   
   local function callback()
@@ -26,7 +26,7 @@ function DelayedAction(CallDelay, func, ...)
   Action.EventHandler=Common.ActionQueue.CreateEventHandler(callback)
   Action.ActionQueue=Common.ActionQueue.Create()
   Action.connection = Action.ActionQueue:RegisterEventHandler(CallDelay, 1, Action.EventHandler)
-  TempGlobals[Action]=Action -- хак сборщика мусора
+  TempGlobals[Action]=Action -- С…Р°Рє СЃР±РѕСЂС‰РёРєР° РјСѓСЃРѕСЂР°
   return Action
 end
 

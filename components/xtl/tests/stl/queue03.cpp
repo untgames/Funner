@@ -1,4 +1,4 @@
-//тестиоование функций доступа
+//С‚РµСЃС‚РёРѕРѕРІР°РЅРёРµ С„СѓРЅРєС†РёР№ РґРѕСЃС‚СѓРїР°
 #include <stl/queue>
 #include <stl/algorithm>
 #include <stdio.h>

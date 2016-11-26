@@ -4,7 +4,7 @@ using namespace render::scene;
 using namespace render::scene::client;
 
 /*
-    Îïèñàíèå ðåàëèçàöèè ñóùíîñòè
+    ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚Ð¸
 */
 
 namespace
@@ -50,15 +50,15 @@ struct ShaderPropertiesSync
 
 struct VisualModel::Impl
 {
-  scene_graph::Scissor* scissor;                   //ñîõðàíåííàÿ îáëàñòü îòñå÷åíèÿ
-  ShaderPropertiesSync  dynamic_shader_properties; //äèíàìè÷åñêèå ñâîéñòâà øåéäåðà
-  ShaderPropertiesSync  static_shader_properties;  //ñòàòè÷åñêèå ñâîéñòâà øåéäåðà
+  scene_graph::Scissor* scissor;                   //ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð½Ð°Ñ Ð¾Ð±Ð»Ð°ÑÑ‚ÑŒ Ð¾Ñ‚ÑÐµÑ‡ÐµÐ½Ð¸Ñ
+  ShaderPropertiesSync  dynamic_shader_properties; //Ð´Ð¸Ð½Ð°Ð¼Ð¸Ñ‡ÐµÑÐºÐ¸Ðµ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð° ÑˆÐµÐ¹Ð´ÐµÑ€Ð°
+  ShaderPropertiesSync  static_shader_properties;  //ÑÑ‚Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸Ðµ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð° ÑˆÐµÐ¹Ð´ÐµÑ€Ð°
 
   Impl () : scissor () {}
 };
 
 /*
-    Êîíñòðóêòîð / äåñòðóêòîð
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ / Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
 */
 
 VisualModel::VisualModel (scene_graph::VisualModel& entity, SceneManager& manager, interchange::NodeType node_type)
@@ -72,7 +72,7 @@ VisualModel::~VisualModel ()
 }
 
 /*
-    Ðåàëèçàöèÿ ñèíõðîíèçàöèè
+    Ð ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ð¸
 */
 
 void VisualModel::UpdateCore (client::Context& context)
@@ -83,7 +83,7 @@ void VisualModel::UpdateCore (client::Context& context)
 
     scene_graph::VisualModel& model = SourceNode ();
 
-      //ñèíõðîíèçàöèÿ îáëàñòè îòñå÷åíèÿ
+      //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð¾Ñ‚ÑÐµÑ‡ÐµÐ½Ð¸Ñ
 
     scene_graph::Scissor* scissor = model.Scissor ();
 
@@ -100,7 +100,7 @@ void VisualModel::UpdateCore (client::Context& context)
       impl->scissor = scissor;
     }    
 
-      //ñèíõðîíèçàöèÿ ñâîéñòâ øåéäåðà
+      //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÐ²Ð¾Ð¹ÑÑ‚Ð² ÑˆÐµÐ¹Ð´ÐµÑ€Ð°
 
     if (impl->dynamic_shader_properties.Sync (model.DynamicShaderProperties (), Scenes ()))
       context.SetVisualModelDynamicShaderProperties (Id (), impl->dynamic_shader_properties.cached_id);

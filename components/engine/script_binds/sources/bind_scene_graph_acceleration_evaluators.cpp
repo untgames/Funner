@@ -13,25 +13,25 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-//Создание объекта
+//РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р°
 LinearAccelerationEvaluator create_linear_acceleration_evaluator ()
 {
   return LinearAccelerationEvaluator ();
 }
 
 /*
-    Регистрация библиотеки работы с линейным рассчетом ускорения
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ Р»РёРЅРµР№РЅС‹Рј СЂР°СЃСЃС‡РµС‚РѕРј СѓСЃРєРѕСЂРµРЅРёСЏ
 */
 
 void bind_linear_acceleration_evaluator_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_LINEAR_ACCELERATION_EVALUATOR_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_linear_acceleration_evaluator));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Acceleration", make_invoker (&LinearAccelerationEvaluator::SetAcceleration));
   lib.Register ("set_Deceleration", make_invoker (&LinearAccelerationEvaluator::SetDeceleration));
@@ -40,7 +40,7 @@ void bind_linear_acceleration_evaluator_library (Environment& environment)
   lib.Register ("get_Deceleration", make_invoker (&LinearAccelerationEvaluator::Deceleration));
   lib.Register ("get_MaxSpeed",     make_invoker (&LinearAccelerationEvaluator::MaxSpeed));
 
-    //регистрация типа данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР° РґР°РЅРЅС‹С…
 
   environment.RegisterType<LinearAccelerationEvaluator> (SCENE_LINEAR_ACCELERATION_EVALUATOR_LIBRARY);
 }

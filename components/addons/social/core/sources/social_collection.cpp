@@ -22,7 +22,7 @@ struct Collection<Item>::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class Item>
@@ -52,7 +52,7 @@ Collection<Item>& Collection<Item>::operator = (const Collection<Item>& source)
 }
 
 /*
-   Количество элементов / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class Item>
@@ -68,7 +68,7 @@ bool Collection<Item>::IsEmpty () const
 }
 
 /*
-   Доступ к элементу по индексу
+   Р”РѕСЃС‚СѓРї Рє СЌР»РµРјРµРЅС‚Сѓ РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 template <class Item>
@@ -87,7 +87,7 @@ Item& Collection<Item>::operator [] (size_t index)
 }
 
 /*
-   Резервирование элементов
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class Item>
@@ -103,7 +103,7 @@ void Collection<Item>::Reserve (size_t count)
 }
 
 /*
-   Добавление элемента в коллекцию
+   Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РІ РєРѕР»Р»РµРєС†РёСЋ
 */
 
 template <class Item>
@@ -115,7 +115,7 @@ size_t Collection<Item>::Add (const Item& item)
 }
 
 /*
-   Удаление элемента из коллекции
+   РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РёР· РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class Item>
@@ -128,7 +128,7 @@ void Collection<Item>::Remove (size_t index)
 }
 
 /*
-   Очистка коллекции
+   РћС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёРё
 */
 
 template <class Item>
@@ -138,7 +138,7 @@ void Collection<Item>::Clear ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class Item>

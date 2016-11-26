@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки геометрии
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РіРµРѕРјРµС‚СЂРёРё
 */
 
 void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
@@ -16,7 +16,7 @@ void DaeParser::ParseLibraryGeometries (Parser::Iterator iter)
 }
 
 /*
-    Разбор геометрии
+    Р Р°Р·Р±РѕСЂ РіРµРѕРјРµС‚СЂРёРё
 */
 
 void DaeParser::ParseGeometry (Parser::Iterator iter)
@@ -29,7 +29,7 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
   if (mesh_iter->NextNamesake ())
     raise_parser_exception (mesh_iter->NextNamesake (), "Only one 'mesh' tag allowed");
 
-    //разбор меша
+    //СЂР°Р·Р±РѕСЂ РјРµС€Р°
 
   Mesh mesh;
   
@@ -39,7 +39,7 @@ void DaeParser::ParseGeometry (Parser::Iterator iter)
 
   ParseMesh (mesh_iter, mesh);
 
-    //добавление меша в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ РјРµС€Р° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
   model.Meshes ().Insert (id, mesh);
 }

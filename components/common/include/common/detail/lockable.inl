@@ -1,5 +1,5 @@
 /*
-    Блокировка в пределах блока
+    Р‘Р»РѕРєРёСЂРѕРІРєР° РІ РїСЂРµРґРµР»Р°С… Р±Р»РѕРєР°
 */
 
 inline Lock::Lock (const Lockable& in_lockable)
@@ -14,7 +14,7 @@ inline Lock::~Lock ()
 }
 
 /*
-    Функции для взаимодействия с XTL
+    Р¤СѓРЅРєС†РёРё РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ XTL
 */
 
 inline void lock (Lockable& lockable)

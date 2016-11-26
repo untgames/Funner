@@ -4,27 +4,27 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Описание реализации модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРѕРґРµР»Рё
 */
 
 typedef media::CollectionImpl<Animation, ICollection<Animation> > AnimationListImpl;
 
 struct Model::Impl
 {
-  stl::string            name;            //имя модели
-  stl::string            active_scene;    //имя активной сцены
-  float                  unit_of_measure; //значение единицы величины по отношению к метру
-  AnimationListImpl      animations;      //библиотека анимаций
-  LibraryImpl<Effect>    effects;         //библиотека эффектов
-  LibraryImpl<Image>     images;          //библиотека картинок
-  LibraryImpl<Material>  materials;       //библиотека материалов
-  LibraryImpl<Mesh>      meshes;          //библиотека мешей
-  LibraryImpl<Morph>     morphs;          //библиотека морферов
-  LibraryImpl<Skin>      skins;           //библиотека скинов
-  LibraryImpl<Node>      nodes;           //библиотека узлов
-  LibraryImpl<Node>      scenes;          //библиотека сцен
-  LibraryImpl<Light>     lights;          //библиотека источников света
-  LibraryImpl<Camera>    cameras;         //библиотека камер
+  stl::string            name;            //РёРјСЏ РјРѕРґРµР»Рё
+  stl::string            active_scene;    //РёРјСЏ Р°РєС‚РёРІРЅРѕР№ СЃС†РµРЅС‹
+  float                  unit_of_measure; //Р·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ РІРµР»РёС‡РёРЅС‹ РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє РјРµС‚СЂСѓ
+  AnimationListImpl      animations;      //Р±РёР±Р»РёРѕС‚РµРєР° Р°РЅРёРјР°С†РёР№
+  LibraryImpl<Effect>    effects;         //Р±РёР±Р»РёРѕС‚РµРєР° СЌС„С„РµРєС‚РѕРІ
+  LibraryImpl<Image>     images;          //Р±РёР±Р»РёРѕС‚РµРєР° РєР°СЂС‚РёРЅРѕРє
+  LibraryImpl<Material>  materials;       //Р±РёР±Р»РёРѕС‚РµРєР° РјР°С‚РµСЂРёР°Р»РѕРІ
+  LibraryImpl<Mesh>      meshes;          //Р±РёР±Р»РёРѕС‚РµРєР° РјРµС€РµР№
+  LibraryImpl<Morph>     morphs;          //Р±РёР±Р»РёРѕС‚РµРєР° РјРѕСЂС„РµСЂРѕРІ
+  LibraryImpl<Skin>      skins;           //Р±РёР±Р»РёРѕС‚РµРєР° СЃРєРёРЅРѕРІ
+  LibraryImpl<Node>      nodes;           //Р±РёР±Р»РёРѕС‚РµРєР° СѓР·Р»РѕРІ
+  LibraryImpl<Node>      scenes;          //Р±РёР±Р»РёРѕС‚РµРєР° СЃС†РµРЅ
+  LibraryImpl<Light>     lights;          //Р±РёР±Р»РёРѕС‚РµРєР° РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
+  LibraryImpl<Camera>    cameras;         //Р±РёР±Р»РёРѕС‚РµРєР° РєР°РјРµСЂ
 
   Impl ()
     : unit_of_measure (1.f)
@@ -32,14 +32,14 @@ struct Model::Impl
 };
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace
 {
 
-const char* COLLADA_LOADERS_MASK = "media.collada.loaders.*"; //маска имён компонентов загрузки коллада-моделей
-const char* COLLADA_SAVERS_MASK  = "media.collada.savers.*";  //маска имён компонентов сохранения коллада-моделей
+const char* COLLADA_LOADERS_MASK = "media.collada.loaders.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р·Р°РіСЂСѓР·РєРё РєРѕР»Р»Р°РґР°-РјРѕРґРµР»РµР№
+const char* COLLADA_SAVERS_MASK  = "media.collada.savers.*";  //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ СЃРѕС…СЂР°РЅРµРЅРёСЏ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»РµР№
 
 void default_collada_log (const char*)
 {
@@ -48,7 +48,7 @@ void default_collada_log (const char*)
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Model::Model  ()
@@ -108,7 +108,7 @@ Model& Model::operator = (const Model& model)
 }
 
 /*
-    Имя модели
+    РРјСЏ РјРѕРґРµР»Рё
 */
 
 const char* Model::Name () const
@@ -125,7 +125,7 @@ void Model::Rename (const char* new_name)
 }
 
 /*
-    Имя активной сцены
+    РРјСЏ Р°РєС‚РёРІРЅРѕР№ СЃС†РµРЅС‹
 */
 
 const char* Model::ActiveSceneName () const
@@ -142,7 +142,7 @@ void Model::SetActiveSceneName (const char* scene_name)
 }
 
 /*
-   Значение единицы величины по отношению к метру
+   Р—РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ РІРµР»РёС‡РёРЅС‹ РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє РјРµС‚СЂСѓ
 */
 
 float Model::UnitOfMeasure () const
@@ -156,7 +156,7 @@ void Model::SetUnitOfMeasure (float value)
 }
 
 /*
-    Библиотеки
+    Р‘РёР±Р»РёРѕС‚РµРєРё
 */
 
 AnimationList& Model::Animations ()
@@ -270,7 +270,7 @@ const NodeLibrary& Model::Scenes () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Model::Swap (Model& model)
@@ -294,7 +294,7 @@ void swap (Model& a, Model& b)
 }
 
 /*
-    Загрузка / сохранение
+    Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void Model::Load (const char* file_name)

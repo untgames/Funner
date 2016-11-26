@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -39,7 +39,7 @@ inline rect<T>::rect (const rect<T1>& r)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -65,7 +65,7 @@ inline rect<T>& rect<T>::operator = (const rect<T1>& r)
 }
 
 /*
-    Получение экстент
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЃС‚РµРЅС‚
 */
 
 template <class T>
@@ -93,7 +93,7 @@ inline typename rect<T>::value_type rect<T>::bottom () const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -109,7 +109,7 @@ inline bool rect<T>::operator != (const rect& r) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>

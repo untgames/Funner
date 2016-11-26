@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding = "utf-8"?>
-<!-- Ñîîòâåòñâèÿ èìåí óñòðîéñòâ ââîäà è ôàéëîâ ñ îáðàáîò÷èêàìè ñîáûòèé -->
+<!-- Ð¡Ð¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÐ²Ð¸Ñ Ð¸Ð¼ÐµÐ½ ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð² Ð²Ð²Ð¾Ð´Ð° Ð¸ Ñ„Ð°Ð¹Ð»Ð¾Ð² Ñ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸ÐºÐ°Ð¼Ð¸ ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ð¹ -->
 <TranslationMapRegistry>
-  <!-- Profile - èìÿ óñòðîéñòâà TranslationMap - èìÿ ôàéëà ñîîòâåòñâèÿ ñîáûòèé è îáðàáîò÷èêîâ -->
+  <!-- Profile - Ð¸Ð¼Ñ ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð²Ð° TranslationMap - Ð¸Ð¼Ñ Ñ„Ð°Ð¹Ð»Ð° ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÐ²Ð¸Ñ ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ð¹ Ð¸ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸ÐºÐ¾Ð² -->
   <Translation Profile="game.window.MainWindowDevice" TranslationMap="data/input/game.xkeymap"/>
   <!---->
   <Translation Profile="game.accelerometer" TranslationMap="data/input/game.xkeymap"/>

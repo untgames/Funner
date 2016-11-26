@@ -6,17 +6,17 @@ namespace
 {
 
 /*
-    Вспомогательные переменные
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 */
 
-char         IDENTIFIER_CHAR_MAP [256]; //карта разрешенных символов разбора идентификатора
-char         DUMMY_CHAR         = ' ';  //символ используемый для фиктивного затирания при лексическом разборе
-const size_t MAX_UTF8_CHAR_SIZE = 6;    //максимальный размер представления одного символа в utf-8 кодировке
+char         IDENTIFIER_CHAR_MAP [256]; //РєР°СЂС‚Р° СЂР°Р·СЂРµС€РµРЅРЅС‹С… СЃРёРјРІРѕР»РѕРІ СЂР°Р·Р±РѕСЂР° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
+char         DUMMY_CHAR         = ' ';  //СЃРёРјРІРѕР» РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РґР»СЏ С„РёРєС‚РёРІРЅРѕРіРѕ Р·Р°С‚РёСЂР°РЅРёСЏ РїСЂРё Р»РµРєСЃРёС‡РµСЃРєРѕРј СЂР°Р·Р±РѕСЂРµ
+const size_t MAX_UTF8_CHAR_SIZE = 6;    //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р° РІ utf-8 РєРѕРґРёСЂРѕРІРєРµ
 
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XmlLexer::XmlLexer ()
@@ -47,7 +47,7 @@ XmlLexer::XmlLexer ()
 }
 
 /*
-    Установка буфера разбора
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 */
 
 void XmlLexer::Reset (char* buffer)
@@ -64,7 +64,7 @@ void XmlLexer::Reset (char* buffer)
 }
 
 /*
-    Установка ошибки разбора
+    РЈСЃС‚Р°РЅРѕРІРєР° РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°
 */
 
 void XmlLexer::SetError (XmlLexerStatus error, const char* error_position = 0)
@@ -76,7 +76,7 @@ void XmlLexer::SetError (XmlLexerStatus error, const char* error_position = 0)
 }
 
 /*
-    Утилиты разбора
+    РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
 */
 
 void XmlLexer::NextLine ()
@@ -212,7 +212,7 @@ void XmlLexer::ReadSymbolReference (char*& write_position)
 
       for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
 
-      if (!*s1) //соответствие найдено
+      if (!*s1) //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅР°Р№РґРµРЅРѕ
       {
         position           = s2 - 1;
         write_position [0] = m->replacement;
@@ -221,7 +221,7 @@ void XmlLexer::ReadSymbolReference (char*& write_position)
       }
     }
 
-    if (m == markers + markers_count) //если соответствие не найдено
+    if (m == markers + markers_count) //РµСЃР»Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ
       SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
   }
 }

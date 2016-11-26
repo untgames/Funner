@@ -4,20 +4,20 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t MODES_RESERVE_SIZE = 256;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Output::Output (const DxOutputPtr& in_output)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!in_output)
       throw xtl::make_null_argument_exception ("", "output");
@@ -28,7 +28,7 @@ Output::Output (const DxOutputPtr& in_output)
 
     check_errors ("IDXGIOutput::GetDesc", output->GetDesc (&desc));
 
-      //сохранение параметров
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
       
     name = common::tostring (desc.DeviceName);
     
@@ -49,7 +49,7 @@ Output::Output (const DxOutputPtr& in_output)
     properties.AddProperty ("Rotation", rotation_string);
     properties.AddProperty ("Monitor", common::format ("%08x", desc.Monitor).c_str ());
 
-      //перечисление режимов
+      //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ СЂРµР¶РёРјРѕРІ
 
     modes.reserve (MODES_RESERVE_SIZE);
 
@@ -113,7 +113,7 @@ Output::~Output ()
 }
 
 /*
-    Получение имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
 */
 
 const char* Output::GetName ()
@@ -130,7 +130,7 @@ const char* Output::GetName ()
 }
 
 /*
-    Дескриптор устройства вывода
+    Р”РµСЃРєСЂРёРїС‚РѕСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 IDXGIOutput& Output::GetHandle ()
@@ -139,7 +139,7 @@ IDXGIOutput& Output::GetHandle ()
 }
 
 /*
-    Получение списка видео-режимов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Output::GetModesCount ()
@@ -172,7 +172,7 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 }
 
 /*
-    Установка текущего видео-режима
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void Output::SetCurrentMode (const OutputModeDesc& desc)
@@ -202,7 +202,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 }
 
 /*
-    Управление гамма-коррекцией
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Output::SetGammaRamp (const render::low_level::Color3f table [256])
@@ -232,7 +232,7 @@ void Output::GetGammaRamp (render::low_level::Color3f table [256])
 }
 
 /*
-    Список свойств устройства вывода
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 IPropertyList* Output::GetProperties ()

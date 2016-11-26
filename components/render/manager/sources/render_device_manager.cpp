@@ -4,19 +4,19 @@ using namespace render;
 using namespace render::manager;
 
 /*
-    Описание реализации менеджера устройства
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 struct DeviceManager::Impl
 {
-  LowLevelDeviceContextPtr                  context;                    //непосредственный контекст отрисовки
-  LowLevelDevicePtr                         device;                     //устройство визуализации
-  LowLevelDriverPtr                         driver;                     //драйвер устройства визуализации
-  CacheManagerPtr                           cache_manager;              //менеджер кэширования
-  render::manager::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
-  render::manager::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
-  SettingsPtr                               settings;                   //настройки менеджера рендеринга
-  low_level::DeviceCaps                     device_caps;                //возможности устройства отрисовки
+  LowLevelDeviceContextPtr                  context;                    //РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚ РѕС‚СЂРёСЃРѕРІРєРё
+  LowLevelDevicePtr                         device;                     //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІРёР·СѓР°Р»РёР·Р°С†РёРё
+  LowLevelDriverPtr                         driver;                     //РґСЂР°Р№РІРµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРёР·СѓР°Р»РёР·Р°С†РёРё
+  CacheManagerPtr                           cache_manager;              //РјРµРЅРµРґР¶РµСЂ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
+  render::manager::InputLayoutManager       input_layout_manager;       //РјРµРЅРµРґР¶РµСЂ Р»СЌР№Р°СѓС‚РѕРІ РіРµРѕРјРµС‚СЂРёРё
+  render::manager::ProgramParametersManager program_parameters_manager; //РјРµРЅРµРґР¶РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРј С€СЌР№РґРёРЅРіР°  
+  SettingsPtr                               settings;                   //РЅР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+  low_level::DeviceCaps                     device_caps;                //РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
   
   Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings, const CacheManagerPtr& in_cache_manager)
     : context (in_device->GetImmediateContext ())
@@ -32,7 +32,7 @@ struct DeviceManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDriverPtr& driver, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
@@ -65,7 +65,7 @@ DeviceManager::~DeviceManager ()
 }
 
 /*
-    Получение устройства / непосредственного контекста / драйвера
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° / РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° / РґСЂР°Р№РІРµСЂР°
 */
 
 render::low_level::IDevice& DeviceManager::Device ()
@@ -84,7 +84,7 @@ render::low_level::IDriver& DeviceManager::Driver ()
 }
 
 /*
-    Возможности устройства отрисовки
+    Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 const low_level::DeviceCaps& DeviceManager::DeviceCaps ()
@@ -93,7 +93,7 @@ const low_level::DeviceCaps& DeviceManager::DeviceCaps ()
 }
 
 /*
-    Менеджер кэширования
+    РњРµРЅРµРґР¶РµСЂ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 render::manager::CacheManager& DeviceManager::CacheManager ()
@@ -102,7 +102,7 @@ render::manager::CacheManager& DeviceManager::CacheManager ()
 }
 
 /*
-    Менеджер лэйаутов геометрии
+    РњРµРЅРµРґР¶РµСЂ Р»СЌР№Р°СѓС‚РѕРІ РіРµРѕРјРµС‚СЂРёРё
 */
 
 InputLayoutManager& DeviceManager::InputLayoutManager ()
@@ -111,7 +111,7 @@ InputLayoutManager& DeviceManager::InputLayoutManager ()
 }
 
 /*
-    Менеджер параметров программ шэйдинга
+    РњРµРЅРµРґР¶РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРј С€СЌР№РґРёРЅРіР°
 */
 
 ProgramParametersManager& DeviceManager::ProgramParametersManager ()
@@ -120,7 +120,7 @@ ProgramParametersManager& DeviceManager::ProgramParametersManager ()
 }
 
 /*
-    Настройки менеджера рендеринга
+    РќР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 Settings& DeviceManager::Settings ()

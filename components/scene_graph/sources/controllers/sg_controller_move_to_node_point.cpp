@@ -4,18 +4,18 @@ using namespace scene_graph;
 using namespace scene_graph::controllers;
 
 /*
-    Описание реализации контроллера следования за точкой узла
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР° СЃР»РµРґРѕРІР°РЅРёСЏ Р·Р° С‚РѕС‡РєРѕР№ СѓР·Р»Р°
 */
 
 struct MoveToNodePoint::Impl: public xtl::instance_counter<MoveToNodePoint>
 {
-  Node*                node;                    //передвигаемый узел
-  AccelerationFunction acceleration_function;   //функция рассчета ускорения узла
-  Node::ConstPointer   target_node;             //преследуемый узел
-  math::vec3f          target_point;            //целевая точка в системе координат преследуемого узла
-  math::vec3f          current_speed;           //текущая скорость узла
-  NodeTransformSpace   transform_space;         //пространство рассчета скорости
-  xtl::auto_connection scene_attach_connection; //соединения события присоединения узла к сцене
+  Node*                node;                    //РїРµСЂРµРґРІРёРіР°РµРјС‹Р№ СѓР·РµР»
+  AccelerationFunction acceleration_function;   //С„СѓРЅРєС†РёСЏ СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
+  Node::ConstPointer   target_node;             //РїСЂРµСЃР»РµРґСѓРµРјС‹Р№ СѓР·РµР»
+  math::vec3f          target_point;            //С†РµР»РµРІР°СЏ С‚РѕС‡РєР° РІ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ РїСЂРµСЃР»РµРґСѓРµРјРѕРіРѕ СѓР·Р»Р°
+  math::vec3f          current_speed;           //С‚РµРєСѓС‰Р°СЏ СЃРєРѕСЂРѕСЃС‚СЊ СѓР·Р»Р°
+  NodeTransformSpace   transform_space;         //РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ СЂР°СЃСЃС‡РµС‚Р° СЃРєРѕСЂРѕСЃС‚Рё
+  xtl::auto_connection scene_attach_connection; //СЃРѕРµРґРёРЅРµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ СѓР·Р»Р° Рє СЃС†РµРЅРµ
 
   Impl (Node& in_node)
     : node (&in_node)
@@ -32,7 +32,7 @@ struct MoveToNodePoint::Impl: public xtl::instance_counter<MoveToNodePoint>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MoveToNodePoint::MoveToNodePoint (Node& node)
@@ -45,7 +45,7 @@ MoveToNodePoint::~MoveToNodePoint ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 MoveToNodePoint::Pointer MoveToNodePoint::Create (Node& node)
@@ -54,7 +54,7 @@ MoveToNodePoint::Pointer MoveToNodePoint::Create (Node& node)
 }
 
 /*
-   Установка/получение функции рассчета ускорения узла
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С„СѓРЅРєС†РёРё СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
 */
 
 void MoveToNodePoint::SetAccelerationHandler (const AccelerationFunction& acceleration_function)
@@ -68,7 +68,7 @@ const MoveToNodePoint::AccelerationFunction& MoveToNodePoint::AccelerationHandle
 }
 
 /*
-   Установка / получение пространства рассчета скорости
+   РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° СЂР°СЃСЃС‡РµС‚Р° СЃРєРѕСЂРѕСЃС‚Рё
 */
 
 void MoveToNodePoint::SetTransformSpace (NodeTransformSpace transform_space)
@@ -90,7 +90,7 @@ NodeTransformSpace MoveToNodePoint::TransformSpace () const
 }
 
 /*
-   Запуск движения
+   Р—Р°РїСѓСЃРє РґРІРёР¶РµРЅРёСЏ
 */
 
 void MoveToNodePoint::Start (const Node& node, const math::vec3f& node_space_position)
@@ -100,7 +100,7 @@ void MoveToNodePoint::Start (const Node& node, const math::vec3f& node_space_pos
 }
 
 /*
-   Остановка движения
+   РћСЃС‚Р°РЅРѕРІРєР° РґРІРёР¶РµРЅРёСЏ
 */
 
 void MoveToNodePoint::Stop ()
@@ -109,7 +109,7 @@ void MoveToNodePoint::Stop ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void MoveToNodePoint::Update (const TimeValue& time_value)

@@ -1,8 +1,8 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := SOUNDSYSTEM_COMPONENTS
 
-#Цель №1 - пакет
+#Р¦РµР»СЊ в„–1 - РїР°РєРµС‚
 SOUNDSYSTEM_COMPONENTS.TYPE       := package
 SOUNDSYSTEM_COMPONENTS.COMPONENTS := low_level openal_device manager scene_player low_level_media_players

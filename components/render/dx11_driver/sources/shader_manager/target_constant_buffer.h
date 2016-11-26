@@ -3,38 +3,38 @@ class TargetConstantBuffer;
 typedef xtl::com_ptr<TargetConstantBuffer> TargetConstantBufferPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Прототип целевого буфера
+///РџСЂРѕС‚РѕС‚РёРї С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TargetConstantBufferPrototype  (ShaderLibrary& library, const ProgramParametersLayout& src_layout, const ProgramBufferLayout& dst_layout);
     ~TargetConstantBufferPrototype ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение буфера
+///РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TargetConstantBuffer& GetBuffer (const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT], ShaderLibrary& library) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение списка индексов константных буферов
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РёРЅРґРµРєСЃРѕРІ РєРѕРЅСЃС‚Р°РЅС‚РЅС‹С… Р±СѓС„РµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned char        GetSourceBuffersCount   () const { return indices.size (); }
     const unsigned char* GetSourceBuffersIndices () const { return indices.empty () ? (unsigned char*)0 : &indices [0]; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение минимального размера буфера для указанного слота
-/// (без проверок корректности аргументов)
+///РџРѕР»СѓС‡РµРЅРёРµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃР»РѕС‚Р°
+/// (Р±РµР· РїСЂРѕРІРµСЂРѕРє РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetMinSourceBufferSize      (size_t index) const { return synchronizer.GetMinSourceBufferSize (indices [index]); }
     size_t GetMinDestinationBufferSize ()             const { return synchronizer.GetMinDestinationBufferSize (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Синхронизация
-/// (без проверок корректности)
+///РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
+/// (Р±РµР· РїСЂРѕРІРµСЂРѕРє РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CopyTo (size_t index, const char* src_buffer, char* dst_buffer) const
     {
@@ -42,13 +42,13 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг
+///Р‘РёРЅРґРёРЅРі
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind (ID3D11Buffer& buffer, ID3D11Buffer* context_buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание буфера
+///РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TargetConstantBufferPtr CreateBuffer (const DeviceManager& device_manager, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const;
 
@@ -57,37 +57,37 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
     typedef ProgramBufferLayout::Slot  Slot;
 
   private:
-    ShaderBuffersSynchronizer& synchronizer; //синхронизатор
-    const ProgramBufferLayout& dst_layout;   //целевой лэйаут
-    IndexArray                 indices;      //индексы
-    size_t                     slots_count;  //количество слотов
-    const Slot*                slots;        //слоты
+    ShaderBuffersSynchronizer& synchronizer; //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ
+    const ProgramBufferLayout& dst_layout;   //С†РµР»РµРІРѕР№ Р»СЌР№Р°СѓС‚
+    IndexArray                 indices;      //РёРЅРґРµРєСЃС‹
+    size_t                     slots_count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‚РѕРІ
+    const Slot*                slots;        //СЃР»РѕС‚С‹
 };
 
 typedef xtl::intrusive_ptr<TargetConstantBufferPrototype> TargetConstantBufferPrototypePtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Целевой буфер
+///Р¦РµР»РµРІРѕР№ Р±СѓС„РµСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class TargetConstantBuffer: public DeviceObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TargetConstantBuffer  (const DeviceManager&, const TargetConstantBufferPrototype& prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]);
     ~TargetConstantBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Биндинг
+///Р‘РёРЅРґРёРЅРі
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind (ID3D11DeviceContext&, ID3D11Buffer* context_buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]);
 
   private:
     struct SourceBufferDesc
     {
-      SourceConstantBuffer* buffer; //исходный буфер
-      size_t                hash;   //хэш искходного буфера
+      SourceConstantBuffer* buffer; //РёСЃС…РѕРґРЅС‹Р№ Р±СѓС„РµСЂ
+      size_t                hash;   //С…СЌС€ РёСЃРєС…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       SourceBufferDesc (SourceConstantBuffer* in_buffer)
         : buffer (in_buffer)
@@ -99,7 +99,7 @@ class TargetConstantBuffer: public DeviceObject
     typedef stl::vector<SourceBufferDesc> BufferDescArray;
 
   private:
-    const TargetConstantBufferPrototype& prototype;   //прототип
-    DxBufferPtr                          dst_buffer;  //целевой буфер  
-    BufferDescArray                      src_buffers; //исходные буферы
+    const TargetConstantBufferPrototype& prototype;   //РїСЂРѕС‚РѕС‚РёРї
+    DxBufferPtr                          dst_buffer;  //С†РµР»РµРІРѕР№ Р±СѓС„РµСЂ  
+    BufferDescArray                      src_buffers; //РёСЃС…РѕРґРЅС‹Рµ Р±СѓС„РµСЂС‹
 };

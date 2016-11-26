@@ -11,7 +11,7 @@ namespace xtl
 {
 
 /*
-    Сравнение строк
+    РЎСЂР°РІРЅРµРЅРёРµ СЃС‚СЂРѕРє
 */
 
 int xstrcmp   (const char* s1, const char* s2);
@@ -20,24 +20,24 @@ int xstrncmp  (const char* s1, const char* s2, size_t max_count);
 int xstrnicmp (const char* s1, const char* s2, size_t max_count);
 
 /*
-    Получение длины строки
+    РџРѕР»СѓС‡РµРЅРёРµ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё
 */
 
 size_t xstrlen (const char* s);
 size_t xstrlen (const wchar_t* s);
 
 /*
-    Копирование строк
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРє
 */
 
 char*    xstrncpy (char* dst, const char* src, int length);
 wchar_t* xstrncpy (wchar_t* dst, const wchar_t* src, int length);
 
 /*
-    Печать в строку:
-      - если размер буфера недостаточен для печати строки возвращается -1;
-      - count - максимальное количество записываемых символов включая '\0';
-      - если buffer == NULL && count == 0, то возвращается размер форматирования.
+    РџРµС‡Р°С‚СЊ РІ СЃС‚СЂРѕРєСѓ:
+      - РµСЃР»Рё СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РЅРµРґРѕСЃС‚Р°С‚РѕС‡РµРЅ РґР»СЏ РїРµС‡Р°С‚Рё СЃС‚СЂРѕРєРё РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ -1;
+      - count - РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃС‹РІР°РµРјС‹С… СЃРёРјРІРѕР»РѕРІ РІРєР»СЋС‡Р°СЏ '\0';
+      - РµСЃР»Рё buffer == NULL && count == 0, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ СЂР°Р·РјРµСЂ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ.
 */
 
 int xsnprintf  (char* buffer, size_t count, const char* format, ...);

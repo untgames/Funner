@@ -17,13 +17,13 @@ class MusicPlayer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Делегат проигрывателя
+///Р”РµР»РµРіР°С‚ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface AudioPlayerDelegate : NSObject <AVAudioPlayerDelegate>
 {
   @private
-    MusicPlayer *player;  //проигрыватель
-    common::Log *log;     //протокол событий проигрывания
+    MusicPlayer *player;  //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ
+    common::Log *log;     //РїСЂРѕС‚РѕРєРѕР» СЃРѕР±С‹С‚РёР№ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 }
 
 -(id) init;
@@ -38,13 +38,13 @@ const char*  LOG_NAME = "media.players.iphone.MusicPlayer";
 const double EPSILON  = 0.01;
 
 /*
-    Проигрыватель видео на iPhone
+    РџСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ РІРёРґРµРѕ РЅР° iPhone
 */
 
 class MusicPlayer: public IStreamPlayer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MusicPlayer (const char* in_stream_name, const StreamPlayerManager::StreamEventHandler& in_handler)
       : handler (in_handler), stream_name (in_stream_name), player (0), player_delegate (0), is_paused (false)
     {
@@ -77,20 +77,20 @@ class MusicPlayer: public IStreamPlayer
       player.delegate = player_delegate;
     }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~MusicPlayer ()
     {
       [player release];
       [player_delegate release];
     }
 
-///Длительность потока
+///Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РїРѕС‚РѕРєР°
     float Duration ()
     {
       return player.duration;
     }
 
-///Начать проигрывание
+///РќР°С‡Р°С‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Play ()
     {
       static const char* METHOD_NAME = "media::players::iphone::MusicPlayer::Play";
@@ -106,7 +106,7 @@ class MusicPlayer: public IStreamPlayer
       is_paused = false;
     }
     
-///Приостановить проигрывание
+///РџСЂРёРѕСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void PauseWithoutNotify ()
     {
       [player pause];
@@ -124,7 +124,7 @@ class MusicPlayer: public IStreamPlayer
       OnEvent (StreamEvent_OnPause);
     }
     
-///Остановить проигрывание
+///РћСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Stop ()
     {
       [player stop];
@@ -135,25 +135,25 @@ class MusicPlayer: public IStreamPlayer
       is_paused = false;
     }
     
-///Установить позицию проигрывания
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetPosition (float position)
     {
       player.currentTime = position;
     }
 
-///Получить позицию проигрывания
+///РџРѕР»СѓС‡РёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     float Position ()
     {
       return player.currentTime;
     }
 
-///Установка режима циклического проигрывания
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° С†РёРєР»РёС‡РµСЃРєРѕРіРѕ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetLooping (bool state)
     {
       player.numberOfLoops = state ? -1 : 0;
     }
 
-///Установить громкость
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіСЂРѕРјРєРѕСЃС‚СЊ
     void SetVolume (float volume)
     {
       volume = stl::max (0.f, stl::min (1.f, volume));
@@ -161,19 +161,19 @@ class MusicPlayer: public IStreamPlayer
       player.volume = volume;
     }
     
-///Получение имени потока
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РїРѕС‚РѕРєР°
     const char* StreamName ()
     {
       return stream_name.c_str ();
     }
 
-///Получение состояния проигрывателя
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
     bool IsPaused ()
     {
       return is_paused;
     }
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
     void OnEvent (StreamEvent event)
     {
       handler (this, event);
@@ -183,11 +183,11 @@ class MusicPlayer: public IStreamPlayer
     typedef StreamPlayerManager::StreamEventHandler StreamEventHandler;
 
   private:
-    StreamEventHandler  handler;           //обработчик событий
-    stl::string         stream_name;       //имя проигрываемого потока
-    AVAudioPlayer       *player;           //проигрыватель звука
-    AudioPlayerDelegate *player_delegate;  //делегат проигрывателя
-    bool                is_paused;         //находится ли в режиме паузы (необходимо для отработки прерывания проигрывания внешними событиями)
+    StreamEventHandler  handler;           //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№
+    stl::string         stream_name;       //РёРјСЏ РїСЂРѕРёРіСЂС‹РІР°РµРјРѕРіРѕ РїРѕС‚РѕРєР°
+    AVAudioPlayer       *player;           //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ Р·РІСѓРєР°
+    AudioPlayerDelegate *player_delegate;  //РґРµР»РµРіР°С‚ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
+    bool                is_paused;         //РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РІ СЂРµР¶РёРјРµ РїР°СѓР·С‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РѕС‚СЂР°Р±РѕС‚РєРё РїСЂРµСЂС‹РІР°РЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РІРЅРµС€РЅРёРјРё СЃРѕР±С‹С‚РёСЏРјРё)
 };
 
 }
@@ -284,7 +284,7 @@ namespace iphone
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание проигрывателя
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler)
 {

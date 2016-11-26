@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PrimitiveBuffers::PrimitiveBuffers (PrimitiveBuffersImpl* in_impl)
@@ -31,7 +31,7 @@ PrimitiveBuffers& PrimitiveBuffers::operator = (const PrimitiveBuffers& p)
 }
 
 /*
-    Добавление буферов
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffers::Add (const media::geometry::VertexStream& buffer, MeshBufferUsage usage)
@@ -50,7 +50,7 @@ void PrimitiveBuffers::Add (const media::geometry::IndexBuffer& buffer, MeshBuff
 }
 
 /*
-    Обновление буферов
+    РћР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffers::Update (const media::geometry::VertexStream& buffer)
@@ -64,7 +64,7 @@ void PrimitiveBuffers::Update (const media::geometry::IndexBuffer& buffer)
 }
 
 /*
-    Удаление буферов
+    РЈРґР°Р»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffers::Remove (const media::geometry::VertexStream& buffer)
@@ -88,7 +88,7 @@ void PrimitiveBuffers::RemoveAll ()
 }
 
 /*
-    Резервирование вспомогательных примитивов
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void PrimitiveBuffers::ReserveDynamicBuffers (unsigned int vertices_count, unsigned int indices_count)
@@ -110,7 +110,7 @@ unsigned int PrimitiveBuffers::DynamicIndicesCount () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PrimitiveBuffers::Swap (PrimitiveBuffers& buffers)

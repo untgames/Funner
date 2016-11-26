@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-   Получение параметров текстуры
+   РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 namespace render
@@ -17,7 +17,7 @@ namespace opengl
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-//преобразование формата хранения пикселей к внутреннему формату OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє РІРЅСѓС‚СЂРµРЅРЅРµРјСѓ С„РѕСЂРјР°С‚Сѓ OpenGL
 GLint get_gl_internal_format (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_internal_format";
@@ -54,7 +54,7 @@ GLint get_gl_internal_format (PixelFormat format)
   }
 }
 
-//преобразование формата хранения пикселей к формату буферов OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє С„РѕСЂРјР°С‚Сѓ Р±СѓС„РµСЂРѕРІ OpenGL
 GLenum get_gl_format (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_format";
@@ -91,7 +91,7 @@ GLenum get_gl_format (PixelFormat format)
   }
 }
 
-//преобразование формата хранения пикселей к типу элементов в буферах OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє С‚РёРїСѓ СЌР»РµРјРµРЅС‚РѕРІ РІ Р±СѓС„РµСЂР°С… OpenGL
 GLenum get_gl_type (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_type";
@@ -127,7 +127,7 @@ GLenum get_gl_type (PixelFormat format)
   }
 }
 
-//получение формата хранения пикселей по GL-формату
+//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ РїРѕ GL-С„РѕСЂРјР°С‚Сѓ
 PixelFormat get_pixel_format (GLenum gl_format)
 {
   switch (gl_format)
@@ -159,7 +159,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
 #endif
 
-//преобразование формата хранения пикселей к внутреннему формату OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє РІРЅСѓС‚СЂРµРЅРЅРµРјСѓ С„РѕСЂРјР°С‚Сѓ OpenGL
 GLint get_gl_internal_format (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_internal_format";
@@ -193,7 +193,7 @@ GLint get_gl_internal_format (PixelFormat format)
   }
 }
 
-//преобразование формата хранения пикселей к формату буферов OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє С„РѕСЂРјР°С‚Сѓ Р±СѓС„РµСЂРѕРІ OpenGL
 GLenum get_gl_format (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_format";
@@ -227,7 +227,7 @@ GLenum get_gl_format (PixelFormat format)
   }
 }
 
-//преобразование формата хранения пикселей к типу элементов в буферах OpenGL
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ Рє С‚РёРїСѓ СЌР»РµРјРµРЅС‚РѕРІ РІ Р±СѓС„РµСЂР°С… OpenGL
 GLenum get_gl_type (PixelFormat format)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::get_gl_type";
@@ -254,7 +254,7 @@ GLenum get_gl_type (PixelFormat format)
   }
 }
 
-//получение формата хранения пикселей по GL-формату
+//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ РїРѕ GL-С„РѕСЂРјР°С‚Сѓ
 PixelFormat get_pixel_format (GLenum gl_format)
 {
   switch (gl_format)
@@ -287,25 +287,25 @@ PixelFormat get_pixel_format (GLenum gl_format)
 
 #endif
 
-//распакованный внутренний формат OpenGL
+//СЂР°СЃРїР°РєРѕРІР°РЅРЅС‹Р№ РІРЅСѓС‚СЂРµРЅРЅРёР№ С„РѕСЂРјР°С‚ OpenGL
 GLenum get_uncompressed_gl_internal_format (PixelFormat format)
 {
   return get_gl_internal_format (get_uncompressed_format (format));  
 }
 
-//распакованный формат OpenGL
+//СЂР°СЃРїР°РєРѕРІР°РЅРЅС‹Р№ С„РѕСЂРјР°С‚ OpenGL
 GLenum get_uncompressed_gl_format (PixelFormat format)
 {
   return get_gl_format (get_uncompressed_format (format));
 }
 
-//распакованный тип OpenGL
+//СЂР°СЃРїР°РєРѕРІР°РЅРЅС‹Р№ С‚РёРї OpenGL
 GLenum get_uncompressed_gl_type (PixelFormat format)
 {
   return get_gl_type (get_uncompressed_format (format));
 }
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 unsigned int get_next_higher_power_of_two (unsigned int k)
 {
   if (!k)

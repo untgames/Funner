@@ -5,7 +5,7 @@ using namespace common;
 using namespace input;
 
 /*
-   Фильтр
+   Р¤РёР»СЊС‚СЂ
 */
 
 class EventsFilter : public ControlsDetector::IFilter
@@ -36,19 +36,19 @@ class EventsFilter : public ControlsDetector::IFilter
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Определитель событий
+///РћРїСЂРµРґРµР»РёС‚РµР»СЊ СЃРѕР±С‹С‚РёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ControlsDetector::Impl : public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор / присваивание
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    Impl  () {}
    ~Impl () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация соответствий
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Add (const char* action, const char* input_event_mask, const char* replacement)
     {
@@ -85,7 +85,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор
+///РџРµСЂРµР±РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ControlsDetector::Iterator CreateIterator () const
     {
@@ -93,7 +93,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
+///РћС‡РёСЃС‚РєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Clear ()
     {
@@ -101,7 +101,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
     }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Определение события для указанного тэга в таблице трансляции
+///РћРїСЂРµРґРµР»РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С‚СЌРіР° РІ С‚Р°Р±Р»РёС†Рµ С‚СЂР°РЅСЃР»СЏС†РёРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection Detect (const EventsSource& source, const char* action, const EventHandler& handler)
     {
@@ -163,7 +163,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 
           string control_mask;
 
-          control_mask.reserve (strlen (event_components [0]) + strlen (event_mask) + 2); // 2 - кавычки вокруг имени контрола
+          control_mask.reserve (strlen (event_components [0]) + strlen (event_mask) + 2); // 2 - РєР°РІС‹С‡РєРё РІРѕРєСЂСѓРі РёРјРµРЅРё РєРѕРЅС‚СЂРѕР»Р°
 
           control_mask += '\'';
           control_mask += event_components [0];
@@ -194,7 +194,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ControlsDetector::ControlsDetector  ()
@@ -226,7 +226,7 @@ ControlsDetector& ControlsDetector::operator = (const ControlsDetector& source)
 }
 
 /*
-   Регистрация соответствий
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№
 */
 
 void ControlsDetector::Add (const char* action, const char* input_event_mask, const char* replacement)
@@ -272,7 +272,7 @@ void ControlsDetector::Remove (const char* action)
 }
 
 /*
-   Перебор
+   РџРµСЂРµР±РѕСЂ
 */
 
 ControlsDetector::Iterator ControlsDetector::CreateIterator () const
@@ -281,7 +281,7 @@ ControlsDetector::Iterator ControlsDetector::CreateIterator () const
 }
 
 /*
-   Очистка
+   РћС‡РёСЃС‚РєР°
 */
 
 void ControlsDetector::Clear ()
@@ -290,7 +290,7 @@ void ControlsDetector::Clear ()
 }
     
 /*
-   Определение события для указанного тэга в таблице трансляции
+   РћРїСЂРµРґРµР»РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С‚СЌРіР° РІ С‚Р°Р±Р»РёС†Рµ С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 
 xtl::connection ControlsDetector::Detect (const EventsSource& source, const char* action, const EventHandler& handler)
@@ -302,7 +302,7 @@ xtl::connection ControlsDetector::Detect (const EventsSource& source, const char
 }
 
 /*
-   Сохранение / загрузка
+   РЎРѕС…СЂР°РЅРµРЅРёРµ / Р·Р°РіСЂСѓР·РєР°
 */
 
 void ControlsDetector::Load (const char* file_name)
@@ -326,7 +326,7 @@ void ControlsDetector::Save (const char* file_name)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void ControlsDetector::Swap (ControlsDetector& source)
@@ -338,7 +338,7 @@ namespace input
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 void swap (ControlsDetector& source1, ControlsDetector& source2)
 {

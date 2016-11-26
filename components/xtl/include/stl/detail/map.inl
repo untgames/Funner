@@ -14,7 +14,7 @@ inline map_base<Key,T,Compare,Allocator>::value_compare::value_compare (Compare 
 {  }  
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -28,7 +28,7 @@ inline map_base<Key,T,Compare,Allocator>::map_base (const key_compare& cmp,const
 { }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -38,7 +38,7 @@ inline typename map_base<Key,T,Compare,Allocator>::allocator_type map_base<Key,T
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -72,7 +72,7 @@ inline bool map_base<Key,T,Compare,Allocator>::empty () const
 }
 
 /*
-    Итераторы
+    РС‚РµСЂР°С‚РѕСЂС‹
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -124,7 +124,7 @@ inline typename map_base<Key,T,Compare,Allocator>::const_reverse_iterator map_ba
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -152,7 +152,7 @@ inline void map_base<Key,T,Compare,Allocator>::clear ()
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -221,7 +221,7 @@ map_base<Key,T,Compare,Allocator>::equal_range (const key_type& x) const
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -261,7 +261,7 @@ inline bool map_base<Key,T,Compare,Allocator>::operator >= (const map_base& x) c
 }
 
 /*
-    Множество с уникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ СѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -288,7 +288,7 @@ inline map<Key,T,Compare,Allocator>::map (Iter first,Iter last,const key_compare
   tree.insert_unique (first,last);
 }
 
-//Операции доступа
+//РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 template <class Key,class T,class Compare,class Allocator>
 inline T& map<Key,T,Compare,Allocator>::operator [] (const key_type& k) 
 {
@@ -300,7 +300,7 @@ inline T& map<Key,T,Compare,Allocator>::operator [] (const key_type& k)
   return i->second;
 }
 
-//Вставка
+//Р’СЃС‚Р°РІРєР°
 template <class Key,class T,class Compare,class Allocator>
 inline pair<typename map<Key,T,Compare,Allocator>::iterator,bool> 
 map<Key,T,Compare,Allocator>::insert (const value_type& x)
@@ -339,7 +339,7 @@ inline void map<Key,T,Compare,Allocator>::insert (Iter first,Iter last)
   tree.insert_unique (first,last);
 }
 
-//Обмен
+//РћР±РјРµРЅ
 template <class Key,class T,class Compare,class Allocator>
 inline void map<Key,T,Compare,Allocator>::swap (map& s)
 {
@@ -353,7 +353,7 @@ inline void swap (map<Key,T,Compare,Allocator>& a,map<Key,T,Compare,Allocator>& 
 }
 
 /*
-    Множество с неуникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ РЅРµСѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class T,class Compare,class Allocator>
@@ -416,7 +416,7 @@ inline void multimap<Key,T,Compare,Allocator>::insert (Iter first,Iter last)
   tree.insert_equal (first,last);
 }
 
-//Обмен
+//РћР±РјРµРЅ
 template <class Key,class T,class Compare,class Allocator>
 inline void multimap<Key,T,Compare,Allocator>::swap (multimap& s)
 {

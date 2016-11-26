@@ -1,4 +1,4 @@
-//тестирование функции erase и clear
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё erase Рё clear
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

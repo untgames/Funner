@@ -2,10 +2,10 @@
 #define XTL_TYPE_TRAITS_REFPTR_HEADER
 
 /*
-    Преобразование указателей и ссылок
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№ Рё СЃСЃС‹Р»РѕРє
 */
 
-//добавление/удаление ссылки
+//РґРѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ СЃСЃС‹Р»РєРё
 template <class T> struct remove_reference                   { typedef T    type; };
 template <class T> struct remove_reference<T&>               { typedef T    type; };
 template <class T> struct add_reference                      { typedef T&   type; };
@@ -15,7 +15,7 @@ template <>        struct add_reference<const void>          { typedef void type
 template <>        struct add_reference<volatile void>       { typedef void type; };
 template <>        struct add_reference<const volatile void> { typedef void type; };
 
-//добавление/удаление указателя
+//РґРѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
 template <class T> struct remove_pointer                    { typedef T type; };
 template <class T> struct remove_pointer<T*>                { typedef T type; };
 template <class T> struct remove_pointer<T* const>          { typedef T type; };
@@ -23,14 +23,14 @@ template <class T> struct remove_pointer<T* volatile>       { typedef T type; };
 template <class T> struct remove_pointer<T* const volatile> { typedef T type; };
 template <class T> struct add_pointer                       { typedef typename remove_reference<T>::type* type; };
 
-//проверка является ли T указателем
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T СѓРєР°Р·Р°С‚РµР»РµРј
 template <class T> struct is_pointer:                    public false_type {};
 template <class T> struct is_pointer<T*>:                public true_type {};
 template <class T> struct is_pointer<T* const>:          public true_type {};
 template <class T> struct is_pointer<T* volatile>:       public true_type {};
 template <class T> struct is_pointer<T* const volatile>: public true_type {};
 
-//проверка является ли T ссылкой
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T СЃСЃС‹Р»РєРѕР№
 template <class T> struct is_reference:     public false_type {};
 template <class T> struct is_reference<T&>: public true_type {};
 

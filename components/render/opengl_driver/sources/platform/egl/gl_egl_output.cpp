@@ -8,29 +8,29 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t OUTPUT_MAX_NAME_SIZE = 128; //максимальный размер имени устройства вывода
+const size_t OUTPUT_MAX_NAME_SIZE = 128; //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 
 }
 
 /*
-    Описание реализации устройства вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 struct Output::Impl
 {
-  Log               log;                         //протокол графического драйвера
-  AdapterPtr        adapter;                     //адаптер отрисовки
-  NativeWindowType  native_window;               //окно
-  NativeDisplayType native_display;              //целевое платформо-зависимое устройство вывода
-  EGLDisplay        egl_display;                 //целевое устройство вывода
-  char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена  
+  Log               log;                         //РїСЂРѕС‚РѕРєРѕР» РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РґСЂР°Р№РІРµСЂР°
+  AdapterPtr        adapter;                     //Р°РґР°РїС‚РµСЂ РѕС‚СЂРёСЃРѕРІРєРё
+  NativeWindowType  native_window;               //РѕРєРЅРѕ
+  NativeDisplayType native_display;              //С†РµР»РµРІРѕРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
+  EGLDisplay        egl_display;                 //С†РµР»РµРІРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
+  char              name [OUTPUT_MAX_NAME_SIZE]; //РёРјСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°  
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Adapter* in_adapter, const void* window_handle)
     : adapter (in_adapter)
     , native_window ((NativeWindowType)window_handle)
@@ -41,11 +41,11 @@ struct Output::Impl
 
     try
     {
-        //платформо-зависимая инициализация
+        //РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 
       PlatformInitialize ();
 
-        //создание дисплея
+        //СЃРѕР·РґР°РЅРёРµ РґРёСЃРїР»РµСЏ
 
       log.Printf ("...create display");
 
@@ -54,7 +54,7 @@ struct Output::Impl
       if (!egl_display)
         log.Printf ("...using default display");
 
-        //инициализация EGL
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ EGL
 
       log.Printf ("...initialize EGL");            
 
@@ -75,16 +75,16 @@ struct Output::Impl
     }
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
     {
-        //закрытие сессии с целевым устройством вывода
+        //Р·Р°РєСЂС‹С‚РёРµ СЃРµСЃСЃРёРё СЃ С†РµР»РµРІС‹Рј СѓСЃС‚СЂРѕР№СЃС‚РІРѕРј РІС‹РІРѕРґР°
       
       eglTerminate (egl_display);
       
-        //платформо-зависимое освобождение ресурсов
+        //РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
 
       PlatformDone ();
     }
@@ -95,7 +95,7 @@ struct Output::Impl
   
 #if defined ( _WIN32 ) && !defined ( BADA )
 
-///Платформо-зависимая инициализация
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void PlatformInitialize ()
   {
     try
@@ -105,12 +105,12 @@ struct Output::Impl
       native_display = ::GetDC (native_window);      
 
       if (!native_display)
-        throw xtl::format_operation_exception ("::GetDC", "Operation failed"); //сделать через raise_error!!!
+        throw xtl::format_operation_exception ("::GetDC", "Operation failed"); //СЃРґРµР»Р°С‚СЊ С‡РµСЂРµР· raise_error!!!
 
       log.Printf ("...get window name");
 
       if (!GetWindowTextA (native_window, name, sizeof (name)))
-        throw xtl::format_operation_exception ("::GetWindowTextA", "Operation failed"); //сделать через raise_error!!!
+        throw xtl::format_operation_exception ("::GetWindowTextA", "Operation failed"); //СЃРґРµР»Р°С‚СЊ С‡РµСЂРµР· raise_error!!!
     }
     catch (xtl::exception& exception)
     {
@@ -119,7 +119,7 @@ struct Output::Impl
     }
   }
   
-///Платформо-зависимое освобождение ресурсов
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
   void PlatformDone ()
   {    
     if (native_display && native_window)
@@ -132,7 +132,7 @@ struct Output::Impl
 
 #elif defined BADA
 
-///Платформо-зависимая инициализация
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void PlatformInitialize ()
   {
     native_display = EGL_DEFAULT_DISPLAY;
@@ -142,14 +142,14 @@ struct Output::Impl
     strncpy (name, common::tostring (reinterpret_cast<Osp::Ui::Control*> (native_window)->GetName ().GetPointer ()).c_str (), sizeof (name));
   }
   
-///Платформо-зависимое освобождение ресурсов
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
   void PlatformDone ()
   {    
   }
   
 #elif defined BEAGLEBOARD
 
-///Платформо-зависимая инициализация
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void PlatformInitialize ()
   {
     native_display = (NativeDisplayType)syslib::x11::DisplayManager::DisplayHandle ();
@@ -167,33 +167,33 @@ struct Output::Impl
     strncpy (name, window_name, sizeof (name));
   }
   
-///Платформо-зависимое освобождение ресурсов
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
   void PlatformDone ()
   {
   }
   
 #elif defined ANDROID  
 
-///Платформо-зависимая инициализация
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void PlatformInitialize ()
   {
     native_display = EGL_DEFAULT_DISPLAY;
   }
   
-///Платформо-зависимое освобождение ресурсов
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
   void PlatformDone ()
   {
   }
   
 #elif defined TABLETOS
 
-///Платформо-зависимая инициализация
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void PlatformInitialize ()
   {
     native_display = EGL_DEFAULT_DISPLAY;    
   }
   
-///Платформо-зависимое освобождение ресурсов
+///РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРµ РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
   void PlatformDone ()
   {
   }
@@ -204,7 +204,7 @@ struct Output::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Output::Output (Adapter* adapter, const void* window_handle)
@@ -234,7 +234,7 @@ Output::~Output ()
 }
 
 /*
-    Получение имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
 */
 
 const char* Output::GetName ()
@@ -243,7 +243,7 @@ const char* Output::GetName ()
 }
 
 /*
-    Получение списка видео-режимов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Output::GetModesCount ()
@@ -257,7 +257,7 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 }
 
 /*
-    Установка текущего видео-режима
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void Output::SetCurrentMode (const OutputModeDesc&)
@@ -271,7 +271,7 @@ void Output::GetCurrentMode (OutputModeDesc&)
 }
 
 /*
-    Управление гамма-коррекцией
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Output::SetGammaRamp (const Color3f [256])
@@ -285,7 +285,7 @@ void Output::GetGammaRamp (Color3f [256])
 }
 
 /*
-    Получение параметров EGL
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ EGL
 */
 
 EGLDisplay Output::GetEglDisplay ()

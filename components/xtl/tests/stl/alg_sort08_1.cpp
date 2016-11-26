@@ -1,4 +1,4 @@
-//Тестирование алгоритма inplace_merge (first, middle, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° inplace_merge (first, middle, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

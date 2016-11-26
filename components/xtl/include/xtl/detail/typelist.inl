@@ -1,5 +1,5 @@
 /*
-    Определение длины списка
+    РћРїСЂРµРґРµР»РµРЅРёРµ РґР»РёРЅС‹ СЃРїРёСЃРєР°
 */
 
 template <class Head, class Tail> struct length<type_node<Head, Tail> >
@@ -18,7 +18,7 @@ template <> struct length<type_node<null_type, null_type> >
 };
 
 /*
-    Получение index-го элемента списка
+    РџРѕР»СѓС‡РµРЅРёРµ index-РіРѕ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
 */
 
 template <class Head, class Tail> struct at<type_node<Head, Tail>, 0>
@@ -32,7 +32,7 @@ template <class Head, class Tail, size_t index> struct at<type_node<Head, Tail>,
 };
 
 /*
-    Получение индекса элемента
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° СЌР»РµРјРµРЅС‚Р°
 */
 
 template <class Head, class Tail, class T> struct indexof<type_node<Head, Tail>, T>
@@ -52,7 +52,7 @@ template <class Tail, class T> struct indexof<type_node<T, Tail>, T>
 };
 
 /*
-    Добавление элемента или списка типов
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РёР»Рё СЃРїРёСЃРєР° С‚РёРїРѕРІ
 */
 
 template <> struct append<null_type, null_type>
@@ -76,7 +76,7 @@ template <class Head, class Tail, class T> struct append<type_node<Head, Tail>, 
 };
 
 /*
-    Удаление первого вхождения элемента в список
+    РЈРґР°Р»РµРЅРёРµ РїРµСЂРІРѕРіРѕ РІС…РѕР¶РґРµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° РІ СЃРїРёСЃРѕРє
 */
 
 template <class T> struct erase_first<null_type, T>
@@ -95,7 +95,7 @@ template <class Head, class Tail, class T> struct erase_first<type_node<Head, Ta
 };
 
 /*
-    Удаление всех вхождений элементов в список
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РІС…РѕР¶РґРµРЅРёР№ СЌР»РµРјРµРЅС‚РѕРІ РІ СЃРїРёСЃРѕРє
 */
 
 template <class T> struct erase<null_type, T>
@@ -114,7 +114,7 @@ template <class Head, class Tail, class T> struct erase<type_node<Head, Tail>, T
 };
 
 /*
-    Удаление дубликатов
+    РЈРґР°Р»РµРЅРёРµ РґСѓР±Р»РёРєР°С‚РѕРІ
 */
 
 template <> struct unique<null_type>
@@ -128,7 +128,7 @@ template <class Head, class Tail> struct unique<type_node<Head, Tail> >
 };
 
 /*
-    Замена первого вхождения элемента T в списке на R
+    Р—Р°РјРµРЅР° РїРµСЂРІРѕРіРѕ РІС…РѕР¶РґРµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° T РІ СЃРїРёСЃРєРµ РЅР° R
 */
 
 template <class T, class R> struct replace_first<null_type, T, R>
@@ -147,7 +147,7 @@ template <class Head, class Tail, class T, class R> struct replace_first<type_no
 };
 
 /*
-    Замена всех вхождений элемента T в списке на R
+    Р—Р°РјРµРЅР° РІСЃРµС… РІС…РѕР¶РґРµРЅРёР№ СЌР»РµРјРµРЅС‚Р° T РІ СЃРїРёСЃРєРµ РЅР° R
 */
 
 template <class T, class R> struct replace<null_type, T, R>
@@ -167,7 +167,7 @@ struct replace<type_node<Head, Tail>, T, R>
 };
 
 /*
-    Обращение порядка следования элементов в списке
+    РћР±СЂР°С‰РµРЅРёРµ РїРѕСЂСЏРґРєР° СЃР»РµРґРѕРІР°РЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ РІ СЃРїРёСЃРєРµ
 */
 
 template <class T> struct reverse<type_node<T, null_type> >
@@ -181,7 +181,7 @@ template <class Head, class Tail> struct reverse<type_node<Head, Tail> >
 };
 
 /*
-    Отображение списка с применением к каждому из его элементов операции Transform
+    РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРїРёСЃРєР° СЃ РїСЂРёРјРµРЅРµРЅРёРµРј Рє РєР°Р¶РґРѕРјСѓ РёР· РµРіРѕ СЌР»РµРјРµРЅС‚РѕРІ РѕРїРµСЂР°С†РёРё Transform
 */
 
 template <template <class T> class Transform> struct transform<null_type, Transform>
@@ -196,7 +196,7 @@ struct transform<type_node<Head, Tail>, Transform>
 };
 
 /*
-    Аккумулирование преобразований над списком
+    РђРєРєСѓРјСѓР»РёСЂРѕРІР°РЅРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ РЅР°Рґ СЃРїРёСЃРєРѕРј
 */
 
 template <class TypeNode, template <class CurrentResult, class T> class Transform, class StartResult>
@@ -218,7 +218,7 @@ template <class TypeNode, template <class CurrentResult, class T> class Transfor
 struct accumulate: public reverse_accumulate<typename reverse<TypeNode>::type, Transform, StartResult> {};
 
 /*
-    Генерация иерархии с множественным наследованием
+    Р“РµРЅРµСЂР°С†РёСЏ РёРµСЂР°СЂС…РёРё СЃ РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹Рј РЅР°СЃР»РµРґРѕРІР°РЅРёРµРј
 */
 
 template <class TypeNode, template <class T> class Unit, class Root>
@@ -243,7 +243,7 @@ template <class TypeNode, template <class T> class Unit, class Root>
 struct generate_hierarchy: public generate_hierarchy_helper<TypeNode, Unit, Root>::generate_hierarchy {};
 
 /*
-    Генерация иерархии с одиночным наследованием
+    Р“РµРЅРµСЂР°С†РёСЏ РёРµСЂР°СЂС…РёРё СЃ РѕРґРёРЅРѕС‡РЅС‹Рј РЅР°СЃР»РµРґРѕРІР°РЅРёРµРј
 */
 
 template <class TypeNode, template <class Base, class T> class Unit, class Root>

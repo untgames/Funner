@@ -7,15 +7,15 @@ using namespace common;
 void BadaPlatform::InitLockable (lockable_t& lockable) {
     try {
 
-        // îáúåêò ìüþòåêñ äëÿ bad'û
+        // Ð¾Ð±ÑŠÐµÐºÑ‚ Ð¼ÑŒÑŽÑ‚ÐµÐºÑ Ð´Ð»Ñ bad'Ñ‹
         Osp::Base::Runtime::Mutex* mutex = new Osp::Base::Runtime::Mutex();
 
-        // åñëè ìüþòåêñ íå ñîçäàëñÿ, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð¼ÑŒÑŽÑ‚ÐµÐºÑ Ð½Ðµ ÑÐ¾Ð·Ð´Ð°Ð»ÑÑ, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if(mutex->Create() != E_SUCCESS) {
             throw xtl::make_null_argument_exception("", "lockable");
         }
 
-        // çàïîìíèëè ìüþòåêñ
+        // Ð·Ð°Ð¿Ð¾Ð¼Ð½Ð¸Ð»Ð¸ Ð¼ÑŒÑŽÑ‚ÐµÐºÑ
         lockable = mutex;
 
     } catch (xtl::exception& exception) {
@@ -29,12 +29,12 @@ void BadaPlatform::DestroyLockable (lockable_t& lockable) {
 
     try {
 
-        // åñëè ìüþòåêñà íåò, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð¼ÑŒÑŽÑ‚ÐµÐºÑÐ° Ð½ÐµÑ‚, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if (!lockable) {
             throw xtl::make_null_argument_exception("", "lockable");
         }
 
-        // óäàëåíèå ìüþòåêñà
+        // ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¼ÑŒÑŽÑ‚ÐµÐºÑÐ°
         Osp::Base::Runtime::Mutex* mutex = (Osp::Base::Runtime::Mutex*)lockable;
         mutex->~Mutex();
         delete reinterpret_cast<Osp::Base::Runtime::Mutex*> (lockable);
@@ -50,14 +50,14 @@ void BadaPlatform::DestroyLockable (lockable_t& lockable) {
 void BadaPlatform::Lock (lockable_t& lockable) {
     try {
     
-        // åñëè ìüþòåêñà íåò, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð¼ÑŒÑŽÑ‚ÐµÐºÑÐ° Ð½ÐµÑ‚, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if (!lockable) {
             throw xtl::make_null_argument_exception("", "lockable");
         }
 
         Osp::Base::Runtime::Mutex* mutex = (Osp::Base::Runtime::Mutex*)lockable;
 
-        // åñëè çàáëîêèðîâàòü íå óäàëîñü, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ðµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if (mutex->Acquire() != E_SUCCESS) {
             throw xtl::format_operation_exception("::Acquire", "Operation failed. Reason: Mutex is already acquired by another thread");
         }    
@@ -72,14 +72,14 @@ void BadaPlatform::Lock (lockable_t& lockable) {
 void BadaPlatform::Unlock (lockable_t& lockable) {
     try {
     
-        // åñëè ìüþòåêñà íåò, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð¼ÑŒÑŽÑ‚ÐµÐºÑÐ° Ð½ÐµÑ‚, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if (!lockable) {
             throw xtl::make_null_argument_exception("", "lockable");
         }
 
         Osp::Base::Runtime::Mutex* mutex = (Osp::Base::Runtime::Mutex*)lockable;
 
-        // åñëè îñâîáîäèòü íå óäàëîñü, òî èñêëþ÷åíèå
+        // ÐµÑÐ»Ð¸ Ð¾ÑÐ²Ð¾Ð±Ð¾Ð´Ð¸Ñ‚ÑŒ Ð½Ðµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ, Ñ‚Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ
         if (mutex->Release() != E_SUCCESS) {
             throw xtl::format_operation_exception("::Release", "Operation failed. Reason: Unknown");
         }

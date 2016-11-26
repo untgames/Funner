@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 RenderingContext::RenderingContext (FrameImpl& in_frame, const math::mat4f& in_vp_tm, RenderingContext* in_previous)
@@ -15,7 +15,7 @@ RenderingContext::RenderingContext (FrameImpl& in_frame, const math::mat4f& in_v
 }
 
 /*
-    Поиск локальных объектов
+    РџРѕРёСЃРє Р»РѕРєР°Р»СЊРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 */
 
 TexturePtr RenderingContext::FindLocalTexture (const char* name)

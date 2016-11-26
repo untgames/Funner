@@ -1,4 +1,4 @@
-// Тестирование функций удаления: erase (), clear ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёР№ СѓРґР°Р»РµРЅРёСЏ: erase (), clear ()
 #include <stdio.h>
 #include <stl/map>
 #include "test.h"

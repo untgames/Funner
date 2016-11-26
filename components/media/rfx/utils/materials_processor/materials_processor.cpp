@@ -22,29 +22,29 @@ const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                name;          //имя команды
-  char                       short_name;    //короткое имя
-  const char*                argument_name; //имя аргумента
-  const char*                tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                       short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;            //массив опций
-  size_t        options_count;      //количество опций
-  stl::string   source_material;    //файл исходного материала
-  stl::string   result_material;    //файл результирующего материала
-  StringArray   merge_materials;    //материалы на склейку
-  bool          silent;             //отключение предупреждений
-  bool          print_help;         //печать подсказки
+  const Option* options;            //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;      //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string   source_material;    //С„Р°Р№Р» РёСЃС…РѕРґРЅРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
+  stl::string   result_material;    //С„Р°Р№Р» СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РјР°С‚РµСЂРёР°Р»Р°
+  StringArray   merge_materials;    //РјР°С‚РµСЂРёР°Р»С‹ РЅР° СЃРєР»РµР№РєСѓ
+  bool          silent;             //РѕС‚РєР»СЋС‡РµРЅРёРµ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№
+  bool          print_help;         //РїРµС‡Р°С‚СЊ РїРѕРґСЃРєР°Р·РєРё
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -71,7 +71,7 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка имени результирующего материала
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 void command_line_result_material (const char* file_name, Params& params)
 {
   if (!params.result_material.empty ())
@@ -80,19 +80,19 @@ void command_line_result_material (const char* file_name, Params& params)
   params.result_material = file_name;
 }
 
-//имена материалов на склейку
+//РёРјРµРЅР° РјР°С‚РµСЂРёР°Р»РѕРІ РЅР° СЃРєР»РµР№РєСѓ
 void command_line_merge (const char* file_names, Params& params)
 {
   params.merge_materials += split (file_names);
 }
 
-//установка тихого режима
+//СѓСЃС‚Р°РЅРѕРІРєР° С‚РёС…РѕРіРѕ СЂРµР¶РёРјР°
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   static const char* METHOD_NAME = "validate";
@@ -104,7 +104,7 @@ void validate (Params& params)
     throw xtl::format_operation_exception (METHOD_NAME, "Source material path not setted");
 }
 
-//генерация лицензии
+//РіРµРЅРµСЂР°С†РёСЏ Р»РёС†РµРЅР·РёРё
 void process_material (Params& params)
 {
   MaterialLibrary source_library (params.source_material.c_str ());
@@ -198,7 +198,7 @@ int main (int argc, const char *argv[])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     Params params;
 
     static Option options [] = {
@@ -220,10 +220,10 @@ int main (int argc, const char *argv[])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
     if (params.print_help)
       return 0;
 
@@ -233,10 +233,10 @@ int main (int argc, const char *argv[])
     if (command_line.ParamsCount ())
       params.source_material = command_line.Param (0);
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
     validate (params);
 
-      //Обработка материала
+      //РћР±СЂР°Р±РѕС‚РєР° РјР°С‚РµСЂРёР°Р»Р°
     process_material (params);
   }
   catch (std::exception& exception)

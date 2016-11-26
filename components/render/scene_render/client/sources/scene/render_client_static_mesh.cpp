@@ -6,22 +6,22 @@ using namespace render::scene::client;
 namespace
 {
 
-///Статический меш
+///РЎС‚Р°С‚РёС‡РµСЃРєРёР№ РјРµС€
 class StaticMesh: public VisualModel
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StaticMesh (scene_graph::StaticMesh& mesh, SceneManager& manager)
       : VisualModel (mesh, manager, interchange::NodeType_StaticMesh)
       , mesh_name_hash () 
     {
     }
 
-///Исходный узел
+///РСЃС…РѕРґРЅС‹Р№ СѓР·РµР»
     scene_graph::StaticMesh& SourceNode () const { return static_cast<scene_graph::StaticMesh&> (Node::SourceNode ()); }
 
   protected:
-///Реализация синхронизации
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
     void UpdateCore (client::Context& context)
     {
       try
@@ -30,7 +30,7 @@ class StaticMesh: public VisualModel
 
         scene_graph::StaticMesh& mesh = SourceNode ();
 
-          //синхронизация имени меша
+          //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РёРјРµРЅРё РјРµС€Р°
 
         size_t cur_mesh_name_hash = mesh.MeshNameHash ();
 
@@ -49,7 +49,7 @@ class StaticMesh: public VisualModel
     }
 
   private:
-    size_t mesh_name_hash; //хэш имени меша
+    size_t mesh_name_hash; //С…СЌС€ РёРјРµРЅРё РјРµС€Р°
 };
 
 }

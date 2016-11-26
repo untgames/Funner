@@ -3,20 +3,20 @@
 using namespace media;
 
 /*
-   Библиотека шрифтов
+   Р‘РёР±Р»РёРѕС‚РµРєР° С€СЂРёС„С‚РѕРІ
 */
 
 namespace
 {
 
-const char* FONT_LOADERS_MASK = "media.font.loaders.*"; //маска имён компонентов загрузки шрифтов
-const char* LOG_NAME          = "media.FontLibrary";    //имя протокола
+const char* FONT_LOADERS_MASK = "media.font.loaders.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р·Р°РіСЂСѓР·РєРё С€СЂРёС„С‚РѕРІ
+const char* LOG_NAME          = "media.FontLibrary";    //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
 
-//Элемент карты загруженных шрифтов
+//Р­Р»РµРјРµРЅС‚ РєР°СЂС‚С‹ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… С€СЂРёС„С‚РѕРІ
 struct FontEntry : public xtl::reference_counter
 {
-  stl::string font_name; //имя шрифта
-  FontDesc    font_desc; //описание шрифта
+  stl::string font_name; //РёРјСЏ С€СЂРёС„С‚Р°
+  FontDesc    font_desc; //РѕРїРёСЃР°РЅРёРµ С€СЂРёС„С‚Р°
 
   FontEntry (const FontDesc& in_font_desc)
     : font_desc (in_font_desc)
@@ -60,16 +60,16 @@ namespace media
 
 struct FontLibrary::Impl : public xtl::reference_counter
 {
-  stl::string name;        //имя библиотеки
-  stl::string cache_dir;   //путь к папке хранения кеша
-  bool        cache_state; //включено ли кеширование
-  FontsArray  fonts;       //загруженные шрифты
+  stl::string name;        //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  stl::string cache_dir;   //РїСѓС‚СЊ Рє РїР°РїРєРµ С…СЂР°РЅРµРЅРёСЏ РєРµС€Р°
+  bool        cache_state; //РІРєР»СЋС‡РµРЅРѕ Р»Рё РєРµС€РёСЂРѕРІР°РЅРёРµ
+  FontsArray  fonts;       //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ С€СЂРёС„С‚С‹
 
   Impl ()
     : cache_state (true)
     {}
 
-  ///Загрузка шрифта
+  ///Р—Р°РіСЂСѓР·РєР° С€СЂРёС„С‚Р°
   void LoadFont (const char* file_name, const FontManager::LoadHandler* load_handler)
   {
     xtl::com_ptr<IFontDesc> font_desc ((*load_handler) (file_name), false);
@@ -93,7 +93,7 @@ struct FontLibrary::Impl : public xtl::reference_counter
 }
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 FontLibrary::FontLibrary ()
@@ -120,7 +120,7 @@ FontLibrary& FontLibrary::operator = (const FontLibrary& source)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t FontLibrary::Id () const
@@ -129,7 +129,7 @@ size_t FontLibrary::Id () const
 }
 
 /*
-   Имя библиотеки
+   РРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 const char* FontLibrary::Name () const
@@ -146,7 +146,7 @@ void FontLibrary::SetName (const char* name)
 }
 
 /*
-   Количество дескрипторов шрифтов в библиотеке / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ С€СЂРёС„С‚РѕРІ РІ Р±РёР±Р»РёРѕС‚РµРєРµ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 unsigned int FontLibrary::Size () const
 {
@@ -159,7 +159,7 @@ bool FontLibrary::IsEmpty () const
 }
 
 /*
-   Получение итератора
+   РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 FontLibrary::Iterator FontLibrary::CreateIterator ()
@@ -173,7 +173,7 @@ FontLibrary::ConstIterator FontLibrary::CreateIterator () const
 }
 
 /*
-   Получение идентификатора шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С€СЂРёС„С‚Р°
 */
 
 const char* FontLibrary::FontName (const ConstIterator& i) const
@@ -192,7 +192,7 @@ const char* FontLibrary::FontName (const ConstIterator& i) const
 }
 
 /*
-   Поиск
+   РџРѕРёСЃРє
 */
 
 FontDesc* FontLibrary::Find (const char* name) const
@@ -214,7 +214,7 @@ FontDesc* FontLibrary::Find (const char* name) const
 }
 
 /*
-   Очистка библиотеки
+   РћС‡РёСЃС‚РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 void FontLibrary::Clear ()
@@ -223,7 +223,7 @@ void FontLibrary::Clear ()
 }
 
 /*
-   Загрузка шрифта
+   Р—Р°РіСЂСѓР·РєР° С€СЂРёС„С‚Р°
 */
 
 void FontLibrary::LoadFont (const char* file_name)
@@ -307,7 +307,7 @@ void FontLibrary::UnloadFonts (const char* wildcard)
 }
 
 /*
-   Создание шрифта
+   РЎРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 */
 
 Font FontLibrary::CreateFont (const char* name, const FontCreationParams& params)
@@ -349,7 +349,7 @@ bool FontLibrary::CanCreateFont (const char* name, const FontCreationParams& par
 }
 
 /*
-   Управление параметрами кэширования
+   РЈРїСЂР°РІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°РјРё РєСЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 void FontLibrary::SetCacheState (bool state)
@@ -376,7 +376,7 @@ const char* FontLibrary::CacheDir () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FontLibrary::Swap (FontLibrary& source)
@@ -388,7 +388,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (FontLibrary& library1, FontLibrary& library2)

@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Работа с блокировками
+    Р Р°Р±РѕС‚Р° СЃ Р±Р»РѕРєРёСЂРѕРІРєР°РјРё
 */
 
 void Win32Platform::InitLockable (lockable_t& lockable)

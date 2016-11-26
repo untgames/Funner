@@ -1,13 +1,13 @@
 #include "shared.h"
 
-//TODO: добавить очистки ресурсов процесса pthread_win32_process_detach_np () !!!!!
+//TODO: РґРѕР±Р°РІРёС‚СЊ РѕС‡РёСЃС‚РєРё СЂРµСЃСѓСЂСЃРѕРІ РїСЂРѕС†РµСЃСЃР° pthread_win32_process_detach_np () !!!!!
 
 namespace syslib
 {
 
 #ifdef _WIN32
 
-//функция инициализации библиотеки
+//С„СѓРЅРєС†РёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
 void thread_init ()
 {
   static bool is_process_initialized = false;
@@ -19,7 +19,7 @@ void thread_init ()
     is_process_initialized = true;
   }
 
-//!!!!!!!!!!!! Не работает !!!!!!!!!!!!!
+//!!!!!!!!!!!! РќРµ СЂР°Р±РѕС‚Р°РµС‚ !!!!!!!!!!!!!
 /*  static __declspec(thread) bool is_thread_initialized = false;
 
   if (is_thread_initialized)
@@ -30,7 +30,7 @@ void thread_init ()
 //  is_thread_initialized = true;
 }
 
-//функция деинициализации библиотеки
+//С„СѓРЅРєС†РёСЏ РґРµРёРЅРёС†РёР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
 void thread_done (void*)
 {
   pthread_win32_thread_detach_np ();

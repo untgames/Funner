@@ -4,13 +4,13 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t RESERVED_MACRO_SIZE = 16;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -18,7 +18,7 @@ namespace
 
 typedef stl::vector<D3D10_SHADER_MACRO> MacroArray;
 
-/// Список макросов
+/// РЎРїРёСЃРѕРє РјР°РєСЂРѕСЃРѕРІ
 struct ShaderMacroMapper
 {
   common::StringArray strings;
@@ -66,7 +66,7 @@ struct ShaderMacroMapper
   }
 };
 
-/// Интерфейс подключаемых модулей
+/// РРЅС‚РµСЂС„РµР№СЃ РїРѕРґРєР»СЋС‡Р°РµРјС‹С… РјРѕРґСѓР»РµР№
 class IncludeManager: public ID3D10Include
 {
   public:
@@ -143,7 +143,7 @@ ShaderCode::ShaderCode
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -157,7 +157,7 @@ ShaderCode::ShaderCode
     if (source_code_length == (size_t)-1)
       source_code_length = strlen (source_code);
 
-      //построение списка макросов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РјР°РєСЂРѕСЃРѕРІ
 
     if (!options)
       options = "";      
@@ -166,11 +166,11 @@ ShaderCode::ShaderCode
 
     common::parse_init_string (options, xtl::ref (macro_mapper));
 
-      //подготовка интерфейса получения подключаемых модулей
+      //РїРѕРґРіРѕС‚РѕРІРєР° РёРЅС‚РµСЂС„РµР№СЃР° РїРѕР»СѓС‡РµРЅРёСЏ РїРѕРґРєР»СЋС‡Р°РµРјС‹С… РјРѕРґСѓР»РµР№
 
     IncludeManager include_manager;
 
-      //компиляция шейдера
+      //РєРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂР°
 
     ID3D10Blob *dx_shader_blob = 0, *dx_error_msg_blob = 0;
 
@@ -218,7 +218,7 @@ ShaderCode::~ShaderCode ()
 }
 
 /*
-    Получение скомпилированного шейдера
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅРѕРіРѕ С€РµР№РґРµСЂР°
 */
 
 const void* ShaderCode::GetCompiledData () const
@@ -232,7 +232,7 @@ size_t ShaderCode::GetCompiledDataSize () const
 }
 
 /*
-    Хэш данных
+    РҐСЌС€ РґР°РЅРЅС‹С…
 */
 
 size_t ShaderCode::GetCompiledDataHash () const

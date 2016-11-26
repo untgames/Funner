@@ -26,24 +26,24 @@ namespace debug_map_file_gcc
 {
 
 /*
-    Парсер
+    РџР°СЂСЃРµСЂ
 */
 
 class GccMapFileParser
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     GccMapFileParser (const char* file_name, MapFile& file)
       : map_file (file)
       , log (LOG_NAME)
     {
       try
       {
-          //загрузка содержимого map file
+          //Р·Р°РіСЂСѓР·РєР° СЃРѕРґРµСЂР¶РёРјРѕРіРѕ map file
         
         FileSystem::LoadTextFile (file_name, file_content);
         
-          //инициализация разбора
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°Р·Р±РѕСЂР°
           
         state = State_SearchingSymbol;
         
@@ -58,7 +58,7 @@ class GccMapFileParser
         
         tokens.reserve (MAX_TOKENS_SIZE);
         
-          //разбор
+          //СЂР°Р·Р±РѕСЂ
           
         Parse (&file_content [0]);
       }
@@ -70,7 +70,7 @@ class GccMapFileParser
     }
     
   private:
-///Разбор
+///Р Р°Р·Р±РѕСЂ
     void Parse (char* content)
     {
       char *first = content, *s = first;
@@ -98,7 +98,7 @@ class GccMapFileParser
       }      
     }
     
-///Разбиение строки на токены
+///Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё РЅР° С‚РѕРєРµРЅС‹
   size_t TokenizeLine (char* line)
   {
     size_t empty_space = 0;
@@ -190,7 +190,7 @@ class GccMapFileParser
     return empty_space;
   }
     
-///Разбор строки map file
+///Р Р°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё map file
     void ParseLine (char* line)
     {
       line_number++;      
@@ -312,20 +312,20 @@ class GccMapFileParser
     typedef stl::vector<const char*> TokenList;
     
   private:
-    MapFile&    map_file;          //файл карты символов
-    stl::string file_content;      //содержимое файла
-    size_t      line_number;       //номер строки разбора
-    State       state;             //состояние разбора
-    TokenList   tokens;            //токены строки разбора
-    const char* sym_header;        //заголовок символа
-    size_t      sym_start_address; //начальный адрес
-    size_t      sym_size;          //размер символа
-    const char* sym_name;          //имя символа
-    common::Log log;               //протокол
+    MapFile&    map_file;          //С„Р°Р№Р» РєР°СЂС‚С‹ СЃРёРјРІРѕР»РѕРІ
+    stl::string file_content;      //СЃРѕРґРµСЂР¶РёРјРѕРµ С„Р°Р№Р»Р°
+    size_t      line_number;       //РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё СЂР°Р·Р±РѕСЂР°
+    State       state;             //СЃРѕСЃС‚РѕСЏРЅРёРµ СЂР°Р·Р±РѕСЂР°
+    TokenList   tokens;            //С‚РѕРєРµРЅС‹ СЃС‚СЂРѕРєРё СЂР°Р·Р±РѕСЂР°
+    const char* sym_header;        //Р·Р°РіРѕР»РѕРІРѕРє СЃРёРјРІРѕР»Р°
+    size_t      sym_start_address; //РЅР°С‡Р°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ
+    size_t      sym_size;          //СЂР°Р·РјРµСЂ СЃРёРјРІРѕР»Р°
+    const char* sym_name;          //РёРјСЏ СЃРёРјРІРѕР»Р°
+    common::Log log;               //РїСЂРѕС‚РѕРєРѕР»
 };
 
 /*
-    Компонент парсера gcc map files
+    РљРѕРјРїРѕРЅРµРЅС‚ РїР°СЂСЃРµСЂР° gcc map files
 */
 
 class Component

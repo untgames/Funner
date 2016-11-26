@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Поддерживаемые форматы пикселей
+    РџРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ С„РѕСЂРјР°С‚С‹ РїРёРєСЃРµР»РµР№
 */
 
 #pragma pack(1)
@@ -35,7 +35,7 @@ struct PixelRgba8: public PixelRgb8, public PixelA8 {};
 struct PixelLa8: public PixelL8, PixelA8 {};
 
 /*
-    Копирование данных пикселя
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РїРёРєСЃРµР»СЏ
 */
 
 inline unsigned char get_red       (const void*) { return 0; }
@@ -65,7 +65,7 @@ inline void set_alpha     (PixelA8*   pixel, unsigned char value) { pixel->alpha
 inline void set_luminance (PixelL8*   pixel, unsigned char value) { pixel->luminance = value; }
 
 /*
-    Копирование образов в различных форматах
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РѕР±СЂР°Р·РѕРІ РІ СЂР°Р·Р»РёС‡РЅС‹С… С„РѕСЂРјР°С‚Р°С…
 */
 
 template <class SrcT, class DstT>

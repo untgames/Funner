@@ -8,21 +8,21 @@ using namespace math;
 using namespace common;
 
 /*
-    Описание реализации излучателя звука
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РёР·Р»СѓС‡Р°С‚РµР»СЏ Р·РІСѓРєР°
 */
 
 typedef xtl::signal<void (Emitter&, EmitterEvent)> EmitterSignal;
 
 struct Emitter::Impl
 {
-  stl::string   source;                     //имя источника
-  float         volume;                     //добавочная громкость
-  vec3f         position;                   //положение
-  vec3f         direction;                  //направление
-  vec3f         velocity;                   //скорость
-  EmitterSignal signals [EmitterEvent_Num]; //сигналы
-  size_t        activation_count;           //счётчик активаций
-  size_t        sample_index;               //индекс сэмпла для проигрывания
+  stl::string   source;                     //РёРјСЏ РёСЃС‚РѕС‡РЅРёРєР°
+  float         volume;                     //РґРѕР±Р°РІРѕС‡РЅР°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ
+  vec3f         position;                   //РїРѕР»РѕР¶РµРЅРёРµ
+  vec3f         direction;                  //РЅР°РїСЂР°РІР»РµРЅРёРµ
+  vec3f         velocity;                   //СЃРєРѕСЂРѕСЃС‚СЊ
+  EmitterSignal signals [EmitterEvent_Num]; //СЃРёРіРЅР°Р»С‹
+  size_t        activation_count;           //СЃС‡С‘С‚С‡РёРє Р°РєС‚РёРІР°С†РёР№
+  size_t        sample_index;               //РёРЅРґРµРєСЃ СЃСЌРјРїР»Р° РґР»СЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 
   Impl ()
     : volume (1.f), activation_count (0), sample_index (0)
@@ -40,7 +40,7 @@ struct Emitter::Impl
   }
 
 /*
-   Источник звука
+   РСЃС‚РѕС‡РЅРёРє Р·РІСѓРєР°
 */
 
   void SetSource (const char* source_name)
@@ -54,7 +54,7 @@ struct Emitter::Impl
   }
 
 /*
-   Указание номера сэмпла на источнике звука
+   РЈРєР°Р·Р°РЅРёРµ РЅРѕРјРµСЂР° СЃСЌРјРїР»Р° РЅР° РёСЃС‚РѕС‡РЅРёРєРµ Р·РІСѓРєР°
 */
 
   void SetSampleIndex (size_t in_sample_index)
@@ -70,7 +70,7 @@ struct Emitter::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Emitter::Emitter ()
@@ -83,7 +83,7 @@ Emitter::~Emitter ()
 }
 
 /*
-    Источник звука
+    РСЃС‚РѕС‡РЅРёРє Р·РІСѓРєР°
 */
 
 void Emitter::SetSource (const char* source_name)
@@ -100,7 +100,7 @@ const char* Emitter::Source () const
 }
 
 /*
-   Указание номера сэмпла на источнике звука
+   РЈРєР°Р·Р°РЅРёРµ РЅРѕРјРµСЂР° СЃСЌРјРїР»Р° РЅР° РёСЃС‚РѕС‡РЅРёРєРµ Р·РІСѓРєР°
 */
 
 void Emitter::SetSampleIndex (size_t sample_index)
@@ -114,7 +114,7 @@ size_t Emitter::SampleIndex () const
 }
 
 /*
-    Установка добавочной громкости звука
+    РЈСЃС‚Р°РЅРѕРІРєР° РґРѕР±Р°РІРѕС‡РЅРѕР№ РіСЂРѕРјРєРѕСЃС‚Рё Р·РІСѓРєР°
 */
 
 void Emitter::SetVolume (float volume)
@@ -129,7 +129,7 @@ float Emitter::Volume () const
 }
 
 /*
-    Установка динамических параметров излучателя
+    РЈСЃС‚Р°РЅРѕРІРєР° РґРёРЅР°РјРёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ РёР·Р»СѓС‡Р°С‚РµР»СЏ
 */
 
 void Emitter::SetPosition  (const math::vec3f& position)
@@ -166,10 +166,10 @@ const vec3f& Emitter::Velocity () const
 }
 
 /*
-    Управление активностью
-      - первый вызов Activate генерирует событие EmitterEvent_OnActivate
-      - последний вызов Deactivate генерирует событие EmitterEvent_OnDeactivate
-      - излучатель является активным до тех пор, пока проигрывается хотя бы в одном менеджере
+    РЈРїСЂР°РІР»РµРЅРёРµ Р°РєС‚РёРІРЅРѕСЃС‚СЊСЋ
+      - РїРµСЂРІС‹Р№ РІС‹Р·РѕРІ Activate РіРµРЅРµСЂРёСЂСѓРµС‚ СЃРѕР±С‹С‚РёРµ EmitterEvent_OnActivate
+      - РїРѕСЃР»РµРґРЅРёР№ РІС‹Р·РѕРІ Deactivate РіРµРЅРµСЂРёСЂСѓРµС‚ СЃРѕР±С‹С‚РёРµ EmitterEvent_OnDeactivate
+      - РёР·Р»СѓС‡Р°С‚РµР»СЊ СЏРІР»СЏРµС‚СЃСЏ Р°РєС‚РёРІРЅС‹Рј РґРѕ С‚РµС… РїРѕСЂ, РїРѕРєР° РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ С…РѕС‚СЏ Р±С‹ РІ РѕРґРЅРѕРј РјРµРЅРµРґР¶РµСЂРµ
 */
 
 void Emitter::Activate ()
@@ -196,7 +196,7 @@ bool Emitter::IsActive () const
 }
 
 /*
-   Подписка на события
+   РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection Emitter::RegisterEventHandler (EmitterEvent event, const EventHandler& handler)

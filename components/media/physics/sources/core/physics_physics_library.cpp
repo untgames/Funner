@@ -3,7 +3,7 @@
 using namespace media::physics;
 
 /*
-   Реализация физической библиотеки
+   Р РµР°Р»РёР·Р°С†РёСЏ С„РёР·РёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 PhysicsLibrary::SaveOptions::SaveOptions ()
@@ -12,16 +12,16 @@ PhysicsLibrary::SaveOptions::SaveOptions ()
 
 struct PhysicsLibrary::Impl : public xtl::reference_counter
 {
-  stl::string            name;              //имя библиотеки
-  MaterialCollection     materials;         //коллекция материалов
-  RigidBodyCollection    rigid_bodies;      //коллекция твердых тел
-  SceneCollection        scenes;            //коллекция сцен
-  ShapeCollection        shapes;            //коллекция геометрических тел
-  TriangleMeshCollection triangle_meshes;   //коллекция сеток
+  stl::string            name;              //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  MaterialCollection     materials;         //РєРѕР»Р»РµРєС†РёСЏ РјР°С‚РµСЂРёР°Р»РѕРІ
+  RigidBodyCollection    rigid_bodies;      //РєРѕР»Р»РµРєС†РёСЏ С‚РІРµСЂРґС‹С… С‚РµР»
+  SceneCollection        scenes;            //РєРѕР»Р»РµРєС†РёСЏ СЃС†РµРЅ
+  ShapeCollection        shapes;            //РєРѕР»Р»РµРєС†РёСЏ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёС… С‚РµР»
+  TriangleMeshCollection triangle_meshes;   //РєРѕР»Р»РµРєС†РёСЏ СЃРµС‚РѕРє
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PhysicsLibrary::PhysicsLibrary ()
@@ -68,7 +68,7 @@ PhysicsLibrary& PhysicsLibrary::operator = (const PhysicsLibrary& source)
 }
     
 /*
-   Имя модели
+   РРјСЏ РјРѕРґРµР»Рё
 */
 
 const char* PhysicsLibrary::Name () const
@@ -85,7 +85,7 @@ void PhysicsLibrary::Rename (const char* name)
 }
 
 /*
-   Получение коллекций
+   РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»Р»РµРєС†РёР№
 */
 
 const PhysicsLibrary::MaterialCollection& PhysicsLibrary::Materials () const
@@ -139,7 +139,7 @@ PhysicsLibrary::TriangleMeshCollection& PhysicsLibrary::TriangleMeshes ()
 }
 
 /*
-   Загрузка / сохранение
+   Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void PhysicsLibrary::Load (const char* file_name)
@@ -179,7 +179,7 @@ void PhysicsLibrary::Save (const char* file_name, const SaveOptions& options) co
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void PhysicsLibrary::Swap (PhysicsLibrary& source)
@@ -194,7 +194,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (PhysicsLibrary& library1, PhysicsLibrary& library2)

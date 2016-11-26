@@ -7,21 +7,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const float  EPSILON                           = 0.0001f; //погрешность для проверки с нулём
-const unsigned int DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE = 4;       //резервируемое количество событий для одного вызова GetEvents
+const float  EPSILON                           = 0.0001f; //РїРѕРіСЂРµС€РЅРѕСЃС‚СЊ РґР»СЏ РїСЂРѕРІРµСЂРєРё СЃ РЅСѓР»С‘Рј
+const unsigned int DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE = 4;       //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕР±С‹С‚РёР№ РґР»СЏ РѕРґРЅРѕРіРѕ РІС‹Р·РѕРІР° GetEvents
 
 /*
-    Информация о событии
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕР±С‹С‚РёРё
 */
 
 struct EventDesc : public xtl::reference_counter
 {
-  float       delay;  //задержка перед первым срабатыванием события
-  float       period; //время срабатывания события
-  stl::string event;  //событие
+  float       delay;  //Р·Р°РґРµСЂР¶РєР° РїРµСЂРµРґ РїРµСЂРІС‹Рј СЃСЂР°Р±Р°С‚С‹РІР°РЅРёРµРј СЃРѕР±С‹С‚РёСЏ
+  float       period; //РІСЂРµРјСЏ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ СЃРѕР±С‹С‚РёСЏ
+  stl::string event;  //СЃРѕР±С‹С‚РёРµ
 
   EventDesc (float in_delay, float in_period, const char* in_event)
     : delay (in_delay)
@@ -37,17 +37,17 @@ typedef stl::vector<EventDescPtr>     EventDescArray;
 }
 
 /*
-    Реализация трека событий анимации
+    Р РµР°Р»РёР·Р°С†РёСЏ С‚СЂРµРєР° СЃРѕР±С‹С‚РёР№ Р°РЅРёРјР°С†РёРё
 */
 
 struct EventTrack::Impl: public xtl::reference_counter
 {
-  EventDescArray events;                //список событий
-  EventDescArray events_to_fire;        //список событий, сработавших при вызове GetEvents (буфер для сокращения количества операций выделения и освобождения памяти)
-  float          min_time;              //минимальное время
-  float          max_time;              //максимальное время
-  bool           has_periodic;          //есть ли периодические события
-  bool           need_limits_recompute; //нужно ли пересчитывать лимтиы
+  EventDescArray events;                //СЃРїРёСЃРѕРє СЃРѕР±С‹С‚РёР№
+  EventDescArray events_to_fire;        //СЃРїРёСЃРѕРє СЃРѕР±С‹С‚РёР№, СЃСЂР°Р±РѕС‚Р°РІС€РёС… РїСЂРё РІС‹Р·РѕРІРµ GetEvents (Р±СѓС„РµСЂ РґР»СЏ СЃРѕРєСЂР°С‰РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° РѕРїРµСЂР°С†РёР№ РІС‹РґРµР»РµРЅРёСЏ Рё РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ РїР°РјСЏС‚Рё)
+  float          min_time;              //РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+  float          max_time;              //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+  bool           has_periodic;          //РµСЃС‚СЊ Р»Рё РїРµСЂРёРѕРґРёС‡РµСЃРєРёРµ СЃРѕР±С‹С‚РёСЏ
+  bool           need_limits_recompute; //РЅСѓР¶РЅРѕ Р»Рё РїРµСЂРµСЃС‡РёС‚С‹РІР°С‚СЊ Р»РёРјС‚РёС‹
 
   Impl ()
     : min_time (0.0f)
@@ -101,7 +101,7 @@ struct EventTrack::Impl: public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 EventTrack::EventTrack ()
@@ -133,7 +133,7 @@ EventTrack& EventTrack::operator = (const EventTrack& source)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 EventTrack EventTrack::Clone () const
@@ -142,7 +142,7 @@ EventTrack EventTrack::Clone () const
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t EventTrack::Id () const
@@ -152,7 +152,7 @@ size_t EventTrack::Id () const
 
     
 /*
-    Количество событий
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕР±С‹С‚РёР№
 */
 
 unsigned int EventTrack::Size () const
@@ -161,7 +161,7 @@ unsigned int EventTrack::Size () const
 }
 
 /*
-    Резервирование числа событий
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ С‡РёСЃР»Р° СЃРѕР±С‹С‚РёР№
 */
 
 unsigned int EventTrack::Capacity () const
@@ -175,7 +175,7 @@ void EventTrack::Reserve (unsigned int events_count)
 }
 
 /*
-    Минимальное / максимальное время
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ / РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
 */
 
 float EventTrack::MinTime () const
@@ -193,7 +193,7 @@ float EventTrack::MaxTime () const
 }
 
 /*
-    Минимальное / максимальное неотсеченное время (-INF/INF в случае открытого диапазона)
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ / РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ (-INF/INF РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РґРёР°РїР°Р·РѕРЅР°)
 */
 
 float EventTrack::MinUnwrappedTime () const
@@ -209,7 +209,7 @@ float EventTrack::MaxUnwrappedTime () const
 }
 
 /*
-    Добавление / изменение событий
+    Р”РѕР±Р°РІР»РµРЅРёРµ / РёР·РјРµРЅРµРЅРёРµ СЃРѕР±С‹С‚РёР№
 */
 
 unsigned int EventTrack::AddEvent (float delay, float period, const char* event)
@@ -300,7 +300,7 @@ void EventTrack::SetEvent (unsigned int event_index, const char* event)
 }
 
 /*
-    Получение событий
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёР№
 */
 
 const char* EventTrack::GetEvent (unsigned int event_index) const
@@ -328,7 +328,7 @@ float EventTrack::GetPeriod (unsigned int event_index) const
 }
 
 /*
-    Перечисление событий, прошедших в указанном промежутке времени
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЃРѕР±С‹С‚РёР№, РїСЂРѕС€РµРґС€РёС… РІ СѓРєР°Р·Р°РЅРЅРѕРј РїСЂРѕРјРµР¶СѓС‚РєРµ РІСЂРµРјРµРЅРё
 */
 
 void EventTrack::GetEvents (float previous_time, float current_time, const EventHandler& handler) const
@@ -371,32 +371,32 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
 
       if (delay > t)
       {
-          //событие ещё не сработало (задержка больше текущего времени)
+          //СЃРѕР±С‹С‚РёРµ РµС‰С‘ РЅРµ СЃСЂР°Р±РѕС‚Р°Р»Рѕ (Р·Р°РґРµСЂР¶РєР° Р±РѕР»СЊС€Рµ С‚РµРєСѓС‰РµРіРѕ РІСЂРµРјРµРЅРё)
         
         dt = delay - t;
       }
       else
       {
-          //событие либо сработало в первый раз, либо уже срабатывало до времени t
+          //СЃРѕР±С‹С‚РёРµ Р»РёР±Рѕ СЃСЂР°Р±РѕС‚Р°Р»Рѕ РІ РїРµСЂРІС‹Р№ СЂР°Р·, Р»РёР±Рѕ СѓР¶Рµ СЃСЂР°Р±Р°С‚С‹РІР°Р»Рѕ РґРѕ РІСЂРµРјРµРЅРё t
         
         if (fabs (period) < EPSILON)
         {
-            //событие - непериодическое
+            //СЃРѕР±С‹С‚РёРµ - РЅРµРїРµСЂРёРѕРґРёС‡РµСЃРєРѕРµ
           
           if (fabs (t - delay) < EPSILON)
           {
-              //событие сработало в первый и единственный раз
+              //СЃРѕР±С‹С‚РёРµ СЃСЂР°Р±РѕС‚Р°Р»Рѕ РІ РїРµСЂРІС‹Р№ Рё РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ СЂР°Р·
             
             handler (t + previous_time, impl->events_to_fire [i]->event.c_str ());
           }
         }
         else
         {
-            //событие периодическое
+            //СЃРѕР±С‹С‚РёРµ РїРµСЂРёРѕРґРёС‡РµСЃРєРѕРµ
 
           float clamped_t = fmod (t - delay, period);                    
 
-          if (period - clamped_t < EPSILON) //защита от потери точности float при сложении
+          if (period - clamped_t < EPSILON) //Р·Р°С‰РёС‚Р° РѕС‚ РїРѕС‚РµСЂРё С‚РѕС‡РЅРѕСЃС‚Рё float РїСЂРё СЃР»РѕР¶РµРЅРёРё
             clamped_t = 0;
 
           dt = period - clamped_t;
@@ -417,7 +417,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
 }
 
 /*
-   Удаление ключевых точек
+   РЈРґР°Р»РµРЅРёРµ РєР»СЋС‡РµРІС‹С… С‚РѕС‡РµРє
 */
 
 void EventTrack::Remove (unsigned int event_index)
@@ -438,7 +438,7 @@ void EventTrack::Clear ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void EventTrack::Swap (EventTrack& track)
@@ -453,7 +453,7 @@ namespace animation
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (EventTrack& track1, EventTrack& track2)

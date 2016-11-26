@@ -3,7 +3,7 @@
 using namespace syslib;
 
 /*
-    Приостановка выполнения приложения на miliseconds милисекунд
+    РџСЂРёРѕСЃС‚Р°РЅРѕРІРєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° miliseconds РјРёР»РёСЃРµРєСѓРЅРґ
 */
 
 void WindowsApplicationManager::Sleep (size_t miliseconds)

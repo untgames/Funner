@@ -21,14 +21,14 @@
 #pragma pack (1)
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 const size_t DEFAULT_BLUR_PASSES_COUNT  = 4;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -45,7 +45,7 @@ void error (const char* format, ...)
   exit (1);
 }
 
-//форматы пикселя
+//С„РѕСЂРјР°С‚С‹ РїРёРєСЃРµР»СЏ
 struct bgra_t
 {
   unsigned char blue;
@@ -63,60 +63,60 @@ struct rgba_t
 };
 
 /*
-    Обработка командной строки
+    РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  common::CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                        name;          //имя команды
-  char                               short_name;    //короткое имя
-  const char*                        argument_name; //имя аргумента
-  const char*                        tip;           //подсказка
+  common::CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                        name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                               short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                        argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                        tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                   //массив опций
-  size_t        options_count;             //количество опций
-  stl::string   source_file_name;          //имя исходного файла
-  stl::string   layout_file_name;          //имя файла разметки
-  stl::string   layers_dir_name;           //имя каталога с сохранёнными слоями
-  stl::string   layout_layers_dir_name;    //имя каталога с сохранёнными слоями, используемое в файле разметки
-  stl::string   layers_format;             //строка форматирования имён слоёв
-  stl::string   crop_exclude;              //необрезаемые слои
-  stl::string   dummy_materials_wildcard;  //маска имён слоев, для которых генерируются материалы-заглушки
-  unsigned int  crop_alpha;                //коэффициент обрезания по прозрачности
-  unsigned int  zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
-  unsigned int  blur_passes_count;         //количество проходов, используемое при блюре
-  unsigned int  max_image_size;            //максимальный размер выходного изображения
-  bgra_t        zcolor_min;                //минимальный z-цвет, заменяемый на прозрачный
-  bgra_t        zcolor_max;                //минимальный z-цвет, заменяемый на прозрачный
-  bool          silent;                    //минимальное число сообщений
-  bool          print_help;                //нужно ли печатать сообщение помощи
-  bool          need_layout;               //нужно генерировать файл разметки
-  bool          need_layers;               //нужно сохранять слои
-  bool          need_pot_extent;           //нужно ли расширять изображения до ближайшей степени двойки
-  bool          need_crop_alpha;           //нужно ли обрезать картинку по нулевой прозрачности
-  bool          need_replace_zcolor;       //нужно заменять Z-цвет
-  bool          need_trim_name_spaces;     //нужно ли отсекать пробелы в именах
-  bool          need_fix_zero_alpha_color; //нужно исправлять ошибку с цветом нулевой альфы
-  bool          has_zcolor_min;            //минимальный z-цвет установлен
-  bool          has_zcolor_max;            //максимальный z-цвет установлен
+  const Option* options;                   //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;             //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string   source_file_name;          //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  stl::string   layout_file_name;          //РёРјСЏ С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
+  stl::string   layers_dir_name;           //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё СЃР»РѕСЏРјРё
+  stl::string   layout_layers_dir_name;    //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё СЃР»РѕСЏРјРё, РёСЃРїРѕР»СЊР·СѓРµРјРѕРµ РІ С„Р°Р№Р»Рµ СЂР°Р·РјРµС‚РєРё
+  stl::string   layers_format;             //СЃС‚СЂРѕРєР° С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ РёРјС‘РЅ СЃР»РѕС‘РІ
+  stl::string   crop_exclude;              //РЅРµРѕР±СЂРµР·Р°РµРјС‹Рµ СЃР»РѕРё
+  stl::string   dummy_materials_wildcard;  //РјР°СЃРєР° РёРјС‘РЅ СЃР»РѕРµРІ, РґР»СЏ РєРѕС‚РѕСЂС‹С… РіРµРЅРµСЂРёСЂСѓСЋС‚СЃСЏ РјР°С‚РµСЂРёР°Р»С‹-Р·Р°РіР»СѓС€РєРё
+  unsigned int  crop_alpha;                //РєРѕСЌС„С„РёС†РёРµРЅС‚ РѕР±СЂРµР·Р°РЅРёСЏ РїРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
+  unsigned int  zero_alpha_fix_value;      //РєРѕСЌС„С„РёС†РёРµРЅС‚ РѕРїСЂРµРґРµР»РµРЅРёСЏ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёСЃРїСЂР°РІР»РµРЅРёСЏ С†РІРµС‚Р° РїСЂРѕР·СЂР°С‡РЅРѕРіРѕ РїРёРєСЃРµР»СЏ
+  unsigned int  blur_passes_count;         //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС…РѕРґРѕРІ, РёСЃРїРѕР»СЊР·СѓРµРјРѕРµ РїСЂРё Р±Р»СЋСЂРµ
+  unsigned int  max_image_size;            //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РІС‹С…РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  bgra_t        zcolor_min;                //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ z-С†РІРµС‚, Р·Р°РјРµРЅСЏРµРјС‹Р№ РЅР° РїСЂРѕР·СЂР°С‡РЅС‹Р№
+  bgra_t        zcolor_max;                //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ z-С†РІРµС‚, Р·Р°РјРµРЅСЏРµРјС‹Р№ РЅР° РїСЂРѕР·СЂР°С‡РЅС‹Р№
+  bool          silent;                    //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool          print_help;                //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
+  bool          need_layout;               //РЅСѓР¶РЅРѕ РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» СЂР°Р·РјРµС‚РєРё
+  bool          need_layers;               //РЅСѓР¶РЅРѕ СЃРѕС…СЂР°РЅСЏС‚СЊ СЃР»РѕРё
+  bool          need_pot_extent;           //РЅСѓР¶РЅРѕ Р»Рё СЂР°СЃС€РёСЂСЏС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
+  bool          need_crop_alpha;           //РЅСѓР¶РЅРѕ Р»Рё РѕР±СЂРµР·Р°С‚СЊ РєР°СЂС‚РёРЅРєСѓ РїРѕ РЅСѓР»РµРІРѕР№ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
+  bool          need_replace_zcolor;       //РЅСѓР¶РЅРѕ Р·Р°РјРµРЅСЏС‚СЊ Z-С†РІРµС‚
+  bool          need_trim_name_spaces;     //РЅСѓР¶РЅРѕ Р»Рё РѕС‚СЃРµРєР°С‚СЊ РїСЂРѕР±РµР»С‹ РІ РёРјРµРЅР°С…
+  bool          need_fix_zero_alpha_color; //РЅСѓР¶РЅРѕ РёСЃРїСЂР°РІР»СЏС‚СЊ РѕС€РёР±РєСѓ СЃ С†РІРµС‚РѕРј РЅСѓР»РµРІРѕР№ Р°Р»СЊС„С‹
+  bool          has_zcolor_min;            //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ z-С†РІРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
+  bool          has_zcolor_max;            //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ z-С†РІРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ
 };
 
-//прямоугольная область
+//РїСЂСЏРјРѕСѓРіРѕР»СЊРЅР°СЏ РѕР±Р»Р°СЃС‚СЊ
 struct Rect
 {
   int          x, y;
   unsigned int width, height;
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("psd-exporter [<OPTIONS>] <SOURCE> ...\n");
@@ -143,55 +143,55 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка имени результирующего файла разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
 void command_line_result_layout (const char* file_name, Params& params)
 {
   params.layout_file_name = file_name;
 }
 
-//установка имени результирующей директории с содержимым слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ РґРёСЂРµРєС‚РѕСЂРёРё СЃ СЃРѕРґРµСЂР¶РёРјС‹Рј СЃР»РѕС‘РІ
 void command_line_result_layers_dir (const char* dir_name, Params& params)
 {
   params.layers_dir_name = dir_name;
 }
 
-//установка имени результирующей директории с содержимым слоёв, используемой в файле разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµР№ РґРёСЂРµРєС‚РѕСЂРёРё СЃ СЃРѕРґРµСЂР¶РёРјС‹Рј СЃР»РѕС‘РІ, РёСЃРїРѕР»СЊР·СѓРµРјРѕР№ РІ С„Р°Р№Р»Рµ СЂР°Р·РјРµС‚РєРё
 void command_line_result_layout_layers_dir (const char* dir_name, Params& params)
 {
   params.layout_layers_dir_name = dir_name;
 }
 
-//установка формата имени результирующих файлов слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёС… С„Р°Р№Р»РѕРІ СЃР»РѕС‘РІ
 void command_line_result_layers_format (const char* format, Params& params)
 {
   params.layers_format = format;
 }
 
-//установка флага генерации файла разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РіРµРЅРµСЂР°С†РёРё С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
 void command_line_no_layout (const char* file_name, Params& params)
 {
   params.need_layout = false;
 }
 
-//установка флага генерации файлов с содержимым слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РіРµРЅРµСЂР°С†РёРё С„Р°Р№Р»РѕРІ СЃ СЃРѕРґРµСЂР¶РёРјС‹Рј СЃР»РѕС‘РІ
 void command_line_no_layers (const char* file_name, Params& params)
 {
   params.need_layers = false;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра генерации слоёв размерами кратными степени двойки
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РіРµРЅРµСЂР°С†РёРё СЃР»РѕС‘РІ СЂР°Р·РјРµСЂР°РјРё РєСЂР°С‚РЅС‹РјРё СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 void command_line_pot (const char*, Params& params)
 {
   params.need_pot_extent = true;
 }
 
-//установка параметра обрезания по прозрачности
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РѕР±СЂРµР·Р°РЅРёСЏ РїРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
 void command_line_crop_alpha (const char* value_string, Params& params)
 {
   int value = atoi (value_string);
@@ -200,38 +200,38 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
-//установка необрезаемых слоёв
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±СЂРµР·Р°РµРјС‹С… СЃР»РѕС‘РІ
 void command_line_crop_exclude (const char* string, Params& params)
 {
   params.crop_exclude = string;
 }
 
-//установка максимального размера выходного изображения
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РІС‹С…РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 void command_line_max_image_size (const char* value_string, Params& params)
 {
   params.max_image_size = (size_t)atoi (value_string);
 }
 
-//установка необходимости отсечения пробелов в именах
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ РїСЂРѕР±РµР»РѕРІ РІ РёРјРµРЅР°С…
 void command_line_trim_name_spaces (const char*, Params& params)
 {
   params.need_trim_name_spaces = true;
 }
 
-//установка необходимости исправление цвета прозрачной альфы
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РёСЃРїСЂР°РІР»РµРЅРёРµ С†РІРµС‚Р° РїСЂРѕР·СЂР°С‡РЅРѕР№ Р°Р»СЊС„С‹
 void command_line_fix_zero_alpha_color (const char* value, Params& params)
 {
   params.need_fix_zero_alpha_color = true;
   params.zero_alpha_fix_value      = (size_t)atoi (value);
 }
 
-//установка количества проходов блюра
+//СѓСЃС‚Р°РЅРѕРІРєР° РєРѕР»РёС‡РµСЃС‚РІР° РїСЂРѕС…РѕРґРѕРІ Р±Р»СЋСЂР°
 void command_line_blur_passes_count (const char* value, Params& params)
 {
   params.blur_passes_count = (size_t)atoi (value);
 }
 
-//установка значения z-цвета
+//СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ z-С†РІРµС‚Р°
 void command_line_zcolor_min (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, " ");
@@ -266,20 +266,20 @@ void command_line_zcolor_max (const char* value, Params& params)
     params.zcolor_min = params.zcolor_max;
 }
 
-//установка заменяемого значения прозрачности для z-цвета
+//СѓСЃС‚Р°РЅРѕРІРєР° Р·Р°РјРµРЅСЏРµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё РґР»СЏ z-С†РІРµС‚Р°
 void command_line_zalpha (const char* value, Params& params)
 {
   params.zcolor_min.alpha    = (unsigned char)atoi (value);
   params.need_replace_zcolor = true; 
 }
 
-//установка маски слоев с минимальными материалами
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°СЃРєРё СЃР»РѕРµРІ СЃ РјРёРЅРёРјР°Р»СЊРЅС‹РјРё РјР°С‚РµСЂРёР°Р»Р°РјРё
 void command_line_dummy_materials (const char* string, Params& params)
 {
   params.dummy_materials_wildcard = string;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 { 
   if (params.layout_file_name.empty ())
@@ -298,7 +298,7 @@ void validate (Params& params)
   }
 }
 
-//проверка статуса PSD
+//РїСЂРѕРІРµСЂРєР° СЃС‚Р°С‚СѓСЃР° PSD
 void check_status (psd_status status, const char* source)
 {
   if (status == psd_status_done)
@@ -334,7 +334,7 @@ void check_status (psd_status status, const char* source)
   }
 } */
 
-//преобразование растровой карты
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЂР°СЃС‚СЂРѕРІРѕР№ РєР°СЂС‚С‹
 void convert_image_data (size_t src_width, size_t src_height, const psd_argb_color* src_image, const Rect& src_crop, size_t dst_width, size_t dst_height, void* dst_image)
 {    
   for (size_t i=0; i<src_crop.height; i++)
@@ -352,7 +352,7 @@ void convert_image_data (size_t src_width, size_t src_height, const psd_argb_col
   }
 }
 
-//обрезание
+//РѕР±СЂРµР·Р°РЅРёРµ
 void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, size_t crop_alpha, Rect& cropped_rect)
 {
   int  min_x = 0, min_y = 0, max_x = 0, max_y = 0;
@@ -413,7 +413,7 @@ void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, si
   }  
 }
 
-//замена z-цвета
+//Р·Р°РјРµРЅР° z-С†РІРµС‚Р°
 void zcolor_correction (const bgra_t& zcolor_min, const bgra_t& zcolor_max, size_t width, size_t height, psd_argb_color* image)
 {
   for (int y=0; y<(int)height; y++)
@@ -433,7 +433,7 @@ void zcolor_correction (const bgra_t& zcolor_min, const bgra_t& zcolor_max, size
   }
 }
 
-//усреднение цвета
+//СѓСЃСЂРµРґРЅРµРЅРёРµ С†РІРµС‚Р°
 template <size_t source_count>
 void get_average_color (rgba_t* (&source_pixels) [source_count], rgba_t& result)
 {
@@ -457,13 +457,13 @@ void get_average_color (rgba_t* (&source_pixels) [source_count], rgba_t& result)
   result.blue  = static_cast<unsigned char> (avg_blue);
 }
 
-//исправление ошибки с цветом пикселей с нулевой альфой
+//РёСЃРїСЂР°РІР»РµРЅРёРµ РѕС€РёР±РєРё СЃ С†РІРµС‚РѕРј РїРёРєСЃРµР»РµР№ СЃ РЅСѓР»РµРІРѕР№ Р°Р»СЊС„РѕР№
 void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitmap, unsigned char fix_alpha_value, size_t passes_count)
 {
   if (!width || !height)
     return;
 
-    //первый проход - зануление цвета под полностью прозрачными пикселями (alpha = 0)
+    //РїРµСЂРІС‹Р№ РїСЂРѕС…РѕРґ - Р·Р°РЅСѓР»РµРЅРёРµ С†РІРµС‚Р° РїРѕРґ РїРѕР»РЅРѕСЃС‚СЊСЋ РїСЂРѕР·СЂР°С‡РЅС‹РјРё РїРёРєСЃРµР»СЏРјРё (alpha = 0)
 
   for (unsigned int i=0; i<height; i++)
   {
@@ -480,7 +480,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
     }         
   }
   
-    //блюр картинки
+    //Р±Р»СЋСЂ РєР°СЂС‚РёРЅРєРё
     
   media::Image tmp_image (width, height, 1, media::PixelFormat_RGBA8);  
   
@@ -490,7 +490,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
 
   for (size_t pass=0; pass<passes_count; pass++)
   {
-      //усреднение верхней линии
+      //СѓСЃСЂРµРґРЅРµРЅРёРµ РІРµСЂС…РЅРµР№ Р»РёРЅРёРё
     
     if (height > 1)
     {
@@ -553,7 +553,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
       }
     }
     
-      //усреднение центра
+      //СѓСЃСЂРµРґРЅРµРЅРёРµ С†РµРЅС‚СЂР°
     
     for (size_t i=1; i<height-1; i++)
     {
@@ -590,7 +590,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
       }
     }
     
-      //усреднение нижней линии
+      //СѓСЃСЂРµРґРЅРµРЅРёРµ РЅРёР¶РЅРµР№ Р»РёРЅРёРё
     
     if (height > 1)
     {
@@ -654,7 +654,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
     }    
   }
   
-    //формирование окончательного изображения
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕРєРѕРЅС‡Р°С‚РµР»СЊРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     
   for (size_t i=0; i<height; i++)
   {
@@ -673,7 +673,7 @@ void fix_zero_alpha_color (unsigned int width, unsigned int height, rgba_t* bitm
   }
 }
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k) 
 {
   if (!k)
@@ -690,7 +690,7 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
-//получение имени слоя
+//РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃР»РѕСЏ
 stl::string get_layer_name (const Params& params, const psd_layer_record& layer)
 {
   xtl::uninitialized_storage<char> ascii_layer_name (layer.unicode_name_length + 1);
@@ -708,14 +708,14 @@ stl::string get_layer_name (const Params& params, const psd_layer_record& layer)
   return params.need_trim_name_spaces ? common::trim (ascii_layer_name.data ()) : ascii_layer_name.data ();
 }
 
-//экспорт
+//СЌРєСЃРїРѕСЂС‚
 void export_data (Params& params)
 {
   psd_context* context = 0;
   
   check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");       
   
-    //обрезание по альфа
+    //РѕР±СЂРµР·Р°РЅРёРµ РїРѕ Р°Р»СЊС„Р°
   
   typedef stl::vector<Rect> RectArray;
   
@@ -745,7 +745,7 @@ void export_data (Params& params)
         continue;
     }
     
-    //проверка корректности имени слоя
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РёРјРµРЅРё СЃР»РѕСЏ
     for (const char* symbol = name.c_str (); *symbol; symbol++)
     {
       static const char* allowed_symbols = "_.- $%!@#^()[],~";
@@ -754,7 +754,7 @@ void export_data (Params& params)
         throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
     }
     
-    //коррекция z-цвета
+    //РєРѕСЂСЂРµРєС†РёСЏ z-С†РІРµС‚Р°
     
     if (params.need_replace_zcolor)
       zcolor_correction (params.zcolor_min, params.zcolor_max, layer.width, layer.height, layer.image_data);
@@ -797,7 +797,7 @@ void export_data (Params& params)
     image_index++;
   }
   
-    //сохранение разметки
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СЂР°Р·РјРµС‚РєРё
     
   if (params.need_layout)
   {
@@ -855,7 +855,7 @@ void export_data (Params& params)
     }
   }
   
-    //сохранение содержимого слоёв
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ СЃР»РѕС‘РІ
   
   if (params.need_layers)
   {
@@ -977,12 +977,12 @@ void export_data (Params& params)
   psd_image_free (context);
 }
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
       
     bgra_t default_zcolor = {0, 0, 0, 0};
 
@@ -1036,10 +1036,10 @@ int main (int argc, const char* argv [])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 
     if (params.print_help)
       return 0;
@@ -1053,11 +1053,11 @@ int main (int argc, const char* argv [])
 
     params.source_file_name = command_line.Param (0);
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
     validate (params);
       
-      //экспорт
+      //СЌРєСЃРїРѕСЂС‚
 
     export_data (params);
 

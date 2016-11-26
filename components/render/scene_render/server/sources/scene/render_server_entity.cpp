@@ -4,22 +4,22 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации сущности
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃСѓС‰РЅРѕСЃС‚Рё
 */
 
 struct Entity::Impl
 {
-  bool                  is_infinite; //бесконечен ли ограничивающий объем
-  bound_volumes::aaboxf bound_box;   //ограничивающий бокс
-  bool                  is_visible;  //является ли данная сущность видимой
-  Scene*                scene;       //сцена
+  bool                  is_infinite; //Р±РµСЃРєРѕРЅРµС‡РµРЅ Р»Рё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉРµРј
+  bound_volumes::aaboxf bound_box;   //РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ Р±РѕРєСЃ
+  bool                  is_visible;  //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґР°РЅРЅР°СЏ СЃСѓС‰РЅРѕСЃС‚СЊ РІРёРґРёРјРѕР№
+  Scene*                scene;       //СЃС†РµРЅР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl () : is_infinite (true), is_visible (true), scene () {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Entity::Entity ()
@@ -33,7 +33,7 @@ Entity::~Entity ()
 }
 
 /*
-    Сцена
+    РЎС†РµРЅР°
 */
 
 void Entity::SetSceneOwner (Scene* scene)
@@ -68,7 +68,7 @@ Scene* Entity::SceneOwner () const
 }
 
 /*
-    Ограничивающее тело
+    РћРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРµ С‚РµР»Рѕ
 */
 
 void Entity::SetBounds (bool is_infinite, const bound_volumes::aaboxf& box)
@@ -90,7 +90,7 @@ const bound_volumes::aaboxf& Entity::BoundBox () const
 }
 
 /*
-    Видимость объекта
+    Р’РёРґРёРјРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°
 */
 
 void Entity::SetVisible (bool state)
@@ -104,7 +104,7 @@ bool Entity::IsVisible () const
 }
 
 /*
-    Оповещение об обновлении ограничивающего тела
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ С‚РµР»Р°
 */
 
 void Entity::OnUpdateBounds ()
@@ -112,7 +112,7 @@ void Entity::OnUpdateBounds ()
 }
 
 /*
-    Обход
+    РћР±С…РѕРґ
 */
 
 void Entity::Visit (ISceneVisitor& visitor)

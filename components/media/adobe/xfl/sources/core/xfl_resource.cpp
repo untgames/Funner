@@ -3,17 +3,17 @@
 using namespace media::adobe::xfl;
 
 /*
-    Описание реализации ресурса
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂРµСЃСѓСЂСЃР°
 */
 
 struct Resource::Impl : public xtl::reference_counter
 {
-  stl::string name; //имя ресурса
-  stl::string path; //путь к файлу
+  stl::string name; //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+  stl::string path; //РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Resource::Resource ()
@@ -39,7 +39,7 @@ Resource& Resource::operator = (const Resource& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* Resource::Name () const
@@ -56,7 +56,7 @@ void Resource::SetName (const char* name)
 }
 
 /*
-   Путь к ресурсу
+   РџСѓС‚СЊ Рє СЂРµСЃСѓСЂСЃСѓ
 */
 
 const char* Resource::Path () const
@@ -73,7 +73,7 @@ void Resource::SetPath (const char* path)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Resource::Swap (Resource& resource)
@@ -91,7 +91,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Resource& resource1, Resource& resource2)

@@ -88,7 +88,7 @@
 typedef GLuint GLhandleARB;
 
 /*
-    Переопределения для упрощения портируемости
+    РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёСЏ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РїРѕСЂС‚РёСЂСѓРµРјРѕСЃС‚Рё
 */
 
 typedef PFNGLFRAMEBUFFERTEXTURE3DOESPROC PFNGLFRAMEBUFFERTEXTURE3DPROC;

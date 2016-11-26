@@ -16,7 +16,7 @@ inline void TestModeFlag (string& tmp,filemode_t mode,size_t flag,const char* fl
 }
 
 /*
-    Формирование строки режима файла
+    Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЂРµР¶РёРјР° С„Р°Р№Р»Р°
 */
 
 string common::strfilemode (filemode_t mode)
@@ -34,7 +34,7 @@ string common::strfilemode (filemode_t mode)
 }
 
 /*
-    Форматирование флагов поиска
+    Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ С„Р»Р°РіРѕРІ РїРѕРёСЃРєР°
 */
 
 string common::strsearchflags (size_t flags)

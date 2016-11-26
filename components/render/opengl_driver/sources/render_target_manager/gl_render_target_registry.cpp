@@ -9,24 +9,24 @@ namespace
 
 /*
 ===================================================================================================
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 ===================================================================================================
 */
 
 /*
-    Фабрика буфера кадра
+    Р¤Р°Р±СЂРёРєР° Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 struct FrameBufferFactory
 {
-  FrameBufferChecker checker; //функтор, проверяющий возможность создания буфера кадра из двух отображений
-  FrameBufferCreater creater; //функтор, создающий буфер кадра по двум отображениям
+  FrameBufferChecker checker; //С„СѓРЅРєС‚РѕСЂ, РїСЂРѕРІРµСЂСЏСЋС‰РёР№ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР° РёР· РґРІСѓС… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
+  FrameBufferCreater creater; //С„СѓРЅРєС‚РѕСЂ, СЃРѕР·РґР°СЋС‰РёР№ Р±СѓС„РµСЂ РєР°РґСЂР° РїРѕ РґРІСѓРј РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏРј
   
   FrameBufferFactory (const FrameBufferChecker& in_checker, const FrameBufferCreater& in_creater) : checker (in_checker), creater (in_creater) {}
 };
 
 /*
-    Хранилище буфера кадра
+    РҐСЂР°РЅРёР»РёС‰Рµ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 typedef stl::auto_ptr<IFrameBuffer> FrameBufferPtr;
@@ -39,7 +39,7 @@ struct FrameBufferHolder: public xtl::reference_counter
 };
 
 /*
-    Целевые отображения (ключ поиска в карте буферов кадра)
+    Р¦РµР»РµРІС‹Рµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ (РєР»СЋС‡ РїРѕРёСЃРєР° РІ РєР°СЂС‚Рµ Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°)
 */
 
 struct RenderTargetViews
@@ -63,7 +63,7 @@ inline size_t hash (const RenderTargetViews& views)
   return stl::hash (views.render_target_view, stl::hash (views.depth_stencil_view));
 }
 
-//получение строки с конфигурацией буфера кадра
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ Р±СѓС„РµСЂР° РєР°РґСЂР°
 inline void get_configuration_name (View* color_view, View* depth_stencil_view, stl::string& out_name)
 {
   format ("color-view=%s, depth-stencil-view=%s", color_view ? color_view->GetTextureTypeName () : "null",
@@ -79,7 +79,7 @@ inline void get_configuration_name (View* color_view, View* depth_stencil_view, 
 */
 
 /*
-    Описание реализации менеджера буферов кадра
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
 */
 
 typedef stl::list<FrameBufferFactory>                          FrameBufferFactoryList;
@@ -88,15 +88,15 @@ typedef stl::hash_map<RenderTargetViews, FrameBufferHolderPtr> FrameBufferMap;
 
 struct RenderTargetRegistry::Impl
 {
-  FrameBufferFactoryList    frame_buffer_factories;       //список фабрик буферов кадра
-  RenderBufferCreater       render_buffer_creater;        //функтор создания буфера рендеринга
-  ColorBufferCreater        color_buffer_creater;         //функтор создания буфера цвета
-  DepthStencilBufferCreater depth_stencil_buffer_creater; //функтор создания буфера попиксельного отсечения
-  FrameBufferMap            frame_buffers;                //буферы кадра
+  FrameBufferFactoryList    frame_buffer_factories;       //СЃРїРёСЃРѕРє С„Р°Р±СЂРёРє Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
+  RenderBufferCreater       render_buffer_creater;        //С„СѓРЅРєС‚РѕСЂ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+  ColorBufferCreater        color_buffer_creater;         //С„СѓРЅРєС‚РѕСЂ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР° С†РІРµС‚Р°
+  DepthStencilBufferCreater depth_stencil_buffer_creater; //С„СѓРЅРєС‚РѕСЂ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
+  FrameBufferMap            frame_buffers;                //Р±СѓС„РµСЂС‹ РєР°РґСЂР°
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetRegistry::RenderTargetRegistry ()
@@ -109,7 +109,7 @@ RenderTargetRegistry::~RenderTargetRegistry ()
 }
 
 /*
-    Регистрация обработчиков создания буферов кадра / буферов отрисовки
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂРѕРІ РєР°РґСЂР° / Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void RenderTargetRegistry::RegisterCreater (const FrameBufferChecker& checker, const FrameBufferCreater& creater)
@@ -133,7 +133,7 @@ void RenderTargetRegistry::RegisterCreater (const DepthStencilBufferCreater& cre
 }
 
 /*
-    Создание буферов рендеринга
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 ITexture* RenderTargetRegistry::CreateRenderBuffer (const TextureDesc& desc)
@@ -161,12 +161,12 @@ ITexture* RenderTargetRegistry::CreateDepthStencilBuffer (ISwapChain* swap_chain
 }
 
 /*
-    Получение буфера кадра
+    РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 IFrameBuffer& RenderTargetRegistry::GetFrameBuffer (View* render_target_view, View* depth_stencil_view)
 {
-    //поиск буфера в списке уже созданных
+    //РїРѕРёСЃРє Р±СѓС„РµСЂР° РІ СЃРїРёСЃРєРµ СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С…
 
   RenderTargetViews render_target_views (render_target_view, depth_stencil_view);
 
@@ -175,27 +175,27 @@ IFrameBuffer& RenderTargetRegistry::GetFrameBuffer (View* render_target_view, Vi
   if (iter != impl->frame_buffers.end ())
     return *iter->second->frame_buffer;
 
-    //создание нового буфера кадра
+    //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
   return *CreateFrameBuffer (render_target_view, depth_stencil_view);
 }
 
 /*
-    Создание буфера кадра
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view, View* depth_stencil_view)
 {
   try
   {
-      //проверка корректности конфигурации
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
     if (render_target_view)
     {
       if (!(render_target_view->GetBindFlags () & BindFlag_RenderTarget))
         throw xtl::format_exception<xtl::bad_argument> ("", "Render-target view has wrong bind flags %s", get_name ((BindFlag)render_target_view->GetBindFlags ()));
 
-        //проверка корректности формата пикселей
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
       ITexture* texture = render_target_view->GetTexture ();
 
@@ -238,7 +238,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
       if (!(depth_stencil_view->GetBindFlags () & BindFlag_DepthStencil))
         throw xtl::format_exception<xtl::bad_argument> ("", "Depth-stencil view has wrong bind flags %s", get_name ((BindFlag)depth_stencil_view->GetBindFlags ()));
 
-        //проверка корректности формата пикселей
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
       ITexture* texture = depth_stencil_view->GetTexture ();
 
@@ -276,24 +276,24 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
       }
     }
     
-      //поиск фабрики, создающей буфер кадра указанной конфигурации
+      //РїРѕРёСЃРє С„Р°Р±СЂРёРєРё, СЃРѕР·РґР°СЋС‰РµР№ Р±СѓС„РµСЂ РєР°РґСЂР° СѓРєР°Р·Р°РЅРЅРѕР№ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
     for (FrameBufferFactoryList::iterator iter=impl->frame_buffer_factories.begin (), end=impl->frame_buffer_factories.end (); iter!=end; ++iter)
     {
-        //провера возможности создания буфера
+        //РїСЂРѕРІРµСЂР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР°
       
       if (!iter->checker (render_target_view, depth_stencil_view))
         continue;
       
       try
       {
-          //создание буфера
+          //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
         FrameBufferPtr frame_buffer (iter->creater (render_target_view, depth_stencil_view));
 
         FrameBufferHolderPtr holder (new FrameBufferHolder (frame_buffer), false);
         
-          //регистрация буфера
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±СѓС„РµСЂР°
 
         impl->frame_buffers.insert_pair (RenderTargetViews (render_target_view, depth_stencil_view), holder);
 
@@ -311,7 +311,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
       }
     }
 
-      //буфер не может быть создан, поскольку заданная конфигурация не поддерживается
+      //Р±СѓС„РµСЂ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЃРѕР·РґР°РЅ, РїРѕСЃРєРѕР»СЊРєСѓ Р·Р°РґР°РЅРЅР°СЏ РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ
 
     stl::string cfg_name;
 
@@ -327,12 +327,12 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
 }
 
 /*
-    Освобождение ресурсов, связанных с отображением
+    РћСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ, СЃРІСЏР·Р°РЅРЅС‹С… СЃ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµРј
 */
 
 void RenderTargetRegistry::ReleaseResources (View* view)
 {
-    //удаление всех буферов кадра, в которых присутствует указанное отображение
+    //СѓРґР°Р»РµРЅРёРµ РІСЃРµС… Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°, РІ РєРѕС‚РѕСЂС‹С… РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ СѓРєР°Р·Р°РЅРЅРѕРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ
 
   for (FrameBufferMap::iterator iter=impl->frame_buffers.begin (), end=impl->frame_buffers.end (); iter!=end;)
   {

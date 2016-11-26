@@ -4,7 +4,7 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Описание реализации PrimitiveBuffers
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PrimitiveBuffers
 */
 
 namespace
@@ -70,15 +70,15 @@ typedef stl::hash_map<size_t, VertexBufferPtr>    CacheVertexBufferMap;
 
 struct PrimitiveBuffersImpl::Impl
 {
-  DeviceManagerPtr                        device_manager;       //менеджер устройства отрисовки
-  VertexStreamMap                         vertex_streams;       //вершинные потоки
-  VertexBufferMap                         vertex_buffers;       //вершинные буферы
-  IndexBufferMap                          index_buffers;        //индексные буферы
-  CacheBufferMap                          vertex_streams_cache; //кэш вершинных потоков
-  CacheBufferMap                          index_buffers_cache;  //кэш индексных буферов
-  CacheVertexBufferMap                    vertex_buffers_cache; //кэш вершинных буферов
-  bool                                    cache_state;          //состояние кэша
-  stl::auto_ptr<manager::BatchingManager> batching_manager;     //менеджер пакетирования
+  DeviceManagerPtr                        device_manager;       //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  VertexStreamMap                         vertex_streams;       //РІРµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
+  VertexBufferMap                         vertex_buffers;       //РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+  IndexBufferMap                          index_buffers;        //РёРЅРґРµРєСЃРЅС‹Рµ Р±СѓС„РµСЂС‹
+  CacheBufferMap                          vertex_streams_cache; //РєСЌС€ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ
+  CacheBufferMap                          index_buffers_cache;  //РєСЌС€ РёРЅРґРµРєСЃРЅС‹С… Р±СѓС„РµСЂРѕРІ
+  CacheVertexBufferMap                    vertex_buffers_cache; //РєСЌС€ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
+  bool                                    cache_state;          //СЃРѕСЃС‚РѕСЏРЅРёРµ РєСЌС€Р°
+  stl::auto_ptr<manager::BatchingManager> batching_manager;     //РјРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)   
@@ -88,7 +88,7 @@ struct PrimitiveBuffersImpl::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PrimitiveBuffersImpl::PrimitiveBuffersImpl (const DeviceManagerPtr& device_manager)
@@ -101,7 +101,7 @@ PrimitiveBuffersImpl::~PrimitiveBuffersImpl ()
 }
 
 /*
-    Создание отображений буферов
+    РЎРѕР·РґР°РЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№ Р±СѓС„РµСЂРѕРІ
 */
 
 LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometry::VertexStream& vs, MeshBufferUsage usage)
@@ -248,7 +248,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
 }
 
 /*
-    Добавление буферов
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffersImpl::Add (const media::geometry::VertexStream& vs, MeshBufferUsage usage)
@@ -312,7 +312,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::IndexBuffer& ib, MeshBuff
 }
 
 /*
-    Обновление буферов
+    РћР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
@@ -365,7 +365,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
 }
 
 /*
-    Удаление буферов
+    РЈРґР°Р»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
 */
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::VertexStream& vs)
@@ -391,7 +391,7 @@ void PrimitiveBuffersImpl::RemoveAll ()
 }
 
 /*
-    Менеджер пакетирования
+    РњРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 */
 
 render::manager::BatchingManager& PrimitiveBuffersImpl::BatchingManager ()
@@ -418,7 +418,7 @@ bool PrimitiveBuffersImpl::HasBatchingManager ()
 }
 
 /*
-    Управление кэшем
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РµРј
 */
 
 void PrimitiveBuffersImpl::SetCacheState (bool state)

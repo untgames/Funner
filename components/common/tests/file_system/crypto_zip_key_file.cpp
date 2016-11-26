@@ -39,22 +39,22 @@ int main ()
   
   try
   {
-      //получение ключа
+      //РїРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡Р°
       
     filecryptokey_t crypto_key;
       
     FileSystem::GetFileCryptoKey (KEY_FILE, crypto_key);    
 
-      //преобразование ключа      
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР»СЋС‡Р°      
 
     FileCryptoParameters crypto_params (DECRYPT_METHOD, ENCRYPT_METHOD, crypto_key, sizeof (crypto_key) * CHAR_BIT);
     
-      //установка параметров шифрования
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ
 
     FileSystem::SetCryptoParameters (CRYPTO_FILE_NAME, crypto_params);
     FileSystem::AddSearchPath (SEARCH_PATH, &PrintLog);
 
-      //чтение файла
+      //С‡С‚РµРЅРёРµ С„Р°Р№Р»Р°
       
     ReadFileContent (SOURCE_FILE);    
   }

@@ -1,4 +1,4 @@
-//í•·‚®‡Æ¢†≠®• max_size ® capacity
+//–¢–µ—Å—Ç–∏—Ä–æ–≤–∞–Ω–∏–µ max_size –∏ capacity
 #include <stdio.h>
 #include <stl/string>
 

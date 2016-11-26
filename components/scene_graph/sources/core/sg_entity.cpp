@@ -13,13 +13,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const float  INFINITE_BOUND_VALUE       = 1e8f; //значение бесконечности для ограничивающих объёмов
-const size_t INTERSECTIONS_RESERVE_SIZE = 16;   //резервируемое число пересечений
+const float  INFINITE_BOUND_VALUE       = 1e8f; //Р·РЅР°С‡РµРЅРёРµ Р±РµСЃРєРѕРЅРµС‡РЅРѕСЃС‚Рё РґР»СЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉС‘РјРѕРІ
+const size_t INTERSECTIONS_RESERVE_SIZE = 16;   //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РїРµСЂРµСЃРµС‡РµРЅРёР№
 
-//получение хэша от ограничивающего параллелипиппеда
+//РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕС‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
 inline size_t hash (const bound_volumes::aaboxf& box)
 {
   return common::crc32 (&box, sizeof (box));
@@ -28,26 +28,26 @@ inline size_t hash (const bound_volumes::aaboxf& box)
 }
 
 /*
-    Описание реализации Entity
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Entity
 */
 
 struct Entity::Impl: public SceneObject, public xtl::instance_counter<Entity>
 {
-  vec3f  wire_color;               //цвет проволочного представления объекта
-  aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат
-  aaboxf world_bound_box;          //ограничивающий параллелипиппед в мировой системе координат
-  size_t local_bounds_hash;        //хэш локального ограничивающего параллелипиппеда
-  size_t world_bounds_hash;        //хэш мирового ограничивающего параллелипиппеда
-  bool   need_local_bounds_update; //локальные ограничивающие объёмы требуют пересчёта
-  bool   need_world_bounds_update; //мировые ограничивающие объёмы требуют пересчёта
-  bool   infinite_bounds;          //являются ли ограничивающие объёмы узла бесконечными
-  bool   visible;                  //являются ли объект видимым
+  vec3f  wire_color;               //С†РІРµС‚ РїСЂРѕРІРѕР»РѕС‡РЅРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
+  aaboxf local_bound_box;          //РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґ РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
+  aaboxf world_bound_box;          //РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґ РІ РјРёСЂРѕРІРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
+  size_t local_bounds_hash;        //С…СЌС€ Р»РѕРєР°Р»СЊРЅРѕРіРѕ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
+  size_t world_bounds_hash;        //С…СЌС€ РјРёСЂРѕРІРѕРіРѕ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РїР°СЂР°Р»Р»РµР»РёРїРёРїРїРµРґР°
+  bool   need_local_bounds_update; //Р»РѕРєР°Р»СЊРЅС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ С‚СЂРµР±СѓСЋС‚ РїРµСЂРµСЃС‡С‘С‚Р°
+  bool   need_world_bounds_update; //РјРёСЂРѕРІС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ С‚СЂРµР±СѓСЋС‚ РїРµСЂРµСЃС‡С‘С‚Р°
+  bool   infinite_bounds;          //СЏРІР»СЏСЋС‚СЃСЏ Р»Рё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ СѓР·Р»Р° Р±РµСЃРєРѕРЅРµС‡РЅС‹РјРё
+  bool   visible;                  //СЏРІР»СЏСЋС‚СЃСЏ Р»Рё РѕР±СЉРµРєС‚ РІРёРґРёРјС‹Рј
   
   Impl (scene_graph::Entity& entity) : SceneObject (entity) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Entity::Entity ()
@@ -68,7 +68,7 @@ Entity::~Entity ()
 }
 
 /*
-    Цвет проволочного представления объекта
+    Р¦РІРµС‚ РїСЂРѕРІРѕР»РѕС‡РЅРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 void Entity::SetWireColor (const vec3f& color)
@@ -89,7 +89,7 @@ const vec3f& Entity::WireColor () const
 }
 
 /*
-    Видимость объекта
+    Р’РёРґРёРјРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°
 */
 
 void Entity::SetVisible (bool state)
@@ -105,10 +105,10 @@ bool Entity::IsVisible () const
 }
 
 /*
-    Работа с ограничивающими объёмами
+    Р Р°Р±РѕС‚Р° СЃ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРјРё РѕР±СЉС‘РјР°РјРё
 */
 
-//оповещение об обновлении локальных ограничивающих объёмов
+//РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё Р»РѕРєР°Р»СЊРЅС‹С… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉС‘РјРѕРІ
 void Entity::UpdateBoundsNotify ()
 {
   impl->need_local_bounds_update = true;
@@ -117,13 +117,13 @@ void Entity::UpdateBoundsNotify ()
   UpdateNotify ();
 }
 
-//оповещение об обновлении мировых ограничивающих объёмов
+//РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РјРёСЂРѕРІС‹С… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉС‘РјРѕРІ
 void Entity::UpdateWorldBoundsNotify ()
 {
   impl->need_world_bounds_update = true;
 }
 
-//пересчёт мировых ограничивающих объёмов
+//РїРµСЂРµСЃС‡С‘С‚ РјРёСЂРѕРІС‹С… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉС‘РјРѕРІ
 void Entity::UpdateWorldBounds () const
 {
   if (impl->need_local_bounds_update)
@@ -136,7 +136,7 @@ void Entity::UpdateWorldBounds () const
   impl->need_world_bounds_update = false;
 }
 
-//установка ограничивающего объёма
+//СѓСЃС‚Р°РЅРѕРІРєР° РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 void Entity::SetBoundBox (const bound_volumes::aaboxf& box)
 {
   impl->infinite_bounds = false;
@@ -146,7 +146,7 @@ void Entity::SetBoundBox (const bound_volumes::aaboxf& box)
   UpdateNotify ();
 }
 
-//ограничивающий объём узла в локальной системе координат
+//РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј СѓР·Р»Р° РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
 const aaboxf& Entity::BoundBox () const
 {
   if (impl->need_local_bounds_update)
@@ -160,7 +160,7 @@ const aaboxf& Entity::BoundBox () const
   return impl->local_bound_box;
 }
 
-//ограничивающий объём узла в мировой системе координат
+//РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј СѓР·Р»Р° РІ РјРёСЂРѕРІРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
 const aaboxf& Entity::WorldBoundBox () const
 {
   if (impl->need_world_bounds_update)
@@ -189,10 +189,10 @@ size_t Entity::WorldBoundBoxHash () const
   return impl->world_bounds_hash;
 }
 
-//установка бесконечных ограничивающий объёмов
+//СѓСЃС‚Р°РЅРѕРІРєР° Р±РµСЃРєРѕРЅРµС‡РЅС‹С… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘РјРѕРІ
 void Entity::SetInfiniteBounds ()
 {
-  if (impl->infinite_bounds) //игнорируем повторную установку бесконечных ограничивающих объёмов
+  if (impl->infinite_bounds) //РёРіРЅРѕСЂРёСЂСѓРµРј РїРѕРІС‚РѕСЂРЅСѓСЋ СѓСЃС‚Р°РЅРѕРІРєСѓ Р±РµСЃРєРѕРЅРµС‡РЅС‹С… РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉС‘РјРѕРІ
     return;
 
   impl->infinite_bounds = true;
@@ -202,12 +202,12 @@ void Entity::SetInfiniteBounds ()
   UpdateNotify ();
 }
 
-//Обновление локального ограничивающего объёма
+//РћР±РЅРѕРІР»РµРЅРёРµ Р»РѕРєР°Р»СЊРЅРѕРіРѕ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 void Entity::UpdateBoundsCore ()
 {
 }
 
-//являются ли ограничивающие объёмы узла бесконечными
+//СЏРІР»СЏСЋС‚СЃСЏ Р»Рё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ СѓР·Р»Р° Р±РµСЃРєРѕРЅРµС‡РЅС‹РјРё
 bool Entity::IsInfiniteBounds () const
 {
   if (impl->need_local_bounds_update)
@@ -216,19 +216,19 @@ bool Entity::IsInfiniteBounds () const
   return impl->infinite_bounds;
 }
 
-//ограничивающий объём потомков в локальной системе координат узла
+//РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј РїРѕС‚РѕРјРєРѕРІ РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ СѓР·Р»Р°
 aaboxf Entity::ChildrenBoundBox () const
 {
   return WorldChildrenBoundBox () * inverse (WorldTM ());
 }
 
-//полный ограничивающий объём узла с потомками в локальной системе координат узла
+//РїРѕР»РЅС‹Р№ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј СѓР·Р»Р° СЃ РїРѕС‚РѕРјРєР°РјРё РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ СѓР·Р»Р°
 aaboxf Entity::FullBoundBox () const
 {
   return WorldFullBoundBox () * inverse (WorldTM ());
 }
 
-//ограничивающий объём потомков в мировой системе координат
+//РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј РїРѕС‚РѕРјРєРѕРІ РІ РјРёСЂРѕРІРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
 aaboxf Entity::WorldChildrenBoundBox () const
 {
   struct EntityVisitor: public visitor<void, Entity>
@@ -260,27 +260,27 @@ aaboxf Entity::WorldChildrenBoundBox () const
   return visitor.box;
 }
 
-//полный ограничивающий объём узла с потомками в мировой системе координат
+//РїРѕР»РЅС‹Р№ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј СѓР·Р»Р° СЃ РїРѕС‚РѕРјРєР°РјРё РІ РјРёСЂРѕРІРѕР№ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚
 aaboxf Entity::WorldFullBoundBox () const
 {
   return WorldChildrenBoundBox () += WorldBoundBox ();
 }
 
 /*
-    Получение пересечений
+    РџРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµСЃРµС‡РµРЅРёР№
 */
 
 namespace
 {
 
-//враппер для добавления объекта в массив
+//РІСЂР°РїРїРµСЂ РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РІ РјР°СЃСЃРёРІ
 struct ArrayInserter: public INodeTraverser
 {
   ArrayInserter (const Entity& in_self, NodeArray& in_array) : self (in_self), array (in_array) {}
 
   void operator () (Node& entity)
   {
-    if (&entity == &self) //защита от самопересечений
+    if (&entity == &self) //Р·Р°С‰РёС‚Р° РѕС‚ СЃР°РјРѕРїРµСЂРµСЃРµС‡РµРЅРёР№
       return;
 
     array.Add (entity);
@@ -318,7 +318,7 @@ NodeArray Entity::GetIntersections () const
 }
 
 /*
-    Обработка оповещения об изменении мирового положения узла
+    РћР±СЂР°Р±РѕС‚РєР° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РёР·РјРµРЅРµРЅРёРё РјРёСЂРѕРІРѕРіРѕ РїРѕР»РѕР¶РµРЅРёСЏ СѓР·Р»Р°
 */
 
 void Entity::AfterUpdateWorldTransformEvent ()
@@ -327,7 +327,7 @@ void Entity::AfterUpdateWorldTransformEvent ()
 }
 
 /*
-    Обработка оповещений об присоединении/отсоединении объекта к сцене
+    РћР±СЂР°Р±РѕС‚РєР° РѕРїРѕРІРµС‰РµРЅРёР№ РѕР± РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё/РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё РѕР±СЉРµРєС‚Р° Рє СЃС†РµРЅРµ
 */
 
 void Entity::AfterSceneAttachEvent ()
@@ -341,7 +341,7 @@ void Entity::BeforeSceneDetachEvent ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Entity::AcceptCore (Visitor& visitor)
@@ -351,7 +351,7 @@ void Entity::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void Entity::BindProperties (common::PropertyBindingMap& bindings)

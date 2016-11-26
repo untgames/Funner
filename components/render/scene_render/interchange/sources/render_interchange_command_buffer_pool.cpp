@@ -6,16 +6,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-size_t DEFAULT_BUFFER_SIZE   = 2 * 1024 * 1024; //размер буфера по умолчанию
-size_t DEFAULT_BUFFERS_COUNT = 2;               //резервируемое количество буферов
+size_t DEFAULT_BUFFER_SIZE   = 2 * 1024 * 1024; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+size_t DEFAULT_BUFFERS_COUNT = 2;               //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±СѓС„РµСЂРѕРІ
 
 }
 
 /*
-    Описание реализации пула буферов команд
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСѓР»Р° Р±СѓС„РµСЂРѕРІ РєРѕРјР°РЅРґ
 */
 
 typedef stl::vector<CommandBuffer> BufferArray;
@@ -24,16 +24,16 @@ struct CommandBufferPool::Impl: public xtl::reference_counter, public xtl::spin_
 {  
   typedef xtl::lock_ptr<Impl> Guard;
 
-  size_t      default_buffer_size; //размер буфера по умолчанию
-  BufferArray buffers;             //буферы
+  size_t      default_buffer_size; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  BufferArray buffers;             //Р±СѓС„РµСЂС‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl () : default_buffer_size (DEFAULT_BUFFER_SIZE)
   {
     buffers.reserve (DEFAULT_BUFFERS_COUNT);
   }
 
-/// Очистка неиспользуемых буферов
+/// РћС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… Р±СѓС„РµСЂРѕРІ
   void FlushUnusedBuffers ()
   {
     if (buffers.size () <= DEFAULT_BUFFERS_COUNT)
@@ -51,7 +51,7 @@ struct CommandBufferPool::Impl: public xtl::reference_counter, public xtl::spin_
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 CommandBufferPool::CommandBufferPool ()
@@ -79,7 +79,7 @@ CommandBufferPool& CommandBufferPool::operator = (const CommandBufferPool& pool)
 }
 
 /*
-    Резервируемый размер буфера по умолчанию
+    Р РµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void CommandBufferPool::SetDefaultBufferSize (size_t size)
@@ -97,7 +97,7 @@ size_t CommandBufferPool::DefaultBufferSize () const
 }
 
 /*
-    Создание буфера
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 */
 
 CommandBuffer CommandBufferPool::CreateBuffer ()
@@ -106,7 +106,7 @@ CommandBuffer CommandBufferPool::CreateBuffer ()
   {
     Impl::Guard guard (impl);
 
-      //попытка найти буфер среди уже созданных
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё Р±СѓС„РµСЂ СЃСЂРµРґРё СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С…
 
     for (BufferArray::iterator iter=impl->buffers.begin (), end=impl->buffers.end (); iter!=end; ++iter)
       if (iter->UseCount () == 1)
@@ -122,7 +122,7 @@ CommandBuffer CommandBufferPool::CreateBuffer ()
         return result;
       }
 
-      //создание нового буфера
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р±СѓС„РµСЂР°
 
     CommandBuffer buffer;
 

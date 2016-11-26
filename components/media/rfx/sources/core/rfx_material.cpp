@@ -2,10 +2,10 @@
 
 using namespace media::rfx;
 
-const size_t TEXMAP_RESERVE_SIZE = 8; //резервируемое количество текстурных карт
+const size_t TEXMAP_RESERVE_SIZE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
 
 /*
-    Описание реализации Material
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Material
 */
 
 typedef stl::vector<Texmap> TexmapArray;
@@ -13,12 +13,12 @@ typedef stl::vector<size_t> TagHashArray;
 
 struct Material::Impl: public xtl::reference_counter
 {
-  stl::string         name;       //имя материала
-  stl::string         program;    //имя программы
-  common::StringArray tags;       //тэги материала  
-  TagHashArray        tag_hashes; //хэши тэгов
-  common::PropertyMap properties; //свойства материала
-  TexmapArray         texmaps;    //текстурные карты  
+  stl::string         name;       //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  stl::string         program;    //РёРјСЏ РїСЂРѕРіСЂР°РјРјС‹
+  common::StringArray tags;       //С‚СЌРіРё РјР°С‚РµСЂРёР°Р»Р°  
+  TagHashArray        tag_hashes; //С…СЌС€Рё С‚СЌРіРѕРІ
+  common::PropertyMap properties; //СЃРІРѕР№СЃС‚РІР° РјР°С‚РµСЂРёР°Р»Р°
+  TexmapArray         texmaps;    //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹  
   
   Impl ()
   {
@@ -40,7 +40,7 @@ struct Material::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Material::Material ()
@@ -72,7 +72,7 @@ Material& Material::operator = (const Material& material)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Material Material::Clone () const
@@ -89,7 +89,7 @@ Material Material::Clone () const
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
    
 size_t Material::Id () const
@@ -98,7 +98,7 @@ size_t Material::Id () const
 }
 
 /*
-    Имя материала
+    РРјСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* Material::Name () const
@@ -115,7 +115,7 @@ void Material::SetName (const char* name)
 }
 
 /*
-    Имя программы
+    РРјСЏ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 void Material::SetProgram (const char* name)
@@ -132,7 +132,7 @@ const char* Material::Program () const
 }
 
 /*
-    Свойства материала
+    РЎРІРѕР№СЃС‚РІР° РјР°С‚РµСЂРёР°Р»Р°
 */
 
 common::PropertyMap& Material::Properties ()
@@ -146,7 +146,7 @@ const common::PropertyMap& Material::Properties () const
 }
 
 /*
-    Тэги
+    РўСЌРіРё
 */
 
 void Material::SetTags (const char* tags)
@@ -209,7 +209,7 @@ const size_t* Material::TagHashes () const
 }
 
 /*
-    Текстурные карты
+    РўРµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹
 */
 
 size_t Material::TexmapCount () const
@@ -259,7 +259,7 @@ void Material::RemoveAllTexmaps ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Material::Swap (Material& material)

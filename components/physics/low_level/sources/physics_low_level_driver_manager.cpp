@@ -13,13 +13,13 @@ using namespace physics::low_level;
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const char* DRIVER_COMPONENTS_MASK = "physics.low_level.*"; //маска имён компонентов низкоуровневых драйверов физичиских систем
+const char* DRIVER_COMPONENTS_MASK = "physics.low_level.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹С… РґСЂР°Р№РІРµСЂРѕРІ С„РёР·РёС‡РёСЃРєРёС… СЃРёСЃС‚РµРј
 
 }
 
@@ -30,13 +30,13 @@ namespace low_level
 {
 
 /*
-    Описание реализации системы управления низкоуровневыми драйверами физических систем
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјС‹ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё С„РёР·РёС‡РµСЃРєРёС… СЃРёСЃС‚РµРј
 */
 
 class DriverManagerImpl
 {
   public:
-///Регистрация драйвера
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂР°
     void RegisterDriver (const char* name, IDriver* driver)
     {
       static const char* METHOD_NAME = "physics::low_level::DriverManager::RegisterDriver";
@@ -55,7 +55,7 @@ class DriverManagerImpl
       drivers.insert_pair (name, driver);
     }
 
-///Отмена регистрации драйвера
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РґСЂР°Р№РІРµСЂР°
     void UnregisterDriver (const char* name)
     {
       if (!name)
@@ -64,13 +64,13 @@ class DriverManagerImpl
       drivers.erase (name);
     }
 
-///Отмена регистрации всех драйверов
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… РґСЂР°Р№РІРµСЂРѕРІ
     void UnregisterAllDrivers ()
     {
       drivers.clear ();
     }
 
-///Поиск драйвера по имени
+///РџРѕРёСЃРє РґСЂР°Р№РІРµСЂР° РїРѕ РёРјРµРЅРё
     IDriver* FindDriver (const char* name)
     {
       if (!name)
@@ -84,7 +84,7 @@ class DriverManagerImpl
     }
 
   private:
-///Загрузка драйверов по умолчанию
+///Р—Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     void LoadDefaultDrivers ()
     {
       static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
@@ -95,7 +95,7 @@ class DriverManagerImpl
     typedef stl::hash_map<stl::string, DriverPtr> DriverMap;
 
   private:
-    DriverMap drivers; //карта драйверов
+    DriverMap drivers; //РєР°СЂС‚Р° РґСЂР°Р№РІРµСЂРѕРІ
 };
 
 }
@@ -103,7 +103,7 @@ class DriverManagerImpl
 }
 
 /*
-    Обёртки над обращениями к системе управления низкоуровневыми драйверами отрисовки
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РѕР±СЂР°С‰РµРЅРёСЏРјРё Рє СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 typedef Singleton<DriverManagerImpl> DriverManagerSingleton;

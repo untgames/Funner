@@ -21,7 +21,7 @@ struct Test
 
   Test ()
   {
-      //создание сцены
+      //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
     curl = PageCurl::Create ();
 
@@ -60,7 +60,7 @@ struct Test
     camera->SetZNear    (-2);
     camera->SetZFar     (2);
 
-      //создание областей вывода
+      //СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     Viewport vp;
 
@@ -78,17 +78,17 @@ struct Test
 
     screen.Attach (vp);
 
-      //настройка целевых буферов вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІС‹РІРѕРґР°
 
     RenderTarget& render_target = application.RenderTarget ();
 
     render_target.SetScreen (&screen);
 
-      //загрузка ресурсов
+      //Р·Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 
     application.LoadResources ();
 
-      //установка idle-функции
+      //СѓСЃС‚Р°РЅРѕРІРєР° idle-С„СѓРЅРєС†РёРё
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
 
@@ -110,14 +110,14 @@ struct Test
 
     if (window_aspect_ratio / aspect_ratio < 1.0)
     {
-        //полосы по вертикали
+        //РїРѕР»РѕСЃС‹ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
 
       viewport_width  = window_width;
       viewport_height = size_t (viewport_width / aspect_ratio);
     }
     else
     {
-        //полосы по горизонтали
+        //РїРѕР»РѕСЃС‹ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
 
       viewport_height = window_height;
       viewport_width  = size_t (viewport_height * aspect_ratio);
@@ -129,7 +129,7 @@ struct Test
     viewport.bottom = viewport.top + viewport_height;
   }
 
-    //обработчик главного цикла приложения
+    //РѕР±СЂР°Р±РѕС‚С‡РёРє РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
   void Idle ()
   {
     try
@@ -142,7 +142,7 @@ struct Test
     }
   }
 
-    //обработчик движения мыши
+    //РѕР±СЂР°Р±РѕС‚С‡РёРє РґРІРёР¶РµРЅРёСЏ РјС‹С€Рё
   void OnMouseMove (const syslib::Window& window, const syslib::WindowEventContext& context)
   {
     syslib::Rect viewport = window.Viewport ();
@@ -172,11 +172,11 @@ int main ()
 
   try
   {
-      //настройка протоколированиЯ
+      //РЅР°СЃС‚СЂРѕР№РєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРЇ
 
     common::LogFilter filter ("*", &log_print);
 
-      //запуск теста
+      //Р·Р°РїСѓСЃРє С‚РµСЃС‚Р°
 
     Test test;
 

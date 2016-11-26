@@ -4,24 +4,24 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации отображаемой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕР№ РјРѕРґРµР»Рё
 */
 
 struct PageCurl::Impl
 {
-  PageCurlParams   params;               //параметры
-  stl::string      front_left_material;  //материал страницы
-  stl::string      front_right_material; //материал страницы
-  stl::string      back_left_material;   //материал страницы
-  stl::string      back_right_material;  //материал страницы
-  manager::Entity& entity;               //сущность
+  PageCurlParams   params;               //РїР°СЂР°РјРµС‚СЂС‹
+  stl::string      front_left_material;  //РјР°С‚РµСЂРёР°Р» СЃС‚СЂР°РЅРёС†С‹
+  stl::string      front_right_material; //РјР°С‚РµСЂРёР°Р» СЃС‚СЂР°РЅРёС†С‹
+  stl::string      back_left_material;   //РјР°С‚РµСЂРёР°Р» СЃС‚СЂР°РЅРёС†С‹
+  stl::string      back_right_material;  //РјР°С‚РµСЂРёР°Р» СЃС‚СЂР°РЅРёС†С‹
+  manager::Entity& entity;               //СЃСѓС‰РЅРѕСЃС‚СЊ
 
-  /// Конструктор
+  /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (manager::Entity& in_entity) : entity (in_entity) {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PageCurl::PageCurl (RenderManager& render_manager)
@@ -35,7 +35,7 @@ PageCurl::~PageCurl ()
 }
 
 /*
-    Параметры
+    РџР°СЂР°РјРµС‚СЂС‹
 */
 
 void PageCurl::SetParams (const PageCurlParams& params, const char* front_left_material, const char* front_right_material,
@@ -68,7 +68,7 @@ const PageCurlParams& PageCurl::Params () const
 }
 
 /*
-   Отрисовка
+   РћС‚СЂРёСЃРѕРІРєР°
 */
 
 void PageCurl::DrawCore (RenderingContext& context, void* user_data)

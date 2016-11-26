@@ -3,7 +3,7 @@
 using namespace media;
 
 /*
-   Шрифт
+   РЁСЂРёС„С‚
 */
 
 namespace media
@@ -11,9 +11,9 @@ namespace media
 
 struct FontDesc::Impl : public xtl::reference_counter
 {
-  stl::string             source; //имя файла
-  unsigned int            index;  //индекс используемого шрифта
-  xtl::com_ptr<IFontDesc> desc;   //шрифт
+  stl::string             source; //РёРјСЏ С„Р°Р№Р»Р°
+  unsigned int            index;  //РёРЅРґРµРєСЃ РёСЃРїРѕР»СЊР·СѓРµРјРѕРіРѕ С€СЂРёС„С‚Р°
+  xtl::com_ptr<IFontDesc> desc;   //С€СЂРёС„С‚
 
   Impl (const char* in_source, IFontDesc* in_desc, unsigned int in_index)
     : source (in_source)
@@ -25,7 +25,7 @@ struct FontDesc::Impl : public xtl::reference_counter
 }
 
 /*
-   Конструктор / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 FontDesc::FontDesc (const char* source, IFontDesc* desc, unsigned int index)
@@ -52,7 +52,7 @@ FontDesc& FontDesc::operator = (const FontDesc& source)
 }
 
 /*
-   Имя файла
+   РРјСЏ С„Р°Р№Р»Р°
 */
 
 const char* FontDesc::Source () const
@@ -61,7 +61,7 @@ const char* FontDesc::Source () const
 }
 
 /*
-   Имя гарнитуры / имя семейства / имя стиля
+   РРјСЏ РіР°СЂРЅРёС‚СѓСЂС‹ / РёРјСЏ СЃРµРјРµР№СЃС‚РІР° / РёРјСЏ СЃС‚РёР»СЏ
 */
 
 const char* FontDesc::FamilyName () const
@@ -75,7 +75,7 @@ const char* FontDesc::StyleName  () const
 }
     
 /*
-   Создание экземпляра шрифта
+   РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° С€СЂРёС„С‚Р°
 */
 
 Font FontDesc::CreateFont (const FontCreationParams& params) const
@@ -89,7 +89,7 @@ bool FontDesc::CanCreateFont (const FontCreationParams& params) const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FontDesc::Swap (FontDesc& source)
@@ -101,7 +101,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (FontDesc& font1, FontDesc& font2)

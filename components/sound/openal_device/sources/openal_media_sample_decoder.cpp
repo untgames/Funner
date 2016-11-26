@@ -3,11 +3,11 @@
 using namespace sound::low_level::openal;
 
 /*
-   Класс работы с сэмплами на основе media::Sample
+   РљР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃ СЃСЌРјРїР»Р°РјРё РЅР° РѕСЃРЅРѕРІРµ media::Sample
 */
 
 /*
-   Конструкторы
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 MediaSampleDecoder::MediaSampleDecoder (const char* name)
@@ -37,7 +37,7 @@ MediaSampleDecoder::MediaSampleDecoder (const media::SoundSample& in_sample)
 }
 
 /*
-   Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
+   Р§С‚РµРЅРёРµ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅРѕРіРѕ Р·РІСѓРєР° РєРѕР»РёС‡РµСЃС‚РІРѕРј samples_count СЃСЌРјРїР»РѕРІ РЅР°С‡РёРЅР°СЏ СЃ first sample РІ data
 */
 
 unsigned int MediaSampleDecoder::Read (unsigned int first_sample, unsigned int samples_count, void* data)
@@ -54,7 +54,7 @@ unsigned int MediaSampleDecoder::Read (unsigned int first_sample, unsigned int s
 }
 
 /*
-   Клонирование
+   РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 MediaSampleDecoder* MediaSampleDecoder::Clone ()

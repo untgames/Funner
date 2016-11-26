@@ -4,10 +4,10 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-//таблица имён ICD-точек входа
+//С‚Р°Р±Р»РёС†Р° РёРјС‘РЅ ICD-С‚РѕС‡РµРє РІС…РѕРґР°
 const char* ICD_ENTRY_NAMES [] = {
   "glNewList",        /* 0 */
   "glEndList",        /* 1 */
@@ -350,20 +350,20 @@ const char* ICD_ENTRY_NAMES [] = {
 const size_t ICD_ENTRIES_COUNT = sizeof (ICD_ENTRY_NAMES) / sizeof (*ICD_ENTRY_NAMES);
 
 /*
-    Карта имён точек входа
+    РљР°СЂС‚Р° РёРјС‘РЅ С‚РѕС‡РµРє РІС…РѕРґР°
 */
 
 class IcdEntryMap
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     IcdEntryMap ()
     {
       for (size_t i=0; i<ICD_ENTRIES_COUNT; i++)
         entries [ICD_ENTRY_NAMES [i]] = i;
     }
     
-///Получение индекса точки входа
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° С‚РѕС‡РєРё РІС…РѕРґР°
     int FindIndex (const char* name)
     {
       if (!name)
@@ -401,7 +401,7 @@ namespace windows
 {
 
 /*
-    Получение индекса точки входа в таблице ICD-драйвера
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° С‚РѕС‡РєРё РІС…РѕРґР° РІ С‚Р°Р±Р»РёС†Рµ ICD-РґСЂР°Р№РІРµСЂР°
 */
 
 int get_icd_table_index (const char* name)

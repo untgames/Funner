@@ -1,5 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS SYSTEMLIB.INFO
 
@@ -9,7 +9,7 @@ TARGETS.tabletos  += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
 TARGETS.x86_winrt += SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR
 TARGETS.win8      += SYSTEMLIB.UTILS.WIN8_LAUNCHER
 
-#Цель - System library sources
+#Р¦РµР»СЊ - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
 SYSTEMLIB.SOURCES.NAME                              := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS                      += sources
@@ -48,14 +48,14 @@ ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   SYSTEMLIB.SOURCES.x86-64.IMPORTS := compile.extern.geekinfo
 endif
 
-#Цель - System library tests
+#Р¦РµР»СЊ - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system link.common.zip_file_system
 SYSTEMLIB.TESTS.LIBS             := 
 SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 
-#Цель - Android launcher
+#Р¦РµР»СЊ - Android launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.TYPE          := android-pak
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner.application
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLL_DIRS       = $(PLATFORM_DIR)/arch-arm/usr/lib
@@ -64,12 +64,12 @@ SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
 
-#Цель - Android launcher common
+#Р¦РµР»СЊ - Android launcher common
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.TYPE         := android-jar
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.NAME         := funner.application
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.SOURCE_DIRS  := utils/android_launcher
 
-#Цель - Tabletos launcher
+#Р¦РµР»СЊ - Tabletos launcher
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.NAME          := funner.application
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.SOURCE_DIRS   := utils/tabletos_launcher
@@ -77,13 +77,13 @@ SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.LIBS          := socket EGL GLESv1_CM png free
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
 
-#Цель - Win8 activator
+#Р¦РµР»СЊ - Win8 activator
 SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.TYPE        := application
 SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.NAME        := win8-app-launcher
 SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.SOURCE_DIRS := utils/win8_appx_activator
 SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.LIBS        := wsock32
 
-#Цель - Win8 launcher
+#Р¦РµР»СЊ - Win8 launcher
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.TYPE              := win8-appx
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.NAME              := funner.application
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DIRS       := utils/win8_launcher
@@ -95,7 +95,7 @@ SYSTEMLIB.UTILS.WIN8_LAUNCHER.PUBLISHER         := CN=leny
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.COMPILER_CFLAGS   := -ZW
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.LIBS              := wsock32
 
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 SYSTEMLIB.INFO.TYPE        := doxygen-info
 SYSTEMLIB.INFO.CHM_NAME    := funner.system
 SYSTEMLIB.INFO.SOURCE_DIRS := include

@@ -6,29 +6,29 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t PROPERTY_ARRAY_RESERVE_SIZE = 8; //резервируемое количество свойств
+const size_t PROPERTY_ARRAY_RESERVE_SIZE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
 
 }
 
 /*
-    Описание реализации расположения свойств
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
 */
 
 typedef stl::vector<PropertyDesc> PropertyArray;
 
 struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  PropertyArray properties;  //свойства
-  StringArray   names;       //имена свойств
-  size_t        buffer_size; //размер буфера
-  size_t        hash;        //хэш
-  bool          need_update; //необходимо обновить хэш
-  bool          captured;    //объект захвачен для эксклюзивной записи
+  PropertyArray properties;  //СЃРІРѕР№СЃС‚РІР°
+  StringArray   names;       //РёРјРµРЅР° СЃРІРѕР№СЃС‚РІ
+  size_t        buffer_size; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
+  size_t        hash;        //С…СЌС€
+  bool          need_update; //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ С…СЌС€
+  bool          captured;    //РѕР±СЉРµРєС‚ Р·Р°С…РІР°С‡РµРЅ РґР»СЏ СЌРєСЃРєР»СЋР·РёРІРЅРѕР№ Р·Р°РїРёСЃРё
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : buffer_size (0)
     , hash (0)
@@ -38,7 +38,7 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
     properties.reserve (PROPERTY_ARRAY_RESERVE_SIZE);
   }
 
-///Конструктор копирования
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
   Impl (const Impl& impl)
     : properties (impl.properties)
     , names (impl.names.Clone ())
@@ -50,13 +50,13 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
     Update ();
   }
     
-///Оповещение об обновлении
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё
   void UpdateNotify ()
   {
     need_update = true;    
   }
   
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
   void Update ()
   {
     buffer_size = 0;
@@ -80,7 +80,7 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
     need_update = false;    
   }  
   
-///Захват расположения свойств
+///Р—Р°С…РІР°С‚ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
   static void Capture (PropertyLayout& layout)
   {
     if (layout.impl->captured && layout.impl->use_count () > 1)
@@ -89,7 +89,7 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyLayout::PropertyLayout ()
@@ -121,7 +121,7 @@ PropertyLayout& PropertyLayout::operator = (const PropertyLayout& layout)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t PropertyLayout::Id () const
@@ -130,7 +130,7 @@ size_t PropertyLayout::Id () const
 }
 
 /*
-    Получение объекта оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& PropertyLayout::Trackable () const
@@ -149,7 +149,7 @@ xtl::trackable& get_trackable (const PropertyLayout& layout)
 }
 
 /*
-    Получение числа ссылок на данный объект
+    РџРѕР»СѓС‡РµРЅРёРµ С‡РёСЃР»Р° СЃСЃС‹Р»РѕРє РЅР° РґР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚
 */
 
 size_t PropertyLayout::UseCount () const
@@ -158,7 +158,7 @@ size_t PropertyLayout::UseCount () const
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 PropertyLayout PropertyLayout::Clone () const
@@ -175,7 +175,7 @@ PropertyLayout PropertyLayout::Clone () const
 }
 
 /*
-    Захват расположения свойств (изменения копий данного объекта не влияют на его состояние)
+    Р—Р°С…РІР°С‚ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ (РёР·РјРµРЅРµРЅРёСЏ РєРѕРїРёР№ РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° РЅРµ РІР»РёСЏСЋС‚ РЅР° РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёРµ)
 */
 
 void PropertyLayout::Capture ()
@@ -184,7 +184,7 @@ void PropertyLayout::Capture ()
 }
 
 /*
-    Хэш структуры / размер буфера
+    РҐСЌС€ СЃС‚СЂСѓРєС‚СѓСЂС‹ / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 */
 
 size_t PropertyLayout::Hash () const
@@ -204,7 +204,7 @@ size_t PropertyLayout::BufferSize () const
 }
 
 /*
-    Количество свойств
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t PropertyLayout::Size () const
@@ -213,7 +213,7 @@ size_t PropertyLayout::Size () const
 }
 
 /*
-    Получение свойств
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 const PropertyDesc* PropertyLayout::Properties () const
@@ -282,7 +282,7 @@ size_t PropertyLayout::PropertyElementsCount (const char* property_name) const
 }
 
 /*
-    Добавление и удаление свойств
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t PropertyLayout::AddProperty (const char* name, common::PropertyType type, size_t elements_count)
@@ -366,7 +366,7 @@ void PropertyLayout::Clear ()
 }
 
 /*
-    Модификация свойств
+    РњРѕРґРёС„РёРєР°С†РёСЏ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyLayout::SetPropertyName (const char* property_name, const char* new_name)
@@ -477,7 +477,7 @@ void PropertyLayout::SetPropertyElementsCount (size_t property_index, size_t ele
 }
 
 /*
-    Поиск индекса свойства
+    РџРѕРёСЃРє РёРЅРґРµРєСЃР° СЃРІРѕР№СЃС‚РІР°
 */
 
 int PropertyLayout::IndexOf (const char* name) const
@@ -504,7 +504,7 @@ bool PropertyLayout::IsPresent (const char* name) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyLayout::Swap (PropertyLayout& layout)

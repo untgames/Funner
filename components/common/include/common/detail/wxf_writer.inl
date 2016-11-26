@@ -1,5 +1,5 @@
 /*
-    Работа с фреймами
+    Р Р°Р±РѕС‚Р° СЃ С„СЂРµР№РјР°РјРё
 */
 
 template <class T>
@@ -29,7 +29,7 @@ inline void WxfWriter::BeginFrame (const char* frame_tag, const T& value, const 
 }
 
 /*
-    Сериализация атрибутов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class T>
@@ -65,7 +65,7 @@ inline void WxfWriter::Write (const char* tag, const T& value, const char* forma
 }
 
 /*
-    Сериализация диапазонов атрибутов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ РґРёР°РїР°Р·РѕРЅРѕРІ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class FwdIter>
@@ -121,7 +121,7 @@ inline void WxfWriter::Write (const char* tag, const xtl::iterator_range<FwdIter
 }
 
 /*
-    Перегрузки вывода различных типов атрибутов
+    РџРµСЂРµРіСЂСѓР·РєРё РІС‹РІРѕРґР° СЂР°Р·Р»РёС‡РЅС‹С… С‚РёРїРѕРІ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class T>

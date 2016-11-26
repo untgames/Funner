@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Создание и уничтожение экранной клавиатуры
+    РЎРѕР·РґР°РЅРёРµ Рё СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЌРєСЂР°РЅРЅРѕР№ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 struct screen_keyboard_handle
@@ -30,7 +30,7 @@ void DefaultScreenKeyboardManager::DestroyScreenKeyboard (screen_keyboard_t hand
 }
 
 /*
-    Показ и скрытие клавиатуры
+    РџРѕРєР°Р· Рё СЃРєСЂС‹С‚РёРµ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 void DefaultScreenKeyboardManager::ShowScreenKeyboard (screen_keyboard_t)
@@ -42,7 +42,7 @@ void DefaultScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t)
 }
 
 /*
-    Проверка поддержки клавиатуры
+    РџСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 bool DefaultScreenKeyboardManager::IsScreenKeyboardSupported (ScreenKeyboardType type)

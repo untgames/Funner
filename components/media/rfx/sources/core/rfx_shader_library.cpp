@@ -7,13 +7,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* DEFAULT_SHADER_LOG = "media.rfx.shader"; //протокол по умолчанию для загрузчика шейдеров
+const char* DEFAULT_SHADER_LOG = "media.rfx.shader"; //РїСЂРѕС‚РѕРєРѕР» РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ Р·Р°РіСЂСѓР·С‡РёРєР° С€РµР№РґРµСЂРѕРІ
 
 /*
-    Описание шейдера
+    РћРїРёСЃР°РЅРёРµ С€РµР№РґРµСЂР°
 */
 
 struct ShaderDesc
@@ -31,14 +31,14 @@ struct ShaderDesc
 }
 
 /*
-    Описание реализации библиотеки материалов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 typedef stl::hash_multimap<stl::hash_key<const char*>, ShaderDesc> ShaderMap;
 
 struct ShaderLibrary::Impl
 {
-  ShaderMap shaders; //библиотека материалов
+  ShaderMap shaders; //Р±РёР±Р»РёРѕС‚РµРєР° РјР°С‚РµСЂРёР°Р»РѕРІ
   
   Impl ()
   {
@@ -52,7 +52,7 @@ struct ShaderLibrary::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderLibrary::ShaderLibrary ()
@@ -70,7 +70,7 @@ ShaderLibrary::~ShaderLibrary ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ShaderLibrary& ShaderLibrary::operator = (const ShaderLibrary& library)
@@ -80,7 +80,7 @@ ShaderLibrary& ShaderLibrary::operator = (const ShaderLibrary& library)
 }
 
 /*
-    Количество шейдеров / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ С€РµР№РґРµСЂРѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 size_t ShaderLibrary::Size () const
@@ -94,13 +94,13 @@ bool ShaderLibrary::IsEmpty () const
 }
 
 /*
-    Получение итератора
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 namespace
 {
 
-//селектор материала
+//СЃРµР»РµРєС‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
 template <class T>
 struct Shader_selector
 {
@@ -120,7 +120,7 @@ ShaderLibrary::ConstIterator ShaderLibrary::CreateIterator () const
 }
 
 /*
-    Получение идентификатора материала
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* ShaderLibrary::ItemId (const ConstIterator& i) const
@@ -134,7 +134,7 @@ const char* ShaderLibrary::ItemId (const ConstIterator& i) const
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 Shader* ShaderLibrary::Find (const char* name, const char* profile)
@@ -160,7 +160,7 @@ const Shader* ShaderLibrary::Find (const char* name, const char* profile) const
 }
 
 /*
-    Присоединение материалов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void ShaderLibrary::Attach (const char* id, const Shader& shader)
@@ -217,7 +217,7 @@ void ShaderLibrary::DetachAll ()
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void ShaderLibrary::Clear ()
@@ -226,7 +226,7 @@ void ShaderLibrary::Clear ()
 }
 
 /*
-    Загрузка
+    Р—Р°РіСЂСѓР·РєР°
 */
 
 void ShaderLibrary::Load (const char* file_mask, const char* name_prefix, const LogHandler& log_handler)
@@ -309,7 +309,7 @@ void ShaderLibrary::Load (const char* file_mask, const char* name_prefix)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ShaderLibrary::Swap (ShaderLibrary& library)

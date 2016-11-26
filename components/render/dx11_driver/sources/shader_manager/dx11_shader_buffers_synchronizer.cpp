@@ -4,13 +4,13 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t CHUNK_RESERVE_SIZE = 8; //резервируемое количество блоков
+const size_t CHUNK_RESERVE_SIZE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р»РѕРєРѕРІ
 
 /*
-    Предикат сравнения двух блоков
+    РџСЂРµРґРёРєР°С‚ СЃСЂР°РІРЅРµРЅРёСЏ РґРІСѓС… Р±Р»РѕРєРѕРІ
 */
 
 inline bool ShaderBuffersSynchronizer::Chunk::operator < (const Chunk& another) const
@@ -75,7 +75,7 @@ void merge (const ShaderBuffersSynchronizer::Chunk* first_chunk, size_t count, s
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout)
@@ -83,26 +83,26 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
 {
   try
   {
-      //резервирование количества блоков
+      //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° Р±Р»РѕРєРѕРІ
 
     ChunkArray tmp_chunks;
 
     tmp_chunks.reserve (dst_layout.GetParamsCount ());
 
-      //обход параметров
+      //РѕР±С…РѕРґ РїР°СЂР°РјРµС‚СЂРѕРІ
 
     const ShaderParameter* dst_param = dst_layout.GetParams ();
 
     for (size_t i=0, count=dst_layout.GetParamsCount (); i<count; i++, dst_param++)
     {
-        //поиск параметра в исходном лэйауте
+        //РїРѕРёСЃРє РїР°СЂР°РјРµС‚СЂР° РІ РёСЃС…РѕРґРЅРѕРј Р»СЌР№Р°СѓС‚Рµ
 
       const ProgramParameter* src_param = src_layout.FindParameter (dst_param->name);
 
       if (!src_param)
         throw xtl::format_operation_exception ("", "Can't find required shader parameter '%s' in program parameters layout", dst_param->name);
 
-        //проверка возможности использования параметра
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂР°
 
       if (src_param->type != dst_param->type)
          throw xtl::format_operation_exception ("", "Shader parameter '%s' can't be used from program parameters layout. Types mistmatch: required %s but found %s",
@@ -146,7 +146,7 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
       if (src_param->slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
         throw xtl::format_operation_exception ("", "Shader parameter '%s' has wrong constant buffer slot index %u", dst_param->name, src_param->slot);
 
-        //создание блока
+        //СЃРѕР·РґР°РЅРёРµ Р±Р»РѕРєР°
       
       Chunk chunk;
 
@@ -158,7 +158,7 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
 
       tmp_chunks.push_back (chunk);
 
-        //обновление параметров слота
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃР»РѕС‚Р°
 
       Slot& slot = slots [src_param->slot];
 
@@ -169,11 +169,11 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
         min_dst_buffer_size = dst_param->offset + param_size;
     }
 
-      //упорядочивание блоков по источнику
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ Р±Р»РѕРєРѕРІ РїРѕ РёСЃС‚РѕС‡РЅРёРєСѓ
 
     stl::sort (tmp_chunks.begin (), tmp_chunks.end ());
 
-      //оптимизация блоков
+      //РѕРїС‚РёРјРёР·Р°С†РёСЏ Р±Р»РѕРєРѕРІ
 
     chunks.reserve (CHUNK_RESERVE_SIZE);
 
@@ -193,7 +193,7 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
     if (first_chunk)
       merge (first_chunk, tmp_chunks.end () - first_chunk, chunks);
 
-      //обновление слотов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃР»РѕС‚РѕРІ
 
     size_t current_slot = DEVICE_CONSTANT_BUFFER_SLOTS_COUNT;
 

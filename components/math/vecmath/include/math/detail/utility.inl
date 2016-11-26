@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Преобразования: кватернион - матрица, осевой угол, углы Эйлера
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ: РєРІР°С‚РµСЂРЅРёРѕРЅ - РјР°С‚СЂРёС†Р°, РѕСЃРµРІРѕР№ СѓРіРѕР», СѓРіР»С‹ Р­Р№Р»РµСЂР°
 */
 
 struct quat_to_matrix {
@@ -144,7 +144,7 @@ struct euler_angles_to_quat {
 };
 
 /*
-    Аффинные преобразования
+    РђС„С„РёРЅРЅС‹Рµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 struct matrix_translate {
@@ -238,7 +238,7 @@ struct matrix_lookat {
 }
 
 /*
-    Преобразования: кватернион - матрица,  осевой угол,  углы Эйлера
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ: РєРІР°С‚РµСЂРЅРёРѕРЅ - РјР°С‚СЂРёС†Р°,  РѕСЃРµРІРѕР№ СѓРіРѕР»,  СѓРіР»С‹ Р­Р№Р»РµСЂР°
 */
 
 template <class T>
@@ -320,7 +320,7 @@ void to_euler_angles (const quat<T>& q, angle<T>& pitch, angle<T>& yaw, angle<T>
 }
 
 /*
-    Аффинные преобразования
+    РђС„С„РёРЅРЅС‹Рµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 template <class T>
@@ -348,7 +348,7 @@ matrix<T, 4> lookat (const vector<T, 3>& pos, const vector<T, 3>& center, const 
 }
 
 /*
-    Определение угла между векторами
+    РћРїСЂРµРґРµР»РµРЅРёРµ СѓРіР»Р° РјРµР¶РґСѓ РІРµРєС‚РѕСЂР°РјРё
 */
 
 template <class T, unsigned int Size>
@@ -370,31 +370,31 @@ angle<T> find_angle (const vector<T, Size>& a, const vector<T, Size>& b, const T
 }
 
 /*
-    Композиция аффинных преобразований
+    РљРѕРјРїРѕР·РёС†РёСЏ Р°С„С„РёРЅРЅС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 */
 
-//композиция преобразований
+//РєРѕРјРїРѕР·РёС†РёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 inline void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
 {
   tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
 }
 
-//декомпозиция аффинных преобразований из матрицы преобразований
+//РґРµРєРѕРјРїРѕР·РёС†РёСЏ Р°С„С„РёРЅРЅС‹С… РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ РёР· РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 inline void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::quatf& rotation, math::vec3f& scale)
 {
-  math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
+  math::mat4f local_matrix (transpose (matrix)); //РєРѕРїРёСЏ РјР°С‚СЂРёС†С‹ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 
-  //выделение преобразования переноса  
+  //РІС‹РґРµР»РµРЅРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РїРµСЂРµРЅРѕСЃР° В 
   for (unsigned short i = 0; i < 3; i++)
   {
     position [i] = local_matrix [3][i];
     local_matrix [3][i] = 0;
   }
 
-  //выделение преобразования масштабирования
+  //РІС‹РґРµР»РµРЅРёРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
   for (unsigned short i = 0; i < 3; i++)
   {
-    //определение длины вектора-столбца преобразований
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ РґР»РёРЅС‹ РІРµРєС‚РѕСЂР°-СЃС‚РѕР»Р±С†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
     float square_length = 0;
 
     for (unsigned short j = 0; j < 3; j++)
@@ -402,7 +402,7 @@ inline void affine_decompose (const math::mat4f& matrix, math::vec3f& position, 
 
     scale [i] = sqrt (square_length);
 
-    //нормирование
+    //РЅРѕСЂРјРёСЂРѕРІР°РЅРёРµ
     for (unsigned short j = 0; j < 3; j++)
       local_matrix [i][j] /= scale [i];
   }

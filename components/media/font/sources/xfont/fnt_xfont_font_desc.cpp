@@ -20,14 +20,14 @@ namespace xfont
 {
 
 /*
-   Шрифт
+   РЁСЂРёС„С‚
 */
 
 struct XFontFontDesc::Impl
 {
-  FontBuilder font; //шрифт
+  FontBuilder font; //С€СЂРёС„С‚
 
-  ///Конструктор / деструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* file_name)
   {
     try
@@ -114,7 +114,7 @@ struct XFontFontDesc::Impl
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XFontFontDesc::XFontFontDesc (const char* file_name)
@@ -127,7 +127,7 @@ XFontFontDesc::~XFontFontDesc ()
 }
 
 /*
-   Количество шрифтов в наборе
+   РљРѕР»РёС‡РµСЃС‚РІРѕ С€СЂРёС„С‚РѕРІ РІ РЅР°Р±РѕСЂРµ
 */
 
 unsigned int XFontFontDesc::FontsCount ()
@@ -136,7 +136,7 @@ unsigned int XFontFontDesc::FontsCount ()
 }
 
 /*
-   Имя гарнитуры / имя семейства / имя стиля
+   РРјСЏ РіР°СЂРЅРёС‚СѓСЂС‹ / РёРјСЏ СЃРµРјРµР№СЃС‚РІР° / РёРјСЏ СЃС‚РёР»СЏ
 */
 
 const char* XFontFontDesc::FamilyName (unsigned int index)
@@ -156,7 +156,7 @@ const char* XFontFontDesc::StyleName (unsigned int index)
 }
 
 /*
-   Создание шрифта
+   РЎРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 */
 
 Font XFontFontDesc::CreateFont (unsigned int index, const FontCreationParams& params)

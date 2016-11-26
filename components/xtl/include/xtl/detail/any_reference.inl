@@ -1,5 +1,5 @@
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 inline any_reference::any_reference ()
@@ -16,7 +16,7 @@ inline any_reference::any_reference (T& referenced_object)
 }
 
 /*
-    Тип и данные
+    РўРёРї Рё РґР°РЅРЅС‹Рµ
 */
 
 inline const std::type_info& any_reference::type () const
@@ -34,7 +34,7 @@ inline T* any_reference::content () const
 }
 
 /*
-    Приведение к указанному типу (исключение в случае неудачи)
+    РџСЂРёРІРµРґРµРЅРёРµ Рє СѓРєР°Р·Р°РЅРЅРѕРјСѓ С‚РёРїСѓ (РёСЃРєР»СЋС‡РµРЅРёРµ РІ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё)
 */
 
 template <class T>
@@ -49,7 +49,7 @@ inline T& any_reference::cast () const
 }
 
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class T>

@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Получение адреса объекта
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° РѕР±СЉРµРєС‚Р°
 */
 
 template <class T> T* addressof (T& object)
@@ -13,11 +13,11 @@ template <class T> T* addressof (T& object)
 }
 
 /*
-    Обёртка над ссылкой
+    РћР±С‘СЂС‚РєР° РЅР°Рґ СЃСЃС‹Р»РєРѕР№
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -38,7 +38,7 @@ inline T& reference_wrapper<T>::get () const
 }
 
 /*
-    Создание обёрток над ссылками
+    РЎРѕР·РґР°РЅРёРµ РѕР±С‘СЂС‚РѕРє РЅР°Рґ СЃСЃС‹Р»РєР°РјРё
 */
 
 template <class T>
@@ -66,7 +66,7 @@ inline reference_wrapper<const T> cref (reference_wrapper<T> rw)
 }
 
 /*
-    Очистка reference_wrapper
+    РћС‡РёСЃС‚РєР° reference_wrapper
 */
 
 template <class T> struct remove_reference_wrapper                                       { typedef T type; };

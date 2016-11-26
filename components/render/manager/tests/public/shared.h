@@ -25,7 +25,7 @@
 using namespace common;
 using namespace render::manager;
 
-//константы
+//СЉСЋСЌС‘Р„СЂСЌР„в€љ
 const size_t WINDOW_WIDTH  = 800;
 const size_t WINDOW_HEIGHT = 600;
 
@@ -35,7 +35,7 @@ static void log_print (const char* log_name, const char* message)
   fflush (stdout);
 }
 
-//протокол теста
+//СЏРЃСЋР„СЋСЉСЋС‹ Р„С…С‘Р„СЂ
 struct TestLogFilter
 {
   stl::auto_ptr<common::LogFilter> log_filter;
@@ -47,11 +47,11 @@ struct TestLogFilter
   }
 };
 
-///’естовое приложение
+///РўС…С‘Р„СЋС‚СЋС… СЏРЃС€С‹СЋС†С…СЌС€С…
 class Test: private xtl::trackable, private TestLogFilter
 {
   public:
-///Љонструктор
+///РљСЋСЌС‘Р„РЃС”СЉР„СЋРЃ
     Test (const wchar_t* title, bool logging = true)
       : TestLogFilter (logging)
       , window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -62,25 +62,25 @@ class Test: private xtl::trackable, private TestLogFilter
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnWindowClose, this)));
     }
     
-///Џолучение менеджера рендеринга
+///РџСЋС‹С”СћС…СЌС€С… СЊС…СЌС…С„С†С…РЃСЂ РЃС…СЌС„С…РЃС€СЌСѓСЂ
     render::manager::RenderManager RenderManager ()
     {
       return render_manager;
     }
     
-///Џолучение окна
+///РџСЋС‹С”СћС…СЌС€С… СЋСЉСЌСЂ
     render::manager::Window Window ()
     {
       return render_window;
     }
     
-///Џоказ окна
+///РџСЋСЉСЂС‡ СЋСЉСЌСЂ
     void ShowWindow ()
     {
       window.Show ();
     }    
     
-///ѓлавный цикл
+///Р“С‹СЂС‚СЌв€љС‰ РЋС€СЉС‹
     int Run ()
     {
       window.Show ();    
@@ -90,7 +90,7 @@ class Test: private xtl::trackable, private TestLogFilter
       return syslib::Application::GetExitCode ();
     }
     
-///’ест изменениЯ стилЯ окна
+///РўС…С‘Р„ С€С‡СЊС…СЌС…СЌС€в–Ђ С‘Р„С€С‹в–Ђ СЋСЉСЌСЂ
     void TestChangeWindowStyle ()
     {
       window.SetStyle (syslib::WindowStyle_PopUp);
@@ -98,7 +98,7 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
   private:
-///‘оздание окна рендеринга
+///РЎСЋС‡С„СЂСЌС€С… СЋСЉСЌСЂ РЃС…СЌС„С…РЃС€СЌСѓСЂ
     render::manager::Window CreateRenderWindow ()
     {
       connect_tracker (render_manager.RegisterWindowEventHandler (RenderManagerWindowEvent_OnAdded, xtl::bind (&Test::OnWindowAdded, this, _2)));
@@ -112,7 +112,7 @@ class Test: private xtl::trackable, private TestLogFilter
       return render_manager.CreateWindow (window, properties);
     }
     
-///Ћбработка событиЯ добавлениЯ окна
+///РћСЃРЃСЂСЃСЋР„СЉСЂ С‘СЋСЃв€љР„С€в–Ђ С„СЋСЃСЂС‚С‹С…СЌС€в–Ђ СЋСЉСЌСЂ
     void OnWindowAdded (render::manager::Window& window)
     {
       printf ("window added\n");
@@ -120,25 +120,25 @@ class Test: private xtl::trackable, private TestLogFilter
       connect_tracker (window.RegisterEventHandler (WindowEvent_OnResize, xtl::bind (&Test::OnWindowResize, this, _1)));
     }
     
-///Ћбработка событиЯ удалениЯ окна
+///РћСЃРЃСЂСЃСЋР„СЉСЂ С‘СЋСЃв€љР„С€в–Ђ С”С„СЂС‹С…СЌС€в–Ђ СЋСЉСЌСЂ
     void OnWindowRemoved (render::manager::Window& window)
     {
       printf ("window removed\n");
     }
     
-///Ћбработка событиЯ изменениЯ размеров окна
+///РћСЃРЃСЂСЃСЋР„СЉСЂ С‘СЋСЃв€љР„С€в–Ђ С€С‡СЊС…СЌС…СЌС€в–Ђ РЃСЂС‡СЊС…РЃСЋС‚ СЋСЉСЌСЂ
     void OnWindowResize (render::manager::Window& window)
     {
       printf ("window resize\n");
     }
     
-///Ћбработка событиЯ закрытиЯ окна
+///РћСЃРЃСЂСЃСЋР„СЉСЂ С‘СЋСЃв€љР„С€в–Ђ С‡СЂСЉРЃв€љР„С€в–Ђ СЋСЉСЌСЂ
     void OnWindowClose ()
     {
       syslib::Application::Exit (0);
     }
     
-///Ћбработка
+///РћСЃРЃСЂСЃСЋР„СЉСЂ
   
   private:
     syslib::Window                  window;

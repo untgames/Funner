@@ -4,7 +4,7 @@ using namespace media;
 using namespace media::animation;
 
 /*
-   Канал анимации
+   РљР°РЅР°Р» Р°РЅРёРјР°С†РёРё
 */
 
 typedef xtl::intrusive_ptr<animation::detail::IEvaluatorBase> EvaluatorBasePtr;
@@ -23,7 +23,7 @@ struct Channel::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Channel::Channel ()
@@ -55,7 +55,7 @@ Channel& Channel::operator = (const Channel& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Channel Channel::Clone () const
@@ -64,7 +64,7 @@ Channel Channel::Clone () const
 }
     
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Channel::Id () const
@@ -73,7 +73,7 @@ size_t Channel::Id () const
 }
 
 /*
-    Минимальное / максимальное время
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ / РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
 */
 
 float Channel::MinTime () const
@@ -93,7 +93,7 @@ float Channel::MaxTime () const
 }
 
 /*
-    Минимальное / максимальное неотсеченное время (-INF/INF в случае открытого диапазона)
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ / РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ (-INF/INF РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РґРёР°РїР°Р·РѕРЅР°)
 */
 
 float Channel::MinUnwrappedTime () const
@@ -113,7 +113,7 @@ float Channel::MaxUnwrappedTime () const
 }
 
 /*
-    Имя анимируемого параметра
+    РРјСЏ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 */
 
 const char* Channel::ParameterName () const
@@ -130,7 +130,7 @@ void Channel::SetParameterName (const char* name)
 }
 
 /*
-    Тип трека / тип значения
+    РўРёРї С‚СЂРµРєР° / С‚РёРї Р·РЅР°С‡РµРЅРёСЏ
 */
 
 const std::type_info& Channel::TrackType () const
@@ -144,7 +144,7 @@ const std::type_info& Channel::ValueType () const
 }
 
 /*
-    Установка трека
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚СЂРµРєР°
 */
 
 void Channel::SetTrackCore (animation::detail::IEvaluatorBase* in_track)
@@ -173,7 +173,7 @@ bool Channel::HasTrack () const
 }
 
 /*
-    Выброс исключения несоответствия типа
+    Р’С‹Р±СЂРѕСЃ РёСЃРєР»СЋС‡РµРЅРёСЏ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ С‚РёРїР°
 */
 
 void Channel::RaiseTypeError (const char* source, const std::type_info& type) const
@@ -182,7 +182,7 @@ void Channel::RaiseTypeError (const char* source, const std::type_info& type) co
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Channel::Swap (Channel& source)

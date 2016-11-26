@@ -9,7 +9,7 @@ namespace media
 typedef xtl::com_ptr<ISoundInputStream> SoundInputStreamPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание реализации звукового сэмпла
+///РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р·РІСѓРєРѕРІРѕРіРѕ СЃСЌРјРїР»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct SoundSample::Impl : public xtl::reference_counter
 {
@@ -27,14 +27,14 @@ struct SoundSample::Impl : public xtl::reference_counter
     }
 
     stl::string         str_name;     //SoundSample name
-    SoundSampleInfo     info;         //Информация о файле
-    SoundInputStreamPtr input_stream; //Кодек
+    SoundSampleInfo     info;         //РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»Рµ
+    SoundInputStreamPtr input_stream; //РљРѕРґРµРє
 };
 
 }
 
 /*
-   Конструкторы / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SoundSample::SoundSample (Impl* in_impl)
@@ -98,7 +98,7 @@ SoundSample::~SoundSample ()
 }
 
 /*
-   Присваивание
+   РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SoundSample& SoundSample::operator = (const SoundSample& source)
@@ -109,7 +109,7 @@ SoundSample& SoundSample::operator = (const SoundSample& source)
 }
 
 /*
-   Клонирование
+   РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 SoundSample SoundSample::Clone () const
@@ -126,7 +126,7 @@ SoundSample SoundSample::Clone () const
 }
 
 /*
-   Загрузка
+   Р—Р°РіСЂСѓР·РєР°
 */
 
 void SoundSample::Load (const char* file_name)
@@ -135,7 +135,7 @@ void SoundSample::Load (const char* file_name)
 }
 
 /*
-   Имя сэмпла
+   РРјСЏ СЃСЌРјРїР»Р°
 */
 
 const char* SoundSample::Name () const
@@ -149,7 +149,7 @@ void SoundSample::Rename (const char* new_name)
 }
 
 /*
-   Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
+   Р¤СѓРЅРєС†РёРё СЂР°СЃС‡С‘С‚Р° РѕРґРЅРёС… С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє С‡РµСЂРµР· РґСЂСѓРіРёРµ (РІСЃРµРіРґР° РїСЂРѕРёСЃС…РѕРґРёС‚ РѕРєСЂСѓРіР»РµРЅРёРµ РІ РјРµРЅСЊС€СѓСЋ СЃС‚РѕСЂРѕРЅСѓ)
 */
 
 unsigned int SoundSample::SamplesToBytes (unsigned int sample_count) const
@@ -179,7 +179,7 @@ unsigned int SoundSample::SecondsToSamples (double second_count) const
 }
 
 /*
-   Характеристики
+   РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё
 */
 
 unsigned int SoundSample::SamplesCount () const
@@ -208,7 +208,7 @@ unsigned char SoundSample::BitsPerSample () const
 }
 
 /*
-   Работа с данными
+   Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё
 */
 
 unsigned int SoundSample::Read (unsigned int first_sample, unsigned int samples_count, void* data)
@@ -220,7 +220,7 @@ unsigned int SoundSample::Read (unsigned int first_sample, unsigned int samples_
 }
 
 /*
-   Сохранение
+   РЎРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void SoundSample::Save (const char* file_name) const
@@ -242,7 +242,7 @@ void SoundSample::Save (const char* file_name) const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void SoundSample::Swap (SoundSample& sound)

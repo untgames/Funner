@@ -9,22 +9,22 @@ using namespace script;
 */
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const size_t OVERLOADS_RESERVE_SIZE = 2; //резервируемое число перегрузок
+const size_t OVERLOADS_RESERVE_SIZE = 2; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РїРµСЂРµРіСЂСѓР·РѕРє
 
 /*
-    Перегрузка
+    РџРµСЂРµРіСЂСѓР·РєР°
 */
 
 struct Overload: public xtl::reference_counter
 {
-  InvokerSignature        signature; //сигнатура
-  stl::auto_ptr<IInvoker> invoker;   //шлюз
+  InvokerSignature        signature; //СЃРёРіРЅР°С‚СѓСЂР°
+  stl::auto_ptr<IInvoker> invoker;   //С€Р»СЋР·
   
   Overload (IInvoker* in_invoker)
   {
@@ -39,7 +39,7 @@ struct Overload: public xtl::reference_counter
 }
 
 /*
-    Описание реализации шлюза
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С€Р»СЋР·Р°
 */
 
 typedef xtl::intrusive_ptr<Overload> OverloadPtr;
@@ -56,7 +56,7 @@ struct Invoker::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Invoker::Invoker ()
@@ -111,7 +111,7 @@ Invoker& Invoker::operator = (const Invoker& invoker)
 }
 
 /*
-    Перегрузки
+    РџРµСЂРµРіСЂСѓР·РєРё
 */
 
 size_t Invoker::OverloadsCount () const
@@ -136,7 +136,7 @@ IInvoker* Invoker::OverloadInvoker (size_t index) const
 }
 
 /*
-    Добавление и удаление перегрузок
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РїРµСЂРµРіСЂСѓР·РѕРє
 */
 
 size_t Invoker::AddOverload (IInvoker* invoker)
@@ -180,7 +180,7 @@ void Invoker::RemoveAllOverloads ()
 }
 
 /*
-    Вызов
+    Р’С‹Р·РѕРІ
 */
 
 size_t Invoker::operator () (IStack& stack) const
@@ -199,24 +199,24 @@ size_t Invoker::operator () (IStack& stack) const
         {
           Overload& overload = **iter;
 
-            //попытка вызова шлюза
+            //РїРѕРїС‹С‚РєР° РІС‹Р·РѕРІР° С€Р»СЋР·Р°
 
           try
           {
-            return (*overload.invoker)(stack); //если шлюз вызван успешно, то остальные перегрузки проверять не нужно
+            return (*overload.invoker)(stack); //РµСЃР»Рё С€Р»СЋР· РІС‹Р·РІР°РЅ СѓСЃРїРµС€РЅРѕ, С‚Рѕ РѕСЃС‚Р°Р»СЊРЅС‹Рµ РїРµСЂРµРіСЂСѓР·РєРё РїСЂРѕРІРµСЂСЏС‚СЊ РЅРµ РЅСѓР¶РЅРѕ
           }
           catch (script::ArgumentException&)
           {
-            //поглощение исключений приведения типов аргументов
+            //РїРѕРіР»РѕС‰РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№ РїСЂРёРІРµРґРµРЅРёСЏ С‚РёРїРѕРІ Р°СЂРіСѓРјРµРЅС‚РѕРІ
           }
         }
 
-          //если шлюз не найден, то генерируем исключение о недопустимой перегрузке
+          //РµСЃР»Рё С€Р»СЋР· РЅРµ РЅР°Р№РґРµРЅ, С‚Рѕ РіРµРЅРµСЂРёСЂСѓРµРј РёСЃРєР»СЋС‡РµРЅРёРµ Рѕ РЅРµРґРѕРїСѓСЃС‚РёРјРѕР№ РїРµСЂРµРіСЂСѓР·РєРµ
           
         size_t arguments_count = stack.Size ();
 
         if (arguments_count)
-          arguments_count--; //удаление имени функции из стека
+          arguments_count--; //СѓРґР°Р»РµРЅРёРµ РёРјРµРЅРё С„СѓРЅРєС†РёРё РёР· СЃС‚РµРєР°
           
         stl::string overloads_string;
         
@@ -260,7 +260,7 @@ size_t Invoker::operator () (size_t overload_index, IStack& stack) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Invoker::Swap (Invoker& invoker)
@@ -296,7 +296,7 @@ InvokerSignature SimpleInvoker::GetSignature ()
 
 /*
 ===================================================================================================
-    Создание перегруженного шлюза
+    РЎРѕР·РґР°РЅРёРµ РїРµСЂРµРіСЂСѓР¶РµРЅРЅРѕРіРѕ С€Р»СЋР·Р°
 ===================================================================================================
 */
 

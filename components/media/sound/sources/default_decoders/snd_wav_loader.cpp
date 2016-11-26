@@ -102,13 +102,13 @@ ISoundInputStream* default_wav_loader (const char* file_name, SoundSampleInfo& s
 }
 
 /*
-   Љ®¬Ї®­Ґ­в а Ў®вл б §ўгЄ ¬Ё
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂР°Р±РѕС‚С‹ СЃ Р·РІСѓРєР°РјРё
 */
 
 class WavLoaderComponent
 {
   public:
-    //§ Јаг§Є  Є®¬Ї®­Ґ­в 
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     WavLoaderComponent () 
     {
       SoundSampleManager::RegisterLoader ("wav", &default_wav_loader);

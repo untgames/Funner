@@ -1,5 +1,5 @@
 /*
-    Проверка принадлежности типа к базовым категориям типов
+    РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє Р±Р°Р·РѕРІС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 */
 
 namespace detail
@@ -12,9 +12,9 @@ struct is_array_tag;
 struct is_function_tag;
 struct is_member_function_pointer_tag;
 
-//вспомогательный класс для проверки свойства типа без учёта cv-модификаторов
+//РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РґР»СЏ РїСЂРѕРІРµСЂРєРё СЃРІРѕР№СЃС‚РІР° С‚РёРїР° Р±РµР· СѓС‡С‘С‚Р° cv-РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРІ
 template <class Tag, class T>
-struct type_trait_checker: public false_type {}; //если тип неизвестен - то результат проверки свойства - ложь
+struct type_trait_checker: public false_type {}; //РµСЃР»Рё С‚РёРї РЅРµРёР·РІРµСЃС‚РµРЅ - С‚Рѕ СЂРµР·СѓР»СЊС‚Р°С‚ РїСЂРѕРІРµСЂРєРё СЃРІРѕР№СЃС‚РІР° - Р»РѕР¶СЊ
 
 template <class Tag, class T>
 struct cv_type_trait_checker: public type_trait_checker<Tag, T> {};
@@ -28,10 +28,10 @@ struct cv_type_trait_checker<Tag, volatile T>: public type_trait_checker<Tag, T>
 template <class Tag, class T>
 struct cv_type_trait_checker<Tag, const volatile T>: public type_trait_checker<Tag, T> {};
 
-//специализации для проверки является ли T void-типом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РїСЂРѕРІРµСЂРєРё СЏРІР»СЏРµС‚СЃСЏ Р»Рё T void-С‚РёРїРѕРј
 template <> struct type_trait_checker<is_void_tag, void>: public true_type {};
 
-//специализации для проверки является ли T целочисленным типом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РїСЂРѕРІРµСЂРєРё СЏРІР»СЏРµС‚СЃСЏ Р»Рё T С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Рј С‚РёРїРѕРј
 template <> struct type_trait_checker<is_integral_tag, unsigned char>:  public true_type {};
 template <> struct type_trait_checker<is_integral_tag, unsigned short>: public true_type {};
 template <> struct type_trait_checker<is_integral_tag, unsigned int>:   public true_type {};
@@ -54,12 +54,12 @@ template <> struct type_trait_checker<is_integral_tag, signed __int64>: public t
 
 #endif
 
-//специализации для проверки является ли T вещественным типом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РїСЂРѕРІРµСЂРєРё СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РІРµС‰РµСЃС‚РІРµРЅРЅС‹Рј С‚РёРїРѕРј
 template <> struct type_trait_checker<is_floating_point_tag, float>:       public true_type {};
 template <> struct type_trait_checker<is_floating_point_tag, double>:      public true_type {};
 template <> struct type_trait_checker<is_floating_point_tag, long double>: public true_type {};
 
-//специализации для проверки является ли T массивом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РїСЂРѕРІРµСЂРєРё СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РјР°СЃСЃРёРІРѕРј
 template <class T, size_t N> struct type_trait_checker<is_array_tag, T [N]>:                public true_type {};
 template <class T, size_t N> struct type_trait_checker<is_array_tag, T const [N]>:          public true_type {};
 template <class T, size_t N> struct type_trait_checker<is_array_tag, T volatile [N]>:       public true_type {};
@@ -77,13 +77,13 @@ template <class T> struct is_floating_point: public detail::cv_type_trait_checke
 template <class T> struct is_array:          public detail::cv_type_trait_checker<detail::is_array_tag, T> {};
 
 /*
-    Проверка является ли T объединением
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РѕР±СЉРµРґРёРЅРµРЅРёРµРј
 */
 
 template <class T> struct is_union: public detail::type_traits_intrinsics::is_union<T> {};
       
 /*
-    Проверка наличия знака
+    РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·РЅР°РєР°
 */
 
 namespace detail
@@ -111,14 +111,14 @@ template <class T> struct is_unsigned_helper<T, false>: public false_type {};
 
 }
 
-//проверка является ли T знаковым типом
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T Р·РЅР°РєРѕРІС‹Рј С‚РёРїРѕРј
 template <class T> struct is_signed: public detail::is_signed_helper<T> {};
 
-//проверка является ли T беззнаковым типом
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T Р±РµР·Р·РЅР°РєРѕРІС‹Рј С‚РёРїРѕРј
 template <class T> struct is_unsigned: public detail::is_unsigned_helper<T> {};
 
 /*
-    Проверка является ли T POD-типом
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T POD-С‚РёРїРѕРј
 */
 
 template <class T> struct is_pod:
@@ -127,20 +127,20 @@ template <class T> struct is_pod:
 template <class T, size_t N> struct is_pod<T [N]>: is_pod<T> {};
 
 /*
-    Проверка является ли T пустым типом
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РїСѓСЃС‚С‹Рј С‚РёРїРѕРј
 */
 
 template <class T> struct is_empty: public detail::type_traits_intrinsics::is_empty<T> {};
 
 /*
-    Проверка является ли T указателем на член класса
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С‡Р»РµРЅ РєР»Р°СЃСЃР°
 */
 
 template <class T>          struct is_member_pointer:         public is_member_function_pointer<T> {};
 template <class T, class U> struct is_member_pointer<U T::*>: public true_type {};
 
 /*
-    Проверка является ли T указателем на функцию/указателем на функцию-член класса/указателем на поле класса
+    РџСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С„СѓРЅРєС†РёСЋ/СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР°/СѓРєР°Р·Р°С‚РµР»РµРј РЅР° РїРѕР»Рµ РєР»Р°СЃСЃР°
 */
 
 namespace detail
@@ -158,76 +158,76 @@ template <class T> struct is_member_object_pointer:
          public bool_constant<is_member_pointer<T>::value && !is_member_function_pointer<T>::value> {};
 
 /*
-    Проверка принадлежности типа к объединённым категориям типов
+    РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє РѕР±СЉРµРґРёРЅС‘РЅРЅС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 */
 
-//проверка является ли T арифметическим типом 
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРј С‚РёРїРѕРј 
 template <class T> struct is_arithmetic: bool_constant<is_integral<T>::value || is_floating_point<T>::value> {};
 
-//проверка является ли T фундаментальны типом 
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T С„СѓРЅРґР°РјРµРЅС‚Р°Р»СЊРЅС‹ С‚РёРїРѕРј 
 template <class T> struct is_fundamental: bool_constant<is_arithmetic<T>::value || is_void<T>::value> {};
 
-//проверка является ли T объектным типом (не ссылка, void или функция)
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РѕР±СЉРµРєС‚РЅС‹Рј С‚РёРїРѕРј (РЅРµ СЃСЃС‹Р»РєР°, void РёР»Рё С„СѓРЅРєС†РёСЏ)
 template <class T> struct is_object: bool_constant<!(is_reference<T>::value || is_void<T>::value || is_function<T>::value)> {};
 
-//проверка является ли T скалярным типом
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T СЃРєР°Р»СЏСЂРЅС‹Рј С‚РёРїРѕРј
 template <class T> struct is_scalar: bool_constant<is_arithmetic<T>::value || is_enum<T>::value || 
                                                        is_pointer<T>::value || is_member_pointer<T>::value> {};
 
-//проверка является ли T не фундаментальным типом
+//РїСЂРѕРІРµСЂРєР° СЏРІР»СЏРµС‚СЃСЏ Р»Рё T РЅРµ С„СѓРЅРґР°РјРµРЅС‚Р°Р»СЊРЅС‹Рј С‚РёРїРѕРј
 template <class T> struct is_compound: bool_constant<!is_fundamental<T>::value> {};
 
 /*
-    Проверка сложных свойств типа, определение которых требует поддержки компилятора
+    РџСЂРѕРІРµСЂРєР° СЃР»РѕР¶РЅС‹С… СЃРІРѕР№СЃС‚РІ С‚РёРїР°, РѕРїСЂРµРґРµР»РµРЅРёРµ РєРѕС‚РѕСЂС‹С… С‚СЂРµР±СѓРµС‚ РїРѕРґРґРµСЂР¶РєРё РєРѕРјРїРёР»СЏС‚РѕСЂР°
 */
 
-//проверка имеет ли тип T тривиальный конструктор по умолчанию
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 template <class T> struct has_trivial_constructor: 
          public bool_constant<detail::type_traits_intrinsics::has_trivial_constructor<T>::value || is_pod<T>::value> {};
 
-//проверка имеет ли тип T тривиальный конструктор копирования
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 template <class T> struct has_trivial_copy:
          public bool_constant<(is_pod<T>::value || detail::type_traits_intrinsics::has_trivial_copy<T>::value) &&
                               !is_volatile<T>::value> {};
 
-//проверка имеет ли тип T тривиальный оператор присваивания
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 template <class T> struct has_trivial_assign:
          public bool_constant<(is_pod<T>::value || detail::type_traits_intrinsics::has_trivial_assign<T>::value) &&
                                !is_const<T>::value && !is_volatile<T>::value> {};
 
-//проверка имеет ли тип тривиальный деструктор
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 template <class T> struct has_trivial_destructor:
          public bool_constant<detail::type_traits_intrinsics::has_trivial_destructor<T>::value || is_pod<T>::value> {};
 
-//проверка имеет ли тип виртуальный деструктор
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї РІРёСЂС‚СѓР°Р»СЊРЅС‹Р№ РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 template <class T> struct has_virtual_destructor: public detail::type_traits_intrinsics::has_virtual_destructor<T> {};
 
-//проверка имеет ли тип T бессбойный конструктор по умолчанию
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T Р±РµСЃСЃР±РѕР№РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 template <class T> struct has_nothrow_constructor:
          public bool_constant<has_trivial_constructor<T>::value || detail::type_traits_intrinsics::has_nothrow_constructor<T>::value> {};
 
-//проверка имеет ли тип T бессбойный конструктор копирования
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T Р±РµСЃСЃР±РѕР№РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 template <class T> struct has_nothrow_copy:
          public bool_constant<has_trivial_copy<T>::value || detail::type_traits_intrinsics::has_nothrow_copy<T>::value> {};
 
-//проверка имеет ли тип T бессбойный оператор присваивания
+//РїСЂРѕРІРµСЂРєР° РёРјРµРµС‚ Р»Рё С‚РёРї T Р±РµСЃСЃР±РѕР№РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 template <class T> struct has_nothrow_assign:
          public bool_constant<has_trivial_assign<T>::value || detail::type_traits_intrinsics::has_nothrow_assign<T>::value> {};
 
 /*
-    Преобразование массивов
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ
 */
 
 namespace detail
 {
 
-//удаление всех размерностей массива
+//СѓРґР°Р»РµРЅРёРµ РІСЃРµС… СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 template <class T, bool is_array=is_array<T>::value>
 struct remove_all_extents_helper: public remove_all_extents_helper<typename remove_extent<T>::type> {};
 
 template <class T> struct remove_all_extents_helper<T, false> { typedef T type; };
 
-//рекурсивное определение ранга массива (количество размерностей)
+//СЂРµРєСѓСЂСЃРёРІРЅРѕРµ РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°РЅРіР° РјР°СЃСЃРёРІР° (РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№)
 template <class T, size_t N>           struct rank_helper:                          public integral_constant<size_t, N> {};
 template <class T, size_t R, size_t N> struct rank_helper<T [R], N>:                public rank_helper<T, N+1> {};
 template <class T, size_t R, size_t N> struct rank_helper<T const [R], N>:          public rank_helper<T, N+1> {};
@@ -238,7 +238,7 @@ template <class T, size_t N>           struct rank_helper<T const [], N>:       
 template <class T, size_t N>           struct rank_helper<T volatile [], N>:        public rank_helper<T, N+1> {};
 template <class T, size_t N>           struct rank_helper<T const volatile [], N>:  public rank_helper<T, N+1> {};
 
-//определение размерности массива
+//РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 template <class T, size_t N>           struct extent_helper:                          public integral_constant<size_t, 0> {};
 template <class T, size_t R, size_t N> struct extent_helper<T [R], N>:                public extent_helper<T, N-1> {};
 template <class T, size_t R, size_t N> struct extent_helper<T const [R], N>:          public extent_helper<T, N-1> {};
@@ -259,16 +259,16 @@ template <class T>                     struct extent_helper<T const volatile [],
 
 }
 
-//удаление размерности массива
+//СѓРґР°Р»РµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 template <class T>           struct remove_extent        { typedef T type; };
 template <class T, size_t N> struct remove_extent<T [N]> { typedef T type; };
 template <class T>           struct remove_extent<T []>  { typedef T type; };
 
-//удаление всех размерностей массива
+//СѓРґР°Р»РµРЅРёРµ РІСЃРµС… СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 template <class T> struct remove_all_extents: public detail::remove_all_extents_helper<T> {};
 
-//определение ранга массива
+//РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°РЅРіР° РјР°СЃСЃРёРІР°
 template <class T> struct rank: public detail::rank_helper<T, 0> {};
 
-//определение размера I-й размерности массива
+//РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°Р·РјРµСЂР° I-Р№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 template <class T, unsigned I> struct extent: public detail::extent_helper<T, I> {};

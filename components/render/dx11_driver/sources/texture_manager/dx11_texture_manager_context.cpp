@@ -13,7 +13,7 @@ namespace
 typedef xtl::com_ptr<Texture>      TexturePtr;
 typedef xtl::com_ptr<SamplerState> SamplerStatePtr;
 
-/// Слот текстура - сэмплер
+/// РЎР»РѕС‚ С‚РµРєСЃС‚СѓСЂР° - СЃСЌРјРїР»РµСЂ
 struct SamplerSlot
 {
   TexturePtr              texture;
@@ -25,20 +25,20 @@ struct SamplerSlot
 
 struct TextureManagerContextState::Impl: public DeviceObject
 {  
-  SamplerSlot samplers [DEVICE_SAMPLER_SLOTS_COUNT]; //сэмплеры
-  bool        is_dirty;                              //флаг "грязности"
+  SamplerSlot samplers [DEVICE_SAMPLER_SLOTS_COUNT]; //СЃСЌРјРїР»РµСЂС‹
+  bool        is_dirty;                              //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
     , is_dirty (true)
   {
   }
 
-/// Десктруктор
+/// Р”РµСЃРєС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl () {}
 
-/// Оповещение об изменении состояния
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ
   void UpdateNotify ()
   {
     is_dirty = true;
@@ -46,7 +46,7 @@ struct TextureManagerContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureManagerContextState::TextureManagerContextState (const DeviceManager& manager)
@@ -64,7 +64,7 @@ TextureManagerContextState::~TextureManagerContextState ()
 }
 
 /*
-    Ссылка на реализацию
+    РЎСЃС‹Р»РєР° РЅР° СЂРµР°Р»РёР·Р°С†РёСЋ
 */
 
 TextureManagerContextState::Impl& TextureManagerContextState::GetImpl () const
@@ -73,7 +73,7 @@ TextureManagerContextState::Impl& TextureManagerContextState::GetImpl () const
 }
 
 /*
-    Установка текущей текстуры и сэмплера
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ С‚РµРєСЃС‚СѓСЂС‹ Рё СЃСЌРјРїР»РµСЂР°
 */
 
 void TextureManagerContextState::SetTexture (size_t sampler_slot, ITexture* in_texture)
@@ -154,7 +154,7 @@ ISamplerState* TextureManagerContextState::GetSampler (size_t sampler_slot) cons
 }
 
 /*
-    Копирование состояния
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void TextureManagerContextState::CopyTo (const StateBlockMask& mask, TextureManagerContextState& dst_state) const
@@ -198,9 +198,9 @@ void TextureManagerContextState::CopyTo (const StateBlockMask& mask, TextureMana
 
 struct TextureManagerContext::Impl: public TextureManagerContextState::Impl
 {
-  DxContextPtr context;  //низкоуровневый контекст
+  DxContextPtr context;  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РєРѕРЅС‚РµРєСЃС‚
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager, const DxContextPtr& in_context)
     : TextureManagerContextState::Impl (device_manager)
     , context (in_context)
@@ -211,7 +211,7 @@ struct TextureManagerContext::Impl: public TextureManagerContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureManagerContext::TextureManagerContext (const DeviceManager& device_manager, const DxContextPtr& context)
@@ -224,7 +224,7 @@ TextureManagerContext::~TextureManagerContext ()
 }
 
 /*
-    Ссылка на реализацию
+    РЎСЃС‹Р»РєР° РЅР° СЂРµР°Р»РёР·Р°С†РёСЋ
 */
 
 TextureManagerContext::Impl& TextureManagerContext::GetImpl () const
@@ -233,7 +233,7 @@ TextureManagerContext::Impl& TextureManagerContext::GetImpl () const
 }
 
 /*
-    Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+    Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
 */
 
 void TextureManagerContext::GenerateMips (ITexture* in_texture)
@@ -257,21 +257,21 @@ void TextureManagerContext::GenerateMips (ITexture* in_texture)
 }
 
 /*
-    Биндинг
+    Р‘РёРЅРґРёРЅРі
 */
 
 void TextureManagerContext::Bind ()
 {
   try
   {
-      //проверка флага "грязности"
+      //РїСЂРѕРІРµСЂРєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     Impl& impl = GetImpl ();
 
     if (!impl.is_dirty)
       return;
 
-      //преобразование контекстной информации
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 
     ID3D11SamplerState*       samplers [DEVICE_SAMPLER_SLOTS_COUNT];
     ID3D11ShaderResourceView* texture_views [DEVICE_SAMPLER_SLOTS_COUNT];
@@ -284,7 +284,7 @@ void TextureManagerContext::Bind ()
       texture_views [i] = slot.texture_view ? slot.texture_view.get () : (ID3D11ShaderResourceView*)0;
     }
 
-      //установка в контекст
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚
 
     ID3D11DeviceContext& context = *impl.context;
 
@@ -297,7 +297,7 @@ void TextureManagerContext::Bind ()
     context.VSSetShaderResources (0, DEVICE_SAMPLER_SLOTS_COUNT, texture_views);
     context.VSSetSamplers        (0, DEVICE_SAMPLER_SLOTS_COUNT, samplers);
 
-      //очистка флага "грязности"
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     impl.is_dirty = false;
   }

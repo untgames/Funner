@@ -1,4 +1,4 @@
-//тестирование функции assign и operator=
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё assign Рё operator=
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

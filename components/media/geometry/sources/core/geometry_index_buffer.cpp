@@ -5,7 +5,7 @@ using namespace media;
 using namespace common;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace
@@ -44,14 +44,14 @@ template <class SrcT> void convert_dispatch (const SrcT* src, void* dst, size_t 
 }
 
 /*
-    Описание реализации индексного буфера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 struct IndexBuffer::Impl: public xtl::reference_counter
 {
-  IndexType data_type;     //тип данных
-  uint32_t  indices_count; //количество индексов
-  Buffer    indices;       //массив индексов
+  IndexType data_type;     //С‚РёРї РґР°РЅРЅС‹С…
+  uint32_t  indices_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ
+  Buffer    indices;       //РјР°СЃСЃРёРІ РёРЅРґРµРєСЃРѕРІ
   
   Impl (IndexType in_data_type)
     : data_type (in_data_type)
@@ -70,7 +70,7 @@ struct IndexBuffer::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 IndexBuffer::IndexBuffer ()
@@ -102,7 +102,7 @@ IndexBuffer::~IndexBuffer ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
@@ -113,7 +113,7 @@ IndexBuffer& IndexBuffer::operator = (const IndexBuffer& ib)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 IndexBuffer IndexBuffer::Clone () const
@@ -122,7 +122,7 @@ IndexBuffer IndexBuffer::Clone () const
 }
 
 /*
-    Идентификатор буфера
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р±СѓС„РµСЂР°
 */
 
 size_t IndexBuffer::Id () const
@@ -131,7 +131,7 @@ size_t IndexBuffer::Id () const
 }
 
 /*
-    Тип данных
+    РўРёРї РґР°РЅРЅС‹С…
 */
 
 IndexType IndexBuffer::DataType () const
@@ -175,7 +175,7 @@ void IndexBuffer::SetDataType (IndexType type)
 }
 
 /*
-    Данные
+    Р”Р°РЅРЅС‹Рµ
 */
 
 const void* IndexBuffer::Data () const
@@ -189,7 +189,7 @@ void* IndexBuffer::Data ()
 }
 
 /*
-    Количество индексов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ
 */
 
 uint32_t IndexBuffer::Size () const
@@ -205,7 +205,7 @@ void IndexBuffer::Resize (uint32_t indices_count)
 }
 
 /*
-    Очистка буфера
+    РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂР°
 */
 
 void IndexBuffer::Clear ()
@@ -216,7 +216,7 @@ void IndexBuffer::Clear ()
 }
 
 /*
-    Резервирование памяти
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 */
 
 uint32_t IndexBuffer::Capacity () const
@@ -230,7 +230,7 @@ void IndexBuffer::Reserve (uint32_t indices_count)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void IndexBuffer::Swap (IndexBuffer& ib)

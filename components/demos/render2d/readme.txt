@@ -1,1 +1,1 @@
-На данный момент тесты только собираются, но не отлажены с новым рендером.
+At this moment test are built but have not been configured for work with render3d

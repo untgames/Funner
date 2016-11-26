@@ -26,13 +26,13 @@ namespace common
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //маска имён компонентов слушателй событий очереди действий
+const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ СЃР»СѓС€Р°С‚РµР»Р№ СЃРѕР±С‹С‚РёР№ РѕС‡РµСЂРµРґРё РґРµР№СЃС‚РІРёР№
 
 /*
-    Реализация действия
+    Р РµР°Р»РёР·Р°С†РёСЏ РґРµР№СЃС‚РІРёСЏ
 */
 
 struct ActionImpl;
@@ -41,16 +41,16 @@ typedef xtl::lock_ptr<ActionImpl, xtl::intrusive_ptr<ActionImpl> > ActionLock;
 
 struct ActionImpl: public xtl::reference_counter, public Lockable
 {
-  ActionQueue::ActionHandler     action_handler;  //обработчик выполнения действия
-  Action::WaitCompleteHandler    wait_handler;    //обработчик ожидания выполнения операции
-  ActionThread                   thread_type;     //тип нити
-  Timer                          timer;           //таймер, связанный с действием
-  ActionQueue::time_t            next_time;       //время следующего выполнения действия
-  ActionQueue::time_t            period;          //период выполнения действия
-  size_t                         thread_id;       //идентификатор нити, в которой создано действие
-  bool                           is_periodic;     //является ли действие периодическим
-  bool                           is_completed;    //завершено ли действие
-  bool                           is_canceled;     //действие отменено
+  ActionQueue::ActionHandler     action_handler;  //РѕР±СЂР°Р±РѕС‚С‡РёРє РІС‹РїРѕР»РЅРµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ
+  Action::WaitCompleteHandler    wait_handler;    //РѕР±СЂР°Р±РѕС‚С‡РёРє РѕР¶РёРґР°РЅРёСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёРё
+  ActionThread                   thread_type;     //С‚РёРї РЅРёС‚Рё
+  Timer                          timer;           //С‚Р°Р№РјРµСЂ, СЃРІСЏР·Р°РЅРЅС‹Р№ СЃ РґРµР№СЃС‚РІРёРµРј
+  ActionQueue::time_t            next_time;       //РІСЂРµРјСЏ СЃР»РµРґСѓСЋС‰РµРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ
+  ActionQueue::time_t            period;          //РїРµСЂРёРѕРґ РІС‹РїРѕР»РЅРµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ
+  size_t                         thread_id;       //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРёС‚Рё, РІ РєРѕС‚РѕСЂРѕР№ СЃРѕР·РґР°РЅРѕ РґРµР№СЃС‚РІРёРµ
+  bool                           is_periodic;     //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґРµР№СЃС‚РІРёРµ РїРµСЂРёРѕРґРёС‡РµСЃРєРёРј
+  bool                           is_completed;    //Р·Р°РІРµСЂС€РµРЅРѕ Р»Рё РґРµР№СЃС‚РІРёРµ
+  bool                           is_canceled;     //РґРµР№СЃС‚РІРёРµ РѕС‚РјРµРЅРµРЅРѕ
 
   ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
     : action_handler (in_handler)
@@ -79,7 +79,7 @@ namespace
 {
 
 /*
-    Действие с обратным вызовом по завершению
+    Р”РµР№СЃС‚РІРёРµ СЃ РѕР±СЂР°С‚РЅС‹Рј РІС‹Р·РѕРІРѕРј РїРѕ Р·Р°РІРµСЂС€РµРЅРёСЋ
 */
 
 class ActionWithCallback
@@ -103,31 +103,31 @@ class ActionWithCallback
 };
 
 /*
-    Очередь нити
+    РћС‡РµСЂРµРґСЊ РЅРёС‚Рё
 */
 
 class ThreadActionQueue: public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ThreadActionQueue ()
     {
       actions_count = 0;
     }
   
-///Проверка на пустоту
+///РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsEmpty ()
     {
       return actions.empty ();
     }
     
-///Количество действий в очереди
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РґРµР№СЃС‚РІРёР№ РІ РѕС‡РµСЂРµРґРё
     size_t Size ()
     {
       return actions_count;
     }
   
-///Добавление действия
+///Р”РѕР±Р°РІР»РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ
     void PushAction (const ActionPtr& action)
     {
       if (!action)
@@ -138,7 +138,7 @@ class ThreadActionQueue: public xtl::reference_counter
       actions_count++;
     }    
     
-///Получение действия
+///РџРѕР»СѓС‡РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ
     ActionPtr PopAction ()
     {
       for (ActionList::iterator iter=actions.begin (); iter!=actions.end ();)
@@ -196,7 +196,7 @@ class ThreadActionQueue: public xtl::reference_counter
 typedef xtl::intrusive_ptr<ThreadActionQueue> ThreadActionQueuePtr;
 
 /*
-    Реализация очереди действий
+    Р РµР°Р»РёР·Р°С†РёСЏ РѕС‡РµСЂРµРґРё РґРµР№СЃС‚РІРёР№
 */
 
 class ActionQueueImpl
@@ -206,14 +206,14 @@ class ActionQueueImpl
     typedef ActionQueue::ActionHandler   ActionHandler;
     typedef ActionQueue::CallbackHandler CallbackHandler;
     
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ActionQueueImpl ()
       : default_wait_handler (xtl::bind (&ActionQueueImpl::DefaultWaitHandler, _1, _2))
     {
       default_timer.Start ();
     }
 
-///Добавление действия в очередь
+///Р”РѕР±Р°РІР»РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ РІ РѕС‡РµСЂРµРґСЊ
     Action PushAction (const ActionHandler& action_handler, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
     {
       try
@@ -260,7 +260,7 @@ class ActionQueueImpl
       }
     }    
 
-///Размер очереди
+///Р Р°Р·РјРµСЂ РѕС‡РµСЂРµРґРё
     size_t ActionsCount (ActionThread thread)
     {
       try
@@ -304,7 +304,7 @@ class ActionQueueImpl
       }
     }
 
-///Извлечение действия из очереди
+///РР·РІР»РµС‡РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ РёР· РѕС‡РµСЂРµРґРё
     Action PopAction (ActionThread thread)
     {
       try
@@ -324,7 +324,7 @@ class ActionQueueImpl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }        
 
         return result;
@@ -336,7 +336,7 @@ class ActionQueueImpl
       }      
     }
 
-///Очистка вспомогательных структур для текущей нити
+///РћС‡РёСЃС‚РєР° РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… СЃС‚СЂСѓРєС‚СѓСЂ РґР»СЏ С‚РµРєСѓС‰РµР№ РЅРёС‚Рё
     void CleanupCurrentThread ()
     {
       try
@@ -362,7 +362,7 @@ class ActionQueueImpl
       }
     }
     
-///Регистрация обработчиков событий
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
     xtl::connection RegisterEventHandler (ActionQueueEvent event, const ActionQueue::EventHandler& handler)
     {
       switch (event)
@@ -377,11 +377,11 @@ class ActionQueueImpl
       return signals [event].connect (handler);
     }
 
-///Получение таймера по умолчанию
+///РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р№РјРµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     Timer& DefaultTimer () { return default_timer; }    
 
   private:
-///Помещение действия в очередь
+///РџРѕРјРµС‰РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ РІ РѕС‡РµСЂРµРґСЊ
     Action PushAction (const ActionPtr& action, ThreadActionQueue& queue)
     {
       try
@@ -398,7 +398,7 @@ class ActionQueueImpl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
 
         return result;
@@ -410,7 +410,7 @@ class ActionQueueImpl
       }
     }  
   
-///Получение очереди нити
+///РџРѕР»СѓС‡РµРЅРёРµ РѕС‡РµСЂРµРґРё РЅРёС‚Рё
     ThreadActionQueue& GetQueue (ActionThread thread, size_t thread_id = Platform::GetCurrentThreadId ())
     {
       switch (thread)
@@ -437,7 +437,7 @@ class ActionQueueImpl
       }
     }
     
-///Функция ожидания по умолчанию
+///Р¤СѓРЅРєС†РёСЏ РѕР¶РёРґР°РЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     static bool DefaultWaitHandler (Action& action, size_t milliseconds)
     {
       size_t       end_time = common::milliseconds () + milliseconds;
@@ -475,7 +475,7 @@ typedef common::Singleton<ActionQueueImpl> ActionQueueSingleton;
 }
 
 /*
-    Врапперы
+    Р’СЂР°РїРїРµСЂС‹
 */
 
 Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay)
@@ -580,7 +580,7 @@ void ActionQueue::CleanupCurrentThread ()
 }
 
 /*
-    Действие
+    Р”РµР№СЃС‚РІРёРµ
 */
 
 Action::Action ()
@@ -758,7 +758,7 @@ void swap (Action& action1, Action& action2)
 }
 
 /*
-    Создание диспетчера функции обратного вызова в указанной нити
+    РЎРѕР·РґР°РЅРёРµ РґРёСЃРїРµС‚С‡РµСЂР° С„СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РІ СѓРєР°Р·Р°РЅРЅРѕР№ РЅРёС‚Рё
 */
 
 namespace

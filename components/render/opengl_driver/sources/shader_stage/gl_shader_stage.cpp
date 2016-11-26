@@ -14,17 +14,17 @@ namespace
 {
 
 /*
-    Состояние уровня шейдинга
+    РЎРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ С€РµР№РґРёРЅРіР°
 */
 
 class ShaderStageState: public IStageState
 {
   public:  
-      //конструкторы
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
     ShaderStageState (ShaderStageState* in_main_state) : owner (0), main_state (in_main_state) {}
     ShaderStageState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}    
 
-      //установка программы
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹
     void SetProgram (ICompiledProgram* in_program)
     {
       if (in_program == program)
@@ -39,19 +39,19 @@ class ShaderStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение программы
+      //РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
     ICompiledProgram* GetProgram () const
     {
       return program.get ();
     }
 
-      //получение словаря вершинных атрибутов
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃР»РѕРІР°СЂСЏ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
     IVertexAttributeDictionary* GetVertexAttributeDictionary ()
     {
       return vertex_attribute_dictionary.get ();
     }
 
-      //установка константного буффера
+      //СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„С„РµСЂР°
     void SetConstantBuffer (unsigned int buffer_slot, IBindableBuffer* buffer)
     {
       if (buffer == constant_buffers [buffer_slot])
@@ -62,19 +62,19 @@ class ShaderStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение константного буффера
+      //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„С„РµСЂР°
     IBindableBuffer* GetConstantBuffer (unsigned int buffer_slot) const
     {
       return constant_buffers [buffer_slot].get ();
     }
     
-      //получение массива указателей на константные буферы
+      //РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рµ Р±СѓС„РµСЂС‹
     ConstantBufferPtr* GetConstantBuffers ()
     {
       return &constant_buffers [0];
     }
     
-      //установка расположения параметров шейдера
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ С€РµР№РґРµСЂР°
     void SetProgramParametersLayout (ProgramParametersLayout* in_parameters_layout)
     {
       if (in_parameters_layout == parameters_layout)
@@ -85,20 +85,20 @@ class ShaderStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение расположения параметров шейдера
+      //РїРѕР»СѓС‡РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ С€РµР№РґРµСЂР°
     ProgramParametersLayout* GetProgramParametersLayout () const
     {
       return parameters_layout.get ();
     }
 
-      //захват состояния
+      //Р·Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
     
-      //восстановление состояния
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -106,7 +106,7 @@ class ShaderStageState: public IStageState
     }
 
   private:
-      //копирование
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ
     void Copy (const ShaderStageState& source, const StateBlockMask& mask)
     {
       if (mask.ss_program)
@@ -120,7 +120,7 @@ class ShaderStageState: public IStageState
           SetConstantBuffer (i, source.GetConstantBuffer (i));
     }
 
-      //оповещение об изменении состояния
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void UpdateNotify ()
     {
       if (!owner)
@@ -136,31 +136,31 @@ class ShaderStageState: public IStageState
     typedef xtl::trackable_ptr<IVertexAttributeDictionary> VertexAttributeDictionaryPtr;
 
   private:
-    ContextObject*               owner;                                                 //владелец состояния
-    ShaderStageStatePtr          main_state;                                            //основное состояние уровня
-    ProgramParametersLayoutPtr   parameters_layout;                                     //расположение параметров шейдера
-    ProgramPtr                   program;                                               //шейдер
-    VertexAttributeDictionaryPtr vertex_attribute_dictionary;                           //словарь вершинных атрибутов
-    ConstantBufferPtr            constant_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+    ContextObject*               owner;                                                 //РІР»Р°РґРµР»РµС† СЃРѕСЃС‚РѕСЏРЅРёСЏ
+    ShaderStageStatePtr          main_state;                                            //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    ProgramParametersLayoutPtr   parameters_layout;                                     //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С€РµР№РґРµСЂР°
+    ProgramPtr                   program;                                               //С€РµР№РґРµСЂ
+    VertexAttributeDictionaryPtr vertex_attribute_dictionary;                           //СЃР»РѕРІР°СЂСЊ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
+    ConstantBufferPtr            constant_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Рµ Р±СѓС„РµСЂС‹ С€РµР№РґРµСЂР°
 };
 
 /*
-    Программа шейдинга с параметрами
+    РџСЂРѕРіСЂР°РјРјР° С€РµР№РґРёРЅРіР° СЃ РїР°СЂР°РјРµС‚СЂР°РјРё
 */
 
 struct ProgramWithParameters
 {
-  ICompiledProgram*        program;           //программа шейдинга
-  ProgramParametersLayout* parameters_layout; //расположение параметров
+  ICompiledProgram*        program;           //РїСЂРѕРіСЂР°РјРјР° С€РµР№РґРёРЅРіР°
+  ProgramParametersLayout* parameters_layout; //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ProgramWithParameters (ICompiledProgram* in_program, ProgramParametersLayout* layout) : program (in_program), parameters_layout (layout) {}
   
-///Сравнение
+///РЎСЂР°РІРЅРµРЅРёРµ
   bool operator == (const ProgramWithParameters& p) const { return program == p.program && parameters_layout == p.parameters_layout; }  
 };
 
-//получение хэша
+//РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р°
 size_t hash (const ProgramWithParameters& p)
 {
   return stl::hash (p.program, stl::hash (p.parameters_layout));
@@ -169,13 +169,13 @@ size_t hash (const ProgramWithParameters& p)
 }
 
 /*
-    Описание реализации ShaderStage
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё ShaderStage
 */
 
 struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const ContextManager& context_manager)
       : ContextObject (context_manager),
         ShaderStageState (static_cast<ContextObject*> (this)),
@@ -183,7 +183,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     {
       try
       {
-          //добавление менеджеров шейдеров
+          //РґРѕР±Р°РІР»РµРЅРёРµ РјРµРЅРµРґР¶РµСЂРѕРІ С€РµР№РґРµСЂРѕРІ
           
 #ifndef OPENGL_ES_SUPPORT
 
@@ -197,7 +197,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         {
           RegisterManager (ShaderManagerPtr (create_ffp_shader_manager (context_manager), false));
 
-            //регистрация программы "по умолчанию"
+            //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїСЂРѕРіСЂР°РјРјС‹ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
           ShaderDesc shader_desc;
 
@@ -216,7 +216,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         if (!default_program && GetCaps ().has_arb_shading_language_100)
         {
-            //регистрация программы "по умолчанию"
+            //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїСЂРѕРіСЂР°РјРјС‹ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
 #ifndef OPENGL_ES2_SUPPORT
             const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
@@ -248,20 +248,20 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }
 
-///Установка состояния в контекст OpenGL
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     void Bind ()
     {
       try
       {
-          //получение программы, устанавливаемой в контекст OpenGL
+          //РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
         IBindableProgram& bindable_program = GetBindableProgram ();
 
-          //установка программы в контекст OpenGL
+          //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
         bindable_program.Bind (GetConstantBuffers ());
 
-          //сохранение текущей программы
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ С‚РµРєСѓС‰РµР№ РїСЂРѕРіСЂР°РјРјС‹
           
         current_binded_program = &bindable_program;
       }
@@ -272,7 +272,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }       
     
-///Проверка корректности установленной программы
+///РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
     void ValidateBindedProgram ()
     {
       try
@@ -289,12 +289,12 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }
 
-///Создание программы
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
     ICompiledProgram* CreateProgram (unsigned int shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!shader_descs)
           throw xtl::make_null_argument_exception ("", "shader_descs");
@@ -311,12 +311,12 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           if (!desc.source_code)
             throw xtl::format_exception<xtl::null_argument_exception> ("", "shader_descs[%u].source_code", i);
 
-            //получение имени базового профиля
+            //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±Р°Р·РѕРІРѕРіРѕ РїСЂРѕС„РёР»СЏ
 
           if (!desc.profile)
             throw xtl::format_exception<xtl::null_argument_exception> ("", "Null argument 'shader_descs[%u].profile'", i);
 
-            //поиск менеджера шейдеров по имени базового профиля
+            //РїРѕРёСЃРє РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРµСЂРѕРІ РїРѕ РёРјРµРЅРё Р±Р°Р·РѕРІРѕРіРѕ РїСЂРѕС„РёР»СЏ
 
           ProfileMap::iterator iter = profiles.find (desc.profile);
 
@@ -327,16 +327,16 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
             throw xtl::format_exception<xtl::argument_exception> ("", "Invalid argument 'shader_descs[%u].profile'='%s'. "
               "Incompatible shader profiles (previous profile is '%s')", i, desc.profile, shader_descs [0].profile);
               
-            //сохранение менеджера
+            //СЃРѕС…СЂР°РЅРµРЅРёРµ РјРµРЅРµРґР¶РµСЂР°
 
           manager = iter->second.get ();
         }
         
-          //оповещение о необходимости ребиндинга уровня
+          //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 
         StageRebindNotify (Stage_Shading);        
 
-          //компиляция шейдеров
+          //РєРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂРѕРІ
 
         stl::vector<ShaderPtr> program_shaders;
 
@@ -344,7 +344,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         for (unsigned int i=0; i<shaders_count; i++)
         {
-            //корректировка описания шейдера
+            //РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РѕРїРёСЃР°РЅРёСЏ С€РµР№РґРµСЂР°
 
           ShaderDesc desc = shader_descs [i];
 
@@ -357,12 +357,12 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           if (desc.source_code_size == (unsigned int) (~0))
             desc.source_code_size = (unsigned int)strlen (desc.source_code);
 
-            //добавление скомпилированного шейдера к шейдерам программы
+            //РґРѕР±Р°РІР»РµРЅРёРµ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅРѕРіРѕ С€РµР№РґРµСЂР° Рє С€РµР№РґРµСЂР°Рј РїСЂРѕРіСЂР°РјРјС‹
 
           program_shaders.push_back (GetShader (desc, *manager, error_log));
         }
 
-          //формирование массива указателей на шейдеры
+          //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РјР°СЃСЃРёРІР° СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С€РµР№РґРµСЂС‹
 
         stl::vector<IShader*> program_shader_pointers;
 
@@ -371,7 +371,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         for (size_t i=0; i<program_shaders.size (); i++)
           program_shader_pointers [i] = program_shaders [i].get ();
 
-          //создание программы шейдинга
+          //СЃРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
 
         return manager->CreateProgram ((unsigned int)program_shader_pointers.size (), &program_shader_pointers [0], error_log);
       }
@@ -382,13 +382,13 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }
     
-///Получение строки поддерживаемых профилей шейдера
+///РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РїСЂРѕС„РёР»РµР№ С€РµР№РґРµСЂР°
     const char* GetShaderProfilesString () const
     {
       return supported_profiles.c_str ();
     }
 
-///Получение словаря вершинных атрибутов
+///РџРѕР»СѓС‡РµРЅРёРµ СЃР»РѕРІР°СЂСЏ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
     IVertexAttributeDictionary& GetVertexAttributeDictionary ()
     {
       IVertexAttributeDictionary* dictionary = ShaderStageState::GetVertexAttributeDictionary ();
@@ -409,17 +409,17 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     typedef stl::hash_map<stl::hash_key<const char*>, ShaderManagerPtr> ProfileMap;
 
   private:
-///Регистрация менеджера шейдеров
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРµСЂРѕРІ
     void RegisterManager (const ShaderManagerPtr& manager)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ShaderStage::Impl::RegisterManager";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!manager)
         throw xtl::make_null_argument_exception (METHOD_NAME, "manager");
 
-        //регистрация профилей
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїСЂРѕС„РёР»РµР№
         
       size_t start_profiles_string_size = supported_profiles.size ();
 
@@ -456,33 +456,33 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }      
     }  
   
-///Получение хэша шейдера
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° С€РµР№РґРµСЂР°
     size_t GetShaderHash (const ShaderDesc& desc)
     {
       return common::crc32 (desc.source_code, desc.source_code_size, common::strhash (desc.profile, common::strhash (desc.options)));
     }
 
-///Получение шейдера
+///РџРѕР»СѓС‡РµРЅРёРµ С€РµР№РґРµСЂР°
     ShaderPtr GetShader (const ShaderDesc& desc, IShaderManager& manager, const LogFunction& error_log)
     {
       try
       {
-          //получение хэша шейдера
+          //РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° С€РµР№РґРµСЂР°
 
         size_t shader_hash = GetShaderHash (desc);
 
-          //поиск шейдера в карте скомпилированных шейдеров
+          //РїРѕРёСЃРє С€РµР№РґРµСЂР° РІ РєР°СЂС‚Рµ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅС‹С… С€РµР№РґРµСЂРѕРІ
 
         ShaderMap::iterator iter = shaders.find (shader_hash);
 
         if (iter != shaders.end ())
           return iter->second;
           
-          //создание нового шейдера
+          //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ С€РµР№РґРµСЂР°
 
         ShaderPtr shader (manager.CreateShader (desc, error_log), false);
 
-          //регистрация скомпилированного шейдера
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅРѕРіРѕ С€РµР№РґРµСЂР°
 
         shader->RegisterDestroyHandler (xtl::bind (&Impl::RemoveShaderByHash, this, shader_hash), GetTrackable ());
 
@@ -497,18 +497,18 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }    
     
-///Удаление шейдера по хэшу
+///РЈРґР°Р»РµРЅРёРµ С€РµР№РґРµСЂР° РїРѕ С…СЌС€Сѓ
     void RemoveShaderByHash (size_t shader_hash)
     {
       shaders.erase (shader_hash);
     }
     
-///Получение программы с возможностью установки в контекст OpenGL
+///РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ СЃ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ СѓСЃС‚Р°РЅРѕРІРєРё РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     IBindableProgram& GetBindableProgram (ICompiledProgram* program, ProgramParametersLayout* layout)
     {
       try
       {
-          //поиск программы в карте
+          //РїРѕРёСЃРє РїСЂРѕРіСЂР°РјРјС‹ РІ РєР°СЂС‚Рµ
 
         ProgramWithParameters parametrized_program (program, layout);
 
@@ -517,20 +517,20 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         if (iter != bindable_programs.end ())
           return *iter->second;
 
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!program)
           throw xtl::make_null_argument_exception ("", "program");
           
-          //создание программы
+          //СЃРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 
         BindableProgramPtr bindable_program (program->CreateBindableProgram (layout), false);
         
-          //регистрация в карте
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІ РєР°СЂС‚Рµ
 
         iter = bindable_programs.insert_pair (parametrized_program, bindable_program).first;
         
-          //регистрация обработчиков оповещения об удалении программы
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё РїСЂРѕРіСЂР°РјРјС‹
           
         xtl::connection c;
 
@@ -570,7 +570,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       return GetBindableProgram (program, GetProgramParametersLayout ());
     }
     
-///Удаление программы, устанавливаемой в контекст OpenGL
+///РЈРґР°Р»РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     void RemoveBindableProgram (ICompiledProgram* program, ProgramParametersLayout* layout)
     {            
       for (BindableProgramMap::iterator iter = bindable_programs.begin (), end = bindable_programs.end (); iter != end;)
@@ -593,7 +593,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }
 
-///Протоколирование ошибок шейдера
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РѕРє С€РµР№РґРµСЂР°
     void LogShaderMessage (const char* message)
     {
       if (!message || !*message)
@@ -603,17 +603,17 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
 
   private:
-    ShaderMap                   shaders;                             //скомпилированные шейдеры
-    BindableProgramMap          bindable_programs;                   //карта программ шейдинга с возможностью установки в контекст OpenGL
-    ProfileMap                  profiles;                            //соответствие профиль -> менеджер шейдеров
-    ProgramPtr                  default_program;                     //программа "по умолчанию"
-    IVertexAttributeDictionary* default_vertex_attribute_dictionary; //словарь вершинных атрибутов "по умолчанию"
-    stl::string                 supported_profiles;                  //поддерживаемые профили шейдеров
-    IBindableProgram*           current_binded_program;              //текущая программа, установленная в контекст OpenGL
+    ShaderMap                   shaders;                             //СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅС‹Рµ С€РµР№РґРµСЂС‹
+    BindableProgramMap          bindable_programs;                   //РєР°СЂС‚Р° РїСЂРѕРіСЂР°РјРј С€РµР№РґРёРЅРіР° СЃ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ СѓСЃС‚Р°РЅРѕРІРєРё РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
+    ProfileMap                  profiles;                            //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РїСЂРѕС„РёР»СЊ -> РјРµРЅРµРґР¶РµСЂ С€РµР№РґРµСЂРѕРІ
+    ProgramPtr                  default_program;                     //РїСЂРѕРіСЂР°РјРјР° "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
+    IVertexAttributeDictionary* default_vertex_attribute_dictionary; //СЃР»РѕРІР°СЂСЊ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
+    stl::string                 supported_profiles;                  //РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ РїСЂРѕС„РёР»Рё С€РµР№РґРµСЂРѕРІ
+    IBindableProgram*           current_binded_program;              //С‚РµРєСѓС‰Р°СЏ РїСЂРѕРіСЂР°РјРјР°, СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅР°СЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderStage::ShaderStage (const ContextManager& context_manager)
@@ -625,7 +625,7 @@ ShaderStage::~ShaderStage ()
 }
 
 /*
-    Создание объекта состояния уровня
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 */
 
 IStageState* ShaderStage::CreateStageState ()
@@ -634,7 +634,7 @@ IStageState* ShaderStage::CreateStageState ()
 }
 
 /*
-    Установка состояния уровня в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void ShaderStage::Bind ()
@@ -643,7 +643,7 @@ void ShaderStage::Bind ()
 }
 
 /*
-    Создание ресурсов уровня шейдинга
+    РЎРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ СѓСЂРѕРІРЅСЏ С€РµР№РґРёРЅРіР°
 */
 
 IProgramParametersLayout* ShaderStage::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
@@ -665,21 +665,21 @@ IProgram* ShaderStage::CreateProgram (unsigned int shaders_count, const ShaderDe
 }
    
 /*
-    Установка параметров уровня шейдинга
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СѓСЂРѕРІРЅСЏ С€РµР№РґРёРЅРіР°
 */
 
 void ShaderStage::SetProgram (IProgram* program)
 {
   try
   {
-      //проверка совместимости контекстов
+      //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚РѕРІ
 
     ContextObject* program_object = cast_object<ContextObject> (program, "", "program");
 
     if (program_object && !program_object->IsCompatible (*impl))
       throw xtl::format_exception<xtl::bad_argument> ("", "Argument 'program' is incompatible with target IDevice");
 
-      //установка программы
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹
 
     impl->SetProgram (cast_object<ICompiledProgram> (program, "", "program"));
   }
@@ -699,19 +699,19 @@ void ShaderStage::SetConstantBuffer (unsigned int buffer_slot, IBuffer* buffer)
 {
   try
   {
-      //проверка корректности индекса константного буфера
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РёРЅРґРµРєСЃР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
     
     if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
       throw xtl::make_range_exception ("", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-      //проверка совместимости контекстов
+      //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚РѕРІ
 
     ContextObject* buffer_object = cast_object<ContextObject> (buffer, "", "buffer");      
 
     if (buffer_object && !buffer_object->IsCompatible (*impl))
       throw xtl::format_exception<xtl::bad_argument> ("", "Argument 'buffer' is incompatible with target IDevice");
 
-      //установка буфера
+      //СѓСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР°
 
     impl->SetConstantBuffer (buffer_slot, cast_object<IBindableBuffer> (buffer, "", "buffer"));
   }
@@ -723,7 +723,7 @@ void ShaderStage::SetConstantBuffer (unsigned int buffer_slot, IBuffer* buffer)
 }
 
 /*
-    Получение параметров уровня шейдинга
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СѓСЂРѕРІРЅСЏ С€РµР№РґРёРЅРіР°
 */
 
 IProgramParametersLayout* ShaderStage::GetProgramParametersLayout () const
@@ -750,7 +750,7 @@ IBuffer* ShaderStage::GetConstantBuffer (unsigned int buffer_slot) const
 }
 
 /*
-    Получение строки поддерживаемых контекстом профилей шейдеров
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РєРѕРЅС‚РµРєСЃС‚РѕРј РїСЂРѕС„РёР»РµР№ С€РµР№РґРµСЂРѕРІ
 */
 
 const char* ShaderStage::GetShaderProfilesString () const
@@ -759,7 +759,7 @@ const char* ShaderStage::GetShaderProfilesString () const
 }
 
 /*
-    Валидация текущей программы перед отрисовкой
+    Р’Р°Р»РёРґР°С†РёСЏ С‚РµРєСѓС‰РµР№ РїСЂРѕРіСЂР°РјРјС‹ РїРµСЂРµРґ РѕС‚СЂРёСЃРѕРІРєРѕР№
 */
 
 void ShaderStage::ValidateBindedProgram ()

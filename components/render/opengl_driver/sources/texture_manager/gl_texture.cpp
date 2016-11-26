@@ -8,15 +8,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int DXT_EDGE_SIZE  = 4;  //размер стороны блока DXT-сжатия
+const unsigned int DXT_EDGE_SIZE  = 4;  //СЂР°Р·РјРµСЂ СЃС‚РѕСЂРѕРЅС‹ Р±Р»РѕРєР° DXT-СЃР¶Р°С‚РёСЏ
 
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture::Texture
@@ -33,7 +33,7 @@ Texture::Texture
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::Texture";   
 
-    //проверка корректности формата
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„РѕСЂРјР°С‚Р°
 
   switch (desc.format)
   {
@@ -46,7 +46,7 @@ Texture::Texture
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-        //проверка возможности работы совместно с mip-mapping
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂР°Р±РѕС‚С‹ СЃРѕРІРјРµСЃС‚РЅРѕ СЃ mip-mapping
         
       if (desc.generate_mips_enable)
         throw xtl::format_operation_exception (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
@@ -102,7 +102,7 @@ Texture::Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
   }
   
-    //проверка корректности флагов доступа
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„Р»Р°РіРѕРІ РґРѕСЃС‚СѓРїР°
     
   switch (desc.access_flags)
   {
@@ -115,12 +115,12 @@ Texture::Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", (size_t)desc.access_flags);
   }
 
-    //выделение нового OpenGL-идентификатора текстуры
+    //РІС‹РґРµР»РµРЅРёРµ РЅРѕРІРѕРіРѕ OpenGL-РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РµРєСЃС‚СѓСЂС‹
 
   MakeContextCurrent ();
   glGenTextures      (1, &texture_id);
   
-    //включение автоматической генерации
+    //РІРєР»СЋС‡РµРЅРёРµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ РіРµРЅРµСЂР°С†РёРё
 
   if (mips_count > 1)
   {
@@ -136,7 +136,7 @@ Texture::Texture
 #endif
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
@@ -163,12 +163,12 @@ Texture::~Texture ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-   Получение дескрипторов
+   РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ
 */
 
 void Texture::GetDesc (TextureDesc& out_desc)
@@ -191,7 +191,7 @@ void Texture::GetDesc (RenderTargetTextureDesc& out_desc)
 }
 
 /*
-    Изменение формата текстуры
+    РР·РјРµРЅРµРЅРёРµ С„РѕСЂРјР°С‚Р° С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void Texture::SetFormat (PixelFormat format)
@@ -200,7 +200,7 @@ void Texture::SetFormat (PixelFormat format)
 }
 
 /*
-    Установка / получение хэша дескриптора прикрепленного сэмплера
+    РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РґРµСЃРєСЂРёРїС‚РѕСЂР° РїСЂРёРєСЂРµРїР»РµРЅРЅРѕРіРѕ СЃСЌРјРїР»РµСЂР°
 */
 
 void Texture::SetSamplerHash (size_t hash)
@@ -214,46 +214,46 @@ size_t Texture::GetSamplerHash ()
 }
 
 /*
-   Выбор текстуры в контекст OpenGL
+   Р’С‹Р±РѕСЂ С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void Texture::Bind ()
 {
-    //получение кэш-переменных
+    //РїРѕР»СѓС‡РµРЅРёРµ РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   unsigned int current_active_slot     = (unsigned int)GetContextCacheValue (CacheEntry_ActiveTextureSlot);
   size_t       &current_texture_target = GetContextCache () [CacheEntry_TextureTarget0 + current_active_slot],
                &current_texture_id     = GetContextCache () [CacheEntry_TextureId0 + current_active_slot];
 
-    //проверка необходимости биндинга текстуры
+    //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР° С‚РµРєСЃС‚СѓСЂС‹
 
   if (current_texture_id == GetId ())
     return;
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //биндинг текстуры
+    //Р±РёРЅРґРёРЅРі С‚РµРєСЃС‚СѓСЂС‹
 
   glBindTexture (target, texture_id);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::Texture::Bind");
 
-    //обновление кэш-переменных
+    //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   current_texture_id     = GetId ();
   current_texture_target = target;
   
-    //оповещение о необходимости ребиндинга уровня
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
     
   StageRebindNotify (Stage_TextureManager);
 }
 
 /*
-    Получение дескриптора mip-уровня текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° mip-СѓСЂРѕРІРЅСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void Texture::GetMipLevelDesc (unsigned int mip_level, MipLevelDesc& out_desc)
@@ -269,7 +269,7 @@ void Texture::GetMipLevelDesc (unsigned int mip_level, MipLevelDesc& out_desc)
 }
 
 /*
-    Получение дескриптора слоя текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃР»РѕСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void Texture::GetLayerDesc (unsigned int layer, LayerDesc& desc)
@@ -279,7 +279,7 @@ void Texture::GetLayerDesc (unsigned int layer, LayerDesc& desc)
 }
 
 /*
-    Генерация mip-уровней
+    Р“РµРЅРµСЂР°С†РёСЏ mip-СѓСЂРѕРІРЅРµР№
 */
 
 namespace
@@ -313,7 +313,7 @@ void Texture::BuildMipmaps
   const unsigned int buffer_size = get_image_size (get_next_mip_size (width), get_next_mip_size (height), format);
 
   xtl::uninitialized_storage<char> dst_buffer (buffer_size),
-                                   src_buffer (buffer_size / 2); //на 4 делить не нужно! (необходимо для прямоугольных текстур с длиной стороны 1)
+                                   src_buffer (buffer_size / 2); //РЅР° 4 РґРµР»РёС‚СЊ РЅРµ РЅСѓР¶РЅРѕ! (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅС‹С… С‚РµРєСЃС‚СѓСЂ СЃ РґР»РёРЅРѕР№ СЃС‚РѕСЂРѕРЅС‹ 1)
 
   const char* src = reinterpret_cast<const char*> (data);
   char*       dst = dst_buffer.data ();
@@ -333,7 +333,7 @@ void Texture::BuildMipmaps
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
 
-    glPixelStorei (GL_UNPACK_ROW_LENGTH, unclamped_width); //длина строки в пикселях (для данного mip-уровня)
+    glPixelStorei (GL_UNPACK_ROW_LENGTH, unclamped_width); //РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС… (РґР»СЏ РґР°РЅРЅРѕРіРѕ mip-СѓСЂРѕРІРЅСЏ)
 
 #endif
 
@@ -347,7 +347,7 @@ void Texture::BuildMipmaps
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture::SetUncompressedData (unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, GLenum, GLenum, const void*)
@@ -361,7 +361,7 @@ void Texture::SetCompressedData (unsigned int, unsigned int, unsigned int, unsig
 }
 
 /*
-   Работа с данными
+   Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё
 */
 
 void Texture::SetData
@@ -380,12 +380,12 @@ void Texture::SetData
 //  if (context)
 //    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
   
-    //проверка возможности записи
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё Р·Р°РїРёСЃРё
     
   if (!(desc.access_flags & AccessFlag_Write))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
   
-    //проверка корректности номеров слоя и mip-уровня
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РЅРѕРјРµСЂРѕРІ СЃР»РѕСЏ Рё mip-СѓСЂРѕРІРЅСЏ
 
   if (layer >= desc.layers)
     throw xtl::make_range_exception (METHOD_NAME, "layer", layer, desc.layers);
@@ -393,12 +393,12 @@ void Texture::SetData
   if (mip_level >= mips_count)
     throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, mips_count);
 
-    //сохранение неотсеченных размеров
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅС‹С… СЂР°Р·РјРµСЂРѕРІ
 
   unsigned int unclamped_width  = width,
                unclamped_height = height;
 
-    //получение дескриптора mip-уровня и информации о слое текстуры
+    //РїРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° mip-СѓСЂРѕРІРЅСЏ Рё РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃР»РѕРµ С‚РµРєСЃС‚СѓСЂС‹
 
   MipLevelDesc level_desc;
   LayerDesc    layer_desc;
@@ -406,7 +406,7 @@ void Texture::SetData
   GetMipLevelDesc (mip_level, level_desc);
   GetLayerDesc    (layer, layer_desc);
 
-    //отсечение
+    //РѕС‚СЃРµС‡РµРЅРёРµ
 
   if (x >= level_desc.width || y >= level_desc.height)
     return;
@@ -423,18 +423,18 @@ void Texture::SetData
   if (!buffer)
     throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
     
-    //установка текстуры в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   Bind ();  
   
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-    //настройка параметров расположения данных в буфере
+    //РЅР°СЃС‚СЂРѕР№РєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂРµ
 
-  glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //длина строки в пикселях (для нулевого mip-уровня)
-  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);               //выравнивание начала строк
-  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);               //количество пропускаемых строк
-  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);               //количество пропускаемых пикселей
+  glPixelStorei (GL_UNPACK_ROW_LENGTH,  unclamped_width); //РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС… (РґР»СЏ РЅСѓР»РµРІРѕРіРѕ mip-СѓСЂРѕРІРЅСЏ)
+  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);               //РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРє
+  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);               //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃС‚СЂРѕРє
+  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);               //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… РїРёРєСЃРµР»РµР№
   
 #else
 
@@ -443,7 +443,7 @@ void Texture::SetData
 
 #endif
 
-    //проверка совместимости форматов
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С„РѕСЂРјР°С‚РѕРІ
 
   bool is_depth_stencil_source_format = is_depth_stencil (source_format),
        is_depth_stencil_tex_format    = is_depth_stencil (desc.format),
@@ -459,14 +459,14 @@ void Texture::SetData
   if (source_format == PixelFormat_D24S8 && !GetCaps ().has_ext_packed_depth_stencil)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported format %s (GL_EXT_packed_depth_stencil not supported)", get_name (source_format));
 
-    //преобразование формата пикселей
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
   
   GLenum gl_format = get_gl_format (source_format),
          gl_type   = get_gl_type (source_format);
 
   if (is_compressed (source_format))
   {
-      //проверка корректности размеров
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂР°Р·РјРµСЂРѕРІ
       
     switch (source_format)
     {
@@ -480,7 +480,7 @@ void Texture::SetData
         if (width % DXT_EDGE_SIZE == 3 || height % DXT_EDGE_SIZE == 3)
           throw xtl::format_not_supported_exception (METHOD_NAME, "Wrong block size (%u, %u) of compressed texture", width, height);
 
-          //копирование сжатого образа
+          //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃР¶Р°С‚РѕРіРѕ РѕР±СЂР°Р·Р°
 
         if (GetCaps ().has_ext_texture_compression_s3tc && source_format == desc.format)
         {
@@ -523,9 +523,9 @@ void Texture::SetData
   }
   else
   {
-      //копирование несжатого образа
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ РЅРµСЃР¶Р°С‚РѕРіРѕ РѕР±СЂР°Р·Р°
 
-      //преобразование данных буфера глубины
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С… Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹
 
     xtl::uninitialized_storage<unsigned int> tmp_buffer;
 
@@ -577,7 +577,7 @@ void Texture::SetData
     }
   }     
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
@@ -601,12 +601,12 @@ void Texture::GetData
 //  if (context)
 //    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
-    //проверка возможности чтения
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё С‡С‚РµРЅРёСЏ
 
   if (!(desc.access_flags & AccessFlag_Read))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't get texture data (no AccessFlag_Read in desc.access_flags)");
 
-    //проверка корректности номеров слоя и mip-уровня
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РЅРѕРјРµСЂРѕРІ СЃР»РѕСЏ Рё mip-СѓСЂРѕРІРЅСЏ
 
   if (layer >= desc.layers)
     throw xtl::make_range_exception (METHOD_NAME, "layer", layer, desc.layers);
@@ -614,7 +614,7 @@ void Texture::GetData
   if (mip_level >= mips_count)
     throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, mips_count);
     
-    //получение дескриптора mip-уровня и информации о слое текстуры
+    //РїРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° mip-СѓСЂРѕРІРЅСЏ Рё РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃР»РѕРµ С‚РµРєСЃС‚СѓСЂС‹
 
   MipLevelDesc level_desc;
   LayerDesc    layer_desc;
@@ -622,7 +622,7 @@ void Texture::GetData
   GetMipLevelDesc (mip_level, level_desc);
   GetLayerDesc    (layer, layer_desc);  
 
-    //отсечение
+    //РѕС‚СЃРµС‡РµРЅРёРµ
     
   unsigned int unclamped_width  = width,
                unclamped_height = height;
@@ -642,7 +642,7 @@ void Texture::GetData
   if (!buffer)
     throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
 
-    //проверка совместимости форматов
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С„РѕСЂРјР°С‚РѕРІ
 
   bool is_depth_stencil_target_format = is_depth_stencil (target_format),
        is_depth_stencil_tex_format    = is_depth_stencil (desc.format),
@@ -658,32 +658,32 @@ void Texture::GetData
       get_name (target_format));
   }
   
-    //установка текстуры в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   Bind ();
   
   const ContextCaps& caps = GetCaps ();  
   
-    //настройка параметров расположения данных в буфере
+    //РЅР°СЃС‚СЂРѕР№РєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂРµ
 
-  glPixelStorei (GL_PACK_ROW_LENGTH,  0); //размер строки в пикселях
-  glPixelStorei (GL_PACK_ALIGNMENT,   1); //выравнивание начала строк
-  glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
-  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
+  glPixelStorei (GL_PACK_ROW_LENGTH,  0); //СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС…
+  glPixelStorei (GL_PACK_ALIGNMENT,   1); //РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРє
+  glPixelStorei (GL_PACK_SKIP_ROWS,   0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃС‚СЂРѕРє
+  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… РїРёРєСЃРµР»РµР№
 
   if (caps.has_ext_texture3d)
   {
-    glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //количество пропускаемых слоев
-    glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях
+    glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃР»РѕРµРІ
+    glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //РІС‹СЃРѕС‚Р° СЃР»РѕСЏ РІ РїРёРєСЃРµР»СЏС…
   }
 
-    //проверка частного случая копирования полного образа
+    //РїСЂРѕРІРµСЂРєР° С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ РїРѕР»РЅРѕРіРѕ РѕР±СЂР°Р·Р°
 
   bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;
 
   if (is_compressed (target_format))
   {    
-      //проверка возможности копирования
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РєРѕРїРёСЂРѕРІР°РЅРёСЏ
       
     if (target_format != desc.format)
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
@@ -695,7 +695,7 @@ void Texture::GetData
     }
     else
     {            
-        //проверка корректности
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё
         
       switch (target_format)
       {
@@ -721,7 +721,7 @@ void Texture::GetData
           if (width % DXT_EDGE_SIZE == 3 || height % DXT_EDGE_SIZE == 3)
             throw xtl::format_not_supported_exception (METHOD_NAME, "Wrong block size (%u, %u) of compressed texture", width, height);
 
-            //переход к размерности блока в DXT
+            //РїРµСЂРµС…РѕРґ Рє СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё Р±Р»РѕРєР° РІ DXT
 
           x                /= DXT_EDGE_SIZE;
           y                /= DXT_EDGE_SIZE;
@@ -730,7 +730,7 @@ void Texture::GetData
           unclamped_width   = stl::max (unclamped_width / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
           unclamped_height  = stl::max (unclamped_height / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
 
-            //копирование полного образа во временный буфер
+            //РєРѕРїРёСЂРѕРІР°РЅРёРµ РїРѕР»РЅРѕРіРѕ РѕР±СЂР°Р·Р° РІРѕ РІСЂРµРјРµРЅРЅС‹Р№ Р±СѓС„РµСЂ
 
           unsigned int layer_size = get_image_size (level_desc.width, level_desc.height, target_format),
                        quad_size  = get_image_size (DXT_EDGE_SIZE, DXT_EDGE_SIZE, target_format);
@@ -739,7 +739,7 @@ void Texture::GetData
 
           caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
 
-            //копирование части образа в пользовательский буфер
+            //РєРѕРїРёСЂРѕРІР°РЅРёРµ С‡Р°СЃС‚Рё РѕР±СЂР°Р·Р° РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№ Р±СѓС„РµСЂ
 
           unsigned int src_line_size    = stl::max (level_desc.width / DXT_EDGE_SIZE, DXT_EDGE_SIZE) * quad_size,
                        src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
@@ -764,7 +764,7 @@ void Texture::GetData
     if (is_compressed (desc.format))
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't get uncompressed data (format %s) from compressed texture (format %s)", get_name (target_format), get_name (desc.format));
 
-      //копирование несжатого образа
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ РЅРµСЃР¶Р°С‚РѕРіРѕ РѕР±СЂР°Р·Р°
       
     GLenum gl_format = get_gl_format (target_format),
            gl_type   = get_gl_type (target_format);
@@ -790,7 +790,7 @@ void Texture::GetData
     }
     else
     {
-        //копирование полного образа текстуры во временный буфер
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ РїРѕР»РЅРѕРіРѕ РѕР±СЂР°Р·Р° С‚РµРєСЃС‚СѓСЂС‹ РІРѕ РІСЂРµРјРµРЅРЅС‹Р№ Р±СѓС„РµСЂ
 
       unsigned int texel_size = get_texel_size (target_format);
 
@@ -798,7 +798,7 @@ void Texture::GetData
 
       glGetTexImage (layer_desc.target, mip_level, gl_format, gl_type, temp_buffer.data ());
 
-        //копирование части образа в пользовательсий буфер
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ С‡Р°СЃС‚Рё РѕР±СЂР°Р·Р° РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРёР№ Р±СѓС„РµСЂ
 
       unsigned int src_line_size    = level_desc.width * texel_size,
                    src_layer_size   = src_line_size * level_desc.height,
@@ -820,7 +820,7 @@ void Texture::GetData
         }
         case PixelFormat_D24X8:
         {
-            //преобразование данных буфера глубины
+            //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С… Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹
 
           const unsigned int* src = reinterpret_cast<const unsigned int*> (temp_buffer.data () + src_start_offset);
           unsigned int*       dst = reinterpret_cast<unsigned int*> (buffer);
@@ -844,7 +844,7 @@ void Texture::GetData
     }
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }

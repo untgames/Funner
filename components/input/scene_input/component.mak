@@ -1,20 +1,20 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := INPUT.SCENE_INPUT.SOURCES INPUT.SCENE_INPUT.TESTS INPUT.SCENE_INPUT.INFO
 
-#Цель №1 - INPUT manager sources
+#Р¦РµР»СЊ в„–1 - INPUT manager sources
 INPUT.SCENE_INPUT.SOURCES.TYPE        := static-lib
 INPUT.SCENE_INPUT.SOURCES.NAME        := funner.input.scene_input
 INPUT.SCENE_INPUT.SOURCES.SOURCE_DIRS := sources
 INPUT.SCENE_INPUT.SOURCES.IMPORTS     := compile.input.scene_input compile.common compile.math.bound_volumes
 
-#Цель №2 - INPUT manager tests
+#Р¦РµР»СЊ в„–2 - INPUT manager tests
 INPUT.SCENE_INPUT.TESTS.TYPE        := test-suite
 INPUT.SCENE_INPUT.TESTS.SOURCE_DIRS := tests
 INPUT.SCENE_INPUT.TESTS.IMPORTS     := compile.input.scene_input link.input.scene_input
                                    
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 INPUT.SCENE_INPUT.INFO.TYPE        := doxygen-info
 INPUT.SCENE_INPUT.INFO.CHM_NAME    := funner.input.scene_input
 INPUT.SCENE_INPUT.INFO.SOURCE_DIRS := include

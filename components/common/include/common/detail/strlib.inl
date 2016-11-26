@@ -1,5 +1,5 @@
 /*
-    Хэширование
+    РҐСЌС€РёСЂРѕРІР°РЅРёРµ
 */
 
 inline size_t strhash (const stl::string& s,size_t init_hash)

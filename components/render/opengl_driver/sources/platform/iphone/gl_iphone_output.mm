@@ -5,12 +5,12 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::iphone;
 
 /*
-    Описание реализации устройства вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 struct Output::Impl
 {
-  OutputModeDesc mode_desc;  //поддерживаемый режим
+  OutputModeDesc mode_desc;  //РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ СЂРµР¶РёРј
 
   Impl ()
   {
@@ -26,7 +26,7 @@ struct Output::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Output::Output ()
@@ -39,7 +39,7 @@ Output::~Output ()
 }
 
 /*
-   Получение имени устройства
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Output::GetName ()
@@ -48,7 +48,7 @@ const char* Output::GetName ()
 }
 
 /*
-   Получение списка видео-режимов
+   РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Output::GetModesCount ()
@@ -65,7 +65,7 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 }
 
 /*
-   Установка текущего видео-режима
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void Output::SetCurrentMode (const OutputModeDesc& new_mode)
@@ -81,7 +81,7 @@ void Output::GetCurrentMode (OutputModeDesc& current_mode)
 }
 
 /*
-   Управление гамма-коррекцией
+   РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Output::SetGammaRamp (const Color3f table [256])

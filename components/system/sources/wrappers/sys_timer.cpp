@@ -7,16 +7,16 @@ using namespace syslib;
 #endif
 
 /*
-    Описание реализации таймера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚Р°Р№РјРµСЂР°
 */
 
 struct Timer::Impl
 {
-  Timer&       timer;      //таймер
-  TickHandler  handler;    //обработчик срабатываний таймера
-  size_t       period;     //период срабатываний (в милисекундах)
-  timer_t      sys_timer;  //дескриптор системного таймера
-  size_t       start_time; //время старта таймера
+  Timer&       timer;      //С‚Р°Р№РјРµСЂ
+  TickHandler  handler;    //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃСЂР°Р±Р°С‚С‹РІР°РЅРёР№ С‚Р°Р№РјРµСЂР°
+  size_t       period;     //РїРµСЂРёРѕРґ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёР№ (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…)
+  timer_t      sys_timer;  //РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРёСЃС‚РµРјРЅРѕРіРѕ С‚Р°Р№РјРµСЂР°
+  size_t       start_time; //РІСЂРµРјСЏ СЃС‚Р°СЂС‚Р° С‚Р°Р№РјРµСЂР°
 
   Impl  (Timer& in_timer, const TickHandler& in_handler);
   ~Impl ();
@@ -71,7 +71,7 @@ void Timer::Impl::TimerHandler (void* user_data)
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Timer::Timer (const TickHandler& in_handler, size_t period_in_milliseconds, TimerState initial_state)
@@ -87,7 +87,7 @@ Timer::~Timer ()
 }
 
 /*
-    Обработчик
+    РћР±СЂР°Р±РѕС‚С‡РёРє
 */
 
 const Timer::TickHandler& Timer::Handler () const
@@ -96,7 +96,7 @@ const Timer::TickHandler& Timer::Handler () const
 }
 
 /*
-    Период
+    РџРµСЂРёРѕРґ
 */
 
 size_t Timer::Period () const
@@ -110,7 +110,7 @@ void Timer::SetPeriod (size_t period_in_milliseconds)
 }
 
 /*
-    Приостановка / возобновление работы таймера
+    РџСЂРёРѕСЃС‚Р°РЅРѕРІРєР° / РІРѕР·РѕР±РЅРѕРІР»РµРЅРёРµ СЂР°Р±РѕС‚С‹ С‚Р°Р№РјРµСЂР°
 */
 
 void Timer::SetState (TimerState state)
@@ -129,7 +129,7 @@ TimerState Timer::State () const
 }
 
 /*
-    Количество милисекунд, прошедшее с момента старта таймера
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РјРёР»РёСЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РµРµ СЃ РјРѕРјРµРЅС‚Р° СЃС‚Р°СЂС‚Р° С‚Р°Р№РјРµСЂР°
 */
 
 size_t Timer::ElapsedMilliseconds () const

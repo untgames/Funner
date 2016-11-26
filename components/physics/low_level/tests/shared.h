@@ -24,7 +24,7 @@ using namespace physics::low_level;
 class Object : virtual public IObject, public xtl::reference_counter
 {
   public:
-    ///Подсчёт ссылок
+    ///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }
     void Release () { release (this); }
 };
@@ -34,12 +34,12 @@ class TestScene : public IScene, public Object
   public:
     TestScene () : gravity (0.0f, -9.8f, 0.0f), simulation_step (1.f / 60.f) {}
 
-    ///Управление гравитацией
+    ///РЈРїСЂР°РІР»РµРЅРёРµ РіСЂР°РІРёС‚Р°С†РёРµР№
     const math::vec3f& Gravity () { return gravity; }
 
     void SetGravity (const math::vec3f& value) { gravity = value; }
 
-    ///Симуляция
+    ///РЎРёРјСѓР»СЏС†РёСЏ
     float SimulationStep () { return simulation_step; }
 
     void  SetSimulationStep (float step) { simulation_step = step; }
@@ -49,13 +49,13 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::PerformSimulation");
     }
 
-    ///Создание тел в сцене
+    ///РЎРѕР·РґР°РЅРёРµ С‚РµР» РІ СЃС†РµРЅРµ
     IRigidBody* CreateRigidBody (IShape* shape, float mass)
     {
       throw xtl::make_not_implemented_exception ("TestScene::CreateRigidBody");
     }
 
-    ///Создание соединений между телами
+    ///РЎРѕР·РґР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёР№ РјРµР¶РґСѓ С‚РµР»Р°РјРё
     IJoint* CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const SphericalJointDesc& desc)
     {
       throw xtl::make_not_implemented_exception ("TestScene::CreateSphericalJoint");
@@ -76,7 +76,7 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::CreatePrismaticJoint");
     }
 
-    ///Фильтрация столкновений объектов
+    ///Р¤РёР»СЊС‚СЂР°С†РёСЏ СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
     void SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter)
     {
       throw xtl::make_not_implemented_exception ("TestScene::SetCollisionFilter");
@@ -87,13 +87,13 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::SetDefaultCollisionFilter");
     }
 
-    ///Обработка столкновений объектов
+    ///РћР±СЂР°Р±РѕС‚РєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler)
     {
       throw xtl::make_not_implemented_exception ("TestScene::RegisterCallback");
     }
 
-    ///Трассировка луча, порядок вызова не соответствует удаленности объекта
+    ///РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РїРѕСЂСЏРґРѕРє РІС‹Р·РѕРІР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СѓРґР°Р»РµРЅРЅРѕСЃС‚Рё РѕР±СЉРµРєС‚Р°
     void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
     {
       throw xtl::make_not_implemented_exception ("TestScene::RayTest");
@@ -105,7 +105,7 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::RayTest");
     }
 
-    ///Отладочная отрисовка
+    ///РћС‚Р»Р°РґРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°
     void Draw (render::debug::PrimitiveRender&)
     {
       throw xtl::make_not_implemented_exception ("TestScene::Draw");
@@ -116,28 +116,28 @@ class TestScene : public IScene, public Object
     float       simulation_step;
 };
 
-//тестовый драйвер
+//С‚РµСЃС‚РѕРІС‹Р№ РґСЂР°Р№РІРµСЂ
 class TestDriver: public IDriver, public Object
 {
   public:
     TestDriver () {}
 
-    ///Описание драйвера
+    ///РћРїРёСЃР°РЅРёРµ РґСЂР°Р№РІРµСЂР°
     const char* GetDescription () { return "TestDriver"; }
 
-    ///Создаение сцены
+    ///РЎРѕР·РґР°РµРЅРёРµ СЃС†РµРЅС‹
     IScene* CreateScene ()
     {
       return new TestScene ();
     }
 
-    ///Создание материала
+    ///РЎРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»Р°
     IMaterial* CreateMaterial ()
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateMaterial");
     }
 
-    ///Создание геометрических тел
+    ///РЎРѕР·РґР°РЅРёРµ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёС… С‚РµР»
     IShape* CreateBoxShape (const math::vec3f& half_dimensions)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateBoxShape");

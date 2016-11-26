@@ -1,4 +1,4 @@
-// Тестирование assign, operator =
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ assign, operator =
 
 #include <stdio.h>
 #include <stl/string>

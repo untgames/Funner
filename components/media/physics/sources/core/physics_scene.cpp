@@ -11,15 +11,15 @@ const float       DEFAULT_SIMULATION_STEP = 1.f / 60.f;
 }
 
 /*
-   Реализация материала
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct Scene::Impl : public xtl::reference_counter
 {
-  stl::string               name;              //имя
-  CollisionFilterCollection collision_filters; //фильтры коллизий
-  math::vec3f               gravity;           //гравитация
-  float                     simulation_step;   //шаг симуляции
+  stl::string               name;              //РёРјСЏ
+  CollisionFilterCollection collision_filters; //С„РёР»СЊС‚СЂС‹ РєРѕР»Р»РёР·РёР№
+  math::vec3f               gravity;           //РіСЂР°РІРёС‚Р°С†РёСЏ
+  float                     simulation_step;   //С€Р°Рі СЃРёРјСѓР»СЏС†РёРё
 
   Impl ()
     : gravity (DEFAULT_GRAVITY)
@@ -39,7 +39,7 @@ struct Scene::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Scene::Scene ()
@@ -71,7 +71,7 @@ Scene& Scene::operator = (const Scene& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Scene Scene::Clone () const
@@ -80,7 +80,7 @@ Scene Scene::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Scene::Id () const
@@ -89,7 +89,7 @@ size_t Scene::Id () const
 }
 
 /*
-   Имя сцены
+   РРјСЏ СЃС†РµРЅС‹
 */
 
 const char* Scene::Name () const
@@ -106,7 +106,7 @@ void Scene::Rename (const char* name)
 }
 
 /*
-   Получение коллекций фильтров коллизий
+   РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»Р»РµРєС†РёР№ С„РёР»СЊС‚СЂРѕРІ РєРѕР»Р»РёР·РёР№
 */
 
 const Scene::CollisionFilterCollection& Scene::CollisionFilters () const
@@ -120,7 +120,7 @@ Scene::CollisionFilterCollection& Scene::CollisionFilters ()
 }
 
 /*
-   Гравитация
+   Р“СЂР°РІРёС‚Р°С†РёСЏ
 */
 
 const math::vec3f& Scene::Gravity () const
@@ -134,7 +134,7 @@ void Scene::SetGravity (const math::vec3f& gravity)
 }
 
 /*
-   Точность симуляции
+   РўРѕС‡РЅРѕСЃС‚СЊ СЃРёРјСѓР»СЏС†РёРё
 */
 
 float Scene::SimulationStep () const
@@ -148,7 +148,7 @@ void Scene::SetSimulationStep (float value)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Scene::Swap (Scene& source)
@@ -163,7 +163,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Scene& scene1, Scene& scene2)

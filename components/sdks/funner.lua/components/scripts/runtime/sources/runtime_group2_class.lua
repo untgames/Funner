@@ -1,7 +1,7 @@
--- Атрибут функторов, вызываемых при конструировании класса
+-- РђС‚СЂРёР±СѓС‚ С„СѓРЅРєС‚РѕСЂРѕРІ, РІС‹Р·С‹РІР°РµРјС‹С… РїСЂРё РєРѕРЅСЃС‚СЂСѓРёСЂРѕРІР°РЅРёРё РєР»Р°СЃСЃР°
 local class_initializer = attribute ()
 
--- Получение таблицы реализации класса
+-- РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СЂРµР°Р»РёР·Р°С†РёРё РєР»Р°СЃСЃР°
 local function GetClassImpl (class)
   local impl = rawget (class, "impl")
   
@@ -12,7 +12,7 @@ local function GetClassImpl (class)
   return impl
 end
 
--- Установка свойства
+-- РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР°
 local function SetProperty (object, name, value)
   local set_handler = object [string.format ("set_%s", name)]
   
@@ -23,7 +23,7 @@ local function SetProperty (object, name, value)
   return true
 end
 
--- Чтение свойства
+-- Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР°
 local function GetProperty (object, name, result)
   local get_handler = object [string.format ("get_%s", name)]
 
@@ -34,7 +34,7 @@ local function GetProperty (object, name, result)
   return true
 end
 
--- Установка члена класса
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‡Р»РµРЅР° РєР»Р°СЃСЃР°
 local function SetClassField (class, name, value)
   local impl   = GetClassImpl (class)
   local member = impl [name]  
@@ -59,7 +59,7 @@ local function SetClassField (class, name, value)
   return false
 end
 
--- Получение члена класса
+-- РџРѕР»СѓС‡РµРЅРёРµ С‡Р»РµРЅР° РєР»Р°СЃСЃР°
 local function GetClassField (class, name, result)
   local impl   = GetClassImpl (class)
   local member = impl [name]
@@ -84,17 +84,17 @@ local function GetClassField (class, name, result)
   return false
 end
 
--- Мета-таблица класса
+-- РњРµС‚Р°-С‚Р°Р±Р»РёС†Р° РєР»Р°СЃСЃР°
 local class_meta_table =
 {
-  -- Установка члена класса 
+  -- РЈСЃС‚Р°РЅРѕРІРєР° С‡Р»РµРЅР° РєР»Р°СЃСЃР° 
   __newindex = function (class, name, value)
     if not SetClassField (class, name, value) then
       error (string.format ("Can't set value: member '%s.%s' not found", tostring (class), name))    
     end
   end,
   
-  -- Получение члена класса
+  -- РџРѕР»СѓС‡РµРЅРёРµ С‡Р»РµРЅР° РєР»Р°СЃСЃР°
   __index = function (class, name)
     local result = {}
   
@@ -105,26 +105,26 @@ local class_meta_table =
     return result.value
   end,
   
-  -- Преобразование в строку
+  -- РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІ СЃС‚СЂРѕРєСѓ
   __tostring = function (class)
     return rawget (class, "name")
   end,
 }
 
--- Создание класса или объекта
+-- РЎРѕР·РґР°РЅРёРµ РєР»Р°СЃСЃР° РёР»Рё РѕР±СЉРµРєС‚Р°
 local function CreateClassInstance (class_name, impl, parent)
-  -- Создание класса
+  -- РЎРѕР·РґР°РЅРёРµ РєР»Р°СЃСЃР°
 
   local class = {}  
   
   class.impl = impl  
   class.name = class_name
 
-  -- Установка мета-таблицы
+  -- РЈСЃС‚Р°РЅРѕРІРєР° РјРµС‚Р°-С‚Р°Р±Р»РёС†С‹
   
   setmetatable (class, class_meta_table)
 
-  -- Инициализация класса    
+  -- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєР»Р°СЃСЃР°    
 
   for name, value in pairs (impl) do
     local initializer = class_initializer [value]
@@ -145,10 +145,10 @@ local function CreateClassInstance (class_name, impl, parent)
   return class
 end
 
--- Счётчик анонимных классов
+-- РЎС‡С‘С‚С‡РёРє Р°РЅРѕРЅРёРјРЅС‹С… РєР»Р°СЃСЃРѕРІ
 local anonymous_classes_number = 0
 
--- Регистрация класса
+-- Р РµРіРёСЃС‚СЂР°С†РёСЏ РєР»Р°СЃСЃР°
 local function KeywordClass (param)
   if type (param) == "string" then
     local class_name = param
@@ -167,7 +167,7 @@ local function KeywordClass (param)
   end
 end
 
--- Реализация наследования
+-- Р РµР°Р»РёР·Р°С†РёСЏ РЅР°СЃР»РµРґРѕРІР°РЅРёСЏ
 local function KeywordSuperClass (...)
   local parents = { ... }
 
@@ -194,7 +194,7 @@ local function KeywordSuperClass (...)
   return RegisterSuperClass
 end
 
--- Реализация конструктора
+-- Р РµР°Р»РёР·Р°С†РёСЏ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°
 local function KeywordConstructor (fn)
   local function CreateConstructor (class, fn)
     local function Constructor (...)
@@ -225,7 +225,7 @@ local function KeywordConstructor (fn)
   return fn
 end
 
--- Реализация перебора полей класса
+-- Р РµР°Р»РёР·Р°С†РёСЏ РїРµСЂРµР±РѕСЂР° РїРѕР»РµР№ РєР»Р°СЃСЃР°
 local function KeywordMembersOf (class)
   local result = {}
   
@@ -248,7 +248,7 @@ local function KeywordMembersOf (class)
   return pairs (result)
 end
 
--- Переопределения имён
+-- РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёСЏ РёРјС‘РЅ
 class       = KeywordClass
 extend      = KeywordSuperClass
 constructor = KeywordConstructor

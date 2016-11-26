@@ -1,5 +1,5 @@
 /*
-    Ключ хэширования
+    РљР»СЋС‡ С…СЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 template <class T>
@@ -26,7 +26,7 @@ inline bool hash_key<T>::operator != (const hash_key& key) const
 }
 
 /*
-    Функции хэширования
+    Р¤СѓРЅРєС†РёРё С…СЌС€РёСЂРѕРІР°РЅРёСЏ
 */
 
 inline size_t hash (int x)
@@ -110,14 +110,14 @@ inline size_t hash (const wchar_t* s)
 
 #endif
 
-//получение последовательного хэша
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРіРѕ С…СЌС€Р°
 template <class T>
 inline size_t hash (const T& object, size_t previous_hash)
 {
   return hash (object) ^ previous_hash;
 }
 
-//получение хэша пары
+//РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РїР°СЂС‹
 template <class T1, class T2>
 inline size_t hash (const pair<T1, T2>& p)
 {

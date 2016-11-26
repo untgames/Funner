@@ -6,22 +6,22 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AsyncPredicate::AsyncPredicate (const ContextManager& manager)
   : ContextObject (manager)
 {
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //создание запроса
+    //СЃРѕР·РґР°РЅРёРµ Р·Р°РїСЂРѕСЃР°
 
   if (glGenQueries) glGenQueries    (1, &query);
   else              glGenQueriesARB (1, &query);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::AsyncPredicate::AsyncPredicate");
 }
@@ -30,16 +30,16 @@ AsyncPredicate::~AsyncPredicate ()
 {
   try
   {
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     if (TryMakeContextCurrent ())
     {
-        //удаление запроса
+        //СѓРґР°Р»РµРЅРёРµ Р·Р°РїСЂРѕСЃР°
 
       if (glDeleteQueries) glDeleteQueries    (1, &query);
       else                 glDeleteQueriesARB (1, &query);
 
-        //проверка ошибок
+        //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
       CheckErrors ("");
     }
@@ -56,42 +56,42 @@ AsyncPredicate::~AsyncPredicate ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Указание границ запроса
+    РЈРєР°Р·Р°РЅРёРµ РіСЂР°РЅРёС† Р·Р°РїСЂРѕСЃР°
 */
 
 /*
-    Указание границ запроса
+    РЈРєР°Р·Р°РЅРёРµ РіСЂР°РЅРёС† Р·Р°РїСЂРѕСЃР°
 */
 void AsyncPredicate::Begin (IDeviceContext*)
 {
   try
   {
-      //проверка возможности открытия запроса
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕС‚РєСЂС‹С‚РёСЏ Р·Р°РїСЂРѕСЃР°
 
     const size_t current_is_in_ranges = GetContextCacheValue (CacheEntry_IsInQueryRanges);
 
     if (current_is_in_ranges)
       throw xtl::format_operation_exception ("", "Begin already called without end call");
 
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     MakeContextCurrent ();
 
-      //открытие запроса
+      //РѕС‚РєСЂС‹С‚РёРµ Р·Р°РїСЂРѕСЃР°
 
     if (glBeginQuery) glBeginQuery    (GL_SAMPLES_PASSED, query);
     else              glBeginQueryARB (GL_SAMPLES_PASSED, query);
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     CheckErrors ("");
 
-      //установка кэш-переменных
+      //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
     SetContextCacheValue (CacheEntry_IsInQueryRanges, 1);
   }
@@ -106,50 +106,50 @@ void AsyncPredicate::End (IDeviceContext*)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::AsyncPredicate::End";
 
-    //проверка возможности закрытия запроса
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё Р·Р°РєСЂС‹С‚РёСЏ Р·Р°РїСЂРѕСЃР°
 
   const size_t current_is_in_ranges = GetContextCacheValue (CacheEntry_IsInQueryRanges);
 
   if (!current_is_in_ranges)
     throw xtl::format_operation_exception (METHOD_NAME, "There was not begin call");
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //зкрытие запроса
+    //Р·РєСЂС‹С‚РёРµ Р·Р°РїСЂРѕСЃР°
 
   if (glEndQuery) glEndQuery    (GL_SAMPLES_PASSED);
   else            glEndQueryARB (GL_SAMPLES_PASSED);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //установка кэш-переменных
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   SetContextCacheValue (CacheEntry_IsInQueryRanges, 0);
 }
 
 /*
-    Получение результата отрисовки
-      (операция может привести к остановке выполнения нити до завершения отрисовки)
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
+      (РѕРїРµСЂР°С†РёСЏ РјРѕР¶РµС‚ РїСЂРёРІРµСЃС‚Рё Рє РѕСЃС‚Р°РЅРѕРІРєРµ РІС‹РїРѕР»РЅРµРЅРёСЏ РЅРёС‚Рё РґРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ РѕС‚СЂРёСЃРѕРІРєРё)
 */
 
 bool AsyncPredicate::GetResult ()
 {
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //получение значения результата запроса
+    //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° Р·Р°РїСЂРѕСЃР°
 
   GLuint count = 0;
 
   if (glGetQueryObjectuiv) glGetQueryObjectuiv    (query, GL_QUERY_RESULT, &count);
   else                     glGetQueryObjectuivARB (query, GL_QUERY_RESULT, &count);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::AsyncPredicate::GetResult");
 
@@ -157,23 +157,23 @@ bool AsyncPredicate::GetResult ()
 }
 
 /*
-    Получение доступности результата отрисовки
+    РџРѕР»СѓС‡РµРЅРёРµ РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚Р°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 bool AsyncPredicate::IsResultAvailable ()
 {
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //проверка готовности результата
+    //РїСЂРѕРІРµСЂРєР° РіРѕС‚РѕРІРЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚Р°С‚Р°
 
   GLint available = 0;
 
   if (glGetQueryObjectiv) glGetQueryObjectiv    (query, GL_QUERY_RESULT_AVAILABLE, &available);
   else                    glGetQueryObjectivARB (query, GL_QUERY_RESULT_AVAILABLE, &available);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::AsyncPredicate::IsResultAvailable");
 

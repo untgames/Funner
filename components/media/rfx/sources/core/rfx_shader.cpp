@@ -4,18 +4,18 @@ using namespace common;
 using namespace media::rfx;
 
 /*
-    Описание реализации шейдера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С€РµР№РґРµСЂР°
 */
 
 struct Shader::Impl: public xtl::reference_counter
 {
-  stl::string name;        //имя шейдера
-  stl::string profile;     //профиль шейдера
-  stl::string source_code; //исходный код
+  stl::string name;        //РёРјСЏ С€РµР№РґРµСЂР°
+  stl::string profile;     //РїСЂРѕС„РёР»СЊ С€РµР№РґРµСЂР°
+  stl::string source_code; //РёСЃС…РѕРґРЅС‹Р№ РєРѕРґ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Shader::Shader ()
@@ -47,7 +47,7 @@ Shader& Shader::operator = (const Shader& shader)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Shader Shader::Clone () const
@@ -56,7 +56,7 @@ Shader Shader::Clone () const
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Shader::Id () const
@@ -65,7 +65,7 @@ size_t Shader::Id () const
 }
 
 /*
-    Имя шейдера
+    РРјСЏ С€РµР№РґРµСЂР°
 */
 
 const char* Shader::Name () const
@@ -82,7 +82,7 @@ void Shader::SetName (const char* name)
 }
 
 /*
-    Профиль шейдера
+    РџСЂРѕС„РёР»СЊ С€РµР№РґРµСЂР°
 */
 
 const char* Shader::Profile () const
@@ -99,7 +99,7 @@ void Shader::SetProfile (const char* profile)
 }
 
 /*
-    Исходный код и его полный размер (не включая завершающий '\0')
+    РСЃС…РѕРґРЅС‹Р№ РєРѕРґ Рё РµРіРѕ РїРѕР»РЅС‹Р№ СЂР°Р·РјРµСЂ (РЅРµ РІРєР»СЋС‡Р°СЏ Р·Р°РІРµСЂС€Р°СЋС‰РёР№ '\0')
 */
 
 const char* Shader::SourceCode () const
@@ -130,7 +130,7 @@ void Shader::SetSourceCode (const char* source, size_t size)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Shader::Swap (Shader& shader)

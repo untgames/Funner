@@ -3,38 +3,38 @@
 using namespace common;
 
 /*
-    Состояние записи
+    РЎРѕСЃС‚РѕСЏРЅРёРµ Р·Р°РїРёСЃРё
 */
 
 enum WriterState
 {
-  WriterState_DocumentStart,  //запись в начале документа
-  WriterState_DocumentEnd,    //запись завершена
-  WriterState_AttributeList,  //запись списка атрибутов
-  WriterState_AttributeValue, //запсь значения атрибута
-  WriterState_NodeScope,      //запись в блоке узла
+  WriterState_DocumentStart,  //Р·Р°РїРёСЃСЊ РІ РЅР°С‡Р°Р»Рµ РґРѕРєСѓРјРµРЅС‚Р°
+  WriterState_DocumentEnd,    //Р·Р°РїРёСЃСЊ Р·Р°РІРµСЂС€РµРЅР°
+  WriterState_AttributeList,  //Р·Р°РїРёСЃСЊ СЃРїРёСЃРєР° Р°С‚СЂРёР±СѓС‚РѕРІ
+  WriterState_AttributeValue, //Р·Р°РїСЃСЊ Р·РЅР°С‡РµРЅРёСЏ Р°С‚СЂРёР±СѓС‚Р°
+  WriterState_NodeScope,      //Р·Р°РїРёСЃСЊ РІ Р±Р»РѕРєРµ СѓР·Р»Р°
 };
 
 /*
-    Описание реализации XmlWriter    
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё XmlWriter    
 */
 
 typedef stl::stack<stl::string> NodeStack;
 
 struct XmlWriter::Impl
 {
-  OutputTextStream stream;         //поток вывода
-  size_t           node_indent;    //отступ между узлами
-  NodeStack        node_stack;     //стек имён узлов
-  WriterState      state;          //состояние записи
-  stl::string      escaped_string; //строка с результатом замены специальных символов
+  OutputTextStream stream;         //РїРѕС‚РѕРє РІС‹РІРѕРґР°
+  size_t           node_indent;    //РѕС‚СЃС‚СѓРї РјРµР¶РґСѓ СѓР·Р»Р°РјРё
+  NodeStack        node_stack;     //СЃС‚РµРє РёРјС‘РЅ СѓР·Р»РѕРІ
+  WriterState      state;          //СЃРѕСЃС‚РѕСЏРЅРёРµ Р·Р°РїРёСЃРё
+  stl::string      escaped_string; //СЃС‚СЂРѕРєР° СЃ СЂРµР·СѓР»СЊС‚Р°С‚РѕРј Р·Р°РјРµРЅС‹ СЃРїРµС†РёР°Р»СЊРЅС‹С… СЃРёРјРІРѕР»РѕРІ
   
   Impl (const WriteFunction& writer, size_t in_node_indent) :
        stream (writer), node_indent (in_node_indent), state (WriterState_DocumentStart) {}
 };
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 XmlWriter::XmlWriter (const char* file_name, size_t node_indent)
@@ -56,7 +56,7 @@ XmlWriter::~XmlWriter ()
 }
 
 /*
-    Поток вывода
+    РџРѕС‚РѕРє РІС‹РІРѕРґР°
 */
 
 const OutputTextStream& XmlWriter::Stream () const
@@ -70,7 +70,7 @@ OutputTextStream& XmlWriter::Stream ()
 }
 
 /*
-    Размер отступа нового узла
+    Р Р°Р·РјРµСЂ РѕС‚СЃС‚СѓРїР° РЅРѕРІРѕРіРѕ СѓР·Р»Р°
 */
 
 size_t XmlWriter::NodeIndent () const
@@ -79,7 +79,7 @@ size_t XmlWriter::NodeIndent () const
 }
 
 /*
-    Работа с атрибутами
+    Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
 */
 
 void XmlWriter::BeginAttribute (const char* name)
@@ -120,7 +120,7 @@ void XmlWriter::CloseAttributeList ()
 }
 
 /*
-    Работа с узлами
+    Р Р°Р±РѕС‚Р° СЃ СѓР·Р»Р°РјРё
 */
 
 void XmlWriter::BeginNode (const char* name)
@@ -128,28 +128,28 @@ void XmlWriter::BeginNode (const char* name)
   if (!name)
     throw xtl::make_null_argument_exception ("common::XmlWriter::BeginNode", "name");
 
-    //проверка возможности записи
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё Р·Р°РїРёСЃРё
 
   CheckEndOfDocument ("common::XmlWriter::BeginNode");
 
-    //закрытие списка атрибутов
+    //Р·Р°РєСЂС‹С‚РёРµ СЃРїРёСЃРєР° Р°С‚СЂРёР±СѓС‚РѕРІ
 
   CloseAttributeList ();
   
-    //запись отступа
+    //Р·Р°РїРёСЃСЊ РѕС‚СЃС‚СѓРїР°
   
   WriteIndent ();  
 
-    //помещение имени узла в стек
+    //РїРѕРјРµС‰РµРЅРёРµ РёРјРµРЅРё СѓР·Р»Р° РІ СЃС‚РµРє
 
   impl->node_stack.push (name);
 
-    //запись заголовка узла
+    //Р·Р°РїРёСЃСЊ Р·Р°РіРѕР»РѕРІРєР° СѓР·Р»Р°
 
   write (impl->stream, "<");
   write (impl->stream, name);
 
-    //переход в состояние записи списка атрибутов
+    //РїРµСЂРµС…РѕРґ РІ СЃРѕСЃС‚РѕСЏРЅРёРµ Р·Р°РїРёСЃРё СЃРїРёСЃРєР° Р°С‚СЂРёР±СѓС‚РѕРІ
 
   impl->state = WriterState_AttributeList;
 }
@@ -193,7 +193,7 @@ void XmlWriter::EndNode ()
 }
 
 /*
-    Запись данных
+    Р—Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
 */
 
 void XmlWriter::BeginData ()
@@ -222,7 +222,7 @@ void XmlWriter::EndCData ()
 }
 
 /*
-    Вставка комментария
+    Р’СЃС‚Р°РІРєР° РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 */
 
 void XmlWriter::WriteComment (const char* comment)
@@ -230,15 +230,15 @@ void XmlWriter::WriteComment (const char* comment)
   if (!comment)
     throw xtl::make_null_argument_exception ("common::XmlWriter::WriteComment", "comment");
     
-    //проверка возможности записи
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё Р·Р°РїРёСЃРё
     
   CheckEndOfDocument ("common::XmlWriter::WriteComment");
     
-    //закрытие списка атрибутов
+    //Р·Р°РєСЂС‹С‚РёРµ СЃРїРёСЃРєР° Р°С‚СЂРёР±СѓС‚РѕРІ
     
   CloseAttributeList ();
 
-    //запись комментария
+    //Р·Р°РїРёСЃСЊ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 
   WriteIndent ();
 
@@ -285,7 +285,7 @@ void XmlWriter::WriteComment (const char* comment)
 }
 
 /*
-    Сброс буферов потока
+    РЎР±СЂРѕСЃ Р±СѓС„РµСЂРѕРІ РїРѕС‚РѕРєР°
 */
 
 void XmlWriter::Flush ()
@@ -294,7 +294,7 @@ void XmlWriter::Flush ()
 }
 
 /*
-    Запись заголовка
+    Р—Р°РїРёСЃСЊ Р·Р°РіРѕР»РѕРІРєР°
 */
 
 void XmlWriter::WriteHeader ()
@@ -303,7 +303,7 @@ void XmlWriter::WriteHeader ()
 }
 
 /*
-    Запись отступа
+    Р—Р°РїРёСЃСЊ РѕС‚СЃС‚СѓРїР°
 */
 
 void XmlWriter::WriteIndent (int offset)
@@ -312,7 +312,7 @@ void XmlWriter::WriteIndent (int offset)
 }
 
 /*
-    Проверка корректности. Возбуждение исключения в случае записи в конец документа
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё. Р’РѕР·Р±СѓР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ Р·Р°РїРёСЃРё РІ РєРѕРЅРµС† РґРѕРєСѓРјРµРЅС‚Р°
 */
 
 void XmlWriter::RaiseEndOfDocument (const char* source)
@@ -327,7 +327,7 @@ void XmlWriter::CheckEndOfDocument (const char* source)
 }
 
 /*
-    Маскирование символов
+    РњР°СЃРєРёСЂРѕРІР°РЅРёРµ СЃРёРјРІРѕР»РѕРІ
 */
 
 const char* XmlWriter::EscapeStringSymbols (const char* value)

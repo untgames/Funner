@@ -1,4 +1,4 @@
-//Тестирование find_last_not_of
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find_last_not_of
 #include <stdio.h>
 #include <stl/string>
 

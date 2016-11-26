@@ -6,8 +6,8 @@ using namespace common;
 //#define NO_BALANCE
 
 /*
-    Работа с деревом блоков среднего размера
-    Дерево свободных блоков представляет собой красно-чёрное дерево
+    ╨а╨░╨▒╨╛╤В╨░ ╤Б ╨┤╨╡╤А╨╡╨▓╨╛╨╝ ╨▒╨╗╨╛╨║╨╛╨▓ ╤Б╤А╨╡╨┤╨╜╨╡╨│╨╛ ╤А╨░╨╖╨╝╨╡╤А╨░
+    ╨Ф╨╡╤А╨╡╨▓╨╛ ╤Б╨▓╨╛╨▒╨╛╨┤╨╜╤Л╤Е ╨▒╨╗╨╛╨║╨╛╨▓ ╨┐╤А╨╡╨┤╤Б╤В╨░╨▓╨╗╤П╨╡╤В ╤Б╨╛╨▒╨╛╨╣ ╨║╤А╨░╤Б╨╜╨╛-╤З╤С╤А╨╜╨╛╨╡ ╨┤╨╡╤А╨╡╨▓╨╛
 */
 
 MediumBlockTree::MediumBlockTree ()
@@ -20,7 +20,7 @@ MediumBlockTree::MediumBlockTree ()
 
 MediumBlock* MediumBlockTree::FindSmallestBlock (size_t size,AllocNode* node)
 {
-  //root является корректным узлом
+  //root ╤П╨▓╨╗╤П╨╡╤В╤Б╤П ╨║╨╛╤А╤А╨╡╨║╤В╨╜╤Л╨╝ ╤Г╨╖╨╗╨╛╨╝
   
   MediumBlock* block = root, *result = NULL; 
   size_t       steps = 1;
@@ -132,13 +132,13 @@ void MediumBlockTree::InsertBlock (MediumBlock* new_node)
     if (size < parent->size) parent->left  = new_node;
     else                     parent->right = new_node;
   }
-  else root = new_node; //возможно данный случай следует вынести      
+  else root = new_node; //╨▓╨╛╨╖╨╝╨╛╨╢╨╜╨╛ ╨┤╨░╨╜╨╜╤Л╨╣ ╤Б╨╗╤Г╤З╨░╨╣ ╤Б╨╗╨╡╨┤╤Г╨╡╤В ╨▓╤Л╨╜╨╡╤Б╤В╨╕      
   
 #ifdef NO_BALANCE
   return;
 #endif
   
-  //балансировка дерева
+  //╨▒╨░╨╗╨░╨╜╤Б╨╕╤А╨╛╨▓╨║╨░ ╨┤╨╡╤А╨╡╨▓╨░
   
   node = new_node;  
   
@@ -205,7 +205,7 @@ void MediumBlockTree::InsertBlock (MediumBlock* new_node)
 
 void MediumBlockTree::RemoveBlock (MediumBlock* node)
 {
-  if (node->prev_free) //удаление данного блока не изменяет структуру дерева свободных блоков
+  if (node->prev_free) //╤Г╨┤╨░╨╗╨╡╨╜╨╕╨╡ ╨┤╨░╨╜╨╜╨╛╨│╨╛ ╨▒╨╗╨╛╨║╨░ ╨╜╨╡ ╨╕╨╖╨╝╨╡╨╜╤П╨╡╤В ╤Б╤В╤А╤Г╨║╤В╤Г╤А╤Г ╨┤╨╡╤А╨╡╨▓╨░ ╤Б╨▓╨╛╨▒╨╛╨┤╨╜╤Л╤Е ╨▒╨╗╨╛╨║╨╛╨▓
   {
     node->prev_free->next_free = node->next_free;
 
@@ -240,7 +240,7 @@ void MediumBlockTree::RemoveBlock (MediumBlock* node)
   
   nodes_count--;
   
-  if (!nodes_count) //удаление последнего узла в дереве
+  if (!nodes_count) //╤Г╨┤╨░╨╗╨╡╨╜╨╕╨╡ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨│╨╛ ╤Г╨╖╨╗╨░ ╨▓ ╨┤╨╡╤А╨╡╨▓╨╡
   {
     min_block_size = (size_t)-1;
     max_block_size = 0;

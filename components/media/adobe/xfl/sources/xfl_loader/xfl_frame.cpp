@@ -4,7 +4,7 @@ using namespace common;
 using namespace media::adobe::xfl;
 
 /*
-    Разбор кадра анимации
+    Р Р°Р·Р±РѕСЂ РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseFrame (Parser::Iterator iter, Frame& frame)

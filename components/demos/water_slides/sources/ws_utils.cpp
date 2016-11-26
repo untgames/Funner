@@ -1,6 +1,6 @@
 #include "shared.h"
 
-//получение ортографической матрицы проекции
+//РїРѕР»СѓС‡РµРЅРёРµ РѕСЂС‚РѕРіСЂР°С„РёС‡РµСЃРєРѕР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµРєС†РёРё
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
 {
   math::mat4f proj_matrix;
@@ -9,7 +9,7 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
         height = top - bottom,
         depth  = zfar - znear;  
 
-    //выбрана матрица проецирования, используемая gluOrtho2D
+    //РІС‹Р±СЂР°РЅР° РјР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ, РёСЃРїРѕР»СЊР·СѓРµРјР°СЏ gluOrtho2D
 
   proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
   proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
@@ -19,7 +19,7 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
-//получение перспективной матрицы проекции
+//РїРѕР»СѓС‡РµРЅРёРµ РїРµСЂСЃРїРµРєС‚РёРІРЅРѕР№ РјР°С‚СЂРёС†С‹ РїСЂРѕРµРєС†РёРё
 math::mat4f get_perspective_proj (const math::anglef& fov_x, const math::anglef& fov_y, float znear, float zfar)
 {
   math::mat4f proj_matrix;

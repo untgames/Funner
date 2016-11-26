@@ -33,7 +33,7 @@ template <class Fn> class ActivityMessage: public MessageQueue::Message
 class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AndroidApplicationDelegate ()
       : background_mode_after_stop (ApplicationBackgroundMode_Suspend)
       , message_queue (*MessageQueueSingleton::Instance ())    
@@ -52,7 +52,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       application_delegate = this;      
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~AndroidApplicationDelegate ()
     {
       application_delegate = 0;
@@ -63,11 +63,11 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Помещение сообщения в очередь
+///РџРѕРјРµС‰РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕС‡РµСЂРµРґСЊ
     template <class Fn> static void PushMessage (const Fn& fn)
     {
       try
@@ -76,11 +76,11 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       if (listener)
@@ -91,7 +91,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         while (!IsMessageQueueEmpty ())
           DoNextEvent ();                    
 
-         //если нет обработчиков OnIdle - приостанавливаем приложение
+         //РµСЃР»Рё РЅРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ OnIdle - РїСЂРёРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 
         if (!idle_enabled)
         {
@@ -108,13 +108,13 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));      
     }
     
-///Обработка события выхода из приложения
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnExit (int code)
     {
       is_exited = true;
@@ -123,7 +123,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         listener->OnExit (code);
     }    
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
@@ -132,13 +132,13 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         message_queue.PushEmptyMessage ();
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Установка состояния активности приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ Р°РєС‚РёРІРЅРѕСЃС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetActivityState (bool state)
     {
       {
@@ -168,7 +168,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
     }
     
-///Оповещение о приостановке приложения
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёРѕСЃС‚Р°РЅРѕРІРєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnPause ()
     {        
       log.Printf ("Application paused");
@@ -213,20 +213,20 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         listener->OnStart ();
     }
 
-///Оповещение о возврате приложения из сна (вызывается только в случае ApplicationBackgroundMode_Active)
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РІСЂР°С‚Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ РёР· СЃРЅР° (РІС‹Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ ApplicationBackgroundMode_Active)
     void OnStartInActiveMode ()
     {
       OnStart ();
     }
 
-///Оповещение о недостаточности памяти
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕСЃС‚Рё РїР°РјСЏС‚Рё
     void OnMemoryWarning ()
     {
       if (listener)
         listener->OnMemoryWarning ();
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -238,7 +238,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     }
     
   private:
-///Отложенное события выхода из приложения
+///РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     struct ExitMessage: public MessageQueue::Message
     {
       ExitMessage (AndroidApplicationDelegate& in_delegate, int in_code) : delegate (in_delegate), code (in_code) {}
@@ -252,7 +252,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       int                         code;
     };
     
-///Проверка очереди событий на пустоту
+///РџСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРё СЃРѕР±С‹С‚РёР№ РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsMessageQueueEmpty ()
     {
       if (is_exited)
@@ -261,7 +261,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       return message_queue.IsEmpty ();
     }    
     
-///Ожидание события
+///РћР¶РёРґР°РЅРёРµ СЃРѕР±С‹С‚РёСЏ
     void WaitMessage ()
     {
       try
@@ -275,7 +275,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
     }
     
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvent ()
     {
       try
@@ -302,7 +302,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
 };
 
 /*
-    Оповещения о событиях приложения
+    РћРїРѕРІРµС‰РµРЅРёСЏ Рѕ СЃРѕР±С‹С‚РёСЏС… РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 void on_pause_callback (JNIEnv& env, jobject activity)
@@ -348,7 +348,7 @@ void on_low_memory_callback (JNIEnv& env, jobject activity)
 }
 
 /*
-    Посылка сообщения приложению
+    РџРѕСЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЋ
 */
 
 void post_notification_impl (const stl::string& notification)
@@ -364,7 +364,7 @@ void post_notification (JNIEnv& env, jobject, jstring notification)
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* AndroidApplicationManager::CreateDefaultApplicationDelegate ()
@@ -373,7 +373,7 @@ IApplicationDelegate* AndroidApplicationManager::CreateDefaultApplicationDelegat
 }
 
 /*
-    Открытие URL во внешнем браузере
+    РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void AndroidApplicationManager::OpenUrl (const char* url)
@@ -401,7 +401,7 @@ void AndroidApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-    Управление энергосбережением
+    РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void AndroidApplicationManager::SetScreenSaverState (bool state)
@@ -433,7 +433,7 @@ bool AndroidApplicationManager::GetScreenSaverState ()
 }
 
 /*
-    Получение системных свойств
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& properties)
@@ -467,7 +467,7 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
 }
 
 /*
-    Управление режимом работы в фоне
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј СЂР°Р±РѕС‚С‹ РІ С„РѕРЅРµ
 */
 
 void AndroidApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
@@ -489,7 +489,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация методов обратного вызова activity
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° activity
 void register_activity_callbacks (JNIEnv* env, jclass activity_class)
 {
   try

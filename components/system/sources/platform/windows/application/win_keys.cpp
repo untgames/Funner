@@ -4,10 +4,10 @@ using namespace syslib;
 using namespace common;
 
 /*
-    Получение имени клавиши
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°РІРёС€Рё
 */
 
-//возвращается длина строки без учёта '\0'
+//РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё Р±РµР· СѓС‡С‘С‚Р° '\0'
 size_t WindowsWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
 {
 #ifdef WINCE

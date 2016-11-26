@@ -1,4 +1,4 @@
-//Тестирование find_first_not_of (string, pos)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find_first_not_of (string, pos)
 #include <stdio.h>
 #include <stl/string>
 

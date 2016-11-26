@@ -3,7 +3,7 @@
 using namespace physics;
 
 /*
-   Физическая сцена
+   Р¤РёР·РёС‡РµСЃРєР°СЏ СЃС†РµРЅР°
 */
 
 namespace
@@ -129,13 +129,13 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 {
   DriverPtr                                           driver;
   RigidBodyMap                                        rigid_body_map;
-  CollisionGroupsMap                                  collision_groups;              //Зарегистрированные группы коллизий
-  CollisionFilterDescArray                            collision_filters;             //Зарегистрированные в низкоуровневой сцене фильтры
-  CollisionFiltersMap                                 registered_filters;            //Зарегистрированные фильтры
-  xtl::auto_connection                                collision_connections [physics::low_level::CollisionEventType_Num];  //Соединения обработки коллизий для оповещения тел
-  CollisionHandlersSet                                registered_collision_handlers; //Зарегестрированные обработчики коллизий
+  CollisionGroupsMap                                  collision_groups;              //Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РіСЂСѓРїРїС‹ РєРѕР»Р»РёР·РёР№
+  CollisionFilterDescArray                            collision_filters;             //Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РІ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕР№ СЃС†РµРЅРµ С„РёР»СЊС‚СЂС‹
+  CollisionFiltersMap                                 registered_filters;            //Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ С„РёР»СЊС‚СЂС‹
+  xtl::auto_connection                                collision_connections [physics::low_level::CollisionEventType_Num];  //РЎРѕРµРґРёРЅРµРЅРёСЏ РѕР±СЂР°Р±РѕС‚РєРё РєРѕР»Р»РёР·РёР№ РґР»СЏ РѕРїРѕРІРµС‰РµРЅРёСЏ С‚РµР»
+  CollisionHandlersSet                                registered_collision_handlers; //Р—Р°СЂРµРіРµСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚С‡РёРєРё РєРѕР»Р»РёР·РёР№
   ScenePtr                                            scene;
-  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;               //Тела сцены
+  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;               //РўРµР»Р° СЃС†РµРЅС‹
   size_t                                              next_collision_filter_id;
   size_t                                              next_collision_group_id;
 
@@ -155,7 +155,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
       collision_connections [i] = scene->RegisterCollisionCallback ((physics::low_level::CollisionEventType)i, xtl::bind (&Scene::Impl::BodyCollisionHandler, this, _1));
   }
 
-  //Получение номера группы коллизий по имени.
+  //РџРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РіСЂСѓРїРїС‹ РєРѕР»Р»РёР·РёР№ РїРѕ РёРјРµРЅРё.
   size_t CollisionGroupForName (const char* name)
   {
     if (!name)
@@ -182,19 +182,19 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     return next_collision_group_id++;
   }
 
-  ///Обработка удаления тела
+  ///РћР±СЂР°Р±РѕС‚РєР° СѓРґР°Р»РµРЅРёСЏ С‚РµР»Р°
   void OnBodyDestroy (RigidBodyImpl* body_impl)
   {
     rigid_body_map.erase (body_impl->LowLevelBody ());
   }
 
-  ///Обработка удаления обработчика коллизий
+  ///РћР±СЂР°Р±РѕС‚РєР° СѓРґР°Р»РµРЅРёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕР»Р»РёР·РёР№
   void OnCollisionHandlerDestroy (CollisionHandler* handler)
   {
     registered_collision_handlers.erase (handler);
   }
 
-  ///Создание тел
+  ///РЎРѕР·РґР°РЅРёРµ С‚РµР»
   RigidBody CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material)
   {
     RigidBody     return_value = RigidBodyImplProvider::CreateRigidBody (body, shape, material, SceneImplProvider::CreateScene (this));
@@ -261,7 +261,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     return CreateRigidBody (body, shape, material);
   }
 
-  ///Создание связей между телами
+  ///РЎРѕР·РґР°РЅРёРµ СЃРІСЏР·РµР№ РјРµР¶РґСѓ С‚РµР»Р°РјРё
   Joint CreateSphericalJoint (const JointBind& bind1, const JointBind& bind2)
   {
     RigidBodyArray bodies_array;
@@ -344,12 +344,12 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
   }
 
   /*
-    Фильтрация столкновений объектов. Объекты сталкиваются, если:
-     - не задан фильтр;
-     - задан дефолтный фильтр и collides = true;
-     - заданный фильтр возвращает true и collides = true;
-     - заданный фильтр возвращает false и collides = false.
-    Приоритет фильтрации: чем позже добавлен фильтр, тем выше его приоритет
+    Р¤РёР»СЊС‚СЂР°С†РёСЏ СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ. РћР±СЉРµРєС‚С‹ СЃС‚Р°Р»РєРёРІР°СЋС‚СЃСЏ, РµСЃР»Рё:
+     - РЅРµ Р·Р°РґР°РЅ С„РёР»СЊС‚СЂ;
+     - Р·Р°РґР°РЅ РґРµС„РѕР»С‚РЅС‹Р№ С„РёР»СЊС‚СЂ Рё collides = true;
+     - Р·Р°РґР°РЅРЅС‹Р№ С„РёР»СЊС‚СЂ РІРѕР·РІСЂР°С‰Р°РµС‚ true Рё collides = true;
+     - Р·Р°РґР°РЅРЅС‹Р№ С„РёР»СЊС‚СЂ РІРѕР·РІСЂР°С‰Р°РµС‚ false Рё collides = false.
+    РџСЂРёРѕСЂРёС‚РµС‚ С„РёР»СЊС‚СЂР°С†РёРё: С‡РµРј РїРѕР·Р¶Рµ РґРѕР±Р°РІР»РµРЅ С„РёР»СЊС‚СЂ, С‚РµРј РІС‹С€Рµ РµРіРѕ РїСЂРёРѕСЂРёС‚РµС‚
   */
 
   bool CollisionFilter (physics::low_level::IRigidBody* low_level_body1, physics::low_level::IRigidBody* low_level_body2, const Scene::BroadphaseCollisionFilter& filter)
@@ -449,7 +449,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
       for (CollisionFiltersMap::iterator filter_iter = registered_filters.begin (); filter_iter != registered_filters.end ();)
       {
-        if (filter_iter->second == *iter)  //Фильтр необходимо разорвать
+        if (filter_iter->second == *iter)  //Р¤РёР»СЊС‚СЂ РЅРµРѕР±С…РѕРґРёРјРѕ СЂР°Р·РѕСЂРІР°С‚СЊ
         {
           filter_map_modified = true;
 
@@ -488,7 +488,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     collision_filters.clear ();
   }
 
-  ///Обработка столкновений объектов
+  ///РћР±СЂР°Р±РѕС‚РєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
   physics::low_level::CollisionEventType ConvertCollisionEventType (physics::CollisionEventType type)
   {
     switch (type)
@@ -578,7 +578,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     handler->OnCollision (event, body1, body2);
   }
 
-  ///Трассировка луча, порядок вызова не соответствует удаленности объекта
+  ///РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РїРѕСЂСЏРґРѕРє РІС‹Р·РѕРІР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СѓРґР°Р»РµРЅРЅРѕСЃС‚Рё РѕР±СЉРµРєС‚Р°
   physics::low_level::RayTestMode ConvertRayTestMode (RayTestMode mode)
   {
     switch (mode)
@@ -646,7 +646,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Scene::Scene (Impl* source_impl)
@@ -672,7 +672,7 @@ Scene& Scene::operator = (const Scene& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Scene::Id () const
@@ -681,7 +681,7 @@ size_t Scene::Id () const
 }
 
 /*
-   Создание тел
+   РЎРѕР·РґР°РЅРёРµ С‚РµР»
 */
 
 RigidBody Scene::CreateRigidBody (const char* name, const math::vec3f& scale)
@@ -695,7 +695,7 @@ RigidBody Scene::CreateRigidBody (const Shape& shape, float mass)
 }
 
 /*
-   Создание связей между телами
+   РЎРѕР·РґР°РЅРёРµ СЃРІСЏР·РµР№ РјРµР¶РґСѓ С‚РµР»Р°РјРё
 */
 
 Joint Scene::CreateSphericalJoint (const JointBind& bind1, const JointBind& bind2)
@@ -719,7 +719,7 @@ Joint Scene::CreatePrismaticJoint (const JointBind& bind1, const JointBind& bind
 }
 
 /*
-   Управление гравитацией
+   РЈРїСЂР°РІР»РµРЅРёРµ РіСЂР°РІРёС‚Р°С†РёРµР№
 */
 
 const math::vec3f& Scene::Gravity () const
@@ -733,7 +733,7 @@ void Scene::SetGravity (const math::vec3f& value)
 }
 
 /*
-   Параметры симуляции
+   РџР°СЂР°РјРµС‚СЂС‹ СЃРёРјСѓР»СЏС†РёРё
 */
 
 float Scene::SimulationStep () const
@@ -747,7 +747,7 @@ void Scene::SetSimulationStep (float step)
 }
 
 /*
-   Симуляция
+   РЎРёРјСѓР»СЏС†РёСЏ
 */
 void Scene::PerformSimulation (float dt)
 {
@@ -755,12 +755,12 @@ void Scene::PerformSimulation (float dt)
 }
 
 /*
-  Фильтрация столкновений объектов. Объекты сталкиваются, если:
-   - не задан фильтр;
-   - задан дефолтный фильтр и collides = true;
-   - заданный фильтр возвращает true и collides = true;
-   - заданный фильтр возвращает false и collides = false.
-  Приоритет фильтрации: чем позже добавлен фильтр, тем выше его приоритет
+  Р¤РёР»СЊС‚СЂР°С†РёСЏ СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ. РћР±СЉРµРєС‚С‹ СЃС‚Р°Р»РєРёРІР°СЋС‚СЃСЏ, РµСЃР»Рё:
+   - РЅРµ Р·Р°РґР°РЅ С„РёР»СЊС‚СЂ;
+   - Р·Р°РґР°РЅ РґРµС„РѕР»С‚РЅС‹Р№ С„РёР»СЊС‚СЂ Рё collides = true;
+   - Р·Р°РґР°РЅРЅС‹Р№ С„РёР»СЊС‚СЂ РІРѕР·РІСЂР°С‰Р°РµС‚ true Рё collides = true;
+   - Р·Р°РґР°РЅРЅС‹Р№ С„РёР»СЊС‚СЂ РІРѕР·РІСЂР°С‰Р°РµС‚ false Рё collides = false.
+  РџСЂРёРѕСЂРёС‚РµС‚ С„РёР»СЊС‚СЂР°С†РёРё: С‡РµРј РїРѕР·Р¶Рµ РґРѕР±Р°РІР»РµРЅ С„РёР»СЊС‚СЂ, С‚РµРј РІС‹С€Рµ РµРіРѕ РїСЂРёРѕСЂРёС‚РµС‚
 */
 
 size_t Scene::AddCollisionFilter (const char* group1_mask, const char* group2_mask, bool collides, const BroadphaseCollisionFilter& filter)
@@ -779,7 +779,7 @@ void Scene::RemoveAllCollisionFilters ()
 }
 
 /*
-   Обработка столкновений объектов
+   РћР±СЂР°Р±РѕС‚РєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
 */
 
 xtl::connection Scene::RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
@@ -788,7 +788,7 @@ xtl::connection Scene::RegisterCollisionCallback (const char* group1_mask, const
 }
 
 /*
-   Трассировка луча, порядок вызова не соответствует удаленности объекта
+   РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РїРѕСЂСЏРґРѕРє РІС‹Р·РѕРІР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СѓРґР°Р»РµРЅРЅРѕСЃС‚Рё РѕР±СЉРµРєС‚Р°
 */
 
 void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
@@ -802,7 +802,7 @@ void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, 
 }
 
 /*
-   Отладочная отрисовка
+   РћС‚Р»Р°РґРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°
 */
 
 void Scene::Draw (render::debug::PrimitiveRender& render)
@@ -811,7 +811,7 @@ void Scene::Draw (render::debug::PrimitiveRender& render)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Scene::Swap (Scene& scene)
@@ -823,7 +823,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Scene& scene1, Scene& scene2)
@@ -834,7 +834,7 @@ void swap (Scene& scene1, Scene& scene2)
 }
 
 /*
-   Создание
+   РЎРѕР·РґР°РЅРёРµ
 */
 
 Scene SceneImplProvider::CreateScene (physics::low_level::IDriver* driver, ScenePtr scene, const media::physics::PhysicsLibrary::RigidBodyCollection& body_collection)
@@ -858,7 +858,7 @@ Scene SceneImplProvider::CreateScene (Scene::Impl* impl)
 }
 
 /*
-   Получение номера группы коллизий по имени
+   РџРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° РіСЂСѓРїРїС‹ РєРѕР»Р»РёР·РёР№ РїРѕ РёРјРµРЅРё
 */
 
 size_t SceneImplProvider::CollisionGroupForName (const Scene& scene, const char* name)

@@ -4,13 +4,13 @@ namespace
 {
 
 /*
-    Преобразователь данных коллады
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ РґР°РЅРЅС‹С… РєРѕР»Р»Р°РґС‹
 */
 
 class Converter
 {
   public:
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Converter (const media::collada::Model& in_model, media::physics::PhysicsLibrary& library)
       : model (in_model)
       , mesh_collection (library.TriangleMeshes ())
@@ -18,17 +18,17 @@ class Converter
       ConvertMeshLibrary (model.Meshes ());
     }
 
-    ///Преобразование библиотеки
+    ///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     void ConvertMeshLibrary (const media::collada::MeshLibrary& library)
     {
       for (media::collada::MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
         ConvertMesh (library.ItemId (i), *i);
     }
 
-    ///Преобразование поверхности
+    ///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     void ConvertSurface (const media::collada::Surface& src_surface, media::physics::shapes::TriangleMesh& dst_mesh, unsigned int first_vertex, unsigned int first_index)
     {
-        //преобразование массивов поверхности
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
       size_t                        vertices_count = src_surface.VerticesCount ();
       const media::collada::Vertex* src_vertex     = src_surface.Vertices ();
       math::vec3f*                  dst_vertex     = dst_mesh.Vertices () + first_vertex;
@@ -44,18 +44,18 @@ class Converter
         *dst_index = *src_index + first_vertex;
     }    
     
-    ///Преобразование меша
+    ///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјРµС€Р°
     void ConvertMesh (const char* id, const media::collada::Mesh& src_mesh)
     {
       static const char* METHOD_NAME = "media::collada::Converter::ConvertMesh";
 
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       media::physics::shapes::TriangleMesh dst_mesh;
       
       dst_mesh.Rename (id);
 
-        //резервирование памяти для хранения индексов
+        //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРЅРґРµРєСЃРѕРІ
         
       size_t vertices_count = 0, indices_count = 0;
       
@@ -74,7 +74,7 @@ class Converter
       dst_mesh.SetVerticesCount  (vertices_count);
       dst_mesh.SetTrianglesCount (indices_count / 3);
 
-        //преобразование поверхностей
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 
       unsigned int first_vertex = 0, first_index = 0;
 
@@ -86,14 +86,14 @@ class Converter
         first_index  += iter->IndicesCount ();
       }
 
-        //регистрация меша
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС€Р°
 
       mesh_collection.Attach (id, dst_mesh);
     }    
 
   private:
-    const media::collada::Model&                             model;           //исходная коллада-модель
-    media::physics::PhysicsLibrary::TriangleMeshCollection&  mesh_collection; //результирующая коллекция мешей
+    const media::collada::Model&                             model;           //РёСЃС…РѕРґРЅР°СЏ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»СЊ
+    media::physics::PhysicsLibrary::TriangleMeshCollection&  mesh_collection; //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РєРѕР»Р»РµРєС†РёСЏ РјРµС€РµР№
 };
 
 }
@@ -104,7 +104,7 @@ namespace media
 namespace collada
 {
 
-///Преобразование коллада-модели в библиотеку мешей
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»Рё РІ Р±РёР±Р»РёРѕС‚РµРєСѓ РјРµС€РµР№
 void convert_triangle_meshes (const collada::Model& source, physics::PhysicsLibrary& destination)
 {
   Converter (source, destination);

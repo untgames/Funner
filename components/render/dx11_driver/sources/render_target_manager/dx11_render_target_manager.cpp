@@ -4,12 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджера целей рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct RenderTargetManager::Impl: public DeviceObject
 {
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
   {
@@ -17,7 +17,7 @@ struct RenderTargetManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetManager::RenderTargetManager (const DeviceManager& device_manager)
@@ -30,7 +30,7 @@ RenderTargetManager::~RenderTargetManager ()
 }
 
 /*
-    Создание текстур
+    РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂ
 */
 
 ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* in_swap_chain, size_t buffer_index)
@@ -119,7 +119,7 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* in_swap_ch
 }
 
 /*
-    Создание отображений
+    РЎРѕР·РґР°РЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc& desc)

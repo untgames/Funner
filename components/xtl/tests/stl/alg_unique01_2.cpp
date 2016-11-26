@@ -1,4 +1,4 @@
-//Тестирование алгоритма unique (first,last,pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° unique (first,last,pred)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

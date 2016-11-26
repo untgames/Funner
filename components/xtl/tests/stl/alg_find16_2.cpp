@@ -1,4 +1,4 @@
-//Тестирование алгоритма lexicographical_compare (range1, range2, compare)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° lexicographical_compare (range1, range2, compare)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

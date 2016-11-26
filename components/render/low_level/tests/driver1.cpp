@@ -15,7 +15,7 @@ int main ()
     for (size_t i=0; i<DriverManager::DriversCount (); i++)
       printf ("  driver: name='%s', description='%s'\n", DriverManager::DriverName (i), DriverManager::Driver (i)->GetDescription ());    
     
-    SwapChainDesc swap_chain_desc; //не инициализируется, поскольку не будет использован в дальнейшем    
+    SwapChainDesc swap_chain_desc; //┬н╥Р ╨Б┬н╨Б╨╢╨Б┬а┬л╨Б┬з╨Б╨░╨│╥Р╨▓╨▒╨┐, ╨З┬о╨▒╨Д┬о┬л╨╝╨Д╨│ ┬н╥Р ╨О╨│┬д╥Р╨▓ ╨Б╨▒╨З┬о┬л╨╝┬з┬о╤Ю┬а┬н ╤Ю ┬д┬а┬л╨╝┬н╥Р┬й╨╕╥Р┬м    
     
     IDevice*    device     = 0;
     ISwapChain* swap_chain = 0;

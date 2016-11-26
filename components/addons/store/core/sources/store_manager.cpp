@@ -3,13 +3,13 @@
 using namespace store;
 
 /*
-   Реализация менеджера магазинов
+   Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РјР°РіР°Р·РёРЅРѕРІ
 */
 
 namespace
 {
 
-const char* COMPONENTS_MASK = "store.stores.*"; //маска имён компонентов магазинов
+const char* COMPONENTS_MASK = "store.stores.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РјР°РіР°Р·РёРЅРѕРІ
 
 struct StoreDesc
 {
@@ -30,7 +30,7 @@ struct StoreManagerImpl::Impl
 
   StoreDescMap store_creators;
 
-  ///Регистрация создателей магазинов
+  ///Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ РјР°РіР°Р·РёРЅРѕРІ
   void RegisterStore (const char* id, const char* store_name_mask, const store::StoreManager::CreateStoreHandler& handler)
   {
     static const char* METHOD_NAME = "store::StoreManager::RegisterStore";
@@ -62,7 +62,7 @@ struct StoreManagerImpl::Impl
     store_creators.clear ();
   }
 
-  ///Поиск магазина
+  ///РџРѕРёСЃРє РјР°РіР°Р·РёРЅР°
   StoreDescMap::iterator FindStoreDesc (const char* store_name)
   {
     for (StoreDescMap::iterator iter = store_creators.begin (), end = store_creators.end (); iter != end; ++iter)
@@ -74,7 +74,7 @@ struct StoreManagerImpl::Impl
     return store_creators.end ();
   }
 
-  ///Проверка наличия магазина
+  ///РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РјР°РіР°Р·РёРЅР°
   bool IsStoreRegistered (const char* store_name)
   {
     if (!store_name)
@@ -85,7 +85,7 @@ struct StoreManagerImpl::Impl
     return FindStoreDesc (store_name) != store_creators.end ();
   }
 
-  ///Создание магазина
+  ///РЎРѕР·РґР°РЅРёРµ РјР°РіР°Р·РёРЅР°
   store::IStore* CreateStore (const char* store_name)
   {
     static const char* METHOD_NAME = "store::StoreManagerImpl::CreateStore";
@@ -103,7 +103,7 @@ struct StoreManagerImpl::Impl
     return iter->second.handler (store_name);
   }
 
-  ///Загрузка магазинов по умолчанию
+  ///Р—Р°РіСЂСѓР·РєР° РјР°РіР°Р·РёРЅРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   void LoadDefaultStores ()
   {
     static common::ComponentLoader loader (COMPONENTS_MASK);
@@ -111,7 +111,7 @@ struct StoreManagerImpl::Impl
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StoreManagerImpl::StoreManagerImpl ()
@@ -124,7 +124,7 @@ StoreManagerImpl::~StoreManagerImpl ()
 }
 
 /*
-   Регистрация создателей магазинов
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ РјР°РіР°Р·РёРЅРѕРІ
 */
 
 void StoreManagerImpl::RegisterStore (const char* id, const char* store_name_mask, const store::StoreManager::CreateStoreHandler& handler)
@@ -143,7 +143,7 @@ void StoreManagerImpl::UnregisterAllStores ()
 }
 
 /*
-   Проверка наличия магазинов
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РјР°РіР°Р·РёРЅРѕРІ
 */
 
 bool StoreManagerImpl::IsStoreRegistered (const char* store_name)
@@ -152,7 +152,7 @@ bool StoreManagerImpl::IsStoreRegistered (const char* store_name)
 }
 
 /*
-   Создание магазина
+   РЎРѕР·РґР°РЅРёРµ РјР°РіР°Р·РёРЅР°
 */
 
 store::IStore* StoreManagerImpl::CreateStore (const char* store_name)
@@ -161,7 +161,7 @@ store::IStore* StoreManagerImpl::CreateStore (const char* store_name)
 }
 
 /*
-   Регистрация создателей магазинов
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР·РґР°С‚РµР»РµР№ РјР°РіР°Р·РёРЅРѕРІ
 */
 
 void StoreManager::RegisterStore (const char* id, const char* store_name_mask, const CreateStoreHandler& handler)
@@ -180,7 +180,7 @@ void StoreManager::UnregisterAllStores ()
 }
 
 /*
-   Проверка наличия магазина
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РјР°РіР°Р·РёРЅР°
 */
     
 bool StoreManager::IsStoreRegistered (const char* store_name)

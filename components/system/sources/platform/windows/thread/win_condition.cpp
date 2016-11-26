@@ -258,7 +258,7 @@ struct syslib::condition_handle
   pthread_cond_t condition;
 };
 
-//создание условия
+//СЃРѕР·РґР°РЅРёРµ СѓСЃР»РѕРІРёСЏ
 condition_t WindowsThreadManager::CreateCondition ()
 {
   try
@@ -276,7 +276,7 @@ condition_t WindowsThreadManager::CreateCondition ()
   }
 }
 
-//удаление условия
+//СѓРґР°Р»РµРЅРёРµ СѓСЃР»РѕРІРёСЏ
 void WindowsThreadManager::DestroyCondition (condition_t handle)
 {
   try

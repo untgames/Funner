@@ -16,28 +16,28 @@ const float  DEFAULT_SHADOW_WIDTH            = 0.25f;
 }
 
 /*
-    Описание реализации перелистывания страницы
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРµСЂРµР»РёСЃС‚С‹РІР°РЅРёСЏ СЃС‚СЂР°РЅРёС†С‹
 */
 
 struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
 {
-  PageCurlMode   mode;                               //режим страниц
-  stl::string    materials [PageCurlPageType_Num];   //материалы
-  math::vec2f    size;                               //полный размер страниц
-  math::vec2f    curl_point;                         //точка перетаскивания
-  math::vec2f    curl_point_position;                //позиция точки перетаскивания
-  float          curl_radius;                        //радиус загиба
-  float          minimum_curl_radius;                //минимальный радиус загиба
-  math::vec2ui   grid_size;                          //количество разбиений сетки
-  math::vec4f    color;                              //цвет страницы
-  float          corner_shadow_offset;               //смещение тени от угла
-  float          shadow_width;                       //ширина тени
-  float          shadow_log_base;                    //основание логарифма генерации тени
-  float          shadow_min_log_value;               //минимальное значение тени при логарифмировании
-  unsigned int   find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
-  float          binding_mismatch_weight;            //вес отклонения позиции сгиба страницы при поиске наилучешй позиции загиба
-  bool           is_rigid_page;                      //является ли страница жесткой
-  float          rigid_page_perspective_factor;      //коэффициент увеличения края жесткой страницы для симуляции перспективы
+  PageCurlMode   mode;                               //СЂРµР¶РёРј СЃС‚СЂР°РЅРёС†
+  stl::string    materials [PageCurlPageType_Num];   //РјР°С‚РµСЂРёР°Р»С‹
+  math::vec2f    size;                               //РїРѕР»РЅС‹Р№ СЂР°Р·РјРµСЂ СЃС‚СЂР°РЅРёС†
+  math::vec2f    curl_point;                         //С‚РѕС‡РєР° РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ
+  math::vec2f    curl_point_position;                //РїРѕР·РёС†РёСЏ С‚РѕС‡РєРё РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ
+  float          curl_radius;                        //СЂР°РґРёСѓСЃ Р·Р°РіРёР±Р°
+  float          minimum_curl_radius;                //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°РґРёСѓСЃ Р·Р°РіРёР±Р°
+  math::vec2ui   grid_size;                          //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·Р±РёРµРЅРёР№ СЃРµС‚РєРё
+  math::vec4f    color;                              //С†РІРµС‚ СЃС‚СЂР°РЅРёС†С‹
+  float          corner_shadow_offset;               //СЃРјРµС‰РµРЅРёРµ С‚РµРЅРё РѕС‚ СѓРіР»Р°
+  float          shadow_width;                       //С€РёСЂРёРЅР° С‚РµРЅРё
+  float          shadow_log_base;                    //РѕСЃРЅРѕРІР°РЅРёРµ Р»РѕРіР°СЂРёС„РјР° РіРµРЅРµСЂР°С†РёРё С‚РµРЅРё
+  float          shadow_min_log_value;               //РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С‚РµРЅРё РїСЂРё Р»РѕРіР°СЂРёС„РјРёСЂРѕРІР°РЅРёРё
+  unsigned int   find_best_curl_steps;               //РєРѕР»РёС‡РµСЃС‚РІРѕ РёС‚РµСЂР°С†РёР№ РїРѕРёСЃРєР° РЅР°РёР»СѓС‡С€РµР№ РїРѕР·РёС†РёРё Р·Р°РіРёР±Р°
+  float          binding_mismatch_weight;            //РІРµСЃ РѕС‚РєР»РѕРЅРµРЅРёСЏ РїРѕР·РёС†РёРё СЃРіРёР±Р° СЃС‚СЂР°РЅРёС†С‹ РїСЂРё РїРѕРёСЃРєРµ РЅР°РёР»СѓС‡РµС€Р№ РїРѕР·РёС†РёРё Р·Р°РіРёР±Р°
+  bool           is_rigid_page;                      //СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃС‚СЂР°РЅРёС†Р° Р¶РµСЃС‚РєРѕР№
+  float          rigid_page_perspective_factor;      //РєРѕСЌС„С„РёС†РёРµРЅС‚ СѓРІРµР»РёС‡РµРЅРёСЏ РєСЂР°СЏ Р¶РµСЃС‚РєРѕР№ СЃС‚СЂР°РЅРёС†С‹ РґР»СЏ СЃРёРјСѓР»СЏС†РёРё РїРµСЂСЃРїРµРєС‚РёРІС‹
 
   Impl ()
     : mode (PageCurlMode_SinglePage)
@@ -58,7 +58,7 @@ struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PageCurl::PageCurl ()
@@ -73,7 +73,7 @@ PageCurl::~PageCurl ()
 }
 
 /*
-    Создание
+    РЎРѕР·РґР°РЅРёРµ
 */
 
 PageCurl::Pointer PageCurl::Create ()
@@ -82,7 +82,7 @@ PageCurl::Pointer PageCurl::Create ()
 }
 
 /*
-   Установка режима страниц
+   РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° СЃС‚СЂР°РЅРёС†
 */
 
 void PageCurl::SetMode (PageCurlMode mode)
@@ -108,7 +108,7 @@ PageCurlMode PageCurl::Mode () const
 }
 
 /*
-   Установка материалов
+   РЈСЃС‚Р°РЅРѕРІРєР° РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void PageCurl::SetPageMaterial (PageCurlPageType type, const char* name)
@@ -135,7 +135,7 @@ const char* PageCurl::PageMaterial (PageCurlPageType type) const
 }
 
 /*
-   Установка полного размера страниц
+   РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»РЅРѕРіРѕ СЂР°Р·РјРµСЂР° СЃС‚СЂР°РЅРёС†
 */
 
 void PageCurl::SetSize (const math::vec2f& size)
@@ -156,7 +156,7 @@ const math::vec2f& PageCurl::Size () const
 }
 
 /*
-   Установка точки перетаскивания
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РѕС‡РєРё РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ
 */
 
 void PageCurl::SetCurlPoint (PageCurlCorner corner)
@@ -215,7 +215,7 @@ const math::vec2f& PageCurl::CurlPointPosition () const
 }
 
 /*
-   Настройка загиба
+   РќР°СЃС‚СЂРѕР№РєР° Р·Р°РіРёР±Р°
 */
 
 void PageCurl::SetCurlRadius (float curl_radius)
@@ -243,7 +243,7 @@ float PageCurl::MinimumCurlRadius () const
 }
 
 /*
-   Опциональные параметры
+   РћРїС†РёРѕРЅР°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 */
 
 void PageCurl::SetGridSize (const math::vec2ui& size)
@@ -374,7 +374,7 @@ float PageCurl::RigidPagePerspectiveFactor () const
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void PageCurl::UpdateBoundsCore ()
@@ -383,7 +383,7 @@ void PageCurl::UpdateBoundsCore ()
 }
 
 /*
-    Метод, вызываемый при посещении данного объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РґР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 void PageCurl::AcceptCore (Visitor& visitor)

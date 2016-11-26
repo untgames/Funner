@@ -3,16 +3,16 @@
 using namespace debug;
 
 /*
-    Описание реализации карыт символов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°СЂС‹С‚ СЃРёРјРІРѕР»РѕРІ
 */
 
 typedef stl::map<size_t, Symbol> SymbolMap;
 
 struct MapFile::Impl: public xtl::reference_counter
 {
-  stl::string name;    //имя файла
-  stl::string type;    //тип файла
-  SymbolMap   symbols; //символы
+  stl::string name;    //РёРјСЏ С„Р°Р№Р»Р°
+  stl::string type;    //С‚РёРї С„Р°Р№Р»Р°
+  SymbolMap   symbols; //СЃРёРјРІРѕР»С‹
   
   Impl (const char* in_name, const char* in_type)
     : name (in_name)
@@ -22,7 +22,7 @@ struct MapFile::Impl: public xtl::reference_counter
 };
   
 /*
-    Конструкторы / присваивание / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MapFile::MapFile (const char* file_name, const char* type)
@@ -73,7 +73,7 @@ MapFile& MapFile::operator = (const MapFile& file)
 }
 
 /*
-    Тип
+    РўРёРї
 */
 
 const char* MapFile::Type () const
@@ -82,7 +82,7 @@ const char* MapFile::Type () const
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* MapFile::Name () const
@@ -99,7 +99,7 @@ void MapFile::SetName (const char* name)
 }
 
 /*
-    Добавление / удаление символов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
 */
 
 void MapFile::AddSymbol (const Symbol& symbol)
@@ -123,7 +123,7 @@ void MapFile::RemoveAllSymbols ()
 }
 
 /*
-    Перебор символов
+    РџРµСЂРµР±РѕСЂ СЃРёРјРІРѕР»РѕРІ
 */
 
 namespace
@@ -147,7 +147,7 @@ MapFile::ConstIterator MapFile::CreateIterator () const
 }
 
 /*
-    Поиск символа по адресу
+    РџРѕРёСЃРє СЃРёРјРІРѕР»Р° РїРѕ Р°РґСЂРµСЃСѓ
 */
 
 Symbol* MapFile::FindSymbol (size_t address)
@@ -173,7 +173,7 @@ const Symbol* MapFile::FindSymbol (size_t address) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void MapFile::Swap (MapFile& file)

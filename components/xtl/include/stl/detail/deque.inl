@@ -1,5 +1,5 @@
 /*
-    Итератор (base)
+    РС‚РµСЂР°С‚РѕСЂ (base)
 */
 
 template <class T,class Allocator>
@@ -55,7 +55,7 @@ inline bool deque_iterator_base<T,Allocator>::operator >= (const deque_iterator_
 }   
 
 /*
-    Итератор
+    РС‚РµСЂР°С‚РѕСЂ
 */
   
 template <class T,class Ref,class Ptr,class Allocator>
@@ -149,7 +149,7 @@ deque_iterator<T,Ref,Ptr,Allocator>::operator - (const base& i) const
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T,class Allocator>
@@ -230,7 +230,7 @@ inline deque<T,Allocator>::~deque ()
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */           
 
 template <class T,class Allocator>
@@ -240,7 +240,7 @@ inline typename deque<T,Allocator>::allocator_type deque<T,Allocator>::get_alloc
 }
 
 /*
-    Возбуждение исключений
+    Р’РѕР·Р±СѓР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
 */
 
 template <class T,class Allocator>
@@ -259,7 +259,7 @@ inline void deque<T,Allocator>::raise_out_of_range (const char* func_name,iterat
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T,class Allocator>
@@ -293,7 +293,7 @@ inline bool deque<T,Allocator>::empty () const
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class T,class Allocator>
@@ -345,7 +345,7 @@ inline typename deque<T,Allocator>::const_reverse_iterator deque<T,Allocator>::r
 }
 
 /*
-    Доступ
+    Р”РѕСЃС‚СѓРї
 */
 
 template <class T,class Allocator>
@@ -425,28 +425,28 @@ inline typename deque<T,Allocator>::const_reference deque<T,Allocator>::back () 
 }
 
 /*
-    Изменение размера дека    
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° РґРµРєР°    
 */
 
 template <class T,class Allocator>
 inline typename deque<T,Allocator>::size_type deque<T,Allocator>::next_size () const
 {        
-  size_type map_max_size = min (map_allocator.max_size (),max_size () / BLOCK_SIZE), //макс. размер карты
+  size_type map_max_size = min (map_allocator.max_size (),max_size () / BLOCK_SIZE), //РјР°РєСЃ. СЂР°Р·РјРµСЂ РєР°СЂС‚С‹
             new_map_size = map_size + 1; 
   
-  if (!(map_max_size-map_size)) // возможен ли рост карты?
+  if (!(map_max_size-map_size)) // РІРѕР·РјРѕР¶РµРЅ Р»Рё СЂРѕСЃС‚ РєР°СЂС‚С‹?
     return 0;    
     
-  if (map_max_size - map_size >= map_size) //возможно ли двухкратное увеличение размера карты?
+  if (map_max_size - map_size >= map_size) //РІРѕР·РјРѕР¶РЅРѕ Р»Рё РґРІСѓС…РєСЂР°С‚РЅРѕРµ СѓРІРµР»РёС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РєР°СЂС‚С‹?
     new_map_size = max (2*map_size,new_map_size);
     
-  if (new_map_size < MIN_MAP_SIZE && MIN_MAP_SIZE < map_max_size) //карта слишком мала?
+  if (new_map_size < MIN_MAP_SIZE && MIN_MAP_SIZE < map_max_size) //РєР°СЂС‚Р° СЃР»РёС€РєРѕРј РјР°Р»Р°?
     new_map_size = MIN_MAP_SIZE;
   
   return min (new_map_size,max_size ()/BLOCK_SIZE);
 }
 
-//увеличивает потенциальный размер дека на inc_size элементов
+//СѓРІРµР»РёС‡РёРІР°РµС‚ РїРѕС‚РµРЅС†РёР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РґРµРєР° РЅР° inc_size СЌР»РµРјРµРЅС‚РѕРІ
 template <class T,class Allocator>
 void deque<T,Allocator>::grow ()
 {   
@@ -462,11 +462,11 @@ void deque<T,Allocator>::grow ()
           *new_first = new_map + first_block;
           
   /*
-    Поскольку дек является закольцованным, возможны лишь 2 ситуации:
-      1) ......12345... - данные расположены в одном диапозоне       
-      2) 45.........123 - данные расположены в двух диапозонах                 
+    РџРѕСЃРєРѕР»СЊРєСѓ РґРµРє СЏРІР»СЏРµС‚СЃСЏ Р·Р°РєРѕР»СЊС†РѕРІР°РЅРЅС‹Рј, РІРѕР·РјРѕР¶РЅС‹ Р»РёС€СЊ 2 СЃРёС‚СѓР°С†РёРё:
+      1) ......12345... - РґР°РЅРЅС‹Рµ СЂР°СЃРїРѕР»РѕР¶РµРЅС‹ РІ РѕРґРЅРѕРј РґРёР°РїРѕР·РѕРЅРµ       
+      2) 45.........123 - РґР°РЅРЅС‹Рµ СЂР°СЃРїРѕР»РѕР¶РµРЅС‹ РІ РґРІСѓС… РґРёР°РїРѕР·РѕРЅР°С…                 
 
-    Следующий код производит перемещение указателей на блоки в новую карту с корректировкой расположения
+    РЎР»РµРґСѓСЋС‰РёР№ РєРѕРґ РїСЂРѕРёР·РІРѕРґРёС‚ РїРµСЂРµРјРµС‰РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° Р±Р»РѕРєРё РІ РЅРѕРІСѓСЋ РєР°СЂС‚Сѓ СЃ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРѕР№ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ
   */
 
   new_first = uninitialized_copy (map+first_block,map+map_size,new_first); 
@@ -506,7 +506,7 @@ inline void deque<T,Allocator>::resize (size_type new_size)
 }
 
 /*
-    Добавление / удаление элементов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class T,class Allocator>
@@ -593,7 +593,7 @@ void deque<T,Allocator>::pop_front ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T,class Allocator>
@@ -649,7 +649,7 @@ deque<T,Allocator>& deque<T,Allocator>::operator = (const deque& x)
 }
 
 /*
-    Вставка элементов
+    Р’СЃС‚Р°РІРєР° СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 template <class T,class Allocator>
@@ -673,15 +673,15 @@ typename deque<T,Allocator>::iterator deque<T,Allocator>::insert (iterator posit
   iterator mid;
   size_type offset = position - begin ();
   
-  T t = x; //если x уже в последовательности
+  T t = x; //РµСЃР»Рё x СѓР¶Рµ РІ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
 
-  if (offset < size () / 2) //ближе к началу
+  if (offset < size () / 2) //Р±Р»РёР¶Рµ Рє РЅР°С‡Р°Р»Сѓ
   { 
     push_front (front ());
     mid = begin () + offset;
     copy (begin ()+2,mid+1,begin ()+1);
   }
-  else //ближе к концу
+  else //Р±Р»РёР¶Рµ Рє РєРѕРЅС†Сѓ
   {
     push_back (back ());
     mid = begin () + offset;
@@ -708,7 +708,7 @@ void deque<T,Allocator>::insert (iterator position,size_type count,const value_t
   iterator mid;
   size_type num, offset = position - begin (), rem = size () - offset, old_size = size ();
   
-  if (offset < rem) //ближе к началу
+  if (offset < rem) //Р±Р»РёР¶Рµ Рє РЅР°С‡Р°Р»Сѓ
   { 
     try
     {    
@@ -738,7 +738,7 @@ void deque<T,Allocator>::insert (iterator position,size_type count,const value_t
       throw;
     }
   }
-  else //ближе к концу
+  else //Р±Р»РёР¶Рµ Рє РєРѕРЅС†Сѓ
   {
     try
     {
@@ -867,7 +867,7 @@ void deque<T,Allocator>::_insert (iterator pos,Iter first,Iter last,bidirectiona
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class T,class Allocator>
@@ -917,7 +917,7 @@ void deque<T,Allocator>::clear ()
 }
 
 /*
-    Обмен содержимого двух деков
+    РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… РґРµРєРѕРІ
 */
 
 template <class T,class Allocator>
@@ -945,7 +945,7 @@ inline void swap (deque<T,Allocator>& a,deque<T,Allocator>& b)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T,class Allocator>

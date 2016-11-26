@@ -1,57 +1,57 @@
 /*
-    Создание аргумента функции-шлюза
+    РЎРѕР·РґР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° С„СѓРЅРєС†РёРё-С€Р»СЋР·Р°
 */
 
 namespace detail
 {
 
 /*
-    Извлечение аргументов из стека
+    РР·РІР»РµС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РёР· СЃС‚РµРєР°
 */
 
-//общая версия
+//РѕР±С‰Р°СЏ РІРµСЂСЃРёСЏ
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
   static T get (IStack& stack, unsigned int index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
 };
 
-//извлечение enum-типов
+//РёР·РІР»РµС‡РµРЅРёРµ enum-С‚РёРїРѕРІ
 template <class T> struct common_argument_selector<T, true>
 {
   static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
-//извлечение целочисленного аргумента
+//РёР·РІР»РµС‡РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 template <class T> struct int_argument_selector
 {
   static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
-//извлечение вещественного аргумента
+//РёР·РІР»РµС‡РµРЅРёРµ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
 template <class T> struct float_argument_selector
 {
   static T get (IStack& stack, unsigned int index) { return static_cast<T> (stack.GetFloat (index)); }
 };
 
-//извлечение void-указателей
+//РёР·РІР»РµС‡РµРЅРёРµ void-СѓРєР°Р·Р°С‚РµР»РµР№
 struct raw_pointer_argument_selector
 {
   static void* get (IStack& stack, unsigned int index) { return stack.GetPointer (index); }
 };
 
-//извлечение строк
+//РёР·РІР»РµС‡РµРЅРёРµ СЃС‚СЂРѕРє
 struct string_argument_selector
 {
   static const char* get (IStack& stack, unsigned int index) { return stack.GetString (index); }
 };
 
-//извлечение вариантных типов данных
+//РёР·РІР»РµС‡РµРЅРёРµ РІР°СЂРёР°РЅС‚РЅС‹С… С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 struct any_argument_selector
 {
   static xtl::any& get (IStack& stack, unsigned int index) { return stack.GetVariant (index); }
 };
 
-//диспетчеризация взятия аргумента для различных типов данных
+//РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ РІР·СЏС‚РёСЏ Р°СЂРіСѓРјРµРЅС‚Р° РґР»СЏ СЂР°Р·Р»РёС‡РЅС‹С… С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 template <class T> struct argument_selector: public common_argument_selector<T> {};
 
 template <> struct argument_selector<xtl::any>:                 public any_argument_selector {};
@@ -91,7 +91,7 @@ template <class Traits, class Allocator>
 struct argument_selector<stl::basic_string<char, Traits, Allocator> > : public string_argument_selector {};
 
 /*
-    Помещение аргумента в стек
+    РџРѕРјРµС‰РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РІ СЃС‚РµРє
 */
 
 template <class T>
@@ -108,7 +108,7 @@ struct argument_invoker_helper: public argument_invoker<T> {};
 template <class T>
 struct argument_invoker_helper<T, true>
 {
-    //enum-типы приводятся к ptrdiff_t
+    //enum-С‚РёРїС‹ РїСЂРёРІРѕРґСЏС‚СЃСЏ Рє ptrdiff_t
 
   typedef ptrdiff_t type;
 
@@ -161,7 +161,7 @@ inline const char* make_invoker_argument (stl::basic_string<char, Traits, Alloca
   return s.c_str ();
 }
 
-//взятие аргумента из стека
+//РІР·СЏС‚РёРµ Р°СЂРіСѓРјРµРЅС‚Р° РёР· СЃС‚РµРєР°
 template <class T>
 T get_argument (IStack& stack, unsigned int index)
 {
@@ -187,7 +187,7 @@ T get_argument (IStack& stack, unsigned int index)
   }
 }
 
-//проверка наличия достаточного числа аргументов в стеке
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
 template <size_t expected_arguments_count>
 inline void check_arguments_count (size_t stack_arguments_count)
 {
@@ -201,7 +201,7 @@ inline void check_arguments_count<0> (size_t stack_arguments_count)
 }
 
 /*
-    Помещение аргумента в стек
+    РџРѕРјРµС‰РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РІ СЃС‚РµРє
 */
 
 struct ignore {};
@@ -216,7 +216,7 @@ inline void push_argument (IStack& stack, ignore)
 }
 
 /*
-    Селектор аргументов
+    РЎРµР»РµРєС‚РѕСЂ Р°СЂРіСѓРјРµРЅС‚РѕРІ
 */
 
 template <class FunctionalTraits, size_t I, bool is_memfun=FunctionalTraits::is_memfun>
@@ -243,7 +243,7 @@ struct functional_argument_traits<FunctionalTraits, 0, true>
   enum { argument_index = 1 };
 };
 
-//выборка аргумента
+//РІС‹Р±РѕСЂРєР° Р°СЂРіСѓРјРµРЅС‚Р°
 template <class FunctionalTraits> struct stack_argument_selector
 {
   template <size_t I> struct traits: public functional_argument_traits<FunctionalTraits, I> {};  
@@ -255,7 +255,7 @@ template <class FunctionalTraits> struct stack_argument_selector
 };
 
 /*
-    Функтор шлюза
+    Р¤СѓРЅРєС‚РѕСЂ С€Р»СЋР·Р°
 */
 
 template <class Signature, class Fn, class Ret=typename xtl::functional_traits<Signature>::result_type>
@@ -269,11 +269,11 @@ struct invoker_impl_base: public IInvoker
   {
     enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
-      //проверка наличия достаточного числа аргументов в стеке
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
 
     check_arguments_count<arguments_count> (stack.Size ());
 
-      //вызов шлюза и помещение его результата в стек
+      //РІС‹Р·РѕРІ С€Р»СЋР·Р° Рё РїРѕРјРµС‰РµРЅРёРµ РµРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р° РІ СЃС‚РµРє
       
     typename func_traits::result_type result = xtl::apply<typename func_traits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<func_traits> ()));
 
@@ -296,11 +296,11 @@ struct invoker_impl_base<Signature, Fn, void>: public IInvoker
   {
     enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
-      //проверка наличия достаточного числа аргументов в стеке
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
 
     check_arguments_count<arguments_count> (stack.Size ());
 
-      //вызов шлюза
+      //РІС‹Р·РѕРІ С€Р»СЋР·Р°
 
     xtl::apply<void, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<func_traits> ()));
 
@@ -549,7 +549,7 @@ template <class Signature> struct signature_helper<Signature, true, 8>
 };
 
 /*
-    Функция-диспетчер вызова шлюза
+    Р¤СѓРЅРєС†РёСЏ-РґРёСЃРїРµС‚С‡РµСЂ РІС‹Р·РѕРІР° С€Р»СЋР·Р°
 */
 
 template <class Ret>
@@ -623,7 +623,7 @@ Ret invoke_dispatch
 }
 
 /*
-    Создание шлюза для произвольного функтора с известной сигнатурой
+    РЎРѕР·РґР°РЅРёРµ С€Р»СЋР·Р° РґР»СЏ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ С„СѓРЅРєС‚РѕСЂР° СЃ РёР·РІРµСЃС‚РЅРѕР№ СЃРёРіРЅР°С‚СѓСЂРѕР№
 */
 
 template <class Signature, class Fn>
@@ -655,7 +655,7 @@ inline Invoker make_invoker (Fn fn)
 }
 
 /*
-    Создание функции, возвращающей константу
+    РЎРѕР·РґР°РЅРёРµ С„СѓРЅРєС†РёРё, РІРѕР·РІСЂР°С‰Р°СЋС‰РµР№ РєРѕРЅСЃС‚Р°РЅС‚Сѓ
 */
 
 namespace detail
@@ -679,7 +679,7 @@ inline Invoker make_const (const T& value)
 }
 
 /*
-    Вызов шлюза
+    Р’С‹Р·РѕРІ С€Р»СЋР·Р°
 */
 
 template <class Ret>
@@ -863,7 +863,7 @@ inline Ret invoke
 }
 
 /*
-    Создание шлюза для функции обратного вызова
+    РЎРѕР·РґР°РЅРёРµ С€Р»СЋР·Р° РґР»СЏ С„СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР°
 */
 
 namespace detail
@@ -970,7 +970,7 @@ template <class Signature> struct callback_invoker: public SimpleInvoker, public
 {
   size_t operator () (IStack& stack)
   {
-      //проверка наличия достаточного числа аргументов в стеке
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРіРѕ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
 
     check_arguments_count<1> (stack.Size ());  
   
