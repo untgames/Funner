@@ -129,7 +129,7 @@ typedef struct {HANDLE signal, broadcast;} pthread_cond_t;
 typedef DWORD pthread_t;
 #define pid_t HANDLE // MINGW typedefs pid_t to int. Using #define here.
 
-#if defined (_MSC_VER) && _MSC_VER < 1400
+#if defined (_MSC_VER) && _MSC_VER < 1900
 
 struct timespec {
   long tv_nsec;
