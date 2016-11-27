@@ -4,18 +4,18 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Описание реализации состояния соединения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 struct ConnectionState::Impl
 {
-  ServerImpl&                        server;             //ссылка на сервер
-  server::Context*                   context;            //контекст
-  interchange::PropertyMapAutoWriter properties_writer;  //синхронизатор свойств (запись на клиент)
-  interchange::PropertyMapReader     properties_reader;  //синхронизатор свойств (чтение с клиента)
-  ResourceClient                     resource_client;    //клиент менеджера ресурсов
+  ServerImpl&                        server;             //СЃСЃС‹Р»РєР° РЅР° СЃРµСЂРІРµСЂ
+  server::Context*                   context;            //РєРѕРЅС‚РµРєСЃС‚
+  interchange::PropertyMapAutoWriter properties_writer;  //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ (Р·Р°РїРёСЃСЊ РЅР° РєР»РёРµРЅС‚)
+  interchange::PropertyMapReader     properties_reader;  //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ (С‡С‚РµРЅРёРµ СЃ РєР»РёРµРЅС‚Р°)
+  ResourceClient                     resource_client;    //РєР»РёРµРЅС‚ РјРµРЅРµРґР¶РµСЂР° СЂРµСЃСѓСЂСЃРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ServerImpl& in_server)
     : server (in_server)
     , context ()
@@ -23,7 +23,7 @@ struct ConnectionState::Impl
   {
   }  
 
-/// Получение контекста
+/// РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
   server::Context& Context ()
   {
     if (!context)
@@ -34,7 +34,7 @@ struct ConnectionState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ConnectionState::ConnectionState (ServerImpl& server)
@@ -55,7 +55,7 @@ ConnectionState::~ConnectionState ()
 }
 
 /*
-    Установка контекста
+    РЈСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void ConnectionState::SetContext (Context* context)
@@ -64,7 +64,7 @@ void ConnectionState::SetContext (Context* context)
 }
 
 /*
-    Синхронизация свойств
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃРІРѕР№СЃС‚РІ
 */
 
 PropertyMapSynchronizer ConnectionState::CreateSynchronizer (const common::PropertyMap& properties)
@@ -107,7 +107,7 @@ void ConnectionState::SynchronizeProperties ()
 }
 
 /*
-    Команды клиента: окна
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°: РѕРєРЅР°
 */
 
 void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)
@@ -189,7 +189,7 @@ void ConnectionState::OnWindowPaint (size_t id)
 }
 
 /*
-    Команды клиента: свойства
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°: СЃРІРѕР№СЃС‚РІР°
 */
 
 void ConnectionState::UpdatePropertyMap (interchange::InputStream& stream)
@@ -232,7 +232,7 @@ void ConnectionState::RemovePropertyLayout (object_id_t id)
 }
 
 /*
-    Команды клиента
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°
 */
 
 void ConnectionState::FenceRequest (object_id_t tag)
@@ -252,7 +252,7 @@ void ConnectionState::FenceRequest (object_id_t tag)
 }
 
 /*
-    Команды клиента: работа с ресурсами
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°: СЂР°Р±РѕС‚Р° СЃ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 void ConnectionState::LoadResource (const char* name)
@@ -282,7 +282,7 @@ void ConnectionState::UnloadResource (const char* name)
 }
 
 /*
-    Команды клиента: максимальная глубина рендеринга
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°: РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void ConnectionState::SetMaxDrawDepth (uint32 depth)
@@ -299,7 +299,7 @@ void ConnectionState::SetMaxDrawDepth (uint32 depth)
 }
 
 /*
-    Работа с ресурсами
+    Р Р°Р±РѕС‚Р° СЃ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 void ConnectionState::CreateTexture (const char* texture_name, const media::Image& image, interchange::TextureDimension in_dimension, bool8 create_mips)
@@ -404,7 +404,7 @@ void ConnectionState::RemoveMaterial (const char* material_name)
 }
 
 /*
-    Команды клиента: области вывода и цели рендеринга
+    РљРѕРјР°РЅРґС‹ РєР»РёРµРЅС‚Р°: РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° Рё С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height, float32 min_depth, float32 max_depth)
@@ -680,7 +680,7 @@ void ConnectionState::UpdateRenderTarget (object_id_t id)
 }
 
 /*
-    Работа со сценой
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃС†РµРЅРѕР№
 */
 
 void ConnectionState::CreateScene (object_id_t id)
@@ -747,7 +747,7 @@ void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray
 }
 
 /*
-    Работа с узлами
+    Р Р°Р±РѕС‚Р° СЃ СѓР·Р»Р°РјРё
 */
 
 void ConnectionState::CreateNode (object_id_t id, interchange::NodeType type)

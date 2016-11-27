@@ -6,13 +6,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENT_MASK = "media.players.stream.*"; //маска компонентов проигрывания медиа-потоков
+const char* COMPONENT_MASK = "media.players.stream.*"; //РјР°СЃРєР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
 const char* LOG_NAME       = "media::players::MediaPlayer";
 
-///Класс устанавливающий значение переменной в true в конструкторе и в false в деструкторе
+///РљР»Р°СЃСЃ СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‰РёР№ Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ РІ true РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРµ Рё РІ false РІ РґРµСЃС‚СЂСѓРєС‚РѕСЂРµ
 class PlayStateLockScope
 {
   public:
@@ -34,7 +34,7 @@ class PlayStateLockScope
 }
 
 /*
-    Описание реализации проигрывателя медиа-потоков
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ РјРµРґРёР°-РїРѕС‚РѕРєРѕРІ
 */
 
 typedef xtl::shared_ptr<IStreamPlayer>                     StreamPtr;
@@ -44,24 +44,24 @@ typedef stl::vector<common::Action>                        ActionArray;
 
 struct MediaPlayer::Impl : public common::Lockable
 {
-  MediaPlayer&                            owner;                          //владелец
-  stl::string                             name;                           //имя проигрывателя
-  stl::string                             target_name;                    //имя цели проигрывания
-  media::players::Playlist                list;                           //список воспроизведения
-  StreamArray                             streams;                        //проигрыватели потоков
-  StreamPtr                               current_stream;                 //текущий проигрываемый поток
-  StreamPlayerManager::StreamEventHandler callback_handler;               //обработчик изменения состояния проигрываемых потоков
-  int                                     current_track;                  //текущий трек
-  unsigned int                            next_track;                     //следующий трек
-  MediaPlayerState                        current_track_state;            //состояние текущего трека
-  bool                                    is_muted;                       //выключен ли звук
-  bool                                    play_state_lock;                //предотвращение двойного вызова функции изменения состояния проигрывателя (play / pause / stop)
-  float                                   volume;                         //текущая громкость
-  MediaPlayerRepeatMode                   repeat_mode;                    //режим повтора проигрывания треков
-  MediaPlayerSignal                       signals [MediaPlayerEvent_Num]; //обработчики событий проигрывателя
-  ActionArray                             notify_actions;                 //действия оповещения о событиях
+  MediaPlayer&                            owner;                          //РІР»Р°РґРµР»РµС†
+  stl::string                             name;                           //РёРјСЏ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
+  stl::string                             target_name;                    //РёРјСЏ С†РµР»Рё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+  media::players::Playlist                list;                           //СЃРїРёСЃРѕРє РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ
+  StreamArray                             streams;                        //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»Рё РїРѕС‚РѕРєРѕРІ
+  StreamPtr                               current_stream;                 //С‚РµРєСѓС‰РёР№ РїСЂРѕРёРіСЂС‹РІР°РµРјС‹Р№ РїРѕС‚РѕРє
+  StreamPlayerManager::StreamEventHandler callback_handler;               //РѕР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°РµРјС‹С… РїРѕС‚РѕРєРѕРІ
+  int                                     current_track;                  //С‚РµРєСѓС‰РёР№ С‚СЂРµРє
+  unsigned int                            next_track;                     //СЃР»РµРґСѓСЋС‰РёР№ С‚СЂРµРє
+  MediaPlayerState                        current_track_state;            //СЃРѕСЃС‚РѕСЏРЅРёРµ С‚РµРєСѓС‰РµРіРѕ С‚СЂРµРєР°
+  bool                                    is_muted;                       //РІС‹РєР»СЋС‡РµРЅ Р»Рё Р·РІСѓРє
+  bool                                    play_state_lock;                //РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёРµ РґРІРѕР№РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРё РёР·РјРµРЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ (play / pause / stop)
+  float                                   volume;                         //С‚РµРєСѓС‰Р°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ
+  MediaPlayerRepeatMode                   repeat_mode;                    //СЂРµР¶РёРј РїРѕРІС‚РѕСЂР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ С‚СЂРµРєРѕРІ
+  MediaPlayerSignal                       signals [MediaPlayerEvent_Num]; //РѕР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
+  ActionArray                             notify_actions;                 //РґРµР№СЃС‚РІРёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ СЃРѕР±С‹С‚РёСЏС…
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (MediaPlayer& in_owner)
     : owner (in_owner)
     , callback_handler (xtl::bind (&Impl::OnStreamEvent, this, _1, _2))
@@ -90,7 +90,7 @@ struct MediaPlayer::Impl : public common::Lockable
     current_stream->SetLooping (current_track == streams.size () - 1 && repeat_mode == MediaPlayerRepeatMode_Last && current_stream == streams [current_track]);
   }
 
-  ///Создание проигрывателей потоков
+  ///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»РµР№ РїРѕС‚РѕРєРѕРІ
   void UpdatePlaylist (const media::players::Playlist& in_play_list)
   {
     try
@@ -168,26 +168,26 @@ struct MediaPlayer::Impl : public common::Lockable
     }
   }
   
-///Корректен ли текущий поток
+///РљРѕСЂСЂРµРєС‚РµРЅ Р»Рё С‚РµРєСѓС‰РёР№ РїРѕС‚РѕРє
   bool IsCurrentTrackValid ()
   {
     return (unsigned int)current_track < streams.size ();
   }
 
-///Текущий медиа-поток
+///РўРµРєСѓС‰РёР№ РјРµРґРёР°-РїРѕС‚РѕРє
   IStreamPlayer* CurrentTrackStream ()
   {
     return IsCurrentTrackValid () ? streams [current_track].get () : 0;
   }
 
-///Обработчик событий медиа-потока
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РјРµРґРёР°-РїРѕС‚РѕРєР°
   void OnStreamEvent (IStreamPlayer* stream_player, StreamEvent event)
   {
     common::Lock lock (*this);
 
     try
     {
-        //обрабатываются только события текущего трека
+        //РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃРѕР±С‹С‚РёСЏ С‚РµРєСѓС‰РµРіРѕ С‚СЂРµРєР°
     
       if (stream_player != current_stream.get () || !stream_player)
         return;
@@ -217,7 +217,7 @@ struct MediaPlayer::Impl : public common::Lockable
           
           if (next_track >= streams.size ())
           {
-              //весь список проигран
+              //РІРµСЃСЊ СЃРїРёСЃРѕРє РїСЂРѕРёРіСЂР°РЅ
               
             switch (repeat_mode)
             {
@@ -264,7 +264,7 @@ struct MediaPlayer::Impl : public common::Lockable
     }    
   }
   
-///Оповещения о возникновении событий
+///РћРїРѕРІРµС‰РµРЅРёСЏ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёР№
   void Notify (MediaPlayerEvent event)
   {
     for (int i = (int)notify_actions.size () - 1; i >= 0; i--)
@@ -297,7 +297,7 @@ struct MediaPlayer::Impl : public common::Lockable
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 MediaPlayer::MediaPlayer ()  
@@ -371,7 +371,7 @@ MediaPlayer::~MediaPlayer ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 void MediaPlayer::SetName (const char* name)
@@ -390,7 +390,7 @@ const char* MediaPlayer::Name () const
 }
 
 /*
-    Текущая цель проигрывания
+    РўРµРєСѓС‰Р°СЏ С†РµР»СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 void MediaPlayer::SetTarget (const char* target_name)
@@ -403,22 +403,22 @@ void MediaPlayer::SetTarget (const char* target_name)
     {
       common::Lock lock (*impl);
 
-      //закрытие всех проигрываемых потоков
+      //Р·Р°РєСЂС‹С‚РёРµ РІСЃРµС… РїСЂРѕРёРіСЂС‹РІР°РµРјС‹С… РїРѕС‚РѕРєРѕРІ
 
       Close ();
 
-      //обновление цели
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С†РµР»Рё
 
       impl->target_name.clear ();
 
       impl->target_name = target_name;
 
-      //оповещение о смене цели
+      //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРјРµРЅРµ С†РµР»Рё
 
       impl->Notify (MediaPlayerEvent_OnChangeTarget);
     }
     
-      //обновление потоков
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕС‚РѕРєРѕРІ
       
     impl->UpdatePlaylist (impl->list);
   }
@@ -429,14 +429,14 @@ void MediaPlayer::SetTarget (const char* target_name)
   }
 }
 
-//имя цели проигрывания
+//РёРјСЏ С†РµР»Рё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 const char* MediaPlayer::Target () const
 {
   return impl->target_name.c_str ();
 }
 
 /*
-   Открытие / закрытие потока (список проигрывание клонируется)
+   РћС‚РєСЂС‹С‚РёРµ / Р·Р°РєСЂС‹С‚РёРµ РїРѕС‚РѕРєР° (СЃРїРёСЃРѕРє РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ РєР»РѕРЅРёСЂСѓРµС‚СЃСЏ)
 */
 
 void MediaPlayer::Open (const char* stream_name)
@@ -534,9 +534,9 @@ void MediaPlayer::Close ()
 }
 
 /*
-   Изменение списка проигрывания (если воспроизведение активно, оно не останавливается;
-   если имя текущего трека не соответствует имени трека в новом списке проигрывания - номер
-   следующего трека сбрасывается в 0, номер текущего трека в -1)
+   РР·РјРµРЅРµРЅРёРµ СЃРїРёСЃРєР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ (РµСЃР»Рё РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ Р°РєС‚РёРІРЅРѕ, РѕРЅРѕ РЅРµ РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ;
+   РµСЃР»Рё РёРјСЏ С‚РµРєСѓС‰РµРіРѕ С‚СЂРµРєР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РёРјРµРЅРё С‚СЂРµРєР° РІ РЅРѕРІРѕРј СЃРїРёСЃРєРµ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ - РЅРѕРјРµСЂ
+   СЃР»РµРґСѓСЋС‰РµРіРѕ С‚СЂРµРєР° СЃР±СЂР°СЃС‹РІР°РµС‚СЃСЏ РІ 0, РЅРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ С‚СЂРµРєР° РІ -1)
 */
 
 void MediaPlayer::UpdatePlaylist (const media::players::Playlist& new_playlist)
@@ -545,7 +545,7 @@ void MediaPlayer::UpdatePlaylist (const media::players::Playlist& new_playlist)
 }
 
 /*
-        Список проигрывания
+        РЎРїРёСЃРѕРє РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 const media::players::Playlist& MediaPlayer::Playlist () const
@@ -554,7 +554,7 @@ const media::players::Playlist& MediaPlayer::Playlist () const
 }
 
 /*
-    Количество треков
+    РљРѕР»РёС‡РµСЃС‚РІРѕ С‚СЂРµРєРѕРІ
 */
 
 unsigned int MediaPlayer::TracksCount () const
@@ -563,7 +563,7 @@ unsigned int MediaPlayer::TracksCount () const
 }
 
 /*
-    Режим повторения источников
+    Р РµР¶РёРј РїРѕРІС‚РѕСЂРµРЅРёСЏ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 void MediaPlayer::SetRepeatMode (MediaPlayerRepeatMode mode)
@@ -588,10 +588,10 @@ MediaPlayerRepeatMode MediaPlayer::RepeatMode () const
 }
 
 /*
-    Номер проигрываемого трека / имя потока / его длительность
+    РќРѕРјРµСЂ РїСЂРѕРёРіСЂС‹РІР°РµРјРѕРіРѕ С‚СЂРµРєР° / РёРјСЏ РїРѕС‚РѕРєР° / РµРіРѕ РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ
 */
 
-//установка текущего трека
+//СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ С‚СЂРµРєР°
 void MediaPlayer::SetTrack (unsigned int track)
 {
   common::Lock lock (*impl);
@@ -646,7 +646,7 @@ void MediaPlayer::SetNextPlayTrack (unsigned int track)
   }
 }
 
-//текущий трек
+//С‚РµРєСѓС‰РёР№ С‚СЂРµРє
 int MediaPlayer::Track () const
 {
   common::Lock lock (*impl);
@@ -661,7 +661,7 @@ unsigned int MediaPlayer::NextPlayTrack () const
   return impl->next_track;
 }
 
-//имя трека
+//РёРјСЏ С‚СЂРµРєР°
 const char* MediaPlayer::Source (unsigned int track) const
 {
   try
@@ -675,13 +675,13 @@ const char* MediaPlayer::Source (unsigned int track) const
   }
 }
 
-//имя прогрываемого трека
+//РёРјСЏ РїСЂРѕРіСЂС‹РІР°РµРјРѕРіРѕ С‚СЂРµРєР°
 const char* MediaPlayer::Source () const
 {
   return Source (Track ());
 }
 
-//длительность трека
+//РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ С‚СЂРµРєР°
 float MediaPlayer::Duration (unsigned int track) const
 {  
   try
@@ -698,7 +698,7 @@ float MediaPlayer::Duration (unsigned int track) const
   }
 }
 
-//длительность проигрываемого трека
+//РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РµРјРѕРіРѕ С‚СЂРµРєР°
 float MediaPlayer::Duration () const
 {
   common::Lock lock (*impl);
@@ -710,7 +710,7 @@ float MediaPlayer::Duration () const
 }
 
 /*
-    Переключение треков
+    РџРµСЂРµРєР»СЋС‡РµРЅРёРµ С‚СЂРµРєРѕРІ
 */
 
 void MediaPlayer::NextTrack ()
@@ -754,10 +754,10 @@ void MediaPlayer::PrevTrack ()
 }
 
 /*
-    Управление проигрыванием
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµРј
 */
 
-//состояние проигрывания
+//СЃРѕСЃС‚РѕСЏРЅРёРµ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 MediaPlayerState MediaPlayer::State () const
 {
   common::Lock lock (*impl);
@@ -765,7 +765,7 @@ MediaPlayerState MediaPlayer::State () const
   return impl->current_track_state;
 }
 
-//начать / продолжить проигрывание
+//РЅР°С‡Р°С‚СЊ / РїСЂРѕРґРѕР»Р¶РёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 void MediaPlayer::Play ()
 {
   common::Lock lock (*impl);
@@ -816,7 +816,7 @@ void MediaPlayer::Play ()
   }
 }
 
-//приостановить проигрывание
+//РїСЂРёРѕСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 void MediaPlayer::Pause ()
 {
   common::Lock lock (*impl);
@@ -853,7 +853,7 @@ void MediaPlayer::Pause ()
   }
 }
 
-//остановить проигрывание
+//РѕСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 void MediaPlayer::Stop ()
 {
   common::Lock lock (*impl);
@@ -889,7 +889,7 @@ void MediaPlayer::Stop ()
 }
 
 /*
-    Позиция проигрывания
+    РџРѕР·РёС†РёСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 void MediaPlayer::SetPosition (float position)
@@ -928,7 +928,7 @@ float MediaPlayer::Position () const
 }
 
 /*
-    Управление громкостью
+    РЈРїСЂР°РІР»РµРЅРёРµ РіСЂРѕРјРєРѕСЃС‚СЊСЋ
 */
 
 //in range [0..1]
@@ -964,7 +964,7 @@ float MediaPlayer::Volume () const
   return impl->is_muted ? 0.0f : impl->volume;
 }
 
-//включен или отключен ли звук
+//РІРєР»СЋС‡РµРЅ РёР»Рё РѕС‚РєР»СЋС‡РµРЅ Р»Рё Р·РІСѓРє
 void MediaPlayer::SetMute (bool state)
 {
   common::Lock lock (*impl);
@@ -997,7 +997,7 @@ bool MediaPlayer::IsMuted () const
 }
 
 /*
-    Оповещения о событиях плеера
+    РћРїРѕРІРµС‰РµРЅРёСЏ Рѕ СЃРѕР±С‹С‚РёСЏС… РїР»РµРµСЂР°
 */
 
 xtl::connection MediaPlayer::RegisterEventHandler (MediaPlayerEvent event, const EventHandler& handler) const

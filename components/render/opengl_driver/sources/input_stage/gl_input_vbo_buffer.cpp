@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, const BufferDesc& in_desc)
@@ -13,7 +13,7 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
 {
   try
   {
-      //определение режима использования буфера
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ СЂРµР¶РёРјР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р±СѓС„РµСЂР°
 
     GLenum gl_usage_mode;    
 
@@ -38,11 +38,11 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
         throw xtl::make_argument_exception ("", "desc.usage_mode", in_desc.usage_mode);
     }
 
-      //выбор текущего контекста
+      //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     MakeContextCurrent ();
     
-      //получение информации о достпных расширениях
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РґРѕСЃС‚РїРЅС‹С… СЂР°СЃС€РёСЂРµРЅРёСЏС…
       
     const ContextCaps& caps = GetCaps ();
       
@@ -50,7 +50,7 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
     PFNGLBINDBUFFERPROC glBindBuffer_fn = caps.glBindBuffer_fn;
     PFNGLBUFFERDATAPROC glBufferData_fn = caps.glBufferData_fn;
 
-      //создание буфера
+      //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
     glGenBuffers_fn (1, &buffer_id);
 
@@ -92,12 +92,12 @@ VboBuffer::~VboBuffer ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Установка / чтение данных после отсечения
+    РЈСЃС‚Р°РЅРѕРІРєР° / С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С… РїРѕСЃР»Рµ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void VboBuffer::SetDataCore (unsigned int offset, unsigned int size, const void* data)
@@ -125,7 +125,7 @@ void VboBuffer::GetDataCore (unsigned int offset, unsigned int size, void* data)
 }
 
 /*
-    Установка буфера в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void VboBuffer::Bind ()
@@ -143,16 +143,16 @@ void VboBuffer::Bind ()
 
   CheckErrors ("render::low_level::opengl::VboBuffer::Bind");
 
-    //установка кэш-переменной
+    //СѓСЃС‚Р°РЅРѕРІРєР° РєСЌС€-РїРµСЂРµРјРµРЅРЅРѕР№
 
   SetContextCacheValue (CacheEntry_BindedVboBuffer, GetId ());
 }
 
 /*
-    Получение указателя на начало буфера
+    РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РЅР°С‡Р°Р»Рѕ Р±СѓС„РµСЂР°
 */
 
 void* VboBuffer::GetDataPointer ()
 {
-  return 0; //возвращается смещение от начала буфера
+  return 0; //РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° Р±СѓС„РµСЂР°
 }

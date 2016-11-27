@@ -1,51 +1,51 @@
 /*
    Class: Engine.SubsystemManager
  
-   Менеджер подсистем. Предназначен для запуска/остановки/перезапуска подсистем.
+   РњРµРЅРµРґР¶РµСЂ РїРѕРґСЃРёСЃС‚РµРј. РџСЂРµРґРЅР°Р·РЅР°С‡РµРЅ РґР»СЏ Р·Р°РїСѓСЃРєР°/РѕСЃС‚Р°РЅРѕРІРєРё/РїРµСЂРµР·Р°РїСѓСЃРєР° РїРѕРґСЃРёСЃС‚РµРј.
  */
 
 /*
-   Group: Функции
+   Group: Р¤СѓРЅРєС†РёРё
  */
 
 /*
    Function: Start
  
-   Запуск подсистем из файла по маске.
+   Р—Р°РїСѓСЃРє РїРѕРґСЃРёСЃС‚РµРј РёР· С„Р°Р№Р»Р° РїРѕ РјР°СЃРєРµ.
 
-   Параметры:
-     config_file_name    - имя файла конфигурации
-     subsystem_name_mask - маска имени подсистемы
+   РџР°СЂР°РјРµС‚СЂС‹:
+     config_file_name    - РёРјСЏ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+     subsystem_name_mask - РјР°СЃРєР° РёРјРµРЅРё РїРѕРґСЃРёСЃС‚РµРјС‹
  */
 Start (string config_file_name, string subsystem_name_mask) 
 
 /*
    Function: Restart
  
-   Перезапуск подсистем по маске с чтением конфигурации из файла.
+   РџРµСЂРµР·Р°РїСѓСЃРє РїРѕРґСЃРёСЃС‚РµРј РїРѕ РјР°СЃРєРµ СЃ С‡С‚РµРЅРёРµРј РєРѕРЅС„РёРіСѓСЂР°С†РёРё РёР· С„Р°Р№Р»Р°.
 
-   Параметры:
-     config_file_name    - имя файла конфигурации
-     subsystem_name_mask - маска имени подсистемы
+   РџР°СЂР°РјРµС‚СЂС‹:
+     config_file_name    - РёРјСЏ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+     subsystem_name_mask - РјР°СЃРєР° РёРјРµРЅРё РїРѕРґСЃРёСЃС‚РµРјС‹
  */
 Restart (string config_file_name, string subsystem_name_mask) 
 
 /*
    Function: Remove
  
-   Остановка подсистем по маске.
+   РћСЃС‚Р°РЅРѕРІРєР° РїРѕРґСЃРёСЃС‚РµРј РїРѕ РјР°СЃРєРµ.
 
-   Параметры:
-     subsystem_name_mask - маска имени подсистемы
+   РџР°СЂР°РјРµС‚СЂС‹:
+     subsystem_name_mask - РјР°СЃРєР° РёРјРµРЅРё РїРѕРґСЃРёСЃС‚РµРјС‹
  */
 Remove (string subsystem_name_mask) 
 
 /*
-   Group: Примеры
+   Group: РџСЂРёРјРµСЂС‹
  
  */
 /*
-  Topic: Пример кода
+  Topic: РџСЂРёРјРµСЂ РєРѕРґР°
  
   (start code) 
   local CONFIG_FILE_NAME = "data/config.xml"
@@ -73,7 +73,7 @@ Remove (string subsystem_name_mask)
 */
 
 /*
-  Topic: Результат
+  Topic: Р РµР·СѓР»СЊС‚Р°С‚
  
   (start code) 
   Results of engine_subsystem_manager_test:
@@ -107,7 +107,7 @@ Remove (string subsystem_name_mask)
 */
 
 /*
-  Topic: Файл config.xml
+  Topic: Р¤Р°Р№Р» config.xml
  
   (start code) 
    <?xml version="1.0" encoding = "windows-1251"?>

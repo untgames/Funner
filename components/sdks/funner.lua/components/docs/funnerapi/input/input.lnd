@@ -1,33 +1,33 @@
 /*
    Class: Input
  
-   Система ввода.
+   РЎРёСЃС‚РµРјР° РІРІРѕРґР°.
  */
 
 /*
-   Group: Функции
+   Group: Р¤СѓРЅРєС†РёРё
  
  */
 
 /*
    Function: CreateEventHandler
  
-   Создание обработчика событий ввода.
+   РЎРѕР·РґР°РЅРёРµ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°.
 
-   Параметры:
-     function_name - имя обработчика событий
+   РџР°СЂР°РјРµС‚СЂС‹:
+     function_name - РёРјСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№
 
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      <Common.Connection>  
  */  
 CreateEventHandler (string function_name)
   
 /*
-   Group: Примеры
+   Group: РџСЂРёРјРµСЂС‹
  
  */
 /*
-  Topic: Пример кода
+  Topic: РџСЂРёРјРµСЂ РєРѕРґР°
  
   (start code) 
   function input_handler (event)
@@ -40,7 +40,7 @@ CreateEventHandler (string function_name)
 */
 
 /*
-  Topic: Результат
+  Topic: Р РµР·СѓР»СЊС‚Р°С‚
  
   (start code) 
   (end code)

@@ -15,16 +15,16 @@ inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
 }
 
 /*
-    Инициализация точек входа WGL
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР° WGL
 */
 
 void WglExtensionEntries::Init (ILibrary& library)
 {
-    //обнуление адресов точек входа
+    //РѕР±РЅСѓР»РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР°
 
   memset (this, 0, sizeof WglExtensionEntries);
 
-    //получение адресов точек входа расширений OpenGL
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
 
   init_extension_entry (library, "wglCreateBufferRegionARB", CreateBufferRegionARB);
   init_extension_entry (library, "wglDeleteBufferRegionARB", DeleteBufferRegionARB);

@@ -20,7 +20,7 @@ struct thread_handle
 namespace
 {
 
-//функция нити
+//С„СѓРЅРєС†РёСЏ РЅРёС‚Рё
 void* thread_run (void* data)
 {
   if (!data)
@@ -50,25 +50,25 @@ void* thread_run (void* data)
 }
 
 /*
-    Создание / удаление нити
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ РЅРёС‚Рё
 */
 
 syslib::thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
-      //проверка корректности аргументов, захват объекта обслуживания нити
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ, Р·Р°С…РІР°С‚ РѕР±СЉРµРєС‚Р° РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ РЅРёС‚Рё
 
     if (!in_callback)
       throw xtl::make_null_argument_exception ("", "callback");
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
 
-      //инициализации библиотеки
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
 
     thread_init ();
 
-      //создание нити
+      //СЃРѕР·РґР°РЅРёРµ РЅРёС‚Рё
 
     stl::auto_ptr<thread_handle> handle (new thread_handle);
 
@@ -95,7 +95,7 @@ void PThreadManager::DestroyThread (thread_t thread)
 }
 
 /*
-    Ожидание завершения нити
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РЅРёС‚Рё
 */
 
 void PThreadManager::JoinThread (thread_t thread)
@@ -122,7 +122,7 @@ void PThreadManager::JoinThread (thread_t thread)
 }
 
 /*
-   Получение идентификатора нити
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РЅРёС‚Рё
 */
 
 size_t PThreadManager::GetThreadId (thread_t thread)
@@ -140,7 +140,7 @@ size_t PThreadManager::GetCurrentThreadId ()
 }
 
 /*
-   Установка приоритета нити
+   РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРѕСЂРёС‚РµС‚Р° РЅРёС‚Рё
 */
 
 void PThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)

@@ -7,10 +7,10 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* FLOAT_FORMAT = ".#####"; //количество знаков после запятой при выводе вещественных чисел
+const char* FLOAT_FORMAT = ".#####"; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ РїСЂРё РІС‹РІРѕРґРµ РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… С‡РёСЃРµР»
 
 }
 
@@ -21,7 +21,7 @@ namespace geometry
 {
 
 /*
-    Сохранение вершинных данных
+    РЎРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 void write (OutputTextStream& stream, const VertexWeight& weight)
@@ -49,7 +49,7 @@ namespace xmesh_saver
 {
 
 /*
-    Класс, сохраняющий меш-модели в Xml-формате
+    РљР»Р°СЃСЃ, СЃРѕС…СЂР°РЅСЏСЋС‰РёР№ РјРµС€-РјРѕРґРµР»Рё РІ Xml-С„РѕСЂРјР°С‚Рµ
 */
 
 class XmlMeshLibrarySaver
@@ -57,7 +57,7 @@ class XmlMeshLibrarySaver
   private:
     typedef stl::hash_map<size_t, size_t> ResourceMap;
     
-      //создание интервала с данными канала
+      //СЃРѕР·РґР°РЅРёРµ РёРЅС‚РµСЂРІР°Р»Р° СЃ РґР°РЅРЅС‹РјРё РєР°РЅР°Р»Р°
     template <class T> static xtl::iterator_range<xtl::stride_ptr<const T> > MakeRange (const VertexStream& vs, size_t offset)
     {
       xtl::stride_ptr<const T> first (reinterpret_cast<const T*> (static_cast<const char*> (vs.Data ()) + offset), vs.VertexSize ()),
@@ -66,15 +66,15 @@ class XmlMeshLibrarySaver
       return xtl::make_iterator_range (first, last);
     }
 
-      //сохранение вершинного потока
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
     void SaveVertexStream (const VertexStream& vs)
     {
       ResourceMap::const_iterator iter = vertex_streams.find (vs.Id ());
       
       if (iter != vertex_streams.end ())
-        return; //поток уже сохранён
+        return; //РїРѕС‚РѕРє СѓР¶Рµ СЃРѕС…СЂР°РЅС‘РЅ
         
-        //сохранение заголовка потока
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РїРѕС‚РѕРєР°
       
       XmlWriter::Scope scope (writer, "vertex_stream");
       
@@ -84,7 +84,7 @@ class XmlMeshLibrarySaver
       writer.WriteAttribute ("vertices_count", vs.Size ());
       writer.WriteAttribute ("vertex_size", vs.VertexSize ());
 
-        //сохранение вершинных данных
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… РґР°РЅРЅС‹С…
         
       for (uint32_t i=0; i<vertex_format.AttributesCount (); i++)
       {
@@ -101,7 +101,7 @@ class XmlMeshLibrarySaver
         writer.WriteAttribute ("type", get_type_name (attribute.type));
         writer.WriteAttribute ("offset", attribute.offset);
 
-          //сохранение данных канала
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РєР°РЅР°Р»Р°
 
         switch (attribute.type)
         {
@@ -117,12 +117,12 @@ class XmlMeshLibrarySaver
         }
       }
 
-        //добавление потока в список сохранённых
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїРѕС‚РѕРєР° РІ СЃРїРёСЃРѕРє СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…
         
       vertex_streams.insert_pair (vs.Id (), vertex_streams.size () + 1);
     }
     
-      //сохранение потока вершинных весов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
       
     void SaveVertexWeightStream (const VertexWeightStream& vws)
     {
@@ -132,25 +132,25 @@ class XmlMeshLibrarySaver
       ResourceMap::const_iterator iter = vertex_weights.find (vws.Id ());
 
       if (iter != vertex_weights.end ())
-        return; //поток уже сохранён
+        return; //РїРѕС‚РѕРє СѓР¶Рµ СЃРѕС…СЂР°РЅС‘РЅ
 
-        //сохранение заголовка потока
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РїРѕС‚РѕРєР°
 
       XmlWriter::Scope scope (writer, "vertex_weight_stream");
 
       writer.WriteAttribute ("id", format ("vws#%u", vertex_weights.size () + 1));
       writer.WriteAttribute ("weights_count", vws.Size ());
 
-        //сохранение весов
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЃРѕРІ
 
       writer.WriteData (xtl::make_iterator_range (vws.Size (), vws.Data ()));
 
-        //добавление потока в список сохранённых
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїРѕС‚РѕРєР° РІ СЃРїРёСЃРѕРє СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…
 
       vertex_weights.insert_pair (vws.Id (), vertex_weights.size () + 1);
     }
     
-      //сохранение вершинного буфера
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void SaveVertexBuffer (const VertexBuffer& vb)
     {
       if (!vb.VerticesCount ())
@@ -159,9 +159,9 @@ class XmlMeshLibrarySaver
       ResourceMap::const_iterator iter = vertex_buffers.find (vb.Id ());
       
       if (iter != vertex_buffers.end ())
-        return; //буфер уже сохранён
+        return; //Р±СѓС„РµСЂ СѓР¶Рµ СЃРѕС…СЂР°РЅС‘РЅ
       
-        //сохранение заголовка вершинного буфера
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       XmlWriter::Scope vertex_buffer_scope (writer, "vertex_buffer");
       
@@ -172,7 +172,7 @@ class XmlMeshLibrarySaver
       if (weights_iter != vertex_weights.end ())
         writer.WriteAttribute ("weights", format ("vws#%u", weights_iter->second));      
       
-        //сохранение ссылок на вершинные потоки
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃСЃС‹Р»РѕРє РЅР° РІРµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
         
       XmlWriter::Scope streams_scope (writer, "streams");
       
@@ -186,12 +186,12 @@ class XmlMeshLibrarySaver
         writer.WriteData (format ("vs#%u", iter->second));
       }      
       
-        //добавление буфера в список сохранённых
+        //РґРѕР±Р°РІР»РµРЅРёРµ Р±СѓС„РµСЂР° РІ СЃРїРёСЃРѕРє СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…
       
       vertex_buffers.insert_pair (vb.Id (), vertex_buffers.size () + 1);
     }
     
-      //сохранение индексного буфера
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void SaveIndexBuffer (const IndexBuffer& ib)
     {
       if (!ib.Size ())
@@ -200,16 +200,16 @@ class XmlMeshLibrarySaver
       ResourceMap::const_iterator iter = index_buffers.find (ib.Id ());
       
       if (iter != index_buffers.end ())
-        return; //буфер уже сохранён
+        return; //Р±СѓС„РµСЂ СѓР¶Рµ СЃРѕС…СЂР°РЅС‘РЅ
       
-        //сохранение заголовка вершинного буфера
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       XmlWriter::Scope index_buffer_scope (writer, "index_buffer");
       
       writer.WriteAttribute ("id", format ("ib#%u", index_buffers.size () + 1));
       writer.WriteAttribute ("indices_count", ib.Size ());
       
-        //сохранение индексов      
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РёРЅРґРµРєСЃРѕРІ      
       
       switch (ib.DataType ())
       {
@@ -229,12 +229,12 @@ class XmlMeshLibrarySaver
           return;
       }
 
-        //добавление потока в список сохранённых
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїРѕС‚РѕРєР° РІ СЃРїРёСЃРѕРє СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…
 
       index_buffers.insert_pair (ib.Id (), index_buffers.size () + 1);        
     }
     
-      //сохранение примитива
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РїСЂРёРјРёС‚РёРІР°
     void SavePrimitive (const Primitive& primitive)
     {
       XmlWriter::Scope scope (writer, "primitive");
@@ -249,7 +249,7 @@ class XmlMeshLibrarySaver
         writer.WriteAttribute ("base_vertex", primitive.base_vertex);
     }
     
-      //сохранение вершинных буферов меша
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ РјРµС€Р°
     void SaveMeshVertexBuffers (const Mesh& mesh)
     {
       XmlWriter::Scope scope (writer, "vertex_buffers");
@@ -263,7 +263,7 @@ class XmlMeshLibrarySaver
       }
     }
     
-      //сохранение примитивов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     void SaveMeshPrimitives (const Mesh& mesh)
     {
       XmlWriter::Scope scope (writer, "primitives");
@@ -272,7 +272,7 @@ class XmlMeshLibrarySaver
         SavePrimitive (mesh.Primitive (i));      
     }
     
-      //сохранение меша
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РјРµС€Р°
     void SaveMesh (const char* id, const Mesh& mesh)
     {
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
@@ -294,7 +294,7 @@ class XmlMeshLibrarySaver
       SaveMeshPrimitives (mesh);        
     }
     
-      //сохранение вершинных потоков
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ
     void SaveVertexStreams ()
     {
       XmlWriter::Scope scope (writer, "vertex_streams");
@@ -315,7 +315,7 @@ class XmlMeshLibrarySaver
       }
     }
     
-      //сохранение вершинных буферов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
     void SaveVertexBuffers ()
     {
       XmlWriter::Scope scope (writer, "vertex_buffers");            
@@ -329,7 +329,7 @@ class XmlMeshLibrarySaver
       }
     }
     
-      //сохранение индексных буферов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РёРЅРґРµРєСЃРЅС‹С… Р±СѓС„РµСЂРѕРІ
     void SaveIndexBuffers ()
     {
       XmlWriter::Scope scope (writer, "index_buffers");            
@@ -338,7 +338,7 @@ class XmlMeshLibrarySaver
         SaveIndexBuffer (i->IndexBuffer ());
     }
     
-      //сохранение мешей
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РјРµС€РµР№
     void SaveMeshes ()
     {
       XmlWriter::Scope scope (writer, "meshes");      
@@ -347,7 +347,7 @@ class XmlMeshLibrarySaver
         SaveMesh (library.ItemId (i), *i);
     }
     
-      //сохранение библиотеки
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     void SaveLibrary ()
     {
       XmlWriter::Scope scope (writer, "mesh_library");
@@ -359,23 +359,23 @@ class XmlMeshLibrarySaver
     }
     
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     XmlMeshLibrarySaver (const char* file_name, const MeshLibrary& in_library) : writer (file_name), library (in_library)
     {
       SaveLibrary ();
     }
 
   private:
-    XmlWriter          writer;          //сериализатор Xml
-    const MeshLibrary& library;         //сохраняемая библиотека
-    ResourceMap        vertex_streams;  //сохранённые вершинные потоки
-    ResourceMap        vertex_buffers;  //сохранённые вершинные буферы
-    ResourceMap        vertex_weights;  //сохранённые потоки вершинных весов
-    ResourceMap        index_buffers;   //сохранённые индексные буферы
+    XmlWriter          writer;          //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ Xml
+    const MeshLibrary& library;         //СЃРѕС…СЂР°РЅСЏРµРјР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    ResourceMap        vertex_streams;  //СЃРѕС…СЂР°РЅС‘РЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
+    ResourceMap        vertex_buffers;  //СЃРѕС…СЂР°РЅС‘РЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+    ResourceMap        vertex_weights;  //СЃРѕС…СЂР°РЅС‘РЅРЅС‹Рµ РїРѕС‚РѕРєРё РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
+    ResourceMap        index_buffers;   //СЃРѕС…СЂР°РЅС‘РЅРЅС‹Рµ РёРЅРґРµРєСЃРЅС‹Рµ Р±СѓС„РµСЂС‹
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XMeshSaverComponent

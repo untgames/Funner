@@ -5,19 +5,19 @@ using namespace math;
 using namespace bound_volumes;
 
 /*
-    Описание реализации Camera
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Camera
 */
 
 struct Camera::Impl: public xtl::instance_counter<Camera>
 {
-  mat4f       proj_matrix;     //матрица проецирования
-  plane_listf frustum;         //пирамида видимости
-  bool        dirty_pm;        //при true матрица проецирования нуждается в перерасчёте
-  bool        dirty_frustum;   //при true пирамида видимости нуждается в перерасчёте
+  mat4f       proj_matrix;     //РјР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ
+  plane_listf frustum;         //РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё
+  bool        dirty_pm;        //РїСЂРё true РјР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ РЅСѓР¶РґР°РµС‚СЃСЏ РІ РїРµСЂРµСЂР°СЃС‡С‘С‚Рµ
+  bool        dirty_frustum;   //РїСЂРё true РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё РЅСѓР¶РґР°РµС‚СЃСЏ РІ РїРµСЂРµСЂР°СЃС‡С‘С‚Рµ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Camera::Camera ()
@@ -37,7 +37,7 @@ Camera::~Camera ()
 }
 
 /*
-    Матрица проекции
+    РњР°С‚СЂРёС†Р° РїСЂРѕРµРєС†РёРё
 */
 
 const mat4f& Camera::ProjectionMatrix () const
@@ -53,7 +53,7 @@ const mat4f& Camera::ProjectionMatrix () const
 }
 
 /*
-    Получение пирамиды видимости
+    РџРѕР»СѓС‡РµРЅРёРµ РїРёСЂР°РјРёРґС‹ РІРёРґРёРјРѕСЃС‚Рё
 */
 
 const plane_listf& Camera::Frustum () const
@@ -71,7 +71,7 @@ const plane_listf& Camera::Frustum () const
 }
 
 /*
-    Сигнал обновления матрицы
+    РЎРёРіРЅР°Р» РѕР±РЅРѕРІР»РµРЅРёСЏ РјР°С‚СЂРёС†С‹
 */
 
 void Camera::UpdateCameraNotify ()
@@ -88,7 +88,7 @@ void Camera::AfterUpdateWorldTransformEvent ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Camera::AcceptCore (Visitor& visitor)

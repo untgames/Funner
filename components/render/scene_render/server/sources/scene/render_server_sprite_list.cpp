@@ -5,29 +5,29 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVE_SUBLIST_COUNT = 4; //резервируемое количество вложенных списков
+const size_t RESERVE_SUBLIST_COUNT = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІР»РѕР¶РµРЅРЅС‹С… СЃРїРёСЃРєРѕРІ
 
 /*
-    Описание реализации списка спрайтов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 namespace
 {
 
-/// Вложенный список спрайтов
+/// Р’Р»РѕР¶РµРЅРЅС‹Р№ СЃРїРёСЃРѕРє СЃРїСЂР°Р№С‚РѕРІ
 struct Sublist: public xtl::reference_counter
 {
-  SpriteMode          mode;         //режим спрайтов
-  PrimitiveUsage      usage;        //режим использования
-  math::vec3f         up;           //вектор "вверх"
-  stl::string         batch_name;   //имя пакета
-  size_t              descs_count;  //количество спрайтов
-  manager::SpriteList sprites;      //спрайты  
+  SpriteMode          mode;         //СЂРµР¶РёРј СЃРїСЂР°Р№С‚РѕРІ
+  PrimitiveUsage      usage;        //СЂРµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
+  math::vec3f         up;           //РІРµРєС‚РѕСЂ "РІРІРµСЂС…"
+  stl::string         batch_name;   //РёРјСЏ РїР°РєРµС‚Р°
+  size_t              descs_count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ
+  manager::SpriteList sprites;      //СЃРїСЂР°Р№С‚С‹  
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Sublist (SpriteMode in_mode, PrimitiveUsage in_usage, const char* in_batch_name, const manager::SpriteList& in_sprites)
     : mode (in_mode)
     , usage (in_usage)
@@ -45,12 +45,12 @@ typedef stl::vector<SublistPtr>     SublistArray;
 
 struct SpriteList::Impl
 {
-  manager::Entity&  entity;                //сущность
-  RenderManager     render_manager;        //менеджер рендеринга
-  SublistArray      sublists;              //вложенные списки
-  size_t            active_sublists_count; //количество активных списков
+  manager::Entity&  entity;                //СЃСѓС‰РЅРѕСЃС‚СЊ
+  RenderManager     render_manager;        //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  SublistArray      sublists;              //РІР»РѕР¶РµРЅРЅС‹Рµ СЃРїРёСЃРєРё
+  size_t            active_sublists_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РєС‚РёРІРЅС‹С… СЃРїРёСЃРєРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (RenderManager& in_render_manager, manager::Entity& in_entity)
     : entity (in_entity)
     , render_manager (in_render_manager)
@@ -59,7 +59,7 @@ struct SpriteList::Impl
     sublists.reserve (RESERVE_SUBLIST_COUNT);
   }
 
-/// Получение вложенного списка
+/// РџРѕР»СѓС‡РµРЅРёРµ РІР»РѕР¶РµРЅРЅРѕРіРѕ СЃРїРёСЃРєР°
   Sublist& Item (subid_t subid, const char* source = "")
   {
     if (subid < sublists.size ())
@@ -77,7 +77,7 @@ struct SpriteList::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SpriteList::SpriteList (RenderManager& render_manager)
@@ -99,7 +99,7 @@ SpriteList::~SpriteList ()
 }
 
 /*
-    Создание / удаление списка
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРїРёСЃРєР°
 */
 
 void SpriteList::CreateList (subid_t subid, SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch)
@@ -223,7 +223,7 @@ void SpriteList::ReserveLists (subid_t count)
 }
 
 /*
-    Основные параметры
+    РћСЃРЅРѕРІРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
 */
 
 SpriteMode SpriteList::Mode (subid_t subid) const
@@ -247,7 +247,7 @@ const char* SpriteList::Batch (subid_t subid) const
 }
 
 /*
-    Имя материала
+    РРјСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 void SpriteList::SetMaterial (subid_t subid, const char* name)
@@ -272,7 +272,7 @@ const char* SpriteList::Material (subid_t subid) const
 }
 
 /*
-    Количество спрайтов / размер буфера
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 */
 
 size_t SpriteList::Size (subid_t subid) const
@@ -286,7 +286,7 @@ size_t SpriteList::Capacity (subid_t subid) const
 }
 
 /*
-    Изменение размера списка спрайтов / резервирование места для хранения спрайтов
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteList::Resize (subid_t subid, size_t count)
@@ -323,7 +323,7 @@ void SpriteList::Reserve (subid_t subid, size_t count)
 }
 
 /*
-    Обновление дескрипторов спрайтов
+    РћР±РЅРѕРІР»РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteList::SetDescs (subid_t subid, size_t first, size_t count, const SpriteDesc* descs)

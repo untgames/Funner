@@ -25,7 +25,7 @@ vec4f clamp (const vec4f& color)
   return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
 }
 
-//определение корректности кода символа
+//РѕРїСЂРµРґРµР»РµРЅРёРµ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РєРѕРґР° СЃРёРјРІРѕР»Р°
 inline bool is_symbol_valid (size_t symbol_code, size_t first_code, size_t last_code)
 {
   return symbol_code >= first_code && symbol_code < last_code;
@@ -36,7 +36,7 @@ const size_t      DEFAULT_FONT_SIZE         = 14;
 const size_t      DEFAULT_FONT_SIZE_EPS     = 2;
 const char*       DEFAULT_FONT_CHARSET      = "";
 
-//границы текста
+//РіСЂР°РЅРёС†С‹ С‚РµРєСЃС‚Р°
 struct TextDimensions
 {
   math::vec2f min;
@@ -69,7 +69,7 @@ struct FontCreationParamsImpl: public media::FontCreationParams
 
 
 /*
-    Описание реализации TextLine
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё TextLine
 */
 
 typedef xtl::uninitialized_storage<unsigned int> Utf32Buffer;
@@ -89,10 +89,10 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
   FontCreationParamsImpl     font_creation_params;
   stl::auto_ptr<media::Font> font;
   vec4f                      color;
-  vec4f                      last_asked_char_color;    //переменная для хранения возвращаемого значения
+  vec4f                      last_asked_char_color;    //РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
   TextLineAlignment          horizontal_alignment;
   TextLineAlignment          vertical_alignment;
-  CharsColors                chars_colors_factors;     //множители цвета букв
+  CharsColors                chars_colors_factors;     //РјРЅРѕР¶РёС‚РµР»Рё С†РІРµС‚Р° Р±СѓРєРІ
   CharsColors                chars_colors;
   bool                       chars_colors_need_update;
   float                      spacing_multiplier;
@@ -131,7 +131,7 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextLine::TextLine (const media::FontLibrary& font_library)
@@ -145,7 +145,7 @@ TextLine::~TextLine ()
 }
 
 /*
-    Создание линии текста
+    РЎРѕР·РґР°РЅРёРµ Р»РёРЅРёРё С‚РµРєСЃС‚Р°
 */
 
 TextLine::Pointer TextLine::Create (const media::FontLibrary& font_library)
@@ -154,7 +154,7 @@ TextLine::Pointer TextLine::Create (const media::FontLibrary& font_library)
 }
 
 /*
-    Цвет текста
+    Р¦РІРµС‚ С‚РµРєСЃС‚Р°
 */
 
 void TextLine::SetColor (const vec4f& color)
@@ -180,7 +180,7 @@ const vec4f& TextLine::Color () const
 }
 
 /*
-   Цвет определенных символов текста
+   Р¦РІРµС‚ РѕРїСЂРµРґРµР»РµРЅРЅС‹С… СЃРёРјРІРѕР»РѕРІ С‚РµРєСЃС‚Р°
 */
 
 void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec4f& color)
@@ -276,7 +276,7 @@ void TextLine::CharsColors (size_t first, size_t count, math::vec4f* colors) con
 }
 
 /*
-   Установка/получение текста
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚Р°
 */
 
 void TextLine::SetTextUtf8 (const char* text)
@@ -435,19 +435,19 @@ const unsigned int* TextLine::TextUtf32 () const
 size_t TextLine::TextLength  () const
 {
   if (impl->text_utf32_need_update)
-    TextUtf32 (); //обновление длины
+    TextUtf32 (); //РѕР±РЅРѕРІР»РµРЅРёРµ РґР»РёРЅС‹
 
   return impl->length;
 }
 
 /*
-    Хэш текста
+    РҐСЌС€ С‚РµРєСЃС‚Р°
 */
 
 size_t TextLine::TextUtf8Hash () const
 {
   if (impl->text_utf8_need_update)
-    TextUtf8 (); //обновление хэша
+    TextUtf8 (); //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
   return impl->text_utf8_hash;
 }
@@ -455,13 +455,13 @@ size_t TextLine::TextUtf8Hash () const
 size_t TextLine::TextUtf32Hash () const
 {
   if (impl->text_utf32_need_update)
-    TextUtf32 (); //обновление хэша
+    TextUtf32 (); //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
   return impl->text_utf32_hash;
 }
 
 /*
-   Установка/получение имени шрифта
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С€СЂРёС„С‚Р°
 */
 
 void TextLine::SetFont (const char* font_name)
@@ -518,7 +518,7 @@ const media::FontCreationParams& TextLine::FontCreationParams () const
 }
 
 /*
-   Установка/получение межбуквенного интервала
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РјРµР¶Р±СѓРєРІРµРЅРЅРѕРіРѕ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 void TextLine::SetSpacingMultiplier (float spacing_multiplier)
@@ -535,7 +535,7 @@ float TextLine::SpacingMultiplier () const
 }
 
 /*
-   Выравнивание
+   Р’С‹СЂР°РІРЅРёРІР°РЅРёРµ
 */
 
 void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment vertical)
@@ -588,7 +588,7 @@ TextLineAlignment TextLine::HorizontalAlignment () const
 }
 
 /*
-    Перестроение таблицы символов
+    РџРµСЂРµСЃС‚СЂРѕРµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃРёРјРІРѕР»РѕРІ
 */
 
 void TextLine::RebuildCharsCore ()
@@ -597,17 +597,17 @@ void TextLine::RebuildCharsCore ()
   {
     if (!impl->font)
     {
-        //создание шрифта
+        //СЃРѕР·РґР°РЅРёРµ С€СЂРёС„С‚Р°
 
       impl->font.reset (new media::Font (FontLibrary ().CreateFont (impl->font_name.c_str (), impl->font_creation_params)));
     }
 
-      //обновление цветов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С†РІРµС‚РѕРІ
 
     if (impl->chars_colors_need_update)
       impl->UpdateCharsColors ();
 
-      //обновление символов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
 
     size_t chars_count = TextLength ();
 
@@ -636,7 +636,7 @@ void TextLine::RebuildCharsCore ()
 
     for (size_t i=0; i<chars_count; i++, src_char++)
     {
-        //проверка наличия кода символа в шрифте
+        //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєРѕРґР° СЃРёРјРІРѕР»Р° РІ С€СЂРёС„С‚Рµ
 
       unsigned int current_symbol_code = *src_char;
 
@@ -648,14 +648,14 @@ void TextLine::RebuildCharsCore ()
         current_symbol_code = '?';
       }
 
-        //получение глифа
+        //РїРѕР»СѓС‡РµРЅРёРµ РіР»РёС„Р°
 
       unsigned int            glyph_index = current_symbol_code - first_glyph_code;
       const media::GlyphInfo& glyph       = glyphs [glyph_index];
 
-        //перенос пера
+        //РїРµСЂРµРЅРѕСЃ РїРµСЂР°
 
-      if (dst_char != dst_first_char) //производится только если есть предыдущий символ
+      if (dst_char != dst_first_char) //РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ С‚РѕР»СЊРєРѕ РµСЃР»Рё РµСЃС‚СЊ РїСЂРµРґС‹РґСѓС‰РёР№ СЃРёРјРІРѕР»
       {
         if (font.HasKerning (prev_glyph_index, glyph_index))
         {
@@ -666,7 +666,7 @@ void TextLine::RebuildCharsCore ()
         }
       }
 
-        //инициализация символа
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРёРјРІРѕР»Р°
 
       float bearing_x = glyph.bearing_x / font_size,
             bearing_y = glyph.bearing_y / font_size,
@@ -679,12 +679,12 @@ void TextLine::RebuildCharsCore ()
       dst_char->size     = math::vec2f (size_x, size_y);
       dst_char->color    = colors ? colors [i] : default_color;
 
-        //перенос пера
+        //РїРµСЂРµРЅРѕСЃ РїРµСЂР°
 
       current_pen_x += glyph.advance_x * advance_multiplier;
       current_pen_y += glyph.advance_y * advance_multiplier;
 
-        //корректировка границ текста
+        //РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РіСЂР°РЅРёС† С‚РµРєСЃС‚Р°
 
       TextDimensions glyph_dimensions;
 
@@ -698,24 +698,24 @@ void TextLine::RebuildCharsCore ()
       if (glyph_dimensions.max.x > impl->text_dimensions.max.x) impl->text_dimensions.max.x = glyph_dimensions.max.x;
       if (glyph_dimensions.max.y > impl->text_dimensions.max.y) impl->text_dimensions.max.y = glyph_dimensions.max.y;
 
-        //переход к следующему символу
+        //РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ СЃРёРјРІРѕР»Сѓ
 
       dst_char++;
 
       prev_glyph_index = glyph_index;
     }    
 
-      //корректировка количества символов
+      //РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РєРѕР»РёС‡РµСЃС‚РІР° СЃРёРјРІРѕР»РѕРІ
 
     chars_count = dst_char - dst_first_char;
 
     ResizeChars (chars_count);
 
-      //смещение в зависимости от выравнивания
+      //СЃРјРµС‰РµРЅРёРµ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ
 
     if (impl->horizontal_alignment != TextLineAlignment_Left || impl->vertical_alignment != TextLineAlignment_Left)
     {
-        //расчёт вектора смещения надписи
+        //СЂР°СЃС‡С‘С‚ РІРµРєС‚РѕСЂР° СЃРјРµС‰РµРЅРёСЏ РЅР°РґРїРёСЃРё
 
       math::vec2f size = impl->text_dimensions.max - impl->text_dimensions.min;
       math::vec3f offset (-impl->text_dimensions.min.x, -impl->text_dimensions.min.y, 0);
@@ -766,7 +766,7 @@ void TextLine::RebuildCharsCore ()
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void TextLine::UpdateBoundsCore ()
@@ -778,7 +778,7 @@ void TextLine::UpdateBoundsCore ()
 
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void TextLine::AcceptCore (Visitor& visitor)
@@ -788,7 +788,7 @@ void TextLine::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void TextLine::BindProperties (common::PropertyBindingMap& bindings)

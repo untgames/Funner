@@ -3,7 +3,7 @@
 namespace
 {
 
-//получение строки с сообщением об ошибке
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ СЃРѕРѕР±С‰РµРЅРёРµРј РѕР± РѕС€РёР±РєРµ
 stl::string get_error_message (DWORD error_code)
 {
   void* buffer = 0;
@@ -17,7 +17,7 @@ stl::string get_error_message (DWORD error_code)
   }
   else
   {    
-      //отсечение завершающих \n и пробелов      
+      //РѕС‚СЃРµС‡РµРЅРёРµ Р·Р°РІРµСЂС€Р°СЋС‰РёС… \n Рё РїСЂРѕР±РµР»РѕРІ      
 
     char* iter = (char*)buffer;    
     
@@ -66,7 +66,7 @@ namespace opengl
 namespace windows
 {
 
-//генерация исключения
+//РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ
 void raise_error (const char* source)
 {
   DWORD error_code = GetLastError ();
@@ -77,7 +77,7 @@ void raise_error (const char* source)
   throw xtl::format_operation_exception (source, "Operation failed");
 }
 
-///Проверка поддержки расширений
+///РџСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№
 stl::string get_wgl_extensions_string (const WglExtensionEntries& wgl_extension_entries, HDC device_context)
 {
   if (wgl_extension_entries.GetExtensionsStringARB)
@@ -94,7 +94,7 @@ bool has_extension (const char* extensions_string, const char* extension)
   return extensions_string && extension && strstr (extensions_string, extension);
 }
 
-//перенаправление вызовов Dll
+//РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹Р·РѕРІРѕРІ Dll
 void redirect_dll_call (HMODULE module, const char* import_module_name, void* src_thunk, void* dst_thunk)
 {
   try
@@ -111,7 +111,7 @@ void redirect_dll_call (HMODULE module, const char* import_module_name, void* sr
     if (!dst_thunk)
       throw xtl::make_null_argument_exception ("", "dst_thunk");      
     
-      //получение базового адреса текущего процесса и адресов PE-заголовков
+      //РїРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ Р°РґСЂРµСЃР° С‚РµРєСѓС‰РµРіРѕ РїСЂРѕС†РµСЃСЃР° Рё Р°РґСЂРµСЃРѕРІ PE-Р·Р°РіРѕР»РѕРІРєРѕРІ
 
     char*             image_base = reinterpret_cast<char*> (module);
     PIMAGE_DOS_HEADER dos_header = reinterpret_cast<PIMAGE_DOS_HEADER> (image_base);
@@ -122,18 +122,18 @@ void redirect_dll_call (HMODULE module, const char* import_module_name, void* sr
     if (!import_offset)
       throw xtl::format_operation_exception ("", "Null import table offset");
 
-      //получение адреса таблицы импорта
+      //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚Р°Р±Р»РёС†С‹ РёРјРїРѕСЂС‚Р°
 
     PIMAGE_IMPORT_DESCRIPTOR import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR> (image_base + import_offset);
 
-    for (;import_descriptor->Name; ++import_descriptor) //перебор импортируемых модулей
+    for (;import_descriptor->Name; ++import_descriptor) //РїРµСЂРµР±РѕСЂ РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… РјРѕРґСѓР»РµР№
     {
       const char* module_name = reinterpret_cast<const char*> (image_base + import_descriptor->Name);      
 
       if (xtl::xstricmp (module_name, import_module_name))
         continue;
 
-        //перебор точек входа
+        //РїРµСЂРµР±РѕСЂ С‚РѕС‡РµРє РІС…РѕРґР°
 
       void**            thunk      = reinterpret_cast<void**> (image_base + import_descriptor->FirstThunk);
       char*             hint       = import_descriptor->OriginalFirstThunk ? image_base + import_descriptor->OriginalFirstThunk : (char*)thunk;

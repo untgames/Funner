@@ -12,13 +12,13 @@ namespace Funner
 {
 
 /*
-    Класс движка
+    РљР»Р°СЃСЃ РґРІРёР¶РєР°
 */
 
 private ref class Engine
 {
   public:    
-///Получение движка
+///РџРѕР»СѓС‡РµРЅРёРµ РґРІРёР¶РєР°
     static IEngine* GetEngine ()
     {
       if (engine)
@@ -47,12 +47,12 @@ private ref class Engine
     }
 
   private:
-    static IEngine* engine = 0; //указатель на объект движка
+    static IEngine* engine = 0; //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±СЉРµРєС‚ РґРІРёР¶РєР°
 };
 
 
 /*
-    Обёртка над слушателем событий окна движка
+    РћР±С‘СЂС‚РєР° РЅР°Рґ СЃР»СѓС€Р°С‚РµР»РµРј СЃРѕР±С‹С‚РёР№ РѕРєРЅР° РґРІРёР¶РєР°
 */
 
 private interface class IFunnerViewListener
@@ -73,7 +73,7 @@ namespace
 {
 
 /*
-    Слушатель событий окна движка
+    РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РѕРєРЅР° РґРІРёР¶РєР°
 */
 
 class FunnerViewListener: public IWindowListener
@@ -81,13 +81,13 @@ class FunnerViewListener: public IWindowListener
   public:
     msclr::auto_gcroot<IFunnerViewListener^> Listener;
   
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     FunnerViewListener ()
       : keys_converter (gcnew KeysConverter)
     {
     }
     
-    ///Обработчик события перерисовки окна
+    ///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РїРµСЂРµСЂРёСЃРѕРІРєРё РѕРєРЅР°
     void OnPaint ()
     {
       printf ("%s\n", __FUNCTION__);      
@@ -95,14 +95,14 @@ class FunnerViewListener: public IWindowListener
         Listener->OnEnginePaint ();
     }
     
-    ///Обработчик изменения размеров окна
+    ///РћР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
     void OnSize (size_t, size_t)
     {
       if (Listener)
         Listener->OnEngineResize (gcnew EventArgs ());      
     }
     
-    ///Обработчики событий ввода    
+    ///РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°    
     void OnMouseEnter (int, int)
     {
       if (Listener)
@@ -212,16 +212,16 @@ class FunnerViewListener: public IWindowListener
     }
 
   private:
-    msclr::auto_gcroot<KeysConverter^> keys_converter; //конвертер строк в коды клавиш
+    msclr::auto_gcroot<KeysConverter^> keys_converter; //РєРѕРЅРІРµСЂС‚РµСЂ СЃС‚СЂРѕРє РІ РєРѕРґС‹ РєР»Р°РІРёС€
 };
 
 }
 
-///Открытый интерфейс окна движка
+///РћС‚РєСЂС‹С‚С‹Р№ РёРЅС‚РµСЂС„РµР№СЃ РѕРєРЅР° РґРІРёР¶РєР°
 public ref class FunnerView: public UserControl, public IFunnerViewListener
 {
   public:
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     FunnerView ()
       : engine (0)
       , window (0)
@@ -263,7 +263,7 @@ public ref class FunnerView: public UserControl, public IFunnerViewListener
       }
     }
 
-    ///Деструктор
+    ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~FunnerView ()
     {
       try
@@ -278,11 +278,11 @@ public ref class FunnerView: public UserControl, public IFunnerViewListener
       }
       catch (...)
       {
-        ///подавление всех исключений
+        ///РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Обработка событий встроенного окна
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РІСЃС‚СЂРѕРµРЅРЅРѕРіРѕ РѕРєРЅР°
     virtual void OnEngineKeyDown (KeyEventArgs^ args)
     {
       UserControl::OnKeyDown (args);
@@ -334,13 +334,13 @@ public ref class FunnerView: public UserControl, public IFunnerViewListener
     }    
 
   private:
-///Обновление родительского окна
+///РћР±РЅРѕРІР»РµРЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
     void UpdateParent ()
     {
       window->SetParentHandle ((void*)Handle);
     }
 
-///Обновление размеров
+///РћР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ
     void UpdateRect ()
     {
       System::Drawing::Rectangle^ rect = ClientRectangle;
@@ -349,22 +349,22 @@ public ref class FunnerView: public UserControl, public IFunnerViewListener
       window->SetSize     (rect->Width, rect->Height);
     }
 
-///Обработка события создания дескриптора формы
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СЃРѕР·РґР°РЅРёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° С„РѕСЂРјС‹
     void OnCreateHandle (System::Object^, EventArgs^)
     {
       window_listener->Listener = this;      
       
-        //обновление параметров
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
       UpdateParent ();
       UpdateRect ();
 
-        //отображение окна
+        //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РѕРєРЅР°
 
       window->Show (true);
     }
 
-///Обработка события уничтожения дескриптора формы
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРЅРёС‡С‚РѕР¶РµРЅРёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° С„РѕСЂРјС‹
     void OnDestroyHandle (System::Object^, EventArgs^)
     {
       window_listener->Listener = nullptr;
@@ -372,7 +372,7 @@ public ref class FunnerView: public UserControl, public IFunnerViewListener
       window->SetParentHandle (0);
     }
 
-///Обработка события изменения размеров формы
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ С„РѕСЂРјС‹
     void OnResize (Object^, EventArgs^)
     {
       UpdateRect ();

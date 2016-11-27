@@ -15,16 +15,16 @@ using namespace xtl;
 using namespace math;
 
 const size_t ACTION_TIME = 1000;
-const size_t TEST_WORK_TIME = 15000;  //время работы теста (в милисекундах)
+const size_t TEST_WORK_TIME = 15000;  //РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ С‚РµСЃС‚Р° (РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…)
 const char* library_file = "data/test.snddecl";
 
-//печать числа с плавающей точкой
+//РїРµС‡Р°С‚СЊ С‡РёСЃР»Р° СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
 void print (float value)
 {
   printf ("%+.3f", value);
 }
 
-//печать вектора
+//РїРµС‡Р°С‚СЊ РІРµРєС‚РѕСЂР°
 template <class T, unsigned int N>
 void print (const math::vector<T, N>& v)
 {

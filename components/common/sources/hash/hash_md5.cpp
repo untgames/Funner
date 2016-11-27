@@ -283,7 +283,7 @@ void Decode (UINT4 *output, unsigned char *input, unsigned int len)
 namespace common
 {
 
-/* hash_value - 16 αΰις */
+/* hash_value - 16 Π±Π°ΠΉΡ‚ */
 
 void md5 (const void* buf, size_t len, unsigned char result_hash_value [16])
 {

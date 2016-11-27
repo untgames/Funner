@@ -3,7 +3,7 @@
 namespace common
 {
 
-//алгоритм взят из библиотеки mhash_0.9
+//Р°Р»РіРѕСЂРёС‚Рј РІР·СЏС‚ РёР· Р±РёР±Р»РёРѕС‚РµРєРё mhash_0.9
 
 size_t adler32 (const void* buf,size_t len,size_t hash_value)
 {

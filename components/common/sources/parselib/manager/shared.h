@@ -21,7 +21,7 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Грамматический разбор
+///Р“СЂР°РјРјР°С‚РёС‡РµСЃРєРёР№ СЂР°Р·Р±РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ParseNode parse (ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer);
 void      parse (ParseTreeBuilder& builder, ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer);

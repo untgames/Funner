@@ -4,14 +4,14 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации InputZone
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё InputZone
 */
 
 struct InputZone::Impl: public xtl::instance_counter<InputZone>
 {
-  ZoneDesc zone_desc [NodeOrt_Num];   //описание спрайта
-  size_t   plane_mask;                //маска включеных плоскостей ввода
-  size_t   zones_count;               //количество зон
+  ZoneDesc zone_desc [NodeOrt_Num];   //РѕРїРёСЃР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
+  size_t   plane_mask;                //РјР°СЃРєР° РІРєР»СЋС‡РµРЅС‹С… РїР»РѕСЃРєРѕСЃС‚РµР№ РІРІРѕРґР°
+  size_t   zones_count;               //РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РѕРЅ
   
   Impl ()
   {
@@ -54,7 +54,7 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputZone::InputZone ()
@@ -70,7 +70,7 @@ InputZone::~InputZone ()
 }
 
 /*
-    Создание спрайта
+    РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
 */
 
 InputZone::Pointer InputZone::Create ()
@@ -79,7 +79,7 @@ InputZone::Pointer InputZone::Create ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void InputZone::AcceptCore (Visitor& visitor)
@@ -89,7 +89,7 @@ void InputZone::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Реализация получения количества спрайтов и массива спрайтов
+    Р РµР°Р»РёР·Р°С†РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЃРїСЂР°Р№С‚РѕРІ Рё РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t InputZone::ZoneDescsCountCore ()
@@ -103,7 +103,7 @@ const InputZoneModel::ZoneDesc* InputZone::ZoneDescsCore ()
 }
 
 /*
-    Управление плоскостями зон ввода
+    РЈРїСЂР°РІР»РµРЅРёРµ РїР»РѕСЃРєРѕСЃС‚СЏРјРё Р·РѕРЅ РІРІРѕРґР°
 */
 
 void InputZone::SetPlaneState (NodeOrt normal, bool state)

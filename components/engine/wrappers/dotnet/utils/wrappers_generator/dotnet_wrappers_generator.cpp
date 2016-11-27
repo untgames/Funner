@@ -14,7 +14,7 @@ using namespace script;
 typedef stl::multimap<stl::string, Environment::Type*>    TypeMap;
 typedef stl::hash_map<const xtl::type_info*, stl::string> TypeNameMap;
 
-// поиск имени типа
+// РїРѕРёСЃРє РёРјРµРЅРё С‚РёРїР°
 stl::string get_type_name (Environment& env, const xtl::type_info& type, TypeNameMap& type_names)
 {
   TypeNameMap::iterator iter = type_names.find (&type);
@@ -99,7 +99,7 @@ stl::string get_type_name (Environment& env, const xtl::type_info& type, TypeNam
   return type.name ();
 }
 
-// Проверка сигнатуры на
+// РџСЂРѕРІРµСЂРєР° СЃРёРіРЅР°С‚СѓСЂС‹ РЅР°
 bool is_property (const char* name, const InvokerSignature& signature)
 {
   return !strncmp (name, "get_", 4) || !strncmp (name, "set_", 4);
@@ -113,7 +113,7 @@ struct Property
   Property () : has_setter (false), has_getter (false) {}
 };
 
-// обработка библиотеки
+// РѕР±СЂР°Р±РѕС‚РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 void process_library (Environment::Type& type, size_t prefix_size, Environment& env, TypeNameMap& type_names)
 {
   InvokerRegistry& lib  = type.Library ();
@@ -160,7 +160,7 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
   
   printf ("%s\n{\n  public:\n", name);
 
-  // Генерация списка всех свойств  
+  // Р“РµРЅРµСЂР°С†РёСЏ СЃРїРёСЃРєР° РІСЃРµС… СЃРІРѕР№СЃС‚РІ  
   typedef stl::map<stl::string, Property> PropertyMap;
   
   PropertyMap properties;
@@ -211,7 +211,7 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
     printf ("    }\n\n");
   }
   
-  // Генерация всех методов
+  // Р“РµРЅРµСЂР°С†РёСЏ РІСЃРµС… РјРµС‚РѕРґРѕРІ
   for (InvokerRegistry::Iterator iter=lib.CreateIterator (); iter; ++iter)
   {
     Invoker invoker = *iter;
@@ -227,7 +227,7 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
       
       const xtl::type_info& result_type = s.ResultType ().remove_reference ().remove_pointer ();
       
-      if (&result_type == &ext_type && stl::string (lib.InvokerId (iter)) == "Create") //конструктор
+      if (&result_type == &ext_type && stl::string (lib.InvokerId (iter)) == "Create") //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
       {
         printf ("    %s (", name);
       }
@@ -274,7 +274,7 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
   printf ("};\n\n");
 }
 
-// обработка пространств имён
+// РѕР±СЂР°Р±РѕС‚РєР° РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІ РёРјС‘РЅ
 void process_namespace (Environment& env, size_t prefix_size, TypeMap::iterator& iter, TypeMap::iterator end, TypeNameMap& type_names)
 {
   if (iter == end)
@@ -292,7 +292,7 @@ void process_namespace (Environment& env, size_t prefix_size, TypeMap::iterator&
   
   if (last_dot_pos == stl::string::npos || first_dot_pos == stl::string::npos)
   {
-     // обработка типа внутри пространства имён
+     // РѕР±СЂР°Р±РѕС‚РєР° С‚РёРїР° РІРЅСѓС‚СЂРё РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјС‘РЅ
      
     process_library (*iter->second, prefix_size + first_dot_pos + 1, env, type_names);
     
@@ -301,13 +301,13 @@ void process_namespace (Environment& env, size_t prefix_size, TypeMap::iterator&
     return;
   }
   
-    // определение имени пространства имён
+    // РѕРїСЂРµРґРµР»РµРЅРёРµ РёРјРµРЅРё РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјС‘РЅ
     
   stl::string namespace_name = library_name.substr (0, first_dot_pos);    
   
   printf ("namespace %s\n{\n\n", namespace_name.c_str ());  
     
-    // обработка вложенных пространств имён
+    // РѕР±СЂР°Р±РѕС‚РєР° РІР»РѕР¶РµРЅРЅС‹С… РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІ РёРјС‘РЅ
     
   for (;;)
   {
@@ -329,12 +329,12 @@ void process_namespace (Environment& env, size_t prefix_size, TypeMap::iterator&
       break;
   }
     
-    // закрытие пространства имён
+    // Р·Р°РєСЂС‹С‚РёРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјС‘РЅ
   
   printf ("}\n\n");
 }
 
-// обработка библиотек
+// РѕР±СЂР°Р±РѕС‚РєР° Р±РёР±Р»РёРѕС‚РµРє
 void process_libraries (Environment& env)
 {
   TypeMap types;
@@ -350,18 +350,18 @@ void process_libraries (Environment& env)
     process_namespace (env, 0, iter, types.end (), type_names);
 }
 
-// точка входа
+// С‚РѕС‡РєР° РІС…РѕРґР°
 int main ()
 {
   try
   {
-      //создание окружения и привязка библиотек
+      //СЃРѕР·РґР°РЅРёРµ РѕРєСЂСѓР¶РµРЅРёСЏ Рё РїСЂРёРІСЏР·РєР° Р±РёР±Р»РёРѕС‚РµРє
     
     Environment env;
     
     env.BindLibraries ("*");
     
-      //перебор библиотек
+      //РїРµСЂРµР±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
       
     process_libraries (env);
   }

@@ -1,4 +1,4 @@
-// Тестирование reverse
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ reverse
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

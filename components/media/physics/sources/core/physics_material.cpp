@@ -14,17 +14,17 @@ const float       DEFAULT_RESTITUTION          = 0.f;
 }
 
 /*
-   Реализация материала
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct Material::Impl : public xtl::reference_counter
 {
-  stl::string name;                  //имя материала
-  math::vec3f anisotropic_friction;  //трение по другим осям
-  float       linear_damping;        //линейная амортизация
-  float       angular_damping;       //угловая амортизация
-  float       friction;              //трение
-  float       restitution;           //упругость
+  stl::string name;                  //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  math::vec3f anisotropic_friction;  //С‚СЂРµРЅРёРµ РїРѕ РґСЂСѓРіРёРј РѕСЃСЏРј
+  float       linear_damping;        //Р»РёРЅРµР№РЅР°СЏ Р°РјРѕСЂС‚РёР·Р°С†РёСЏ
+  float       angular_damping;       //СѓРіР»РѕРІР°СЏ Р°РјРѕСЂС‚РёР·Р°С†РёСЏ
+  float       friction;              //С‚СЂРµРЅРёРµ
+  float       restitution;           //СѓРїСЂСѓРіРѕСЃС‚СЊ
 
   Impl ()
     : anisotropic_friction (DEFAULT_ANISOTROPIC_FRICTION)
@@ -36,7 +36,7 @@ struct Material::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Material::Material ()
@@ -68,7 +68,7 @@ Material& Material::operator = (const Material& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Material Material::Clone () const
@@ -77,7 +77,7 @@ Material Material::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Material::Id () const
@@ -86,7 +86,7 @@ size_t Material::Id () const
 }
 
 /*
-   Имя материала
+   РРјСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* Material::Name () const
@@ -103,7 +103,7 @@ void Material::Rename (const char* name)
 }
     
 /*
-   Управление линейной/угловой аммортизацией
+   РЈРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРµР№РЅРѕР№/СѓРіР»РѕРІРѕР№ Р°РјРјРѕСЂС‚РёР·Р°С†РёРµР№
 */
 
 float Material::LinearDamping () const
@@ -127,7 +127,7 @@ void Material::SetAngularDamping (float value)
 }
 
 /*
-   Управление трением
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚СЂРµРЅРёРµРј
 */
 
 float Material::Friction () const
@@ -151,7 +151,7 @@ void Material::SetAnisotropicFriction (const math::vec3f& value)
 }
 
 /*
-   Управление упругостью
+   РЈРїСЂР°РІР»РµРЅРёРµ СѓРїСЂСѓРіРѕСЃС‚СЊСЋ
 */
 
 float Material::Restitution () const
@@ -165,7 +165,7 @@ void Material::SetRestitution (float value)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Material::Swap (Material& source)
@@ -180,7 +180,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Material& material1, Material& material2)

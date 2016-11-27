@@ -4,18 +4,18 @@ using namespace render;
 using namespace render::scene::server;
 
 /*
-    Описание реализации менеджера областей вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 */
 
 typedef stl::hash_map<object_id_t, Viewport> ViewportMap;
 
 struct ViewportManager::Impl: public xtl::reference_counter
 {
-  ViewportMap      viewports;         //области вывода
-  ViewportDrawList drawing_viewports; //области вывода, в которые производилась отрисовка
-  size_t           max_draw_depth;    //максимальный уровень вложенности рендеринга
+  ViewportMap      viewports;         //РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  ViewportDrawList drawing_viewports; //РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°, РІ РєРѕС‚РѕСЂС‹Рµ РїСЂРѕРёР·РІРѕРґРёР»Р°СЃСЊ РѕС‚СЂРёСЃРѕРІРєР°
+  size_t           max_draw_depth;    //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : max_draw_depth (1)
   {
@@ -23,7 +23,7 @@ struct ViewportManager::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ViewportManager::ViewportManager ()
@@ -52,7 +52,7 @@ ViewportManager& ViewportManager::operator = (const ViewportManager& manager)
 }
 
 /*
-    Получение области вывода
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 Viewport& ViewportManager::GetViewport (object_id_t id)
@@ -66,7 +66,7 @@ Viewport& ViewportManager::GetViewport (object_id_t id)
 }
 
 /*
-    Создание области вывода / удаление области вывода
+    РЎРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° / СѓРґР°Р»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void ViewportManager::AddViewport (object_id_t id, const Viewport& viewport)
@@ -85,7 +85,7 @@ void ViewportManager::RemoveViewport (object_id_t id)
 }
 
 /*
-    Максимальный уровень вложенности рендеринга
+    РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void ViewportManager::SetMaxDrawDepth (size_t level)
@@ -113,7 +113,7 @@ size_t ViewportManager::MaxDrawDepth () const
 }
 
 /*
-    Список областей вывода, в которые производилась отрисовка
+    РЎРїРёСЃРѕРє РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°, РІ РєРѕС‚РѕСЂС‹Рµ РїСЂРѕРёР·РІРѕРґРёР»Р°СЃСЊ РѕС‚СЂРёСЃРѕРІРєР°
 */
 
 const ViewportDrawList& ViewportManager::DrawingViewports () const

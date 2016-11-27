@@ -10,10 +10,10 @@ namespace xanim_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "media.animation.XmlAnimationLibraryLoader"; //имя потока протоколирования
+const char* LOG_NAME = "media.animation.XmlAnimationLibraryLoader"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 template <unsigned int Size>
 void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& value)
@@ -46,13 +46,13 @@ void read (Parser::Iterator iter, const char* str, float& value)
 }
 
 /*
-    Загрузчик анимаций в формате Xml
+    Р—Р°РіСЂСѓР·С‡РёРє Р°РЅРёРјР°С†РёР№ РІ С„РѕСЂРјР°С‚Рµ Xml
 */
 
 class XmlAnimationLibraryLoader
 {
   private:
-    //разбор трека событий
+    //СЂР°Р·Р±РѕСЂ С‚СЂРµРєР° СЃРѕР±С‹С‚РёР№
     void ParseEvent (Parser::Iterator event_iter, EventTrack& track)
     {
       const char* event  = get<const char*> (*event_iter, "event");
@@ -62,7 +62,7 @@ class XmlAnimationLibraryLoader
       track.AddEvent (delay, period, event);
     }
 
-    //разбор канала анимации
+    //СЂР°Р·Р±РѕСЂ РєР°РЅР°Р»Р° Р°РЅРёРјР°С†РёРё
     template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_tcb_key<T>& key)
     {
       typedef typename math::spline_tcb_key<T>::scalar_type scalar_type;
@@ -174,7 +174,7 @@ class XmlAnimationLibraryLoader
       parent.AddChannel (target_name, channel);
     }
 
-    //разбор анимации
+    //СЂР°Р·Р±РѕСЂ Р°РЅРёРјР°С†РёРё
     void ParseAnimation (Parser::Iterator animation_iter, AnimationLibrary& library)
     {
       const char *id   = get<const char*> (*animation_iter, "id"),
@@ -201,7 +201,7 @@ class XmlAnimationLibraryLoader
       for_each_child (parser.Root ().First ("animation_library"), "animation",
                       xtl::bind (&XmlAnimationLibraryLoader::ParseAnimation, this, _1, xtl::ref (library)));
 
-        //протоколирование
+        //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 
       Log log (LOG_NAME);
 
@@ -209,11 +209,11 @@ class XmlAnimationLibraryLoader
     }
     
   private:
-    Parser parser;   //парсер
+    Parser parser;   //РїР°СЂСЃРµСЂ
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XAnimLoaderComponent

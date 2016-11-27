@@ -4,19 +4,19 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации модели линий
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРѕРґРµР»Рё Р»РёРЅРёР№
 */
 
 typedef xtl::signal<void (LineModel& sender, LineModelEvent event_id)> LineModelSignal;
 
 struct LineModel::Impl: public xtl::instance_counter<LineModel>
 {
-  stl::string     material;                     //имя материала
-  size_t          material_hash;                //хэш имени материала
-  stl::string     batch;                        //имя пакета
-  size_t          batch_hash;                   //хэш имени пакета
-  LineUsage       usage;                        //режим использования линий
-  LineModelSignal signals [LineModelEvent_Num]; //сигналы модели 
+  stl::string     material;                     //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  size_t          material_hash;                //С…СЌС€ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string     batch;                        //РёРјСЏ РїР°РєРµС‚Р°
+  size_t          batch_hash;                   //С…СЌС€ РёРјРµРЅРё РїР°РєРµС‚Р°
+  LineUsage       usage;                        //СЂРµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р»РёРЅРёР№
+  LineModelSignal signals [LineModelEvent_Num]; //СЃРёРіРЅР°Р»С‹ РјРѕРґРµР»Рё 
 
   Impl ()
     : material_hash (0xffffffff)
@@ -25,7 +25,7 @@ struct LineModel::Impl: public xtl::instance_counter<LineModel>
   {
   }
 
-    //оповещение о событии
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (LineModel& sender, LineModelEvent event_id)
   {
     try
@@ -37,13 +37,13 @@ struct LineModel::Impl: public xtl::instance_counter<LineModel>
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LineModel::LineModel ()
@@ -56,7 +56,7 @@ LineModel::~LineModel ()
 }
 
 /*
-    Материал
+    РњР°С‚РµСЂРёР°Р»
 */
 
 void LineModel::SetMaterial (const char* in_material)
@@ -86,7 +86,7 @@ size_t LineModel::MaterialHash () const
 }
 
 /*
-    Пакет
+    РџР°РєРµС‚
 */
 
 void LineModel::SetBatch (const char* in_batch)
@@ -118,7 +118,7 @@ size_t LineModel::BatchHash () const
 }
 
 /*
-    Режим использования линий
+    Р РµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р»РёРЅРёР№
 */
 
 void LineModel::SetUsage (LineUsage usage)
@@ -150,7 +150,7 @@ LineUsage LineModel::Usage () const
 }
 
 /*
-    Количество линий / размер буфера линий / получение массива линий
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р»РёРЅРёР№ / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° Р»РёРЅРёР№ / РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° Р»РёРЅРёР№
 */
 
 size_t LineModel::LineDescsCount () const
@@ -169,7 +169,7 @@ const LineDesc* LineModel::LineDescs () const
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void LineModel::AcceptCore (Visitor& visitor)
@@ -179,7 +179,7 @@ void LineModel::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Подписка на события модели
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРѕРґРµР»Рё
 */
 
 xtl::connection LineModel::RegisterEventHandler (LineModelEvent event, const EventHandler& handler)
@@ -197,7 +197,7 @@ xtl::connection LineModel::RegisterEventHandler (LineModelEvent event, const Eve
 }
 
 /*
-    Оповещение об изменении данных линий
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґР°РЅРЅС‹С… Р»РёРЅРёР№
 */
 
 void LineModel::UpdateLineDescsNotify ()
@@ -208,7 +208,7 @@ void LineModel::UpdateLineDescsNotify ()
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void LineModel::BindProperties (common::PropertyBindingMap& bindings)

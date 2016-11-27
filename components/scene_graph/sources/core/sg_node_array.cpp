@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Интерфейс реализации массива
+    РРЅС‚РµСЂС„РµР№СЃ СЂРµР°Р»РёР·Р°С†РёРё РјР°СЃСЃРёРІР°
 */
 
 namespace scene_graph
@@ -31,19 +31,19 @@ namespace
 {
 
 /*
-    Массив с подсчётом ссылок элементов
+    РњР°СЃСЃРёРІ СЃ РїРѕРґСЃС‡С‘С‚РѕРј СЃСЃС‹Р»РѕРє СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 struct NodeIntrusiveArray: public NodeArrayImpl
 {
   public:
-////Политика владения элементами
+////РџРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ СЌР»РµРјРµРЅС‚Р°РјРё
     NodeArrayLinkMode LinkMode () { return NodeArrayLinkMode_AddRef; }
 
-///Количество элементов в массиве
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ РјР°СЃСЃРёРІРµ
     size_t Size () { return items.size (); }
 
-///Получение элемента
+///РџРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
     Node& Item (size_t index)
     {
       if (index >= items.size ())
@@ -52,7 +52,7 @@ struct NodeIntrusiveArray: public NodeArrayImpl
       return *items [index];
     }
 
-///Добавление элемента
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
     size_t Add (Node& node)
     {
       items.push_back (&node);
@@ -60,7 +60,7 @@ struct NodeIntrusiveArray: public NodeArrayImpl
       return items.size () - 1;
     }
 
-///Удаление элемента по индексу
+///РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РїРѕ РёРЅРґРµРєСЃСѓ
     void Remove (size_t index)
     {
       if (index >= items.size ())
@@ -69,7 +69,7 @@ struct NodeIntrusiveArray: public NodeArrayImpl
       items.erase (items.begin () + index);
     }
 
-///Удаление элемента по значению
+///РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РїРѕ Р·РЅР°С‡РµРЅРёСЋ
     void Remove (Node& node)
     {
       for (Array::iterator iter=items.begin (); iter!=items.end ();)
@@ -77,13 +77,13 @@ struct NodeIntrusiveArray: public NodeArrayImpl
         else                       ++iter;
     }
 
-///Очистка массива
+///РћС‡РёСЃС‚РєР° РјР°СЃСЃРёРІР°
     void Clear () { items.clear (); }
 
-///Резервирование места для хранения элементов
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ
     void Reserve (size_t count) { items.reserve (count); }
     
-///Количество зарезервированных элементов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
     size_t Capacity () { return items.capacity (); }
 
   private:
@@ -94,22 +94,22 @@ struct NodeIntrusiveArray: public NodeArrayImpl
 };
 
 /*
-    Массив с автоматическим удалением элементов
+    РњР°СЃСЃРёРІ СЃ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёРј СѓРґР°Р»РµРЅРёРµРј СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 struct NodeWeakRefArray: public NodeArrayImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     NodeWeakRefArray () : on_destroy_handler (DestroyHandler (this)) {}
 
-////Политика владения элементами
+////РџРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ СЌР»РµРјРµРЅС‚Р°РјРё
     NodeArrayLinkMode LinkMode () { return NodeArrayLinkMode_WeakRef; }
 
-///Количество элементов в массиве
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ РјР°СЃСЃРёРІРµ
     size_t Size () { return items.size (); }
 
-///Получение элемента
+///РџРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
     Node& Item (size_t index)
     {
       if (index >= items.size ())
@@ -118,7 +118,7 @@ struct NodeWeakRefArray: public NodeArrayImpl
       return items [index]->node;
     }
 
-///Добавление элемента
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
     size_t Add (Node& node)
     {
       items.push_back (ItemHolderPtr (new ItemHolder (node, on_destroy_handler), false));
@@ -126,7 +126,7 @@ struct NodeWeakRefArray: public NodeArrayImpl
       return items.size () - 1;
     }
 
-///Удаление элемента по индексу
+///РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РїРѕ РёРЅРґРµРєСЃСѓ
     void Remove (size_t index)
     {
       if (index >= items.size ())
@@ -135,7 +135,7 @@ struct NodeWeakRefArray: public NodeArrayImpl
       items.erase (items.begin () + index);
     }
 
-///Удаление элемента по значению
+///РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РїРѕ Р·РЅР°С‡РµРЅРёСЋ
     void Remove (Node& node)
     {
       for (Array::iterator iter=items.begin (); iter!=items.end ();)
@@ -143,13 +143,13 @@ struct NodeWeakRefArray: public NodeArrayImpl
         else                             ++iter;
     }
 
-///Очистка массива
+///РћС‡РёСЃС‚РєР° РјР°СЃСЃРёРІР°
     void Clear () { items.clear (); }
 
-///Резервирование места для хранения элементов
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ
     void Reserve (size_t count) { items.reserve (count); }
 
-///Количество зарезервированных элементов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
     size_t Capacity () { return items.capacity (); }
 
   private:      
@@ -184,7 +184,7 @@ struct NodeWeakRefArray: public NodeArrayImpl
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 NodeArray::NodeArray (NodeArrayLinkMode link_mode)
@@ -229,7 +229,7 @@ NodeArray& NodeArray::operator = (const NodeArray& array)
 }
 
 /*
-    Политика владения
+    РџРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ
 */
 
 NodeArrayLinkMode NodeArray::LinkMode () const
@@ -238,7 +238,7 @@ NodeArrayLinkMode NodeArray::LinkMode () const
 }
 
 /*
-    Количество элементов в коллекции / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ РєРѕР»Р»РµРєС†РёРё / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 size_t NodeArray::Size () const
@@ -252,7 +252,7 @@ bool NodeArray::IsEmpty () const
 }
 
 /*
-    Получение элемента коллекции
+    РџРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РєРѕР»Р»РµРєС†РёРё
 */
 
 Node& NodeArray::Item (size_t index) const
@@ -261,7 +261,7 @@ Node& NodeArray::Item (size_t index) const
 }
 
 /*
-    Добавление / удаление объектов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ
 */
 
 size_t NodeArray::Add (Node& node)
@@ -285,7 +285,7 @@ void NodeArray::Clear ()
 }
 
 /*
-    Резервирование места для хранения объектов
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ
 */
 
 size_t NodeArray::Capacity () const
@@ -299,7 +299,7 @@ void NodeArray::Reserve (size_t count)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void NodeArray::Swap (NodeArray& array)

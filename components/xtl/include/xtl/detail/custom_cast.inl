@@ -1,5 +1,5 @@
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class From, class To>
@@ -137,7 +137,7 @@ class type_converter
     }
 
   private:
-    enum { table_size = 24593 }; //простое число для размера хэш-таблицы
+    enum { table_size = 24593 }; //РїСЂРѕСЃС‚РѕРµ С‡РёСЃР»Рѕ РґР»СЏ СЂР°Р·РјРµСЂР° С…СЌС€-С‚Р°Р±Р»РёС†С‹
 
     type_converter_item* items [table_size];
 };
@@ -252,7 +252,7 @@ inline const type_converter_item* find_converter (const custom_ref_caster_type_i
 }
 
 /*
-    Преобразователь типов
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ С‚РёРїРѕРІ
 */
 
 namespace detail

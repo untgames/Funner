@@ -4,15 +4,15 @@ local GameSettingsByIndex={}
 function LoadGameSettings()
   print("LoadGameSettings()")
   local xml=CreateXML()
-  -- попыта загрузить файл с настройками
+  -- РїРѕРїС‹С‚Р° Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё
   if not(xml.Load("data/GameSettings.xml")) then
-    -- загружаем файл настроек по умолчанию
+    -- Р·Р°РіСЂСѓР¶Р°РµРј С„Р°Р№Р» РЅР°СЃС‚СЂРѕРµРє РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     xml.Load("data/Default_GameSettings.xml")
   end
   
   local index=1
   local function LoadSetting(xml)
-    --загрузка отдельной настройки
+    --Р·Р°РіСЂСѓР·РєР° РѕС‚РґРµР»СЊРЅРѕР№ РЅР°СЃС‚СЂРѕР№РєРё
     local setting={}
     setting.Name=xml.ReadStringByName("Name")
     setting.Type=xml.ReadStringByName("Type")

@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Êîíñòðóêòîð / äåñòðóêòîð
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ / Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
 */
 
 SceneObject::SceneObject (scene_graph::Entity& in_entity)
@@ -17,18 +17,18 @@ SceneObject::~SceneObject ()
 }
 
 /*
-    Ñâÿçûâàíèå îáúåêòà ñ ïðîñòðàíñòâîì
+    Ð¡Ð²ÑÐ·Ñ‹Ð²Ð°Ð½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð° Ñ Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð¾Ð¼
 */
 
 void SceneObject::BindToSpace (SceneSpace* new_space)
 {
-    //óäàëåíèå îáúåêòà èç ïðîñòðàíñòâà    
+    //ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð° Ð¸Ð· Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð°    
 
   if (space)
   {
     space->objects_count--;    
     
-      //óäàëåíèå îáúåêòà èç öåïî÷êè îáúåêòîâ ïðîñòðàíñòâà
+      //ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð° Ð¸Ð· Ñ†ÐµÐ¿Ð¾Ñ‡ÐºÐ¸ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð² Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð°
     
     prev_object->next_object = next_object;
     next_object->prev_object = prev_object;
@@ -40,14 +40,14 @@ void SceneObject::BindToSpace (SceneSpace* new_space)
     }    
   }
   
-    //óñòàíîâêà íîâîãî ïðîñòðàíñòâà
+    //ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð½Ð¾Ð²Ð¾Ð³Ð¾ Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð°
     
   space = new_space;  
 
   if (!new_space)
     return;
   
-    //äîáàâëåíèå îáúåêòà â ïðîñòðàíñòâî
+    //Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð° Ð² Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð¾
     
   if (space->first_object)
   {

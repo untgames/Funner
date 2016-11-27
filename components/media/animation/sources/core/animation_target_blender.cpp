@@ -3,29 +3,29 @@
 using namespace media::animation;
 
 /*
-    Описание реализации блендера анимационных целей
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±Р»РµРЅРґРµСЂР° Р°РЅРёРјР°С†РёРѕРЅРЅС‹С… С†РµР»РµР№
 */
 
 namespace
 {
 
-///Источник
+///РСЃС‚РѕС‡РЅРёРє
 struct Source: public xtl::reference_counter, public xtl::trackable
 {
-  size_t               property_index;               //индекс свойства
-  xtl::auto_connection blender_on_remove_connection; //соединение с событием удаления канала из блендера
-  xtl::auto_connection blender_on_add_connection;    //соединение с событием добавления канала в блендер
+  size_t               property_index;               //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР°
+  xtl::auto_connection blender_on_remove_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРѕР±С‹С‚РёРµРј СѓРґР°Р»РµРЅРёСЏ РєР°РЅР°Р»Р° РёР· Р±Р»РµРЅРґРµСЂР°
+  xtl::auto_connection blender_on_add_connection;    //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРѕР±С‹С‚РёРµРј РґРѕР±Р°РІР»РµРЅРёСЏ РєР°РЅР°Р»Р° РІ Р±Р»РµРЅРґРµСЂ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Source (size_t in_property_index) : property_index (in_property_index) {}
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~Source () {};
 
-///Получение базового блендера каналов
+///РџРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ Р±Р»РµРЅРґРµСЂР° РєР°РЅР°Р»РѕРІ
   virtual ChannelBlenderBase& Blender () = 0;
   
-///Обновление канала
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РЅР°Р»Р°
   virtual void Update (common::PropertyMap& properties) = 0;
 };
 
@@ -70,24 +70,24 @@ typedef xtl::intrusive_ptr<Source> SourcePtr;
 
 template <class T, class PropertyType> struct SourceImpl: public Source
 {
-  ChannelBlender<T> blender; //блендер каналов
+  ChannelBlender<T> blender; //Р±Р»РµРЅРґРµСЂ РєР°РЅР°Р»РѕРІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   SourceImpl (size_t property_index) : Source (property_index) {}
   
-///Создание канала
+///РЎРѕР·РґР°РЅРёРµ РєР°РЅР°Р»Р°
   static SourcePtr Create (size_t property_index)
   {
     return new SourceImpl (property_index);
   }
   
-///Получение базового блендера каналов
+///РџРѕР»СѓС‡РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ Р±Р»РµРЅРґРµСЂР° РєР°РЅР°Р»РѕРІ
   ChannelBlenderBase& Blender ()
   {
     return blender;
   }
 
-///Обновление канала
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РЅР°Р»Р°
   void Update (common::PropertyMap& properties)
   {
     properties.SetProperty (property_index, property_cast (blender (), xtl::type<PropertyType> ()));
@@ -102,13 +102,13 @@ struct TargetBlender::Impl: public xtl::reference_counter
 {
   typedef xtl::signal<void (TargetBlenderEvent)> Signal;
 
-  SourceMap           sources;                          //источники
-  common::PropertyMap properties;                       //свойства
-  Signal              signals [TargetBlenderEvent_Num]; //сигналы о создании и удалении каналов
-  size_t              sources_count;                    //общее количество источников
-  bool                need_update_sources_count;        //флаг необходимости обновления общего числа источников
+  SourceMap           sources;                          //РёСЃС‚РѕС‡РЅРёРєРё
+  common::PropertyMap properties;                       //СЃРІРѕР№СЃС‚РІР°
+  Signal              signals [TargetBlenderEvent_Num]; //СЃРёРіРЅР°Р»С‹ Рѕ СЃРѕР·РґР°РЅРёРё Рё СѓРґР°Р»РµРЅРёРё РєР°РЅР°Р»РѕРІ
+  size_t              sources_count;                    //РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ
+  bool                need_update_sources_count;        //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РѕР±С‰РµРіРѕ С‡РёСЃР»Р° РёСЃС‚РѕС‡РЅРёРєРѕРІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : sources_count (0)
     , need_update_sources_count (true)
@@ -117,14 +117,14 @@ struct TargetBlender::Impl: public xtl::reference_counter
 //    properties.Capture ();
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     sources.clear ();
     properties.Clear ();
   }
   
-///Оповещение о возникновении события канала
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ РєР°РЅР°Р»Р°
   void Notify (TargetBlenderEvent event)
   {
     if (event < 0 || event >= TargetBlenderEvent_Num)
@@ -136,21 +136,21 @@ struct TargetBlender::Impl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   
-///Добавление источника
+///Р”РѕР±Р°РІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР°
   void AddSource (AnimationState& state, const Channel& channel, const char* property_name)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     static const char* METHOD_NAME = "media::animation::TargetBlender::Impl::AddSource";
     
     if (!property_name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "property_name");
       
-      //определение типа свойства
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЃРІРѕР№СЃС‚РІР°
       
     typedef SourcePtr (*SourceCreator)(size_t property_index);
 
@@ -202,7 +202,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     if (!creator || property_type == common::PropertyType_Num)
       throw xtl::format_not_supported_exception (METHOD_NAME, "Source channel type '%s' is not supported", type.name ());
 
-      //создание канала
+      //СЃРѕР·РґР°РЅРёРµ РєР°РЅР°Р»Р°
       
     SourcePtr source;
       
@@ -212,7 +212,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     {
       source = iter->second;
 
-        //добавление канала блендинга
+        //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»Р° Р±Р»РµРЅРґРёРЅРіР°
 
       ChannelBlenderBase& blender = source->Blender ();
 
@@ -233,7 +233,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
         
         sources.insert_pair (property_name, source);
         
-          //добавление канала блендинга
+          //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»Р° Р±Р»РµРЅРґРёРЅРіР°
 
         ChannelBlenderBase& blender = source->Blender ();
 
@@ -248,7 +248,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     }    
   }    
   
-///Обработка события добавления канала
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РґРѕР±Р°РІР»РµРЅРёСЏ РєР°РЅР°Р»Р°
   void OnChannelsAdded ()
   {
     Notify (TargetBlenderEvent_OnSourcesChanged);
@@ -256,7 +256,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     need_update_sources_count = true;
   }  
     
-///Обработка события удаления канала
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ РєР°РЅР°Р»Р°
   void OnChannelsRemoved (Source* source)
   {
     need_update_sources_count = true;
@@ -276,7 +276,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     }    
   }
   
-///Удаление источника по имени свойства
+///РЈРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° РїРѕ РёРјРµРЅРё СЃРІРѕР№СЃС‚РІР°
   void RemoveSourceByName (const stl::hash_key<const char*>& key)
   {
     SourceMap::iterator iter = sources.find (key);
@@ -302,7 +302,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
       Notify (TargetBlenderEvent_OnSourcesEmpty);
   }
 
-///Обновление количества источников
+///РћР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РёСЃС‚РѕС‡РЅРёРєРѕРІ
   void UpdateSourcesCount ()
   {
     if (!need_update_sources_count)
@@ -318,7 +318,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 TargetBlender::TargetBlender ()
@@ -344,7 +344,7 @@ TargetBlender& TargetBlender::operator = (const TargetBlender& blender)
 }
 
 /*
-    Общее количество источников
+    РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 size_t TargetBlender::SourcesCount () const
@@ -355,7 +355,7 @@ size_t TargetBlender::SourcesCount () const
 }
 
 /*
-    Добавление и удаление источников
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 void TargetBlender::AddSource (AnimationState& state, const Channel& channel)
@@ -432,7 +432,7 @@ void TargetBlender::RemoveAllSources ()
 }
 
 /*
-    Текущее состояние свойств анимационной цели
+    РўРµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРІРѕР№СЃС‚РІ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
 */
 
 const common::PropertyMap& TargetBlender::Properties () const
@@ -441,7 +441,7 @@ const common::PropertyMap& TargetBlender::Properties () const
 }
 
 /*
-    Обновление состояния анимационной цели
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
 */
 
 void TargetBlender::Update ()
@@ -503,7 +503,7 @@ void TargetBlender::Update ()
 }
 
 /*
-    Подписка на события
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection TargetBlender::RegisterEventHandler (TargetBlenderEvent event, const EventHandler& handler) const
@@ -515,7 +515,7 @@ xtl::connection TargetBlender::RegisterEventHandler (TargetBlenderEvent event, c
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void TargetBlender::Swap (TargetBlender& blender)

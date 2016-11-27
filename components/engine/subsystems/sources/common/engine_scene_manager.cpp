@@ -18,33 +18,33 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  COMPONENT_NAME            = "engine.subsystems.SceneManagerSubsystem"; //имя компонента
-const char*  LOG_NAME                  = COMPONENT_NAME;                            //имя протокола
-const char*  SUBSYSTEM_NAME            = "SceneManager";                            //подсистема
-const size_t RESERVED_SUBSYSTEMS_COUNT = 4;                                         //резервируемое количество вложенных подсистем
+const char*  COMPONENT_NAME            = "engine.subsystems.SceneManagerSubsystem"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char*  LOG_NAME                  = COMPONENT_NAME;                            //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
+const char*  SUBSYSTEM_NAME            = "SceneManager";                            //РїРѕРґСЃРёСЃС‚РµРјР°
+const size_t RESERVED_SUBSYSTEMS_COUNT = 4;                                         //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІР»РѕР¶РµРЅРЅС‹С… РїРѕРґСЃРёСЃС‚РµРј
 
 /*
-    Вспомогательные классы
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹
 */
 
-///Интерфейс подсистемы менеджера сцен
+///РРЅС‚РµСЂС„РµР№СЃ РїРѕРґСЃРёСЃС‚РµРјС‹ РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅ
 class ISceneManagerSubsystem: public xtl::reference_counter
 {
   public:
     virtual ~ISceneManagerSubsystem () {}
     
-///Регистрация в контексте сцены
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РІ РєРѕРЅС‚РµРєСЃС‚Рµ СЃС†РµРЅС‹
     virtual void OnSceneContextCreated (scene_graph::SceneContext& context) {}
 };
 
-///Анимационный менеджер
+///РђРЅРёРјР°С†РёРѕРЅРЅС‹Р№ РјРµРЅРµРґР¶РµСЂ
 class AnimationManagerSubsystem: public ISceneManagerSubsystem, public media::rms::ICustomServer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AnimationManagerSubsystem (const common::ParseNode& node, const common::Log& in_log)
       : log (in_log)
     {
@@ -64,7 +64,7 @@ class AnimationManagerSubsystem: public ISceneManagerSubsystem, public media::rm
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~AnimationManagerSubsystem ()
     {
       if (!attachment_name.empty ())
@@ -73,7 +73,7 @@ class AnimationManagerSubsystem: public ISceneManagerSubsystem, public media::rm
       resource_server = 0;
     }
     
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
     }
@@ -120,24 +120,24 @@ class AnimationManagerSubsystem: public ISceneManagerSubsystem, public media::rm
       }
     }    
     
-///Регистрация в контексте сцены
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РІ РєРѕРЅС‚РµРєСЃС‚Рµ СЃС†РµРЅС‹
     void OnSceneContextCreated (scene_graph::SceneContext& context)
     {
       context.Attach (manager);
     }
 
   private:
-    common::Log                                      log;              //поток протоколирования
-    scene_graph::controllers::AnimationManager       manager;          //анимационный менеджер
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //сервер ресурсов рендеринга    
-    stl::string                                      attachment_name;  //имя менеджера анимаций
+    common::Log                                      log;              //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    scene_graph::controllers::AnimationManager       manager;          //Р°РЅРёРјР°С†РёРѕРЅРЅС‹Р№ РјРµРЅРµРґР¶РµСЂ
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //СЃРµСЂРІРµСЂ СЂРµСЃСѓСЂСЃРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°    
+    stl::string                                      attachment_name;  //РёРјСЏ РјРµРЅРµРґР¶РµСЂР° Р°РЅРёРјР°С†РёР№
 };
 
-///Менеджер шрифтов
+///РњРµРЅРµРґР¶РµСЂ С€СЂРёС„С‚РѕРІ
 class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::ICustomServer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     FontManagerSubsystem (const common::ParseNode& node, const common::Log& in_log)
       : log (in_log)
     {
@@ -157,7 +157,7 @@ class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::IC
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~FontManagerSubsystem ()
     {
       if (!attachment_name.empty ())
@@ -166,7 +166,7 @@ class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::IC
       resource_server = 0;
     }
     
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
     }
@@ -213,29 +213,29 @@ class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::IC
       }
     }    
     
-///Регистрация в контексте сцены
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РІ РєРѕРЅС‚РµРєСЃС‚Рµ СЃС†РµРЅС‹
     void OnSceneContextCreated (scene_graph::SceneContext& context)
     {
       context.Attach (library);
     }
 
   private:
-    common::Log                                      log;              //поток протоколирования
-    media::FontLibrary                               library;          //библиотека шрифтов
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //сервер ресурсов рендеринга    
-    stl::string                                      attachment_name;  //имя менеджера анимаций
+    common::Log                                      log;              //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    media::FontLibrary                               library;          //Р±РёР±Р»РёРѕС‚РµРєР° С€СЂРёС„С‚РѕРІ
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //СЃРµСЂРІРµСЂ СЂРµСЃСѓСЂСЃРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°    
+    stl::string                                      attachment_name;  //РёРјСЏ РјРµРЅРµРґР¶РµСЂР° Р°РЅРёРјР°С†РёР№
 };
 
 }
 
 /*
-   Подсистема менеджера сцены
+   РџРѕРґСЃРёСЃС‚РµРјР° РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅС‹
 */
 
 class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServer, public xtl::reference_counter, public xtl::noncopyable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SceneManagerSubsystem (common::ParseNode& node)
       : log (LOG_NAME)
       , log_handler (xtl::bind (&Log::Print, &log, _1))
@@ -282,7 +282,7 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
       }
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~SceneManagerSubsystem ()
     {
       if (!attachment_name.empty ())
@@ -291,7 +291,7 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
       resource_server = 0;
     }
 
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
     }
@@ -338,7 +338,7 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -350,11 +350,11 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
     {
       try
       {        
-          //установка функтора протоколирования
+          //СѓСЃС‚Р°РЅРѕРІРєР° С„СѓРЅРєС‚РѕСЂР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
         context.SetLogHandler (log_handler);
 
-          //оповещение подсистем
+          //РѕРїРѕРІРµС‰РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРј
 
         for (SubsystemList::iterator iter=subsystems.begin (), end=subsystems.end (); iter!=end; ++iter)
           (*iter)->OnSceneContextCreated (context);
@@ -367,16 +367,16 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
     }
 
   private:
-    Log                                               log;              //лог
-    scene_graph::SceneManager::LogHandler             log_handler;      //функтор протоколирования
-    stl::auto_ptr<media::rms::ServerGroupAttachment>  resource_server;  //сервер ресурсов рендеринга
-    scene_graph::SceneManager                         scene_manager;    //менеджер сцены
-    stl::string                                       attachment_name;  //имя менеджера сцен
-    SubsystemList                                     subsystems;       //подсистема
+    Log                                               log;              //Р»РѕРі
+    scene_graph::SceneManager::LogHandler             log_handler;      //С„СѓРЅРєС‚РѕСЂ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    stl::auto_ptr<media::rms::ServerGroupAttachment>  resource_server;  //СЃРµСЂРІРµСЂ СЂРµСЃСѓСЂСЃРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
+    scene_graph::SceneManager                         scene_manager;    //РјРµРЅРµРґР¶РµСЂ СЃС†РµРЅС‹
+    stl::string                                       attachment_name;  //РёРјСЏ РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅ
+    SubsystemList                                     subsystems;       //РїРѕРґСЃРёСЃС‚РµРјР°
 };
 
 /*
-   Компонент регистрации менеджера сцены
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅС‹
 */
 
 class SceneManagerComponent

@@ -6,14 +6,14 @@ using namespace render::low_level::opengl;
 namespace
 {
 
-//Константы
+//РљРѕРЅСЃС‚Р°РЅС‚С‹
 const char*  DEFINE_TEXT              = "#define ";
 const size_t DEFINE_ADDITIONAL_LENGTH = xtl::xstrlen (DEFINE_TEXT) + 1;
 
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 GlslShader::GlslShader (const ContextManager& manager, GLenum type, const ShaderDesc& desc, const LogFunction& error_log)
@@ -24,7 +24,7 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     switch (type)
     {
@@ -42,11 +42,11 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported shader profile '%s'", desc.profile);
     }
 
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     MakeContextCurrent ();
 
-      //создание шейдера
+      //СЃРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂР°
 
     if (glCreateShader)
     {
@@ -62,7 +62,7 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
     if (!handle)
       RaiseError (METHOD_NAME);
 
-      //компиляция шейдера
+      //РєРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂР°
 
     GLint compile_status = 0;
 
@@ -122,7 +122,7 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
     }
 #endif
 
-      //протоколирование ошибок компиляции
+      //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РѕРє РєРѕРјРїРёР»СЏС†РёРё
 
     GLint log_length = 0;
 
@@ -163,7 +163,7 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
       else           error_log (log_buffer.c_str ());
     }
 
-      //проверка состояния OpenGL
+      //РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ OpenGL
 
     if (!compile_status)
       RaiseError (METHOD_NAME);
@@ -196,12 +196,12 @@ GlslShader::~GlslShader ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-   Удаление шейдеров
+   РЈРґР°Р»РµРЅРёРµ С€РµР№РґРµСЂРѕРІ
 */
 
 void GlslShader::DeleteShader ()
@@ -209,11 +209,11 @@ void GlslShader::DeleteShader ()
   if (!handle)
     return;
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //удаление шейдера
+    //СѓРґР°Р»РµРЅРёРµ С€РµР№РґРµСЂР°
 
   if (glDeleteShader)
   {
@@ -226,7 +226,7 @@ void GlslShader::DeleteShader ()
   }
 #endif
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::GlslShader::DeleteShader");
 }

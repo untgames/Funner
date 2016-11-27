@@ -14,12 +14,12 @@ class MoviePlayer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Делегат проигрывателя
+///Р”РµР»РµРіР°С‚ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface VideoPlayerListener : NSObject
 {
   @private
-    MoviePlayer *player;  //проигрыватель
+    MoviePlayer *player;  //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ
 }
 
 -(id) init;
@@ -31,13 +31,13 @@ namespace
 {
 
 /*
-    Проигрыватель видео на iPhone
+    РџСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ РІРёРґРµРѕ РЅР° iPhone
 */
 
 class MoviePlayer: public IStreamPlayer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MoviePlayer (const char* in_stream_name, const StreamPlayerManager::StreamEventHandler& in_handler, VideoPlayerControlsType controls_type)
       : handler (in_handler), player_view_controller (0), player (0)
     {
@@ -96,7 +96,7 @@ class MoviePlayer: public IStreamPlayer
       player_listener = [[VideoPlayerListener alloc] initWithPlayer:(this)];
     }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~MoviePlayer ()
     {
       [player_listener release];
@@ -104,15 +104,15 @@ class MoviePlayer: public IStreamPlayer
       [player release];
     }
 
-///Длительность потока
+///Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РїРѕС‚РѕРєР°
     float Duration ()
     {
-      //можно реализовать если отказаться от поддержки OS 2.2.1
+      //РјРѕР¶РЅРѕ СЂРµР°Р»РёР·РѕРІР°С‚СЊ РµСЃР»Рё РѕС‚РєР°Р·Р°С‚СЊСЃСЏ РѕС‚ РїРѕРґРґРµСЂР¶РєРё OS 2.2.1
 
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::Duration");
     }
 
-///Начать проигрывание
+///РќР°С‡Р°С‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Play ()
     {
       if (player_view_controller)
@@ -123,15 +123,15 @@ class MoviePlayer: public IStreamPlayer
       OnEvent (StreamEvent_OnPlay);
     }
     
-///Приостановить проигрывание
+///РџСЂРёРѕСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Pause ()
     {
-      //можно реализовать если отказаться от поддержки OS 2.2.1
+      //РјРѕР¶РЅРѕ СЂРµР°Р»РёР·РѕРІР°С‚СЊ РµСЃР»Рё РѕС‚РєР°Р·Р°С‚СЊСЃСЏ РѕС‚ РїРѕРґРґРµСЂР¶РєРё OS 2.2.1
 
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::Pause");
     }
     
-///Остановить проигрывание
+///РћСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Stop ()
     {
       [player stop];
@@ -142,7 +142,7 @@ class MoviePlayer: public IStreamPlayer
       OnEvent (StreamEvent_OnManualStop);
     }
     
-///Установить позицию проигрывания
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetPosition (float position)
     {
       if (position == 0.f)
@@ -151,33 +151,33 @@ class MoviePlayer: public IStreamPlayer
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::SetPosition");
     }
 
-///Получить позицию проигрывания
+///РџРѕР»СѓС‡РёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     float Position ()
     {
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::Position");
     }
 
-///Установка режима циклического проигрывания
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° С†РёРєР»РёС‡РµСЃРєРѕРіРѕ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetLooping (bool state)
     {
-      //можно реализовать если отказаться от поддержки OS 2.2.1
+      //РјРѕР¶РЅРѕ СЂРµР°Р»РёР·РѕРІР°С‚СЊ РµСЃР»Рё РѕС‚РєР°Р·Р°С‚СЊСЃСЏ РѕС‚ РїРѕРґРґРµСЂР¶РєРё OS 2.2.1
 
       if (state)
         throw xtl::make_argument_exception ("media::players::iphone::MoviePlayer::SetLooping", "state", state, "Looping not supported");
     }
 
-///Установить громкость
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіСЂРѕРјРєРѕСЃС‚СЊ
     void SetVolume (float volume)
     {
     }
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
     void OnEvent (StreamEvent event)
     {
       handler (this, event);
     }
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
     MPMoviePlayerController* GetPlayer ()
     {
       return player;
@@ -187,10 +187,10 @@ class MoviePlayer: public IStreamPlayer
     typedef StreamPlayerManager::StreamEventHandler StreamEventHandler;
 
   private:
-    StreamEventHandler          handler;                 //обработчик событий
-    MPMoviePlayerViewController *player_view_controller; //окно проигрывателя видео
-    MPMoviePlayerController     *player;                 //проигрыватель видео
-    VideoPlayerListener         *player_listener;        //слушатель событий проигрывателя
+    StreamEventHandler          handler;                 //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№
+    MPMoviePlayerViewController *player_view_controller; //РѕРєРЅРѕ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ РІРёРґРµРѕ
+    MPMoviePlayerController     *player;                 //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ РІРёРґРµРѕ
+    VideoPlayerListener         *player_listener;        //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 };
 
 }
@@ -263,7 +263,7 @@ namespace iphone
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание проигрывателя
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler, VideoPlayerControlsType controls_type)
 {

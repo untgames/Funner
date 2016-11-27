@@ -3,16 +3,16 @@
 using namespace media::players;
 
 /*
-    Описание реализации списка проигрывания
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 struct Playlist::Impl: public xtl::reference_counter
 {
-  common::StringArray sources; //массив имён источников
+  common::StringArray sources; //РјР°СЃСЃРёРІ РёРјС‘РЅ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Playlist::Playlist ()
@@ -39,7 +39,7 @@ Playlist& Playlist::operator = (const Playlist& list)
 }
 
 /*
-    Идентификатор списка
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРїРёСЃРєР°
 */
 
 size_t Playlist::Id () const
@@ -48,7 +48,7 @@ size_t Playlist::Id () const
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Playlist Playlist::Clone () const
@@ -69,7 +69,7 @@ Playlist Playlist::Clone () const
 }
 
 /*
-    Количество источников / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 unsigned int Playlist::Size () const
@@ -83,7 +83,7 @@ bool Playlist::IsEmpty () const
 }
 
 /*
-    Получение источников
+    РџРѕР»СѓС‡РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 const char** Playlist::Items () const
@@ -105,7 +105,7 @@ const char* Playlist::Item (unsigned int index) const
 }
 
 /*
-    Добавление и удаление источников
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 unsigned int Playlist::AddSource (const char* source_name)
@@ -148,7 +148,7 @@ void Playlist::Clear ()
 }
 
 /*
-    Резервирование памяти
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 */
 
 void Playlist::Reserve (unsigned int count)
@@ -162,7 +162,7 @@ unsigned int Playlist::Capacity () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Playlist::Swap (Playlist& list)

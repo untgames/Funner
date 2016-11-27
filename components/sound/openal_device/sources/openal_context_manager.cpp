@@ -3,11 +3,11 @@
 using namespace sound::low_level::openal;
 
 /*
-   Менеджер контекстов OpenAL
+   РњРµРЅРµРґР¶РµСЂ РєРѕРЅС‚РµРєСЃС‚РѕРІ OpenAL
 */
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OpenALContextManagerImpl::OpenALContextManagerImpl ()
@@ -19,7 +19,7 @@ OpenALContextManagerImpl::~OpenALContextManagerImpl ()
 }
 
 /*
-   Установка текущего контекста
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void OpenALContextManagerImpl::SetCurrentContext (OpenALContext& context)

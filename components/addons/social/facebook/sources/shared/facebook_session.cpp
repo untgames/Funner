@@ -6,16 +6,16 @@ using namespace social::facebook;
 namespace
 {
 
-const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY     = 5;  //Задержка удаления web-view после скрытия
-const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Задержка показа web-view логина (для логина без показа окна в случае автопродления токена)
+const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY     = 5;  //Р—Р°РґРµСЂР¶РєР° СѓРґР°Р»РµРЅРёСЏ web-view РїРѕСЃР»Рµ СЃРєСЂС‹С‚РёСЏ
+const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Р—Р°РґРµСЂР¶РєР° РїРѕРєР°Р·Р° web-view Р»РѕРіРёРЅР° (РґР»СЏ Р»РѕРіРёРЅР° Р±РµР· РїРѕРєР°Р·Р° РѕРєРЅР° РІ СЃР»СѓС‡Р°Рµ Р°РІС‚РѕРїСЂРѕРґР»РµРЅРёСЏ С‚РѕРєРµРЅР°)
 
 const char*  LOG_NAME              = "social.facebook.FacebookSession";
 const char*  SESSION_DESCRIPTION   = "Facebook";
 const size_t RESERVE_PROPERTY_SIZE = 32;
 
-bool session_created = false;  //Существует ли созданная сессия
+bool session_created = false;  //РЎСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё СЃРѕР·РґР°РЅРЅР°СЏ СЃРµСЃСЃРёСЏ
 
-//Функция, необходимая для удаления web-view после выполнения колбека
+//Р¤СѓРЅРєС†РёСЏ, РЅРµРѕР±С…РѕРґРёРјР°СЏ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ web-view РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ РєРѕР»Р±РµРєР°
 void delete_web_view (xtl::shared_ptr<syslib::WebView> web_view)
 {
 }
@@ -23,7 +23,7 @@ void delete_web_view (xtl::shared_ptr<syslib::WebView> web_view)
 }
 
 /*
-   Конструктор / Деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FacebookSessionImpl::FacebookSessionImpl ()
@@ -46,7 +46,7 @@ FacebookSessionImpl::~FacebookSessionImpl ()
 }
 
 /*
-   Описание сессии
+   РћРїРёСЃР°РЅРёРµ СЃРµСЃСЃРёРё
 */
 
 const char* FacebookSessionImpl::GetDescription ()
@@ -55,7 +55,7 @@ const char* FacebookSessionImpl::GetDescription ()
 }
 
 /*
-   Показ стандартных окон
+   РџРѕРєР°Р· СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РѕРєРѕРЅ
 */
 
 void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties)
@@ -109,7 +109,7 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
 }
 
 /*
-   Загрузка произвольных запросов
+   Р—Р°РіСЂСѓР·РєР° РїСЂРѕРёР·РІРѕР»СЊРЅС‹С… Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 void FacebookSessionImpl::PerformRequest (const char* request, const social::RequestCallback& callback, const common::PropertyMap& properties)
@@ -135,7 +135,7 @@ void FacebookSessionImpl::PerformRequestHandler (bool succeeded, const stl::stri
 }
 
 /*
-   Обработка событий диалогов
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РґРёР°Р»РѕРіРѕРІ
 */
 
 bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const WindowCallback& callback)
@@ -199,7 +199,7 @@ void FacebookSessionImpl::ProcessDialogFail (const WindowCallback& callback)
 }
 
 /*
-   Логин
+   Р›РѕРіРёРЅ
 */
 
 void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::PropertyMap& properties)
@@ -289,7 +289,7 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 }
 
 /*
-   Обработка события логина
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ Р»РѕРіРёРЅР°
 */
 
 void FacebookSessionImpl::OnLoginTokenUpdated (const LoginCallback& callback)
@@ -429,7 +429,7 @@ bool FacebookSessionImpl::IsUserLoggedIn ()
 }
 
 /*
-   Закрытие сессии
+   Р—Р°РєСЂС‹С‚РёРµ СЃРµСЃСЃРёРё
 */
 
 void FacebookSessionImpl::CloseSession ()
@@ -474,7 +474,7 @@ void FacebookSessionImpl::CloseSession ()
 }
 
 /*
-   Проверка наличия в PropertyMap неизвестных полей
+   РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РІ PropertyMap РЅРµРёР·РІРµСЃС‚РЅС‹С… РїРѕР»РµР№
 */
 
 void FacebookSessionImpl::CheckUnknownProperties (const char* source, const common::PropertyMap& properties,
@@ -509,7 +509,7 @@ void FacebookSessionImpl::CheckUnknownProperties (const char* source, const comm
 }
 
 /*
-   Обработка события активации приложения
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ Р°РєС‚РёРІР°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 void FacebookSessionImpl::OnActivate ()
@@ -535,7 +535,7 @@ void FacebookSessionImpl::OnActivate ()
 }
 
 /*
-   Закрытие диалога
+   Р—Р°РєСЂС‹С‚РёРµ РґРёР°Р»РѕРіР°
 */
 
 void FacebookSessionImpl::CloseDialogWebView ()

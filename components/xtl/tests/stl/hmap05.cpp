@@ -1,4 +1,4 @@
-// Тестирование функции find
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё find
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"

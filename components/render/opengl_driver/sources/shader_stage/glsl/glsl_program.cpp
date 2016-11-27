@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_count, IShader** in_shaders, const LogFunction& error_log)
@@ -17,11 +17,11 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
 
   try
   {
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     MakeContextCurrent ();
 
-      //создание программы
+      //СЃРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 
     if (glCreateProgram)
     {
@@ -37,7 +37,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
     if (!handle)
       RaiseError (METHOD_NAME);
 
-      //присоединение шейдеров к программе
+      //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ С€РµР№РґРµСЂРѕРІ Рє РїСЂРѕРіСЂР°РјРјРµ
 
     shaders.reserve (shaders_count);
 
@@ -62,7 +62,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
       shaders.push_back (shader);
     }
 
-      //линковка программы
+      //Р»РёРЅРєРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹
 
     GLint link_status = 0;
 
@@ -77,7 +77,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
     }
 #endif
 
-      //протоколирование ошибок
+      //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РѕРє
 
     if (glGetProgramiv)
     {
@@ -95,7 +95,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
     GetProgramLog (log_buffer);
     error_log     (common::format ("linker: %s", log_buffer.c_str ()).c_str ());
     
-      //получение описания параметров и атрибутов программы
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕРїРёСЃР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё Р°С‚СЂРёР±СѓС‚РѕРІ РїСЂРѕРіСЂР°РјРјС‹
     
     GLint parameters_count = 0, max_parameter_name_length = 0, attributes_count = 0, max_attribute_name_length = 0;
     
@@ -144,7 +144,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
         
       parameter_name.fast_resize (name_length);
 
-      if (strstr (parameter_name.c_str (), "[0]") == parameter_name.end () - 3)  //Обход особенности именования массивов в драйверах nVidia
+      if (strstr (parameter_name.c_str (), "[0]") == parameter_name.end () - 3)  //РћР±С…РѕРґ РѕСЃРѕР±РµРЅРЅРѕСЃС‚Рё РёРјРµРЅРѕРІР°РЅРёСЏ РјР°СЃСЃРёРІРѕРІ РІ РґСЂР°Р№РІРµСЂР°С… nVidia
         parameter_name.fast_resize (parameter_name.size () - 3);
       
       Parameter parameter;
@@ -240,7 +240,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
         
       attribute_name.fast_resize (name_length);
 
-      if (strstr (attribute_name.c_str (), "[0]") == attribute_name.end () - 3)  //Обход особенности именования массивов в драйверах nVidia
+      if (strstr (attribute_name.c_str (), "[0]") == attribute_name.end () - 3)  //РћР±С…РѕРґ РѕСЃРѕР±РµРЅРЅРѕСЃС‚Рё РёРјРµРЅРѕРІР°РЅРёСЏ РјР°СЃСЃРёРІРѕРІ РІ РґСЂР°Р№РІРµСЂР°С… nVidia
         attribute_name.fast_resize (attribute_name.size () - 3);
 
       Attribute attribute;
@@ -262,7 +262,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, unsigned int shaders_co
       attributes.push_back (attribute);
     }
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     if (!link_status)
       RaiseError (METHOD_NAME);
@@ -295,12 +295,12 @@ GlslProgram::~GlslProgram ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Удаление программы
+    РЈРґР°Р»РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 void GlslProgram::DeleteProgram ()
@@ -308,11 +308,11 @@ void GlslProgram::DeleteProgram ()
   if (!handle)
     return;
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //отсоединение шейдеров от программы
+    //РѕС‚СЃРѕРµРґРёРЅРµРЅРёРµ С€РµР№РґРµСЂРѕРІ РѕС‚ РїСЂРѕРіСЂР°РјРјС‹
 
   for (ShaderArray::iterator iter=shaders.begin (), end=shaders.end (); iter!=end; ++iter)
   {
@@ -328,7 +328,7 @@ void GlslProgram::DeleteProgram ()
 #endif
   }
 
-    //удаление программы
+    //СѓРґР°Р»РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 
   if (glDeleteProgram)
   {
@@ -341,26 +341,26 @@ void GlslProgram::DeleteProgram ()
   }
 #endif
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::GlslProgram::DeleteProgram");
 }
 
 /*
-    Получение протокола ошибок OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕС‚РѕРєРѕР»Р° РѕС€РёР±РѕРє OpenGL
 */
 
 void GlslProgram::GetProgramLog (stl::string& log_buffer)
 {
-    //очистка буфера
+    //РѕС‡РёСЃС‚РєР° Р±СѓС„РµСЂР°
 
   log_buffer.clear ();
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
 
-    //получение размера строки состояния программы
+    //РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° СЃС‚СЂРѕРєРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРіСЂР°РјРјС‹
 
   GLint log_length = 0;
 
@@ -378,7 +378,7 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
   if (!log_length)
     return;
 
-    //чтение строки состояния
+    //С‡С‚РµРЅРёРµ СЃС‚СЂРѕРєРё СЃРѕСЃС‚РѕСЏРЅРёСЏ
 
   GLsizei getted_log_size = 0;
 
@@ -398,13 +398,13 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
   if (getted_log_size)
     log_buffer.resize (getted_log_size - 1);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors ("render::low_level::opengl::GlslProgram::GetProgramLog");
 }
 
 /*
-    Создание программы, устанавливаемой в контекст OpenGL
+    РЎРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 IBindableProgram* GlslProgram::CreateBindableProgram (ProgramParametersLayout* layout)
@@ -421,7 +421,7 @@ IBindableProgram* GlslProgram::CreateBindableProgram (ProgramParametersLayout* l
 }
 
 /*
-    Получение словаря атрибутов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃР»РѕРІР°СЂСЏ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 IVertexAttributeDictionary* GlslProgram::GetVertexAttributeDictionary ()
@@ -430,7 +430,7 @@ IVertexAttributeDictionary* GlslProgram::GetVertexAttributeDictionary ()
 }
 
 /*
-    Получение индекса атрибута по имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° Р°С‚СЂРёР±СѓС‚Р° РїРѕ РёРјРµРЅРё
 */
 
 int GlslProgram::FindAttribute (const char* name)
@@ -448,7 +448,7 @@ int GlslProgram::FindAttribute (const char* name)
 }
 
 /*
-    Получение параметров программы
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 unsigned int GlslProgram::GetParametersCount ()

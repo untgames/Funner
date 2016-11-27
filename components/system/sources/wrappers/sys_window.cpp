@@ -7,13 +7,13 @@ using namespace common;
 const unsigned int MAX_TITLE_LENGTH = 256;
 
 /*
-    Описание реализации Window
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Window
 */
 
 struct Window::Impl: public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (Window* in_window, const char* in_init_string)
       : window (in_window)
       , handle (0)
@@ -46,7 +46,7 @@ struct Window::Impl: public xtl::trackable
       memset (title_unicode, 0, sizeof title_unicode);
     }    
     
-///Инциализация окна
+///РРЅС†РёР°Р»РёР·Р°С†РёСЏ РѕРєРЅР°
     void Init (WindowStyle in_style, const void* parent, bool is_visible, const Rect* window_rect = 0)
     {
       try
@@ -54,7 +54,7 @@ struct Window::Impl: public xtl::trackable
         if (embedded)
           throw xtl::format_operation_exception ("", "Can't recreate embedded window");
 
-          //сделать через конструктор и Hide/Show
+          //СЃРґРµР»Р°С‚СЊ С‡РµСЂРµР· РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Рё Hide/Show
           
         switch (in_style)
         {
@@ -91,13 +91,13 @@ struct Window::Impl: public xtl::trackable
       }
     }
 
-///Отмена закрытия окна
+///РћС‚РјРµРЅР° Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
     void CancelClose ()
     {
       close_cancel_flag = true;      
     }
 
-///Принудительное закрытие окна
+///РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР°
     void ForceClose ()
     {
       if (!handle || embedded)
@@ -108,12 +108,12 @@ struct Window::Impl: public xtl::trackable
       Platform::DestroyWindow (handle);
     }
     
-///Стиль окна
+///РЎС‚РёР»СЊ РѕРєРЅР°
     WindowStyle Style () const { return style; }
     
     void SetStyle (WindowStyle in_style) { style = in_style; }
 
-///Низкоуровневый дескриптор окна
+///РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°
     window_t Handle () const { return handle; }
 
     window_t CheckedHandle () const
@@ -124,10 +124,10 @@ struct Window::Impl: public xtl::trackable
       return handle;
     }
     
-///Курсор окна
+///РљСѓСЂСЃРѕСЂ РѕРєРЅР°
     WindowCursor& Cursor () { return cursor; }
 
-///Установка низкоуровневого дескриптора окна
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
     void SetHandle (window_t new_handle)
     {
       if (handle == new_handle)
@@ -138,13 +138,13 @@ struct Window::Impl: public xtl::trackable
       Notify (WindowEvent_OnChangeHandle);
     }
     
-///Низкоуровневый дескриптор родительского окна
+///РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
     const void* ParentHandle () const { return parent_handle; }
 
-///Установка низкоуровневого дескриптора родительского окна
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
     void SetParentHandle (const void* new_parent_handle)
     {
-//      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно
+//      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //РЅСѓР¶РЅРѕ РїРµСЂРµСЃРѕР·РґР°РІР°С‚СЊ РѕРєРЅРѕ
       bool need_window_recreate = false;
 
       if (need_window_recreate)
@@ -161,7 +161,7 @@ struct Window::Impl: public xtl::trackable
       }
     }
 
-///Заголовок окна
+///Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
     const char* Title ()
     {
       strncpy (title, tostring (TitleUnicode ()).c_str (), MAX_TITLE_LENGTH);
@@ -169,7 +169,7 @@ struct Window::Impl: public xtl::trackable
       return title;
     }
 
-///Заголовок окна в Unicode
+///Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР° РІ Unicode
     const wchar_t* TitleUnicode ()
     {
       Platform::GetWindowTitle (CheckedHandle (), MAX_TITLE_LENGTH, title_unicode);
@@ -177,7 +177,7 @@ struct Window::Impl: public xtl::trackable
       return title_unicode;
     }
     
-///Область вывода
+///РћР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
     const Rect& Viewport ()
     {
       if (!need_update_viewport)
@@ -185,12 +185,12 @@ struct Window::Impl: public xtl::trackable
 
       try
       {  
-          //инициализация области вывода
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
         Rect client_rect  = window->ClientRect (),
              new_viewport (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
              
-          //запуск обработчика
+          //Р·Р°РїСѓСЃРє РѕР±СЂР°Р±РѕС‚С‡РёРєР°
          
         try
         {
@@ -202,7 +202,7 @@ struct Window::Impl: public xtl::trackable
           new_viewport = Rect (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
         }
 
-          //обновление кэша
+          //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
         
         need_update_viewport = false;
         viewport             = new_viewport;
@@ -239,16 +239,16 @@ struct Window::Impl: public xtl::trackable
     
     const ViewportUpdateHandler& ViewportHandler () { return viewport_handler; }
     
-///Установка пользовательской функции отладочного протоколирования
+///РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
     void SetDebugLog (const LogHandler& handler)
     {
       debug_log = handler;
     }
 
-///Получение пользовательской функции отладочного протоколирования
+///РџРѕР»СѓС‡РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
     const LogHandler& DebugLog () const { return debug_log; }
 
-///Регистрация обработчиков событий
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
     xtl::connection RegisterEventHandler (WindowEvent event, const EventHandler& handler)
     {    
       static const char* METHOD_NAME = "syslib::Window::Impl::RegisterEventHandler";
@@ -262,7 +262,7 @@ struct Window::Impl: public xtl::trackable
       return signals [event].connect (handler);
     }    
 
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
     void Notify (WindowEvent event, const WindowEventContext& context)
     {
       try
@@ -284,7 +284,7 @@ struct Window::Impl: public xtl::trackable
       }
       catch (...)
       {
-        //подавляем все исключения
+        //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
       }    
     }
 
@@ -300,7 +300,7 @@ struct Window::Impl: public xtl::trackable
     }
 
   private:
-///Обработчик событий окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
     static void MessageHandler (window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
     {
       Impl* impl = reinterpret_cast<Impl*> (user_data);
@@ -312,23 +312,23 @@ struct Window::Impl: public xtl::trackable
       {
         switch (event)
         {
-          case WindowEvent_OnClose: //посылается перед закрытием окна
+          case WindowEvent_OnClose: //РїРѕСЃС‹Р»Р°РµС‚СЃСЏ РїРµСЂРµРґ Р·Р°РєСЂС‹С‚РёРµРј РѕРєРЅР°
           {
             impl->close_cancel_flag = false;
 
             impl->Notify (WindowEvent_OnClose, context);
 
-              //если закрытие окна не было отменено - закрываем окно
+              //РµСЃР»Рё Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР° РЅРµ Р±С‹Р»Рѕ РѕС‚РјРµРЅРµРЅРѕ - Р·Р°РєСЂС‹РІР°РµРј РѕРєРЅРѕ
 
             if (!impl->close_cancel_flag)
               impl->ForceClose ();
 
             break;
           }
-          case WindowEvent_OnDestroy: //окно уничтожено
+          case WindowEvent_OnDestroy: //РѕРєРЅРѕ СѓРЅРёС‡С‚РѕР¶РµРЅРѕ
             impl->SetHandle (0);
             break;
-          case WindowEvent_OnSize:    //изменились размеры окна
+          case WindowEvent_OnSize:    //РёР·РјРµРЅРёР»РёСЃСЊ СЂР°Р·РјРµСЂС‹ РѕРєРЅР°
             impl->InvalidateViewport ();
             impl->Notify (event, context);
             break;          
@@ -339,7 +339,7 @@ struct Window::Impl: public xtl::trackable
       }
       catch (...)
       {
-        //подавляем все исключения
+        //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
       }    
     }
     
@@ -347,25 +347,25 @@ struct Window::Impl: public xtl::trackable
     typedef xtl::signal<void (Window&, WindowEvent, const WindowEventContext&)> WindowSignal;
 
   private:
-    Window*               window;                             //указатель на владельца
-    window_t              handle;                             //низкоуровневый дескриптор окна
-    const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
-    bool                  embedded;                           //окно является встроенным
-    WindowStyle           style;                              //стиль окна
-    stl::string           init_string;                        //строка инициализации окна
-    WindowSignal          signals [WindowEvent_Num];          //сигналы окна
-    bool                  close_cancel_flag;                  //флаг отмены закрытия окна
-    char                  title [MAX_TITLE_LENGTH+1];         //заголовок окна
-    wchar_t               title_unicode [MAX_TITLE_LENGTH+1]; //заголовок окна в Unicode
-    WindowCursor          cursor;                             //курсор окна
-    Rect                  viewport;                           //область вывода
-    bool                  need_update_viewport;               //флаг необходимости обновления области вывода
-    ViewportUpdateHandler viewport_handler;                   //обработчик изменения области вывода
-    LogHandler            debug_log;                          //функция отладочного протоколирования
+    Window*               window;                             //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РІР»Р°РґРµР»СЊС†Р°
+    window_t              handle;                             //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°
+    const void*           parent_handle;                      //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
+    bool                  embedded;                           //РѕРєРЅРѕ СЏРІР»СЏРµС‚СЃСЏ РІСЃС‚СЂРѕРµРЅРЅС‹Рј
+    WindowStyle           style;                              //СЃС‚РёР»СЊ РѕРєРЅР°
+    stl::string           init_string;                        //СЃС‚СЂРѕРєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РѕРєРЅР°
+    WindowSignal          signals [WindowEvent_Num];          //СЃРёРіРЅР°Р»С‹ РѕРєРЅР°
+    bool                  close_cancel_flag;                  //С„Р»Р°Рі РѕС‚РјРµРЅС‹ Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
+    char                  title [MAX_TITLE_LENGTH+1];         //Р·Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
+    wchar_t               title_unicode [MAX_TITLE_LENGTH+1]; //Р·Р°РіРѕР»РѕРІРѕРє РѕРєРЅР° РІ Unicode
+    WindowCursor          cursor;                             //РєСѓСЂСЃРѕСЂ РѕРєРЅР°
+    Rect                  viewport;                           //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
+    bool                  need_update_viewport;               //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+    ViewportUpdateHandler viewport_handler;                   //РѕР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+    LogHandler            debug_log;                          //С„СѓРЅРєС†РёСЏ РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 };
 
 /*
-    Конструктор и деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Рё РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Window::Window (window_t handle)
@@ -428,22 +428,22 @@ Window::~Window ()
 {
   try
   {
-      //оповещение об удалении
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё
 
     impl->Notify (WindowEvent_OnDestroy);
 
-      //принудительное закрытие окна
+      //РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР°
 
     ForceClose ();
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Создание окна
+    РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
 */
 
 void Window::Init (WindowStyle style)
@@ -474,7 +474,7 @@ void Window::Init (WindowStyle style, unsigned int width, unsigned int height)
 }
 
 /*
-    Закрытие окна
+    Р—Р°РєСЂС‹С‚РёРµ РѕРєРЅР°
 */
 
 void Window::Close ()
@@ -503,7 +503,7 @@ void Window::ForceClose ()
   }
 }
 
-//может быть вызван одним из обработчиков события WindowEvent_OnClose
+//РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹Р·РІР°РЅ РѕРґРЅРёРј РёР· РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёСЏ WindowEvent_OnClose
 void Window::CancelClose ()
 {
   impl->CancelClose ();
@@ -515,7 +515,7 @@ bool Window::IsClosed () const
 }
 
 /*
-    Работа с низкоуровневым дескриптором окна
+    Р Р°Р±РѕС‚Р° СЃ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Рј РґРµСЃРєСЂРёРїС‚РѕСЂРѕРј РѕРєРЅР°
 */
 
 const void* Window::Handle () const
@@ -558,14 +558,14 @@ const void* Window::InternalHandle () const
 }
 
 /*
-    Стиль окна
+    РЎС‚РёР»СЊ РѕРєРЅР°
 */
 
 WindowStyle Window::Style () const
 {
   try
   {
-    impl->CheckedHandle (); //для возбуждения исключения в случае закрытого окна
+    impl->CheckedHandle (); //РґР»СЏ РІРѕР·Р±СѓР¶РґРµРЅРёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ Р·Р°РєСЂС‹С‚РѕРіРѕ РѕРєРЅР°
   
     return impl->Style ();    
   }
@@ -585,7 +585,7 @@ void Window::SetStyle (WindowStyle style)
       if (style == impl->Style ())
         return;
         
-        //попытка изменения стиля
+        //РїРѕРїС‹С‚РєР° РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ
         
       switch (style)
       {
@@ -602,7 +602,7 @@ void Window::SetStyle (WindowStyle style)
       }
       else
       {        
-          //пересоздания окна
+          //РїРµСЂРµСЃРѕР·РґР°РЅРёСЏ РѕРєРЅР°
         
         Rect window_rect = WindowRect ();
 
@@ -624,7 +624,7 @@ void Window::SetStyle (WindowStyle style)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 const char* Window::Title () const
@@ -686,7 +686,7 @@ void Window::SetTitle (const wchar_t* title)
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 Rect Window::WindowRect () const
@@ -724,7 +724,7 @@ Rect Window::ClientRect () const
 }
 
 /*
-    Размеры окна
+    Р Р°Р·РјРµСЂС‹ РѕРєРЅР°
 */
 
 unsigned int Window::Width () const
@@ -856,10 +856,10 @@ void Window::SetClientSize (unsigned int width, unsigned int height)
 }
 
 /*
-    Область вывода
+    РћР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
 */
 
-//возвращение области вывода
+//РІРѕР·РІСЂР°С‰РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 Rect Window::Viewport () const
 {
   try
@@ -873,7 +873,7 @@ Rect Window::Viewport () const
   }
 }
 
-//принудительное обновление области вывода
+//РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 void Window::InvalidateViewport ()
 {
   impl->InvalidateViewport ();
@@ -890,7 +890,7 @@ const Window::ViewportUpdateHandler& Window::ViewportHandler () const
 }
 
 /*
-    Положение окна
+    РџРѕР»РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 Point Window::Position () const
@@ -941,7 +941,7 @@ void Window::SetPosition (unsigned int x, unsigned int y)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 Point Window::CursorPosition () const
@@ -976,7 +976,7 @@ void Window::SetCursorPosition (unsigned int x, unsigned int y)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 bool Window::IsCursorVisible () const
@@ -1006,7 +1006,7 @@ void Window::SetCursorVisible (bool state)
 }
 
 /*
-    Установка изображения курсора
+    РЈСЃС‚Р°РЅРѕРІРєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РєСѓСЂСЃРѕСЂР°
 */
 
 void Window::SetCursor (const WindowCursor& cursor)
@@ -1030,7 +1030,7 @@ WindowCursor Window::Cursor () const
 }
 
 /*
-   Установка/получение multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void Window::SetMultitouchEnabled (bool state)
@@ -1060,7 +1060,7 @@ bool Window::IsMultitouchEnabled () const
 }
 
 /*
-    Активность окна
+    РђРєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
 */
 
 bool Window::IsActive () const
@@ -1090,7 +1090,7 @@ void Window::SetActive (bool state)
 }
 
 /*
-    Видимость окна
+    Р’РёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
 */
 
 bool Window::IsVisible () const
@@ -1120,7 +1120,7 @@ void Window::SetVisible (bool state)
 }
 
 /*
-    Максимизация и минимизация окна
+    РњР°РєСЃРёРјРёР·Р°С†РёСЏ Рё РјРёРЅРёРјРёР·Р°С†РёСЏ РѕРєРЅР°
 */
 
 void Window::Maximize ()
@@ -1150,7 +1150,7 @@ void Window::Minimize ()
 }
 
 /*
-    Работа с фокусом ввода
+    Р Р°Р±РѕС‚Р° СЃ С„РѕРєСѓСЃРѕРј РІРІРѕРґР°
 */
 
 bool Window::HasFocus () const
@@ -1180,7 +1180,7 @@ void Window::SetFocus (bool state)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void Window::SetBackgroundColor (const Color& color)
@@ -1236,7 +1236,7 @@ bool Window::IsBackgroundEnabled () const
 }
 
 /*
-    Дескриптор родительского окна
+    Р”РµСЃРєСЂРёРїС‚РѕСЂ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void Window::SetParentHandle (const void* handle)
@@ -1266,7 +1266,7 @@ const void* Window::ParentHandle () const
 }
 
 /*
-    Обновление содержимого окна (посылка OnPaint)
+    РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РѕРєРЅР° (РїРѕСЃС‹Р»РєР° OnPaint)
 */
 
 void Window::Invalidate ()
@@ -1283,7 +1283,7 @@ void Window::Invalidate ()
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 Screen Window::ContainingScreen () const
@@ -1313,7 +1313,7 @@ Screen Window::ContainingScreen (const void* native_handle)
 }
 
 /*
-    Подписка на события окна
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РѕРєРЅР°
 */
 
 connection Window::RegisterEventHandler (WindowEvent event, const EventHandler& handler)
@@ -1330,7 +1330,7 @@ connection Window::RegisterEventHandler (WindowEvent event, const EventHandler& 
 }
 
 /*
-    Установка пользовательской функции отладочного протоколирования
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 void Window::SetDebugLog (const LogHandler& debug_log)
@@ -1352,7 +1352,7 @@ const Window::LogHandler& Window::DebugLog () const
 }
 
 /*
-    Получение объекта оповещения об удалении окна
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё РѕРєРЅР°
 */
 
 xtl::trackable& Window::Trackable () const

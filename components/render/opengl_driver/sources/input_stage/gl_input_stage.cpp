@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Состояние входного уровня
+    РЎРѕСЃС‚РѕСЏРЅРёРµ РІС…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 namespace
@@ -14,11 +14,11 @@ namespace
 class InputStageState: public IStageState
 {
   public:
-      //конструкторы
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
     InputStageState (InputStageState* in_main_state) : owner (0), main_state (in_main_state) {}
     InputStageState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}
     
-      //установка расположения геометрии
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РіРµРѕРјРµС‚СЂРёРё
     void SetInputLayout (InputLayout* in_layout)
     {
       if (in_layout == layout)
@@ -29,13 +29,13 @@ class InputStageState: public IStageState
       UpdateNotify ();
     }
 
-      //получение расположения геометрии
+      //РїРѕР»СѓС‡РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РіРµРѕРјРµС‚СЂРёРё
     InputLayout* GetInputLayout () const
     {
       return layout.get ();
     }
 
-      //установка вершинного буфера
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void SetVertexBuffer (unsigned int slot, Buffer* buffer)
     {
       if (buffer == vertex_buffers [slot])
@@ -46,19 +46,19 @@ class InputStageState: public IStageState
       UpdateNotify ();
     }
     
-      //получение вершинного буфера
+      //РїРѕР»СѓС‡РµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     Buffer* GetVertexBuffer (unsigned int slot) const
     {
       return vertex_buffers [slot].get ();
     }
     
-      //полученеи всех вершинных буферов
+      //РїРѕР»СѓС‡РµРЅРµРё РІСЃРµС… РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
     BufferPtr* GetVertexBuffers ()
     {
       return vertex_buffers.c_array ();
     }
 
-      //установка индексного буфера
+      //СѓСЃС‚Р°РЅРѕРІРєР° РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void SetIndexBuffer (Buffer* buffer)
     {
       if (buffer == index_buffer)
@@ -69,20 +69,20 @@ class InputStageState: public IStageState
       UpdateNotify ();
     }
     
-      //получение индексного буфера
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     Buffer* GetIndexBuffer () const
     {
       return index_buffer.get ();
     }
     
-      //захват состояния
+      //Р·Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
     
-      //восстановление состояния
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -90,7 +90,7 @@ class InputStageState: public IStageState
     }
 
   private:
-      //копирование состояния
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Copy (const InputStageState& source, const StateBlockMask& mask)
     {
       if (mask.is_layout)
@@ -104,7 +104,7 @@ class InputStageState: public IStageState
         SetIndexBuffer (source.GetIndexBuffer ());
     }
     
-      //оповещение об изменении состояния уровня
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
     void UpdateNotify ()
     {
       if (!owner)
@@ -119,29 +119,29 @@ class InputStageState: public IStageState
     typedef xtl::trackable_ptr<InputStageState>                     InputStageStatePtr;
 
   private:
-    ContextObject*     owner;          //владелец состояния уровня
-    InputStageStatePtr main_state;     //основное состояние уровня
-    LayoutPtr          layout;         //описание расположения геометрии
-    VertexBufferArray  vertex_buffers; //вершинные буферы
-    BufferPtr          index_buffer;   //индексный буфер
+    ContextObject*     owner;          //РІР»Р°РґРµР»РµС† СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
+    InputStageStatePtr main_state;     //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    LayoutPtr          layout;         //РѕРїРёСЃР°РЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РіРµРѕРјРµС‚СЂРёРё
+    VertexBufferArray  vertex_buffers; //РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+    BufferPtr          index_buffer;   //РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
 };
 
 }
 
 /*
-    Описание реализации входного уровня конвейера OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РІС…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РєРѕРЅРІРµР№РµСЂР° OpenGL
 */
 
 struct InputStage::Impl: public ContextObject
 {
   public:
     /*
-        Конструктор  
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ  
     */
 
     Impl (const ContextManager& context_manager) : ContextObject (context_manager), state (this)
     {
-        //установка текущего контекста
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
       MakeContextCurrent();
 
@@ -150,7 +150,7 @@ struct InputStage::Impl: public ContextObject
       if (ffp_texture_units_count > DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
         ffp_texture_units_count = DEVICE_VERTEX_BUFFER_SLOTS_COUNT;
         
-        //инициализация состояния уровня
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
         
       InputLayoutDesc default_layout_desc;
       
@@ -166,19 +166,19 @@ struct InputStage::Impl: public ContextObject
       
       SetInputLayout (default_layout.get ());
         
-        //проверка ошибок
+        //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
         
       CheckErrors ("render::low_level::opengl::InputStage::Impl");
     }
     
     /*
-        Получение объекта основного состояния уровня
+        РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕСЃРЅРѕРІРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
     */
     
     InputStageState& GetState () { return state; }
     
     /*
-        Создание буферов
+        РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂРѕРІ
     */
 
     IBuffer* CreateBuffer (const BufferDesc& desc, GLenum buffer_target)
@@ -211,7 +211,7 @@ struct InputStage::Impl: public ContextObject
     }
     
     /*
-        Создание InputLayout
+        РЎРѕР·РґР°РЅРёРµ InputLayout
     */
     
     IInputLayout* CreateInputLayout (const InputLayoutDesc& desc)
@@ -220,7 +220,7 @@ struct InputStage::Impl: public ContextObject
     }
 
     /*
-        Установка / получение InputLayout
+        РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ InputLayout
     */
 
     void SetInputLayout (IInputLayout* in_layout)
@@ -236,7 +236,7 @@ struct InputStage::Impl: public ContextObject
     }
     
     /*
-        Установка / получение вершинного буфера
+        РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     */
     
     void SetVertexBuffer (unsigned int slot, IBuffer* in_buffer)
@@ -263,7 +263,7 @@ struct InputStage::Impl: public ContextObject
     }  
 
     /*
-        Установка / получение индексного буфера
+        РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     */
 
     void SetIndexBuffer (IBuffer* in_buffer)
@@ -281,7 +281,7 @@ struct InputStage::Impl: public ContextObject
     IBuffer* GetIndexBuffer () { return state.GetIndexBuffer (); }
     
     /*
-        Установка состояния уровня в контекст OpenGL
+        РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     */
       
     void Bind (unsigned int base_vertex, unsigned int base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
@@ -306,13 +306,13 @@ struct InputStage::Impl: public ContextObject
     typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
 
   private:
-    InputStageState state;                   //состояние уровня
-    InputLayoutPtr  default_layout;          //состояние расположения геометрии по умолчанию  
-    unsigned int    ffp_texture_units_count; //количество текстурных юнитов поддерживаемое аппаратно для FFP
+    InputStageState state;                   //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    InputLayoutPtr  default_layout;          //СЃРѕСЃС‚РѕСЏРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РіРµРѕРјРµС‚СЂРёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ  
+    unsigned int    ffp_texture_units_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµРєСЃС‚СѓСЂРЅС‹С… СЋРЅРёС‚РѕРІ РїРѕРґРґРµСЂР¶РёРІР°РµРјРѕРµ Р°РїРїР°СЂР°С‚РЅРѕ РґР»СЏ FFP
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputStage::InputStage (const ContextManager& context_manager)
@@ -325,7 +325,7 @@ InputStage::~InputStage()
 }
 
 /*
-    Создание объекта состояния уровня
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 */
 
 IStageState* InputStage::CreateStageState ()
@@ -334,7 +334,7 @@ IStageState* InputStage::CreateStageState ()
 }
 
 /*
-    Создание ресурсов
+    РЎРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 IInputLayout* InputStage::CreateInputLayout (const InputLayoutDesc& desc)
@@ -390,7 +390,7 @@ IBuffer* InputStage::CreateConstantBuffer (const BufferDesc& desc)
 }
 
 /*
-    Управление конфигурацией входных данных    
+    РЈРїСЂР°РІР»РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…    
 */
 
 void InputStage::SetInputLayout (IInputLayout* layout)
@@ -412,7 +412,7 @@ IInputLayout* InputStage::GetInputLayout () const
 }
 
 /*
-    Управление вершинными буферами
+    РЈРїСЂР°РІР»РµРЅРёРµ РІРµСЂС€РёРЅРЅС‹РјРё Р±СѓС„РµСЂР°РјРё
 */
 
 void InputStage::SetVertexBuffer (unsigned int slot, IBuffer* buffer)
@@ -442,7 +442,7 @@ IBuffer* InputStage::GetVertexBuffer (unsigned int slot) const
 }
 
 /*
-    Управление индексным буфером
+    РЈРїСЂР°РІР»РµРЅРёРµ РёРЅРґРµРєСЃРЅС‹Рј Р±СѓС„РµСЂРѕРј
 */
 
 void InputStage::SetIndexBuffer (IBuffer* buffer)
@@ -464,7 +464,7 @@ IBuffer* InputStage::GetIndexBuffer () const
 }
 
 /*
-    Установка состояния уровня в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void InputStage::Bind (unsigned int base_vertex, unsigned int base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
@@ -481,7 +481,7 @@ void InputStage::Bind (unsigned int base_vertex, unsigned int base_index, IVerte
 }
 
 /*
-    Получение имени семантики
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРµРјР°РЅС‚РёРєРё
 */
 
 const char* InputStage::GetVertexAttributeSemanticName (VertexAttributeSemantic semantic)

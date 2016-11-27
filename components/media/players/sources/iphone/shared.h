@@ -24,9 +24,9 @@ enum VideoPlayerControlsType
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание проигрывателей
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»РµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler, VideoPlayerControlsType controls_type); //Для второго параметра используются указатели, поскольку компилятор не поддерживает передачу параметра по ссылке для mm кода
+IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler, VideoPlayerControlsType controls_type); //Р”Р»СЏ РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»Рё, РїРѕСЃРєРѕР»СЊРєСѓ РєРѕРјРїРёР»СЏС‚РѕСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РїРµСЂРµРґР°С‡Сѓ РїР°СЂР°РјРµС‚СЂР° РїРѕ СЃСЃС‹Р»РєРµ РґР»СЏ mm РєРѕРґР°
 IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler);
 
 }

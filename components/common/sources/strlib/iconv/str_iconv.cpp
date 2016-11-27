@@ -20,19 +20,19 @@ namespace iconv_converter
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* ICONV_CONVERTER_NAME = "common.string.converters.iconv";
 
 /*
-    Преобразователь
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ
 */
 
 class IconvStringConverter: public xtl::reference_counter, public IStringConverter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     IconvStringConverter (const char* source_encoding, const char* destination_encoding)
       : cd (0)
     {
@@ -58,13 +58,13 @@ class IconvStringConverter: public xtl::reference_counter, public IStringConvert
       }        
     }    
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~IconvStringConverter ()
     {
       iconv_close (cd);
     }
     
-///Преобразование
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
     void Convert (const void*& source_buffer_ptr, size_t& source_buffer_size, void*& destination_buffer_ptr, size_t& destination_buffer_size)
     {
       try
@@ -81,7 +81,7 @@ class IconvStringConverter: public xtl::reference_counter, public IStringConvert
       }
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
@@ -90,7 +90,7 @@ class IconvStringConverter: public xtl::reference_counter, public IStringConvert
 };
 
 /*
-    Компонент, регистрирующий ICONV-конвертер
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ ICONV-РєРѕРЅРІРµСЂС‚РµСЂ
 */
 
 class Component

@@ -239,7 +239,7 @@ struct screen_keyboard_handle
 }
 
 /*
-   Создание и уничтожение экранной клавиатуры
+   РЎРѕР·РґР°РЅРёРµ Рё СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЌРєСЂР°РЅРЅРѕР№ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 screen_keyboard_t IPhoneScreenKeyboardManager::CreateScreenKeyboard (window_t window, ScreenKeyboardType type, const char* platform_specific)
@@ -253,7 +253,7 @@ void IPhoneScreenKeyboardManager::DestroyScreenKeyboard (screen_keyboard_t handl
 }
 
 /*
-   Показ и скрытие клавиатуры
+   РџРѕРєР°Р· Рё СЃРєСЂС‹С‚РёРµ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 void IPhoneScreenKeyboardManager::ShowScreenKeyboard (screen_keyboard_t handle)
@@ -267,7 +267,7 @@ void IPhoneScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t handle)
 }
 
 /*
-   Проверка поддержки клавиатуры
+   РџСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 bool IPhoneScreenKeyboardManager::IsScreenKeyboardSupported (ScreenKeyboardType type)

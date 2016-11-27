@@ -13,25 +13,25 @@ namespace scene
 namespace server
 {
 
-///Техника рендеринга: отрисовка изображения без освещения
+///РўРµС…РЅРёРєР° СЂРµРЅРґРµСЂРёРЅРіР°: РѕС‚СЂРёСЃРѕРІРєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ Р±РµР· РѕСЃРІРµС‰РµРЅРёСЏ
 class DrawWithoutLights: public Technique
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     DrawWithoutLights (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
     {
-        //чтение имени эффекта
+        //С‡С‚РµРЅРёРµ РёРјРµРЅРё СЌС„С„РµРєС‚Р°
 
       effect_name = common::get<const char*> (node, "effect");
     }
 
-/// Имена для регистрации
+/// РРјРµРЅР° РґР»СЏ СЂРµРіРёСЃС‚СЂР°С†РёРё
     static const char* ClassName     () { return "draw_without_lights"; }
     static const char* ComponentName () { return "render.scene.server.techniques.draw_without_lights"; }
 
   protected:
-///Данные для рендеринга техники в каждом кадре
+///Р”Р°РЅРЅС‹Рµ РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР° С‚РµС…РЅРёРєРё РІ РєР°Р¶РґРѕРј РєР°РґСЂРµ
     struct PrivateData
     {
       BasicRendererPtr renderer;
@@ -39,16 +39,16 @@ class DrawWithoutLights: public Technique
       PrivateData (DrawWithoutLights& technique) : renderer (new BasicRenderer (technique.manager, technique.effect_name.c_str ()), false) {}
     };
 
-///Обновление кадра
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР°
     void UpdateFrameCore (RenderingContext& parent_context, TechniquePrivateData& private_data_holder)
     {
       try
       {
-          //получение приватных данных техники
+          //РїРѕР»СѓС‡РµРЅРёРµ РїСЂРёРІР°С‚РЅС‹С… РґР°РЅРЅС‹С… С‚РµС…РЅРёРєРё
 
         PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
-          //обновление кадра
+          //РѕР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР°
 
         private_data.renderer->Draw (parent_context);
       }
@@ -59,15 +59,15 @@ class DrawWithoutLights: public Technique
       }
     }
 
-///Обновление свойств
+///РћР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
     void UpdatePropertiesCore () {}
 
-///Связывание свойств техники с методами техники
+///РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ С‚РµС…РЅРёРєРё СЃ РјРµС‚РѕРґР°РјРё С‚РµС…РЅРёРєРё
     void BindProperties (common::PropertyBindingMap&) {}
 
   private:
-    RenderManager manager;     //менеджер рендеринга
-    stl::string   effect_name; //имя эффекта
+    RenderManager manager;     //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+    stl::string   effect_name; //РёРјСЏ СЌС„С„РµРєС‚Р°
 };
 
 }

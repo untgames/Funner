@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации спрайтовой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїСЂР°Р№С‚РѕРІРѕР№ РјРѕРґРµР»Рё
 */
 
 typedef xtl::signal<void (VisualModel& sender, VisualModelEvent event_id)> VisualModelSignal;
@@ -12,12 +12,12 @@ typedef stl::auto_ptr<common::PropertyMap>                                 Prope
 
 struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
 {
-  scene_graph::Scissor* scissor;                        //область отсечения
-  xtl::auto_connection  on_scissor_destroy_connection;  //соединение с событием удаления области отсечения
-  PropertyMapPtr        dynamic_shader_properties;      //динамические свойства шейдера
-  PropertyMapPtr        static_shader_properties;       //статические свойства шейдера
-  VisualModelSignal     signals [VisualModelEvent_Num]; //сигналы модели
-  bool                  need_release_scissor;           //нужно ли освобождать область отсечения
+  scene_graph::Scissor* scissor;                        //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  xtl::auto_connection  on_scissor_destroy_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРѕР±С‹С‚РёРµРј СѓРґР°Р»РµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
+  PropertyMapPtr        dynamic_shader_properties;      //РґРёРЅР°РјРёС‡РµСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° С€РµР№РґРµСЂР°
+  PropertyMapPtr        static_shader_properties;       //СЃС‚Р°С‚РёС‡РµСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° С€РµР№РґРµСЂР°
+  VisualModelSignal     signals [VisualModelEvent_Num]; //СЃРёРіРЅР°Р»С‹ РјРѕРґРµР»Рё
+  bool                  need_release_scissor;           //РЅСѓР¶РЅРѕ Р»Рё РѕСЃРІРѕР±РѕР¶РґР°С‚СЊ РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 
   Impl () : scissor (), need_release_scissor () {}
 
@@ -35,7 +35,7 @@ struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
     return scissor->Name ();
   }
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (VisualModel& sender, VisualModelEvent event_id)
   {
     try
@@ -47,11 +47,11 @@ struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-/// Отсоединение области вывода
+/// РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   void UnbindScissor ()
   {
     scissor              = 0;
@@ -62,7 +62,7 @@ struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VisualModel::VisualModel ()
@@ -75,12 +75,12 @@ VisualModel::~VisualModel ()
 }
 
 /*
-    Область отсечения
+    РћР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
 {
-    //проверяем корректность режима присоединения
+    //РїСЂРѕРІРµСЂСЏРµРј РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ СЂРµР¶РёРјР° РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ
 
   bool need_release_scissor = false;
     
@@ -100,7 +100,7 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
 
   scene_graph::Scissor* old_scissor = impl->scissor;
 
-    //установка области отсечения
+    //СѓСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
   xtl::auto_connection on_destroy;
 
@@ -145,7 +145,7 @@ const Scissor* VisualModel::Scissor () const
 }
 
 /*
-    Динамические свойства шейдера (могут быть NULL)
+    Р”РёРЅР°РјРёС‡РµСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° С€РµР№РґРµСЂР° (РјРѕРіСѓС‚ Р±С‹С‚СЊ NULL)
 */
 
 common::PropertyMap* VisualModel::DynamicShaderProperties ()
@@ -179,7 +179,7 @@ void VisualModel::SetDynamicShaderProperties (const common::PropertyMap& propert
 }
 
 /*
-    Статические свойства шейдера (могут быть NULL)
+    РЎС‚Р°С‚РёС‡РµСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° С€РµР№РґРµСЂР° (РјРѕРіСѓС‚ Р±С‹С‚СЊ NULL)
 */
 
 common::PropertyMap* VisualModel::StaticShaderProperties ()
@@ -213,7 +213,7 @@ void VisualModel::SetStaticShaderProperties (const common::PropertyMap& properti
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void VisualModel::AcceptCore (Visitor& visitor)
@@ -223,7 +223,7 @@ void VisualModel::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Подписка на события модели
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРѕРґРµР»Рё
 */
 
 xtl::connection VisualModel::RegisterEventHandler (VisualModelEvent event, const EventHandler& handler)
@@ -240,7 +240,7 @@ xtl::connection VisualModel::RegisterEventHandler (VisualModelEvent event, const
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void VisualModel::BindProperties (common::PropertyBindingMap& bindings)

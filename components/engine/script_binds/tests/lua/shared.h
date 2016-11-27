@@ -60,7 +60,7 @@ inline const char* get_typename (const xtl::any& variant)
 }
 
 /*
-    Выполнение скрипта
+    Р’С‹РїРѕР»РЅРµРЅРёРµ СЃРєСЂРёРїС‚Р°
 */
 
 void load_script (IInterpreter& interpreter, const char* file_name)

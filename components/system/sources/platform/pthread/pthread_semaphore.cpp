@@ -9,7 +9,7 @@ struct syslib::semaphore_handle
   sem_t semaphore;
 };
 
-//создание семафора
+//СЃРѕР·РґР°РЅРёРµ СЃРµРјР°С„РѕСЂР°
 semaphore_t PThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
@@ -32,7 +32,7 @@ semaphore_t PThreadManager::CreateSemaphore (size_t initial_value)
   }
 }
 
-//уничтожение семафора
+//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРµРјР°С„РѕСЂР°
 void PThreadManager::DestroySemaphore (semaphore_t handle)
 {
   try
@@ -51,7 +51,7 @@ void PThreadManager::DestroySemaphore (semaphore_t handle)
   }
 }
 
-//ожидание следующей задачи
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void PThreadManager::WaitSemaphore (semaphore_t handle)
 {
   try
@@ -68,7 +68,7 @@ void PThreadManager::WaitSemaphore (semaphore_t handle)
   }
 }
 
-//ожидание следующей задачи с таймаутом
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 bool PThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
@@ -104,7 +104,7 @@ bool PThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseco
   }
 }
 
-//попытка ожидания следующей задачи
+//РїРѕРїС‹С‚РєР° РѕР¶РёРґР°РЅРёСЏ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 bool PThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
@@ -127,7 +127,7 @@ bool PThreadManager::TryWaitSemaphore (semaphore_t handle)
   }
 }
 
-//посылка следующей задачи
+//РїРѕСЃС‹Р»РєР° СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void PThreadManager::PostSemaphore (semaphore_t handle)
 {
   try

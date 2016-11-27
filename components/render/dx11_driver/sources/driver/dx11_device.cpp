@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const char* init_string)
@@ -12,7 +12,7 @@ Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const c
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!init_string)
       init_string = "";
@@ -20,17 +20,17 @@ Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const c
     if (!in_adapter)
       throw xtl::make_null_argument_exception ("", "adapter");
 
-      //разбор строки инициализации
+      //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 
     common::PropertyMap init_properties = common::parse_init_string (init_string);
 
     bool is_debug = init_properties.IsPresent ("debug") && init_properties.GetInteger ("debug");
 
-      //сохранение аргументов
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     adapter = in_adapter;
 
-      //создание устройства
+      //СЃРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
     ID3D11Device*        dx_device = 0;
     ID3D11DeviceContext* dx_context = 0;
@@ -64,7 +64,7 @@ Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const c
 
     device_manager.reset (new DeviceManager (library, device));
 
-      //инициализация подуровней
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕРґСѓСЂРѕРІРЅРµР№
 
     render_target_manager.reset (new RenderTargetManager (*device_manager));
     texture_manager.reset       (new TextureManager (*device_manager));
@@ -73,20 +73,20 @@ Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const c
     output_manager.reset        (new OutputManager (*device_manager));
     query_manager.reset         (new QueryManager (*device_manager));
 
-      //инициализация ресурсов по умолчанию
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂРµСЃСѓСЂСЃРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     InitDefaults ();
 
-      //создание контекста
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), initial_resources, default_resources), false);      
 
-      //создание отладочного уровня
+      //СЃРѕР·РґР°РЅРёРµ РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 
     if (is_debug)
       StartDebugLayer ();
 
-      //заполнение свойств
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 
     properties.AddProperty ("init_string", init_string);
   }
@@ -103,14 +103,14 @@ Device::~Device ()
 }
 
 /*
-    Инициализация ресурсов по умолчанию
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂРµСЃСѓСЂСЃРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void Device::InitDefaults ()
 {
   try
   {    
-      //создание входного лэйаута по умолчанию
+      //СЃРѕР·РґР°РЅРёРµ РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     InputLayoutDesc default_layout_desc;
     
@@ -139,7 +139,7 @@ void Device::InitDefaults ()
     default_resources.input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
     initial_resources.input_layout = default_resources.input_layout;
 
-      //создание программы по умолчанию
+      //СЃРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     ShaderDesc shader_descs [2];
 
@@ -173,7 +173,7 @@ void Device::InitDefaults ()
 
     default_resources.program = IProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
 
-      //инициализация BlendState
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ BlendState
        
     BlendDesc blend_desc;
     
@@ -189,7 +189,7 @@ void Device::InitDefaults ()
     
     default_resources.blend_state = IBlendStatePtr (CreateBlendState (blend_desc), false);
 
-      //инициализация DepthStencilState
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ DepthStencilState
       
     DepthStencilDesc depth_stencil_desc;
     
@@ -207,7 +207,7 @@ void Device::InitDefaults ()
     
     default_resources.depth_stencil_state = IDepthStencilStatePtr (CreateDepthStencilState (depth_stencil_desc), false);
 
-      //инициализация состояния растеризатора по умолчанию
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     RasterizerDesc rasterizer_desc;
 
@@ -238,7 +238,7 @@ void Device::InitRenderTargets (SwapChain& swap_chain)
     if (initial_resources.render_target_view || initial_resources.depth_stencil_view)
       return;
 
-      //инициализация отображений
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 
     SwapChainDesc swap_chain_desc;
 
@@ -254,7 +254,7 @@ void Device::InitRenderTargets (SwapChain& swap_chain)
     initial_resources.render_target_view = IViewPtr (CreateView (color_texture.get (), view_desc), false);
     initial_resources.depth_stencil_view = IViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);
 
-      //инициализация области вывода
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
     Viewport default_viewport;
 
@@ -267,7 +267,7 @@ void Device::InitRenderTargets (SwapChain& swap_chain)
 
     initial_resources.viewport = default_viewport;
 
-      //инициализация области отсечения
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
     Rect default_scissor;      
     
@@ -320,7 +320,7 @@ void Device::StopDebugLayer  ()
 }
 
 /*
-    Получение дескриптора устройства / адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІР° / Р°РґР°РїС‚РµСЂР°
 */
 
 ID3D11Device& Device::GetHandle ()
@@ -334,7 +334,7 @@ AdapterPtr Device::GetAdapter ()
 }
 
 /*
-    Имя устройства
+    РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Device::GetName ()
@@ -343,7 +343,7 @@ const char* Device::GetName ()
 }
 
 /*
-    Получение возможностей устройства
+    РџРѕР»СѓС‡РµРЅРёРµ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void Device::GetCaps (DeviceCaps& caps)
@@ -392,7 +392,7 @@ const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic sema
 }
 
 /*
-    Управление запросами
+    РЈРїСЂР°РІР»РµРЅРёРµ Р·Р°РїСЂРѕСЃР°РјРё
 */
 
 IQuery* Device::CreateQuery (QueryType type)
@@ -409,7 +409,7 @@ IQuery* Device::CreateQuery (QueryType type)
 }
 
 /*
-    Управление предикатами отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 IPredicate* Device::CreatePredicate ()
@@ -426,7 +426,7 @@ IPredicate* Device::CreatePredicate ()
 }
 
 /*
-    Работа с блоками состояний
+    Р Р°Р±РѕС‚Р° СЃ Р±Р»РѕРєР°РјРё СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
@@ -443,7 +443,7 @@ IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 }
 
 /*
-    Управление входным уровнем (input-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (input-stage)
 */
 
 IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
@@ -487,7 +487,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc, const void* data)
 }
 
 /*
-    Управление шейдерными уровнями (shader-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ С€РµР№РґРµСЂРЅС‹РјРё СѓСЂРѕРІРЅСЏРјРё (shader-stage)
 */
 
 IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
@@ -517,7 +517,7 @@ IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_
 }
 
 /*
-    Управление текстурами
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂР°РјРё
 */
 
 ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
@@ -565,7 +565,7 @@ ITexture* Device::CreateTexture (const TextureDesc&, IBuffer* buffer, size_t buf
 }
 
 /*
-    Управление растеризатором (rasterizer-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂРѕРј (rasterizer-stage)
 */
 
 IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
@@ -582,7 +582,7 @@ IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 }
 
 /*
-    Управление выходным уровнем (output-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС‹С…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (output-stage)
 */
 
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
@@ -612,7 +612,7 @@ IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& des
 }
 
 /*
-    Управление менеджером целевых буферов отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РјРµРЅРµРґР¶РµСЂРѕРј С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buffer_index)
@@ -655,7 +655,7 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 }
 
 /*
-    Создание контекста
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 IDeviceContext* Device::CreateDeferredContext ()
@@ -672,7 +672,7 @@ IDeviceContext* Device::CreateDeferredContext ()
 }
 
 /*
-    Получение непосредственного контекста выполнения операций
+    РџРѕР»СѓС‡РµРЅРёРµ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёР№
 */
 
 IDeviceContext* Device::GetImmediateContext ()
@@ -681,7 +681,7 @@ IDeviceContext* Device::GetImmediateContext ()
 }
 
 /*
-    Список свойств устройства отрисовки
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 IPropertyList* Device::GetProperties ()

@@ -1,5 +1,5 @@
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T, class Allocator>
@@ -30,7 +30,7 @@ inline uninitialized_storage<T, Allocator>::~uninitialized_storage ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T, class Allocator>
@@ -43,7 +43,7 @@ inline uninitialized_storage<T, Allocator>& uninitialized_storage<T, Allocator>:
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class T, class Allocator>
@@ -53,7 +53,7 @@ inline typename uninitialized_storage<T, Allocator>::allocator_type uninitialize
 }
 
 /*
-    Размер буфера / объём буфера (количество доступной памяти)
+    Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР° / РѕР±СЉС‘Рј Р±СѓС„РµСЂР° (РєРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅРѕР№ РїР°РјСЏС‚Рё)
 */
 
 template <class T, class Allocator>
@@ -69,7 +69,7 @@ inline typename uninitialized_storage<T, Allocator>::size_type uninitialized_sto
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T, class Allocator>
@@ -79,7 +79,7 @@ inline bool uninitialized_storage<T, Allocator>::empty () const
 }
 
 /*
-    Данные
+    Р”Р°РЅРЅС‹Рµ
 */
 
 template <class T, class Allocator>
@@ -95,7 +95,7 @@ inline typename uninitialized_storage<T, Allocator>::pointer uninitialized_stora
 }
 
 /*
-    Изменение размера буфера / резервирование памяти
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 */
 
 template <class T, class Allocator>
@@ -134,7 +134,7 @@ inline void uninitialized_storage<T, Allocator>::reserve (size_type new_size, bo
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T, class Allocator>

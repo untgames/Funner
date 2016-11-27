@@ -1,4 +1,4 @@
--- Разбиение строки на несколько
+-- Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё РЅР° РЅРµСЃРєРѕР»СЊРєРѕ
 function SplitString (str, terminal, return_as_table)
   if not str then return nil end
 
@@ -27,7 +27,7 @@ function SplitString (str, terminal, return_as_table)
   return unpack (results)
 end
 
--- Преобразование таблицы строк в таблицу номеров
+-- РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃС‚СЂРѕРє РІ С‚Р°Р±Р»РёС†Сѓ РЅРѕРјРµСЂРѕРІ
 function ToNumbers (...)
   local result = {}
 
@@ -38,7 +38,7 @@ function ToNumbers (...)
   return unpack (result)
 end
 
--- Преобразованеи строки в вектор
+-- РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРµРё СЃС‚СЂРѕРєРё РІ РІРµРєС‚РѕСЂ
 function StringToVec (str)
   local a, b, c, d = ToNumbers (SplitString (str, ";"))
 

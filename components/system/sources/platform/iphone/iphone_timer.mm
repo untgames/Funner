@@ -8,7 +8,7 @@ namespace
 const char* LOG_NAME = "syslib.IPhoneTimer";
 
 /*
-    Описание реализации таймера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚Р°Р№РјРµСЂР°
 */
 
 class IPhoneTimer
@@ -24,10 +24,10 @@ class IPhoneTimer
     static void TimerProc (CFRunLoopTimerRef in_timer, void* user_data);
 
   private:
-    CFRunLoopTimerRef timer;       //таймер
-    TimerHandler      handler;     //обработчик
-    void*             user_data;   //пользовательские данные
-    common::Log       log;         //дебаг-лог
+    CFRunLoopTimerRef timer;       //С‚Р°Р№РјРµСЂ
+    TimerHandler      handler;     //РѕР±СЂР°Р±РѕС‚С‡РёРє
+    void*             user_data;   //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+    common::Log       log;         //РґРµР±Р°Рі-Р»РѕРі
 };
 
 }
@@ -47,7 +47,7 @@ IPhoneTimer::IPhoneTimer (size_t period_in_milliseconds, const TimerHandler& in_
 
   double period_in_seconds = period_in_milliseconds / 1000.f;
 
-  timer = CFRunLoopTimerCreate (0, CFAbsoluteTimeGetCurrent () + period_in_seconds, period_in_seconds, 0, 0, &IPhoneTimer::TimerProc, &timer_context);  //???????Нужно учитывать, что время может измениться (летнее/зимнее)
+  timer = CFRunLoopTimerCreate (0, CFAbsoluteTimeGetCurrent () + period_in_seconds, period_in_seconds, 0, 0, &IPhoneTimer::TimerProc, &timer_context);  //???????РќСѓР¶РЅРѕ СѓС‡РёС‚С‹РІР°С‚СЊ, С‡С‚Рѕ РІСЂРµРјСЏ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊСЃСЏ (Р»РµС‚РЅРµРµ/Р·РёРјРЅРµРµ)
 
   CFRunLoopAddTimer (CFRunLoopGetMain (), timer, kCFRunLoopCommonModes);
 }
@@ -78,7 +78,7 @@ void IPhoneTimer::TimerProc (CFRunLoopTimerRef in_timer, void* user_data)
 }
 
 /*
-    Создание / уничтожение таймера
+    РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 timer_t IPhoneTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)

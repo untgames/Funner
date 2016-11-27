@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StateBlock::StateBlock (Device& in_device, const StateBlockMask& in_mask)
@@ -20,7 +20,7 @@ StateBlock::StateBlock (Device& in_device, const StateBlockMask& in_mask)
 }
 
 /*
-    Получение маски блока
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃРєРё Р±Р»РѕРєР°
 */
 
 void StateBlock::GetMask (StateBlockMask& out_mask)
@@ -29,7 +29,7 @@ void StateBlock::GetMask (StateBlockMask& out_mask)
 }
 
 /*
-    Захват настроек устройства
+    Р—Р°С…РІР°С‚ РЅР°СЃС‚СЂРѕРµРє СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void StateBlock::Capture (IDeviceContext* context)
@@ -54,7 +54,7 @@ void StateBlock::Capture (IDeviceContext* context)
 }
 
 /*
-    Применение настроек устройства
+    РџСЂРёРјРµРЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void StateBlock::Apply (IDeviceContext* context)

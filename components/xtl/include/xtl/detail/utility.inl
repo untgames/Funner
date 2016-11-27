@@ -1,8 +1,8 @@
 /*
-    Управляющие шаблоны
+    РЈРїСЂР°РІР»СЏСЋС‰РёРµ С€Р°Р±Р»РѕРЅС‹
 */
 
-//выбор из двух типов condition == true -> TrueType, false -> FalseType
+//РІС‹Р±РѕСЂ РёР· РґРІСѓС… С‚РёРїРѕРІ condition == true -> TrueType, false -> FalseType
 template <bool condition, class TrueType, class FalseType> struct select
 {
   typedef TrueType type;
@@ -18,7 +18,7 @@ template <bool condition> struct compile_time_assert;
 template <>               struct compile_time_assert<true> { enum { value = 1 }; };
 
 /*
-    Враперы
+    Р’СЂР°РїРµСЂС‹
 */
 
 template <class T>

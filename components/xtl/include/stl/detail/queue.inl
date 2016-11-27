@@ -1,5 +1,5 @@
 /*
-    Очередь (FIFO)
+    РћС‡РµСЂРµРґСЊ (FIFO)
 */
 
 //constructors
@@ -13,7 +13,7 @@ inline queue<T,Sequence>::queue (const Sequence& _c)
   : c (_c) 
   { }
 
-//функции общего назначения  
+//С„СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ  
 template <class T,class Sequence>
 inline bool queue<T,Sequence>::empty () const 
 { 
@@ -26,7 +26,7 @@ inline typename queue<T,Sequence>::size_type queue<T,Sequence>::size () const
   return c.size (); 
 }
 
-//доступ
+//РґРѕСЃС‚СѓРї
 template <class T,class Sequence>
 inline typename queue<T,Sequence>::reference queue<T,Sequence>::front () 
 { 
@@ -51,21 +51,21 @@ inline typename queue<T,Sequence>::const_reference queue<T,Sequence>::back () co
   return c.back (); 
 }
 
-//вставка в очередь
+//РІСЃС‚Р°РІРєР° РІ РѕС‡РµСЂРµРґСЊ
 template <class T,class Sequence>
 inline void queue<T,Sequence>::push (const value_type& x) 
 { 
   c.push_back (x); 
 }
 
-//извлечение из очереди
+//РёР·РІР»РµС‡РµРЅРёРµ РёР· РѕС‡РµСЂРµРґРё
 template <class T,class Sequence>
 inline void queue<T,Sequence>::pop () 
 { 
   c.pop_front (); 
 }
 
-//сравнение
+//СЃСЂР°РІРЅРµРЅРёРµ
 template <class T,class Sequence>
 inline bool queue<T,Sequence>::operator == (const queue& x) const
 {
@@ -103,7 +103,7 @@ inline bool queue<T,Sequence>::operator >= (const queue& x) const
 }
 
 /*
-    Очередь с приоритетами
+    РћС‡РµСЂРµРґСЊ СЃ РїСЂРёРѕСЂРёС‚РµС‚Р°РјРё
 */
 
 //constructors
@@ -146,7 +146,7 @@ inline priority_queue<T,Sequence,Compare>::priority_queue (Iter first,Iter last,
   make_heap (c.begin (),c.end (),comp);
 }
 
-//функции общего назначения
+//С„СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 template <class T,class Sequence,class Compare>  
 inline bool priority_queue<T,Sequence,Compare>::empty () const 
 { 
@@ -159,14 +159,14 @@ inline typename priority_queue<T,Sequence,Compare>::size_type priority_queue<T,S
   return c.size (); 
 }
   
-//доступ
+//РґРѕСЃС‚СѓРї
 template <class T,class Sequence,class Compare>  
 inline typename priority_queue<T,Sequence,Compare>::const_reference priority_queue<T,Sequence,Compare>::top () const 
 { 
   return c.front (); 
 }
 
-//вставка в очередь
+//РІСЃС‚Р°РІРєР° РІ РѕС‡РµСЂРµРґСЊ
 template <class T,class Sequence,class Compare>  
 void priority_queue<T,Sequence,Compare>::push (const value_type& x) 
 {
@@ -182,7 +182,7 @@ void priority_queue<T,Sequence,Compare>::push (const value_type& x)
   }
 }
 
-//извлечение из очереди
+//РёР·РІР»РµС‡РµРЅРёРµ РёР· РѕС‡РµСЂРµРґРё
 template <class T,class Sequence,class Compare>  
 void priority_queue<T,Sequence,Compare>::pop () 
 {

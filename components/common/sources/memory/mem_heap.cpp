@@ -11,7 +11,7 @@
 using namespace common;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 inline size_t AlignSize (size_t size,size_t align)
@@ -29,7 +29,7 @@ inline void* AlignPtr (void* p,size_t align,size_t offset)
   return (char*)(((size_t)p+offset+align-1)&~(align-1))-offset;
 }
 
-//взятие индекса дерева по размеру блока (реализация этой функции взята из dlmalloc)
+//РІР·СЏС‚РёРµ РёРЅРґРµРєСЃР° РґРµСЂРµРІР° РїРѕ СЂР°Р·РјРµСЂСѓ Р±Р»РѕРєР° (СЂРµР°Р»РёР·Р°С†РёСЏ СЌС‚РѕР№ С„СѓРЅРєС†РёРё РІР·СЏС‚Р° РёР· dlmalloc)
 inline size_t GetTreeIndex (size_t size) 
 {
   size_t X = size >> MEDIUM_TREE_INDEX_SHIFT;
@@ -52,7 +52,7 @@ inline size_t GetTreeIndex (size_t size)
 }
 
 /*
-    Работа со статистикой
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃС‚Р°С‚РёСЃС‚РёРєРѕР№
 */
 
 void HeapInternalStat::Init ()
@@ -63,7 +63,7 @@ void HeapInternalStat::Init ()
 }
 
 /*
-    Инициализация / завершение
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ / Р·Р°РІРµСЂС€РµРЅРёРµ
 */
 
 Heap::Impl::Impl (Heap* heap,ICustomAllocator* allocator)
@@ -79,7 +79,7 @@ Heap::Impl::Impl (Heap* heap,ICustomAllocator* allocator)
   sys_deallocate_count      = 0;
   sys_allocate_size         = 0;
   sys_deallocate_size       = 0;  
-  max_heap_size             = (size_t)-1; //размер не ограничен
+  max_heap_size             = (size_t)-1; //СЂР°Р·РјРµСЂ РЅРµ РѕРіСЂР°РЅРёС‡РµРЅ
   small_granularity         = DEFAULT_SMALL_GRANULARITY;
   medium_granularity        = DEFAULT_MEDIUM_GRANULARITY;
   medium_max_block_size     = DEFAULT_MEDIUM_MAX_BLOCK_SIZE;
@@ -108,7 +108,7 @@ Heap::Impl::~Impl ()
 }
 
 /*
-    Распределение страниц памяти    
+    Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ СЃС‚СЂР°РЅРёС† РїР°РјСЏС‚Рё    
 */
 
 MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size)
@@ -237,7 +237,7 @@ void Heap::Impl::TrimFreePages (size_t limit)
 }
 
 /*
-    Распределение блоков малого размера
+    Р Р°СЃРїСЂРµРґРµР»РµРЅРёРµ Р±Р»РѕРєРѕРІ РјР°Р»РѕРіРѕ СЂР°Р·РјРµСЂР°
 */
 
 void* Heap::Impl::AllocSmallBlock (size_t size)
@@ -294,7 +294,7 @@ void Heap::Impl::FreeSmallBlock (void* p)
 }
 
 /*
-    Управление выделением памяти средних блоков
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС‹РґРµР»РµРЅРёРµРј РїР°РјСЏС‚Рё СЃСЂРµРґРЅРёС… Р±Р»РѕРєРѕРІ
 */
 
 inline void Heap::Impl::InsertMediumBlock (MediumBlock* block)
@@ -314,7 +314,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size)
   MediumBlockTree& tree  = medium_tree [GetTreeIndex (size)]; 
   MediumBlock*     block = NULL;
 
-  //имеет смысл упростить логику условных выражений!!
+  //РёРјРµРµС‚ СЃРјС‹СЃР» СѓРїСЂРѕСЃС‚РёС‚СЊ Р»РѕРіРёРєСѓ СѓСЃР»РѕРІРЅС‹С… РІС‹СЂР°Р¶РµРЅРёР№!!
   
   if (size <= tree.max_block_size)
   {
@@ -327,7 +327,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size)
       if (block->size == block->page->size)
         RemoveFreePage (block->page);
           
-      if (block->size - size >= MEDIUM_MIN_BLOCK_SIZE + sizeof (MediumAllocBlock)) //разделяем блок на два
+      if (block->size - size >= MEDIUM_MIN_BLOCK_SIZE + sizeof (MediumAllocBlock)) //СЂР°Р·РґРµР»СЏРµРј Р±Р»РѕРє РЅР° РґРІР°
       { 
         MediumBlock* reserved_block = (MediumBlock*)((char*)block+size);
         
@@ -348,7 +348,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size)
     else block = NULL;
   }
 
-  if (!block && medium_top && medium_top->size >= size) //размещаем блок на доступной вершине
+  if (!block && medium_top && medium_top->size >= size) //СЂР°Р·РјРµС‰Р°РµРј Р±Р»РѕРє РЅР° РґРѕСЃС‚СѓРїРЅРѕР№ РІРµСЂС€РёРЅРµ
   {    
     default_node.stat.medium_top_use_count++;
     
@@ -357,7 +357,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size)
     if (medium_top->page->size == medium_top->size)
       RemoveFreePage (medium_top->page);      
     
-    if (block->size - size >= MEDIUM_MIN_BLOCK_SIZE + sizeof (MediumAllocBlock)) //разрезаем блок
+    if (block->size - size >= MEDIUM_MIN_BLOCK_SIZE + sizeof (MediumAllocBlock)) //СЂР°Р·СЂРµР·Р°РµРј Р±Р»РѕРє
     {
       MediumBlock* new_top = (MediumBlock*)((char*)block+size);
     
@@ -448,7 +448,7 @@ void Heap::Impl::FreeMediumBlock (void* p)
   stat.medium_deallocate_count [tree_index]++;  
   stat.medium_deallocate_size [tree_index] += block->size;
 
-  if (prev && prev->is_free) //объединяем данный блок с предыдущим
+  if (prev && prev->is_free) //РѕР±СЉРµРґРёРЅСЏРµРј РґР°РЅРЅС‹Р№ Р±Р»РѕРє СЃ РїСЂРµРґС‹РґСѓС‰РёРј
   {      
     RemoveMediumBlock (prev);
 
@@ -461,7 +461,7 @@ void Heap::Impl::FreeMediumBlock (void* p)
     block = prev;    
   }
 
-  if (next && next->is_free) //объединяем данный блок с следующим
+  if (next && next->is_free) //РѕР±СЉРµРґРёРЅСЏРµРј РґР°РЅРЅС‹Р№ Р±Р»РѕРє СЃ СЃР»РµРґСѓСЋС‰РёРј
   {
     if (next != medium_top)
       RemoveMediumBlock (next);
@@ -487,7 +487,7 @@ void Heap::Impl::FreeMediumBlock (void* p)
 }
 
 /*
-    Выделение блоков большого размера
+    Р’С‹РґРµР»РµРЅРёРµ Р±Р»РѕРєРѕРІ Р±РѕР»СЊС€РѕРіРѕ СЂР°Р·РјРµСЂР°
 */
 
 void* Heap::Impl::AllocLargeBlock (size_t size)
@@ -528,7 +528,7 @@ void Heap::Impl::FreeLargeBlock (void* p)
 }
 
 /*
-    Инициализация / завершение работы менеджера памяти
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ / Р·Р°РІРµСЂС€РµРЅРёРµ СЂР°Р±РѕС‚С‹ РјРµРЅРµРґР¶РµСЂР° РїР°РјСЏС‚Рё
 */
 
 Heap::Heap ()
@@ -574,7 +574,7 @@ Heap::~Heap ()
 }
 
 /*
-    Установка пользовательских обработчиков событий менеджера памяти
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РјРµРЅРµРґР¶РµСЂР° РїР°РјСЏС‚Рё
 */
 
 void Heap::SetFailHandler (const FailHandler& handler)
@@ -598,7 +598,7 @@ const Heap::DebugHandler& Heap::GetDebugHandler () const
 }
 
 /*
-    Конфигурирование менеджера памяти
+    РљРѕРЅС„РёРіСѓСЂРёСЂРѕРІР°РЅРёРµ РјРµРЅРµРґР¶РµСЂР° РїР°РјСЏС‚Рё
 */
 
 void Heap::SetGranularity (size_t small_granularity,size_t medium_granularity)
@@ -618,7 +618,7 @@ size_t Heap::GetMediumGranularity () const
 }
 
 /*
-    Заказ / освобождение памяти
+    Р—Р°РєР°Р· / РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
 */
 
 void* Heap::TryAllocate (size_t size)
@@ -654,7 +654,7 @@ void* Heap::TryAllocate (size_t size)
 
 void* Heap::TryAllocate (size_t size,size_t align,size_t offset)
 {
-  if (align & (align-1)) //проверка случая, когда align не является степенью двойки
+  if (align & (align-1)) //РїСЂРѕРІРµСЂРєР° СЃР»СѓС‡Р°СЏ, РєРѕРіРґР° align РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃС‚РµРїРµРЅСЊСЋ РґРІРѕР№РєРё
     return NULL;
     
   if (align < ALIGN_SIZE)
@@ -802,7 +802,7 @@ size_t Heap::Size (void* p) const
 }
 
 /*
-    Работа с резервом неисользуемых страниц
+    Р Р°Р±РѕС‚Р° СЃ СЂРµР·РµСЂРІРѕРј РЅРµРёСЃРѕР»СЊР·СѓРµРјС‹С… СЃС‚СЂР°РЅРёС†
 */
 
 void Heap::SetReserveSize (size_t min_size,size_t max_size)
@@ -845,7 +845,7 @@ void Heap::FlushReserve ()
 }
 
 /*
-    Работа с контекстами распределения
+    Р Р°Р±РѕС‚Р° СЃ РєРѕРЅС‚РµРєСЃС‚Р°РјРё СЂР°СЃРїСЂРµРґРµР»РµРЅРёСЏ
 */
 
 AllocationContext Heap::GetDefaultContext () const
@@ -854,7 +854,7 @@ AllocationContext Heap::GetDefaultContext () const
 }
 
 /*
-    Получение статистики
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚Р°С‚РёСЃС‚РёРєРё
 */
 
 void Heap::GetStatistics (HeapStat& stat)

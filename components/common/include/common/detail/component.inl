@@ -3,7 +3,7 @@
 */
 
 /*
-    Конструктор / деструктор    
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ    
 */
 
 template <class Component>
@@ -32,7 +32,7 @@ ComponentRegistrator<Component>::~ComponentRegistrator ()
 }
 
 /*
-    Загрузка / выгрузка по умолчанию
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 template <class Component>

@@ -1,4 +1,4 @@
-//Тестирование конструктора (allocator)
+//╨в╨╡╤Б╤В╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨║╨╛╨╜╤Б╤В╤А╤Г╨║╤В╨╛╤А╨░ (allocator)
 #include <stdio.h>
 #include <stl/string>
 

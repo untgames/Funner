@@ -28,20 +28,20 @@ class TestInput;
 
 TestInput* current_input = 0;
 
-//тестовое устройство ввода
+//С‚РµСЃС‚РѕРІРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІРІРѕРґР°
 class TestInput: virtual public IDevice, public xtl::reference_counter
 {
   public:
     TestInput  () {current_input = this;}
     ~TestInput () {current_input = 0;}
 
-///Получение имени устройства
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
     const char* GetName () { return TEST_DEVICE_NAME; }
 
-///Полное имя устройства (тип.имя.идентификатор)
+///РџРѕР»РЅРѕРµ РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° (С‚РёРї.РёРјСЏ.РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ)
     const char* GetFullName () { return TEST_DEVICE_FULL_NAME; };
 
-///Получение имени контрола
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєРѕРЅС‚СЂРѕР»Р°
     const wchar_t* GetControlName (const char* control_id)
     { 
       control_name = common::towstring (control_id);
@@ -49,13 +49,13 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     }
 
 
-///Подписка на события устройства
+///РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
     xtl::connection RegisterEventHandler (const EventHandler& handler)
     {
       return signals.connect (handler);
     }
 
-///Настройки устройства
+///РќР°СЃС‚СЂРѕР№РєРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
     const char* GetProperties () {return "";}
     void        SetProperty   (const char* name, float value) 
     {
@@ -67,14 +67,14 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
       return 0;
     }    
 
-///Настройки устройства
+///РќР°СЃС‚СЂРѕР№РєРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
     void GenerateTestEvents ()
     {
       for (size_t i = 0; i < sizeof (EVENTS) / sizeof (EVENTS[0]); i++)
         signals (EVENTS[i]);
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }  
     void Release () { release (this); }
 
@@ -86,16 +86,16 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     stl::wstring control_name;
 };
 
-//тестовый драйвер
+//С‚РµСЃС‚РѕРІС‹Р№ РґСЂР°Р№РІРµСЂ
 class TestDriver: virtual public IDriver, public xtl::reference_counter
 {
   public:
     TestDriver () {}
 
-///Описание драйвера
+///РћРїРёСЃР°РЅРёРµ РґСЂР°Р№РІРµСЂР°
     const char* GetDescription () { return "TestDriver"; }
 
-///Перечисление доступных устройств ввода
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІРІРѕРґР°
     size_t      GetDevicesCount ()
     {
       return 1;
@@ -111,13 +111,13 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
       return TEST_DEVICE_FULL_NAME;
     }
 
-///Создаение устройства ввода
+///РЎРѕР·РґР°РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРІРѕРґР°
     IDevice* CreateDevice (const char* name, const char* init_string = "") 
     {
       return new TestInput;
     }
 
-///Установка функции отладочного протоколирования драйвера
+///РЈСЃС‚Р°РЅРѕРІРєР° С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ РґСЂР°Р№РІРµСЂР°
     void SetDebugLog (const LogHandler& in_log)
     {
       log_fn = in_log;
@@ -128,7 +128,7 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
       return log_fn;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }  
     void Release () { release (this); }
 

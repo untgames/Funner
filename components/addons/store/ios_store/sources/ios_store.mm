@@ -32,14 +32,14 @@ void finish_transaction_handler (const Transaction& transaction, const Transacti
   callback (true, "");
 }
 
-// Слушатель событий обновления транзакций
+// РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РѕР±РЅРѕРІР»РµРЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёР№
 class ITransactionObserverListener
 {
   public:
-    //Деструктор
+    //Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     virtual ~ITransactionObserverListener () {}
 
-    //События
+    //РЎРѕР±С‹С‚РёСЏ
     virtual void OnTransactionsRemoved (NSArray* transactions) = 0;
     virtual void OnDownloadsUpdated (NSArray* downloads) = 0;
     virtual void OnTransactionsUpdated (NSArray* transactions) = 0;
@@ -47,14 +47,14 @@ class ITransactionObserverListener
     virtual void OnRestoreCompletedTransactionsFailedWithError (NSError* error) = 0;
 };
 
-// Слушатель событий обновления транзакций
+// РЎР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РѕР±РЅРѕРІР»РµРЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёР№
 class IProductsRequestListener
 {
   public:
-    //Деструктор
+    //Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     virtual ~IProductsRequestListener () {}
 
-    //События
+    //РЎРѕР±С‹С‚РёСЏ
     virtual void OnProductsLoaded (NSArray* products, const char* product_id, size_t quantity) = 0;
     virtual void OnProductsRequestFinished (ProductsRequestDelegate* delegate) = 0;
     virtual void OnProductsRequestFailed (ProductsRequestDelegate* delegate, NSError* error) = 0;
@@ -247,13 +247,13 @@ namespace
 {
 
 /*
-   Реализация магазина
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°РіР°Р·РёРЅР°
 */
 
 class IOSStore : public ITransactionObserverListener, public IProductsRequestListener
 {
   public:
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     IOSStore  ()
       : log (LOG_NAME)
       , restore_purchases_in_progress (false)
@@ -288,14 +288,14 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       [running_products_requests_delegats release];
     }
 
-///Можно ли осуществлять покупки
+///РњРѕР¶РЅРѕ Р»Рё РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊ РїРѕРєСѓРїРєРё
     bool CanBuyProducts ()
     {
       return [SKPaymentQueue canMakePayments];
     }
 
-///Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-///products ответа может содержать не все запрошенные продукты)
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРІР°СЂР°С… (products_ids - СЂР°Р·РґРµР»РµРЅРЅС‹Р№ РїСЂРѕР±РµР»Р°РјРё СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїСЂРѕРґСѓРєС‚РѕРІ,
+///products РѕС‚РІРµС‚Р° РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРµ РІСЃРµ Р·Р°РїСЂРѕС€РµРЅРЅС‹Рµ РїСЂРѕРґСѓРєС‚С‹)
     void LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
     {
       try
@@ -341,7 +341,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       log.Printf ("Can't load products information, error '%s'", [[error description] UTF8String]);
     }
 
-///Покупка / восстановление покупок
+///РџРѕРєСѓРїРєР° / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕРєСѓРїРѕРє
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
     {
       TransactionsArray transactions = pending_transactions;
@@ -396,7 +396,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
             NotifyTransactionUpdated (iter->transaction);
 
-            pending_transactions.erase (iter);  //удаляем транзакцию, поскольку настоящей транзакции для нее не создавалось
+            pending_transactions.erase (iter);  //СѓРґР°Р»СЏРµРј С‚СЂР°РЅР·Р°РєС†РёСЋ, РїРѕСЃРєРѕР»СЊРєСѓ РЅР°СЃС‚РѕСЏС‰РµР№ С‚СЂР°РЅР·Р°РєС†РёРё РґР»СЏ РЅРµРµ РЅРµ СЃРѕР·РґР°РІР°Р»РѕСЃСЊ
             break;
           }
         }
@@ -628,7 +628,7 @@ typedef common::Singleton<IOSStore> StoreSingleton;
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StoreImpl::StoreImpl ()
@@ -640,7 +640,7 @@ StoreImpl::~StoreImpl ()
 }
 
 /*
-   Инициализация
+   РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 */
 
 void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
@@ -649,7 +649,7 @@ void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 }
 
 /*
-   Описание магазина
+   РћРїРёСЃР°РЅРёРµ РјР°РіР°Р·РёРЅР°
 */
 
 const char* StoreImpl::Description ()
@@ -658,7 +658,7 @@ const char* StoreImpl::Description ()
 }
 
 /*
-   Можно ли осуществлять покупки
+   РњРѕР¶РЅРѕ Р»Рё РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊ РїРѕРєСѓРїРєРё
 */
 
 bool StoreImpl::CanBuyProducts ()
@@ -667,8 +667,8 @@ bool StoreImpl::CanBuyProducts ()
 }
 
 /*
-   Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
-   products ответа может содержать не все запрошенные продукты)
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРІР°СЂР°С… (products_ids - СЂР°Р·РґРµР»РµРЅРЅС‹Р№ РїСЂРѕР±РµР»Р°РјРё СЃРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїСЂРѕРґСѓРєС‚РѕРІ,
+   products РѕС‚РІРµС‚Р° РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ РЅРµ РІСЃРµ Р·Р°РїСЂРѕС€РµРЅРЅС‹Рµ РїСЂРѕРґСѓРєС‚С‹)
 */
 
 void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback)
@@ -677,7 +677,7 @@ void StoreImpl::LoadProducts (const char* product_ids, const Store::LoadProducts
 }
 
 /*
-   Покупка / восстановление покупок
+   РџРѕРєСѓРїРєР° / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕРєСѓРїРѕРє
 */
 
 xtl::connection StoreImpl::RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)

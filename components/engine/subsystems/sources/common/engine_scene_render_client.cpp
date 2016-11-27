@@ -25,23 +25,23 @@ namespace scene_render_client_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  COMPONENT_NAME            = "engine.subsystems.SceneRenderClientSubsystem"; //имя компонента
-const char*  LOG_NAME                  = COMPONENT_NAME;                                 //имя протокола
-const char*  SUBSYSTEM_NAME            = "SceneRenderClient";                            //подсистема
-const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                              //резервируемое количество целей отрисовки
+const char*  COMPONENT_NAME            = "engine.subsystems.SceneRenderClientSubsystem"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char*  LOG_NAME                  = COMPONENT_NAME;                                 //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
+const char*  SUBSYSTEM_NAME            = "SceneRenderClient";                            //РїРѕРґСЃРёСЃС‚РµРјР°
+const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                              //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С†РµР»РµР№ РѕС‚СЂРёСЃРѕРІРєРё
 
 /*
-   Подсистема рендера сцены
+   РџРѕРґСЃРёСЃС‚РµРјР° СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
 */
 
 class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Screen>, public IAttachmentRegistryListener<media::FontLibrary>,
   public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SceneRenderClientSubsystem (common::ParseNode& node, SubsystemManager& in_manager)
       : log (LOG_NAME)
       , client (get<const char*> (node, "ConnectionName"), get<const char*> (node, "InitString", ""), get<size_t> (node, "LogonTimeout", size_t (-1)))
@@ -120,7 +120,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       }
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~SceneRenderClientSubsystem ()
     {
       resource_server = 0;      
@@ -129,7 +129,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
-/// События установки/удаления экрана
+/// РЎРѕР±С‹С‚РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё/СѓРґР°Р»РµРЅРёСЏ СЌРєСЂР°РЅР°
     void OnRegisterAttachment (const char* attachment_name, scene_graph::Screen& screen)
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
@@ -154,7 +154,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       render_target.SetScreen (0);
     }
 
-/// События установки/удаления библиотеки шрифтов
+/// РЎРѕР±С‹С‚РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё/СѓРґР°Р»РµРЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
     void OnRegisterAttachment (const char* name, media::FontLibrary& library)
     {
       if (!font_libraries.count (name))
@@ -171,7 +171,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       client.DetachFontLibrary (library);
     }
 
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
     }
@@ -222,7 +222,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -235,7 +235,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       {
         RenderTargetDesc& desc = **iter;
 
-          //проверка синхронизации с частотой обновления кадров
+          //РїСЂРѕРІРµСЂРєР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЃ С‡Р°СЃС‚РѕС‚РѕР№ РѕР±РЅРѕРІР»РµРЅРёСЏ РєР°РґСЂРѕРІ
           
         if (current_time - desc.last_update_time < desc.update_delay)
         {
@@ -243,7 +243,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
           continue;
         }
 
-          //обновление цели рендеринга
+          //РѕР±РЅРѕРІР»РµРЅРёРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
           
         desc.last_update_time = current_time;          
         if (!desc.on_before_update.empty ())
@@ -261,13 +261,13 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
         ++iter;
       }
 
-        //если все цели рендеринга удалены - перерисовывать нечего
+        //РµСЃР»Рё РІСЃРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР° СѓРґР°Р»РµРЅС‹ - РїРµСЂРµСЂРёСЃРѕРІС‹РІР°С‚СЊ РЅРµС‡РµРіРѕ
 
       if (idle_render_targets.empty ())
         idle_connection.disconnect ();
     }
 
-      //пауза приложения
+      //РїР°СѓР·Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnPause ()
     {
       resource_server->DisableNotifications ();
@@ -277,7 +277,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       client.Finish ();
     }
 
-      //восстановление приложения
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnResume ()
     {
       resource_server->EnableNotifications ();
@@ -285,7 +285,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       SubscribeToOnIdle ();
     }
 
-      //подспика на событие OnIdle
+      //РїРѕРґСЃРїРёРєР° РЅР° СЃРѕР±С‹С‚РёРµ OnIdle
     void SubscribeToOnIdle ()
     {
       idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderClientSubsystem::OnIdle, this));
@@ -334,20 +334,20 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
 
   private:
-    Log                                              log;                      //лог
-    Client                                           client;                   //клиент рендеринга
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //сервер ресурсов рендеринга
-    ScreenMap                                        screen_map;               //соответствие экранов и рендер-таргетов
-    FontLibrarySet                                   font_libraries;           //библиотеки шрифтов
-    xtl::auto_connection                             idle_connection;          //соединение обновления рендер-таргетов
-    xtl::auto_connection                             on_app_pause_connection;  //соединение паузы приложения
-    xtl::auto_connection                             on_app_resume_connection; //соединение восстановления приложения
-    RenderTargetArray                                idle_render_targets;      //список автоматически обновляемых целей рендеринга
+    Log                                              log;                      //Р»РѕРі
+    Client                                           client;                   //РєР»РёРµРЅС‚ СЂРµРЅРґРµСЂРёРЅРіР°
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //СЃРµСЂРІРµСЂ СЂРµСЃСѓСЂСЃРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
+    ScreenMap                                        screen_map;               //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЌРєСЂР°РЅРѕРІ Рё СЂРµРЅРґРµСЂ-С‚Р°СЂРіРµС‚РѕРІ
+    FontLibrarySet                                   font_libraries;           //Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
+    xtl::auto_connection                             idle_connection;          //СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЂРµРЅРґРµСЂ-С‚Р°СЂРіРµС‚РѕРІ
+    xtl::auto_connection                             on_app_pause_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ РїР°СѓР·С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    xtl::auto_connection                             on_app_resume_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    RenderTargetArray                                idle_render_targets;      //СЃРїРёСЃРѕРє Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РѕР±РЅРѕРІР»СЏРµРјС‹С… С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
     SubsystemManager&                                manager;
 };
 
 /*
-   Компонент регистрации рендера сцены
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
 */
 
 class SceneRenderClientComponent

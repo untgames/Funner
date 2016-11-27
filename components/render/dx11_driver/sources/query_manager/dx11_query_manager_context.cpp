@@ -10,16 +10,16 @@ using namespace render::low_level::dx11;
 */
 
 /*
-    Описание реализации состояния контекста менеджера запросов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 struct QueryManagerContextState::Impl: public DeviceObject
 {
-  QueryPtr predicate;       //предикат отрисовки
-  bool     predicate_value; //значение предиката
-  bool     is_dirty;        //флаг "грязности"
+  QueryPtr predicate;       //РїСЂРµРґРёРєР°С‚ РѕС‚СЂРёСЃРѕРІРєРё
+  bool     predicate_value; //Р·РЅР°С‡РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°
+  bool     is_dirty;        //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
     , predicate_value ()
@@ -27,12 +27,12 @@ struct QueryManagerContextState::Impl: public DeviceObject
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl ()
   {
   }
 
-/// Обновление состояния
+/// РћР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
   void UpdateNotify ()
   {
     is_dirty = true;
@@ -40,7 +40,7 @@ struct QueryManagerContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 QueryManagerContextState::QueryManagerContextState (const DeviceManager& manager)
@@ -58,7 +58,7 @@ QueryManagerContextState::~QueryManagerContextState ()
 }
 
 /*
-    Реализация
+    Р РµР°Р»РёР·Р°С†РёСЏ
 */
 
 QueryManagerContextState::Impl& QueryManagerContextState::GetImpl () const
@@ -67,7 +67,7 @@ QueryManagerContextState::Impl& QueryManagerContextState::GetImpl () const
 }
 
 /*
-    Управление предикатами отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void QueryManagerContextState::SetPredication (IPredicate* in_predicate, bool predicate_value)
@@ -105,7 +105,7 @@ bool QueryManagerContextState::GetPredicateValue ()
 }
 
 /*
-    Копирование состояния
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void QueryManagerContextState::CopyTo (const StateBlockMask& mask, QueryManagerContextState& dst_state) const
@@ -129,14 +129,14 @@ void QueryManagerContextState::CopyTo (const StateBlockMask& mask, QueryManagerC
 */
 
 /*
-    Описание реализации контекста менеджера запросов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 struct QueryManagerContext::Impl: public QueryManagerContextState::Impl
 {
-  DxContextPtr context; //контекст отрисовки
+  DxContextPtr context; //РєРѕРЅС‚РµРєСЃС‚ РѕС‚СЂРёСЃРѕРІРєРё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager, const DxContextPtr& in_context)
     : QueryManagerContextState::Impl (manager)
     , context (in_context)
@@ -147,7 +147,7 @@ struct QueryManagerContext::Impl: public QueryManagerContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 QueryManagerContext::QueryManagerContext (const DeviceManager& manager, const DxContextPtr& context)
@@ -160,7 +160,7 @@ QueryManagerContext::~QueryManagerContext ()
 }
 
 /*
-    Реализация
+    Р РµР°Р»РёР·Р°С†РёСЏ
 */
 
 QueryManagerContext::Impl& QueryManagerContext::GetImpl () const
@@ -169,7 +169,7 @@ QueryManagerContext::Impl& QueryManagerContext::GetImpl () const
 }
 
 /*
-    Указание границ запроса
+    РЈРєР°Р·Р°РЅРёРµ РіСЂР°РЅРёС† Р·Р°РїСЂРѕСЃР°
 */
 
 void QueryManagerContext::Begin (IQuery* async)
@@ -213,14 +213,14 @@ void QueryManagerContext::End (IQuery* async)
 }
 
 /*
-    Установка состояния уровня в контекст
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 void QueryManagerContext::Bind ()
 {
   try
   {
-      //проверка флага "грязности"
+      //РїСЂРѕРІРµСЂРєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     Impl& impl = GetImpl ();
 
@@ -229,7 +229,7 @@ void QueryManagerContext::Bind ()
 
     impl.context->SetPredication (impl.predicate ? static_cast<ID3D11Predicate*> (&impl.predicate->GetHandle ()) : (ID3D11Predicate*)0, impl.predicate_value);
 
-      //очистка флага "грязности"
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     impl.is_dirty = false;
   }

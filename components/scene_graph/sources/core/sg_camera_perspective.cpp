@@ -8,19 +8,19 @@ using namespace bound_volumes;
 const float EPS = 1e-6f;
 
 /*
-    Описание реализации PerspectiveCamera
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PerspectiveCamera
 */
 
 struct PerspectiveCamera::Impl: public xtl::instance_counter<PerspectiveCamera>
 {
-  anglef fov_x;  //угол обзора по горизонтали
-  anglef fov_y;  //угол обзора по вертикали
-  float  z_near; //ближняя плоскость отсечения
-  float  z_far;  //дальняя плоскость отсечения
+  anglef fov_x;  //СѓРіРѕР» РѕР±Р·РѕСЂР° РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+  anglef fov_y;  //СѓРіРѕР» РѕР±Р·РѕСЂР° РїРѕ РІРµСЂС‚РёРєР°Р»Рё
+  float  z_near; //Р±Р»РёР¶РЅСЏСЏ РїР»РѕСЃРєРѕСЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  float  z_far;  //РґР°Р»СЊРЅСЏСЏ РїР»РѕСЃРєРѕСЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PerspectiveCamera::PerspectiveCamera ()
@@ -38,7 +38,7 @@ PerspectiveCamera::~PerspectiveCamera ()
 }
 
 /*
-    Создание камеры
+    РЎРѕР·РґР°РЅРёРµ РєР°РјРµСЂС‹
 */
 
 PerspectiveCamera::Pointer PerspectiveCamera::Create ()
@@ -47,7 +47,7 @@ PerspectiveCamera::Pointer PerspectiveCamera::Create ()
 }
 
 /*
-    Параметры
+    РџР°СЂР°РјРµС‚СЂС‹
 */
 
 void PerspectiveCamera::SetFovX (const math::anglef& fov_x)
@@ -115,7 +115,7 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void PerspectiveCamera::UpdateBoundsCore ()
@@ -128,7 +128,7 @@ void PerspectiveCamera::UpdateBoundsCore ()
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void PerspectiveCamera::AcceptCore (Visitor& visitor)
@@ -138,7 +138,7 @@ void PerspectiveCamera::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void PerspectiveCamera::BindProperties (common::PropertyBindingMap& bindings)

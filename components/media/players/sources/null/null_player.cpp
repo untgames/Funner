@@ -16,63 +16,63 @@ namespace null_player
 const char* TARGET_NAME = "null";
 
 /*
-    Пустой проигрыватель
+    РџСѓСЃС‚РѕР№ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ
 */
 
 class NullPlayer: public IStreamPlayer
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     NullPlayer (const StreamPlayerManager::StreamEventHandler& in_handler)
       : handler (in_handler)
       {}
 
-///Длительность потока
+///Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РїРѕС‚РѕРєР°
     float Duration ()
     {
       return 1.f;
     }
 
-///Начать проигрывание
+///РќР°С‡Р°С‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Play ()
     {
       OnEvent (StreamEvent_OnPlay);
       OnEvent (StreamEvent_OnAutoStop);
     }
 
-///Приостановить проигрывание
+///РџСЂРёРѕСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Pause ()
     {
     }
 
-///Остановить проигрывание
+///РћСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
     void Stop ()
     {
       OnEvent (StreamEvent_OnManualStop);
     }
 
-///Установить позицию проигрывания
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetPosition (float position)
     {
     }
 
-///Получить позицию проигрывания
+///РџРѕР»СѓС‡РёС‚СЊ РїРѕР·РёС†РёСЋ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     float Position ()
     {
       return 0.f;
     }
 
-///Установка режима циклического проигрывания
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР° С†РёРєР»РёС‡РµСЃРєРѕРіРѕ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
     void SetLooping (bool state)
     {
     }
 
-///Установить громкость
+///РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіСЂРѕРјРєРѕСЃС‚СЊ
     void SetVolume (float volume)
     {
     }
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
     void OnEvent (StreamEvent event)
     {
       handler (this, event);
@@ -82,18 +82,18 @@ class NullPlayer: public IStreamPlayer
     typedef StreamPlayerManager::StreamEventHandler StreamEventHandler;
 
   private:
-    StreamEventHandler handler; //обработчик событий
+    StreamEventHandler handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№
 };
 
 
 /*
-   Компонент проигрывания медиа
+   РљРѕРјРїРѕРЅРµРЅС‚ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РјРµРґРёР°
 */
 
 class PlayerComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     PlayerComponent ()
     {
       StreamPlayerManager::RegisterPlayer (TARGET_NAME, &PlayerComponent::CreatePlayer);

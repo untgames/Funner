@@ -12,7 +12,7 @@ using namespace input;
 class InputEventListener::List::Iterator: public xtl::noncopyable
 {
   public:
-    ///Конструктор
+    ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Iterator (List* in_list)
       : list (in_list)
       , item (in_list->first)
@@ -21,13 +21,13 @@ class InputEventListener::List::Iterator: public xtl::noncopyable
       list->first_iterator = this;
     }
     
-    ///Деструктор
+    ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Iterator ()
     {
       list->first_iterator = next_iterator;
     }
 
-    ///Получение текущего элемента и перемемещение к следующему
+    ///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° Рё РїРµСЂРµРјРµРјРµС‰РµРЅРёРµ Рє СЃР»РµРґСѓСЋС‰РµРјСѓ
     InputEventListener* Next ()
     {
       if (!item)
@@ -40,10 +40,10 @@ class InputEventListener::List::Iterator: public xtl::noncopyable
       return result;
     }
     
-    ///Следующий итератор
+    ///РЎР»РµРґСѓСЋС‰РёР№ РёС‚РµСЂР°С‚РѕСЂ
     Iterator* NextIterator () { return next_iterator; }
     
-    ///Оповещение об удалении слушателя
+    ///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё СЃР»СѓС€Р°С‚РµР»СЏ
     void OnRemove (InputEventListener* entry)
     {
       if (entry != item)
@@ -52,7 +52,7 @@ class InputEventListener::List::Iterator: public xtl::noncopyable
       Next ();
     }
     
-    ///Оповещение о добавлении слушателя
+    ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РґРѕР±Р°РІР»РµРЅРёРё СЃР»СѓС€Р°С‚РµР»СЏ
     void OnAdd (InputEventListener* entry)
     {
       if (item || entry != list->last)
@@ -74,7 +74,7 @@ class InputEventListener::List::Iterator: public xtl::noncopyable
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputEventListener::List::List ()
@@ -90,7 +90,7 @@ InputEventListener::List::~List ()
 }
 
 /*
-    Оповещение
+    РћРїРѕРІРµС‰РµРЅРёРµ
 */
 
 void InputEventListener::List::BroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position)
@@ -110,7 +110,7 @@ void InputEventListener::List::BroadcastTouch (InputPort& input_port, const Touc
 }
 
 /*
-    Удаление всех нажатий, связанных с указанной областью ввода
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РЅР°Р¶Р°С‚РёР№, СЃРІСЏР·Р°РЅРЅС‹С… СЃ СѓРєР°Р·Р°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚СЊСЋ РІРІРѕРґР°
 */
 
 void InputEventListener::List::RemoveAllTouches (InputPort& input_port)
@@ -130,7 +130,7 @@ void InputEventListener::List::RemoveAllTouches (InputPort& input_port)
 }
 
 /*
-    Отсоединение всех
+    РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ РІСЃРµС…
 */
 
 void InputEventListener::List::DetachAll ()
@@ -146,7 +146,7 @@ void InputEventListener::List::DetachAll ()
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputEventListener::InputEventListener ()
@@ -162,7 +162,7 @@ InputEventListener::~InputEventListener ()
 }
 
 /*
-    Присоединение слушателя к списку
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ Рє СЃРїРёСЃРєСѓ
 */
 
 void InputEventListener::Attach (List& new_list)

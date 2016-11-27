@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Получение семейства объекта
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРµРјРµР№СЃС‚РІР° РѕР±СЉРµРєС‚Р°
 */
 
 void Object::GetFamily (ObjectFamily& family, void*& root)

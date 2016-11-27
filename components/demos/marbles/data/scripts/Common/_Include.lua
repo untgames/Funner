@@ -1,6 +1,6 @@
 CommonScriptsFolder="data/scripts/Common"
 
--- подключение независимых файлов
+-- РїРѕРґРєР»СЋС‡РµРЅРёРµ РЅРµР·Р°РІРёСЃРёРјС‹С… С„Р°Р№Р»РѕРІ
 dofile(CommonScriptsFolder.."/assert.lua")
 dofile(CommonScriptsFolder.."/ConvertToFunction.lua")
 dofile(CommonScriptsFolder.."/CreateMethodForObject.lua")
@@ -8,14 +8,14 @@ dofile(CommonScriptsFolder.."/TempGlobals.lua")
 dofile(CommonScriptsFolder.."/GetScriptByName.lua")
 dofile(CommonScriptsFolder.."/ResourceManager.lua")
       InitResourceManager()
---подключение папок c базовыми функциями
+--РїРѕРґРєР»СЋС‡РµРЅРёРµ РїР°РїРѕРє c Р±Р°Р·РѕРІС‹РјРё С„СѓРЅРєС†РёСЏРјРё
 dofile(CommonScriptsFolder.."/String/_Include.lua")
 dofile(CommonScriptsFolder.."/Draw/_Include.lua")
 dofile(CommonScriptsFolder.."/Table/_Include.lua")
 dofile(CommonScriptsFolder.."/Timing/_Include.lua")
 dofile(CommonScriptsFolder.."/XML/_Include.lua")
 
---подключение зависимых файлов
+--РїРѕРґРєР»СЋС‡РµРЅРёРµ Р·Р°РІРёСЃРёРјС‹С… С„Р°Р№Р»РѕРІ
 dofile(CommonScriptsFolder.."/AddEventManager.lua")
 dofile(CommonScriptsFolder.."/Mouse.lua")
       InitMouse()

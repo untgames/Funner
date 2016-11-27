@@ -4,10 +4,10 @@ using namespace render::low_level;
 using namespace render::low_level::helpers;
 using namespace common;
 
-const size_t PROPERTY_ARRAY_RESERVE = 8; //количество резервируемых свойств
+const size_t PROPERTY_ARRAY_RESERVE = 8; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР·РµСЂРІРёСЂСѓРµРјС‹С… СЃРІРѕР№СЃС‚РІ
 
 /*
-    Описание реализации PropertyList
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PropertyList
 */
 
 namespace
@@ -26,11 +26,11 @@ typedef stl::vector<Property*> PropertyArray;
 
 struct PropertyList::Impl
 {
-  PropertyArray properties; //свойства
+  PropertyArray properties; //СЃРІРѕР№СЃС‚РІР°
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PropertyList::PropertyList ()
@@ -45,7 +45,7 @@ PropertyList::~PropertyList ()
 }
 
 /*
-    Количество свойств
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t PropertyList::GetSize ()
@@ -54,7 +54,7 @@ size_t PropertyList::GetSize ()
 }
 
 /*
-    Получение ключа и его значения
+    РџРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡Р° Рё РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 const char* PropertyList::GetKey (size_t index)
@@ -74,7 +74,7 @@ const char* PropertyList::GetValue (size_t index)
 }
 
 /*
-    Добавление / удаление свойств
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t PropertyList::AddProperty (const char* key, const char* value)
@@ -113,7 +113,7 @@ void PropertyList::RemovePropery (size_t index)
 }
 
 /*
-    Удаление всех свойств
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyList::Clear ()

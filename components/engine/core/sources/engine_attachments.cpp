@@ -6,13 +6,13 @@ namespace
 {
 
 /*
-    Ключ к реестре
+    РљР»СЋС‡ Рє СЂРµРµСЃС‚СЂРµ
 */
 
 struct AttachmentKey
 {
-  size_t                name_hash; //хэш имени
-  const std::type_info* type;      //тип точки привязки
+  size_t                name_hash; //С…СЌС€ РёРјРµРЅРё
+  const std::type_info* type;      //С‚РёРї С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
   
   AttachmentKey (const char* name, const std::type_info& in_type) :
     name_hash (common::strhash (name)), type (&in_type) {}
@@ -31,24 +31,24 @@ namespace engine
 {
 
 /*
-    Реализация менеджера точек привязки
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 */
 
 class AttachmentRegistryImpl: public xtl::reference_counter
 {
   public:
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~AttachmentRegistryImpl ()
     {
       UnregisterAll ();
     }
   
-///Регистрация точки привязки
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     void Register (const char* name, detail::IBasicAttachment* attachment)
     {
       static const char* METHOD_NAME = "engine::AttachmentRegistry::Register";
       
-        //проверка корректности аргументов, захват ресурсов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ, Р·Р°С…РІР°С‚ СЂРµСЃСѓСЂСЃРѕРІ
       
       if (!attachment)
         throw xtl::make_null_argument_exception (METHOD_NAME, "attachment");
@@ -59,14 +59,14 @@ class AttachmentRegistryImpl: public xtl::reference_counter
       if (!name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-        //поиск вхождения в карту точек привязки
+        //РїРѕРёСЃРє РІС…РѕР¶РґРµРЅРёСЏ РІ РєР°СЂС‚Сѓ С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 
       AttachmentKey           key (name, type);
       AttachmentMap::iterator iter = attachments.find (key);
       
       if (iter == attachments.end ())
       {
-          //добавление новой точки привязки
+          //РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
         attachments.insert_pair (key, AttachmentEntryPtr (new AttachmentEntry (name, type, attachment_holder), false));
       }
@@ -75,18 +75,18 @@ class AttachmentRegistryImpl: public xtl::reference_counter
         iter->second->attachment = attachment_holder;
       }
 
-        //оповещение об установке новой точки привязки
+        //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ РЅРѕРІРѕР№ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
       RegisterAttachmentNotify (name, type, attachment);      
     }
     
-///Отмена регистрации точки привязки
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     void Unregister (const char* name, const std::type_info& type)
     {
       if (!name)
         return;
 
-        //поиск точки привязки
+        //РїРѕРёСЃРє С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
       AttachmentKey           key (name, type);
       AttachmentMap::iterator iter = attachments.find (key);
@@ -94,18 +94,18 @@ class AttachmentRegistryImpl: public xtl::reference_counter
       if (iter == attachments.end ())
         return;
 
-        //оповещение об удалении точки привязки
+        //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
       AttachmentEntry& entry = *iter->second;
 
       UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
 
-        //удаление точки привязки
+        //СѓРґР°Р»РµРЅРёРµ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
       attachments.erase (iter);
     }
     
-///Отмена регистрации всех точек привязки определённого типа
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё РѕРїСЂРµРґРµР»С‘РЅРЅРѕРіРѕ С‚РёРїР°
     void UnregisterAll (const std::type_info& type)
     {
       for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end ();)
@@ -115,13 +115,13 @@ class AttachmentRegistryImpl: public xtl::reference_counter
 
           ++next;
 
-            //оповещение об удалении точки привязки
+            //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
           AttachmentEntry& entry = *iter->second;
 
           UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
 
-            //удаление точки привязки
+            //СѓРґР°Р»РµРЅРёРµ С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
           attachments.erase (iter);
 
@@ -130,12 +130,12 @@ class AttachmentRegistryImpl: public xtl::reference_counter
         else ++iter;
     }
     
-///Отмена регистрации всех точек привязки
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
     void UnregisterAll ()
     {
       for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end (); ++iter)
       {
-          //оповещение об удалении точки привязки
+          //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
 
         AttachmentEntry& entry = *iter->second;
 
@@ -145,12 +145,12 @@ class AttachmentRegistryImpl: public xtl::reference_counter
       attachments.clear ();
     }
 
-///Поиск точки привязки
+///РџРѕРёСЃРє С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     detail::IBasicAttachment* Find (const char* name, const std::type_info& type, bool raise_exception)
     {
       static const char* METHOD_NAME = "engine::AttachmentRegistryImpl::Find";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!name)
       {
@@ -160,7 +160,7 @@ class AttachmentRegistryImpl: public xtl::reference_counter
         return 0;
       }
       
-        //поиск точки привязки по имени
+        //РїРѕРёСЃРє С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё РїРѕ РёРјРµРЅРё
       
       AttachmentKey           key (name, type);
       AttachmentMap::iterator iter = attachments.find (key);
@@ -176,12 +176,12 @@ class AttachmentRegistryImpl: public xtl::reference_counter
       return iter->second->attachment.get ();
     }
 
-///Добавление слушателя событий
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
     void Attach (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode)
     {
       static const char* METHOD_NAME = "engine::AttachmentRegistryImpl::Attach";
       
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!listener)
         throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
@@ -195,11 +195,11 @@ class AttachmentRegistryImpl: public xtl::reference_counter
           throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
       }
 
-        //добавление слушателя
+        //РґРѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 
       listeners.push_back (ListenerEntry (type, listener));      
       
-        //принудительное оповещение о регистрации точек привязки
+        //РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ СЂРµРіРёСЃС‚СЂР°С†РёРё С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
         
       if (mode == AttachmentRegistryAttachMode_ForceNotify)
       {        
@@ -215,17 +215,17 @@ class AttachmentRegistryImpl: public xtl::reference_counter
             }
             catch (...)
             {
-              //подавление всех исключений
+              //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
             }
           }
         }
       }
     }
     
-///Удаление слушателя событий
+///РЈРґР°Р»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
     void Detach (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode)
     {
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
       if (!listener)
         return;
@@ -248,7 +248,7 @@ class AttachmentRegistryImpl: public xtl::reference_counter
           
           IBasicAttachmentRegistryListener* listener = iter->listener;
           
-            //принудительное оповещение об отмене регистрации точек привязки
+            //РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕС‚РјРµРЅРµ СЂРµРіРёСЃС‚СЂР°С†РёРё С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
 
           if (mode == AttachmentRegistryAttachMode_ForceNotify)
           {        
@@ -264,13 +264,13 @@ class AttachmentRegistryImpl: public xtl::reference_counter
                 }
                 catch (...)
                 {
-                  //подавление всех исключений
+                  //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
                 }
               }
             }
           }          
 
-            //удаление слушателя
+            //СѓРґР°Р»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 
           listeners.erase (iter);
 
@@ -280,7 +280,7 @@ class AttachmentRegistryImpl: public xtl::reference_counter
     }
     
   private:
-///Оповещение о регистрации точки привязки
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЂРµРіРёСЃС‚СЂР°С†РёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     void RegisterAttachmentNotify (const char* name, const std::type_info& type, detail::IBasicAttachment* attachment)
     {
       for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end (); ++iter)
@@ -292,12 +292,12 @@ class AttachmentRegistryImpl: public xtl::reference_counter
           }
           catch (...)
           {
-            //подавление всех исключений
+            //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
           }
         }
     }
 
-///Оповещение об удалении точки привязки
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё С‚РѕС‡РєРё РїСЂРёРІСЏР·РєРё
     void UnregisterAttachmentNotify (const char* name, const std::type_info& type, detail::IBasicAttachment* attachment)
     {
       for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end (); ++iter)
@@ -309,7 +309,7 @@ class AttachmentRegistryImpl: public xtl::reference_counter
           }
           catch (...)
           {
-            //подавление всех исключений
+            //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
           }
         }
     }
@@ -341,8 +341,8 @@ class AttachmentRegistryImpl: public xtl::reference_counter
     typedef stl::list<ListenerEntry>                         ListenerList;
 
   private:
-    AttachmentMap attachments; //карта точек привязки
-    ListenerList  listeners;   //слушатели
+    AttachmentMap attachments; //РєР°СЂС‚Р° С‚РѕС‡РµРє РїСЂРёРІСЏР·РєРё
+    ListenerList  listeners;   //СЃР»СѓС€Р°С‚РµР»Рё
 };
 
 typedef common::Singleton<AttachmentRegistryImpl> AttachmentRegistrySingleton;
@@ -350,7 +350,7 @@ typedef common::Singleton<AttachmentRegistryImpl> AttachmentRegistrySingleton;
 }
 
 /*
-    Врапперы над вызовами к AttachmentRegistry
+    Р’СЂР°РїРїРµСЂС‹ РЅР°Рґ РІС‹Р·РѕРІР°РјРё Рє AttachmentRegistry
 */
 
 void AttachmentRegistry::RegisterCore (const char* name, detail::IBasicAttachment* attachment)

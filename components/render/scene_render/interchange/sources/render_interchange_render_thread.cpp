@@ -14,15 +14,15 @@ typedef xtl::com_ptr<IConnection> ConnectionPtr;
 
 struct RenderThread::Impl: public xtl::reference_counter
 {
-  stl::string            name;                   //имя нити
-  common::Log            log;                    //поток протоколирования
-  stl::string            manager_name;           //имя менеджера соединения
-  CommandQueue           command_queue;          //очередь команд
-  volatile bool          stop_request;           //флаг запроса остановки нити
-  IRenderThreadListener* listener;               //слушатель событий нити
-  syslib::Thread         thread;                 //нить
+  stl::string            name;                   //РёРјСЏ РЅРёС‚Рё
+  common::Log            log;                    //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+  stl::string            manager_name;           //РёРјСЏ РјРµРЅРµРґР¶РµСЂР° СЃРѕРµРґРёРЅРµРЅРёСЏ
+  CommandQueue           command_queue;          //РѕС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ
+  volatile bool          stop_request;           //С„Р»Р°Рі Р·Р°РїСЂРѕСЃР° РѕСЃС‚Р°РЅРѕРІРєРё РЅРёС‚Рё
+  IRenderThreadListener* listener;               //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РЅРёС‚Рё
+  syslib::Thread         thread;                 //РЅРёС‚СЊ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_name, size_t render_queue_size, IRenderThreadListener* in_listener)
     : name (common::format ("%s.%s", LOG_NAME, in_name))
     , log (name.c_str ())
@@ -33,7 +33,7 @@ struct RenderThread::Impl: public xtl::reference_counter
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -47,17 +47,17 @@ struct RenderThread::Impl: public xtl::reference_counter
     }
   }
 
-///Соединение посредник
+///РЎРѕРµРґРёРЅРµРЅРёРµ РїРѕСЃСЂРµРґРЅРёРє
   class ProxyConnection: public IConnection, public xtl::reference_counter, public xtl::trackable
   {
     public:
-      /// Конструктор
+      /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
       ProxyConnection (Impl* in_impl, IConnection* in_source_connection) : impl (in_impl), source_connection (in_source_connection) {}
 
-      /// Является ли соединение внутрипроцессным
+      /// РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
       bool IsInprocessed () { return source_connection->IsInprocessed (); }
 
-      /// Обработка входного потока данных
+      /// РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
       void ProcessCommands (const CommandBuffer& commands)
       {
         try
@@ -71,10 +71,10 @@ struct RenderThread::Impl: public xtl::reference_counter
         }
       }
 
-      /// Получение события оповещения об удалении
+      /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
       xtl::trackable& GetTrackable () { return *this; }
 
-      /// Подсчет ссылок
+      /// РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
       void AddRef  () { addref (this); }
       void Release () { release (this); }
 
@@ -83,7 +83,7 @@ struct RenderThread::Impl: public xtl::reference_counter
       ConnectionPtr            source_connection;
   };
 
-/// Цикл нити
+/// Р¦РёРєР» РЅРёС‚Рё
   int Run ()
   {
     try
@@ -104,11 +104,11 @@ struct RenderThread::Impl: public xtl::reference_counter
     {
       try
       {
-          //обработка системных сообщений
+          //РѕР±СЂР°Р±РѕС‚РєР° СЃРёСЃС‚РµРјРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 
         syslib::Application::ProcessThreadMessages ();
 
-          //обработка очереди команд
+          //РѕР±СЂР°Р±РѕС‚РєР° РѕС‡РµСЂРµРґРё РєРѕРјР°РЅРґ
 
         CommandQueueItem command;
 
@@ -146,7 +146,7 @@ struct RenderThread::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 RenderThread::RenderThread (const char* name, size_t render_queue_size, IRenderThreadListener* listener)
@@ -186,7 +186,7 @@ RenderThread& RenderThread::operator = (const RenderThread& thread)
 }
 
 /*
-    Ожидание незавершеных операций
+    РћР¶РёРґР°РЅРёРµ РЅРµР·Р°РІРµСЂС€РµРЅС‹С… РѕРїРµСЂР°С†РёР№
 */
 
 namespace
@@ -197,10 +197,10 @@ typedef xtl::shared_ptr<syslib::Semaphore> SemaphorePtr;
 class WaiterConnection: public IConnection, public xtl::reference_counter, public xtl::trackable
 {
   public:
-    /// Конструктор
+    /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WaiterConnection (const SemaphorePtr& in_semaphore) : semaphore (in_semaphore) {}
 
-    /// Деструктор
+    /// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~WaiterConnection () 
     {
       try
@@ -212,16 +212,16 @@ class WaiterConnection: public IConnection, public xtl::reference_counter, publi
       }
     }
 
-    /// Является ли соединение внутрипроцессным
+    /// РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
     bool IsInprocessed () { return true; }
 
-    /// Обработка входного потока данных
+    /// РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
     void ProcessCommands (const CommandBuffer&) { }
 
-    /// Получение события оповещения об удалении
+    /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
     xtl::trackable& GetTrackable () { return *this; }
 
-    /// Подсчет ссылок
+    /// РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
@@ -264,7 +264,7 @@ void RenderThread::WaitQueuedCommands ()
 
 
 /*
-    Создание соединения-посредника
+    РЎРѕР·РґР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ-РїРѕСЃСЂРµРґРЅРёРєР°
 */
 
 IConnection* RenderThread::CreateConnection (IConnection* source_connection)
@@ -299,13 +299,13 @@ class CreatorConnection: public IConnection, public xtl::reference_counter, publ
 
     typedef xtl::shared_ptr<Result> ResultPtr;
 
-    /// Конструктор
+    /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     CreatorConnection (const ResultPtr& in_result, const CreatorFn& in_fn) : result (in_result), fn (in_fn) {}
 
-    /// Является ли соединение внутрипроцессным
+    /// РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
     bool IsInprocessed () { return true; }
 
-    /// Обработка входного потока данных
+    /// РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
     void ProcessCommands (const CommandBuffer&)
     {
       try
@@ -330,10 +330,10 @@ class CreatorConnection: public IConnection, public xtl::reference_counter, publ
       }
     }
 
-    /// Получение события оповещения об удалении
+    /// РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
     xtl::trackable& GetTrackable () { return *this; }
 
-    /// Подсчет ссылок
+    /// РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 

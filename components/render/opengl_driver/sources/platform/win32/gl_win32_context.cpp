@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::windows;
 
 /*
-    Описание реализации контекста OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° OpenGL
 */
 
 typedef xtl::com_ptr<Adapter>          AdapterPtr;
@@ -13,16 +13,16 @@ typedef stl::vector<IContextListener*> ListenerArray;
 
 struct Context::Impl: public IContextLostListener
 {
-  Log                         log;                   //протокол
-  AdapterPtr                  adapter;               //адаптер
-  HGLRC                       context;               //контекст OpenGL
-  int                         pixel_format;          //формат пикселей
-  ISwapChain*                 swap_chain;            //текущая цепочка обмена
-  HDC                         device_context;        //контекст устройства текущей цепочки обмена
-  bool                        vsync;                 //включена ли вертикальная синхронизация
-  const WglExtensionEntries*  wgl_extension_entries; //таблица WGL-расширений
-  xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
-  ListenerArray               listeners;             //слушатели событий контекста
+  Log                         log;                   //РїСЂРѕС‚РѕРєРѕР»
+  AdapterPtr                  adapter;               //Р°РґР°РїС‚РµСЂ
+  HGLRC                       context;               //РєРѕРЅС‚РµРєСЃС‚ OpenGL
+  int                         pixel_format;          //С„РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№
+  ISwapChain*                 swap_chain;            //С‚РµРєСѓС‰Р°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  HDC                         device_context;        //РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  bool                        vsync;                 //РІРєР»СЋС‡РµРЅР° Р»Рё РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
+  const WglExtensionEntries*  wgl_extension_entries; //С‚Р°Р±Р»РёС†Р° WGL-СЂР°СЃС€РёСЂРµРЅРёР№
+  xtl::trackable::slot_type   on_destroy_swap_chain; //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  ListenerArray               listeners;             //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РєРѕРЅС‚РµРєСЃС‚Р°
 
   Impl ()
     : context (0)
@@ -35,14 +35,14 @@ struct Context::Impl: public IContextLostListener
   {
   }
 
-///Установка вертикальной синхронизации
+///РЈСЃС‚Р°РЅРѕРІРєР° РІРµСЂС‚РёРєР°Р»СЊРЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
   void SetVSync ()
   {
     if (wgl_extension_entries->SwapIntervalEXT)
       wgl_extension_entries->SwapIntervalEXT (vsync);
   }
 
-///Обработчик удаления цепочки обмена
+///РћР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
   void OnDestroySwapChain ()
   {
     swap_chain            = 0;
@@ -51,7 +51,7 @@ struct Context::Impl: public IContextLostListener
     wgl_extension_entries = 0;
   }
 
-///Оповещение о потере контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕС‚РµСЂРµ РєРѕРЅС‚РµРєСЃС‚Р°
   void LostCurrentNotify ()
   {
     try
@@ -61,11 +61,11 @@ struct Context::Impl: public IContextLostListener
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Оповещение об установке текущего контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void SetCurrentNotify ()
   {
     try
@@ -75,11 +75,11 @@ struct Context::Impl: public IContextLostListener
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }    
   }
 
-///Обработчик события потери текущего контекста
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РїРѕС‚РµСЂРё С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void OnLostCurrent ()
   {
     LostCurrentNotify ();
@@ -87,7 +87,7 @@ struct Context::Impl: public IContextLostListener
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Context::Context (ISwapChain* in_swap_chain)
@@ -95,29 +95,29 @@ Context::Context (ISwapChain* in_swap_chain)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
     ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");    
     
-      //инициализация адаптера
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р°РґР°РїС‚РµСЂР°
       
     impl->adapter = swap_chain->GetAdapterImpl ();
     
-      //получение контекста устройства отрисовки
+      //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
     HDC dc = swap_chain->GetDC ();    
 
-      //получение формата пикселей
+      //РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
     impl->pixel_format = swap_chain->GetPixelFormat ();
 
     if (!impl->pixel_format)
       throw xtl::format_operation_exception ("", "Null pixel format");
 
-      //создание контекста
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->context = impl->adapter->GetLibrary ().CreateContext (dc);    
 
@@ -143,7 +143,7 @@ Context::~Context ()
     
     IAdapterLibrary& library = impl->adapter->GetLibrary ();
 
-      //отмена текущего контекста
+      //РѕС‚РјРµРЅР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     if (library.GetCurrentContext () == impl->context)
     {
@@ -152,7 +152,7 @@ Context::~Context ()
       library.MakeCurrent (0, 0);
     }
 
-      //удаление контекста
+      //СѓРґР°Р»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
       
     impl->log.Printf ("...delete context (handle=%08X)", impl->context);
 
@@ -162,12 +162,12 @@ Context::~Context ()
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Установка текущего контектса
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєС‚СЃР°
 */
 
 void Context::MakeCurrent (ISwapChain* swap_chain)
@@ -179,7 +179,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       
     if (swap_chain != impl->swap_chain)
     {
-        //изменение текущей цепочки обмена
+        //РёР·РјРµРЅРµРЅРёРµ С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
 
@@ -188,20 +188,20 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       impl->vsync                 = casted_swap_chain->HasVSync ();
       impl->wgl_extension_entries = &casted_swap_chain->GetWglExtensionEntries ();
 
-        //подписка на событие удаления цепочки обмена
+        //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
     }
 
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->adapter->GetLibrary ().MakeCurrent (impl->device_context, impl->context, impl.get ());
 
-      //установка вертикальной синхронизации
+      //СѓСЃС‚Р°РЅРѕРІРєР° РІРµСЂС‚РёРєР°Р»СЊРЅРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 
     impl->SetVSync ();
 
-      //оповещение об установке текущего контекста
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->SetCurrentNotify ();
   }
@@ -213,7 +213,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 }
 
 /*
-   Проверка совместимости цепочки обмена с контекстом
+   РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 bool Context::IsCompatible (ISwapChain* in_swap_chain)
@@ -230,7 +230,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
 }
 
 /*
-    Получение интерфейса библиотеки OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° Р±РёР±Р»РёРѕС‚РµРєРё OpenGL
 */
 
 ILibrary& Context::GetLibrary ()
@@ -239,7 +239,7 @@ ILibrary& Context::GetLibrary ()
 }
 
 /*
-    Подписка на события контекста
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void Context::AttachListener (IContextListener* listener)

@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StreamBuffer::StreamBuffer ()
@@ -17,7 +17,7 @@ StreamBuffer::~StreamBuffer ()
 }
 
 /*
-    Установка пользовательского буфера
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 void StreamBuffer::SetBuffer (void* in_buffer, size_t in_buffer_size, bool in_is_user_buffer)
@@ -40,7 +40,7 @@ void StreamBuffer::SetUserBuffer (void* in_buffer, size_t in_buffer_size)
 }
 
 /*
-    Изменение размера буфера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР°
 */
 
 void StreamBuffer::Resize (size_t size, size_t initialized_size)

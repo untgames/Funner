@@ -42,7 +42,7 @@ const char* get_name (InputZoneNotification id)
 
 
 /*
-    Описание реализации зоны ввода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р·РѕРЅС‹ РІРІРѕРґР°
 */
 
 namespace
@@ -65,17 +65,17 @@ typedef stl::vector<ZoneImpl> ZoneImplArray;
 
 struct InputZoneModel::Impl
 {
-  NotificationSignal         notifications [InputZoneNotification_Num]; //оповещения зоны
-  NotificationSignal         default_notification_signal;               //обработчик оповещений по умолчанию
-  EventSignal                event_signals [InputZoneEvent_Num];        //сигналы зоны
-  bool                       is_active;                                 //активна ли зона
-  bool                       bounds_auto_update;                        //резжим автоматического обновления ограничивающего объема
-  ZoneImplArray              zones_impl;                                //реализации зон
-  math::mat4f                inv_world_tm;                              //инвертированная матрица мирового преобразования
-  bool                       need_update_inv_world_tm;                  //инвертированная матрица мирового преобразования требует обновления
-  bool                       need_update_zones_internals;               //необходимо обновить внутреннее представление зон
+  NotificationSignal         notifications [InputZoneNotification_Num]; //РѕРїРѕРІРµС‰РµРЅРёСЏ Р·РѕРЅС‹
+  NotificationSignal         default_notification_signal;               //РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїРѕРІРµС‰РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  EventSignal                event_signals [InputZoneEvent_Num];        //СЃРёРіРЅР°Р»С‹ Р·РѕРЅС‹
+  bool                       is_active;                                 //Р°РєС‚РёРІРЅР° Р»Рё Р·РѕРЅР°
+  bool                       bounds_auto_update;                        //СЂРµР·Р¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РѕР±РЅРѕРІР»РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉРµРјР°
+  ZoneImplArray              zones_impl;                                //СЂРµР°Р»РёР·Р°С†РёРё Р·РѕРЅ
+  math::mat4f                inv_world_tm;                              //РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРЅР°СЏ РјР°С‚СЂРёС†Р° РјРёСЂРѕРІРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
+  bool                       need_update_inv_world_tm;                  //РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРЅР°СЏ РјР°С‚СЂРёС†Р° РјРёСЂРѕРІРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚СЂРµР±СѓРµС‚ РѕР±РЅРѕРІР»РµРЅРёСЏ
+  bool                       need_update_zones_internals;               //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІРёС‚СЊ РІРЅСѓС‚СЂРµРЅРЅРµРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Р·РѕРЅ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : is_active (true)
     , bounds_auto_update (true)
@@ -84,7 +84,7 @@ struct InputZoneModel::Impl
   {
   }    
 
-///Оповещение о событии
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (InputZoneModel& sender, InputZoneEvent event_id)
   {
     try
@@ -96,13 +96,13 @@ struct InputZoneModel::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputZoneModel::InputZoneModel ()
@@ -115,7 +115,7 @@ InputZoneModel::~InputZoneModel ()
 }
 
 /*
-    Количество зон / получение массива зон
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р·РѕРЅ / РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° Р·РѕРЅ
 */
 
 size_t InputZoneModel::ZoneDescsCount () const
@@ -129,7 +129,7 @@ const InputZoneModel::ZoneDesc* InputZoneModel::ZoneDescs () const
 }
 
 /*
-    Режим автоматического обновления ограничивающего объема
+    Р РµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РѕР±РЅРѕРІР»РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉРµРјР°
 */
 
 void InputZoneModel::SetBoundsAutoUpdate (bool state)
@@ -175,7 +175,7 @@ void InputZoneModel::UpdateZoneBounds ()
 }
 
 /*
-    Активность зоны
+    РђРєС‚РёРІРЅРѕСЃС‚СЊ Р·РѕРЅС‹
 */
 
 bool InputZoneModel::IsActive () const
@@ -196,7 +196,7 @@ void InputZoneModel::SetActive (bool state)
 }
 
 /*
-    Подписка на события модели
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРѕРґРµР»Рё
 */
 
 xtl::connection InputZoneModel::RegisterEventHandler (InputZoneEvent event_id, const EventHandler& event_handler) const
@@ -236,7 +236,7 @@ xtl::connection InputZoneModel::RegisterNotificationHandler (const NotificationH
 }
 
 /*
-    Оповещение о возникновении события ввода
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ РІРІРѕРґР°
 */
 
 void InputZoneModel::Notify (const Viewport& viewport, InputZoneNotification notification_id, const InputZoneNotificationContext& context) const
@@ -266,7 +266,7 @@ bool InputZoneModel::HasNotificationHandler (InputZoneNotification notification_
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void InputZoneModel::AcceptCore (Visitor& visitor)
@@ -276,7 +276,7 @@ void InputZoneModel::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Оповещение об изменении данных зоны
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґР°РЅРЅС‹С… Р·РѕРЅС‹
 */
 
 void InputZoneModel::UpdateZoneDescsNotify ()
@@ -292,7 +292,7 @@ void InputZoneModel::UpdateZoneDescsNotify ()
 }
 
 /*
-    Связывание свойств узла с методами узла
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ СѓР·Р»Р° СЃ РјРµС‚РѕРґР°РјРё СѓР·Р»Р°
 */
 
 void InputZoneModel::BindProperties (common::PropertyBindingMap& bindings)
@@ -303,7 +303,7 @@ void InputZoneModel::BindProperties (common::PropertyBindingMap& bindings)
 }
 
 /*
-    Оповещения
+    РћРїРѕРІРµС‰РµРЅРёСЏ
 */
 
 void InputZoneModel::AfterUpdateWorldTransformEvent ()
@@ -314,7 +314,7 @@ void InputZoneModel::AfterUpdateWorldTransformEvent ()
 }
 
 /*
-    Обновление дополнительной информации о зонах
+    РћР±РЅРѕРІР»РµРЅРёРµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·РѕРЅР°С…
 */
 
 void InputZoneModel::UpdateZoneInternals ()
@@ -363,7 +363,7 @@ void InputZoneModel::UpdateZoneInternals ()
 }
 
 /*
-    Проверка пересечения луча с зонами
+    РџСЂРѕРІРµСЂРєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ Р»СѓС‡Р° СЃ Р·РѕРЅР°РјРё
 */
 
 bool InputZoneModel::IsIntersected
@@ -377,12 +377,12 @@ bool InputZoneModel::IsIntersected
 {
   try
   {
-      //обновление внутреннего представления зон
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ Р·РѕРЅ
     
     if (impl->need_update_zones_internals)
       const_cast<InputZoneModel&> (*this).UpdateZoneInternals ();
       
-      //перевод луча в локальную систему координат
+      //РїРµСЂРµРІРѕРґ Р»СѓС‡Р° РІ Р»РѕРєР°Р»СЊРЅСѓСЋ СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
       
     math::vec3f local_ray_from, local_ray_to;
       
@@ -422,7 +422,7 @@ bool InputZoneModel::IsIntersected
     math::vec3f local_ray_dir = local_ray_to - local_ray_from;
     float       eps           = EPS * length (local_ray_dir);
     
-      //проверка пересечения
+      //РїСЂРѕРІРµСЂРєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ
       
     bool intersected = false, quasi_intersected = false;
     

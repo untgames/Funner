@@ -1,5 +1,5 @@
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T> 
@@ -17,7 +17,7 @@ inline void iter_swap (Iter1 a,Iter2 b)
 }
 
 /*
-    Возвращение случайного числа  
+    Р’РѕР·РІСЂР°С‰РµРЅРёРµ СЃР»СѓС‡Р°Р№РЅРѕРіРѕ С‡РёСЃР»Р°  
 */
 
 template <class Distance>
@@ -27,7 +27,7 @@ inline Distance random_number (Distance n)
 }
 
 /*
-    Минимум / максимум
+    РњРёРЅРёРјСѓРј / РјР°РєСЃРёРјСѓРј
 */
 
 template <class T,class Compare>
@@ -69,7 +69,7 @@ inline const T& median (const T& a,const T& b,const T& c,Compare less)
 }
 
 /*
-    Тривиальные случаи копирования (копирование примитивных типов данных)
+    РўСЂРёРІРёР°Р»СЊРЅС‹Рµ СЃР»СѓС‡Р°Рё РєРѕРїРёСЂРѕРІР°РЅРёСЏ (РєРѕРїРёСЂРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРЅС‹С… С‚РёРїРѕРІ РґР°РЅРЅС‹С…)
 */
 
 template <class T>
@@ -87,7 +87,7 @@ inline T* trivial_move (const T* first,const T* last,T* result)
 }
 
 /*
-    Копирование диапозона в прямом порядке
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РґРёР°РїРѕР·РѕРЅР° РІ РїСЂСЏРјРѕРј РїРѕСЂСЏРґРєРµ
 */
 
 template <class InIter,class OutIter>
@@ -138,7 +138,7 @@ inline OutIter copy (InIter first,InIter last,OutIter result)
 }
 
 /*
-    Копирование n элементов первого диапозона во второй
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ n СЌР»РµРјРµРЅС‚РѕРІ РїРµСЂРІРѕРіРѕ РґРёР°РїРѕР·РѕРЅР° РІРѕ РІС‚РѕСЂРѕР№
 */
 
 template <class InIter,class Size,class OutIter>
@@ -165,7 +165,7 @@ inline pair<InIter,OutIter> copy_n (InIter first,Size count,OutIter result)
 }
 
 /*
-    Копирование диапозона в обратном порядке
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РґРёР°РїРѕР·РѕРЅР° РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ
 */
 
 template <class InIter,class OutIter>
@@ -215,7 +215,7 @@ inline OutIter copy_backward (InIter first,InIter last,OutIter result)
 }
 
 /*
-    Инициализация диапозона 
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґРёР°РїРѕР·РѕРЅР° 
 */
 
 template <class InIter,class OutIter>
@@ -276,7 +276,7 @@ inline OutIter uninitialized_copy (InIter first,InIter last,OutIter result)
 }
 
 /*
-    Инициализация n первых элементов диапозона (копированием элементов из другого диапозона)
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ n РїРµСЂРІС‹С… СЌР»РµРјРµРЅС‚РѕРІ РґРёР°РїРѕР·РѕРЅР° (РєРѕРїРёСЂРѕРІР°РЅРёРµРј СЌР»РµРјРµРЅС‚РѕРІ РёР· РґСЂСѓРіРѕРіРѕ РґРёР°РїРѕР·РѕРЅР°)
 */
 
 template <class InIter,class Size,class OutIter>
@@ -320,7 +320,7 @@ inline pair<InIter,OutIter> uninitialized_copy_n (InIter first,Size count,OutIte
 }
 
 /*
-    Заполнение диапозона
+    Р—Р°РїРѕР»РЅРµРЅРёРµ РґРёР°РїРѕР·РѕРЅР°
 */
 
 template <class Iter,class T>
@@ -342,7 +342,7 @@ inline Iter fill_n (Iter first,Size n,const T& value)
 }
 
 /*
-    Инициализация диапозона значением value
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґРёР°РїРѕР·РѕРЅР° Р·РЅР°С‡РµРЅРёРµРј value
 */
 
 template <class Iter,class T>
@@ -409,7 +409,7 @@ inline void unitialized_fill (unsigned char* first,unsigned char* last,int c)
 }
 
 /*
-    Инициализация первых n элементов диапозона значением value
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРІС‹С… n СЌР»РµРјРµРЅС‚РѕРІ РґРёР°РїРѕР·РѕРЅР° Р·РЅР°С‡РµРЅРёРµРј value
 */
 
 template <class Iter,class Size,class T>
@@ -457,7 +457,7 @@ inline unsigned char* uninitialized_fill_n (unsigned char* first,size_t count,in
 }
 
 /*
-    Определение первого несовпадающего элемента диапозонов
+    РћРїСЂРµРґРµР»РµРЅРёРµ РїРµСЂРІРѕРіРѕ РЅРµСЃРѕРІРїР°РґР°СЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° РґРёР°РїРѕР·РѕРЅРѕРІ
 */
 
 template <class Iter1,class Iter2>
@@ -475,7 +475,7 @@ inline pair<Iter1,Iter2> mismatch (Iter1 first1,Iter1 last1,Iter2 first2,BinPred
 }
 
 /*
-    Предикат эквивалентности диапозонов
+    РџСЂРµРґРёРєР°С‚ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё РґРёР°РїРѕР·РѕРЅРѕРІ
 */
 
 template <class Iter1,class Iter2,class BinPredicate>
@@ -509,7 +509,7 @@ inline bool equal (const unsigned char* first1,const unsigned char* last1,const 
 }
 
 /*
-    Лексикографическое сравнение диапозонов
+    Р›РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРµ СЃСЂР°РІРЅРµРЅРёРµ РґРёР°РїРѕР·РѕРЅРѕРІ
 */
 
 template <class Iter1,class Iter2>

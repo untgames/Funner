@@ -4,7 +4,7 @@ using namespace syslib;
 
 #undef CreateWindow
 
-//TODO: исправить утечку
+//TODO: РёСЃРїСЂР°РІРёС‚СЊ СѓС‚РµС‡РєСѓ
 
 namespace
 {
@@ -26,7 +26,7 @@ struct WebViewInitializer
 typedef common::Singleton<WebViewInitializer> WebViewInitializerSingleton;
 
 /*
-    Копирование файла в папку temp
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р° РІ РїР°РїРєСѓ temp
 */
 
 class SysTempFile
@@ -34,7 +34,7 @@ class SysTempFile
   public:
     SysTempFile (const char* data, size_t data_size)
     {
-        //генерация имени нового файла
+        //РіРµРЅРµСЂР°С†РёСЏ РёРјРµРЅРё РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
         
       stl::wstring dir_name;
       
@@ -54,7 +54,7 @@ class SysTempFile
 
       file_name = common::tostring (wfile_name) + ".html";
         
-        //копирование содержимого
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
       
       #ifndef WINCE
         #undef CopyFile
@@ -85,29 +85,29 @@ class SysTempFile
     stl::string Path () const { return file_name; }
   
   private:
-    stl::string file_name; //имя файла
+    stl::string file_name; //РёРјСЏ С„Р°Р№Р»Р°
 };
 
 }
 
 /*
-    Реализация вида
+    Р РµР°Р»РёР·Р°С†РёСЏ РІРёРґР°
 */
 
 struct syslib::web_view_handle: public IUnknown
 {
-  IWebViewListener* listener;           //слушатель события вида
-  window_t          host_window;        //окно-контейнер
-  HWND              host_window_handle; //дескриптор окна-контейнера
-  long              ref_count;          //счетчик ссылок
-  bool              has_scroll_bars;    //есть ли возможность скроллирования
-  IWebBrowser2*     ibrowser;           //указатель на браузер
+  IWebViewListener* listener;           //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёСЏ РІРёРґР°
+  window_t          host_window;        //РѕРєРЅРѕ-РєРѕРЅС‚РµР№РЅРµСЂ
+  HWND              host_window_handle; //РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°-РєРѕРЅС‚РµР№РЅРµСЂР°
+  long              ref_count;          //СЃС‡РµС‚С‡РёРє СЃСЃС‹Р»РѕРє
+  bool              has_scroll_bars;    //РµСЃС‚СЊ Р»Рё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃРєСЂРѕР»Р»РёСЂРѕРІР°РЅРёСЏ
+  IWebBrowser2*     ibrowser;           //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р±СЂР°СѓР·РµСЂ
   DWORD             cookie;             //cookie
-  bool              is_loading;         //загружается ли контент
-  bool              can_go_forward;     //возможно ли перемещение вперед
-  bool              can_go_back;        //возможно ли перемещение назад
+  bool              is_loading;         //Р·Р°РіСЂСѓР¶Р°РµС‚СЃСЏ Р»Рё РєРѕРЅС‚РµРЅС‚
+  bool              can_go_forward;     //РІРѕР·РјРѕР¶РЅРѕ Р»Рё РїРµСЂРµРјРµС‰РµРЅРёРµ РІРїРµСЂРµРґ
+  bool              can_go_back;        //РІРѕР·РјРѕР¶РЅРѕ Р»Рё РїРµСЂРµРјРµС‰РµРЅРёРµ РЅР°Р·Р°Рґ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   web_view_handle (IWebViewListener* in_listener)
     : listener (in_listener)
     , host_window (WindowsWindowManager::CreateWindow (WindowStyle_PopUp, &WindowMessageHandler, 0, 0, this, 0))
@@ -187,7 +187,7 @@ struct syslib::web_view_handle: public IUnknown
     }
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~web_view_handle ()
   {
     try
@@ -199,7 +199,7 @@ struct syslib::web_view_handle: public IUnknown
     }
   }
 
-/// Закрытие окна    
+/// Р—Р°РєСЂС‹С‚РёРµ РѕРєРЅР°    
   void Close ()
   {
     IConnectionPointContainer* cpc = 0;
@@ -499,7 +499,7 @@ struct syslib::web_view_handle: public IUnknown
     HRESULT STDMETHODCALLTYPE EnableModeless        (BOOL)                                  { return S_OK; }    
   } ui_handler;
   
-///Обработчик событий окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
   static void WindowMessageHandler (window_t, WindowEvent event, const WindowEventContext& context, void* user_data)
   {
     if (!user_data)
@@ -536,7 +536,7 @@ struct syslib::web_view_handle: public IUnknown
     }
   }
 
-///Загрузка данных
+///Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
   void LoadRequest (const char* request)
   {
     stl::wstring wRequest = common::towstring (request);
@@ -561,7 +561,7 @@ struct syslib::web_view_handle: public IUnknown
     SysFreeString (bs);
   }
   
-///Фильтр загрузки
+///Р¤РёР»СЊС‚СЂ Р·Р°РіСЂСѓР·РєРё
   void BeforeNavigate2 (BSTR uri, short* cancel)
   {
     *cancel = FALSE;       
@@ -580,7 +580,7 @@ struct syslib::web_view_handle: public IUnknown
     }    
   }
   
-///Оповещение о конце загрузки
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РєРѕРЅС†Рµ Р·Р°РіСЂСѓР·РєРё
   void DocumentComplete (BSTR)
   {
     is_loading = false;
@@ -591,7 +591,7 @@ struct syslib::web_view_handle: public IUnknown
     listener->OnLoadFinished ();
   }
   
-///Оповещение о проблемах в загрузке документа
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРѕР±Р»РµРјР°С… РІ Р·Р°РіСЂСѓР·РєРµ РґРѕРєСѓРјРµРЅС‚Р°
   void DocumentLoadFailed (DWORD status)
   {
     is_loading = false;
@@ -645,18 +645,18 @@ struct syslib::web_view_handle: public IUnknown
 typedef web_view_handle WebViewImpl;
 
 /*
-    Создание/уничтожение web-view
+    РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t WindowsWindowManager::CreateWebView (IWebViewListener* listener)
 {
   try
   {
-      //статическая инициализация
+      //СЃС‚Р°С‚РёС‡РµСЃРєР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
       
     WebViewInitializerSingleton::Instance ();        
     
-      //создание вида
+      //СЃРѕР·РґР°РЅРёРµ РІРёРґР°
     
     stl::auto_ptr<web_view_handle> view (new web_view_handle (listener));
     
@@ -682,7 +682,7 @@ void WindowsWindowManager::DestroyWebView (web_view_t handle)
 }
 
 /*
-    Присоединенное окно
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t WindowsWindowManager::GetWindow (web_view_t handle)
@@ -696,7 +696,7 @@ window_t WindowsWindowManager::GetWindow (web_view_t handle)
 }
 
 /*
-    Загрузка данных
+    Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void WindowsWindowManager::LoadRequest (web_view_t handle, const char* request)
@@ -747,7 +747,7 @@ void WindowsWindowManager::LoadData (web_view_t handle, const char* data, size_t
 }
 
 /*
-    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void WindowsWindowManager::Reload (web_view_t handle)
@@ -811,7 +811,7 @@ bool WindowsWindowManager::IsLoading (web_view_t handle)
 }
 
 /*
-    Средства навигации
+    РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool WindowsWindowManager::CanGoBack (web_view_t handle)

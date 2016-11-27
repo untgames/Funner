@@ -8,7 +8,7 @@ namespace
 
 static const char* LOG_NAME = "media.xfont.XFontFontRasterizer";
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
@@ -25,7 +25,7 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
-//проверка размера на степень двойки
+//РїСЂРѕРІРµСЂРєР° СЂР°Р·РјРµСЂР° РЅР° СЃС‚РµРїРµРЅСЊ РґРІРѕР№РєРё
 bool is_power_of_two (size_t size)
 {
   return ((size - 1) & size) == 0;
@@ -40,15 +40,15 @@ namespace xfont
 {
 
 /*
-   Растеризатор шрифта
+   Р Р°СЃС‚РµСЂРёР·Р°С‚РѕСЂ С€СЂРёС„С‚Р°
 */
 
 struct XFontFontRasterizer::Impl
 {
-  RasterizedFontCreationParams params;      //параметры растеризации
-  RasterizedFontParamsPtr      font_params; //данные о шрифте
+  RasterizedFontCreationParams params;      //РїР°СЂР°РјРµС‚СЂС‹ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
+  RasterizedFontParamsPtr      font_params; //РґР°РЅРЅС‹Рµ Рѕ С€СЂРёС„С‚Рµ
 
-  ///Конструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RasterizedFontCreationParams& in_params, const RasterizedFontParamsPtr& in_font_params)
     : font_params (in_font_params)
   {
@@ -61,7 +61,7 @@ struct XFontFontRasterizer::Impl
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XFontFontRasterizer::XFontFontRasterizer (const RasterizedFontCreationParams& params, const RasterizedFontParamsPtr& font_params)
@@ -74,7 +74,7 @@ XFontFontRasterizer::~XFontFontRasterizer ()
 }
 
 /*
-   Получение информации о растрированных символах
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЂР°СЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… СЃРёРјРІРѕР»Р°С…
 */
 
 const RasterizedGlyphInfo* XFontFontRasterizer::RasterizedGlyphs ()
@@ -83,7 +83,7 @@ const RasterizedGlyphInfo* XFontFontRasterizer::RasterizedGlyphs ()
 }
 
 /*
-   Построение картинок
+   РџРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚РёРЅРѕРє
 */
 
 unsigned int XFontFontRasterizer::ImagesCount ()

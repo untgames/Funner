@@ -4,15 +4,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUPPORTED_VERSION = "1.4.1"; //номер поддерживаемой версии спецификации COLLADA
+const char* SUPPORTED_VERSION = "1.4.1"; //РЅРѕРјРµСЂ РїРѕРґРґРµСЂР¶РёРІР°РµРјРѕР№ РІРµСЂСЃРёРё СЃРїРµС†РёС„РёРєР°С†РёРё COLLADA
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DaeParser::DaeParser (const char* file_name, Model& in_model, const LogHandler& log)
@@ -36,7 +36,7 @@ DaeParser::~DaeParser ()
 }
 
 /*
-    Печать ошибок
+    РџРµС‡Р°С‚СЊ РѕС€РёР±РѕРє
 */
 
 void DaeParser::PrintLog (const LogHandler& log_fn)
@@ -50,12 +50,12 @@ void DaeParser::PrintLog (const LogHandler& log_fn)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Создание и поиск карт вершинных индексов
+    РЎРѕР·РґР°РЅРёРµ Рё РїРѕРёСЃРє РєР°СЂС‚ РІРµСЂС€РёРЅРЅС‹С… РёРЅРґРµРєСЃРѕРІ
 */
 
 VertexIndexMapPtr DaeParser::GetVertexIndicesMap (const char* mesh_id, size_t surface_index)
@@ -65,18 +65,18 @@ VertexIndexMapPtr DaeParser::GetVertexIndicesMap (const char* mesh_id, size_t su
 
   stl::string surface_name = common::format ("%s#%u", mesh_id, surface_index);
 
-    //попытка поиска карты вершинных индексов
+    //РїРѕРїС‹С‚РєР° РїРѕРёСЃРєР° РєР°СЂС‚С‹ РІРµСЂС€РёРЅРЅС‹С… РёРЅРґРµРєСЃРѕРІ
 
   VertexIndexMaps::iterator iter = vertex_index_maps.find (surface_name.c_str ());
 
   if (iter != vertex_index_maps.end ())
     return iter->second;
 
-    //создание карты вершинных индексов
+    //СЃРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹ РІРµСЂС€РёРЅРЅС‹С… РёРЅРґРµРєСЃРѕРІ
 
   VertexIndexMapPtr map (new VertexIndexMap, false);
 
-    //регистрация карты вершинных индексов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєР°СЂС‚С‹ РІРµСЂС€РёРЅРЅС‹С… РёРЅРґРµРєСЃРѕРІ
 
   vertex_index_maps.insert_pair (surface_name.c_str (), map);
 
@@ -84,7 +84,7 @@ VertexIndexMapPtr DaeParser::GetVertexIndicesMap (const char* mesh_id, size_t su
 }
 
 /*
-    Разбор корневого узла
+    Р Р°Р·Р±РѕСЂ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р°
 */
 
 void DaeParser::ParseRoot (Parser::Iterator iter)
@@ -98,7 +98,7 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
     iter->Log ().Warning (*iter, "Currently supported Collada version - %s, document uses other version (%s), "
       "some features may be not fully supported or unsupported", SUPPORTED_VERSION, version);
 
-    //чтение параметров создания файла
+    //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
   common::ParseNode asset_node = iter->First ("asset");
 
   if (!asset_node)
@@ -128,17 +128,17 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
     }
   }
 
-    //разбор библиотек
+    //СЂР°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
 
   ParseLibraries (iter);
 
-    //определение имени активной сцены
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ РёРјРµРЅРё Р°РєС‚РёРІРЅРѕР№ СЃС†РµРЅС‹
 
   const char* active_scene_name = get<const char*> (*iter, "scene.instance_visual_scene.url", "");
   
   if (*active_scene_name)
   {
-    active_scene_name++; //избавляемся от префиксного '#'
+    active_scene_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
     
     model.SetActiveSceneName (active_scene_name);
   }
@@ -149,7 +149,7 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
 }
 
 /*
-    Разбор библиотек
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 void DaeParser::ParseLibraries (Parser::Iterator iter)

@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FfpShaderManager::FfpShaderManager (const ContextManager& context_manager)
@@ -14,7 +14,7 @@ FfpShaderManager::FfpShaderManager (const ContextManager& context_manager)
 }
 
 /*
-    Количество поддерживаемых профилей
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РїСЂРѕС„РёР»РµР№
 */
 
 size_t FfpShaderManager::GetProfilesCount ()
@@ -23,7 +23,7 @@ size_t FfpShaderManager::GetProfilesCount ()
 }
 
 /*
-    Имена поддерживаемых профилей
+    РРјРµРЅР° РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РїСЂРѕС„РёР»РµР№
 */
 
 const char* FfpShaderManager::GetProfile (size_t index)
@@ -35,7 +35,7 @@ const char* FfpShaderManager::GetProfile (size_t index)
 }
 
 /*
-    Создание шейдера
+    РЎРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂР°
 */
 
 IShader* FfpShaderManager::CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log)
@@ -44,14 +44,14 @@ IShader* FfpShaderManager::CreateShader  (const ShaderDesc& shader_desc, const L
 }
 
 /*
-    Создание программы
+    РЎРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 ICompiledProgram* FfpShaderManager::CreateProgram (unsigned int shaders_count, IShader** shaders, const LogFunction&)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FfpShaderManager::CreateProgram";
 
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!shaders)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shaders");
@@ -64,7 +64,7 @@ ICompiledProgram* FfpShaderManager::CreateProgram (unsigned int shaders_count, I
   if (!program)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shaders[0]");
     
-    //создание не требуется поскольку программа совпадает с шейдером
+    //СЃРѕР·РґР°РЅРёРµ РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ РїРѕСЃРєРѕР»СЊРєСѓ РїСЂРѕРіСЂР°РјРјР° СЃРѕРІРїР°РґР°РµС‚ СЃ С€РµР№РґРµСЂРѕРј
 
   program->AddRef ();
 
@@ -72,7 +72,7 @@ ICompiledProgram* FfpShaderManager::CreateProgram (unsigned int shaders_count, I
 }
 
 /*
-    Создание менеджера шейдеров
+    РЎРѕР·РґР°РЅРёРµ РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРµСЂРѕРІ
 */
 
 namespace render

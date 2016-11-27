@@ -3,19 +3,19 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации цели рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct RenderTarget::Impl: public xtl::reference_counter
 {
   RenderTargetPtr render_target;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (RenderTargetImpl* in_rt_impl) : render_target (in_rt_impl) {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 RenderTarget::RenderTarget ()
@@ -52,7 +52,7 @@ RenderTarget& RenderTarget::operator = (const RenderTarget& target)
 }
 
 /*
-    Экран (политика владения - weak-ref)
+    Р­РєСЂР°РЅ (РїРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ - weak-ref)
 */
 
 void RenderTarget::SetScreen (scene_graph::Screen* screen)
@@ -88,7 +88,7 @@ scene_graph::Screen* RenderTarget::Screen () const
 }
 
 /*
-    Проверка связи цели рендеринга с рендером
+    РџСЂРѕРІРµСЂРєР° СЃРІСЏР·Рё С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР° СЃ СЂРµРЅРґРµСЂРѕРј
 */
 
 bool RenderTarget::IsBindedToRenderer () const
@@ -97,7 +97,7 @@ bool RenderTarget::IsBindedToRenderer () const
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void RenderTarget::Update ()
@@ -117,7 +117,7 @@ void RenderTarget::Update ()
 }
 
 /*
-    Захват изображения (screen-shot)
+    Р—Р°С…РІР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ (screen-shot)
 */
 
 void RenderTarget::CaptureImage (media::Image& image)
@@ -160,7 +160,7 @@ void RenderTarget::CaptureImage (const char* image_name)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void RenderTarget::Swap (RenderTarget& target)

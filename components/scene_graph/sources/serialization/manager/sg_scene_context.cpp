@@ -4,7 +4,7 @@ using namespace scene_graph;
 using detail::ISceneAttachment;
 
 /*
-    Описание реализации контекста сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° СЃС†РµРЅС‹
 */
 namespace
 {
@@ -12,7 +12,7 @@ namespace
 typedef xtl::shared_ptr<ISceneAttachment>                        AttachmentPtr;
 typedef stl::hash_map<stl::hash_key<const char*>, AttachmentPtr> AttachmentMap;
 
-///Реестр присоединенных данных
+///Р РµРµСЃС‚СЂ РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹С… РґР°РЅРЅС‹С…
 struct AttachmentRegistry: public xtl::reference_counter
 {
   AttachmentPtr anonymous_attachment;
@@ -27,14 +27,14 @@ typedef xtl::signal<bool (const char*)>                             ExceptionFil
 
 struct SceneContext::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneContext>
 {
-  common::PropertyMap   properties;       //свойства контекста
-  AttachmentRegistryMap attachments;      //присоединенные данные
-  ExceptionFilterSignal exception_filter; //фильтр ислючений
-  LogFunction           log_handler;      //обработчик событий протоколирования
+  common::PropertyMap   properties;       //СЃРІРѕР№СЃС‚РІР° РєРѕРЅС‚РµРєСЃС‚Р°
+  AttachmentRegistryMap attachments;      //РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ
+  ExceptionFilterSignal exception_filter; //С„РёР»СЊС‚СЂ РёСЃР»СЋС‡РµРЅРёР№
+  LogFunction           log_handler;      //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SceneContext::SceneContext ()
@@ -61,7 +61,7 @@ SceneContext& SceneContext::operator = (const SceneContext& context)
 }
 
 /*
-    Свойства
+    РЎРІРѕР№СЃС‚РІР°
 */
 
 common::PropertyMap SceneContext::Properties () const
@@ -75,7 +75,7 @@ void SceneContext::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-    Работа с присоединенными данными
+    Р Р°Р±РѕС‚Р° СЃ РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
 */
 
 void SceneContext::RaiseAttachmentError (const char* name, const std::type_info& type)
@@ -214,7 +214,7 @@ ISceneAttachment* SceneContext::FindAttachmentCore (const char* name, const std:
 }
 
 /*
-    Отсоединение всех данных
+    РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ РІСЃРµС… РґР°РЅРЅС‹С…
 */
 
 void SceneContext::DetachAllCore (const std::type_info& type)
@@ -228,7 +228,7 @@ void SceneContext::DetachAll ()
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void SceneContext::Clear ()
@@ -241,7 +241,7 @@ void SceneContext::Clear ()
 }
 
 /*
-    Обработчик ошибок создания сцены
+    РћР±СЂР°Р±РѕС‚С‡РёРє РѕС€РёР±РѕРє СЃРѕР·РґР°РЅРёСЏ СЃС†РµРЅС‹
 */
 
 namespace
@@ -286,7 +286,7 @@ bool SceneContext::FilterError (const char* error_message) const
 }
 
 /*
-    Поток протоколирования
+    РџРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 void SceneContext::SetLogHandler (const LogFunction& handler)
@@ -300,7 +300,7 @@ const SceneContext::LogFunction& SceneContext::LogHandler () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SceneContext::Swap (SceneContext& context)

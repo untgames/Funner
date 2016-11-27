@@ -5,17 +5,17 @@ using namespace media;
 using namespace common;
 
 /*
-    Реализация библиотеки
+    Р РµР°Р»РёР·Р°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 struct Material::Impl: public xtl::reference_counter
 {
-  stl::string effect; //эффект, связанный с материалом
-  stl::string id;     //идентификатор материала  
+  stl::string effect; //СЌС„С„РµРєС‚, СЃРІСЏР·Р°РЅРЅС‹Р№ СЃ РјР°С‚РµСЂРёР°Р»РѕРј
+  stl::string id;     //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р°  
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Material::Material ()
@@ -42,7 +42,7 @@ Material& Material::operator = (const Material& mtl)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Material Material::Clone () const
@@ -51,7 +51,7 @@ Material Material::Clone () const
 }
 
 /*
-    Идентификатор материала
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* Material::Id () const
@@ -68,7 +68,7 @@ void Material::SetId (const char* id)
 }
 
 /*
-    Эффект связанный с материалом
+    Р­С„С„РµРєС‚ СЃРІСЏР·Р°РЅРЅС‹Р№ СЃ РјР°С‚РµСЂРёР°Р»РѕРј
 */
 
 const char* Material::Effect () const

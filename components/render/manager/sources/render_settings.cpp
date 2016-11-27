@@ -3,12 +3,12 @@
 using namespace render::manager;
 
 /*
-    Описание реализации настроек менеджера рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РЅР°СЃС‚СЂРѕРµРє РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct Settings::Impl
 {
-  render::manager::LogLevel log_level; //уровень протоколирования
+  render::manager::LogLevel log_level; //СѓСЂРѕРІРµРЅСЊ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
   
   Impl ()
     : log_level (LogLevel_Default)
@@ -17,7 +17,7 @@ struct Settings::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Settings::Settings ()
@@ -30,7 +30,7 @@ Settings::~Settings ()
 }
 
 /*
-    Управление протоколированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµРј
 */
 
 void Settings::SetLogLevel (render::manager::LogLevel level)

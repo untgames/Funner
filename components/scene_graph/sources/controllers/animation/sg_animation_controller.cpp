@@ -14,24 +14,24 @@ namespace
 {
 
 /*
-    Констаты
+    РљРѕРЅСЃС‚Р°С‚С‹
 */
 
-const size_t RESERVED_ANIMATIONS_COUNT = 8;                       //резервируемое количество анимаций, одновременно присоединенных к контроллеру
-const size_t TIME_PRECISION            = 1000;                    //разрешающая способность таймера анимации
-const size_t BAD_TIME_NUMERATOR        = ~0u;                     //неверное время
-const char*  LOG_NAME                  = "scene_graph.animation"; //имя потока протоколирования
+const size_t RESERVED_ANIMATIONS_COUNT = 8;                       //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РЅРёРјР°С†РёР№, РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹С… Рє РєРѕРЅС‚СЂРѕР»Р»РµСЂСѓ
+const size_t TIME_PRECISION            = 1000;                    //СЂР°Р·СЂРµС€Р°СЋС‰Р°СЏ СЃРїРѕСЃРѕР±РЅРѕСЃС‚СЊ С‚Р°Р№РјРµСЂР° Р°РЅРёРјР°С†РёРё
+const size_t BAD_TIME_NUMERATOR        = ~0u;                     //РЅРµРІРµСЂРЅРѕРµ РІСЂРµРјСЏ
+const char*  LOG_NAME                  = "scene_graph.animation"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-///Карта отображения параметров анимации на параметры узлов
+///РљР°СЂС‚Р° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Р°РЅРёРјР°С†РёРё РЅР° РїР°СЂР°РјРµС‚СЂС‹ СѓР·Р»РѕРІ
 struct AnimationParameterNameMap
 {
-  media::animation::PropertyNameMap names; //карта имен
+  media::animation::PropertyNameMap names; //РєР°СЂС‚Р° РёРјРµРЅ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   AnimationParameterNameMap ()
   {
     names.Set ("position", "Position");
@@ -56,25 +56,25 @@ namespace scene_graph
 namespace controllers
 {
 
-///Описание реализации анимации
+///РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РЅРёРјР°С†РёРё
 struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, public xtl::noncopyable, public xtl::instance_counter<AnimationImpl>
 {
   typedef xtl::signal<void (AnimationEvent event, Animation& animation)> Signal;
   
   enum Mode { Playing, Stopped, Paused };
 
-  AnimationBlender                 blender;                      //блендер анимаций
-  media::animation::Animation      source;                       //исходная анимация
-  media::animation::AnimationState state;                        //состояние анимации
-  TimeValue                        time;                         //текущее время
-  TimeValue                        start_time;                   //время старта анимации
-  TimeValue                        offset;                       //смещение времени
-  float                            duration;                     //длительность анимации
-  Mode                             mode;                         //текущий режим
-  bool                             looped;                       //флаг цикличности анимации
-  Signal                           signals [AnimationEvent_Num]; //сигналы
+  AnimationBlender                 blender;                      //Р±Р»РµРЅРґРµСЂ Р°РЅРёРјР°С†РёР№
+  media::animation::Animation      source;                       //РёСЃС…РѕРґРЅР°СЏ Р°РЅРёРјР°С†РёСЏ
+  media::animation::AnimationState state;                        //СЃРѕСЃС‚РѕСЏРЅРёРµ Р°РЅРёРјР°С†РёРё
+  TimeValue                        time;                         //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ
+  TimeValue                        start_time;                   //РІСЂРµРјСЏ СЃС‚Р°СЂС‚Р° Р°РЅРёРјР°С†РёРё
+  TimeValue                        offset;                       //СЃРјРµС‰РµРЅРёРµ РІСЂРµРјРµРЅРё
+  float                            duration;                     //РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р°РЅРёРјР°С†РёРё
+  Mode                             mode;                         //С‚РµРєСѓС‰РёР№ СЂРµР¶РёРј
+  bool                             looped;                       //С„Р»Р°Рі С†РёРєР»РёС‡РЅРѕСЃС‚Рё Р°РЅРёРјР°С†РёРё
+  Signal                           signals [AnimationEvent_Num]; //СЃРёРіРЅР°Р»С‹
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   AnimationImpl (const AnimationBlender& in_blender, const media::animation::Animation& in_source)
     : blender (in_blender)
     , source (in_source)
@@ -91,7 +91,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
     duration = max_time; //NOT max_time - min_time
   }  
   
-///Получение смещения относительно начала анимации
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° Р°РЅРёРјР°С†РёРё
   TimeValue Tell ()
   {
     if (mode == Playing) return time - start_time + offset;
@@ -106,7 +106,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
     else        return offset < duration ? Tell ().cast<float> () : duration;
   }  
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void Notify (AnimationEvent event, Animation* animation = 0)
   {
     if (event < 0 || event >= AnimationEvent_Num || signals [event].empty ())
@@ -145,15 +145,15 @@ namespace
 
 struct AnimationTarget {};
 
-///Анимационная цель
+///РђРЅРёРјР°С†РёРѕРЅРЅР°СЏ С†РµР»СЊ
 struct Target: public xtl::reference_counter, public xtl::instance_counter<AnimationTarget>
 {
-  Node*                                                   node;                 //анимируемый узел
-  TargetBlender                                           blender;              //блендер анимационной цели
-  stl::auto_ptr<common::PropertyBindingMap::Synchronizer> synchronizer;         //синхронизатор значений анимируемых свойств
-  xtl::auto_connection                                    on_update_connection; //соединение с событием обновления анимационной цели
+  Node*                                                   node;                 //Р°РЅРёРјРёСЂСѓРµРјС‹Р№ СѓР·РµР»
+  TargetBlender                                           blender;              //Р±Р»РµРЅРґРµСЂ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
+  stl::auto_ptr<common::PropertyBindingMap::Synchronizer> synchronizer;         //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ Р·РЅР°С‡РµРЅРёР№ Р°РЅРёРјРёСЂСѓРµРјС‹С… СЃРІРѕР№СЃС‚РІ
+  xtl::auto_connection                                    on_update_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРѕР±С‹С‚РёРµРј РѕР±РЅРѕРІР»РµРЅРёСЏ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Target (const TargetBlender& in_blender)
     : node ()
     , blender (in_blender)
@@ -161,7 +161,7 @@ struct Target: public xtl::reference_counter, public xtl::instance_counter<Anima
   {
   }
   
-///Присоединение узла
+///РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СѓР·Р»Р°
   void BindNode (Node* node)
   {
     if (!node)
@@ -175,7 +175,7 @@ struct Target: public xtl::reference_counter, public xtl::instance_counter<Anima
     this->node = node;    
   }
   
-///Отсоединение узла
+///РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ СѓР·Р»Р°
   void UnbindNode ()
   {
     node = 0;
@@ -183,7 +183,7 @@ struct Target: public xtl::reference_counter, public xtl::instance_counter<Anima
     synchronizer.reset ();
   }
   
-///Обновление анимационной цели
+///РћР±РЅРѕРІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
   void Update ()
   {
     if (!node || !synchronizer)
@@ -209,21 +209,21 @@ typedef xtl::signal<void (float time, const char* event)>    EventSignal;
 }
 
 /*
-    Описание реализаци анимационного контроллера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†Рё Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 struct AnimationController::Impl: public xtl::trackable, public xtl::instance_counter<AnimationController>
 {
-  AnimationController& owner;         //ссылка на владельца
-  AnimationManager     manager;       //менеджер анимаций
-  AnimationBlender     blender;       //блендер анимаций
-  TargetMap            targets;       //анимационные цели
-  AnimationList        animations;    //анимации
-  EventSignal          event_signal;  //сигнал оповещения о возникновении событий
-  EventHandler         event_handler; //обработчик оповещения о возникновении событий
-  common::Log          log;           //поток протоколирования
+  AnimationController& owner;         //СЃСЃС‹Р»РєР° РЅР° РІР»Р°РґРµР»СЊС†Р°
+  AnimationManager     manager;       //РјРµРЅРµРґР¶РµСЂ Р°РЅРёРјР°С†РёР№
+  AnimationBlender     blender;       //Р±Р»РµРЅРґРµСЂ Р°РЅРёРјР°С†РёР№
+  TargetMap            targets;       //Р°РЅРёРјР°С†РёРѕРЅРЅС‹Рµ С†РµР»Рё
+  AnimationList        animations;    //Р°РЅРёРјР°С†РёРё
+  EventSignal          event_signal;  //СЃРёРіРЅР°Р» РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёР№
+  EventHandler         event_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёР№
+  common::Log          log;           //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (AnimationController& controller, const AnimationManager& in_manager)
     : owner (controller)
     , manager (in_manager)
@@ -242,32 +242,32 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
     }
   }
   
-///Добавление анимационной цели
+///Р”РѕР±Р°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
   void AddTarget (const char* target_name, TargetBlender& target_blender)
   {
     try
     {
-        //получение родительского узла
+        //РїРѕР»СѓС‡РµРЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СѓР·Р»Р°
       
       Node* root = owner.AttachedNode ();
       
       if (!root)
         throw xtl::format_operation_exception ("", "Animation node was detached");
 
-        //проверка корректности
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё
 
       if (targets.find (target_name) != targets.end ())
         throw xtl::format_operation_exception ("", "Animation target '%s' has already registered", target_name);
         
-        //создание анимационной цели
+        //СЃРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
 
       TargetPtr target (new Target (target_blender), false);
         
-        //регистрация анимационной цели
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
 
       targets.insert_pair (target_name, target);
 
-        //поиск потомка
+        //РїРѕРёСЃРє РїРѕС‚РѕРјРєР°
 
       Node::Pointer node;
 
@@ -293,7 +293,7 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
     }    
   }
   
-///Удаление анимационной цели
+///РЈРґР°Р»РµРЅРёРµ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµР»Рё
   void RemoveTarget (const char* target_name)
   {
     if (!target_name)
@@ -302,7 +302,7 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
     targets.erase (target_name);
   }
   
-///Оповещение о присоединении узла
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р°
   void BindNode (Node& child)
   {
     try
@@ -334,7 +334,7 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
     }
   }
   
-///Оповещение об отсоединении узла
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕС‚СЃРѕРµРґРёРЅРµРЅРёРё СѓР·Р»Р°
   void UnbindNode (Node& child)
   {
     const char* target_name = child.Name ();
@@ -353,13 +353,13 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
       target.UnbindNode ();
   }
   
-///Удаление анимации
+///РЈРґР°Р»РµРЅРёРµ Р°РЅРёРјР°С†РёРё
   void RemoveAnimation (AnimationImpl* animation)
   {
     animations.erase (stl::remove (animations.begin (), animations.end (), animation), animations.end ());
   }
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void UpdateNotify (float time, const char* event)
   {
     event_signal (time, event);
@@ -373,7 +373,7 @@ struct AnimationController::Impl: public xtl::trackable, public xtl::instance_co
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AnimationController::AnimationController (Node& node, AnimationManager& manager)
@@ -388,7 +388,7 @@ AnimationController::~AnimationController ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 AnimationController::Pointer AnimationController::Create (Node& node, AnimationManager& manager)
@@ -405,7 +405,7 @@ AnimationController::Pointer AnimationController::Create (Node& node, AnimationM
 }
 
 /*
-    Перебор анимаций в очереди
+    РџРµСЂРµР±РѕСЂ Р°РЅРёРјР°С†РёР№ РІ РѕС‡РµСЂРµРґРё
 */
 
 size_t AnimationController::AnimationsCount () const
@@ -422,7 +422,7 @@ Animation AnimationController::Animation (size_t index) const
 }
 
 /*
-    Проигрывание анимаций
+    РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р°РЅРёРјР°С†РёР№
 */
 
 Animation AnimationController::PlayAnimation (const char* name)
@@ -466,13 +466,13 @@ scene_graph::controllers::Animation AnimationController::CreateAnimation (const 
 {
   try
   {    
-      //создание анимации
+      //СЃРѕР·РґР°РЅРёРµ Р°РЅРёРјР°С†РёРё
       
     xtl::intrusive_ptr<AnimationImpl> source (new AnimationImpl (impl->blender, animation), false);
     
     source->connect_tracker (xtl::bind (&Impl::RemoveAnimation, impl.get (), source.get ()), *impl);
 
-      //регистрация анимации
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р°РЅРёРјР°С†РёРё
     
     impl->animations.push_back (source.get ());
     
@@ -486,7 +486,7 @@ scene_graph::controllers::Animation AnimationController::CreateAnimation (const 
 }
 
 /*
-    Остановка всех анимаций
+    РћСЃС‚Р°РЅРѕРІРєР° РІСЃРµС… Р°РЅРёРјР°С†РёР№
 */
 
 void AnimationController::StopAllAnimations ()
@@ -504,14 +504,14 @@ void AnimationController::StopAllAnimations ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void AnimationController::Update (const TimeValue& value)
 {  
   try
   {
-      //обновление времени
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РІСЂРµРјРµРЅРё
 
     for (AnimationList::iterator iter=impl->animations.begin (), end=impl->animations.end (); iter!=end; ++iter)
     {
@@ -523,7 +523,7 @@ void AnimationController::Update (const TimeValue& value)
         continue;
       }
       
-        //обновление времени
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РІСЂРµРјРµРЅРё
       
       TimeValue prev_time   = animation.time;
       TimeValue prev_offset = animation.Tell ();
@@ -533,13 +533,13 @@ void AnimationController::Update (const TimeValue& value)
       
       animation.time = value;
       
-        //обновление состояния анимации
+        //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р°РЅРёРјР°С†РёРё
 
       float foffset = animation.ClampedTell ();
 
       animation.state.SetTime (foffset);
       
-        //оповещение о возникновении событий
+        //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёР№
         
       animation.Notify (AnimationEvent_OnUpdate);
       
@@ -552,7 +552,7 @@ void AnimationController::Update (const TimeValue& value)
       }      
     }
 
-      //обновление блендера анимаций
+      //РѕР±РЅРѕРІР»РµРЅРёРµ Р±Р»РµРЅРґРµСЂР° Р°РЅРёРјР°С†РёР№
 
     impl->blender.Update (impl->event_handler);
   }
@@ -564,7 +564,7 @@ void AnimationController::Update (const TimeValue& value)
 }
 
 /*
-    Обработка событий
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№
 */
 
 xtl::connection AnimationController::RegisterEventHandler (const EventHandler& handler) const
@@ -573,7 +573,7 @@ xtl::connection AnimationController::RegisterEventHandler (const EventHandler& h
 }
 
 /*
-    Регистрация отображения имён параметров анимации на имена узлов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРјС‘РЅ РїР°СЂР°РјРµС‚СЂРѕРІ Р°РЅРёРјР°С†РёРё РЅР° РёРјРµРЅР° СѓР·Р»РѕРІ
 */
 
 void AnimationController::SetParameterMapping (const char* channel_name, const char* property_name)
@@ -622,7 +622,7 @@ void AnimationController::RemoveAllParameterMappings ()
 */
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Animation::Animation (AnimationImpl& in_impl)
@@ -655,7 +655,7 @@ Animation& Animation::operator = (const Animation& animation)
 }
 
 /*
-    Имя анимации
+    РРјСЏ Р°РЅРёРјР°С†РёРё
 */
 
 const char* Animation::Name () const
@@ -664,7 +664,7 @@ const char* Animation::Name () const
 }
 
 /*
-    Проигрывание анимаций
+    РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р°РЅРёРјР°С†РёР№
 */
 
 void Animation::Play ()
@@ -680,11 +680,11 @@ void Animation::Play ()
         break;
       default:
       case AnimationImpl::Stopped:
-          //добавление анимации в блендер
+          //РґРѕР±Р°РІР»РµРЅРёРµ Р°РЅРёРјР°С†РёРё РІ Р±Р»РµРЅРґРµСЂ
 
         impl->state = impl->blender.AddSource (impl->source, AnimationParameterNameMapSingleton::Instance ()->names);
       case AnimationImpl::Paused:
-          //оповещение о возникновении события
+          //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 
         impl->Notify (AnimationEvent_OnPlay);        
         break;
@@ -717,7 +717,7 @@ void Animation::Stop ()
     impl->mode   = AnimationImpl::Stopped;
     impl->offset = TimeValue ();
 
-      //оповещение о возникновении события
+      //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 
     impl->Notify (AnimationEvent_OnStop);    
   }
@@ -742,7 +742,7 @@ void Animation::Pause()
   impl->mode   = AnimationImpl::Paused;
   impl->offset = impl->time - impl->start_time;
   
-    //оповещение о возникновении события
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   
   impl->Notify (AnimationEvent_OnPause);
 }
@@ -768,7 +768,7 @@ bool Animation::IsPlaying () const
 }
 
 /*
-    Длительность анимации
+    Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р°РЅРёРјР°С†РёРё
 */
 
 float Animation::Duration () const
@@ -777,7 +777,7 @@ float Animation::Duration () const
 }
 
 /*
-    Позиционирование
+    РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 float Animation::Tell () const
@@ -811,7 +811,7 @@ void Animation::Seek (float offset, AnimationSeekMode mode)
 }
 
 /*
-    Подписка на события
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection Animation::RegisterEventHandler (AnimationEvent event, const EventHandler& handler) const
@@ -823,7 +823,7 @@ xtl::connection Animation::RegisterEventHandler (AnimationEvent event, const Eve
 }
 
 /*
-    Цикличность анимации
+    Р¦РёРєР»РёС‡РЅРѕСЃС‚СЊ Р°РЅРёРјР°С†РёРё
 */
 
 void Animation::SetLooping (bool state)
@@ -837,7 +837,7 @@ bool Animation::IsLooping  () const
 }
 
 /*
-    Вес
+    Р’РµСЃ
 */
 
 void Animation::SetWeight (float weight)
@@ -851,7 +851,7 @@ float Animation::Weight () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Animation::Swap (Animation& animation)

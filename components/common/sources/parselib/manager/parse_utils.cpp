@@ -4,7 +4,7 @@ namespace common
 {
 
 /*
-    Генерация исключения парсера
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РїР°СЂСЃРµСЂР°
 */
 
 void raise_parser_exception (const ParseNode& node, const char* format, ...)

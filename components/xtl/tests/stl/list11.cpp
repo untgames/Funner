@@ -1,4 +1,4 @@
-// Тестирование splice
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ splice
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

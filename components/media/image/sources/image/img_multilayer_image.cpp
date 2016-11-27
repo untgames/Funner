@@ -12,7 +12,7 @@ const char* CUBEMAP_SUFFIX = ".cubemap";
 const char* DDS_SUFFIX     = ".dds";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Многослойная картинка
+///РњРЅРѕРіРѕСЃР»РѕР№РЅР°СЏ РєР°СЂС‚РёРЅРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class MultilayerImageImpl: public ImageImpl
 {
@@ -20,19 +20,19 @@ class MultilayerImageImpl: public ImageImpl
     MultilayerImageImpl (unsigned int count, Image* images, LayersCloneMode clone_mode);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Размеры картинки
+///Р Р°Р·РјРµСЂС‹ РєР°СЂС‚РёРЅРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int Width  () { return layers_width;   }
     unsigned int Height () { return layers_height;  }
     unsigned int Depth  () { return (unsigned int)layers.size (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формат
+///Р¤РѕСЂРјР°С‚
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PixelFormat Format () { return layers_format; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ImageImpl* Clone ()
     {
@@ -40,28 +40,28 @@ class MultilayerImageImpl: public ImageImpl
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразование формата
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Convert (PixelFormat new_format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Изменение размера
+///РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Resize (unsigned int width, unsigned int height, unsigned int depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с образом картинки
+///Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј РєР°СЂС‚РёРЅРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void* Bitmap (unsigned int z);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование образа с автоматическим преобразованием формата
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ РѕР±СЂР°Р·Р° СЃ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёРј РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµРј С„РѕСЂРјР°С‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    void PutImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, const void* data);
    void GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned int width, unsigned int height, unsigned int depth, PixelFormat format, void* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сохранение
+///РЎРѕС…СЂР°РЅРµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    void Save (const char*);
 
@@ -83,7 +83,7 @@ class MultilayerImageImpl: public ImageImpl
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 
@@ -134,7 +134,7 @@ MultilayerImageImpl::MultilayerImageImpl (unsigned int count, Image* images, Lay
 }
 
 /*
-    Работа с образом
+    Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј
 */
 
 void* MultilayerImageImpl::Bitmap (unsigned int z)
@@ -171,7 +171,7 @@ void MultilayerImageImpl::GetImage (unsigned int x, unsigned int y, unsigned int
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 void MultilayerImageImpl::Resize (unsigned int width, unsigned int height, unsigned int new_layers_count)
@@ -197,7 +197,7 @@ void MultilayerImageImpl::Resize (unsigned int width, unsigned int height, unsig
 }
 
 /*
-    Преобразование формата
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р°
 */
 
 void MultilayerImageImpl::Convert (PixelFormat new_format)
@@ -219,7 +219,7 @@ void MultilayerImageImpl::Convert (PixelFormat new_format)
 }
 
 /*
-    Сохранение
+    РЎРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void MultilayerImageImpl::SaveSixLayersImage (const char* file_name, const char* suffixes [6])
@@ -274,14 +274,14 @@ void MultilayerImageImpl::Save (const char* file_name)
 }
 
 /*
-    Загрузка
+    Р—Р°РіСЂСѓР·РєР°
 */
 
 namespace media
 {
 
 /*
-    Создание реализации
+    РЎРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 ImageImpl* create_multilayer_image (unsigned int count, Image* images, LayersCloneMode clone_mode)

@@ -2,34 +2,34 @@
     PropertySelector
 */
 
-///Конструктор по умолчанию
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 inline PropertySelector::PropertySelector ()
   : index (~0u)
   , name (0)
 {
 }
 
-///Конструктор по индексу
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ РёРЅРґРµРєСЃСѓ
 inline PropertySelector::PropertySelector (size_t in_index)
   : index (in_index)
   , name (0)
 {
 }
 
-///Конструктор по имени
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ РёРјРµРЅРё
 inline PropertySelector::PropertySelector (const char* in_name)
   : index (~0u)
   , name (in_name)
 {
 }
 
-///Наличие имени
+///РќР°Р»РёС‡РёРµ РёРјРµРЅРё
 inline bool PropertySelector::HasName () const
 {
   return name != 0;
 }
 
-///Наличие индекса
+///РќР°Р»РёС‡РёРµ РёРЅРґРµРєСЃР°
 inline bool PropertySelector::HasIndex () const
 {
   return index != ~0u;
@@ -228,7 +228,7 @@ inline void copy_from (const PropertyMap& map, size_t property_index, math::angl
 }
 
 /*
-    Установка свойств по селектору
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ РїРѕ СЃРµР»РµРєС‚РѕСЂСѓ
 */
 
 template <class T>

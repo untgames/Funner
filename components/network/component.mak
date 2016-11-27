@@ -1,6 +1,6 @@
 TARGETS := NETWORK.SOURCES NETWORK.TESTS
 
-#Φελό Ή1 - System library sources
+#Π¦ΠµΠ»Ρ β„–1 - System library sources
 NETWORK.SOURCES.TYPE                 := static-lib
 NETWORK.SOURCES.NAME                 := funner.network
 NETWORK.SOURCES.INCLUDE_DIRS         := sources
@@ -22,7 +22,7 @@ NETWORK.SOURCES.android.IMPORTS      := compile.extern.curl
 NETWORK.SOURCES.tabletos.IMPORTS     := compile.extern.curl
 NETWORK.SOURCES.linux.IMPORTS        := compile.extern.curl
 
-#Φελό Ή2 - System library tests
+#Π¦ΠµΠ»Ρ β„–2 - System library tests
 NETWORK.TESTS.TYPE        := test-suite
 NETWORK.TESTS.SOURCE_DIRS := tests/wrappers
 NETWORK.TESTS.IMPORTS     := compile.system compile.network link.network compile.common link.common.zip_file_system compile.extern.mongoose link.extern.mongoose

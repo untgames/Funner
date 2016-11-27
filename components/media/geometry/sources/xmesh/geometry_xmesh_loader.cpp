@@ -8,15 +8,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "media.geometry.XmlMeshLibraryLoader"; //имя потока протоколирования
+const char* LOG_NAME = "media.geometry.XmlMeshLibraryLoader"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
 /*
-    Разбор вершинных данных
+    Р Р°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 namespace media
@@ -70,13 +70,13 @@ namespace xmesh_loader
 {
 
 /*
-    Загрузчик меш-моделей в формате Xml
+    Р—Р°РіСЂСѓР·С‡РёРє РјРµС€-РјРѕРґРµР»РµР№ РІ С„РѕСЂРјР°С‚Рµ Xml
 */
 
 class XmlMeshLibraryLoader
 {
   private:
-      //разбор вершинного формата
+      //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
     void ParseVertexFormatChannel (Parser::Iterator channel_iter, VertexFormat& vertex_format)
     {
       static const char* METHOD_NAME = "media::geometry::XmlMeshLibraryLoader::ParseVertexFormatChannel";
@@ -98,35 +98,35 @@ class XmlMeshLibraryLoader
       vertex_format.AddAttribute (name, semantic, type, offset);
     }
     
-      //получение итератора на данные вершинного потока
+      //РїРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР° РЅР° РґР°РЅРЅС‹Рµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
     template <class T> static xtl::stride_ptr<T> MakeVertexAttributeIterator (VertexStream& vs, size_t offset)
     {
       return xtl::stride_ptr<T> (reinterpret_cast<T*> (static_cast<char*> (vs.Data ()) + offset), vs.VertexSize ());
     }
     
-      //разбор вершинного потока
+      //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
     void ParseVertexStream (Parser::Iterator vs_iter)
     {     
-        //чтение идентификатора потока
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РїРѕС‚РѕРєР°
         
       const char* id = get<const char*> (*vs_iter, "id");
 
-        //определение числа вершин и размера вершины
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ С‡РёСЃР»Р° РІРµСЂС€РёРЅ Рё СЂР°Р·РјРµСЂР° РІРµСЂС€РёРЅС‹
       
       unsigned int vertices_count = get<unsigned int> (*vs_iter, "vertices_count"),
                    vertex_size    = get<unsigned int> (*vs_iter, "vertex_size");
 
       VertexFormat vertex_format;
 
-        //разбор вершинного формата
+        //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 
       for_each_child (*vs_iter, "channel", xtl::bind (&XmlMeshLibraryLoader::ParseVertexFormatChannel, this, _1, xtl::ref (vertex_format)));
       
-        //создание вершинного потока
+        //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
       
       VertexStream vs (vertices_count, VertexDeclaration (vertex_format, vertex_size));
       
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
         
       Parser::NamesakeIterator channel_iter = vs_iter->First ("channel");
         
@@ -170,46 +170,46 @@ class XmlMeshLibraryLoader
         }
       }
 
-        //регистрация потока
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕС‚РѕРєР°
 
       vertex_streams.insert_pair (id, vs);
     }
     
-      //разбор потока вершинных весов
+      //СЂР°Р·Р±РѕСЂ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
     void ParseVertexWeightStream (Parser::Iterator vws_iter)
     {
-        //чтение идентификатора потока
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РїРѕС‚РѕРєР°
 
       const char*  id            = get<const char*> (*vws_iter, "id");
       unsigned int weights_count = get<unsigned int> (*vws_iter, "weights_count");
 
-        //создание потока
+        //СЃРѕР·РґР°РЅРёРµ РїРѕС‚РѕРєР°
 
       VertexWeightStream vws (weights_count);
 
-        //чтение весов
+        //С‡С‚РµРЅРёРµ РІРµСЃРѕРІ
 
       read (*vws_iter, "#text", vws.Data (), weights_count);
 
-        //регистрация потока
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕС‚РѕРєР°
 
       vertex_weights.insert_pair (id, vws);
     }
 
-      //разбор вершинного буфера
+      //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void ParseVertexBuffer (Parser::Iterator vb_iter)
     {
       static const char* METHOD_NAME = "media::geometry::XmlMeshLibraryLoader::ParseVertexBuffer";
 
-        //чтение идентификатора буфера
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р±СѓС„РµСЂР°
 
       const char* id = get<const char*> (*vb_iter, "id");
 
-         //создание вершинного буфера
+         //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       VertexBuffer vb;
 
-         //разбор потока вершинных весов
+         //СЂР°Р·Р±РѕСЂ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
 
       const char* weights_id = "";
       
@@ -225,7 +225,7 @@ class XmlMeshLibraryLoader
         vb.AttachWeights (weights_iter->second);
       }
 
-         //разбор вершинных потоков
+         //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ
          
       for (Parser::AttributeIterator i=make_attribute_iterator (*vb_iter, "streams.#text"); i; ++i)
       {
@@ -239,15 +239,15 @@ class XmlMeshLibraryLoader
         vb.Attach (stream_iter->second);
       }
 
-         //регистрация вершинного буфера
+         //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       vertex_buffers.insert_pair (id, vb);
     }
     
-      //разбор индексного буфера
+      //СЂР°Р·Р±РѕСЂ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void ParseIndexBuffer (Parser::Iterator ib_iter)
     {
-        //чтение идентификатора буфера
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р±СѓС„РµСЂР°
 
       const char* id   = get<const char*> (*ib_iter, "id");
       const char* type = get<const char*> (*ib_iter, "type", "uint32");
@@ -284,7 +284,7 @@ class XmlMeshLibraryLoader
       }
     }
     
-      //разбор примитива
+      //СЂР°Р·Р±РѕСЂ РїСЂРёРјРёС‚РёРІР°
     void ParsePrimitive (Parser::Iterator primitive_iter, Mesh& mesh)
     {
       static const char* METHOD_NAME = "media::geometry::XmlMeshLibraryLoader::ParsePrimitive";
@@ -350,12 +350,12 @@ class XmlMeshLibraryLoader
       mesh.AddPrimitive (type, vertex_buffer_index, first, count, base_vertex, material);
     }
     
-      //разбор меша
+      //СЂР°Р·Р±РѕСЂ РјРµС€Р°
     void ParseMesh (Parser::Iterator mesh_iter)
     {
       static const char* METHOD_NAME = "media::geometry::XmlMeshLibraryLoader::ParseMesh";
       
-        //чтение имён: меша, индексного буфера (если есть)
+        //С‡С‚РµРЅРёРµ РёРјС‘РЅ: РјРµС€Р°, РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР° (РµСЃР»Рё РµСЃС‚СЊ)
       
       const char *id    = get<const char*> (*mesh_iter, "id"),
                  *name  = get<const char*> (*mesh_iter, "name", id),
@@ -363,13 +363,13 @@ class XmlMeshLibraryLoader
       
       try_read (*mesh_iter, "index_buffer", ib_id);
                  
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       Mesh mesh;
 
       mesh.Rename (name);                 
                  
-        //поиск вершинных буферов
+        //РїРѕРёСЃРє РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
         
       for (Parser::AttributeIterator vb_iter=make_attribute_iterator (*mesh_iter, "vertex_buffers.#text"); vb_iter; ++vb_iter)
       {
@@ -381,7 +381,7 @@ class XmlMeshLibraryLoader
         mesh.Attach (iter->second);
       }
 
-        //поиск индексного буфера
+        //РїРѕРёСЃРє РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       IndexBuffer* ib = 0;
       
@@ -398,16 +398,16 @@ class XmlMeshLibraryLoader
       if (ib)
         mesh.Attach (*ib);
 
-        //чтение примитивов
+        //С‡С‚РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 
       for_each_child (*mesh_iter, "primitives.primitive", xtl::bind (&XmlMeshLibraryLoader::ParsePrimitive, this, _1, xtl::ref (mesh)));
 
-        //присоединение меша к модели
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РјРµС€Р° Рє РјРѕРґРµР»Рё
 
       library.Attach (id, mesh);
     }
   
-      //разбор библиотеки
+      //СЂР°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
     void ParseLibrary (Parser::Iterator library_iter)
     {
       for_each_child (*library_iter, "vertex_streams.vertex_stream", xtl::bind (&XmlMeshLibraryLoader::ParseVertexStream, this, _1));
@@ -422,7 +422,7 @@ class XmlMeshLibraryLoader
     {
       ParseLibrary (parser.Root ().First ("mesh_library"));
 
-        //протоколирование
+        //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 
       Log log (LOG_NAME);
 
@@ -436,16 +436,16 @@ class XmlMeshLibraryLoader
     typedef stl::hash_map<stl::hash_key<const char*>, IndexBuffer>        IndexBufferMap;
 
   private:
-    Parser                parser;         //парсер
-    MeshLibrary&          library;        //библиотека
-    VertexStreamMap       vertex_streams; //загруженные вершинные потоки
-    VertexWeightStreamMap vertex_weights; //загруженные потоки вершинных весов
-    VertexBufferMap       vertex_buffers; //загруженные вершинные буферы
-    IndexBufferMap        index_buffers;  //загруженные индексные буферы
+    Parser                parser;         //РїР°СЂСЃРµСЂ
+    MeshLibrary&          library;        //Р±РёР±Р»РёРѕС‚РµРєР°
+    VertexStreamMap       vertex_streams; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
+    VertexWeightStreamMap vertex_weights; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РїРѕС‚РѕРєРё РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
+    VertexBufferMap       vertex_buffers; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+    IndexBufferMap        index_buffers;  //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РёРЅРґРµРєСЃРЅС‹Рµ Р±СѓС„РµСЂС‹
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XMeshLoaderComponent

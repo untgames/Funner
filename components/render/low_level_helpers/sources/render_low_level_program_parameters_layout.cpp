@@ -6,7 +6,7 @@ using namespace render::low_level::helpers;
 namespace
 {
 
-//функтор порядка двух параметров программы шейдинга
+//С„СѓРЅРєС‚РѕСЂ РїРѕСЂСЏРґРєР° РґРІСѓС… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
 struct ProgramParameterComparator
 {
   bool operator () (const ProgramParameter* parameter1, const ProgramParameter* parameter2) const
@@ -18,7 +18,7 @@ struct ProgramParameterComparator
 }
 
 /*
-    Описание реализации лэйаута параметров программы
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р»СЌР№Р°СѓС‚Р° РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 typedef stl::vector<ProgramParameter>      ParameterArray;
@@ -26,25 +26,25 @@ typedef stl::vector<ProgramParameterGroup> GroupArray;
 
 struct ProgramParametersLayout::Impl
 {  
-  ParameterArray parameters; //параметры программы шейдинга
-  GroupArray     groups;     //группы параметров программы шейдинга
-  stl::string    names;      //имена параметров
+  ParameterArray parameters; //РїР°СЂР°РјРµС‚СЂС‹ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
+  GroupArray     groups;     //РіСЂСѓРїРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
+  stl::string    names;      //РёРјРµРЅР° РїР°СЂР°РјРµС‚СЂРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const ProgramParametersLayoutDesc& in_desc)
   {
     static const char* METHOD_NAME = "render::low_level::helpers::ProgramParametersLayout::Impl::Impl";
 
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!in_desc.parameters)
       throw xtl::make_null_argument_exception (METHOD_NAME, "desc.parameters");
       
       /*
-          Подготовка данных:
-            1) проверка корректности аргументов;
-            2) построение массива указателей на параметры для упорядочивания по номеру константного буфера, к которому они отностятся;
-            3) подсчёт длины строки имён параметров.
+          РџРѕРґРіРѕС‚РѕРІРєР° РґР°РЅРЅС‹С…:
+            1) РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ;
+            2) РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёСЏ РїРѕ РЅРѕРјРµСЂСѓ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°, Рє РєРѕС‚РѕСЂРѕРјСѓ РѕРЅРё РѕС‚РЅРѕСЃС‚СЏС‚СЃСЏ;
+            3) РїРѕРґСЃС‡С‘С‚ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё РёРјС‘РЅ РїР°СЂР°РјРµС‚СЂРѕРІ.
       */
       
     typedef stl::vector<const ProgramParameter*> ParameterPtrArray;
@@ -74,11 +74,11 @@ struct ProgramParametersLayout::Impl
       names_length       += strlen (param.name) + 1;
     }
 
-      //упорядочивание указателей на параметры по номеру константного буфера
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РїР°СЂР°РјРµС‚СЂС‹ РїРѕ РЅРѕРјРµСЂСѓ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 
     stl::sort (src_parameters.begin (), src_parameters.end (), ProgramParameterComparator ());
     
-      //построение массива параметров и массива групп параметров
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° РїР°СЂР°РјРµС‚СЂРѕРІ Рё РјР°СЃСЃРёРІР° РіСЂСѓРїРї РїР°СЂР°РјРµС‚СЂРѕРІ
       
     ParameterArray new_parameters;
     GroupArray     new_groups;
@@ -88,24 +88,24 @@ struct ProgramParametersLayout::Impl
     new_groups.reserve     (DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
     new_names.reserve      (names_length + 1);
 
-    size_t current_slot = DEVICE_CONSTANT_BUFFER_SLOTS_COUNT + 1; //номер текущего слота (для отслеживания изменения группы параметров)
+    size_t current_slot = DEVICE_CONSTANT_BUFFER_SLOTS_COUNT + 1; //РЅРѕРјРµСЂ С‚РµРєСѓС‰РµРіРѕ СЃР»РѕС‚Р° (РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ РёР·РјРµРЅРµРЅРёСЏ РіСЂСѓРїРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ)
       
     for (ParameterPtrArray::iterator iter=src_parameters.begin (), end=src_parameters.end (); iter!=end; ++iter)
     {
-        //добавление параметра
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
       
       const ProgramParameter& src_param = **iter;
       
       new_parameters.push_back (src_param);
       
-        //добавление имени параметра и установка смещения имени параметра в буфере имён
+        //РґРѕР±Р°РІР»РµРЅРёРµ РёРјРµРЅРё РїР°СЂР°РјРµС‚СЂР° Рё СѓСЃС‚Р°РЅРѕРІРєР° СЃРјРµС‰РµРЅРёСЏ РёРјРµРЅРё РїР°СЂР°РјРµС‚СЂР° РІ Р±СѓС„РµСЂРµ РёРјС‘РЅ
 
       new_parameters.back ().name = reinterpret_cast<const char*> (new_names.size ());
 
       new_names += src_param.name;
       new_names += '\0';
 
-        //отслеживание появления новой группы
+        //РѕС‚СЃР»РµР¶РёРІР°РЅРёРµ РїРѕСЏРІР»РµРЅРёСЏ РЅРѕРІРѕР№ РіСЂСѓРїРїС‹
 
       if (current_slot != src_param.slot)
       {
@@ -122,7 +122,7 @@ struct ProgramParametersLayout::Impl
 
     if (!new_groups.empty ())  
     {
-        //подсчёт количества параметров в группах
+        //РїРѕРґСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІР° РїР°СЂР°РјРµС‚СЂРѕРІ РІ РіСЂСѓРїРїР°С…
 
       for (GroupArray::iterator iter=new_groups.begin (), end=new_groups.end ()-1; iter!=end; ++iter)
         iter->count = (unsigned int)(iter [1].parameters - iter [0].parameters);
@@ -130,13 +130,13 @@ struct ProgramParametersLayout::Impl
       new_groups.back ().count = (unsigned int)(new_parameters.end () - new_groups.back ().parameters);
     }
 
-      //обмен
+      //РѕР±РјРµРЅ
       
     parameters.swap (new_parameters);
     groups.swap     (new_groups);
     names.swap      (new_names);
     
-      //установка имён
+      //СѓСЃС‚Р°РЅРѕРІРєР° РёРјС‘РЅ
 
     for (ParameterArray::iterator iter=parameters.begin (), end=parameters.end (); iter!=end; ++iter)
       iter->name = names.c_str () + reinterpret_cast<size_t> (iter->name);
@@ -144,7 +144,7 @@ struct ProgramParametersLayout::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ProgramParametersLayout::ProgramParametersLayout (const ProgramParametersLayoutDesc& in_desc)
@@ -165,7 +165,7 @@ ProgramParametersLayout::~ProgramParametersLayout ()
 }
 
 /*
-    Получение параметров
+    РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 size_t ProgramParametersLayout::GetParametersCount () const
@@ -182,7 +182,7 @@ const ProgramParameter* ProgramParametersLayout::GetParameters () const
 }
 
 /*
-   Получение данных
+   РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 const ProgramParameterGroup& ProgramParametersLayout::GetGroup (size_t index)

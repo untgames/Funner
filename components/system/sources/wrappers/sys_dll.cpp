@@ -4,20 +4,20 @@ using namespace syslib;
 using namespace common;
 
 /*
-    Описание реализации динамической библиотеки
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РґРёРЅР°РјРёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 struct DynamicLibrary::Impl
 {
-  dll_t        handle;       //дескриптор библиотеки
-  stl::string  name;         //имя библиотеки
-  stl::wstring name_unicode; //unicode имя библиотеки
+  dll_t        handle;       //РґРµСЃРєСЂРёРїС‚РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
+  stl::string  name;         //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+  stl::wstring name_unicode; //unicode РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
   
   Impl () : handle (0) {}
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DynamicLibrary::DynamicLibrary ()
@@ -68,7 +68,7 @@ DynamicLibrary::~DynamicLibrary ()
 }
 
 /*
-    Загрузка / выгрузка
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР°
 */
 
 void DynamicLibrary::Load (const char* name)
@@ -86,14 +86,14 @@ void DynamicLibrary::Unload ()
   DynamicLibrary ().Swap (*this);
 }
 
-//загружена ли библиотека
+//Р·Р°РіСЂСѓР¶РµРЅР° Р»Рё Р±РёР±Р»РёРѕС‚РµРєР°
 bool DynamicLibrary::IsLoaded () const
 {
   return impl->handle != 0;
 }
 
 /*
-    Имя библиотеки
+    РРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 const char* DynamicLibrary::Name () const
@@ -107,7 +107,7 @@ const wchar_t* DynamicLibrary::NameUnicode () const
 }
 
 /*
-    Получение адреса символа по строковому идентификатору
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° СЃРёРјРІРѕР»Р° РїРѕ СЃС‚СЂРѕРєРѕРІРѕРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
 */
 
 void* DynamicLibrary::GetSymbol (const char* name) const
@@ -127,7 +127,7 @@ void* DynamicLibrary::GetSymbol (const char* name) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void DynamicLibrary::Swap (DynamicLibrary& library)

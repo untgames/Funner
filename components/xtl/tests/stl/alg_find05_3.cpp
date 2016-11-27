@@ -1,4 +1,4 @@
-//Тестирование алгоритма search
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° search
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

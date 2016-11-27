@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Îïèñàíèå ğåàëèçàöèè ïàğàìåòğîâ øèôğîâàíèÿ
+    ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ Ñ€ĞµĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸ Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ğ¾Ğ² ÑˆĞ¸Ñ„Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ
 */
 
 struct FileCryptoParameters::Impl: public xtl::reference_counter
@@ -31,7 +31,7 @@ struct FileCryptoParameters::Impl: public xtl::reference_counter
 };
 
 /*
-    Êîíñòğóêòîğû / äåñòğóêòîğ / ïğèñâàèâàíèå
+    ĞšĞ¾Ğ½ÑÑ‚Ñ€ÑƒĞºÑ‚Ğ¾Ñ€Ñ‹ / Ğ´ĞµÑÑ‚Ñ€ÑƒĞºÑ‚Ğ¾Ñ€ / Ğ¿Ñ€Ğ¸ÑĞ²Ğ°Ğ¸Ğ²Ğ°Ğ½Ğ¸Ğµ
 */
 
 FileCryptoParameters::FileCryptoParameters (const char* read_method, const char* write_method, const void* key, unsigned short key_bits)
@@ -100,22 +100,22 @@ FileCryptoParameters& FileCryptoParameters::operator = (const FileCryptoParamete
 }
 
 /*
-    Ïàğàìåòğû
+    ĞŸĞ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹
 */
 
-//ìåòîä øèôğîâàíèÿ ïğè ÷òåíèè èç ôàéëà
+//Ğ¼ĞµÑ‚Ğ¾Ğ´ ÑˆĞ¸Ñ„Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¿Ñ€Ğ¸ Ñ‡Ñ‚ĞµĞ½Ğ¸Ğ¸ Ğ¸Ğ· Ñ„Ğ°Ğ¹Ğ»Ğ°
 const char* FileCryptoParameters::ReadMethod () const
 {
   return impl->read_method.c_str ();
 }
 
-//ìåòîä øèôğîâàíèÿ ïğè çàïèñè â ôàéë
+//Ğ¼ĞµÑ‚Ğ¾Ğ´ ÑˆĞ¸Ñ„Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ Ğ¿Ñ€Ğ¸ Ğ·Ğ°Ğ¿Ğ¸ÑĞ¸ Ğ² Ñ„Ğ°Ğ¹Ğ»
 const char* FileCryptoParameters::WriteMethod () const
 {
   return impl->write_method.c_str ();
 }
 
-//óêàçàòåëü íà áóôåğ, ñîäåğæàùèé êëş÷ øèôğîâàíèÿ
+//ÑƒĞºĞ°Ğ·Ğ°Ñ‚ĞµĞ»ÑŒ Ğ½Ğ° Ğ±ÑƒÑ„ĞµÑ€, ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ°Ñ‰Ğ¸Ğ¹ ĞºĞ»ÑÑ‡ ÑˆĞ¸Ñ„Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ñ
 const void* FileCryptoParameters::Key () const
 {
   static char empty_key = 0;
@@ -123,7 +123,7 @@ const void* FileCryptoParameters::Key () const
   return impl->key.size () ? impl->key.data () : &empty_key;
 }
 
-//êîëè÷åñòâî áèòîâ â êëş÷å
+//ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ Ğ±Ğ¸Ñ‚Ğ¾Ğ² Ğ² ĞºĞ»ÑÑ‡Ğµ
 unsigned short FileCryptoParameters::KeyBits () const
 {
   return impl->key_bits;

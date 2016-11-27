@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* OPERATION_STATUS_LIBRARY     = "Social.OperationStatus";
@@ -358,7 +358,7 @@ namespace social_script_binds
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

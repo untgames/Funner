@@ -4,18 +4,18 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Вспомогательные классы
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹
 */
 
 namespace
 {
 
-/// Ресурс
+/// Р РµСЃСѓСЂСЃ
 struct Resource: public xtl::reference_counter
 {
-  stl::string name; //имя ресурса
+  stl::string name; //РёРјСЏ СЂРµСЃСѓСЂСЃР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Resource (const char* in_name) : name (in_name) {}
 };
 
@@ -33,19 +33,19 @@ namespace scene
 namespace server
 {
 
-/// Библиотека ресурсов
+/// Р‘РёР±Р»РёРѕС‚РµРєР° СЂРµСЃСѓСЂСЃРѕРІ
 struct ResourceLibrary: public xtl::reference_counter
 {
-  RenderManager render_manager; //менеджер рендеринга
-  ResourceMap   resources;      //ресурсы
+  RenderManager render_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  ResourceMap   resources;      //СЂРµСЃСѓСЂСЃС‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ResourceLibrary (const RenderManager& in_render_manager)
     : render_manager (in_render_manager)
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~ResourceLibrary () {}
 };
 
@@ -64,15 +64,15 @@ typedef xtl::intrusive_ptr<ResourceLibrary> ResourceLibraryPtr;
 */
 
 /*
-    Описание реализации клиента
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР»РёРµРЅС‚Р°
 */
 
 struct ResourceClient::Impl: public xtl::reference_counter
 {
-  ResourceMap        resources; //ресурсы
-  ResourceLibraryPtr library;   //библиотека ресурсов
+  ResourceMap        resources; //СЂРµСЃСѓСЂСЃС‹
+  ResourceLibraryPtr library;   //Р±РёР±Р»РёРѕС‚РµРєР° СЂРµСЃСѓСЂСЃРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ResourceLibrary* in_library)
     : library (in_library)
   {
@@ -80,7 +80,7 @@ struct ResourceClient::Impl: public xtl::reference_counter
       throw xtl::make_null_argument_exception ("render::scene::server::ResourceClient::Impl::Impl", "library");
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     for (ResourceMap::iterator iter=resources.begin (), end=resources.end (); iter!=end; ++iter)
@@ -106,7 +106,7 @@ struct ResourceClient::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ResourceClient::ResourceClient (ResourceLibrary* library)
@@ -143,7 +143,7 @@ ResourceClient& ResourceClient::operator = (const ResourceClient& client)
 }
 
 /*
-    Загрузка / выгрузка ресурсов
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void ResourceClient::LoadResource (const char* name)
@@ -258,12 +258,12 @@ void ResourceClient::UnloadResource (const char* name)
 */
 
 /*
-    Описание реализации менеджера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР°
 */
 
 struct ResourceManager::Impl: public ResourceLibrary
 {  
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RenderManager& render_manager)
     : ResourceLibrary (render_manager)
   {
@@ -271,7 +271,7 @@ struct ResourceManager::Impl: public ResourceLibrary
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ResourceManager::ResourceManager (const RenderManager& render_manager)
@@ -300,7 +300,7 @@ ResourceManager& ResourceManager::operator = (const ResourceManager& manager)
 }
 
 /*
-    Создание клиента
+    РЎРѕР·РґР°РЅРёРµ РєР»РёРµРЅС‚Р°
 */
 
 ResourceClient ResourceManager::CreateClient ()

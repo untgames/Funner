@@ -10,20 +10,20 @@ namespace url_file_system
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t DOWNLOAD_BUFFER_SIZE = 32784;
 const char*  LOG_NAME             = "network.url_file_system";
 
 /*
-    URL файл
+    URL С„Р°Р№Р»
 */
 
 class UrlFile: public Lockable
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     UrlFile (const char* in_url, bool in_is_post)
       : url (in_url)
       , is_post (in_is_post)
@@ -35,10 +35,10 @@ class UrlFile: public Lockable
         request_file = TempFile ("/system/inetcache/funner_url_file%06u");
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     virtual ~UrlFile () {}
     
-///Файловые операции
+///Р¤Р°Р№Р»РѕРІС‹Рµ РѕРїРµСЂР°С†РёРё
     virtual size_t     BufferSize () { return request_file.BufferSize (); }
     virtual filepos_t  Tell       () { return 0; }    
     virtual size_t     Read   (void* buf, size_t size) = 0;
@@ -49,7 +49,7 @@ class UrlFile: public Lockable
     virtual bool       Eof    () = 0;
     virtual void       Flush  () = 0;
 
-///Запись в файл запроса
+///Р—Р°РїРёСЃСЊ РІ С„Р°Р№Р» Р·Р°РїСЂРѕСЃР°
     size_t Write (const void* buf, size_t size)
     {
       common::Lock lock (*this);
@@ -61,19 +61,19 @@ class UrlFile: public Lockable
     }    
     
   protected:
-///Завершена ли отсылка данных запроса
+///Р—Р°РІРµСЂС€РµРЅР° Р»Рё РѕС‚СЃС‹Р»РєР° РґР°РЅРЅС‹С… Р·Р°РїСЂРѕСЃР°
     bool IsEndOfRequest () { return end_of_request; }    
     
 ///URL
     const char* Url () { return url.c_str (); }
     
-///URL соединение
+///URL СЃРѕРµРґРёРЅРµРЅРёРµ
     UrlConnection& Connection () { return connection; }
     
-///Поток протоколирования
+///РџРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
     common::Log& Log () { return log; }
     
-///Завершение отсытки данных
+///Р—Р°РІРµСЂС€РµРЅРёРµ РѕС‚СЃС‹С‚РєРё РґР°РЅРЅС‹С…
     void FinishSend ()
     {
       try
@@ -138,26 +138,26 @@ class UrlFile: public Lockable
     }
     
   private:
-    UrlConnection connection;        //соединение
-    stl::string   url;               //URL ресурса
-    File          request_file;      //файла записи данных запроса
-    bool          is_post;           //является ли соедиенние POST запросом
-    bool          is_finish_sending; //флаг - завершение передачи
-    bool          end_of_request;    //флаг - запрос отправлен
-    common::Log   log;               //поток протоколирования
+    UrlConnection connection;        //СЃРѕРµРґРёРЅРµРЅРёРµ
+    stl::string   url;               //URL СЂРµСЃСѓСЂСЃР°
+    File          request_file;      //С„Р°Р№Р»Р° Р·Р°РїРёСЃРё РґР°РЅРЅС‹С… Р·Р°РїСЂРѕСЃР°
+    bool          is_post;           //СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРµРЅРЅРёРµ POST Р·Р°РїСЂРѕСЃРѕРј
+    bool          is_finish_sending; //С„Р»Р°Рі - Р·Р°РІРµСЂС€РµРЅРёРµ РїРµСЂРµРґР°С‡Рё
+    bool          end_of_request;    //С„Р»Р°Рі - Р·Р°РїСЂРѕСЃ РѕС‚РїСЂР°РІР»РµРЅ
+    common::Log   log;               //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 };
 
 class SeekableUrlFile: public UrlFile
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SeekableUrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
       : UrlFile (in_url, in_is_post)
       , buffer_size (in_buffer_size)
     {
     }  
 
-///Закрытие файла
+///Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
     ~SeekableUrlFile ()
     {
       try
@@ -180,7 +180,7 @@ class SeekableUrlFile: public UrlFile
       }
     }
 
-///Рамзер буфера
+///Р Р°РјР·РµСЂ Р±СѓС„РµСЂР°
     size_t BufferSize ()
     {
       if (!IsEndOfRequest ())
@@ -189,7 +189,7 @@ class SeekableUrlFile: public UrlFile
       return response_file.BufferSize ();
     }
 
-///Чтение из файла
+///Р§С‚РµРЅРёРµ РёР· С„Р°Р№Р»Р°
     size_t Read (void* buf, size_t size)
     {
       common::Lock lock (*this);
@@ -199,7 +199,7 @@ class SeekableUrlFile: public UrlFile
       return response_file.Read (buf, size);
     }
     
-///Сброс файлового указателя
+///РЎР±СЂРѕСЃ С„Р°Р№Р»РѕРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
     void Rewind ()
     {
       common::Lock lock (*this);
@@ -209,7 +209,7 @@ class SeekableUrlFile: public UrlFile
       response_file.Rewind ();      
     }
     
-///Позиционирование
+///РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ
     filepos_t Seek (filepos_t pos)
     {
       common::Lock lock (*this);
@@ -229,7 +229,7 @@ class SeekableUrlFile: public UrlFile
       return UrlFile::Tell ();
     }
 
-///Размер файла
+///Р Р°Р·РјРµСЂ С„Р°Р№Р»Р°
     filesize_t Size ()
     {   
       common::Lock lock (*this);
@@ -248,7 +248,7 @@ class SeekableUrlFile: public UrlFile
       response_file.Resize (new_size);
     }
     
-///Проверка конца файла
+///РџСЂРѕРІРµСЂРєР° РєРѕРЅС†Р° С„Р°Р№Р»Р°
     bool Eof ()
     {
       common::Lock lock (*this);
@@ -259,7 +259,7 @@ class SeekableUrlFile: public UrlFile
       return response_file.Eof ();
     }    
     
-///Сброс файла на диск
+///РЎР±СЂРѕСЃ С„Р°Р№Р»Р° РЅР° РґРёСЃРє
     void Flush ()
     {
       common::Lock lock (*this);
@@ -302,14 +302,14 @@ class SeekableUrlFile: public UrlFile
     }
 
   private:
-    File   response_file;  //файл чтения данных ответа
-    size_t buffer_size;    //размер кеша буфера чтения
+    File   response_file;  //С„Р°Р№Р» С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С… РѕС‚РІРµС‚Р°
+    size_t buffer_size;    //СЂР°Р·РјРµСЂ РєРµС€Р° Р±СѓС„РµСЂР° С‡С‚РµРЅРёСЏ
 };
 
 class StreamUrlFile: public UrlFile
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StreamUrlFile (const char* in_url, bool in_is_post)
       : UrlFile (in_url, in_is_post)
       , file_pos ()
@@ -317,7 +317,7 @@ class StreamUrlFile: public UrlFile
     {
     }  
 
-///Закрытие файла
+///Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
     ~StreamUrlFile ()
     {
       try
@@ -331,7 +331,7 @@ class StreamUrlFile: public UrlFile
       }
     }
 
-///Рамзер буфера
+///Р Р°РјР·РµСЂ Р±СѓС„РµСЂР°
     size_t BufferSize ()
     {
       if (!IsEndOfRequest ())
@@ -340,7 +340,7 @@ class StreamUrlFile: public UrlFile
       return 0;
     }
 
-///Чтение из файла
+///Р§С‚РµРЅРёРµ РёР· С„Р°Р№Р»Р°
     size_t Read (void* buf, size_t size)
     {
       common::Lock lock (*this);
@@ -355,14 +355,14 @@ class StreamUrlFile: public UrlFile
       return read_size;
     }
     
-///Сброс файлового указателя
+///РЎР±СЂРѕСЃ С„Р°Р№Р»РѕРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
     void Rewind ()
     {
       if (file_pos)      
         throw xtl::format_not_supported_exception ("network::StreamUrlFile::Rewind", "Position operations are not supported");
     }
     
-///Позиционирование
+///РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ
     filepos_t Seek (filepos_t pos)
     {
       if (pos == file_pos)
@@ -376,7 +376,7 @@ class StreamUrlFile: public UrlFile
       return file_pos;
     }
 
-///Размер файла
+///Р Р°Р·РјРµСЂ С„Р°Р№Р»Р°
     filesize_t Size ()
     {   
       common::Lock lock (*this);
@@ -391,7 +391,7 @@ class StreamUrlFile: public UrlFile
       throw xtl::format_not_supported_exception ("network::StreamUrlFile::Seek", "Can't resize URL stream");
     }
     
-///Проверка конца файла
+///РџСЂРѕРІРµСЂРєР° РєРѕРЅС†Р° С„Р°Р№Р»Р°
     bool Eof ()
     {
       common::Lock lock (*this);
@@ -402,7 +402,7 @@ class StreamUrlFile: public UrlFile
       return is_eof;
     }    
     
-///Сброс файла на диск
+///РЎР±СЂРѕСЃ С„Р°Р№Р»Р° РЅР° РґРёСЃРє
     void Flush ()
     {
     }
@@ -417,25 +417,25 @@ class StreamUrlFile: public UrlFile
     }
     
   private:
-    filepos_t  file_pos;  //позиция в потоке
-    bool       is_eof;    //достигнут ли конец файла
+    filepos_t  file_pos;  //РїРѕР·РёС†РёСЏ РІ РїРѕС‚РѕРєРµ
+    bool       is_eof;    //РґРѕСЃС‚РёРіРЅСѓС‚ Р»Рё РєРѕРЅРµС† С„Р°Р№Р»Р°
 };
 
 /*
-    URL файловая система
+    URL С„Р°Р№Р»РѕРІР°СЏ СЃРёСЃС‚РµРјР°
 */
 
 class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     UrlCustomFileSystem (const char* in_prefix)
       : prefix (in_prefix)
       , log (LOG_NAME)
     {
     }
   
-///Работа с файлом
+///Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
     file_t FileOpen (const char* name, filemode_t mode_flags, size_t buffer_size)
     {
       try
@@ -665,7 +665,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       }      
     }
 
-///Управление расположением файлов
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
     void Remove (const char* file_name)
     {
       throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::Remove", "Remove operation not supported on url links");
@@ -681,7 +681,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::Remove", "Mkdir operation not supported on url links");      
     }
 
-///Получение информации о файле
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
     bool IsFileExist (const char* file_name)
     {
       return false;
@@ -692,7 +692,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       return false;
     }
 
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
     filesize_t GetFreeSpace (const char* path)
     {
       return (filesize_t)-1;
@@ -703,7 +703,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       return (filesize_t)-1;
     }
 
-//Файловые атрибуты
+//Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
     void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
     {
       throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::SetFileAttribute");
@@ -724,13 +724,13 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::RemoveFileAttribute");
     }
 
-///Поиск файла
+///РџРѕРёСЃРє С„Р°Р№Р»Р°
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {
-      //поиска по URL ссылке нет
+      //РїРѕРёСЃРєР° РїРѕ URL СЃСЃС‹Р»РєРµ РЅРµС‚
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -747,7 +747,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
 };
 
 /*
-    Компонент запуска CURL
+    РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РїСѓСЃРєР° CURL
 */
 
 class UrlFileSystemComponent

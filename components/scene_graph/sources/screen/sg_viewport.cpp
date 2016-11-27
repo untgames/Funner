@@ -3,27 +3,27 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации Viewport
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Viewport
 */
 
 typedef stl::list<IViewportListener*> ListenerList;
 
 struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_counter<Viewport>
 {
-  stl::string          name;              //имя области вывода
-  scene_graph::Camera* camera;            //камера
-  stl::string          technique;         //имя техники рендеринга
-  Rect                 rect;              //границы области вывода
-  float                min_depth;         //минимальное значение глубины
-  float                max_depth;         //максимальное значение глубины
-  bool                 is_active;         //флаг активности области вывода  
-  bool                 input_state;       //участвует ли область вывода в обработке ввода
-  int                  z_order;           //порядок отрисовки области вывода
-  math::vec4f          background_color;  //цвет фона
-  bool                 has_background;    //наличие фона
-  common::PropertyMap  properties;        //переменные рендеринга
-  ListenerList         listeners;         //слушатели событий области вывода
-  xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
+  stl::string          name;              //РёРјСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  scene_graph::Camera* camera;            //РєР°РјРµСЂР°
+  stl::string          technique;         //РёРјСЏ С‚РµС…РЅРёРєРё СЂРµРЅРґРµСЂРёРЅРіР°
+  Rect                 rect;              //РіСЂР°РЅРёС†С‹ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  float                min_depth;         //РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РіР»СѓР±РёРЅС‹
+  float                max_depth;         //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РіР»СѓР±РёРЅС‹
+  bool                 is_active;         //С„Р»Р°Рі Р°РєС‚РёРІРЅРѕСЃС‚Рё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°  
+  bool                 input_state;       //СѓС‡Р°СЃС‚РІСѓРµС‚ Р»Рё РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР° РІ РѕР±СЂР°Р±РѕС‚РєРµ РІРІРѕРґР°
+  int                  z_order;           //РїРѕСЂСЏРґРѕРє РѕС‚СЂРёСЃРѕРІРєРё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  math::vec4f          background_color;  //С†РІРµС‚ С„РѕРЅР°
+  bool                 has_background;    //РЅР°Р»РёС‡РёРµ С„РѕРЅР°
+  common::PropertyMap  properties;        //РїРµСЂРµРјРµРЅРЅС‹Рµ СЂРµРЅРґРµСЂРёРЅРіР°
+  ListenerList         listeners;         //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  xtl::auto_connection on_destroy_camera; //СЃР»РѕС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ СЃРёРіРЅР°Р»РѕРј РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё РєР°РјРµСЂС‹
 
   Impl () : camera (0), rect (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), min_depth (0.0f), max_depth (1.0f), is_active (true), input_state (true), z_order (INT_MAX), has_background (false)
   {
@@ -67,7 +67,7 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
       
       iter = next;
@@ -126,7 +126,7 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Viewport::Viewport ()
@@ -153,7 +153,7 @@ Viewport& Viewport::operator = (const Viewport& vp)
 }
 
 /*
-    Имя области вывода
+    РРјСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Viewport::SetName (const char* name)
@@ -175,7 +175,7 @@ const char* Viewport::Name () const
 }
 
 /*
-    Идентификатор области вывода
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 size_t Viewport::Id () const
@@ -184,7 +184,7 @@ size_t Viewport::Id () const
 }
 
 /*
-    Техника рендеринга
+    РўРµС…РЅРёРєР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Viewport::SetTechnique (const char* name)
@@ -206,7 +206,7 @@ const char* Viewport::Technique () const
 }
 
 /*
-    Границы области вывода
+    Р“СЂР°РЅРёС†С‹ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Viewport::SetArea (const Rect& rect)
@@ -250,7 +250,7 @@ const Rect& Viewport::Area () const
 }
 
 /*
-    Область depth
+    РћР±Р»Р°СЃС‚СЊ depth
 */
 
 void Viewport::SetDepthRange (float min_depth, float max_depth)
@@ -285,7 +285,7 @@ float Viewport::MaxDepth () const
 }
 
 /*
-    Управление порядком отрисовки областей вывода (отрисовка от наименьших номеров по увеличению номера)
+    РЈРїСЂР°РІР»РµРЅРёРµ РїРѕСЂСЏРґРєРѕРј РѕС‚СЂРёСЃРѕРІРєРё РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР° (РѕС‚СЂРёСЃРѕРІРєР° РѕС‚ РЅР°РёРјРµРЅСЊС€РёС… РЅРѕРјРµСЂРѕРІ РїРѕ СѓРІРµР»РёС‡РµРЅРёСЋ РЅРѕРјРµСЂР°)
 */
 
 void Viewport::SetZOrder (int z_order)
@@ -304,7 +304,7 @@ int Viewport::ZOrder () const
 }
 
 /*
-    Камера, связанная с областью вывода (политика владения - weak-reference)
+    РљР°РјРµСЂР°, СЃРІСЏР·Р°РЅРЅР°СЏ СЃ РѕР±Р»Р°СЃС‚СЊСЋ РІС‹РІРѕРґР° (РїРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ - weak-reference)
 */
 
 void Viewport::SetCamera (scene_graph::Camera* camera)
@@ -323,7 +323,7 @@ scene_graph::Camera* Viewport::Camera ()
 }
 
 /*
-    Управление активностью области вывода (неакивные области не участвуют в отрисовке)
+    РЈРїСЂР°РІР»РµРЅРёРµ Р°РєС‚РёРІРЅРѕСЃС‚СЊСЋ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° (РЅРµР°РєРёРІРЅС‹Рµ РѕР±Р»Р°СЃС‚Рё РЅРµ СѓС‡Р°СЃС‚РІСѓСЋС‚ РІ РѕС‚СЂРёСЃРѕРІРєРµ)
 */
 
 void Viewport::SetActive (bool state)
@@ -342,7 +342,7 @@ bool Viewport::IsActive () const
 }
 
 /*
-    Участвует ли область вывода в обработке ввода
+    РЈС‡Р°СЃС‚РІСѓРµС‚ Р»Рё РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР° РІ РѕР±СЂР°Р±РѕС‚РєРµ РІРІРѕРґР°
 */
 
 void Viewport::SetInputState (bool state)
@@ -361,7 +361,7 @@ bool Viewport::InputState () const
 }
 
 /*
-    Настройка фона
+    РќР°СЃС‚СЂРѕР№РєР° С„РѕРЅР°
 */
 
 void Viewport::SetBackgroundColor (const math::vec4f& color)
@@ -400,7 +400,7 @@ bool Viewport::BackgroundState () const
 }
 
 /*
-    Установка переменных рендеринга
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРµСЂРµРјРµРЅРЅС‹С… СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Viewport::SetProperties (const common::PropertyMap& properties)
@@ -419,7 +419,7 @@ const common::PropertyMap& Viewport::Properties () const
 }
 
 /*
-    Работа со слушателями
+    Р Р°Р±РѕС‚Р° СЃРѕ СЃР»СѓС€Р°С‚РµР»СЏРјРё
 */
 
 void Viewport::AttachListener (IViewportListener* listener) const
@@ -444,7 +444,7 @@ void Viewport::DetachAllListeners () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Viewport::Swap (Viewport& vp)

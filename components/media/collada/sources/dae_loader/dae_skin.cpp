@@ -5,7 +5,7 @@ using namespace media::collada;
 using namespace math;
 
 /*
-    Разбор источника
+    Р Р°Р·Р±РѕСЂ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void DaeParser::ParseFloatArray (Parser::Iterator iter, stl::vector<mat4f>& source)
@@ -37,7 +37,7 @@ void DaeParser::ParseNameArray (Parser::Iterator iter, stl::vector<string>& sour
 }
 
 /*
-    Разбор скина
+    Р Р°Р·Р±РѕСЂ СЃРєРёРЅР°
 */
 
 void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
@@ -50,7 +50,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
 
   const char* base_mesh = get<const char*> (*iter, "source");
 
-  base_mesh++; //убираем префиксный '#'
+  base_mesh++; //СѓР±РёСЂР°РµРј РїСЂРµС„РёРєСЃРЅС‹Р№ '#'
 
   Mesh*  mesh  = model.Meshes ().Find (base_mesh);
   Morph* morph = model.Morphs ().Find (base_mesh);
@@ -87,7 +87,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     Surface&          surface            = mesh->Surfaces ()[i];
     VertexIndexMapPtr vertex_indices_map = GetVertexIndicesMap (base_mesh, i);
     
-      //невыполнение этого условия теоретически невозможно
+      //РЅРµРІС‹РїРѕР»РЅРµРЅРёРµ СЌС‚РѕРіРѕ СѓСЃР»РѕРІРёСЏ С‚РµРѕСЂРµС‚РёС‡РµСЃРєРё РЅРµРІРѕР·РјРѕР¶РЅРѕ
       
     if (vertex_indices_map->Size () != surface.VerticesCount ())
       continue;
@@ -115,7 +115,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     }
   }
 
-    //создание скина
+    //СЃРѕР·РґР°РЅРёРµ СЃРєРёРЅР°
 
   Skin skin;  
 
@@ -129,7 +129,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     const char *semantic    = get<const char*> (*joints_iter, "semantic"),
                *source_name = get<const char*> (*joints_iter, "source");
 
-    source_name++; //избавляемся от префиксного '#'
+    source_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
 
     if (!::strcmp (semantic, "JOINT"))
     {
@@ -181,7 +181,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     const char *semantic    = get<const char*> (*weights_iter, "semantic"),
                *source_name = get<const char*> (*weights_iter, "source");
   
-    source_name++; //избавляемся от префиксного '#'
+    source_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРЅРѕРіРѕ '#'
 
     if (!::strcmp (semantic, "WEIGHT"))
     {
@@ -213,7 +213,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     skin_weights [i].weight = weights [indices [i * 2 + 1]];
   }
 
-    //нормализация
+    //РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ
 
   size_t cur_index = 0;
 
@@ -232,7 +232,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     cur_index += per_vertex_count[i];
   }
   
-    //добавление скина в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ СЃРєРёРЅР° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
   model.Skins ().Insert (id, skin);
 }

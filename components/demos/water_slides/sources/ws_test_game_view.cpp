@@ -6,20 +6,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  WATER_SHADER_FILE_NAME  = "media/water_shader.wxf";  //имя файла с шейдером воды
-const char*  GROUND_SHADER_FILE_NAME = "media/ground_shader.wxf"; //имя файла с шейдером земли
-const char*  WATER_TEXTURE_NAME      = "media/sky.jpg";           //имя файла с текстурой воды
-const char*  GROUND_TEXTURE_NAME     = "media/bottom.jpg";        //имя файла с текстурой земли
-const char*  BOAT_TEXTURE_NAME       = "media/boat.tif";          //имя файла с лодкой
-const size_t GRID_SIZE               = 128;                        //количество разбиений сетки с водой
-const float  WATER_UPDATE_TIME       = 0.01f;                     //период обновления воды
-const float  SCALE_FACTOR            = 1.1f;                      //коэффициент растяжения сетки
+const char*  WATER_SHADER_FILE_NAME  = "media/water_shader.wxf";  //РёРјСЏ С„Р°Р№Р»Р° СЃ С€РµР№РґРµСЂРѕРј РІРѕРґС‹
+const char*  GROUND_SHADER_FILE_NAME = "media/ground_shader.wxf"; //РёРјСЏ С„Р°Р№Р»Р° СЃ С€РµР№РґРµСЂРѕРј Р·РµРјР»Рё
+const char*  WATER_TEXTURE_NAME      = "media/sky.jpg";           //РёРјСЏ С„Р°Р№Р»Р° СЃ С‚РµРєСЃС‚СѓСЂРѕР№ РІРѕРґС‹
+const char*  GROUND_TEXTURE_NAME     = "media/bottom.jpg";        //РёРјСЏ С„Р°Р№Р»Р° СЃ С‚РµРєСЃС‚СѓСЂРѕР№ Р·РµРјР»Рё
+const char*  BOAT_TEXTURE_NAME       = "media/boat.tif";          //РёРјСЏ С„Р°Р№Р»Р° СЃ Р»РѕРґРєРѕР№
+const size_t GRID_SIZE               = 128;                        //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·Р±РёРµРЅРёР№ СЃРµС‚РєРё СЃ РІРѕРґРѕР№
+const float  WATER_UPDATE_TIME       = 0.01f;                     //РїРµСЂРёРѕРґ РѕР±РЅРѕРІР»РµРЅРёСЏ РІРѕРґС‹
+const float  SCALE_FACTOR            = 1.1f;                      //РєРѕСЌС„С„РёС†РёРµРЅС‚ СЂР°СЃС‚СЏР¶РµРЅРёСЏ СЃРµС‚РєРё
 
 /*
-    Описание отрисовываемых вершин
+    РћРїРёСЃР°РЅРёРµ РѕС‚СЂРёСЃРѕРІС‹РІР°РµРјС‹С… РІРµСЂС€РёРЅ
 */
 
 struct Vec3f
@@ -46,7 +46,7 @@ struct Vertex
 };
 
 /*
-    Поле скоростей воды
+    РџРѕР»Рµ СЃРєРѕСЂРѕСЃС‚РµР№ РІРѕРґС‹
 */
 
 struct WaterField
@@ -55,7 +55,7 @@ struct WaterField
 };
 
 /*
-    Параметры шейдера
+    РџР°СЂР°РјРµС‚СЂС‹ С€РµР№РґРµСЂР°
 */
 
 struct ShaderParameters
@@ -66,7 +66,7 @@ struct ShaderParameters
 };
 
 /*
-    Тестовое игровое отображение
+    РўРµСЃС‚РѕРІРѕРµ РёРіСЂРѕРІРѕРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ
 */
 
 class TestView: public IGameView
@@ -570,7 +570,7 @@ class TestView: public IGameView
 
 }
 
-//создание тестового игрового отображения
+//СЃРѕР·РґР°РЅРёРµ С‚РµСЃС‚РѕРІРѕРіРѕ РёРіСЂРѕРІРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 GameView create_test_game_view ()
 {
   return GameView (new TestView, false);

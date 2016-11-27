@@ -6,10 +6,10 @@ namespace scene_graph
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* XSCENE_ROOT = "xscene"; //имя корневого узла XML сцен
+const char* XSCENE_ROOT = "xscene"; //РёРјСЏ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р° XML СЃС†РµРЅ
 
 }
 
@@ -17,13 +17,13 @@ namespace
 {
 
 /*
-    Дескриптор сцены
+    Р”РµСЃРєСЂРёРїС‚РѕСЂ СЃС†РµРЅС‹
 */
 
 struct SceneDesc: public xtl::reference_counter
 {
-  stl::string    name;   //имя сцены
-  SceneParserPtr parser; //парсер сцены
+  stl::string    name;   //РёРјСЏ СЃС†РµРЅС‹
+  SceneParserPtr parser; //РїР°СЂСЃРµСЂ СЃС†РµРЅС‹
 };
 
 typedef xtl::intrusive_ptr<SceneDesc>                           SceneDescPtr;
@@ -32,16 +32,16 @@ typedef stl::hash_map<stl::hash_key<const char*>, SceneDescPtr> SceneDescMap;
 }
 
 /*
-    Описание реализации фабрики XML сцен
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С„Р°Р±СЂРёРєРё XML СЃС†РµРЅ
 */
 
 struct XmlSceneFactory::Impl
 {
-  SceneDescMap scenes; //сцены
+  SceneDescMap scenes; //СЃС†РµРЅС‹
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_handler)
@@ -51,15 +51,15 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
       
-      //создание реализации
+      //СЃРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
     
     impl = new Impl;
     
-      //создание парсера
+      //СЃРѕР·РґР°РЅРёРµ РїР°СЂСЃРµСЂР°
      
     common::Parser parser (file_name, "xml");
     
-      //парсинг
+      //РїР°СЂСЃРёРЅРі
       
     const common::ParseNode& xscene_root = parser.Root ().First ();
     
@@ -73,7 +73,7 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
 
     for (common::Parser::NamesakeIterator iter=xscene_root.First ("scene"); iter; ++iter)
     {
-        //парсинг сцены
+        //РїР°СЂСЃРёРЅРі СЃС†РµРЅС‹
       
       const char* id = common::get<const char*> (*iter, "id", "");
       
@@ -96,18 +96,18 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
         if (!parser)
           throw xtl::format_operation_exception ("scene_graph::XmlSceneFactory::XmlSceneFactory", "Internal error: parser is null");
 
-          //предварительный разбор
+          //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ
 
         parser->Prepare ();
 
-          //создание описателя сцены
+          //СЃРѕР·РґР°РЅРёРµ РѕРїРёСЃР°С‚РµР»СЏ СЃС†РµРЅС‹
 
         SceneDescPtr desc (new SceneDesc, false);
 
         desc->name   = id;
         desc->parser = parser;
 
-          //регистрация сцены
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС†РµРЅС‹
 
         impl->scenes.insert_pair (id, desc);
       }
@@ -121,11 +121,11 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
       }
     }
 
-      //протоколирование
+      //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 
     parser.Log ().Print (log_handler);     
     
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     if (parser.Log ().HasErrors ())
       throw xtl::format_operation_exception ("", "Scene file '%s' has bad format. Can't parse", file_name);
@@ -142,7 +142,7 @@ XmlSceneFactory::~XmlSceneFactory ()
 }
 
 /*
-    Получение информации о сцене
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃС†РµРЅРµ
 */
 
 bool XmlSceneFactory::GetSceneInfo (const char* name, ResourceGroup* resources)
@@ -162,7 +162,7 @@ bool XmlSceneFactory::GetSceneInfo (const char* name, ResourceGroup* resources)
 }
 
 /*
-    Создание сцены
+    РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 */
 
 void XmlSceneFactory::CreateScene (const char* name, Node& parent, SceneContext& scene_context)
@@ -189,7 +189,7 @@ void XmlSceneFactory::CreateScene (const char* name, Node& parent, SceneContext&
 }
 
 /*
-    Перечисление сцен
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЃС†РµРЅ
 */
 
 void XmlSceneFactory::EnumScenes (const SceneEnumerator& handler)

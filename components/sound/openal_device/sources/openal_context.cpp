@@ -9,9 +9,9 @@ using namespace xtl;
 namespace
 {
 
-const char* LOG_NAME = "sound::low_level::openal";                    //имя потока протоколирования
+const char* LOG_NAME = "sound::low_level::openal";                    //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-//получение текстового описания ошибки контекста OpenAL
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ РѕС€РёР±РєРё РєРѕРЅС‚РµРєСЃС‚Р° OpenAL
 const char* get_alc_error_message (ALCenum error)
 {
   switch (error)
@@ -26,7 +26,7 @@ const char* get_alc_error_message (ALCenum error)
   }
 }
 
-//получение текстового описания ошибки OpenAL
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ РѕС€РёР±РєРё OpenAL
 const char* get_al_error_message (ALenum error)
 {
   switch (error)
@@ -41,7 +41,7 @@ const char* get_al_error_message (ALenum error)
   }
 }
 
-//настройки инициализации контекста
+//РЅР°СЃС‚СЂРѕР№РєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р°
 struct ContextInitProperties
 {
   unsigned int frequency;
@@ -58,7 +58,7 @@ void process_init_string (const char* property, const char* value, ContextInitPr
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OpenALContext::OpenALContext (const char* device_name, const char* init_string)
@@ -132,7 +132,7 @@ OpenALContext::~OpenALContext ()
 }
 
 /*
-    Управление текущими контекстами
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРєСѓС‰РёРјРё РєРѕРЅС‚РµРєСЃС‚Р°РјРё
 */
 
 bool OpenALContext::IsCurrent () const
@@ -159,7 +159,7 @@ bool OpenALContext::MakeCurrent ()
 }
 
 /*
-    Проверка ошибок после вызова функции
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє РїРѕСЃР»Рµ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРё
 */
 
 void OpenALContext::CheckErrors (const char* function_name)
@@ -191,7 +191,7 @@ void OpenALContext::ContextCheckErrors (const char* function_name)
 }
 
 /*
-    Обёртки над вызовами OpenAL
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё OpenAL
 */
 
 void OpenALContext::alEnable (ALenum capability)
@@ -540,7 +540,7 @@ void OpenALContext::alDistanceModel (ALenum distanceModel)
 }
 
 /*
-   Обёртки над вызовами OpenALContext
+   РћР±С‘СЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё OpenALContext
 */
 
 ALCboolean OpenALContext::alcIsExtensionPresent (const ALCchar *extname)

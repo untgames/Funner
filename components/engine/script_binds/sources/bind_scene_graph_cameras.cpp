@@ -21,7 +21,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание камер
+    РЎРѕР·РґР°РЅРёРµ РєР°РјРµСЂ
 */
 
 PerspectiveCamera::Pointer create_perspective_camera ()
@@ -35,22 +35,22 @@ OrthoCamera::Pointer create_ortho_camera ()
 }
 
 /*
-    Регистрация библиотек работы с камерами
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє СЂР°Р±РѕС‚С‹ СЃ РєР°РјРµСЂР°РјРё
 */
 
 void bind_perspective_camera_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_perspective_camera));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_FovX",  make_invoker<void (PerspectiveCamera&, math::anglef)> (&PerspectiveCamera::SetFovX));
   lib.Register ("set_FovY",  make_invoker<void (PerspectiveCamera&, math::anglef)> (&PerspectiveCamera::SetFovY));
@@ -61,7 +61,7 @@ void bind_perspective_camera_library (Environment& environment)
   lib.Register ("get_ZNear", make_invoker (&PerspectiveCamera::ZNear));
   lib.Register ("get_ZFar",  make_invoker (&PerspectiveCamera::ZFar));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<PerspectiveCamera> (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
 }
@@ -70,15 +70,15 @@ void bind_ortho_camera_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_ORTHO_CAMERA_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_ortho_camera));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Left",   make_invoker (&OrthoCamera::SetLeft));
   lib.Register ("set_Right",  make_invoker (&OrthoCamera::SetRight));
@@ -93,7 +93,7 @@ void bind_ortho_camera_library (Environment& environment)
   lib.Register ("get_ZNear",  make_invoker (&OrthoCamera::ZNear));
   lib.Register ("get_ZFar",   make_invoker (&OrthoCamera::ZFar));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<OrthoCamera> (SCENE_ORTHO_CAMERA_LIBRARY);
 }

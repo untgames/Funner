@@ -12,7 +12,7 @@ namespace input_script_bind
 {
 
 /*
-    äÆ≠·‚†≠‚Î
+    –ö–æ–Ω—Å—Ç–∞–Ω—Ç—ã
 */
 
 const char* COMPONENT_NAME = "script.binds.Input";
@@ -21,7 +21,7 @@ const char* INPUT_LIBRARY  = "Input";
 const char* CURSOR_LIBRARY = "Input.Cursor";
 
 /*
-    ê•£®·‚‡†Ê®Ô °®°´®Æ‚•™
+    –†–µ–≥–∏—Å—Ç—Ä–∞—Ü–∏—è –±–∏–±–ª–∏–æ—Ç–µ–∫
 */
 
 Cursor create_cursor ()
@@ -56,7 +56,7 @@ void bind_input_globals (Environment& environment)
 }
 
 /*
-    äÆ¨ØÆ≠•≠‚
+    –ö–æ–º–ø–æ–Ω–µ–Ω—Ç
 */
 
 class Component

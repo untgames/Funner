@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ContextObject::ContextObject (const ContextManager& in_context_manager)
@@ -12,7 +12,7 @@ ContextObject::ContextObject (const ContextManager& in_context_manager)
   {}
 
 /*
-    Проверка совместимости
+    РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 */
 
 bool ContextObject::IsCompatible (const ContextManager& manager) const
@@ -26,7 +26,7 @@ bool ContextObject::IsCompatible (const ContextObject& object) const
 }
 
 /*
-    Активация текущего контекста
+    РђРєС‚РёРІР°С†РёСЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void ContextObject::MakeContextCurrent () const
@@ -40,7 +40,7 @@ bool ContextObject::TryMakeContextCurrent () const
 }
 
 /*
-    Работа с таблицами локальных данных текущего контекста
+    Р Р°Р±РѕС‚Р° СЃ С‚Р°Р±Р»РёС†Р°РјРё Р»РѕРєР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С… С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 const size_t* ContextObject::GetContextCache () const
@@ -64,7 +64,7 @@ size_t ContextObject::GetContextCacheValue (size_t entry_id) const
 }
 
 /*
-    Определение поддержки расширения контекстом
+    РћРїСЂРµРґРµР»РµРЅРёРµ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 bool ContextObject::IsSupported (const Extension& extension) const
@@ -73,7 +73,7 @@ bool ContextObject::IsSupported (const Extension& extension) const
 }
 
 /*
-   Поулчение аппаратно поддерживаемых возможностей контекста
+   РџРѕСѓР»С‡РµРЅРёРµ Р°РїРїР°СЂР°С‚РЅРѕ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 const ContextCaps& ContextObject::GetCaps () const
@@ -82,7 +82,7 @@ const ContextCaps& ContextObject::GetCaps () const
 }
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void ContextObject::LogPrintf  (const char* format, ...) const
@@ -100,7 +100,7 @@ void ContextObject::LogVPrintf (const char* format, va_list args) const
 }
 
 /*
-    Проверка ошибок OpenGL
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє OpenGL
 */
 
 void ContextObject::SetValidationState (bool state)
@@ -129,7 +129,7 @@ void ContextObject::ClearErrors () const
 }
 
 /*
-    Оповещение о необходимости ребинда уровня
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґР° СѓСЂРѕРІРЅСЏ
 */
 
 void ContextObject::StageRebindNotify (Stage stage)

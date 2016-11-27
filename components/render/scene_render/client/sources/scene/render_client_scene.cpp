@@ -3,7 +3,7 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃС†РµРЅС‹
 */
 
 namespace
@@ -69,12 +69,12 @@ struct NodeSceneReseter
 
 struct Scene::Impl
 {
-  object_id_t          id;                      //идентификатор сцены
-  scene_graph::Scene&  scene;                   //сцена
-  SceneManager&        scene_manager;           //менеджер сцен
-  xtl::auto_connection on_node_bind_connection; //оповещение о появлении нового узла в сцене
+  object_id_t          id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃС†РµРЅС‹
+  scene_graph::Scene&  scene;                   //СЃС†РµРЅР°
+  SceneManager&        scene_manager;           //РјРµРЅРµРґР¶РµСЂ СЃС†РµРЅ
+  xtl::auto_connection on_node_bind_connection; //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕСЏРІР»РµРЅРёРё РЅРѕРІРѕРіРѕ СѓР·Р»Р° РІ СЃС†РµРЅРµ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Scene& owner, scene_graph::Scene& in_scene, SceneManager& in_scene_manager, object_id_t in_id)
     : id (in_id)
     , scene (in_scene)
@@ -103,7 +103,7 @@ struct Scene::Impl
     }
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -117,7 +117,7 @@ struct Scene::Impl
     }
   }
 
-/// Оповещение о появлении нового узла в сцене
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕСЏРІР»РµРЅРёРё РЅРѕРІРѕРіРѕ СѓР·Р»Р° РІ СЃС†РµРЅРµ
   void OnNodeBinded (scene_graph::Node& src_node)
   {
     try
@@ -133,7 +133,7 @@ struct Scene::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Scene::Scene (scene_graph::Scene& scene, SceneManager& scene_manager, object_id_t id)
@@ -154,7 +154,7 @@ Scene::~Scene ()
 }
 
 /*
-    Идентификатор сцены
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃС†РµРЅС‹
 */
 
 object_id_t Scene::Id ()
@@ -163,7 +163,7 @@ object_id_t Scene::Id ()
 }
 
 /*
-    Сцена-источник
+    РЎС†РµРЅР°-РёСЃС‚РѕС‡РЅРёРє
 */
 
 scene_graph::Scene& Scene::SourceScene ()

@@ -8,7 +8,7 @@ namespace
 const float TRANSFORM_EQUAL_EPSILON = 0.001f;
 
 /*
-    Преобразователь данных коллады
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ РґР°РЅРЅС‹С… РєРѕР»Р»Р°РґС‹
 */
 
 class Converter
@@ -75,11 +75,11 @@ class Converter
 
       stl::string id (collada_animation.Id ());
 
-      //копируем имя объекта в id анимации, если при экспорте id не был задан
+      //РєРѕРїРёСЂСѓРµРј РёРјСЏ РѕР±СЉРµРєС‚Р° РІ id Р°РЅРёРјР°С†РёРё, РµСЃР»Рё РїСЂРё СЌРєСЃРїРѕСЂС‚Рµ id РЅРµ Р±С‹Р» Р·Р°РґР°РЅ
       if (id.empty () && animation.TargetsCount ())
         id = animation.TargetName (0);
 
-      //если для одного объекта существует несколько анимаций, добавляем символ '_' чтобы не затереть предыдущие
+      //РµСЃР»Рё РґР»СЏ РѕРґРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃСѓС‰РµСЃС‚РІСѓРµС‚ РЅРµСЃРєРѕР»СЊРєРѕ Р°РЅРёРјР°С†РёР№, РґРѕР±Р°РІР»СЏРµРј СЃРёРјРІРѕР» '_' С‡С‚РѕР±С‹ РЅРµ Р·Р°С‚РµСЂРµС‚СЊ РїСЂРµРґС‹РґСѓС‰РёРµ
       while (library.Find (id.c_str ()))
         id += '_';
 
@@ -88,7 +88,7 @@ class Converter
 
   public:
     /*
-        Конструктор
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     */
 
     Converter (const media::collada::Model& model, media::animation::AnimationLibrary& library)
@@ -116,7 +116,7 @@ namespace media
 namespace collada
 {
 
-//преобразование коллада-модели в библиотеку анимаций
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»Рё РІ Р±РёР±Р»РёРѕС‚РµРєСѓ Р°РЅРёРјР°С†РёР№
 void convert (const media::collada::Model& src_model, animation::AnimationLibrary& dst_library)
 {
   Converter (src_model, dst_library);

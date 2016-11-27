@@ -2,8 +2,8 @@ function AddEventManager(obj)
   assert(obj~=nil, "ERROR: AddEventManager - object is nil")
   assert(type(obj)=="table", "ERROR: AddEventManager - object is not a metatable")
   
-  local Handle={} --список списков обработчиков для различных событий
-  local UHandle={} --список универсальных обработчиков
+  local Handle={} --СЃРїРёСЃРѕРє СЃРїРёСЃРєРѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РґР»СЏ СЂР°Р·Р»РёС‡РЅС‹С… СЃРѕР±С‹С‚РёР№
+  local UHandle={} --СЃРїРёСЃРѕРє СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹С… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
   local AdditionalParams={}
   
   obj.RegisterUniversalHandler=function (handler, Param)
@@ -43,15 +43,15 @@ function AddEventManager(obj)
   obj.HandleEvent=function (event, ...)
     --print("Event:",event,...)
     assert(event~=nil, "ERROR AddEventManager(obj).HandleEvent - event is nil")
-    --сохраняем в обьект последнее поступившее событие
+    --СЃРѕС…СЂР°РЅСЏРµРј РІ РѕР±СЊРµРєС‚ РїРѕСЃР»РµРґРЅРµРµ РїРѕСЃС‚СѓРїРёРІС€РµРµ СЃРѕР±С‹С‚РёРµ
     local LastEvent={}
     LastEvent.Name=event
     LastEvent.Params={...}
     obj.LastEvent=LastEvent
-    --основной обработчик событий, вызывающий конкретный обработчик события
+    --РѕСЃРЅРѕРІРЅРѕР№ РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№, РІС‹Р·С‹РІР°СЋС‰РёР№ РєРѕРЅРєСЂРµС‚РЅС‹Р№ РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ
     local AP=false
     if Handle[event] then
-      --вызов обработчиков для конкретного события
+      --РІС‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ СЃРѕР±С‹С‚РёСЏ
       local handlers=Handle[event]
       local handler_index, handler=next(handlers)
       while handler_index do
@@ -64,7 +64,7 @@ function AddEventManager(obj)
         handler_index, handler=next(handlers, handler_index)
       end
     end
-    --вызов универсальных обработчиков
+    --РІС‹Р·РѕРІ СѓРЅРёРІРµСЂСЃР°Р»СЊРЅС‹С… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
     local handlers=UHandle
     local handler_index, handler=next(handlers)
     while handler_index do

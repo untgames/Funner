@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ScaledTexture::ScaledTexture
@@ -62,7 +62,7 @@ ScaledTexture::ScaledTexture
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void ScaledTexture::GetDesc (TextureDesc& out_desc)
@@ -94,7 +94,7 @@ PixelFormat ScaledTexture::GetFormat ()
 }
 
 /*
-    Установка / получение хэша дескриптора прикрепленного сэмплера
+    РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РґРµСЃРєСЂРёРїС‚РѕСЂР° РїСЂРёРєСЂРµРїР»РµРЅРЅРѕРіРѕ СЃСЌРјРїР»РµСЂР°
 */
 
 void ScaledTexture::SetSamplerHash (size_t hash)
@@ -108,7 +108,7 @@ size_t ScaledTexture::GetSamplerHash ()
 }
 
 /*
-    Установка текстуры в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void ScaledTexture::Bind ()
@@ -117,7 +117,7 @@ void ScaledTexture::Bind ()
 }
 
 /*
-    Работа с данными
+    Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё
 */
 
 void ScaledTexture::ScaleImage (unsigned int width, unsigned int height, PixelFormat source_format, const void* buffer, Buffer& scaled_buffer, PixelFormat& scaled_format)

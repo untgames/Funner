@@ -10,17 +10,17 @@ namespace xmtl_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  COMPONENT_NAME      = "media.rfx.material.loaders.xmtl"; //имя компонента
-const char*  LOG_NAME            = COMPONENT_NAME;                    //имя протокола
-const char*  EXTENSION           = "xmtl";                            //расширение загружаемого ресурса
-const size_t TEXMAP_CACHE_SIZE   = 32;                                //резервируемый размер кэша загружаемых текстурных карт
-const size_t ELEMENTS_CACHE_SIZE = 8;                                 //резервируемый размер кэшей загрузки массивов
+const char*  COMPONENT_NAME      = "media.rfx.material.loaders.xmtl"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char*  LOG_NAME            = COMPONENT_NAME;                    //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
+const char*  EXTENSION           = "xmtl";                            //СЂР°СЃС€РёСЂРµРЅРёРµ Р·Р°РіСЂСѓР¶Р°РµРјРѕРіРѕ СЂРµСЃСѓСЂСЃР°
+const size_t TEXMAP_CACHE_SIZE   = 32;                                //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ РєСЌС€Р° Р·Р°РіСЂСѓР¶Р°РµРјС‹С… С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
+const size_t ELEMENTS_CACHE_SIZE = 8;                                 //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ РєСЌС€РµР№ Р·Р°РіСЂСѓР·РєРё РјР°СЃСЃРёРІРѕРІ
 
 /*
-    Загрузчик
+    Р—Р°РіСЂСѓР·С‡РёРє
 */
 
 class XmtlLoader
@@ -32,7 +32,7 @@ class XmtlLoader
     {
       try
       {
-          //резервирование памяти кэшей загрузки
+          //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РєСЌС€РµР№ Р·Р°РіСЂСѓР·РєРё
         
         texmap_cache.reserve (TEXMAP_CACHE_SIZE);
         int_cache.reserve    (ELEMENTS_CACHE_SIZE);
@@ -40,18 +40,18 @@ class XmtlLoader
         vector_cache.reserve (ELEMENTS_CACHE_SIZE);
         matrix_cache.reserve (ELEMENTS_CACHE_SIZE);
         
-          //загрузка библиотек
+          //Р·Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє
           
         for_each_child (parser.Root (), "material_library", xtl::bind (&XmtlLoader::LoadLibrary, this, _1));
         
-          //вывод протокола загрузки
+          //РІС‹РІРѕРґ РїСЂРѕС‚РѕРєРѕР»Р° Р·Р°РіСЂСѓР·РєРё
           
         Log out_log (LOG_NAME);
           
         for (size_t i=0; i<log.MessagesCount (); i++)
           out_log.Print (log.Message (i));
           
-          //проверка ошибок
+          //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
           
         if (log.HasErrors ())
         {
@@ -67,7 +67,7 @@ class XmtlLoader
             }
         }
 
-          //замена
+          //Р·Р°РјРµРЅР°
                 
         in_library.Swap (library);
       }
@@ -79,7 +79,7 @@ class XmtlLoader
     }
     
   private:
-///Загрузка библиотеки материалов
+///Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё РјР°С‚РµСЂРёР°Р»РѕРІ
     void LoadLibrary (Parser::Iterator parse_iter)
     {
       for_each_child (*parse_iter, "layouts", xtl::bind (&XmtlLoader::LoadLayouts, this, _1));
@@ -87,13 +87,13 @@ class XmtlLoader
       for_each_child (*parse_iter, "materials", xtl::bind (&XmtlLoader::LoadMaterials, this, _1));
     }
     
-///Загрузка шаблонов
+///Р—Р°РіСЂСѓР·РєР° С€Р°Р±Р»РѕРЅРѕРІ
     void LoadLayouts (Parser::Iterator parse_iter)
     {
       for_each_child (*parse_iter, "layout", xtl::bind (&XmtlLoader::LoadLayout, this, _1));
     }
     
-///Загрузка шаблона
+///Р—Р°РіСЂСѓР·РєР° С€Р°Р±Р»РѕРЅР°
     void LoadLayout (Parser::Iterator parse_iter)
     {
       const char* id = get<const char*> (*parse_iter, "id");
@@ -108,7 +108,7 @@ class XmtlLoader
       layouts [id] = layout;
     }    
     
-///Определение типа свойства
+///РћРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЃРІРѕР№СЃС‚РІР°
     common::PropertyType GetPropertyType (const char* value, common::ParseNode& node)
     {
       if (!xtl::xstrcmp (value, "string")) return common::PropertyType_String;
@@ -122,7 +122,7 @@ class XmtlLoader
       return common::PropertyType_String;
     }
     
-///Загрузка свойства шаблона
+///Р—Р°РіСЂСѓР·РєР° СЃРІРѕР№СЃС‚РІР° С€Р°Р±Р»РѕРЅР°
     size_t LoadLayoutProperty (Parser::Iterator parse_iter, common::PropertyLayout& layout)
     {
       const char*          name  = get<const char*> (*parse_iter, "name");
@@ -132,13 +132,13 @@ class XmtlLoader
       return layout.AddProperty (name, type, count);
     }
     
-///Загрузка текстурных карт
+///Р—Р°РіСЂСѓР·РєР° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
     void LoadTexmaps (Parser::Iterator parse_iter)
     {
       for_each_child (*parse_iter, "texmap", xtl::bind (&XmtlLoader::LoadGlobalTexmap, this, _1));
     }
     
-///Загрузка текстурной карты
+///Р—Р°РіСЂСѓР·РєР° С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹
     void LoadGlobalTexmap (Parser::Iterator parse_iter)
     {
       const char* id = get<const char*> (*parse_iter, "id");
@@ -166,20 +166,20 @@ class XmtlLoader
       return texmap;
     }
 
-///Загрузка материалов
+///Р—Р°РіСЂСѓР·РєР° РјР°С‚РµСЂРёР°Р»РѕРІ
     void LoadMaterials (Parser::Iterator parse_iter)
     {
       for_each_child (*parse_iter, "material", xtl::bind (&XmtlLoader::LoadMaterial, this, _1));
       for_each_child (*parse_iter, "instance_material", xtl::bind (&XmtlLoader::LoadInstanceMaterial, this, _1));
     }
     
-///Загрузка значения свойства из блока #text
+///Р—Р°РіСЂСѓР·РєР° Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР° РёР· Р±Р»РѕРєР° #text
     template <class T> void LoadPropertyValueFromNode (Parser::Iterator parse_iter, T* destination, size_t count)
     {
       read (*parse_iter, "#text", destination, count);
     }
     
-///Загрузка значения свойства из блока value
+///Р—Р°РіСЂСѓР·РєР° Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР° РёР· Р±Р»РѕРєР° value
     template <class T> bool LoadPropertyValueFromAttribute (Parser::Iterator parse_iter, T* destination, size_t count)
     {
       const char* value = get<const char*> (*parse_iter, "value", "");
@@ -204,7 +204,7 @@ class XmtlLoader
       return true;
     }    
     
-///Загрузка значения свойства
+///Р—Р°РіСЂСѓР·РєР° Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР°
     template <class T> void LoadPropertyValue (Parser::Iterator parse_iter, common::PropertyMap& properties, size_t property_index, stl::vector<T>& cache)
     {
       size_t elements_count = properties.PropertyElementsCount (property_index);
@@ -230,7 +230,7 @@ class XmtlLoader
       }
     }
     
-///Загрузка свойства материала
+///Р—Р°РіСЂСѓР·РєР° СЃРІРѕР№СЃС‚РІР° РјР°С‚РµСЂРёР°Р»Р°
     void LoadMaterialProperty (Parser::Iterator parse_iter, common::PropertyMap& properties, const char* layout)
     {
       const char* name = get<const char*> (*parse_iter, "name");      
@@ -288,13 +288,13 @@ class XmtlLoader
       }
     }
     
-///Загрузка текстурной карты материала
+///Р—Р°РіСЂСѓР·РєР° С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹ РјР°С‚РµСЂРёР°Р»Р°
     void LoadMaterialTexmap (Parser::Iterator parse_iter, stl::vector<Texmap>& material_texmaps)
     {
       material_texmaps.push_back (LoadTexmap (parse_iter));
     }
     
-///Загрузка инстанцированной текстурной карты материала
+///Р—Р°РіСЂСѓР·РєР° РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕР№ С‚РµРєСЃС‚СѓСЂРЅРѕР№ РєР°СЂС‚С‹ РјР°С‚РµСЂРёР°Р»Р°
     void LoadMaterialInstanceTexmap (Parser::Iterator parse_iter, stl::vector<Texmap>& material_texmaps)
     {
       const char* source = get<const char*> (*parse_iter, "source");
@@ -310,7 +310,7 @@ class XmtlLoader
       material_texmaps.push_back (iter->second);
     }
     
-///Загрузка материала
+///Р—Р°РіСЂСѓР·РєР° РјР°С‚РµСЂРёР°Р»Р°
     void LoadMaterial (Parser::Iterator parse_iter)
     {
       const char* id      = get<const char*> (*parse_iter, "id");
@@ -355,7 +355,7 @@ class XmtlLoader
       library.Attach (id, material);
     }
 
-///Инстансинг материала
+///РРЅСЃС‚Р°РЅСЃРёРЅРі РјР°С‚РµСЂРёР°Р»Р°
     void LoadInstanceMaterial (Parser::Iterator parse_iter)
     {
       const char* id     = get<const char*> (*parse_iter, "id");
@@ -382,20 +382,20 @@ class XmtlLoader
     typedef stl::vector<math::mat4f>                                          MatrixArray;
 
   private:
-    MaterialLibrary  library;           //загружаемая библиотека
-    Parser           parser;            //парсер
-    ParseLog         log;               //протокол загрузки
-    LayoutMap        layouts;           //шаблоны
-    TexmapMap        texmaps;           //текстурные карты
-    TexmapArray      texmap_cache;      //кэш загружаемых текстурных карт для материала
-    IntArray         int_cache;         //кэш загрузки массивов целых чисел
-    FloatArray       float_cache;       //кэш загрузки массивов чисел с плавающей точкой
-    VectorArray      vector_cache;      //кэш загрузки массивов векторов
-    MatrixArray      matrix_cache;      //кэш загрузки массивов матриц
+    MaterialLibrary  library;           //Р·Р°РіСЂСѓР¶Р°РµРјР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+    Parser           parser;            //РїР°СЂСЃРµСЂ
+    ParseLog         log;               //РїСЂРѕС‚РѕРєРѕР» Р·Р°РіСЂСѓР·РєРё
+    LayoutMap        layouts;           //С€Р°Р±Р»РѕРЅС‹
+    TexmapMap        texmaps;           //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹
+    TexmapArray      texmap_cache;      //РєСЌС€ Р·Р°РіСЂСѓР¶Р°РµРјС‹С… С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚ РґР»СЏ РјР°С‚РµСЂРёР°Р»Р°
+    IntArray         int_cache;         //РєСЌС€ Р·Р°РіСЂСѓР·РєРё РјР°СЃСЃРёРІРѕРІ С†РµР»С‹С… С‡РёСЃРµР»
+    FloatArray       float_cache;       //РєСЌС€ Р·Р°РіСЂСѓР·РєРё РјР°СЃСЃРёРІРѕРІ С‡РёСЃРµР» СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
+    VectorArray      vector_cache;      //РєСЌС€ Р·Р°РіСЂСѓР·РєРё РјР°СЃСЃРёРІРѕРІ РІРµРєС‚РѕСЂРѕРІ
+    MatrixArray      matrix_cache;      //РєСЌС€ Р·Р°РіСЂСѓР·РєРё РјР°СЃСЃРёРІРѕРІ РјР°С‚СЂРёС†
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

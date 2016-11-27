@@ -5,8 +5,8 @@
 using namespace render;
 using namespace render::scene::server;
 
-//TODO: корректирующая матрица для отрисовки плоских зеркал
-//TODO: хранение фрастума и использование внутреннего фрастума области вывода в случае наличия корректирующей матрицы
+//TODO: РєРѕСЂСЂРµРєС‚РёСЂСѓСЋС‰Р°СЏ РјР°С‚СЂРёС†Р° РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё РїР»РѕСЃРєРёС… Р·РµСЂРєР°Р»
+//TODO: С…СЂР°РЅРµРЅРёРµ С„СЂР°СЃС‚СѓРјР° Рё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ С„СЂР°СЃС‚СѓРјР° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° РІ СЃР»СѓС‡Р°Рµ РЅР°Р»РёС‡РёСЏ РєРѕСЂСЂРµРєС‚РёСЂСѓСЋС‰РµР№ РјР°С‚СЂРёС†С‹
 
 /*
 ===================================================================================================
@@ -86,22 +86,22 @@ struct ViewportDrawListNode
   virtual void Cleanup () = 0;
 };
 
-/// Кэш результата обхода сцены
+/// РљСЌС€ СЂРµР·СѓР»СЊС‚Р°С‚Р° РѕР±С…РѕРґР° СЃС†РµРЅС‹
 struct CameraTraverseResult: public ITraverseResultCache
 {
-  const bound_volumes::plane_listf& frustum;  //пирамида отсечения
-  Scene&                            scene;    //сцена
-  TraverseResult&                   result;   //результат обхода
-  bool                              computed; //результат рассчитан
+  const bound_volumes::plane_listf& frustum;  //РїРёСЂР°РјРёРґР° РѕС‚СЃРµС‡РµРЅРёСЏ
+  Scene&                            scene;    //СЃС†РµРЅР°
+  TraverseResult&                   result;   //СЂРµР·СѓР»СЊС‚Р°С‚ РѕР±С…РѕРґР°
+  bool                              computed; //СЂРµР·СѓР»СЊС‚Р°С‚ СЂР°СЃСЃС‡РёС‚Р°РЅ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   CameraTraverseResult (const bound_volumes::plane_listf& in_frustum, Scene& in_scene, TraverseResult& in_result)
     : frustum (in_frustum)
     , scene (in_scene)
     , result (in_result)
     , computed (false) { }
   
-///Получение результата
+///РџРѕР»СѓС‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р°
   TraverseResult& Result ()
   {
     try
@@ -142,17 +142,17 @@ struct ViewportDrawList::Impl: public ViewportDrawListHead
 */
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t LISTENER_ARRAY_RESERVE_SIZE                = 4;    //резервируемое количество слушателей
-const size_t TECNIQUE_ARRAY_RESERVE_SIZE                = 16;   //резервируемое количество техник
-const size_t FRAME_ARRAY_RESERVE_SIZE                   = 4;    //резервируемое количество кадров
-const size_t TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE        = 64;   //резервируемое количество источников света
-const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых моделей
+const size_t LISTENER_ARRAY_RESERVE_SIZE                = 4;    //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»СѓС€Р°С‚РµР»РµР№
+const size_t TECNIQUE_ARRAY_RESERVE_SIZE                = 16;   //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµС…РЅРёРє
+const size_t FRAME_ARRAY_RESERVE_SIZE                   = 4;    //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ
+const size_t TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE        = 64;   //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
+const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРёР·СѓР°Р»РёР·РёСЂСѓРµРјС‹С… РјРѕРґРµР»РµР№
 
 /*
-    Описание реализации области вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 namespace
@@ -187,37 +187,37 @@ typedef stl::vector<FramePtr>     FrameArray;
 
 struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNode, public IRenderTargetMapListener, public IRenderManagerListener
 {
-  RenderManager                render_manager;             //менеджер рендеринга
-  RenderTargetMap              render_targets;             //цели рендеринга
-  manager::RenderTargetMap     frame_render_targets;       //цели рендеринга фреймов
-  RenderTargetEntryMap         render_target_entries;      //дескрипторы целей рендеринга
-  stl::string                  name;                       //имя области вывода
-  stl::string                  technique_name;             //имя техники
-  stl::string                  effect_name;                //имя эффекта
-  TechniquePtr                 technique;                  //техника
-  Rect                         area;                       //область вывода
-  float                        min_depth;                  //минимальная глубина
-  float                        max_depth;                  //максимальная глубина
-  int                          zorder;                     //порядок вывода
-  bool                         is_active;                  //активна ли область отрисовки
-  FrameArray                   frames;                     //присоединенные кадры
-  size_t                       current_frame_index;        //индекс текущего кадра
-  math::vec4f                  background_color;           //цвет фона
-  bool                         background_state;           //состояние фона
-  common::PropertyMap          properties;                 //свойства области вывода
-  server::Camera               camera;                     //камера
-  stl::auto_ptr<server::Scene> scene;                      //текущая сцена
-  size_t                       max_draw_depth;             //максимальная глубина вложенности рендеринга
-  ListenerArray                listeners;                  //слушатели событий области вывода
-  bool                         need_reconfiguration;       //конфигурация изменена
-  bool                         need_update_technique;      //обновление техники
-  bool                         need_update_area;           //обновилась область
-  bool                         need_update_render_targets; //требуется обновить буферы отрисовки
-  bool                         need_update_background;     //требуется обновить параметры очистки
-  bool                         need_update_camera;         //требуется обновить камеру
-  bool                         need_update_properties;     //требуется обновление свойств
+  RenderManager                render_manager;             //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  RenderTargetMap              render_targets;             //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  manager::RenderTargetMap     frame_render_targets;       //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР° С„СЂРµР№РјРѕРІ
+  RenderTargetEntryMap         render_target_entries;      //РґРµСЃРєСЂРёРїС‚РѕСЂС‹ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
+  stl::string                  name;                       //РёРјСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  stl::string                  technique_name;             //РёРјСЏ С‚РµС…РЅРёРєРё
+  stl::string                  effect_name;                //РёРјСЏ СЌС„С„РµРєС‚Р°
+  TechniquePtr                 technique;                  //С‚РµС…РЅРёРєР°
+  Rect                         area;                       //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
+  float                        min_depth;                  //РјРёРЅРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР°
+  float                        max_depth;                  //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР°
+  int                          zorder;                     //РїРѕСЂСЏРґРѕРє РІС‹РІРѕРґР°
+  bool                         is_active;                  //Р°РєС‚РёРІРЅР° Р»Рё РѕР±Р»Р°СЃС‚СЊ РѕС‚СЂРёСЃРѕРІРєРё
+  FrameArray                   frames;                     //РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Рµ РєР°РґСЂС‹
+  size_t                       current_frame_index;        //РёРЅРґРµРєСЃ С‚РµРєСѓС‰РµРіРѕ РєР°РґСЂР°
+  math::vec4f                  background_color;           //С†РІРµС‚ С„РѕРЅР°
+  bool                         background_state;           //СЃРѕСЃС‚РѕСЏРЅРёРµ С„РѕРЅР°
+  common::PropertyMap          properties;                 //СЃРІРѕР№СЃС‚РІР° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  server::Camera               camera;                     //РєР°РјРµСЂР°
+  stl::auto_ptr<server::Scene> scene;                      //С‚РµРєСѓС‰Р°СЏ СЃС†РµРЅР°
+  size_t                       max_draw_depth;             //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  ListenerArray                listeners;                  //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  bool                         need_reconfiguration;       //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РёР·РјРµРЅРµРЅР°
+  bool                         need_update_technique;      //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµС…РЅРёРєРё
+  bool                         need_update_area;           //РѕР±РЅРѕРІРёР»Р°СЃСЊ РѕР±Р»Р°СЃС‚СЊ
+  bool                         need_update_render_targets; //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІРёС‚СЊ Р±СѓС„РµСЂС‹ РѕС‚СЂРёСЃРѕРІРєРё
+  bool                         need_update_background;     //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІРёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РѕС‡РёСЃС‚РєРё
+  bool                         need_update_camera;         //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІРёС‚СЊ РєР°РјРµСЂСѓ
+  bool                         need_update_properties;     //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets, const ViewportDrawList& viewports, size_t in_max_draw_depth)
     : ViewportDrawListNode (viewports.impl)
     , render_manager (in_render_manager)
@@ -253,7 +253,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     technique = TechniquePtr ();
@@ -262,7 +262,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     render_targets.DetachListener (this);
   }
 
-/// Получение текущего кадра
+/// РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєР°РґСЂР°
   Frame* CurrentFrame ()
   {
     try
@@ -292,7 +292,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Оповещение о добавлении новой области вывода
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РґРѕР±Р°РІР»РµРЅРёРё РЅРѕРІРѕР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   void OnRenderTargetAdded (const RenderTargetDesc& desc)
   {
     RenderTargetEntryMap::iterator iter = render_target_entries.find (&desc);
@@ -306,7 +306,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     need_reconfiguration       = true;
   }
 
-/// Оповещение об изменении области вывода
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   void OnRenderTargetUpdated (const RenderTargetDesc& desc)
   {
     RenderTargetEntryMap::iterator iter = render_target_entries.find (&desc);
@@ -319,7 +319,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     need_reconfiguration       = true;
   }
 
-/// Оповещение об удалении области вывода
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   void OnRenderTargetRemoved (const RenderTargetDesc& desc)
   {
     render_target_entries.erase (&desc);
@@ -328,7 +328,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     need_reconfiguration       = true;    
   }
 
-/// Оповещение об изменении конфигурации
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РєРѕРЅС„РёРіСѓСЂР°С†РёРё
   void OnRenderManagerConfigurationChanged (const common::ParseNode&)
   {
     technique = TechniquePtr ();
@@ -337,7 +337,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     need_reconfiguration  = true;
   }
 
-/// Сброс техники
+/// РЎР±СЂРѕСЃ С‚РµС…РЅРёРєРё
   void ResetTechnique ()
   {
     frames.clear ();
@@ -347,16 +347,16 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     effect_name.clear ();
   }
 
-/// Создание техники
+/// РЎРѕР·РґР°РЅРёРµ С‚РµС…РЅРёРєРё
   void CreateTechnique ()
   {
     try
     {
-        //сброс техники
+        //СЃР±СЂРѕСЃ С‚РµС…РЅРёРєРё
 
       ResetTechnique ();
 
-        //конфигурация
+        //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ
 
       common::Log&      log           = render_manager.Log ();
       common::ParseNode configuration = render_manager.Manager ().Configuration ();
@@ -412,7 +412,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Переконфигурация техники
+/// РџРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ С‚РµС…РЅРёРєРё
   void ReconfigureTechnique ()
   {
     try
@@ -441,13 +441,13 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Конфигурация эффектов
+/// РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЌС„С„РµРєС‚РѕРІ
   void ConfigureEffects (Frame& desc)
   {
     desc.frame.SetEffect (effect_name.c_str ());
   }
 
-/// Конфигурация параметров очистки
+/// РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё
   void ConfigureBackground (Frame& desc)
   {
     if (background_state)
@@ -461,7 +461,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Переконфигурация параметров очистки
+/// РџРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё
   void ReconfigureBackground ()
   {
     try
@@ -478,7 +478,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Переконфигурация целевых буферов отрисовки
+/// РџРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
   void ReconfigureRenderTargets ()
   {
     try
@@ -522,7 +522,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Переконфигурация свойств
+/// РџРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРІРѕР№СЃС‚РІ
   void ReconfigureProperties ()
   {
     try
@@ -556,7 +556,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Переконфигурация
+/// РџРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ
   void Reconfigure ()
   {
     try
@@ -564,27 +564,27 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
       if (!need_reconfiguration)
         return;
 
-        //переконфигурация техники
+        //РїРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ С‚РµС…РЅРёРєРё
 
       if (need_update_technique)
         ReconfigureTechnique ();
 
-        //переконфигурация параметров очистки
+        //РїРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё
         
       if (need_update_background)
         ReconfigureBackground ();
 
-        //переконфигурация целевых буферов отрисовки
+        //РїРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
         
       if (need_update_render_targets || need_update_area)
         ReconfigureRenderTargets ();
 
-        //переконфигурация свойств
+        //РїРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРІРѕР№СЃС‚РІ
 
       if (need_update_properties)
         ReconfigureProperties ();
 
-        //обновление флагов
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р»Р°РіРѕРІ
 
       need_reconfiguration = false;
     }
@@ -595,7 +595,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Очистка после отрисовки кадра
+/// РћС‡РёСЃС‚РєР° РїРѕСЃР»Рµ РѕС‚СЂРёСЃРѕРІРєРё РєР°РґСЂР°
   void Cleanup ()
   {
     current_frame_index = 0;
@@ -603,7 +603,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Viewport::Viewport (const RenderManager& render_manager, const RenderTargetMap& render_target_map, const ViewportDrawList& viewports, size_t max_draw_depth)
@@ -640,7 +640,7 @@ Viewport& Viewport::operator = (const Viewport& vp)
 }
 
 /*
-    Имя области вывода
+    РРјСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Viewport::SetName (const char* name)
@@ -657,7 +657,7 @@ const char* Viewport::Name () const
 }
 
 /*
-    Область
+    РћР±Р»Р°СЃС‚СЊ
 */
 
 void Viewport::SetArea (const Rect& rect)
@@ -676,7 +676,7 @@ const Rect& Viewport::Area () const
 }
 
 /*
-    Диапазон глубины для области вывода
+    Р”РёР°РїР°Р·РѕРЅ РіР»СѓР±РёРЅС‹ РґР»СЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Viewport::SetMinDepth (float value)
@@ -710,7 +710,7 @@ float Viewport::MaxDepth () const
 }
 
 /*
-    Активность области вывода
+    РђРєС‚РёРІРЅРѕСЃС‚СЊ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 void Viewport::SetActive (bool active)
@@ -724,7 +724,7 @@ bool Viewport::IsActive () const
 }
 
 /*
-    Порядок вывода
+    РџРѕСЂСЏРґРѕРє РІС‹РІРѕРґР°
 */
 
 void Viewport::SetZOrder (int order)
@@ -752,7 +752,7 @@ int Viewport::ZOrder () const
 }
 
 /*
-    Задний фон
+    Р—Р°РґРЅРёР№ С„РѕРЅ
 */
 
 void Viewport::SetBackground (bool state, const math::vec4f& color)
@@ -777,7 +777,7 @@ const math::vec4f& Viewport::BackgroundColor () const
 }
 
 /*
-    Техника отрисовки
+    РўРµС…РЅРёРєР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void Viewport::SetTechnique (const char* name)
@@ -801,7 +801,7 @@ const char* Viewport::Technique () const
 }
 
 /*
-    Свойства отрисовки
+    РЎРІРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void Viewport::SetProperties (const common::PropertyMap& properties)
@@ -817,7 +817,7 @@ const common::PropertyMap& Viewport::Properties () const
 }
 
 /*
-    Камера
+    РљР°РјРµСЂР°
 */
 
 Camera* Viewport::Camera ()
@@ -831,7 +831,7 @@ const Camera* Viewport::Camera () const
 }
 
 /*
-    Сцена
+    РЎС†РµРЅР°
 */
 
 void Viewport::SetScene (render::scene::server::Scene* scene)
@@ -851,7 +851,7 @@ const render::scene::server::Scene* Viewport::Scene () const
 }
 
 /*
-    Максимальный уровень вложенности рендеринга
+    РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Viewport::SetMaxDrawDepth (size_t level)
@@ -875,42 +875,42 @@ size_t Viewport::MaxDrawDepth () const
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void Viewport::Update (manager::Frame* parent_frame)
 {
   try
   {
-      //отрисовка только в случае активности области вывода
+      //РѕС‚СЂРёСЃРѕРІРєР° С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ Р°РєС‚РёРІРЅРѕСЃС‚Рё РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     
     if (!impl->is_active)
       return;
 
-      //отрисовка только в случае наличия присоединенной сцены
+      //РѕС‚СЂРёСЃРѕРІРєР° С‚РѕР»СЊРєРѕ РІ СЃР»СѓС‡Р°Рµ РЅР°Р»РёС‡РёСЏ РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕР№ СЃС†РµРЅС‹
 
     if (!impl->scene)
       return;
 
-      //добавление области вывода в список отрисовки
+      //РґРѕР±Р°РІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° РІ СЃРїРёСЃРѕРє РѕС‚СЂРёСЃРѕРІРєРё
 
     impl->AddToDrawingList ();
 
-      //переконфигурация в случае изменения существенных параметров
+      //РїРµСЂРµРєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РІ СЃР»СѓС‡Р°Рµ РёР·РјРµРЅРµРЅРёСЏ СЃСѓС‰РµСЃС‚РІРµРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
     if (impl->need_reconfiguration)
       impl->Reconfigure ();
 
-      //получение текущего кадра
+      //РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєР°РґСЂР°
 
     Frame* frame_desc = impl->CurrentFrame ();
 
     if (!frame_desc)
-      return; //достигнута максимальная глубина вложенности кадров
+      return; //РґРѕСЃС‚РёРіРЅСѓС‚Р° РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё РєР°РґСЂРѕРІ
 
     impl->current_frame_index++;
 
-      //подготовка кэша результатов обхода сцены
+      //РїРѕРґРіРѕС‚РѕРІРєР° РєСЌС€Р° СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РѕР±С…РѕРґР° СЃС†РµРЅС‹
 
     TraverseResult& traverse_result = impl->render_manager.TraverseResultStorage ();
 
@@ -921,11 +921,11 @@ void Viewport::Update (manager::Frame* parent_frame)
 
     CameraTraverseResult camera_traverse_result (impl->camera.Frustum (), *impl->scene, traverse_result);
 
-      //создание контекста рендеринга
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЂРµРЅРґРµСЂРёРЅРіР°
 
     RenderingContext context (frame_desc->frame, impl->render_manager, camera_traverse_result, impl->camera);
 
-      //обновление кадра
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєР°РґСЂР°
 
     if (!impl->technique)
       return;
@@ -951,7 +951,7 @@ void Viewport::Update (manager::Frame* parent_frame)
       return;
     }
 
-      //отрисовка
+      //РѕС‚СЂРёСЃРѕРІРєР°
       
     manager::Frame& frame = frame_desc->frame;   
 
@@ -969,7 +969,7 @@ void Viewport::Update (manager::Frame* parent_frame)
 }
 
 /*
-    Добавление слушателей
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»РµР№
 */
 
 void Viewport::AttachListener (IViewportListener* listener)

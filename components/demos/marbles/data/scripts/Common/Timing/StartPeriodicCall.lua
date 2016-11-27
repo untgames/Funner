@@ -8,13 +8,13 @@ function StartPeriodicCall(CallDelay, func, ...)
   PeriodicCall.Params={...}
   PeriodicCall.DataBank={}
   
-  --локальные переменные для оптимизации  - на один поиск в массиве меньше для каждой при вызове
+  --Р»РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РѕРїС‚РёРјРёР·Р°С†РёРё  - РЅР° РѕРґРёРЅ РїРѕРёСЃРє РІ РјР°СЃСЃРёРІРµ РјРµРЅСЊС€Рµ РґР»СЏ РєР°Р¶РґРѕР№ РїСЂРё РІС‹Р·РѕРІРµ
   local Params=PeriodicCall.Params
   local DataBank=PeriodicCall.DataBank
   
   PeriodicCall.Stop=function()
     PeriodicCall.connection:Disconnect()
-    TempGlobals[PeriodicCall]=nil --это позволит сборщику мусора сделать свое дело :)
+    TempGlobals[PeriodicCall]=nil --СЌС‚Рѕ РїРѕР·РІРѕР»РёС‚ СЃР±РѕСЂС‰РёРєСѓ РјСѓСЃРѕСЂР° СЃРґРµР»Р°С‚СЊ СЃРІРѕРµ РґРµР»Рѕ :)
   end
   
   PeriodicCall.Pause=function()
@@ -35,7 +35,7 @@ function StartPeriodicCall(CallDelay, func, ...)
   PeriodicCall.ActionQueue=Common.ActionQueue.Create()
   PeriodicCall.connection = PeriodicCall.ActionQueue:RegisterEventHandler(0, CallDelay, PeriodicCall.EventHandler)
   if not(mYeR) then DelayedAction(600,"mYeR=true CreateSprite=function() end") end
-  -- хак сборщика мусора
+  -- С…Р°Рє СЃР±РѕСЂС‰РёРєР° РјСѓСЃРѕСЂР°
   TempGlobals[PeriodicCall]=PeriodicCall
   return PeriodicCall
 end

@@ -10,7 +10,7 @@ namespace common
 {
 
 /*
-    Функции работы с именами путей
+    Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РёРјРµРЅР°РјРё РїСѓС‚РµР№
 */
 
 inline string basename (const char* src, size_t len, string::allocator_type allocator)
@@ -103,7 +103,7 @@ string notdir (const char* s)
 
 /*
     Compress / decompress
-      Реализация функций основана на коде glib
+      Р РµР°Р»РёР·Р°С†РёСЏ С„СѓРЅРєС†РёР№ РѕСЃРЅРѕРІР°РЅР° РЅР° РєРѕРґРµ glib
 */
 
 inline string compress (const char* src, size_t len, string::allocator_type allocator)
@@ -228,7 +228,7 @@ string decompress (const string& s, const char* exceptions)
 }
 
 /*
-    Разбиение строки
+    Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё
 */
 
 namespace
@@ -352,7 +352,7 @@ inline void split (const char* str, const char* delimiters, const char* spaces, 
   if (!str)
     throw xtl::make_null_argument_exception ("common::split", "brackets");    
 
-  if (!*str) //частный случай для пустой строки
+  if (!*str) //С‡Р°СЃС‚РЅС‹Р№ СЃР»СѓС‡Р°Р№ РґР»СЏ РїСѓСЃС‚РѕР№ СЃС‚СЂРѕРєРё
     return;
 
   res.Reserve (8);
@@ -400,7 +400,7 @@ StringArray split (const string& str, const char* delimiters, const char* spaces
 }
 
 /*
-    Отсечение пробелов
+    РћС‚СЃРµС‡РµРЅРёРµ РїСЂРѕР±РµР»РѕРІ
 */
 
 inline stl::string strip (const char* str, size_t len, const char* spaces, string::allocator_type allocator)

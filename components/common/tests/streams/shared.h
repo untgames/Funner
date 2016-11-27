@@ -23,7 +23,7 @@ using namespace math;
 using namespace xtl;
 
 /*
-    Вывод текста в стандартный поток вывода
+    Р’С‹РІРѕРґ С‚РµРєСЃС‚Р° РІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РїРѕС‚РѕРє РІС‹РІРѕРґР°
 */
 
 size_t dump (const void* buffer, size_t size)

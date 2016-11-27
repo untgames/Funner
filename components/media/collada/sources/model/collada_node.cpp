@@ -3,7 +3,7 @@
 using namespace media::collada;
 
 /*
-    Описание реализации узла
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓР·Р»Р°
 */
 
 typedef media::CollectionImpl<Node, ICollection<Node> >                             NodeListImpl;
@@ -14,22 +14,22 @@ typedef media::CollectionImpl<InstanceController, ICollection<InstanceController
 
 struct Node::Impl: public xtl::reference_counter
 {
-  stl::string                id;              //идентификатор узла
-  stl::string                sid;             //идентификатор узла в пределах родителя
-  stl::string                name;            //имя узла
-  stl::string                user_properties; //пользовательские свойства узла
-  math::mat4f                tm;              //матрица преобразований узла
-  math::vec3f                rotation_pivot;  //центр поворотов
-  math::vec3f                scale_pivot;     //центр масштабирования
-  NodeListImpl               nodes;           //вложенные узлы
-  LightListImpl              lights;          //источники света
-  CameraListImpl             cameras;         //камеры
-  InstanceMeshListImpl       meshes;          //меши
-  InstanceControllerListImpl controllers;     //контроллеры
+  stl::string                id;              //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р°
+  stl::string                sid;             //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р° РІ РїСЂРµРґРµР»Р°С… СЂРѕРґРёС‚РµР»СЏ
+  stl::string                name;            //РёРјСЏ СѓР·Р»Р°
+  stl::string                user_properties; //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° СѓР·Р»Р°
+  math::mat4f                tm;              //РјР°С‚СЂРёС†Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ СѓР·Р»Р°
+  math::vec3f                rotation_pivot;  //С†РµРЅС‚СЂ РїРѕРІРѕСЂРѕС‚РѕРІ
+  math::vec3f                scale_pivot;     //С†РµРЅС‚СЂ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
+  NodeListImpl               nodes;           //РІР»РѕР¶РµРЅРЅС‹Рµ СѓР·Р»С‹
+  LightListImpl              lights;          //РёСЃС‚РѕС‡РЅРёРєРё СЃРІРµС‚Р°
+  CameraListImpl             cameras;         //РєР°РјРµСЂС‹
+  InstanceMeshListImpl       meshes;          //РјРµС€Рё
+  InstanceControllerListImpl controllers;     //РєРѕРЅС‚СЂРѕР»Р»РµСЂС‹
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Node::Node ()
@@ -56,7 +56,7 @@ Node& Node::operator = (const Node& node)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Node Node::Clone () const
@@ -65,7 +65,7 @@ Node Node::Clone () const
 }
 
 /*
-    Идентификатор узла
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р°
 */
 
 const char* Node::Id () const
@@ -82,7 +82,7 @@ void Node::SetId (const char* id)
 }
 
 /*
-    Идентификатор узла в пределах родительского узла
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓР·Р»Р° РІ РїСЂРµРґРµР»Р°С… СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СѓР·Р»Р°
 */
 
 const char* Node::SubId () const
@@ -99,7 +99,7 @@ void Node::SetSubId (const char* sid)
 }
 
 /*
-    Имя узла
+    РРјСЏ СѓР·Р»Р°
 */
 
 const char* Node::Name () const
@@ -116,7 +116,7 @@ void Node::SetName (const char* name)
 }
   
 /*
-   Пользовательские свойства
+   РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const char* Node::UserProperties () const
@@ -133,7 +133,7 @@ void Node::SetUserProperties (const char* properties)
 }
 
 /*
-    Преобразование узла
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓР·Р»Р°
 */
 
 const math::mat4f& Node::Transform () const
@@ -147,7 +147,7 @@ void Node::SetTransform (const math::mat4f& tm)
 }
 
 /*
-    Центры поворота и масштабирования
+    Р¦РµРЅС‚СЂС‹ РїРѕРІРѕСЂРѕС‚Р° Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ
 */
 
 const math::vec3f& Node::RotationPivot () const
@@ -171,7 +171,7 @@ void Node::SetScalePivot (const math::vec3f& pivot)
 }
 
 /*
-    Коллекции узла
+    РљРѕР»Р»РµРєС†РёРё СѓР·Р»Р°
 */
 
 Node::NodeList& Node::Nodes ()
@@ -225,7 +225,7 @@ const Node::ControllerList& Node::Controllers () const
 }
 
 /*
-    Поиск потомка по Sub-ID
+    РџРѕРёСЃРє РїРѕС‚РѕРјРєР° РїРѕ Sub-ID
 */
 
 const Node* Node::FindChild (const char* sub_id) const

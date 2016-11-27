@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Менеджер техник
+    РњРµРЅРµРґР¶РµСЂ С‚РµС…РЅРёРє
 */
 
 class TechniqueManagerImpl
@@ -15,7 +15,7 @@ class TechniqueManagerImpl
   public:
     typedef TechniqueManager::TechniqueCreator TechniqueCreator;
 
-///Регистрация техник
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ С‚РµС…РЅРёРє
     void RegisterTechnique (const char* technique, const TechniqueCreator& creator)
     {
       static const char* METHOD_NAME = "render::scene::server::TechniqueManagerImpl::RegisterTechnique";
@@ -44,7 +44,7 @@ class TechniqueManagerImpl
       techniques.clear ();
     }
 
-///Создание техники
+///РЎРѕР·РґР°РЅРёРµ С‚РµС…РЅРёРєРё
     TechniquePtr CreateTechnique (const char* technique, RenderManager& manager, const common::ParseNode& configuration)
     {
       try
@@ -72,7 +72,7 @@ class TechniqueManagerImpl
     typedef stl::hash_map<stl::hash_key<const char*>, TechniqueCreator> TechniqueMap;
 
   private:
-    TechniqueMap techniques; //техники
+    TechniqueMap techniques; //С‚РµС…РЅРёРєРё
 };
 
 typedef common::Singleton<TechniqueManagerImpl> TechniqueManagerSingleton;
@@ -80,7 +80,7 @@ typedef common::Singleton<TechniqueManagerImpl> TechniqueManagerSingleton;
 }
 
 /*
-    Делегирование вызовов
+    Р”РµР»РµРіРёСЂРѕРІР°РЅРёРµ РІС‹Р·РѕРІРѕРІ
 */
 
 void TechniqueManager::RegisterTechnique (const char* technique, const TechniqueCreator& creator)

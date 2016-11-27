@@ -11,11 +11,11 @@ const unsigned int MAX_SAMPLE_BUFFER_SIZE = 1024 * 64;
 }
 
 /*
-   Базовый класс работы с сэмплами
+   Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃ СЃСЌРјРїР»Р°РјРё
 */
 
 /*
-   Конструкторы
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 OpenALSample::OpenALSample (const char* in_name)
@@ -67,7 +67,7 @@ OpenALSample::OpenALSample (const SampleDesc& in_desc, const IDevice::SampleRead
 }
 
 /*
-   Получение имени сэмпла
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃСЌРјРїР»Р°
 */
 
 const char* OpenALSample::GetName ()
@@ -76,7 +76,7 @@ const char* OpenALSample::GetName ()
 }
 
 /*
-   Получение дескриптора сэмпла
+   РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃСЌРјРїР»Р°
 */
 
 void OpenALSample::GetDesc (SampleDesc& out_desc)
@@ -85,7 +85,7 @@ void OpenALSample::GetDesc (SampleDesc& out_desc)
 }
 
 /*
-   Функции расчёта одних характеристик через другие (всегда происходит округление в меньшую сторону)
+   Р¤СѓРЅРєС†РёРё СЂР°СЃС‡С‘С‚Р° РѕРґРЅРёС… С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє С‡РµСЂРµР· РґСЂСѓРіРёРµ (РІСЃРµРіРґР° РїСЂРѕРёСЃС…РѕРґРёС‚ РѕРєСЂСѓРіР»РµРЅРёРµ РІ РјРµРЅСЊС€СѓСЋ СЃС‚РѕСЂРѕРЅСѓ)
 */
 
 unsigned int OpenALSample::SamplesToBytes (unsigned int sample_count)
@@ -117,7 +117,7 @@ unsigned int OpenALSample::SecondsToSamples (double second_count)
 }
 
 /*
-   Получение параметров
+   РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 unsigned short OpenALSample::Channels ()
@@ -141,7 +141,7 @@ double OpenALSample::Duration ()
 }
 
 /*
-   Создание декодера
+   РЎРѕР·РґР°РЅРёРµ РґРµРєРѕРґРµСЂР°
 */
 
 ISampleDecoder* OpenALSample::CreateDecoder ()

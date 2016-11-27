@@ -1,4 +1,4 @@
-//Тестирование алгоритма min_element (first, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° min_element (first, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

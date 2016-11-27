@@ -1,4 +1,4 @@
-//Тестирование алгоритма find_first_of (SGI sample)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° find_first_of (SGI sample)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

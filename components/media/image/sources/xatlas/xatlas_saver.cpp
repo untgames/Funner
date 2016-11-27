@@ -10,14 +10,14 @@ namespace xatlas_saver
 {
 
 /*
-    Вспомогательный класс сохранения карт картинок
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР°СЂС‚ РєР°СЂС‚РёРЅРѕРє
 */
 
 class XmlAtlasSaver
 {
   public:
     /*
-        Конструктор
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     */
   
     XmlAtlasSaver (const char* file_name, const Atlas& in_atlas)
@@ -28,7 +28,7 @@ class XmlAtlasSaver
 
   private:  
     /*
-        Сохранение карты картинок
+        РЎРѕС…СЂР°РЅРµРЅРёРµ РєР°СЂС‚С‹ РєР°СЂС‚РёРЅРѕРє
     */
     
     void SaveAtlas ()
@@ -51,7 +51,7 @@ class XmlAtlasSaver
     }
 
     /*
-        Сохранение тайлов
+        РЎРѕС…СЂР°РЅРµРЅРёРµ С‚Р°Р№Р»РѕРІ
     */
 
     void SaveTile (const Tile& tile)
@@ -69,12 +69,12 @@ class XmlAtlasSaver
     }
     
   private:
-    XmlWriter    writer;  //сериализатор XML
-    const Atlas& atlas;   //карта картинок
+    XmlWriter    writer;  //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ XML
+    const Atlas& atlas;   //РєР°СЂС‚Р° РєР°СЂС‚РёРЅРѕРє
 };
 
 /*
-    Сохранение карты картинок
+    РЎРѕС…СЂР°РЅРµРЅРёРµ РєР°СЂС‚С‹ РєР°СЂС‚РёРЅРѕРє
 */
 
 void xatlas_save (const char* file_name, const Atlas& atlas)
@@ -83,13 +83,13 @@ void xatlas_save (const char* file_name, const Atlas& atlas)
 }
 
 /*
-   Компонент сохранение карт картинок
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёРµ РєР°СЂС‚ РєР°СЂС‚РёРЅРѕРє
 */
 
 class XAtlasSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     XAtlasSaverComponent () 
     {
       AtlasManager::RegisterSaver ("xatlas", &xatlas_save);

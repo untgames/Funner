@@ -72,7 +72,7 @@ struct Node
 
 Node* Node::Insert (const ImageDesc& image)
 {
-    //если узел не является листом - вставляем картинку в одного из его детей
+    //РµСЃР»Рё СѓР·РµР» РЅРµ СЏРІР»СЏРµС‚СЃСЏ Р»РёСЃС‚РѕРј - РІСЃС‚Р°РІР»СЏРµРј РєР°СЂС‚РёРЅРєСѓ РІ РѕРґРЅРѕРіРѕ РёР· РµРіРѕ РґРµС‚РµР№
 
   if (child [0])
   {
@@ -84,17 +84,17 @@ Node* Node::Insert (const ImageDesc& image)
     return child [1]->Insert (image);
   }
 
-    //если в узел уже вставлена картинка - добавление невозможно
+    //РµСЃР»Рё РІ СѓР·РµР» СѓР¶Рµ РІСЃС‚Р°РІР»РµРЅР° РєР°СЂС‚РёРЅРєР° - РґРѕР±Р°РІР»РµРЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ
 
   if (image_id)
     return 0;  
   
-    //если нет места для вставки картинки - добавление невозможно  
+    //РµСЃР»Рё РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РІСЃС‚Р°РІРєРё РєР°СЂС‚РёРЅРєРё - РґРѕР±Р°РІР»РµРЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ  
     
   if (rect.width < image.width || rect.height < image.height)
     return 0;
     
-    //если размер картинки точно подходит - добавляем её
+    //РµСЃР»Рё СЂР°Р·РјРµСЂ РєР°СЂС‚РёРЅРєРё С‚РѕС‡РЅРѕ РїРѕРґС…РѕРґРёС‚ - РґРѕР±Р°РІР»СЏРµРј РµС‘
     
   if (rect.width == image.width && rect.height == image.height)
   {
@@ -104,12 +104,12 @@ Node* Node::Insert (const ImageDesc& image)
     return this;
   }
   
-    //разрезаем узел на 2
+    //СЂР°Р·СЂРµР·Р°РµРј СѓР·РµР» РЅР° 2
     
   child [0] = new Node;
   child [1] = new Node;
   
-    //выбор границы разреза
+    //РІС‹Р±РѕСЂ РіСЂР°РЅРёС†С‹ СЂР°Р·СЂРµР·Р°
     
   size_t free_width  = rect.width - image.width,
          free_height = rect.height - image.height;
@@ -125,7 +125,7 @@ Node* Node::Insert (const ImageDesc& image)
     child [1]->rect = Rect (rect.left, rect.top + image.height, rect.width, free_height);
   }
   
-    //вставляем картинку в первого ребёнка
+    //РІСЃС‚Р°РІР»СЏРµРј РєР°СЂС‚РёРЅРєСѓ РІ РїРµСЂРІРѕРіРѕ СЂРµР±С‘РЅРєР°
     
   return child [0]->Insert (image);
 }
@@ -200,7 +200,7 @@ int main ()
   {
     srand (0);
     
-      //генерация картинок
+      //РіРµРЅРµСЂР°С†РёСЏ РєР°СЂС‚РёРЅРѕРє
       
     typedef stl::vector<ImageDesc> ImageArray;
     
@@ -222,11 +222,11 @@ int main ()
       images.push_back (image);
     }  
     
-      //сортировка картинок
+      //СЃРѕСЂС‚РёСЂРѕРІРєР° РєР°СЂС‚РёРЅРѕРє
       
     stl::sort (images.begin (), images.end (), &image_order);
 
-      //заполнение дерева картинками        
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РґРµСЂРµРІР° РєР°СЂС‚РёРЅРєР°РјРё        
       
     size_t bad_inserts;
     Node* root = 0;
@@ -243,7 +243,7 @@ int main ()
     {
       iterations_count++;
       
-        //инициализация корневого узла
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р°
 
       root = new Node;
 
@@ -274,11 +274,11 @@ int main ()
       next_edge = !next_edge;
     }
 
-      //вывод результатов
+      //РІС‹РІРѕРґ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
 
   //  root->PrintImages ();
 
-      //сохранение картинки
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РєР°СЂС‚РёРЅРєРё
       
     printf ("Create large image (%ux%u)...\n", large_image_width, large_image_height);
       
@@ -292,7 +292,7 @@ int main ()
 
     result.Save (RESULT_IMAGE_NAME);    
     
-      //вывод статистики
+      //РІС‹РІРѕРґ СЃС‚Р°С‚РёСЃС‚РёРєРё
 
     printf ("At time:          %.2f seconds\n", float (end_time - start_time) / CLOCKS_PER_SEC);
     printf ("Iterations count: %u\n", iterations_count);

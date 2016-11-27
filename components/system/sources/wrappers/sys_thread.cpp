@@ -7,21 +7,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME_PREFIX = "system.threads"; //имя потока протоколирования
+const char* LOG_NAME_PREFIX = "system.threads"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
 namespace syslib
 {
 
-///Менеджер созданных нитей
+///РњРµРЅРµРґР¶РµСЂ СЃРѕР·РґР°РЅРЅС‹С… РЅРёС‚РµР№
 class ThreadManager
 {
   public:
-    ///Добавление / удаление / поиск нити по идентификатору
+    ///Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ / РїРѕРёСЃРє РЅРёС‚Рё РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
     void AddThread (size_t thread_id, Thread::Impl* thread)
     {
       ThreadsMap::iterator iter = threads_map.find (thread_id);
@@ -59,20 +59,20 @@ typedef common::Singleton<ThreadManager> ThreadManagerSingleton;
 }
 
 /*
-    Описание реализации нити
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РЅРёС‚Рё
 */
 
 struct Thread::Impl: public IThreadCallback
 {
-  Function               thread_function;  //функция нити
-  thread_t               handle;           //идентификатор нити
-  size_t                 id;               //численный идентификатор нити
-  stl::string            name;             //имя нити
-  int                    exit_code;        //код выхода нити
-  bool                   cancel_requested; //был ли получен запрос на отмену нити
-  xtl::reference_counter ref_count;        //счетчик ссылок
+  Function               thread_function;  //С„СѓРЅРєС†РёСЏ РЅРёС‚Рё
+  thread_t               handle;           //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРёС‚Рё
+  size_t                 id;               //С‡РёСЃР»РµРЅРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРёС‚Рё
+  stl::string            name;             //РёРјСЏ РЅРёС‚Рё
+  int                    exit_code;        //РєРѕРґ РІС‹С…РѕРґР° РЅРёС‚Рё
+  bool                   cancel_requested; //Р±С‹Р» Р»Рё РїРѕР»СѓС‡РµРЅ Р·Р°РїСЂРѕСЃ РЅР° РѕС‚РјРµРЅСѓ РЅРёС‚Рё
+  xtl::reference_counter ref_count;        //СЃС‡РµС‚С‡РёРє СЃСЃС‹Р»РѕРє
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function)
     , id ()
@@ -95,7 +95,7 @@ struct Thread::Impl: public IThreadCallback
     }
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -104,18 +104,18 @@ struct Thread::Impl: public IThreadCallback
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   
-///Запуск на выполнение
+///Р—Р°РїСѓСЃРє РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ
   void Run ()
   {
     try
     {
       xtl::com_ptr<Impl> self_lock (this);
 
-      Release (); //компенсация увеличения ссылок в конструкторе
+      Release (); //РєРѕРјРїРµРЅСЃР°С†РёСЏ СѓРІРµР»РёС‡РµРЅРёСЏ СЃСЃС‹Р»РѕРє РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРµ
 
       id = Platform::GetCurrentThreadId ();
 
@@ -136,13 +136,13 @@ struct Thread::Impl: public IThreadCallback
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
 
     ThreadManagerSingleton::Instance ()->RemoveThread (id);
   }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
   void AddRef () { ref_count.increment (); }
 
   void Release ()
@@ -155,7 +155,7 @@ struct Thread::Impl: public IThreadCallback
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Thread::Thread (const Function& thread_function)
@@ -209,7 +209,7 @@ Thread::~Thread ()
 }
 
 /*
-    Идентификатор нити
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅРёС‚Рё
 */
 
 Thread::threadid_t Thread::Id () const
@@ -218,7 +218,7 @@ Thread::threadid_t Thread::Id () const
 }
 
 /*
-    Имя нити
+    РРјСЏ РЅРёС‚Рё
 */
 
 const char* Thread::Name () const
@@ -227,7 +227,7 @@ const char* Thread::Name () const
 }
 
 /*
-   Установка приоритета нити
+   РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРѕСЂРёС‚РµС‚Р° РЅРёС‚Рё
 */
 
 void Thread::SetPriority (ThreadPriority thread_priority)
@@ -244,7 +244,7 @@ void Thread::SetPriority (ThreadPriority thread_priority)
 }
 
 /*
-    Установка маски процессоров
+    РЈСЃС‚Р°РЅРѕРІРєР° РјР°СЃРєРё РїСЂРѕС†РµСЃСЃРѕСЂРѕРІ
 */
 
 void Thread::SetAffinity (size_t affinity)
@@ -261,7 +261,7 @@ void Thread::SetAffinity (size_t affinity)
 }
 
 /*
-    Отмена нити
+    РћС‚РјРµРЅР° РЅРёС‚Рё
 */
 
 void Thread::Cancel ()
@@ -270,7 +270,7 @@ void Thread::Cancel ()
 }
 
 /*
-    Ожидание завершения нити
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РЅРёС‚Рё
 */
 
 int Thread::Join ()
@@ -281,7 +281,7 @@ int Thread::Join ()
 }
 
 /*
-    Получение текущей нити
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РЅРёС‚Рё
 */
 
 Thread Thread::GetCurrent ()
@@ -311,7 +311,7 @@ Thread::threadid_t Thread::GetCurrentThreadId ()
 }
 
 /*
-   Установка точки отмена нити
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РѕС‡РєРё РѕС‚РјРµРЅР° РЅРёС‚Рё
 */
 
 void Thread::TestCancel ()

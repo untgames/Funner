@@ -41,14 +41,14 @@ void log (const char* s, ...)
 }
 
 /*
-    äÆ≠·‚†≠‚Î
+    –ö–æ–Ω—Å—Ç–∞–Ω—Ç—ã
 */
 
 const char*    WINDOW_NAME          = "FunnerWebWindow";
 const wchar_t* ENGINE_LIBRARY_NAME  = L"funner.dll";
 
 /*
-    ë®≠£´‚Æ≠ §´Ô Â‡†≠•≠®Ô Æ°Í•™‚† §¢®¶™†
+    –°–∏–Ω–≥–ª—Ç–æ–Ω –¥–ª—è —Ö—Ä–∞–Ω–µ–Ω–∏—è –æ–±—ä–µ–∫—Ç–∞ –¥–≤–∏–∂–∫–∞
 */
 
 class EngineHolder
@@ -134,7 +134,7 @@ class EngineHolder
 };
 
 /*
-    ç®‚Ï
+    –ù–∏—Ç—å
 */
 
 class PlatformThread
@@ -219,7 +219,7 @@ PlatformThread* make_thread (Fn fn)
 }
 
 /*
-    éØ®·†≠®• ‡•†´®ß†Ê®® FunnerEngine
+    –û–ø–∏—Å–∞–Ω–∏–µ —Ä–µ–∞–ª–∏–∑–∞—Ü–∏–∏ FunnerEngine
 */
 
 struct FunnerEngine::Impl

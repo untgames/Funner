@@ -10,29 +10,29 @@ using namespace render::low_level::dx11;
 */
 
 /*
-    Описание реализации состояния контекста менеджера входного уровня
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° РјРµРЅРµРґР¶РµСЂР° РІС…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 typedef xtl::com_ptr<InputBuffer> InputBufferPtr;
 
 struct InputManagerContextState::Impl: public DeviceObject
 {
-  InputLayoutPtr input_layout;                                      //входной лэйаут  
-  InputBufferPtr vertex_buffers [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //вершинные буферы 
-  InputBufferPtr index_buffer;                                      //индексный буфер
-  bool           is_dirty;                                          //флаг "грязности"
+  InputLayoutPtr input_layout;                                      //РІС…РѕРґРЅРѕР№ Р»СЌР№Р°СѓС‚  
+  InputBufferPtr vertex_buffers [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹ 
+  InputBufferPtr index_buffer;                                      //РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
+  bool           is_dirty;                                          //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
     , is_dirty (true)
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl () {}
 
-/// Оповещение об изменении
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё
   void UpdateNotify ()
   {
     is_dirty = true;
@@ -40,7 +40,7 @@ struct InputManagerContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputManagerContextState::InputManagerContextState (const DeviceManager& device_manager)
@@ -58,7 +58,7 @@ InputManagerContextState::~InputManagerContextState ()
 }
 
 /*
-    Возвращение реализации
+    Р’РѕР·РІСЂР°С‰РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 InputManagerContextState::Impl& InputManagerContextState::GetImpl () const
@@ -67,7 +67,7 @@ InputManagerContextState::Impl& InputManagerContextState::GetImpl () const
 }
 
 /*
-    Управление конфигурацией входных данных
+    РЈРїСЂР°РІР»РµРЅРёРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРµР№ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
 */
 
 void InputManagerContextState::SetInputLayout (InputLayout* state)
@@ -83,7 +83,7 @@ InputLayout* InputManagerContextState::GetInputLayout () const
 }
 
 /*
-    Управление вершинными буферами
+    РЈРїСЂР°РІР»РµРЅРёРµ РІРµСЂС€РёРЅРЅС‹РјРё Р±СѓС„РµСЂР°РјРё
 */
 
 void InputManagerContextState::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* in_buffer)
@@ -123,7 +123,7 @@ IBuffer* InputManagerContextState::GetVertexBuffer (size_t vertex_buffer_slot) c
 }
 
 /*
-    Управление индексным буфером
+    РЈРїСЂР°РІР»РµРЅРёРµ РёРЅРґРµРєСЃРЅС‹Рј Р±СѓС„РµСЂРѕРј
 */
 
 void InputManagerContextState::SetIndexBuffer (IBuffer* in_buffer)
@@ -149,7 +149,7 @@ IBuffer* InputManagerContextState::GetIndexBuffer () const
 }
 
 /*
-    Управление уровнем вывода вершин
+    РЈРїСЂР°РІР»РµРЅРёРµ СѓСЂРѕРІРЅРµРј РІС‹РІРѕРґР° РІРµСЂС€РёРЅ
 */
 
 void InputManagerContextState::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
@@ -205,7 +205,7 @@ size_t InputManagerContextState::SOGetTargetOffset (size_t stream_output_slot)
 }
 
 /*
-    Копирование состояния
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void InputManagerContextState::CopyTo (const StateBlockMask& mask, InputManagerContextState& dst_state) const
@@ -251,10 +251,10 @@ void InputManagerContextState::CopyTo (const StateBlockMask& mask, InputManagerC
 
 struct InputManagerContext::Impl: public InputManagerContextState::Impl
 {
-  DxContextPtr   context;        //контекст
-  InputLayoutPtr default_layout; //лэйаут по умолчанию
+  DxContextPtr   context;        //РєРѕРЅС‚РµРєСЃС‚
+  InputLayoutPtr default_layout; //Р»СЌР№Р°СѓС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : InputManagerContextState::Impl (device_manager)
     , context (in_context)
@@ -271,7 +271,7 @@ struct InputManagerContext::Impl: public InputManagerContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputManagerContext::InputManagerContext (const DeviceManager& device_manager, const DxContextPtr& context, const DefaultResources& default_resources)
@@ -284,7 +284,7 @@ InputManagerContext::~InputManagerContext ()
 }
 
 /*
-    Установка состояния уровня в контекст
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 InputManagerContext::Impl& InputManagerContext::GetImpl () const
@@ -303,14 +303,14 @@ void InputManagerContext::Bind ()
 {
   try
   {
-      //проверка флага "грязности"
+      //РїСЂРѕРІРµСЂРєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     Impl& impl = GetImpl ();
 
     if (!impl.is_dirty)
       return;
 
-      //преобразование контекстной информации
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 
     InputLayout* layout = impl.input_layout ? impl.input_layout.get () : impl.default_layout.get ();
 
@@ -325,7 +325,7 @@ void InputManagerContext::Bind ()
     impl.context->IASetVertexBuffers (0, DEVICE_VERTEX_BUFFER_SLOTS_COUNT, buffers, layout->GetStrides (), VB_OFFSETS);
     impl.context->IASetIndexBuffer   (impl.index_buffer ? &impl.index_buffer->GetHandle () : (ID3D11Buffer*)0, layout->GetIndexFormat (), layout->GetIndexBufferOffset ());
 
-      //очистка флага "грязности"
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     impl.is_dirty = false;
   }

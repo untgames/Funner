@@ -5,17 +5,17 @@ using namespace media::adobe::xfl;
 typedef media::CollectionImpl<Layer, INamedCollection<Layer> > LayerCollection;
 
 /*
-    Описание реализации анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РЅРёРјР°С†РёРё
 */
 
 struct Timeline::Impl : public xtl::reference_counter
 {
-  stl::string     name;   //имя анимации
-  LayerCollection layers; //слои
+  stl::string     name;   //РёРјСЏ Р°РЅРёРјР°С†РёРё
+  LayerCollection layers; //СЃР»РѕРё
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Timeline::Timeline ()
@@ -41,7 +41,7 @@ Timeline& Timeline::operator = (const Timeline& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* Timeline::Name () const
@@ -58,7 +58,7 @@ void Timeline::SetName (const char* name)
 }
 
 /*
-   Слои анимации
+   РЎР»РѕРё Р°РЅРёРјР°С†РёРё
 */
 
 Timeline::LayerList& Timeline::Layers ()
@@ -72,7 +72,7 @@ const Timeline::LayerList& Timeline::Layers () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Timeline::Swap (Timeline& timeline)
@@ -90,7 +90,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Timeline& timeline1, Timeline& timeline2)

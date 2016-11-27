@@ -4,7 +4,7 @@ using namespace common;
 using namespace media::adobe::xfl;
 
 /*
-    Печать лога парсинга
+    РџРµС‡Р°С‚СЊ Р»РѕРіР° РїР°СЂСЃРёРЅРіР°
 */
 
 void XflParser::PrintLog ()
@@ -18,12 +18,12 @@ void XflParser::PrintLog ()
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-   Чтение цвета из строки вида #ffffff
+   Р§С‚РµРЅРёРµ С†РІРµС‚Р° РёР· СЃС‚СЂРѕРєРё РІРёРґР° #ffffff
 */
 
 bool XflParser::ReadHexColor (const char* hex_string, math::vec3f& color)
@@ -51,7 +51,7 @@ bool XflParser::ReadHexColor (const char* hex_string, math::vec3f& color)
 }
 
 /*
-   Чтение флоата из узла вида "0, value"
+   Р§С‚РµРЅРёРµ С„Р»РѕР°С‚Р° РёР· СѓР·Р»Р° РІРёРґР° "0, value"
 */
 
 float XflParser::ReadFloatFromVec2 (Parser::Iterator iter, const char* property_name)
@@ -66,7 +66,7 @@ float XflParser::ReadFloatFromVec2 (Parser::Iterator iter, const char* property_
 }
 
 /*
-   Проверка корректности прочитанного документа
+   РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїСЂРѕС‡РёС‚Р°РЅРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р°
 */
 
 void XflParser::CheckDocument ()

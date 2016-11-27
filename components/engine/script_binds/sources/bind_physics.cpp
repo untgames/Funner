@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* COLLISION_EVENT_TYPE_LIBRARY = "Physics.CollisionEventType";
@@ -371,7 +371,7 @@ namespace physics_script_binds
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

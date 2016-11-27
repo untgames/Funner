@@ -8,15 +8,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t CONFIG_MAX_ATTRIBUTES = 128; //максимальное количество атрибутов в конфигурации
+const size_t CONFIG_MAX_ATTRIBUTES = 128; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РІ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
 }
 
 /*
-    Описание реализации первичной цепочки обмена
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРµСЂРІРёС‡РЅРѕР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 typedef xtl::com_ptr<Adapter>     AdapterPtr;
@@ -25,17 +25,17 @@ typedef stl::auto_ptr<EglSurface> EglSurfacePtr;
 
 struct PrimarySwapChain::Impl
 {
-  AdapterPtr    adapter;            //адаптер, которому принадлежит устройство
-  OutputPtr     output;             //целевое устройство вывода
-  EglSurfacePtr egl_surface_holder; //хранилище поверхности отрисовки
-  Log           log;                //протокол
-  EGLDisplay    egl_display;        //целевое устройство вывода
-  EGLConfig     egl_config;         //целевая конфигурация
-  EGLSurface    egl_surface;        //целевая поверхность отрисовки
-  SwapChainDesc desc;               //дескриптор цепочки обмена
-  PropertyList  properties;         //свойства цепочки обмена
+  AdapterPtr    adapter;            //Р°РґР°РїС‚РµСЂ, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ
+  OutputPtr     output;             //С†РµР»РµРІРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
+  EglSurfacePtr egl_surface_holder; //С…СЂР°РЅРёР»РёС‰Рµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РѕС‚СЂРёСЃРѕРІРєРё
+  Log           log;                //РїСЂРѕС‚РѕРєРѕР»
+  EGLDisplay    egl_display;        //С†РµР»РµРІРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
+  EGLConfig     egl_config;         //С†РµР»РµРІР°СЏ РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ
+  EGLSurface    egl_surface;        //С†РµР»РµРІР°СЏ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ РѕС‚СЂРёСЃРѕРІРєРё
+  SwapChainDesc desc;               //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  PropertyList  properties;         //СЃРІРѕР№СЃС‚РІР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
     , output (adapter->GetOutput (in_desc.window_handle))
@@ -45,7 +45,7 @@ struct PrimarySwapChain::Impl
   {
     DisplayLock lock (output->GetDisplay ());
     
-      //выбор конфигурации
+      //РІС‹Р±РѕСЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
     desc = in_desc;
 
@@ -91,12 +91,12 @@ struct PrimarySwapChain::Impl
 
     egl_surface = egl_surface_holder->GetSurface ();      
 
-      //сохранение дескриптора устройства        
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІР°        
 
     desc.frame_buffer.width  = GetSurfaceAttribute (EGL_WIDTH);
     desc.frame_buffer.height = GetSurfaceAttribute (EGL_HEIGHT);
 
-      //установка свойств цепочки обмена
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
       
     try
     {
@@ -107,12 +107,12 @@ struct PrimarySwapChain::Impl
     }
     catch (...)
     {
-      //исключения при взятии свойств EGL не являются критичными для работы
-      //(обход бага egl для bada)
+      //РёСЃРєР»СЋС‡РµРЅРёСЏ РїСЂРё РІР·СЏС‚РёРё СЃРІРѕР№СЃС‚РІ EGL РЅРµ СЏРІР»СЏСЋС‚СЃСЏ РєСЂРёС‚РёС‡РЅС‹РјРё РґР»СЏ СЂР°Р±РѕС‚С‹
+      //(РѕР±С…РѕРґ Р±Р°РіР° egl РґР»СЏ bada)
     }
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -128,7 +128,7 @@ struct PrimarySwapChain::Impl
     }
   }
 
-///Сравнение двух количественных показателей (0 - первый формат более подходит, 1 - второй формат более подходит)
+///РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅС‹С… РїРѕРєР°Р·Р°С‚РµР»РµР№ (0 - РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚, 1 - РІС‚РѕСЂРѕР№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚)
   static int CompareFormatCounts (size_t source1, size_t source2, size_t require)
   {
     if (source1 == require)
@@ -149,56 +149,56 @@ struct PrimarySwapChain::Impl
     }
   }
 
-///Сравнение двух форматов (0 - первый формат более подходит, 1 - второй формат более подходит)
+///РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… С„РѕСЂРјР°С‚РѕРІ (0 - РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚, 1 - РІС‚РѕСЂРѕР№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚)
   static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
   {
-      //упорядочивание по типу ускорения
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ С‚РёРїСѓ СѓСЃРєРѕСЂРµРЅРёСЏ
 
     if (fmt0.acceleration != fmt1.acceleration)
       return fmt0.acceleration < fmt1.acceleration;
 
-      //упорядочивание по количеству битов цвета
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ С†РІРµС‚Р°
       
     if (fmt0.color_bits != fmt1.color_bits)
       return CompareFormatCounts (fmt0.color_bits, fmt1.color_bits, swap_chain_desc.frame_buffer.color_bits);
 
-      //упорядочивание по количеству битов альфы
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ Р°Р»СЊС„С‹
 
     if (fmt0.alpha_bits != fmt1.alpha_bits)
       return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);
 
-      //упорядочивание по количеству битов глубины
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ РіР»СѓР±РёРЅС‹
 
     if (fmt0.depth_bits != fmt1.depth_bits)
       return CompareFormatCounts (fmt0.depth_bits, fmt1.depth_bits, swap_chain_desc.frame_buffer.depth_bits);
 
-      //упорядочивание по количеству битов трафарета
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ С‚СЂР°С„Р°СЂРµС‚Р°
 
     if (fmt0.stencil_bits != fmt1.stencil_bits)
       return CompareFormatCounts (fmt0.stencil_bits, fmt1.stencil_bits, swap_chain_desc.frame_buffer.stencil_bits);
 
-      //упорядочивание по количеству сэмплов
+      //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ СЃСЌРјРїР»РѕРІ
 
     if (fmt0.samples_count != fmt1.samples_count)
       return CompareFormatCounts (fmt0.samples_count, fmt1.samples_count, swap_chain_desc.samples_count);
 
-      //при прочих равных первый формат более подходит
+      //РїСЂРё РїСЂРѕС‡РёС… СЂР°РІРЅС‹С… РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚
 
     return 1;
   }
 
-///Выбор конфигурации
+///Р’С‹Р±РѕСЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
   EGLConfig ChooseConfig (const SwapChainDesc& swap_chain_desc)
   {
     try
     {
-        //перечисление доступных форматов
+        //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… С„РѕСЂРјР°С‚РѕРІ
 
       Adapter::PixelFormatArray formats;
 
       adapter->EnumPixelFormats (egl_display, formats);
 
-        //выбор формата
+        //РІС‹Р±РѕСЂ С„РѕСЂРјР°С‚Р°
 
       if (formats.empty ())
       {
@@ -208,7 +208,7 @@ struct PrimarySwapChain::Impl
 
       log.Printf ("...found %u pixel formats", formats.size ());
 
-          //поиск формата
+          //РїРѕРёСЃРє С„РѕСЂРјР°С‚Р°
 
       const PixelFormatDesc* best = &formats [0];
         
@@ -225,7 +225,7 @@ struct PrimarySwapChain::Impl
     }
   }
   
-///Получение атрибута
+///РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
   EGLint GetConfigAttribute (EGLint attribute)
   {
     EGLint value = 0;
@@ -236,7 +236,7 @@ struct PrimarySwapChain::Impl
     return value;
   }
   
-///Получение значения атрибута поверхности отрисовки
+///РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ Р°С‚СЂРёР±СѓС‚Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РѕС‚СЂРёСЃРѕРІРєРё
   EGLint GetSurfaceAttribute (EGLint attribute)
   {
     EGLint value = 0;
@@ -247,7 +247,7 @@ struct PrimarySwapChain::Impl
     return value;
   }
   
-///Получение строкового свойства EGL
+///РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРѕРІРѕРіРѕ СЃРІРѕР№СЃС‚РІР° EGL
   const char* GetEglString (EGLint name)
   {
     const char* value = eglQueryString (egl_display, name);
@@ -260,7 +260,7 @@ struct PrimarySwapChain::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimarySwapChain::PrimarySwapChain (Adapter* adapter, const SwapChainDesc& desc)
@@ -286,7 +286,7 @@ PrimarySwapChain::~PrimarySwapChain ()
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* PrimarySwapChain::GetAdapter ()
@@ -295,7 +295,7 @@ IAdapter* PrimarySwapChain::GetAdapter ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -304,7 +304,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
@@ -313,7 +313,7 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PrimarySwapChain::SetFullscreenState (bool state)
@@ -327,7 +327,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PrimarySwapChain::Present ()
@@ -351,7 +351,7 @@ void PrimarySwapChain::Present ()
 }
 
 /*
-    Список свойств устройства вывода
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 IPropertyList* PrimarySwapChain::GetProperties ()
@@ -360,7 +360,7 @@ IPropertyList* PrimarySwapChain::GetProperties ()
 }
 
 /*
-    Получение EGL параметров цепочки обмена
+    РџРѕР»СѓС‡РµРЅРёРµ EGL РїР°СЂР°РјРµС‚СЂРѕРІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 EGLDisplay PrimarySwapChain::GetEglDisplay ()

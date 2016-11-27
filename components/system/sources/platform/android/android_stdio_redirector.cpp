@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const int    FILENO_STDOUT             = 1;
@@ -16,13 +16,13 @@ const size_t MAX_LINE_LENGTH           = 512;
 const int    SELECT_TIMEOUT_IN_SECONDS = 1;
 
 /*
-    Утилитарный класс для перенаправления Stdio
+    РЈС‚РёР»РёС‚Р°СЂРЅС‹Р№ РєР»Р°СЃСЃ РґР»СЏ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ Stdio
 */
 
 class StdioRedirector
 {
   public:
-///Начало перенаправления
+///РќР°С‡Р°Р»Рѕ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ
     static void Init (JavaVM* vm)
     {
       if (instance)
@@ -31,7 +31,7 @@ class StdioRedirector
       instance = new StdioRedirector (vm);
     }
     
-///Конец перенаправления
+///РљРѕРЅРµС† РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ
     static void Shutdown ()
     {
       if (!instance)
@@ -43,7 +43,7 @@ class StdioRedirector
     }
     
   private:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StdioRedirector (JavaVM* in_vm)
       : stop_request (false)
       , thread_ready (false)
@@ -56,7 +56,7 @@ class StdioRedirector
         
         try
         {
-            //инициализация перенаправления
+            //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ
             
           if (!vm)
             throw xtl::make_null_argument_exception ("", "vm");
@@ -81,7 +81,7 @@ class StdioRedirector
           
           stderr_pipe [1] = -1;
           
-           //создание нити для перенаправления потоков
+           //СЃРѕР·РґР°РЅРёРµ РЅРёС‚Рё РґР»СЏ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ РїРѕС‚РѕРєРѕРІ
            
           Lock lock (mutex);
           
@@ -111,12 +111,12 @@ class StdioRedirector
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~StdioRedirector ()
     {
       stop_request = true;      
 
-        //печать сообщения для остановки
+        //РїРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РґР»СЏ РѕСЃС‚Р°РЅРѕРІРєРё
 //      printf("Shutting down\n");
 //      fflush(stdout);
 
@@ -131,7 +131,7 @@ class StdioRedirector
       BufferedData () : count () {}
     };    
     
-///Основной цикл
+///РћСЃРЅРѕРІРЅРѕР№ С†РёРєР»
     int Run ()
     {      
       {
@@ -203,7 +203,7 @@ class StdioRedirector
     
     bool Redirect (int fd, BufferedData& data, int log_level)
     {
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
       
       size_t available = MAX_LINE_LENGTH - data.count;
       int    actual    = read (fd, data.buffer + data.count, available);
@@ -213,7 +213,7 @@ class StdioRedirector
 
       data.count += actual;
       
-        //поиск маркера окончания строки
+        //РїРѕРёСЃРє РјР°СЂРєРµСЂР° РѕРєРѕРЅС‡Р°РЅРёСЏ СЃС‚СЂРѕРєРё
 
       char* s           = data.buffer;
       const char* start = data.buffer;
@@ -230,7 +230,7 @@ class StdioRedirector
         }
       }
 
-        //поиск переполнения
+        //РїРѕРёСЃРє РїРµСЂРµРїРѕР»РЅРµРЅРёСЏ
       
       if (start == data.buffer && data.count == MAX_LINE_LENGTH)
       {
@@ -241,7 +241,7 @@ class StdioRedirector
         start = s + MAX_LINE_LENGTH;
       }
       
-        //обновление данных в случае отсутствия маркера окончания строки
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С… РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РјР°СЂРєРµСЂР° РѕРєРѕРЅС‡Р°РЅРёСЏ СЃС‚СЂРѕРєРё
 
       if (start != data.buffer)
       {

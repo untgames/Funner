@@ -27,13 +27,13 @@ void controls_detector_saver (const char* file_name, const ControlsDetector& sou
 }
 
 /*
-   Компонент сохранения определителей контролов
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёСЏ РѕРїСЂРµРґРµР»РёС‚РµР»РµР№ РєРѕРЅС‚СЂРѕР»РѕРІ
 */
 
 class KeydetSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     KeydetSaverComponent () 
     {
       ControlsDetectorManager::RegisterSaver ("xkeydet", &controls_detector_saver);

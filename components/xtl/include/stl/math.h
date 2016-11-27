@@ -10,7 +10,7 @@ namespace stl
 {
 
 /*
-    Возведение в целую степень (время работы O(logN))
+    Р’РѕР·РІРµРґРµРЅРёРµ РІ С†РµР»СѓСЋ СЃС‚РµРїРµРЅСЊ (РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ O(logN))
 */
 
 template <class T,class Integer,class MonoidOperation> 
@@ -20,7 +20,7 @@ template <class T,class Integer>
 T ipow (T x,Integer n);
 
 /*
-    Адаптеры вызовов математических функций
+    РђРґР°РїС‚РµСЂС‹ РІС‹Р·РѕРІРѕРІ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёС… С„СѓРЅРєС†РёР№
 */
 
 namespace math_adaptors

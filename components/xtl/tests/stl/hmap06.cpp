@@ -1,4 +1,4 @@
-// ����஢���� �㭪樨 count
+// Тестирование функции count
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"

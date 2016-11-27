@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class FwdRange> template <class FwdRange2>
@@ -18,7 +18,7 @@ inline sub_range<FwdRange>::sub_range (Iter first, Iter last)
   {}
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class FwdRange> template <class FwdRange2>
@@ -36,7 +36,7 @@ inline sub_range<FwdRange>& sub_range<FwdRange>::operator = (const FwdRange2& r)
 }
 
 /*
-    Параметры
+    РџР°СЂР°РјРµС‚СЂС‹
 */
 
 template <class FwdRange>
@@ -70,7 +70,7 @@ inline typename sub_range<FwdRange>::size_type sub_range<FwdRange>::size () cons
 }
     
 /*
-    Получение первого и последнего элементов интервала
+    РџРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ Рё РїРѕСЃР»РµРґРЅРµРіРѕ СЌР»РµРјРµРЅС‚РѕРІ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class FwdRange>
@@ -98,7 +98,7 @@ inline const typename sub_range<FwdRange>::value_type& sub_range<FwdRange>::back
 }
 
 /*
-    Индексный доступ (только для итераторов произвольного доступа)
+    РРЅРґРµРєСЃРЅС‹Р№ РґРѕСЃС‚СѓРї (С‚РѕР»СЊРєРѕ РґР»СЏ РёС‚РµСЂР°С‚РѕСЂРѕРІ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ РґРѕСЃС‚СѓРїР°)
 */
 
 template <class FwdRange>
@@ -114,7 +114,7 @@ inline const typename sub_range<FwdRange>::value_type& sub_range<FwdRange>::oper
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class FwdRange1, class FwdRange2>

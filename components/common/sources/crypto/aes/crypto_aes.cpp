@@ -18,13 +18,13 @@ namespace aes_crypto
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t CRYPTO_BLOCK_SIZE = 16; //размер блока шифрования в байтах
+const size_t CRYPTO_BLOCK_SIZE = 16; //СЂР°Р·РјРµСЂ Р±Р»РѕРєР° С€РёС„СЂРѕРІР°РЅРёСЏ РІ Р±Р°Р№С‚Р°С…
 
 /*
-    Реализация алгоритма AES
+    Р РµР°Р»РёР·Р°С†РёСЏ Р°Р»РіРѕСЂРёС‚РјР° AES
 */
 
 enum AesOperation
@@ -35,7 +35,7 @@ enum AesOperation
 
 
 /*
-    Контекст шифрования
+    РљРѕРЅС‚РµРєСЃС‚ С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 class AesContext: public ICryptoContext
@@ -72,13 +72,13 @@ class AesContext: public ICryptoContext
       }
     }
 
-///Размер блока шифрования в байтах
+///Р Р°Р·РјРµСЂ Р±Р»РѕРєР° С€РёС„СЂРѕРІР°РЅРёСЏ РІ Р±Р°Р№С‚Р°С…
     size_t GetBlockSize ()
     {
       return ofb ? 1 : CRYPTO_BLOCK_SIZE;
     }
     
-///Обновление контекста
+///РћР±РЅРѕРІР»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     size_t Update (size_t data_size, const void* src_data, void* dst_data)
     {
       const char* src = (const char*)src_data;
@@ -124,7 +124,7 @@ class AesContext: public ICryptoContext
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class AesComponent

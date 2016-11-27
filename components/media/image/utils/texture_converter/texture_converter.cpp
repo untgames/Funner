@@ -20,7 +20,7 @@
 #endif
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char*  APPLICATION_NAME                = "texture-converter";
@@ -59,7 +59,7 @@ const uint32 FOURCC_ATC_RGB_AMD                     = MAKEFOURCC ('A', 'T', 'C',
 const uint32 FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD     = MAKEFOURCC ('A', 'T', 'C', 'I');
 const uint32 FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD = MAKEFOURCC ('A', 'T', 'C', 'A');
 
-///Формат пикселей DDS файла
+///Р¤РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№ DDS С„Р°Р№Р»Р°
 struct DdsPixelFormat
 {
   uint32 dwSize;        //Structure size; set to 32 (bytes)
@@ -72,7 +72,7 @@ struct DdsPixelFormat
   uint32 dwABitMask;    //Alpha mask for reading alpha data. dwFlags must include DDPF_ALPHAPIXELS or DDPF_ALPHA. For instance, given the A8R8G8B8 format, the alpha mask would be 0xff000000
 };
 
-///Заголовок DDS файла
+///Р—Р°РіРѕР»РѕРІРѕРє DDS С„Р°Р№Р»Р°
 struct DdsHeader
 {
   uint32         dwSize;            //Size of structure. This member must be set to 124
@@ -92,7 +92,7 @@ struct DdsHeader
 };
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -120,19 +120,19 @@ unsigned int get_mips_count (unsigned int width, unsigned int height)
 }
 
 /*
-    Обработка командной строки
+    РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  common::CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                        name;          //имя команды
-  char                               short_name;    //короткое имя
-  const char*                        argument_name; //имя аргумента
-  const char*                        tip;           //подсказка
+  common::CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                        name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                               short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                        argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                        tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
 typedef xtl::function<void (const Params&)> ConvertFunction;
@@ -144,22 +144,22 @@ struct ConversionDesc
   ConvertFunction function;
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option*         options;                  //массив опций
-  size_t                options_count;            //количество опций
-  const ConversionDesc* converters;               //функции конвертирования
-  size_t                converters_count;         //количество функций конвертирования
-  stl::string           source;                   //имя исходного изображения
-  stl::string           source_format;            //формат исходного изображения
-  stl::string           target;                   //имя результирующего изображения
-  stl::string           target_format;            //формат результирующего изображения
-  bool                  silent;                   //минимальное число сообщений
-  bool                  print_help;               //нужно ли печатать сообщение помощи
+  const Option*         options;                  //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t                options_count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  const ConversionDesc* converters;               //С„СѓРЅРєС†РёРё РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ
+  size_t                converters_count;         //РєРѕР»РёС‡РµСЃС‚РІРѕ С„СѓРЅРєС†РёР№ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ
+  stl::string           source;                   //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  stl::string           source_format;            //С„РѕСЂРјР°С‚ РёСЃС…РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  stl::string           target;                   //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  stl::string           target_format;            //С„РѕСЂРјР°С‚ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  bool                  silent;                   //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool                  print_help;               //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -195,31 +195,31 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка формата исходного изображения
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РёСЃС…РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 void command_line_source_format (const char* format, Params& params)
 {
   params.source_format = format;
 }
 
-//установка имени результирующего изображения
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 void command_line_result_image (const char* file_name, Params& params)
 {
   params.target = file_name;
 }
 
-//установка формата результирующего изображения
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 void command_line_result_format (const char* format, Params& params)
 {
   params.target_format = format;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.target.empty ())
@@ -229,7 +229,7 @@ void validate (Params& params)
   }
 }
 
-//сохранение данных в DDS-файл
+//СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РІ DDS-С„Р°Р№Р»
 void save_compressed_dds (const char* file_name, unsigned int width, unsigned int height, uint32 fourcc, unsigned int mips_count, const unsigned char** mips_data, const unsigned int* mips_data_sizes)
 {
   common::OutputFile file (file_name);
@@ -546,7 +546,7 @@ int main (int argc, const char* argv [])
 
     static const size_t converters_count = sizeof (converters) / sizeof (*converters);
 
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 
     params.options           = options;
     params.options_count     = options_count;
@@ -560,10 +560,10 @@ int main (int argc, const char* argv [])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 
     if (params.print_help)
       return 0;
@@ -577,11 +577,11 @@ int main (int argc, const char* argv [])
 
     params.source = command_line.Param (0);
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
   
     validate (params);
 
-      //конвертирование изображения
+      //РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
   
     convert (params);
   }

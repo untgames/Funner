@@ -1,4 +1,4 @@
-// Тестирование resize
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ resize
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

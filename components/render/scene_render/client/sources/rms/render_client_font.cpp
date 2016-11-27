@@ -3,7 +3,7 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации шрифта
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С€СЂРёС„С‚Р°
 */
 
 typedef stl::vector<TexturePtr>          TextureArray;
@@ -11,16 +11,16 @@ typedef stl::vector<RasterizedGlyphInfo> GlyphArray;
 
 struct Font::Impl
 {
-  TextureArray textures;         //текстуры
-  GlyphArray   glyphs;           //глифы
-  size_t       first_glyph_code; //код первого глифа
-  stl::string  name;             //имя шрифта
+  TextureArray textures;         //С‚РµРєСЃС‚СѓСЂС‹
+  GlyphArray   glyphs;           //РіР»РёС„С‹
+  size_t       first_glyph_code; //РєРѕРґ РїРµСЂРІРѕРіРѕ РіР»РёС„Р°
+  stl::string  name;             //РёРјСЏ С€СЂРёС„С‚Р°
     
   Impl () : first_glyph_code () {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Font::Font (MaterialManager& material_manager, const media::Font& font, const media::RasterizedFontCreationParams& creation_params)
@@ -28,15 +28,15 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
 {
   try
   {
-      //сохранение имени
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РёРјРµРЅРё
 
     impl->name = font.Name ();
 
-      //растеризация
+      //СЂР°СЃС‚РµСЂРёР·Р°С†РёСЏ
 
     media::RasterizedFont rasterized_font = font.CreateRasterizedFont (creation_params);
 
-      //создание текстур
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂ
 
     typedef stl::vector<math::vec2f> SizeArray;
 
@@ -61,7 +61,7 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
       sizes.push_back (math::vec2f ((float)image.Width (), (float)image.Height ()));
     }
 
-      //заполнение таблицы глифов
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РіР»РёС„РѕРІ
 
     size_t glyphs_count = font.GlyphsCount ();
 
@@ -96,7 +96,7 @@ Font::~Font ()
 }
 
 /*
-    Имя шрифта
+    РРјСЏ С€СЂРёС„С‚Р°
 */
 
 const char* Font::Name ()
@@ -105,7 +105,7 @@ const char* Font::Name ()
 }
 
 /*
-    Размер таблицы глифов
+    Р Р°Р·РјРµСЂ С‚Р°Р±Р»РёС†С‹ РіР»РёС„РѕРІ
 */
 
 size_t Font::GlyphsCount ()
@@ -114,7 +114,7 @@ size_t Font::GlyphsCount ()
 }
 
 /*
-    Код первого глифа
+    РљРѕРґ РїРµСЂРІРѕРіРѕ РіР»РёС„Р°
 */
 
 size_t Font::FirstGlyphCode ()
@@ -123,7 +123,7 @@ size_t Font::FirstGlyphCode ()
 }
 
 /*
-    Растеризованные глифы
+    Р Р°СЃС‚РµСЂРёР·РѕРІР°РЅРЅС‹Рµ РіР»РёС„С‹
 */
 
 const RasterizedGlyphInfo* Font::RasterizedGlyphs ()
@@ -135,7 +135,7 @@ const RasterizedGlyphInfo* Font::RasterizedGlyphs ()
 }
 
 /*
-    Количество текстур
+    РљРѕР»РёС‡РµСЃС‚РІРѕ С‚РµРєСЃС‚СѓСЂ
 */
 
 size_t Font::TexturesCount ()
@@ -144,7 +144,7 @@ size_t Font::TexturesCount ()
 }
 
 /*
-    Получение текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 const char* Font::TextureName (size_t texture_index)

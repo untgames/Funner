@@ -54,7 +54,7 @@ typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IStateBlock>              StateBlockPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
-// режим вывода логов
+// СЂРµР¶РёРј РІС‹РІРѕРґР° Р»РѕРіРѕРІ
 enum OutputMode
 {
   OutputMode_Success     = 1,
@@ -68,7 +68,7 @@ enum OutputMode
   OutputMode_Num
 };
 
-//тестовое приложение
+//С‚РµСЃС‚РѕРІРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ
 struct Test
 {
   syslib::Window window;
@@ -113,7 +113,7 @@ struct Test
   }
 };
 
-//печать дескриптора blend-state
+//РїРµС‡Р°С‚СЊ РґРµСЃРєСЂРёРїС‚РѕСЂР° blend-state
 inline void dump_desc (IBlendState* state)
 {
   //TODO: MRT
@@ -143,7 +143,7 @@ inline void dump_desc (IBlendState* state)
   printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.render_target [0].color_write_mask));
 }
 
-//печать дескриптора stencil
+//РїРµС‡Р°С‚СЊ РґРµСЃРєСЂРёРїС‚РѕСЂР° stencil
 inline void dump_desc (const StencilDesc& desc)
 {
   printf ("    stencil_compare_mode:   %s\n", get_name (desc.stencil_compare_mode));
@@ -152,7 +152,7 @@ inline void dump_desc (const StencilDesc& desc)
   printf ("    stencil_pass_operation: %s\n", get_name (desc.stencil_pass_operation));
 }
 
-//печать дескриптора depth-stencil-state
+//РїРµС‡Р°С‚СЊ РґРµСЃРєСЂРёРїС‚РѕСЂР° depth-stencil-state
 inline void dump_desc (IDepthStencilState* state)
 {
   if (!state)
@@ -181,7 +181,7 @@ inline void dump_desc (IDepthStencilState* state)
   dump_desc (desc.stencil_desc [FaceMode_Back]);  
 }
 
-//чтение ихсодного текста шейдера в строку
+//С‡С‚РµРЅРёРµ РёС…СЃРѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° С€РµР№РґРµСЂР° РІ СЃС‚СЂРѕРєСѓ
 stl::string read_shader (const char* file_name)
 {
   common::InputFile file (file_name);

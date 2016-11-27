@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с окнами невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РѕРєРЅР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -18,7 +18,7 @@ void raise (const char* method_name)
 }
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t DefaultWindowManager::CreateWindow (WindowStyle, WindowMessageHandler, const void*, const char* init_string, void*)
@@ -39,7 +39,7 @@ void DefaultWindowManager::DestroyWindow (window_t)
 }
 
 /*
-    Попытка изменения стиля окна (может быть проигнорирована)
+    РџРѕРїС‹С‚РєР° РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ РѕРєРЅР° (РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСЂРѕРёРіРЅРѕСЂРёСЂРѕРІР°РЅР°)
 */
 
 bool DefaultWindowManager::ChangeWindowStyle (window_t window, WindowStyle style)
@@ -48,7 +48,7 @@ bool DefaultWindowManager::ChangeWindowStyle (window_t window, WindowStyle style
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* DefaultWindowManager::GetNativeWindowHandle (window_t)
@@ -66,7 +66,7 @@ const void* DefaultWindowManager::GetNativeDisplayHandle (window_t)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void DefaultWindowManager::SetWindowTitle (window_t, const wchar_t*)
@@ -80,7 +80,7 @@ void DefaultWindowManager::GetWindowTitle (window_t, size_t, wchar_t*)
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void DefaultWindowManager::SetWindowRect (window_t, const Rect&)
@@ -104,7 +104,7 @@ void DefaultWindowManager::GetClientRect (window_t, Rect&)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void DefaultWindowManager::SetWindowFlag (window_t, WindowFlag, bool)
@@ -120,7 +120,7 @@ bool DefaultWindowManager::GetWindowFlag (window_t, WindowFlag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void DefaultWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
@@ -136,7 +136,7 @@ const void* DefaultWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-   Установка multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР° multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void DefaultWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
@@ -151,7 +151,7 @@ bool DefaultWindowManager::IsMultitouchEnabled (window_t window)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void DefaultWindowManager::InvalidateWindow (window_t)
@@ -160,7 +160,7 @@ void DefaultWindowManager::InvalidateWindow (window_t)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 void DefaultWindowManager::SetCursorPosition (const Point&)
@@ -190,7 +190,7 @@ Point DefaultWindowManager::GetCursorPosition (window_t)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 void DefaultWindowManager::SetCursorVisible (window_t, bool state)
@@ -205,7 +205,7 @@ bool DefaultWindowManager::GetCursorVisible (window_t)
 }
 
 /*
-    Изображение курсора
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 cursor_t DefaultWindowManager::CreateCursor (const char*, int, int)
@@ -226,7 +226,7 @@ void DefaultWindowManager::SetCursor (window_t, cursor_t)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void DefaultWindowManager::SetBackgroundColor (window_t window, const Color& color)
@@ -254,10 +254,10 @@ bool DefaultWindowManager::GetBackgroundState (window_t window)
 }
 
 /*
-    Получение имени клавиши
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°РІРёС€Рё
 */
 
-//возвращается длина строки без учёта '\0'
+//РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё Р±РµР· СѓС‡С‘С‚Р° '\0'
 size_t DefaultWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
 {
   static const char* METHOD_NAME = "syslib::DefaultWindowManager::GetKeyName";
@@ -277,7 +277,7 @@ size_t DefaultWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size,
 }
 
 /*
-    Создание/уничтожение web-view
+    РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t DefaultWindowManager::CreateWebView (IWebViewListener*)
@@ -292,7 +292,7 @@ void DefaultWindowManager::DestroyWebView (web_view_t)
 }
 
 /*
-    Присоединенное окно
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t DefaultWindowManager::GetWindow (web_view_t)
@@ -302,7 +302,7 @@ window_t DefaultWindowManager::GetWindow (web_view_t)
 }
 
 /*
-    Загрузка данных
+    Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void DefaultWindowManager::LoadRequest (web_view_t, const char*)
@@ -316,7 +316,7 @@ void DefaultWindowManager::LoadData (web_view_t, const char*, size_t, const char
 }
 
 /*
-    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void DefaultWindowManager::Reload (web_view_t)
@@ -336,7 +336,7 @@ bool DefaultWindowManager::IsLoading (web_view_t)
 }
 
 /*
-    Средства навигации
+    РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool DefaultWindowManager::CanGoBack (web_view_t)

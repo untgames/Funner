@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc)
@@ -13,7 +13,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Buffer::Buffer";
 
-    //проверка корректности режима использования буфера
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР¶РёРјР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р±СѓС„РµСЂР°
 
   switch (desc.usage_mode)
   {
@@ -26,7 +26,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
       throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
   }
 
-    //проверка корректности флагов доступа
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„Р»Р°РіРѕРІ РґРѕСЃС‚СѓРїР°
 
   switch (desc.access_flags)
   {
@@ -41,7 +41,7 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void Buffer::GetDesc (BufferDesc& out_desc)
@@ -50,7 +50,7 @@ void Buffer::GetDesc (BufferDesc& out_desc)
 }
 
 /*
-    Работа с данными буфера
+    Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё Р±СѓС„РµСЂР°
 */
 
 void Buffer::SetData (unsigned int offset, unsigned int size, const void* data, IDeviceContext* context)
@@ -60,12 +60,12 @@ void Buffer::SetData (unsigned int offset, unsigned int size, const void* data, 
   if (context)
     throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
-    //проверка возможности установки данных
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
     
   if (!(desc.access_flags & AccessFlag_Write))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set buffer data (no AccessFlag_Write in desc.access_flags)");
 
-    //отсечение
+    //РѕС‚СЃРµС‡РµРЅРёРµ
 
   if (offset >= desc.size)
     return;
@@ -76,12 +76,12 @@ void Buffer::SetData (unsigned int offset, unsigned int size, const void* data, 
   if (!size)
     return;
 
-    //проверка корректности переданных данных
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїРµСЂРµРґР°РЅРЅС‹С… РґР°РЅРЅС‹С…
 
   if (!data)
     throw xtl::make_null_argument_exception (METHOD_NAME, "data");
 
-    //установка данных
+    //СѓСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 
   SetDataCore (offset, size, data);
 }
@@ -93,12 +93,12 @@ void Buffer::GetData (unsigned int offset, unsigned int size, void* data, IDevic
   if (context)
     throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
-    //проверка возможности установки данных
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
     
   if (!(desc.access_flags & AccessFlag_Read))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't get buffer data (no AccessFlag_Read in desc.access_flags)");
 
-    //отсечение
+    //РѕС‚СЃРµС‡РµРЅРёРµ
 
   if (offset >= desc.size)
     return;
@@ -109,12 +109,12 @@ void Buffer::GetData (unsigned int offset, unsigned int size, void* data, IDevic
   if (!size)
     return;
 
-    //проверка корректности результирующего буфера
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР°
 
   if (!data)
     throw xtl::make_null_argument_exception (METHOD_NAME, "data");
 
-    //чтение данных
+    //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
   GetDataCore (offset, size, data);
 }

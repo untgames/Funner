@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace
@@ -13,7 +13,7 @@ namespace
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-//определение типа буфера рендеринга
+//РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 GLenum get_render_buffer_format (PixelFormat format, const char* source, const char* param)
 {
   switch (format)
@@ -47,7 +47,7 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
 
 #else
 
-//определение типа буфера рендеринга
+//РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 GLenum get_render_buffer_format (PixelFormat format, const char* source, const char* param)
 {
   switch (format)
@@ -84,7 +84,7 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const TextureDesc& desc)
@@ -95,18 +95,18 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboRenderBuffer::FboRenderBuffer";
   
-    //выбор текущего контекста
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
   
-    //проверка наличия необходимого расширения
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ СЂР°СЃС€РёСЂРµРЅРёСЏ
     
   const ContextCaps& caps = GetCaps ();
     
   if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
   
-    //преобразование формата буфера рендеринга
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
   
   GLenum internal_format = get_render_buffer_format (desc.format, METHOD_NAME, "desc.format");
   
@@ -118,7 +118,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   
   try
   {  
-      //создание буфера рендеринга
+      //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
     
     caps.glGenRenderbuffers_fn (1, &render_buffer_id);
 
@@ -128,7 +128,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
     caps.glBindRenderbuffer_fn    (GL_RENDERBUFFER, render_buffer_id);
     caps.glRenderbufferStorage_fn (GL_RENDERBUFFER, internal_format, desc.width, desc.height);
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     CheckErrors (METHOD_NAME);
   }
@@ -166,24 +166,24 @@ FboRenderBuffer::~FboRenderBuffer ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }  
 }
 
 /*
-    Получение OpenGL идентификатора буфера кадра для возможности ручной записи / чтения данных
+    РџРѕР»СѓС‡РµРЅРёРµ OpenGL РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° Р±СѓС„РµСЂР° РєР°РґСЂР° РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂСѓС‡РЅРѕР№ Р·Р°РїРёСЃРё / С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С…
 */
 
 unsigned int FboRenderBuffer::GetFrameBufferId ()
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboRenderBuffer::GetFrameBufferId";
 
-    //если буфер создан - возвращаем его
+    //РµСЃР»Рё Р±СѓС„РµСЂ СЃРѕР·РґР°РЅ - РІРѕР·РІСЂР°С‰Р°РµРј РµРіРѕ
 
   if (frame_buffer_id)
     return frame_buffer_id;    
     
-    //выбор текущего контекста
+    //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     
   MakeContextCurrent ();
   
@@ -191,7 +191,7 @@ unsigned int FboRenderBuffer::GetFrameBufferId ()
   
   size_t current_id = GetContextCacheValue (CacheEntry_FrameBufferId);
 
-    //создание буфера кадра
+    //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР°
     
   caps.glGenFramebuffers_fn (1, &frame_buffer_id);
   
@@ -202,11 +202,11 @@ unsigned int FboRenderBuffer::GetFrameBufferId ()
   {
     SetContextCacheValue (CacheEntry_FrameBufferId, 0); //for exceptions
     
-      //установка текущего буфера кадра
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
     caps.glBindFramebuffer_fn (GL_FRAMEBUFFER, frame_buffer_id);
 
-      //связывание буфера кадра с буфером рендеринга    
+      //СЃРІСЏР·С‹РІР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР° СЃ Р±СѓС„РµСЂРѕРј СЂРµРЅРґРµСЂРёРЅРіР°    
 
     switch (GetTargetType ())
     {
@@ -226,7 +226,7 @@ unsigned int FboRenderBuffer::GetFrameBufferId ()
     
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-      //настройка буферов рисования и чтения      
+      //РЅР°СЃС‚СЂРѕР№РєР° Р±СѓС„РµСЂРѕРІ СЂРёСЃРѕРІР°РЅРёСЏ Рё С‡С‚РµРЅРёСЏ      
     
     switch (GetTargetType ())
     {
@@ -244,17 +244,17 @@ unsigned int FboRenderBuffer::GetFrameBufferId ()
     
 #endif
     
-      //проверка состояния буфера кадра
+      //РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
     
     GLenum status = (GLenum)caps.glCheckFramebufferStatus_fn (GL_FRAMEBUFFER);
 
     check_frame_buffer_status (METHOD_NAME, status);
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     CheckErrors (METHOD_NAME);    
 
-      //обновление текущего буфера
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР°
 
     SetContextCacheValue (CacheEntry_FrameBufferId, GetId ());
 
@@ -271,7 +271,7 @@ unsigned int FboRenderBuffer::GetFrameBufferId ()
 }
 
 /*
-    Установка буфера в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void FboRenderBuffer::Bind ()

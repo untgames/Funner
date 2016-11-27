@@ -3,15 +3,15 @@
 using namespace syslib;
 
 /*
-    Описание реализации экранной клавиатуры
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌРєСЂР°РЅРЅРѕР№ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 struct ScreenKeyboard::Impl
 {
-  screen_keyboard_t handle;   //низкоуровневый дескриптор клавиатуры
-  bool              is_shown; //показана ли клавиатура
+  screen_keyboard_t handle;   //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ РєР»Р°РІРёР°С‚СѓСЂС‹
+  bool              is_shown; //РїРѕРєР°Р·Р°РЅР° Р»Рё РєР»Р°РІРёР°С‚СѓСЂР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (syslib::Window& window, ScreenKeyboardType type, const char* platform_specific)
     : handle ()
     , is_shown ()
@@ -25,7 +25,7 @@ struct ScreenKeyboard::Impl
     handle = Platform::CreateScreenKeyboard (reinterpret_cast<window_t> (const_cast<void*> (window.InternalHandle ())), type, platform_specific);
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -39,7 +39,7 @@ struct ScreenKeyboard::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ScreenKeyboard::ScreenKeyboard (syslib::Window& window, ScreenKeyboardType type, const char* platform_specific)
@@ -67,7 +67,7 @@ ScreenKeyboard::~ScreenKeyboard ()
 }
 
 /*
-    Показана ли клавиатура
+    РџРѕРєР°Р·Р°РЅР° Р»Рё РєР»Р°РІРёР°С‚СѓСЂР°
 */
 
 bool ScreenKeyboard::IsShown () const
@@ -76,7 +76,7 @@ bool ScreenKeyboard::IsShown () const
 }
 
 /*
-    Показ и скрытие клавиатуры
+    РџРѕРєР°Р· Рё СЃРєСЂС‹С‚РёРµ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 void ScreenKeyboard::Show ()
@@ -116,7 +116,7 @@ void ScreenKeyboard::Hide ()
 }
 
 /*
-    Проверка поддержки клавиатуры
+    РџСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 bool ScreenKeyboard::IsSupported (ScreenKeyboardType type)

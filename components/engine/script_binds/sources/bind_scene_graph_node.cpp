@@ -9,7 +9,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание узлов сцены
+    РЎРѕР·РґР°РЅРёРµ СѓР·Р»РѕРІ СЃС†РµРЅС‹
 */
 
 Node::Pointer create_node ()
@@ -18,7 +18,7 @@ Node::Pointer create_node ()
 }
 
 /*
-   Регистрация библиотеки работы с узлами сцены
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СѓР·Р»Р°РјРё СЃС†РµРЅС‹
 */
 
 void bind_static_node_library (Environment& environment)
@@ -72,7 +72,7 @@ void bind_static_node_library (Environment& environment)
   environment.RegisterType<common::PropertyType> (SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY);
 }
 
-//получение уникального идентификатора узла
+//РїРѕР»СѓС‡РµРЅРёРµ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СѓР·Р»Р°
 void* get_node_id (Node& node)
 {
   return &node;
@@ -110,15 +110,15 @@ void bind_node_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_node));
 
-    //регистрация статических переменных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
 
   bind_static_node_library (environment);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_Id",                   make_invoker (&get_node_id));
   lib.Register ("get_Scene",                make_invoker (implicit_cast<Scene* (Node::*) ()> (&Node::Scene)));
@@ -240,20 +240,20 @@ void bind_node_library (Environment& environment)
   lib.Register ("RegisterEventHandler",  make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeEvent, const Node::EventHandler&) const> (&Node::RegisterEventHandler)));
   lib.Register ("RegisterSubTreeEventHandler", make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeSubTreeEvent, const Node::SubTreeEventHandler&) const> (&Node::RegisterEventHandler)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Node> (SCENE_NODE_LIBRARY);
 }
 
 /*
-   Регистрация библиотеки работы с массивами узлов сцены
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РјР°СЃСЃРёРІР°РјРё СѓР·Р»РѕРІ СЃС†РµРЅС‹
 */
 
 void bind_node_array_link_mode_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_AddRef",  make_const (NodeArrayLinkMode_AddRef));
   lib.Register ("get_WeakRef", make_const (NodeArrayLinkMode_WeakRef));
@@ -273,16 +273,16 @@ void bind_node_array_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_ARRAY_LIBRARY);
 
-    //регистрация статических библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… Р±РёР±Р»РёРѕС‚РµРє
 
   bind_node_array_link_mode_library (environment);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (&create_node_array),
                                         make_invoker<NodeArray ()> (xtl::bind (&create_node_array, NodeArrayLinkMode_AddRef))));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_Size",     make_invoker (&NodeArray::Size));
   lib.Register ("get_Empty",    make_invoker (&NodeArray::IsEmpty));
@@ -295,13 +295,13 @@ void bind_node_array_library (Environment& environment)
   lib.Register ("Clear",        make_invoker (&NodeArray::Clear));
   lib.Register ("Reserve",      make_invoker (&NodeArray::Reserve));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<NodeArray> (SCENE_NODE_ARRAY_LIBRARY);
 }
 
 /*
-    Регистрация библиотеки работы с контроллером
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРј
 */
 
 void bind_controller_owner_mode_library (Environment& environment)
@@ -317,7 +317,7 @@ void bind_controller_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_AttachedNode",   make_invoker ((Node* (Controller::*)())&Controller::AttachedNode));
   lib.Register ("get_OwnerMode",      make_invoker (&Controller::OwnerMode));
@@ -326,7 +326,7 @@ void bind_controller_library (Environment& environment)
   lib.Register ("NodeOwnsController", make_invoker (&Controller::NodeOwnsController));
   lib.Register ("Detach",             make_invoker (&Controller::Detach));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Controller> (SCENE_CONTROLLER_LIBRARY);
 }

@@ -20,7 +20,7 @@ namespace media_font_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* FONT_LIBRARY_LIBRARY                = "Media.FontLibrary";
@@ -90,15 +90,15 @@ void bind_font_creation_params_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (FONT_CREATION_PARAMS_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&FontCreationParams::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("Clone",   make_invoker (&FontCreationParams::Clone));
 
-    //регистрация свойств
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРІРѕР№СЃС‚РІ
 
   lib.Register ("get_FontSize",      make_invoker (&FontCreationParams::FontSize));
   lib.Register ("set_FontSize",      make_invoker (&FontCreationParams::SetFontSize));
@@ -132,22 +132,22 @@ void bind_font_creation_params_library (Environment& environment)
   environment.RegisterType<media::FontCreationParams> (FONT_CREATION_PARAMS_NATIVE_LIBRARY);
 }
 
-///Функции
+///Р¤СѓРЅРєС†РёРё
 FontLibrary create_font_library ()
 {
   return FontLibrary ();
 }
 
-///Регистрация библиотеки работы с библиотекой шрифтов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ Р±РёР±Р»РёРѕС‚РµРєРѕР№ С€СЂРёС„С‚РѕРІ
 void bind_font_library_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (FONT_LIBRARY_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_font_library));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("LoadFont",    make_invoker (&FontLibrary::LoadFont));
   lib.Register ("UnloadFont",  make_invoker (&FontLibrary::UnloadFont));
@@ -167,7 +167,7 @@ void bind_font_library_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

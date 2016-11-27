@@ -8,7 +8,7 @@ struct syslib::semaphore_handle
   Osp::Base::Runtime::Semaphore semaphore;
 };
 
-//создание семафора
+//СЃРѕР·РґР°РЅРёРµ СЃРµРјР°С„РѕСЂР°
 semaphore_t BadaThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
@@ -32,7 +32,7 @@ semaphore_t BadaThreadManager::CreateSemaphore (size_t initial_value)
   }
 }
 
-//уничтожение семафора
+//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРµРјР°С„РѕСЂР°
 void BadaThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle)
@@ -41,13 +41,13 @@ void BadaThreadManager::DestroySemaphore (semaphore_t handle)
   delete handle;
 }
 
-//ожидание следующей задачи
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void BadaThreadManager::WaitSemaphore (semaphore_t handle)
 {
   WaitSemaphore (handle, INFINITE);
 }
 
-//ожидание следующей задачи с таймаутом
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 bool BadaThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
@@ -67,7 +67,7 @@ bool BadaThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_millis
   }
 }
 
-//попытка ожидания следующей задачи
+//РїРѕРїС‹С‚РєР° РѕР¶РёРґР°РЅРёСЏ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 bool BadaThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
@@ -93,7 +93,7 @@ bool BadaThreadManager::TryWaitSemaphore (semaphore_t handle)
   }
 }
 
-//посылка следующей задачи
+//РїРѕСЃС‹Р»РєР° СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void BadaThreadManager::PostSemaphore (semaphore_t handle)
 {
   try

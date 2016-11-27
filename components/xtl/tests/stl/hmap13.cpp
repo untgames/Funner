@@ -1,4 +1,4 @@
-// í•·‚®‡Æ¢†≠®• ®≠‰Æ‡¨†Ê®® Æ Ø†™•‚†Â ® resize ()
+// –¢–µ—Å—Ç–∏—Ä–æ–≤–∞–Ω–∏–µ –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏–∏ –æ –ø–∞–∫–µ—Ç–∞—Ö –∏ resize ()
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"
@@ -14,7 +14,7 @@ int main ()
   hm1.insert_pair ('a',1);
   hm1.insert_pair ('b',2);
   printf ("size before resize = %lu\n", hm1.size ());
-  hm1.resize (hm1.size () * 100); //‡†ß¨•‡ Á•£Æ ®ß¨•≠Ô•‚·Ô???
+  hm1.resize (hm1.size () * 100); //—Ä–∞–∑–º–µ—Ä —á–µ–≥–æ –∏–∑–º–µ–Ω—è–µ—Ç—Å—è???
   printf ("size after resize = %lu\n", hm1.size ());
   hm1.insert_pair ('c',3);
   hm1.insert_pair ('d',4);

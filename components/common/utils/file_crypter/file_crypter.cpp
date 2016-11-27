@@ -53,7 +53,7 @@ int main (int argc, char* argv [])
       return 1;
     }
 
-      //шифрование
+      //С€РёС„СЂРѕРІР°РЅРёРµ
 
     InputFile  in_file (src_file_name);          
     StdFile    out_bin_file (dst_file_name, FileMode_ReadWrite);

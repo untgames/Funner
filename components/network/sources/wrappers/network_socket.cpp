@@ -21,7 +21,7 @@ struct Socket::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Socket::Socket ()
@@ -59,7 +59,7 @@ Socket& Socket::operator = (const Socket& socket)
 }
 
 /*
-    Закрытие сокета
+    Р—Р°РєСЂС‹С‚РёРµ СЃРѕРєРµС‚Р°
 */
 
 void Socket::Close ()
@@ -68,7 +68,7 @@ void Socket::Close ()
 }
 
 /*
-    Адреса сторон
+    РђРґСЂРµСЃР° СЃС‚РѕСЂРѕРЅ
 */
 
 const SocketAddress& Socket::LocalAddress () const
@@ -82,7 +82,7 @@ const SocketAddress& Socket::RemoteAddress () const
 }
 
 /*
-    Протокол
+    РџСЂРѕС‚РѕРєРѕР»
 */
 
 SocketProtocol Socket::Protocol () const
@@ -91,7 +91,7 @@ SocketProtocol Socket::Protocol () const
 }
 
 /*
-    Закрытие каналов передачи данных
+    Р—Р°РєСЂС‹С‚РёРµ РєР°РЅР°Р»РѕРІ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С…
 */
 
 bool Socket::IsReceiveClosed () const
@@ -115,7 +115,7 @@ void Socket::CloseSend ()
 }
 
 /*
-    Соединение
+    РЎРѕРµРґРёРЅРµРЅРёРµ
 */
 
 void Socket::Bind (const SocketAddress& address)
@@ -129,7 +129,7 @@ void Socket::Connect (const SocketAddress& address, unsigned int timeout)
 }
 
 /*
-    Приём соединений
+    РџСЂРёС‘Рј СЃРѕРµРґРёРЅРµРЅРёР№
 */
 
 void Socket::Listen ()
@@ -157,7 +157,7 @@ bool Socket::TryAccept (Socket& target_socket)
 }
 
 /*
-    Флаги сокета
+    Р¤Р»Р°РіРё СЃРѕРєРµС‚Р°
 */
 
 bool Socket::IsClosed () const
@@ -216,7 +216,7 @@ void Socket::SetTcpNoDelay (bool state)
 }
 
 /*
-    Параметры сокета
+    РџР°СЂР°РјРµС‚СЂС‹ СЃРѕРєРµС‚Р°
 */
 
 void Socket::SetReceiveBufferSize (unsigned int size)
@@ -240,7 +240,7 @@ unsigned int Socket::SendBufferSize () const
 }
 
 /*
-    Чтение / запись данных
+    Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
 */
 
 unsigned int Socket::Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
@@ -254,7 +254,7 @@ unsigned int Socket::Send (const void* buffer, unsigned int size, unsigned int t
 }
 
 /*
-    Количество байт доступных для чтения без блокировки
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚ РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ С‡С‚РµРЅРёСЏ Р±РµР· Р±Р»РѕРєРёСЂРѕРІРєРё
 */
 
 unsigned int Socket::ReceiveAvailable () const
@@ -263,7 +263,7 @@ unsigned int Socket::ReceiveAvailable () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Socket::Swap (Socket& socket)

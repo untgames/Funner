@@ -6,7 +6,7 @@
 #define __MYSTL_STRING_FORWARD_DECLARATIONS__
 
 #include <string.h>
-#include <wchar.h> //cwchar имеет проблемы компиляции на mingw 3.4.5
+#include <wchar.h> //cwchar ╨Б┬м╥Р╥Р╨▓ ╨З╨░┬о╨О┬л╥Р┬м╨╗ ╨Д┬о┬м╨З╨Б┬л╨┐╨╢╨Б╨Б ┬н┬а mingw 3.4.5
 
 #include <stl/config.h>
 

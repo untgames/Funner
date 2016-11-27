@@ -21,7 +21,7 @@ typedef stl::vector<ShapeListEntryPtr>     ShapeListArray;
 }
 
 /*
-   Описание составного тела
+   РћРїРёСЃР°РЅРёРµ СЃРѕСЃС‚Р°РІРЅРѕРіРѕ С‚РµР»Р°
 */
 
 struct ShapeList::Impl : public xtl::reference_counter
@@ -52,7 +52,7 @@ ShapeList& ShapeList::operator = (ShapeList& source)
 }
 
 /*
-   Добавление/удаление тел
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ С‚РµР»
 */
 
 void ShapeList::Add (const Shape& shape, const physics::Transform& transform)
@@ -84,7 +84,7 @@ void ShapeList::Clear ()
 }
 
 /*
-   Получение тел
+   РџРѕР»СѓС‡РµРЅРёРµ С‚РµР»
 */
 
 unsigned int ShapeList::Size () const
@@ -119,7 +119,7 @@ const physics::Transform& ShapeList::Transform (unsigned int index) const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void ShapeList::Swap (ShapeList& shape_list)
@@ -131,7 +131,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (ShapeList& shape_list1, ShapeList& shape_list2)

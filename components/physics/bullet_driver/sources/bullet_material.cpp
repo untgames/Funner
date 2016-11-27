@@ -17,17 +17,17 @@ typedef xtl::signal<void ()> UpdateSignal;
 }
 
 /*
-    Описание реализации материала тела
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјР°С‚РµСЂРёР°Р»Р° С‚РµР»Р°
 */
 
 struct Material::Impl
 {
-  math::vec3f  anisotropic_friction;  //трение по другим осям
-  float        linear_damping;        //линейная амортизация
-  float        angular_damping;       //угловая амортизация
-  float        friction;              //трение
-  float        restitution;           //упругость
-  UpdateSignal update_signal;         //сигнал обновления свойств объекта
+  math::vec3f  anisotropic_friction;  //С‚СЂРµРЅРёРµ РїРѕ РґСЂСѓРіРёРј РѕСЃСЏРј
+  float        linear_damping;        //Р»РёРЅРµР№РЅР°СЏ Р°РјРѕСЂС‚РёР·Р°С†РёСЏ
+  float        angular_damping;       //СѓРіР»РѕРІР°СЏ Р°РјРѕСЂС‚РёР·Р°С†РёСЏ
+  float        friction;              //С‚СЂРµРЅРёРµ
+  float        restitution;           //СѓРїСЂСѓРіРѕСЃС‚СЊ
+  UpdateSignal update_signal;         //СЃРёРіРЅР°Р» РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р°
 
   Impl ()
     : anisotropic_friction (DEFAULT_ANISOTROPIC_FRICTION)
@@ -44,7 +44,7 @@ struct Material::Impl
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Material::Material ()
@@ -52,7 +52,7 @@ Material::Material ()
   {}
 
 /*
-   Управление линейной/угловой аммортизацией
+   РЈРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРµР№РЅРѕР№/СѓРіР»РѕРІРѕР№ Р°РјРјРѕСЂС‚РёР·Р°С†РёРµР№
 */
 
 float Material::LinearDamping ()
@@ -80,7 +80,7 @@ void Material::SetAngularDamping (float value)
 }
 
 /*
-   Управление трением
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚СЂРµРЅРёРµРј
 */
 
 float Material::Friction ()
@@ -108,7 +108,7 @@ void Material::SetAnisotropicFriction (const math::vec3f& value)
 }
 
 /*
-   Управление упругостью
+   РЈРїСЂР°РІР»РµРЅРёРµ СѓРїСЂСѓРіРѕСЃС‚СЊСЋ
 */
 
 float Material::Restitution ()
@@ -124,7 +124,7 @@ void Material::SetRestitution (float value)
 }
 
 /*
-   Подписка на обновление свойств
+   РџРѕРґРїРёСЃРєР° РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 xtl::connection Material::RegisterUpdateHandler (const UpdateHandler& handler)

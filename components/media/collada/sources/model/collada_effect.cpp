@@ -5,23 +5,23 @@ using namespace media;
 using namespace common;
 
 /*
-    Реализация эффекта
+    Р РµР°Р»РёР·Р°С†РёСЏ СЌС„С„РµРєС‚Р°
 */
 
 struct Map
 {
-  Texture     texture; //текстура
-  math::vec4f color;   //цвет карты
+  Texture     texture; //С‚РµРєСЃС‚СѓСЂР°
+  math::vec4f color;   //С†РІРµС‚ РєР°СЂС‚С‹
   
   Map () {}
 };
 
 struct Effect::Impl: public xtl::reference_counter
 {
-  media::collada::ShaderType  shader_type;                     //тип шейдера
-  Map                         maps [TextureMap_Num];           //карты
-  float                       shader_params [EffectParam_Num]; //параметры шейдинга
-  stl::string                 id;                              //идентификатор эффекта
+  media::collada::ShaderType  shader_type;                     //С‚РёРї С€РµР№РґРµСЂР°
+  Map                         maps [TextureMap_Num];           //РєР°СЂС‚С‹
+  float                       shader_params [EffectParam_Num]; //РїР°СЂР°РјРµС‚СЂС‹ С€РµР№РґРёРЅРіР°
+  stl::string                 id;                              //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЌС„С„РµРєС‚Р°
   
   Impl () : shader_type (ShaderType_Default)
   {
@@ -31,7 +31,7 @@ struct Effect::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Effect::Effect ()
@@ -58,7 +58,7 @@ Effect& Effect::operator = (const Effect& effect)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Effect Effect::Clone () const
@@ -67,7 +67,7 @@ Effect Effect::Clone () const
 }
 
 /*
-    Идентификатор эффекта
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЌС„С„РµРєС‚Р°
 */
 
 const char* Effect::Id () const
@@ -84,7 +84,7 @@ void Effect::SetId (const char* id)
 }
 
 /*
-    Тип шейдера
+    РўРёРї С€РµР№РґРµСЂР°
 */
 
 ShaderType Effect::ShaderType () const
@@ -109,7 +109,7 @@ void Effect::SetShaderType (media::collada::ShaderType type)
 }
   
 /*
-    Работа с текстурными картами
+    Р Р°Р±РѕС‚Р° СЃ С‚РµРєСЃС‚СѓСЂРЅС‹РјРё РєР°СЂС‚Р°РјРё
 */
 
 const Texture& Effect::Texture (TextureMap map) const
@@ -142,7 +142,7 @@ bool Effect::HasTexture (TextureMap map) const
 }
 
 /*
-    Работа с цветом карт
+    Р Р°Р±РѕС‚Р° СЃ С†РІРµС‚РѕРј РєР°СЂС‚
 */
 
 const math::vec4f& Effect::MapColor (TextureMap map) const
@@ -162,7 +162,7 @@ void Effect::SetMapColor (TextureMap map, const math::vec4f& color)
 }
 
 /*
-    Параметры шейдинга
+    РџР°СЂР°РјРµС‚СЂС‹ С€РµР№РґРёРЅРіР°
 */
 
 float Effect::Param (EffectParam param) const

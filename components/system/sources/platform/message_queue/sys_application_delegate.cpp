@@ -3,7 +3,7 @@
 using namespace syslib;
 
 /*
-    Работа с очередью сообщений
+    Р Р°Р±РѕС‚Р° СЃ РѕС‡РµСЂРµРґСЊСЋ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 namespace
@@ -12,7 +12,7 @@ namespace
 class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationDelegate ()
       : message_queue (*MessageQueueSingleton::Instance ())
     {
@@ -23,7 +23,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       message_queue.RegisterHandler (*this);
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ApplicationDelegate ()
     {
       try
@@ -35,7 +35,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       }
     }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       try
@@ -48,7 +48,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
           while (!IsMessageQueueEmpty ())
             DoNextEvent ();
 
-           //если нет обработчиков OnIdle - приостанавливаем приложение
+           //РµСЃР»Рё РЅРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ OnIdle - РїСЂРёРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 
           if (!idle_enabled)
           {
@@ -71,13 +71,13 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));
     }
     
-///Обработка события выхода из приложения
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnExit (int code)
     {
       is_exited = true;
@@ -86,7 +86,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
         listener->OnExit (code);
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
@@ -97,13 +97,13 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       }      
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -115,7 +115,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
     }
 
   private:
-///Отложенное события выхода из приложения
+///РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕР±С‹С‚РёСЏ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     struct ExitMessage: public MessageQueue::Message
     {
       ExitMessage (ApplicationDelegate& in_delegate, int in_code) : delegate (in_delegate), code (in_code) {}
@@ -129,7 +129,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       int                     code;
     };
     
-///Проверка очереди событий на пустоту
+///РџСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРё СЃРѕР±С‹С‚РёР№ РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsMessageQueueEmpty ()
     {
       if (is_exited)
@@ -138,7 +138,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       return message_queue.IsEmpty ();
     }
     
-///Ожидание события
+///РћР¶РёРґР°РЅРёРµ СЃРѕР±С‹С‚РёСЏ
     void WaitMessage ()
     {
       try
@@ -152,7 +152,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       }
     }
     
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvent ()
     {
       try
@@ -176,7 +176,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 namespace syslib

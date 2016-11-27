@@ -1,5 +1,5 @@
 /*
-    Описание реализации очереди команд
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕС‡РµСЂРµРґРё РєРѕРјР°РЅРґ
 */
 
 template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
@@ -16,16 +16,16 @@ template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
     xtl::spin_lock& lock;
   };
 
-  Queue             queue;                         //очередь буферов
-  const size_t      max_queue_size;                //максимальный размер очереди
-  const size_t      spin_lock_timeout;             //максимальное время ожидания в spin-wait
-  xtl::spin_lock    lock;                          //примитив синхронизации для быстрого захвата
-  syslib::Semaphore full_semaphore;                //событие для реализации системного ожидания
-  syslib::Semaphore empty_semaphore;               //событие для реализации системного ожидания
-  volatile size_t   full_condition_wait_counter;   //количество нитей, ожидающих на событии переполнения очереди
-  volatile size_t   empty_condition_wait_counter;  //количество нитей, ожидающих на событии пустоты очереди
+  Queue             queue;                         //РѕС‡РµСЂРµРґСЊ Р±СѓС„РµСЂРѕРІ
+  const size_t      max_queue_size;                //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РѕС‡РµСЂРµРґРё
+  const size_t      spin_lock_timeout;             //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ РІ spin-wait
+  xtl::spin_lock    lock;                          //РїСЂРёРјРёС‚РёРІ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ Р·Р°С…РІР°С‚Р°
+  syslib::Semaphore full_semaphore;                //СЃРѕР±С‹С‚РёРµ РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјРЅРѕРіРѕ РѕР¶РёРґР°РЅРёСЏ
+  syslib::Semaphore empty_semaphore;               //СЃРѕР±С‹С‚РёРµ РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјРЅРѕРіРѕ РѕР¶РёРґР°РЅРёСЏ
+  volatile size_t   full_condition_wait_counter;   //РєРѕР»РёС‡РµСЃС‚РІРѕ РЅРёС‚РµР№, РѕР¶РёРґР°СЋС‰РёС… РЅР° СЃРѕР±С‹С‚РёРё РїРµСЂРµРїРѕР»РЅРµРЅРёСЏ РѕС‡РµСЂРµРґРё
+  volatile size_t   empty_condition_wait_counter;  //РєРѕР»РёС‡РµСЃС‚РІРѕ РЅРёС‚РµР№, РѕР¶РёРґР°СЋС‰РёС… РЅР° СЃРѕР±С‹С‚РёРё РїСѓСЃС‚РѕС‚С‹ РѕС‡РµСЂРµРґРё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (size_t in_max_queue_size, size_t in_spin_lock_timeout)
     : max_queue_size (in_max_queue_size)
     , spin_lock_timeout (in_spin_lock_timeout)
@@ -35,7 +35,7 @@ template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
   {
   }
 
-/// Ожидание готовности очереди
+/// РћР¶РёРґР°РЅРёРµ РіРѕС‚РѕРІРЅРѕСЃС‚Рё РѕС‡РµСЂРµРґРё
   bool WaitUnderflow (size_t timeout)
   {
     size_t start_time = common::milliseconds ();
@@ -64,7 +64,7 @@ template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
     }
   }
 
-/// Ожидание изменений
+/// РћР¶РёРґР°РЅРёРµ РёР·РјРµРЅРµРЅРёР№
   bool WaitChanges (size_t start_time, size_t timeout, syslib::Semaphore& semaphore, volatile size_t& wait_counter)
   {
     const size_t initial_queue_size = queue.size (), loop_timeout = timeout < spin_lock_timeout ? timeout : spin_lock_timeout;
@@ -110,7 +110,7 @@ template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T, class Allocator>
@@ -126,7 +126,7 @@ inline SharedQueue<T, Allocator>::~SharedQueue ()
 }
 
 /*
-    Размер очереди / проверка на пустоту
+    Р Р°Р·РјРµСЂ РѕС‡РµСЂРµРґРё / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T, class Allocator>
@@ -152,7 +152,7 @@ inline bool SharedQueue<T, Allocator>::IsEmpty () const
 }
 
 /*
-    Помещение элемента в очередь / извлечение из очереди
+    РџРѕРјРµС‰РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РІ РѕС‡РµСЂРµРґСЊ / РёР·РІР»РµС‡РµРЅРёРµ РёР· РѕС‡РµСЂРµРґРё
 */
 
 template <class T, class Allocator>

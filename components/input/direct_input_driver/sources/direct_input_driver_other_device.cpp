@@ -12,7 +12,7 @@ using namespace syslib;
 namespace
 {
 
-//Неиспользуемые функции на будущее
+//РќРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ С„СѓРЅРєС†РёРё РЅР° Р±СѓРґСѓС‰РµРµ
 const char* object_type_name (GUID type)
 {
   if (type == GUID_XAxis)   return "GUID_XAxis";
@@ -72,7 +72,7 @@ ObjectType get_object_type (DWORD type)
   if (type & DIDFT_RELAXIS)         return ObjectType_RelativeAxis;
   if (type & DIDFT_ABSAXIS)         return ObjectType_AbsoluteAxis;
 
-  if (type & DIDFT_AXIS)            return ObjectType_RelativeAxis;  //если нет точной информации о типе оси
+  if (type & DIDFT_AXIS)            return ObjectType_RelativeAxis;  //РµСЃР»Рё РЅРµС‚ С‚РѕС‡РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РёРїРµ РѕСЃРё
 
   if (type & DIDFT_PSHBUTTON)       return ObjectType_Button;
   if (type & DIDFT_TGLBUTTON)       return ObjectType_Button;
@@ -124,8 +124,8 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
   }
   catch (...)
   {
-    //добавить протоколирование!!
-    ///подавление всех исключений
+    //РґРѕР±Р°РІРёС‚СЊ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ!!
+    ///РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
   return DIENUM_CONTINUE;
@@ -134,7 +134,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
 }
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OtherDevice::OtherDevice
@@ -303,7 +303,7 @@ OtherDevice::~OtherDevice ()
 }
 
 /*
-   Получение имени контрола
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєРѕРЅС‚СЂРѕР»Р°
 */
 
 const wchar_t* OtherDevice::GetControlName (const char* control_id)
@@ -324,7 +324,7 @@ const wchar_t* OtherDevice::GetControlName (const char* control_id)
 }
 
 /*
-   Подписка на события устройства
+   РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 xtl::connection OtherDevice::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
@@ -333,7 +333,7 @@ xtl::connection OtherDevice::RegisterEventHandler (const input::low_level::IDevi
 }
 
 /*
-   Настройки устройства
+   РќР°СЃС‚СЂРѕР№РєРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void OtherDevice::SetProperty (const char* name, float value)
@@ -394,7 +394,7 @@ float OtherDevice::GetProperty (const char* name)
 }
 
 /*
-   Регистрация объекта
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 void OtherDevice::RegisterObject (const char* name, unsigned int offset, ObjectType type)
@@ -431,7 +431,7 @@ void OtherDevice::RegisterObject (const wchar_t* unicode_name, unsigned int offs
 }
 
 /*
-   Получение данных
+   РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
 */
 
 void OtherDevice::PollDevice ()
@@ -666,7 +666,7 @@ void OtherDevice::PollDevice ()
 }
 
 /*
-   Добавление свойства объекта
+   Р”РѕР±Р°РІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р°
 */
 
 void OtherDevice::AddProperty (const char* property_name, ObjectsMap::iterator object_iter, ObjectPropertyType property_type, float default_value)
@@ -688,7 +688,7 @@ void OtherDevice::AddProperty (const char* property_name, ObjectsMap::iterator o
 }
 
 /*
-   Попытка переполучения устройства
+   РџРѕРїС‹С‚РєР° РїРµСЂРµРїРѕР»СѓС‡РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 bool OtherDevice::ReAcquireDevice ()
@@ -705,7 +705,7 @@ bool OtherDevice::ReAcquireDevice ()
 }
 
 /*
-   Обработка поля init_string
+   РћР±СЂР°Р±РѕС‚РєР° РїРѕР»СЏ init_string
 */
 
 void OtherDevice::ProcessInitStringProperty (const char* property, const char* value)
@@ -718,7 +718,7 @@ void OtherDevice::ProcessInitStringProperty (const char* property, const char* v
 }
 
 /*
-   Переименование объекта
+   РџРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р°
 */
 
 void OtherDevice::RenameObject (size_t object_offset, const char* new_name)
@@ -732,7 +732,7 @@ void OtherDevice::RenameObject (size_t object_offset, const char* new_name)
 }
 
 /*
-   Обработка событий
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№
 */
 
 void OtherDevice::ProcessEvent (const char* event)

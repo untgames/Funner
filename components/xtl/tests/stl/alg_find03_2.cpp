@@ -1,4 +1,4 @@
-//Тестирование алгоритма find_first_of (range1, range2, pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° find_first_of (range1, range2, pred)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

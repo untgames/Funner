@@ -1,4 +1,4 @@
-//Тестирование алгоритма uninitialized_fill_n (first, count, val)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° uninitialized_fill_n (first, count, val)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

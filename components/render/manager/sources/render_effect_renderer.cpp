@@ -18,29 +18,29 @@ namespace
 using render::low_level::DEVICE_RENDER_TARGET_SLOTS_COUNT;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int RESERVE_OPERATION_ARRAY          = 512; //резервируемое число операций в массиве операций прохода
-const unsigned int RESERVE_FRAME_ARRAY              = 32;  //резервируемое число вложенных фреймов в эффекте
-const unsigned int RESERVE_MVP_MATRIX_ARRAY         = 512; //резервируемое число матриц MVP (для динамических примитивов)
-const unsigned int RESERVE_BATCHES_ARRAY            = 128; //резервируемое количество пакетов
-const unsigned int RESERVE_NORMALIZED_SCISSOR_ARRAY = 16;  //резервируемое количество областей отсечения
+const unsigned int RESERVE_OPERATION_ARRAY          = 512; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РѕРїРµСЂР°С†РёР№ РІ РјР°СЃСЃРёРІРµ РѕРїРµСЂР°С†РёР№ РїСЂРѕС…РѕРґР°
+const unsigned int RESERVE_FRAME_ARRAY              = 32;  //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РІР»РѕР¶РµРЅРЅС‹С… С„СЂРµР№РјРѕРІ РІ СЌС„С„РµРєС‚Рµ
+const unsigned int RESERVE_MVP_MATRIX_ARRAY         = 512; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РјР°С‚СЂРёС† MVP (РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ)
+const unsigned int RESERVE_BATCHES_ARRAY            = 128; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїР°РєРµС‚РѕРІ
+const unsigned int RESERVE_NORMALIZED_SCISSOR_ARRAY = 16;  //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±Р»Р°СЃС‚РµР№ РѕС‚СЃРµС‡РµРЅРёСЏ
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-///Операция прохода
+///РћРїРµСЂР°С†РёСЏ РїСЂРѕС…РѕРґР°
 struct PassOperation: public RendererOperation
 {
-  ProgramParametersLayout*     frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
-  render::low_level::IBuffer*  frame_entity_parameters_buffer; //буфер параметров пары фрейм-объект
-  unsigned int                 eye_distance;                   //расстояние от z-near
-  int                          mvp_matrix_index;               //ссылка на матрицу Model-View-Projection
-  int                          normalized_scissor_index;       //ссылка на область отсечения в относительных координатах
+  ProgramParametersLayout*     frame_entity_parameters_layout; //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїР°СЂС‹ С„СЂРµР№Рј-РѕР±СЉРµРєС‚
+  render::low_level::IBuffer*  frame_entity_parameters_buffer; //Р±СѓС„РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РїР°СЂС‹ С„СЂРµР№Рј-РѕР±СЉРµРєС‚
+  unsigned int                 eye_distance;                   //СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ z-near
+  int                          mvp_matrix_index;               //СЃСЃС‹Р»РєР° РЅР° РјР°С‚СЂРёС†Сѓ Model-View-Projection
+  int                          normalized_scissor_index;       //СЃСЃС‹Р»РєР° РЅР° РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   PassOperation (const RendererOperation&    base,
                  ProgramParametersLayout*    in_frame_entity_parameters_layout,
                  render::low_level::IBuffer* in_frame_entity_parameters_buffer,
@@ -54,7 +54,7 @@ struct PassOperation: public RendererOperation
     , mvp_matrix_index (in_mvp_matrix_index)
     , normalized_scissor_index (in_normalized_scissor_index)
   {
-      //обновление хэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р°
 
     if (batching_hash)
     {
@@ -64,7 +64,7 @@ struct PassOperation: public RendererOperation
   }
 };
 
-///Дескриптор менеджера упаковки
+///Р”РµСЃРєСЂРёРїС‚РѕСЂ РјРµРЅРµРґР¶РµСЂР° СѓРїР°РєРѕРІРєРё
 struct BatchingManagerDesc
 {
   BatchingManager* manager;
@@ -77,7 +77,7 @@ typedef stl::vector<PassOperation*>      OperationPtrArray;
 typedef stl::vector<PassOperation>       OperationArray;
 typedef stl::vector<BatchingManagerDesc> BatchingManagerArray;
 
-///Компаратор по кэшированию состояний
+///РљРѕРјРїР°СЂР°С‚РѕСЂ РїРѕ РєСЌС€РёСЂРѕРІР°РЅРёСЋ СЃРѕСЃС‚РѕСЏРЅРёР№
 struct StateSwitchComparator
 {
   template <class T> bool compare (const T& obj1, const T& obj2, bool& result) const
@@ -112,7 +112,7 @@ struct StateSwitchComparator
   }
 };
 
-///Компаратор от наиболее близкого объекта к наиболее удаленному
+///РљРѕРјРїР°СЂР°С‚РѕСЂ РѕС‚ РЅР°РёР±РѕР»РµРµ Р±Р»РёР·РєРѕРіРѕ РѕР±СЉРµРєС‚Р° Рє РЅР°РёР±РѕР»РµРµ СѓРґР°Р»РµРЅРЅРѕРјСѓ
 struct FrontToBackComparator
 {
   bool operator () (const PassOperation* op1, const PassOperation* op2) const
@@ -124,7 +124,7 @@ struct FrontToBackComparator
   }
 };
 
-///Компаратор от наиболее удаленного объекта к наиболее близкому
+///РљРѕРјРїР°СЂР°С‚РѕСЂ РѕС‚ РЅР°РёР±РѕР»РµРµ СѓРґР°Р»РµРЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° Рє РЅР°РёР±РѕР»РµРµ Р±Р»РёР·РєРѕРјСѓ
 struct BackToFrontComparator
 {
   bool operator () (const PassOperation* op1, const PassOperation* op2) const
@@ -136,23 +136,23 @@ struct BackToFrontComparator
   }
 };
 
-///Проход рендеринга
+///РџСЂРѕС…РѕРґ СЂРµРЅРґРµСЂРёРЅРіР°
 struct RenderPass: public xtl::reference_counter
 {  
-  common::StringArray         color_targets;           //имя целевых буферов цвета
-  stl::string                 depth_stencil_target;    //имя целевого буфера отсечения
-  SortMode                    sort_mode;               //режим сортировки
-  LowLevelStateBlockPtr       scissor_off_state_block; //блок состояний прохода
-  LowLevelStateBlockPtr       scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
-  ProgramPtr                  program;                 //программа
-  ProgramParametersLayoutPtr  parameters_layout;       //расположение параметров
-  unsigned int                clear_flags;             //флаги очистки экрана
-  OperationArray              operations;              //операции рендеринга
-  OperationPtrArray           operation_ptrs;          //указатели на операции
-  const RendererOperation*    last_operation;          //последняя добавленная операция
-  FrameImpl&                  frame;                   //ссылка на родительский кадр
+  common::StringArray         color_targets;           //РёРјСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ С†РІРµС‚Р°
+  stl::string                 depth_stencil_target;    //РёРјСЏ С†РµР»РµРІРѕРіРѕ Р±СѓС„РµСЂР° РѕС‚СЃРµС‡РµРЅРёСЏ
+  SortMode                    sort_mode;               //СЂРµР¶РёРј СЃРѕСЂС‚РёСЂРѕРІРєРё
+  LowLevelStateBlockPtr       scissor_off_state_block; //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРѕС…РѕРґР°
+  LowLevelStateBlockPtr       scissor_on_state_block;  //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРѕС…РѕРґР° СЃ РІРєР»СЋС‡РµРЅРЅС‹Рј С‚РµСЃС‚РѕРј РѕС‚СЃРµС‡РµРЅРёСЏ
+  ProgramPtr                  program;                 //РїСЂРѕРіСЂР°РјРјР°
+  ProgramParametersLayoutPtr  parameters_layout;       //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
+  unsigned int                clear_flags;             //С„Р»Р°РіРё РѕС‡РёСЃС‚РєРё СЌРєСЂР°РЅР°
+  OperationArray              operations;              //РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
+  OperationPtrArray           operation_ptrs;          //СѓРєР°Р·Р°С‚РµР»Рё РЅР° РѕРїРµСЂР°С†РёРё
+  const RendererOperation*    last_operation;          //РїРѕСЃР»РµРґРЅСЏСЏ РґРѕР±Р°РІР»РµРЅРЅР°СЏ РѕРїРµСЂР°С†РёСЏ
+  FrameImpl&                  frame;                   //СЃСЃС‹Р»РєР° РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РєР°РґСЂ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   RenderPass (const DeviceManagerPtr& device_manager, FrameImpl& in_frame)
     : sort_mode (SortMode_Default)
     , parameters_layout (ProgramParametersLayout::Create (&device_manager->Device (), &device_manager->Settings ()))
@@ -164,7 +164,7 @@ struct RenderPass: public xtl::reference_counter
     operation_ptrs.reserve (operations.size ());
   }
   
-///Сортировка
+///РЎРѕСЂС‚РёСЂРѕРІРєР°
   void Sort ()
   {
     switch (sort_mode)
@@ -204,13 +204,13 @@ struct RenderPass: public xtl::reference_counter
 
 typedef stl::vector<FrameImpl*> FrameArray;
 
-///Инстанцированный эффект
+///РРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹Р№ СЌС„С„РµРєС‚
 struct RenderInstantiatedEffect: public xtl::reference_counter
 {
-  FrameArray frames;     //вложенные фреймы
-  FrameImpl* last_frame; //последний добавленный фрейм
+  FrameArray frames;     //РІР»РѕР¶РµРЅРЅС‹Рµ С„СЂРµР№РјС‹
+  FrameImpl* last_frame; //РїРѕСЃР»РµРґРЅРёР№ РґРѕР±Р°РІР»РµРЅРЅС‹Р№ С„СЂРµР№Рј
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   RenderInstantiatedEffect ()
     : last_frame (0)
   {
@@ -221,13 +221,13 @@ struct RenderInstantiatedEffect: public xtl::reference_counter
 typedef xtl::intrusive_ptr<RenderPass>               RenderPassPtr;
 typedef xtl::intrusive_ptr<RenderInstantiatedEffect> RenderInstantiatedEffectPtr;
 
-///Операция эффекта
+///РћРїРµСЂР°С†РёСЏ СЌС„С„РµРєС‚Р°
 struct RenderEffectOperation: public xtl::reference_counter
 {
-  RenderPassPtr               pass;   //проход рендеринга
-  RenderInstantiatedEffectPtr effect; //инстанцированный эффект
+  RenderPassPtr               pass;   //РїСЂРѕС…РѕРґ СЂРµРЅРґРµСЂРёРЅРіР°
+  RenderInstantiatedEffectPtr effect; //РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹Р№ СЌС„С„РµРєС‚
   
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   RenderEffectOperation (const RenderPassPtr& in_pass) : pass (in_pass) {}
   
   RenderEffectOperation (const RenderInstantiatedEffectPtr& in_effect) : effect (in_effect) {}
@@ -235,13 +235,13 @@ struct RenderEffectOperation: public xtl::reference_counter
 
 typedef xtl::rect<float> rectf;
 
-///Область отсечения в нормированных координатах [0;1]
+///РћР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ РІ РЅРѕСЂРјРёСЂРѕРІР°РЅРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С… [0;1]
 struct NormalizedScissor
 {
-  rectf              rect;    //область отсечения
-  const BoxAreaImpl* scissor; //ссылка на объект-контейнер
+  rectf              rect;    //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  const BoxAreaImpl* scissor; //СЃСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚-РєРѕРЅС‚РµР№РЅРµСЂ
 
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   NormalizedScissor (const BoxAreaImpl* in_scissor, const math::mat4f& vp_matrix)
     : scissor (in_scissor)
   {
@@ -277,20 +277,20 @@ typedef stl::vector<NormalizedScissor>                        NormalizedScissorA
 }
 
 /*
-    Описание реализации рендера эффектов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂРµРЅРґРµСЂР° СЌС„С„РµРєС‚РѕРІ
 */
 
 struct EffectRenderer::Impl
 {
-  DeviceManagerPtr            device_manager;      //менеджер устройства отрисовки
-  TagHashArray                effect_tags;         //тэги эффекта
-  RenderPassMap               passes;              //проходы рендеринга
-  RenderInstantiatedEffectMap effects;             //инстанцированные эффекты
-  RenderEffectOperationArray  operations;          //операции рендеринга
-  MatrixArray                 mvp_matrices;        //матрицы
-  NormalizedScissorArray      normalized_scissors; //нормированные области вывода
-  BatchingManagerArray        batching_managers;   //менеджеры пакетирования
-  bool                        right_hand_viewport; //является ли область вывода правосторонней
+  DeviceManagerPtr            device_manager;      //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TagHashArray                effect_tags;         //С‚СЌРіРё СЌС„С„РµРєС‚Р°
+  RenderPassMap               passes;              //РїСЂРѕС…РѕРґС‹ СЂРµРЅРґРµСЂРёРЅРіР°
+  RenderInstantiatedEffectMap effects;             //РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹Рµ СЌС„С„РµРєС‚С‹
+  RenderEffectOperationArray  operations;          //РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
+  MatrixArray                 mvp_matrices;        //РјР°С‚СЂРёС†С‹
+  NormalizedScissorArray      normalized_scissors; //РЅРѕСЂРјРёСЂРѕРІР°РЅРЅС‹Рµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  BatchingManagerArray        batching_managers;   //РјРµРЅРµРґР¶РµСЂС‹ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
+  bool                        right_hand_viewport; //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР° РїСЂР°РІРѕСЃС‚РѕСЂРѕРЅРЅРµР№
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -303,7 +303,7 @@ struct EffectRenderer::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager, FrameImpl& frame, ProgramParametersLayout* parent_layout)
@@ -311,7 +311,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     if (!effect)
       throw xtl::make_null_argument_exception ("", "effect");
@@ -319,22 +319,22 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");                  
       
-      //получение свойств устройства
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР°
     
     impl->right_hand_viewport = device_manager->DeviceCaps ().has_right_hand_viewport;
       
-      //копирование тэго эффекта в состояние рендера
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ С‚СЌРіРѕ СЌС„С„РµРєС‚Р° РІ СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРЅРґРµСЂР°
       
     if (effect->TagsCount ())
       impl->effect_tags.assign (effect->TagHashes (), effect->TagHashes () + effect->TagsCount ());
       
-      //построение структуры диспетчеризации операций рендеринга
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёРё РѕРїРµСЂР°С†РёР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
     impl->operations.reserve (effect->OperationsCount ());
 
     for (unsigned int i=0, count=effect->OperationsCount (); i<count; i++)
     {
-        //операция рендеринга может быть либо проходом рендеринга, либо рисованием вложенной группы эффектов
+        //РѕРїРµСЂР°С†РёСЏ СЂРµРЅРґРµСЂРёРЅРіР° РјРѕР¶РµС‚ Р±С‹С‚СЊ Р»РёР±Рѕ РїСЂРѕС…РѕРґРѕРј СЂРµРЅРґРµСЂРёРЅРіР°, Р»РёР±Рѕ СЂРёСЃРѕРІР°РЅРёРµРј РІР»РѕР¶РµРЅРЅРѕР№ РіСЂСѓРїРїС‹ СЌС„С„РµРєС‚РѕРІ
       
       EffectPassPtr            src_pass                = effect->OperationPass (i);
       InstantiatedEffectPtr    src_instantiated_effect = effect->OperationEffect (i);
@@ -342,11 +342,11 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
       if (src_pass) 
       {
-          //обработка операции рендеринга - прохода рендеринга
+          //РѕР±СЂР°Р±РѕС‚РєР° РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР° - РїСЂРѕС…РѕРґР° СЂРµРЅРґРµСЂРёРЅРіР°
         
         RenderPassPtr pass (new RenderPass (device_manager, frame), false);
         
-          //построение карты соответствия: тэг материала -> проход рендеринга
+          //РїРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚С‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ: С‚СЌРі РјР°С‚РµСЂРёР°Р»Р° -> РїСЂРѕС…РѕРґ СЂРµРЅРґРµСЂРёРЅРіР°
         
         for (size_t j=0, count=src_pass->TagsCount (); j<count; j++)
         {
@@ -355,7 +355,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
           impl->passes.insert_pair (hash, pass.get ());
         }
         
-          //кэширование общих параметров рендеринга для всего прохода
+          //РєСЌС€РёСЂРѕРІР°РЅРёРµ РѕР±С‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР° РґР»СЏ РІСЃРµРіРѕ РїСЂРѕС…РѕРґР°
         
         pass->color_targets           = src_pass->ColorTargets ().Clone ();
         pass->depth_stencil_target    = src_pass->DepthStencilTarget ();
@@ -365,22 +365,22 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         pass->program                 = src_pass->Program ();
         pass->clear_flags             = src_pass->ClearFlags ();
         
-          //связывание объекта размещения параметров прохода с родительским объектом размещения параметров
+          //СЃРІСЏР·С‹РІР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЂР°Р·РјРµС‰РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕС…РѕРґР° СЃ СЂРѕРґРёС‚РµР»СЊСЃРєРёРј РѕР±СЉРµРєС‚РѕРј СЂР°Р·РјРµС‰РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 
         if (parent_layout)
           pass->parameters_layout->Attach (*parent_layout);
           
-          //создание операции рендеринга
+          //СЃРѕР·РґР°РЅРёРµ РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (pass), false);
       }
       else if (src_instantiated_effect)
       {
-          //обработка операции рендеринга - группы эффектов рендеринга
+          //РѕР±СЂР°Р±РѕС‚РєР° РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР° - РіСЂСѓРїРїС‹ СЌС„С„РµРєС‚РѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
         
         RenderInstantiatedEffectPtr instantiated_effect (new RenderInstantiatedEffect, false);
         
-          //построение карты соответствия: тэг эффекта -> группа эффектов рендеринга
+          //РїРѕСЃС‚СЂРѕРµРЅРёРµ РєР°СЂС‚С‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ: С‚СЌРі СЌС„С„РµРєС‚Р° -> РіСЂСѓРїРїР° СЌС„С„РµРєС‚РѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 
         for (size_t j=0, count=src_instantiated_effect->TagsCount (); j<count; j++)
         {
@@ -389,13 +389,13 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
           impl->effects.insert_pair (hash, instantiated_effect.get ());
         }
         
-          //создание операции рендеринга
+          //СЃРѕР·РґР°РЅРёРµ РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (instantiated_effect), false);
       }            
       else throw xtl::format_operation_exception ("", "Wrong effect operation %u. Operation may have pass or effect", i);     
       
-        //добавленние операции рендеринга к списку операций эффекта
+        //РґРѕР±Р°РІР»РµРЅРЅРёРµ РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР° Рє СЃРїРёСЃРєСѓ РѕРїРµСЂР°С†РёР№ СЌС„С„РµРєС‚Р°
       
       impl->operations.push_back (operation);      
     }
@@ -412,7 +412,7 @@ EffectRenderer::~EffectRenderer ()
 }
 
 /*
-    Добавление операций в список отрисовки
+    Р”РѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёР№ РІ СЃРїРёСЃРѕРє РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void EffectRenderer::AddOperations
@@ -427,52 +427,52 @@ void EffectRenderer::AddOperations
 {
   static const char* METHOD_NAME = "render::manager::EffectRenderer::AddOperations(const RendererOperationList&)";  
   
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!operations_desc.operations && operations_desc.operations_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "operations.operations");  
 
-    //получение идентификатора текущего кадра
+    //РїРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РµРєСѓС‰РµРіРѕ РєР°РґСЂР°
 
   FrameId current_frame_id = impl->device_manager->CacheManager ().CurrentFrame ();
     
-    //кэширование карты проходов
+    //РєСЌС€РёСЂРѕРІР°РЅРёРµ РєР°СЂС‚С‹ РїСЂРѕС…РѕРґРѕРІ
     
   RenderPassMap& passes = impl->passes;
   
-    //перебор операций
+    //РїРµСЂРµР±РѕСЂ РѕРїРµСЂР°С†РёР№
     
   const RendererOperation* operation = operations_desc.operations;    
 
   for (size_t i=0, count=operations_desc.operations_count; i!=count; i++, operation++)
   {
-      //определение списка тэгов данной операции
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃРїРёСЃРєР° С‚СЌРіРѕРІ РґР°РЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
     
     size_t        tags_count = operation->primitive->tags_count;    
     const size_t* tag        = operation->primitive->tags;
 
-      //определение буфера / лэйаута пары frame-entity
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ Р±СѓС„РµСЂР° / Р»СЌР№Р°СѓС‚Р° РїР°СЂС‹ frame-entity
 
     render::low_level::IBuffer* property_buffer = entity_dependent_property_buffer;
     ProgramParametersLayout*    property_layout = entity_dependent_property_layout;
     
-      //сопоставление тэга операции проходу рендеринга
+      //СЃРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ С‚СЌРіР° РѕРїРµСЂР°С†РёРё РїСЂРѕС…РѕРґСѓ СЂРµРЅРґРµСЂРёРЅРіР°
 
     bool dynamic_primitives_added = false;
 
     for (size_t j=0; j!=tags_count; j++, tag++)
     {
-        //поиск проходов по тэгу операции
+        //РїРѕРёСЃРє РїСЂРѕС…РѕРґРѕРІ РїРѕ С‚СЌРіСѓ РѕРїРµСЂР°С†РёРё
       
       stl::pair<RenderPassMap::iterator, RenderPassMap::iterator> range = passes.equal_range (*tag);
 
-        //добавление операции в проход
+        //РґРѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёРё РІ РїСЂРѕС…РѕРґ
 
       int mvp_matrix_index = -1;
       
       for (;range.first!=range.second; ++range.first)
       {
-          //предварительное обновление динамических примитивов
+          //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 
         if (!dynamic_primitives_added)
         {
@@ -510,17 +510,17 @@ void EffectRenderer::AddOperations
           dynamic_primitives_added = true;
         }
 
-          //добавление операции в проход
+          //РґРѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёРё РІ РїСЂРѕС…РѕРґ
 
         RenderPass& pass = *range.first->second;
         
-          //обработка частного случая: добавление операции несколько раз в один и тот же проход
-          //данная ситуация может проявиться если и операция и проход содержать более двух соответствующих тэгов
+          //РѕР±СЂР°Р±РѕС‚РєР° С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ: РґРѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёРё РЅРµСЃРєРѕР»СЊРєРѕ СЂР°Р· РІ РѕРґРёРЅ Рё С‚РѕС‚ Р¶Рµ РїСЂРѕС…РѕРґ
+          //РґР°РЅРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ РјРѕР¶РµС‚ РїСЂРѕСЏРІРёС‚СЊСЃСЏ РµСЃР»Рё Рё РѕРїРµСЂР°С†РёСЏ Рё РїСЂРѕС…РѕРґ СЃРѕРґРµСЂР¶Р°С‚СЊ Р±РѕР»РµРµ РґРІСѓС… СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… С‚СЌРіРѕРІ
         
         if (pass.last_operation == operation)
           continue;
 
-          //обновление области отсечения
+          //РѕР±РЅРѕРІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
         int normalized_scissor_index = -1;
 
@@ -543,7 +543,7 @@ void EffectRenderer::AddOperations
           }
         }
           
-          //добавление операции к списку операций прохода
+          //РґРѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёРё Рє СЃРїРёСЃРєСѓ РѕРїРµСЂР°С†РёР№ РїСЂРѕС…РѕРґР°
 
         pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance, mvp_matrix_index, normalized_scissor_index));
 
@@ -551,7 +551,7 @@ void EffectRenderer::AddOperations
 
         pass.operation_ptrs.push_back (0);
         
-          //запоминание последней добавленной операции для обработки частного случая добавления операции в один и тот же проход несколько раз
+          //Р·Р°РїРѕРјРёРЅР°РЅРёРµ РїРѕСЃР»РµРґРЅРµР№ РґРѕР±Р°РІР»РµРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РѕРїРµСЂР°С†РёРё РІ РѕРґРёРЅ Рё С‚РѕС‚ Р¶Рµ РїСЂРѕС…РѕРґ РЅРµСЃРєРѕР»СЊРєРѕ СЂР°Р·
 
         pass.last_operation = operation;
       }
@@ -561,27 +561,27 @@ void EffectRenderer::AddOperations
 
 void EffectRenderer::AddOperations (FrameImpl& frame)
 {
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   EffectRendererPtr renderer = frame.EffectRenderer ();
   
   if (!renderer)
     return;
     
-    //получение списка тэгов эффекта кадра
+    //РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° С‚СЌРіРѕРІ СЌС„С„РµРєС‚Р° РєР°РґСЂР°
     
   size_t        src_tags_count = renderer->impl->effect_tags.size ();
   const size_t* src_tag        = src_tags_count ? &renderer->impl->effect_tags [0] : (const size_t*)0;
   
-    //кэширование инстанцированных эффектов
+    //РєСЌС€РёСЂРѕРІР°РЅРёРµ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… СЌС„С„РµРєС‚РѕРІ
 
   RenderInstantiatedEffectMap& effects = impl->effects;
   
-    //сопоставление тэгов переданного кадра группе рендеринга эффектов
+    //СЃРѕРїРѕСЃС‚Р°РІР»РµРЅРёРµ С‚СЌРіРѕРІ РїРµСЂРµРґР°РЅРЅРѕРіРѕ РєР°РґСЂР° РіСЂСѓРїРїРµ СЂРµРЅРґРµСЂРёРЅРіР° СЌС„С„РµРєС‚РѕРІ
   
   for (size_t i=0; i!=src_tags_count; i++, src_tag++)
   {
-      //поиск группы эффектов по тэгу эффекта
+      //РїРѕРёСЃРє РіСЂСѓРїРїС‹ СЌС„С„РµРєС‚РѕРІ РїРѕ С‚СЌРіСѓ СЌС„С„РµРєС‚Р°
     
     stl::pair<RenderInstantiatedEffectMap::iterator, RenderInstantiatedEffectMap::iterator> range = effects.equal_range (*src_tag);
     
@@ -589,12 +589,12 @@ void EffectRenderer::AddOperations (FrameImpl& frame)
     {
       RenderInstantiatedEffect& instantiated_effect = *range.first->second;
       
-        //обработка частного случая повторного добавления кадра в группу
+        //РѕР±СЂР°Р±РѕС‚РєР° С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ РїРѕРІС‚РѕСЂРЅРѕРіРѕ РґРѕР±Р°РІР»РµРЅРёСЏ РєР°РґСЂР° РІ РіСЂСѓРїРїСѓ
       
       if (instantiated_effect.last_frame == &frame)
         continue;
         
-        //добавление кадра в группу
+        //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РґСЂР° РІ РіСЂСѓРїРїСѓ
         
       instantiated_effect.frames.push_back (&frame);
       
@@ -604,7 +604,7 @@ void EffectRenderer::AddOperations (FrameImpl& frame)
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void EffectRenderer::RemoveAllOperations ()
@@ -637,13 +637,13 @@ void EffectRenderer::RemoveAllOperations ()
 }
 
 /*
-    Выполнение операций
+    Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№
 */
 
 namespace
 {
 
-///Контекст целевых буферов рендеринга
+///РљРѕРЅС‚РµРєСЃС‚ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 struct RenderTargetContext
 {
   unsigned int  targets_count;
@@ -660,23 +660,23 @@ struct RenderTargetContext
   }
 };
 
-///Обобщение алгоритма рендеринга операций
+///РћР±РѕР±С‰РµРЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° СЂРµРЅРґРµСЂРёРЅРіР° РѕРїРµСЂР°С†РёР№
 struct RenderOperationsExecutor
 {
-  RenderingContext&                  context;                    //контекст рендеринга
-  DeviceManager&                     device_manager;             //менеджер устройства отрисовки
-  render::low_level::IDevice&        device;                     //устройство отрисовки
-  render::low_level::IDeviceContext& device_context;             //контекст отрисовки
-  ProgramParametersManager&          program_parameters_manager; //менеджер параметров программы шейдинга
-  FrameImpl&                         frame;                      //фрейм
-  ShaderOptionsCache&                frame_shader_options_cache; //кэш опций шейдеров для кадра
-  LowLevelBufferPtr                  frame_property_buffer;      //буфер параметров кадра
-  const MatrixArray&                 mvp_matrices;               //массив матриц Model-View-Projection
-  const NormalizedScissorArray&      normalized_scissors;        //нормированные области отсечения
-  BatchingManagerArray&              batching_managers;          //менеджеры пакетирования
-  bool                               right_hand_viewport;        //является ли область вывода правосторонней
+  RenderingContext&                  context;                    //РєРѕРЅС‚РµРєСЃС‚ СЂРµРЅРґРµСЂРёРЅРіР°
+  DeviceManager&                     device_manager;             //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  render::low_level::IDevice&        device;                     //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РѕС‚СЂРёСЃРѕРІРєРё
+  render::low_level::IDeviceContext& device_context;             //РєРѕРЅС‚РµРєСЃС‚ РѕС‚СЂРёСЃРѕРІРєРё
+  ProgramParametersManager&          program_parameters_manager; //РјРµРЅРµРґР¶РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
+  FrameImpl&                         frame;                      //С„СЂРµР№Рј
+  ShaderOptionsCache&                frame_shader_options_cache; //РєСЌС€ РѕРїС†РёР№ С€РµР№РґРµСЂРѕРІ РґР»СЏ РєР°РґСЂР°
+  LowLevelBufferPtr                  frame_property_buffer;      //Р±СѓС„РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РєР°РґСЂР°
+  const MatrixArray&                 mvp_matrices;               //РјР°СЃСЃРёРІ РјР°С‚СЂРёС† Model-View-Projection
+  const NormalizedScissorArray&      normalized_scissors;        //РЅРѕСЂРјРёСЂРѕРІР°РЅРЅС‹Рµ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
+  BatchingManagerArray&              batching_managers;          //РјРµРЅРµРґР¶РµСЂС‹ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
+  bool                               right_hand_viewport;        //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР° РїСЂР°РІРѕСЃС‚РѕСЂРѕРЅРЅРµР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, const NormalizedScissorArray& in_normalized_scissors, BatchingManagerArray& in_batching_managers, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
@@ -691,7 +691,7 @@ struct RenderOperationsExecutor
     , batching_managers (in_batching_managers)
     , right_hand_viewport (in_right_hand_viewport)
   {
-      //обновление динамических данных
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РґР°РЅРЅС‹С…
 
     if (!batching_managers.empty ())
     {
@@ -706,14 +706,14 @@ struct RenderOperationsExecutor
     }
   }
   
-///Выполнение массива операций
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° РѕРїРµСЂР°С†РёР№
   void Draw (RenderEffectOperationArray& operations)
   {
     for (RenderEffectOperationArray::iterator iter=operations.begin (), end=operations.end (); iter!=end; ++iter)
       Draw (**iter);
   }
   
-///Выполнение операции
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё
   void Draw (RenderEffectOperation& operation)
   {
     if (operation.pass)
@@ -723,13 +723,13 @@ struct RenderOperationsExecutor
       DrawEffect (*operation.effect);
   }
   
-///Настройка целевых буферов отрисовки
+///РќР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
   void SetRenderTargets (RenderPass& pass, RenderTargetContext& render_target_context)
   {
     render::low_level::IView* depth_stencil_view  = 0;
     unsigned int              depth_stencil_width = 0, depth_stencil_height = 0;
 
-      //получение информации о буфере отсечения
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р±СѓС„РµСЂРµ РѕС‚СЃРµС‡РµРЅРёСЏ
 
     if (!pass.depth_stencil_target.empty ())
     {
@@ -749,7 +749,7 @@ struct RenderOperationsExecutor
       }
     }
 
-      //получение информации о буфера цвета
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р±СѓС„РµСЂР° С†РІРµС‚Р°
 
     render::low_level::IView*   render_target_views [DEVICE_RENDER_TARGET_SLOTS_COUNT];
     render::low_level::Viewport viewports [DEVICE_RENDER_TARGET_SLOTS_COUNT];
@@ -830,26 +830,26 @@ struct RenderOperationsExecutor
       }      
     }
 
-      //проверка совместимости буфера глубины и цвета
+      //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹ Рё С†РІРµС‚Р°
 
     if (target_initialized && depth_stencil_view && (depth_stencil_width != target_width || depth_stencil_height != target_height))
       throw xtl::format_operation_exception ("", "Different render target sizes: render target sizes (%u, %u) mismatch depth-stencil sizes (%u, %u)",
         target_width, target_height, depth_stencil_width, depth_stencil_height);
 
-      //установка целей и областей вывода
+      //СѓСЃС‚Р°РЅРѕРІРєР° С†РµР»РµР№ Рё РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     device_context.OSSetRenderTargets (render_target_context.targets_count, render_target_views, depth_stencil_view);
 
     for (unsigned int i=0; i<render_target_context.targets_count; i++)
       device_context.RSSetViewport (i, viewports [i]);
 
-      //установка областей отсечения
+      //СѓСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РѕС‚СЃРµС‡РµРЅРёСЏ
 
     if (render_target_context.has_scissors)
       SetScissorRects (render_target_context, 0);
   }
   
-///Очистка целевых буферов
+///РћС‡РёСЃС‚РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ
   void ClearViews (RenderPass& pass, const RenderTargetContext& render_target_context)
   {
     unsigned int src_clear_flags = frame.ClearFlags () & pass.clear_flags, dst_clear_flags = 0;
@@ -874,7 +874,7 @@ struct RenderOperationsExecutor
     }
   }
   
-///Установка состояния области отсечения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
   void SetScissorState (RenderPass& pass, bool state)
   {
     if (state)
@@ -939,7 +939,7 @@ struct RenderOperationsExecutor
     device_context.RSSetScissor (rt_index, dst_rect);
   }
 
-///Восстановление состояния менеджеров упаковки
+///Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂРѕРІ СѓРїР°РєРѕРІРєРё
   void RestoreBatchingManagers ()
   {
     for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
@@ -953,7 +953,7 @@ struct RenderOperationsExecutor
     batching_managers.clear ();
   }
 
-///Обновление динамических примитивов
+///РћР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
   void UpdateDynamicPrimitives (RenderPass& pass)
   {
     FrameImpl& frame = pass.frame;
@@ -981,7 +981,7 @@ struct RenderOperationsExecutor
         dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
       }
 
-        //обновление вершинных буферов
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
 
       for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
       {
@@ -990,13 +990,13 @@ struct RenderOperationsExecutor
         batching_manager.DynamicVertexBuffer ().SyncBuffers (device, iter->saved_dynamic_vertices_count);
       }
 
-        //восстановление состояния менеджеров упаковки
+        //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂРѕРІ СѓРїР°РєРѕРІРєРё
 
       RestoreBatchingManagers ();
     }
     catch (...)
     {
-        //восстановление состояния менеджеров упаковки
+        //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂРѕРІ СѓРїР°РєРѕРІРєРё
 
       RestoreBatchingManagers ();
 
@@ -1004,10 +1004,10 @@ struct RenderOperationsExecutor
     }    
   }
 
-///Подготовка динамических индексных буферов для пакетной отрисовки
+///РџРѕРґРіРѕС‚РѕРІРєР° РґРёРЅР°РјРёС‡РµСЃРєРёС… РёРЅРґРµРєСЃРЅС‹С… Р±СѓС„РµСЂРѕРІ РґР»СЏ РїР°РєРµС‚РЅРѕР№ РѕС‚СЂРёСЃРѕРІРєРё
   OperationPtrArray::iterator PrepareBatchingDynamicIndexBuffers (OperationPtrArray::iterator operation_iter, OperationPtrArray::iterator operation_end)
   {
-      //заполнение индексных буферов
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РёРЅРґРµРєСЃРЅС‹С… Р±СѓС„РµСЂРѕРІ
 
     bool force_stop = false;
 
@@ -1031,7 +1031,7 @@ struct RenderOperationsExecutor
         batching_manager->SetPassUserData (this);
       }
 
-        //определение границ пакета и копирование индексов в линейный буфер
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ РіСЂР°РЅРёС† РїР°РєРµС‚Р° Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ РІ Р»РёРЅРµР№РЅС‹Р№ Р±СѓС„РµСЂ
 
       for (;operation_iter!=operation_end && (*operation_iter)->batching_hash == batching_hash; ++operation_iter)
       {
@@ -1049,7 +1049,7 @@ struct RenderOperationsExecutor
       }
     }
 
-      //синхронизация буферов
+      //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р±СѓС„РµСЂРѕРІ
 
     try
     {
@@ -1085,40 +1085,40 @@ struct RenderOperationsExecutor
     }
   }
   
-///Рендеринг прохода
+///Р РµРЅРґРµСЂРёРЅРі РїСЂРѕС…РѕРґР°
   void DrawPass (RenderPass& pass)
   {
-      //обновление указателей операций
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№ РѕРїРµСЂР°С†РёР№
 
     pass.UpdateOperationPointers ();
 
-      //обновление динамических примитивов
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
  
     UpdateDynamicPrimitives (pass); 
 
-      //сортировка операций
+      //СЃРѕСЂС‚РёСЂРѕРІРєР° РѕРїРµСЂР°С†РёР№
       
     pass.Sort ();
 
-      //установка целевых буферов отрисовки
+      //СѓСЃС‚Р°РЅРѕРІРєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
     
     RenderTargetContext render_target_context;  
     
     SetRenderTargets (pass, render_target_context);
 
-      //применение состояния прохода
+      //РїСЂРёРјРµРЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕС…РѕРґР°
       
     SetScissorState (pass, render_target_context.has_scissors);
 
-      //очистка экрана
+      //РѕС‡РёСЃС‚РєР° СЌРєСЂР°РЅР°
       
     ClearViews (pass, render_target_context);
 
-      //установка константного буфера кадра
+      //СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
     device_context.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
 
-      //выполнение операций
+      //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end;)
     {
@@ -1129,7 +1129,7 @@ struct RenderOperationsExecutor
     }
   }
   
-///Выполнение операции прохода рендеринга
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё РїСЂРѕС…РѕРґР° СЂРµРЅРґРµСЂРёРЅРіР°
   void DrawPassOperation (RenderPass& pass, OperationPtrArray::iterator& operation_iter, OperationPtrArray::iterator operation_end, RenderTargetContext& render_target_context)
   {
     const PassOperation&     operation         = **operation_iter;
@@ -1139,7 +1139,7 @@ struct RenderOperationsExecutor
     if (!primitive.count)
       return;
 
-      //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
+      //РїРѕРёСЃРє РїСЂРѕРіСЂР°РјРјС‹ (TODO: РєСЌС€РёСЂРѕРІР°РЅРёРµ РїРѕРёСЃРєР° РїРѕ Р°РґСЂРµСЃР°Рј РєСЌС€РµР№, FIFO)
       
     Program* program = pass.program ? pass.program.get () : operation.program;
 
@@ -1150,14 +1150,14 @@ struct RenderOperationsExecutor
 
     device_context.SSSetProgram (program->LowLevelProgram ().get ());
 
-      //применение состояния операции
+      //РїСЂРёРјРµРЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕРїРµСЂР°С†РёРё
 
     primitive.state_block->Apply (&device_context);
 
     if (operation.state_block)
       operation.state_block->Apply (&device_context);
 
-      //обработка области отсечения объекта
+      //РѕР±СЂР°Р±РѕС‚РєР° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 
     if (operation_scissor != render_target_context.current_local_scissor)
     {
@@ -1171,7 +1171,7 @@ struct RenderOperationsExecutor
       render_target_context.current_local_scissor = operation_scissor;
     }
 
-      //установка локальных текстур
+      //СѓСЃС‚Р°РЅРѕРІРєР° Р»РѕРєР°Р»СЊРЅС‹С… С‚РµРєСЃС‚СѓСЂ
     
     if (program->HasFramemaps ())
     {
@@ -1192,15 +1192,15 @@ struct RenderOperationsExecutor
       }
     }
 
-      //установка расположения параметров
-      //TODO: кэшировать по entity (FIFO)
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
+      //TODO: РєСЌС€РёСЂРѕРІР°С‚СЊ РїРѕ entity (FIFO)
 
     ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (pass.parameters_layout.get (), operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
     device_context.SSSetProgramParametersLayout (program_parameters_layout->DeviceLayout ().get ());
     device_context.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
 
-      //рисование
+      //СЂРёСЃРѕРІР°РЅРёРµ
 
     if (primitive.indexed)
     {
@@ -1209,7 +1209,7 @@ struct RenderOperationsExecutor
         size_t           batching_hash    = operation.batching_hash;
         BatchingManager& batching_manager = *operation.primitive->batching_manager;
 
-          //определение границ пакета и копирование индексов в линейный буфер
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ РіСЂР°РЅРёС† РїР°РєРµС‚Р° Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ РІ Р»РёРЅРµР№РЅС‹Р№ Р±СѓС„РµСЂ
 
         OperationPtrArray::iterator iter = operation_iter;
 
@@ -1224,7 +1224,7 @@ struct RenderOperationsExecutor
 
         operation_iter = iter - 1;
 
-          //рисование
+          //СЂРёСЃРѕРІР°РЅРёРµ
 
         device_context.DrawIndexed (primitive.type, first, indices_count, 0);
 
@@ -1241,10 +1241,10 @@ struct RenderOperationsExecutor
     }
   }
   
-///Рендеринг вложенного эффекта
+///Р РµРЅРґРµСЂРёРЅРі РІР»РѕР¶РµРЅРЅРѕРіРѕ СЌС„С„РµРєС‚Р°
   void DrawEffect (RenderInstantiatedEffect& effect)
   {
-      //рисование вложенных кадров
+      //СЂРёСЃРѕРІР°РЅРёРµ РІР»РѕР¶РµРЅРЅС‹С… РєР°РґСЂРѕРІ
 
     for (FrameArray::iterator iter=effect.frames.begin (), end=effect.frames.end (); iter!=end; ++iter)
       (*iter)->Draw (&context);
@@ -1257,7 +1257,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
-      //исполнение операций
+      //РёСЃРїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№
 
     RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->normalized_scissors, impl->batching_managers, impl->right_hand_viewport);
 

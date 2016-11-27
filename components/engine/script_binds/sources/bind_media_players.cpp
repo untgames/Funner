@@ -14,7 +14,7 @@ namespace media_players_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* MEDIA_PLAYER_LIBRARY                    = "Media.MediaPlayer";
@@ -28,22 +28,22 @@ const char* COMPONENT_NAME                          = "script.binds.MediaPlayers
 typedef xtl::shared_ptr<MediaPlayer>           MediaPlayerPtr;
 typedef xtl::function<void (MediaPlayerEvent)> MediaPlayerEventHandler;
 
-//Создание плейлиста
+//РЎРѕР·РґР°РЅРёРµ РїР»РµР№Р»РёСЃС‚Р°
 Playlist create_playlist ()
 {
   return Playlist ();
 }
 
-//Регистрация библиотеки работы с плейлистами
+//Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РїР»РµР№Р»РёСЃС‚Р°РјРё
 void bind_playlist_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (MEDIA_PLAYLIST_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_playlist));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_Capacity", make_invoker (&Playlist::Capacity));
   lib.Register ("get_Empty",    make_invoker (&Playlist::IsEmpty));
@@ -61,7 +61,7 @@ void bind_playlist_library (Environment& environment)
   environment.RegisterType<Playlist> (MEDIA_PLAYLIST_LIBRARY);
 }
 
-//Регистрация статических переменных
+//Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
 void bind_static_media_player_library (Environment& environment)
 {
   InvokerRegistry player_state_lib       = environment.CreateLibrary (MEDIA_STATIC_PLAYER_STATE_LIBRARY);
@@ -83,7 +83,7 @@ void bind_static_media_player_library (Environment& environment)
   player_event_lib.Register       ("get_OnChangeRepeatMode", make_const (MediaPlayerEvent_OnChangeRepeatMode));
 }
 
-//Создание проигрывателя
+//РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 MediaPlayerPtr create_player ()
 {
   return MediaPlayerPtr (new MediaPlayer);
@@ -109,22 +109,22 @@ xtl::connection player_register_event_handler (MediaPlayer& player, MediaPlayerE
   return player.RegisterEventHandler (event, xtl::bind (handler, _2));
 }
 
-//Регистрация библиотеки работы с проигрывателями
+//Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏРјРё
 void bind_media_player_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (MEDIA_PLAYER_LIBRARY);
 
-    //регистрация статических переменных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
   bind_static_media_player_library (environment);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (&create_player_with_target_and_playlist),
                                         make_invoker (&create_player_with_target_and_stream),
                                         make_invoker (&create_player_with_target),
                                         make_invoker (&create_player)));
 
-  //регистрация операций
+  //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("get_CurrentPlaybackDuration", make_invoker (implicit_cast<float (MediaPlayer::*) () const> (&MediaPlayer::Duration)));
   lib.Register ("get_IsPaused",                make_invoker (&MediaPlayer::IsPaused));
@@ -170,7 +170,7 @@ void bind_media_player_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

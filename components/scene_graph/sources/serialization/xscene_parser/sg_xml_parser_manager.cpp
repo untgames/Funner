@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Регистрация парсеров
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РїР°СЂСЃРµСЂРѕРІ
 */
 
 void XmlSceneParserManagerImpl::RegisterParser (const char* version, const SceneParserCreator& parser)
@@ -28,7 +28,7 @@ void XmlSceneParserManagerImpl::UnregisterAllParsers ()
 }
 
 /*
-    Версия парсера по умолчанию
+    Р’РµСЂСЃРёСЏ РїР°СЂСЃРµСЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void XmlSceneParserManagerImpl::SetDefaultVersion (const char* version)
@@ -43,7 +43,7 @@ const char* XmlSceneParserManagerImpl::DefaultVersion () const
 }
 
 /*
-    Создание парсера
+    РЎРѕР·РґР°РЅРёРµ РїР°СЂСЃРµСЂР°
 */
 
 SceneParserPtr XmlSceneParserManagerImpl::CreateParser (const common::ParseNode& decl)

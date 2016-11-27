@@ -1,4 +1,4 @@
-//Тестирование алгоритма equal (first1, last1, first2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° equal (first1, last1, first2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

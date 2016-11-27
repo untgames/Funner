@@ -6,16 +6,16 @@ namespace
 {
 
 /*
-    Вспомогательные переменные
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 */
 
-char         DUMMY_CHAR         = ' ';  //символ используемый для фиктивного затирания при лексическом разборе
-const size_t MAX_UTF8_CHAR_SIZE = 6;    //максимальный размер представления одного символа в utf-8 кодировке
+char         DUMMY_CHAR         = ' ';  //СЃРёРјРІРѕР» РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РґР»СЏ С„РёРєС‚РёРІРЅРѕРіРѕ Р·Р°С‚РёСЂР°РЅРёСЏ РїСЂРё Р»РµРєСЃРёС‡РµСЃРєРѕРј СЂР°Р·Р±РѕСЂРµ
+const size_t MAX_UTF8_CHAR_SIZE = 6;    //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р° РІ utf-8 РєРѕРґРёСЂРѕРІРєРµ
 
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 JsonLexer::JsonLexer ()
@@ -26,7 +26,7 @@ JsonLexer::JsonLexer ()
 }
 
 /*
-    Установка буфера разбора
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 */
 
 void JsonLexer::Reset (char* buffer)
@@ -43,7 +43,7 @@ void JsonLexer::Reset (char* buffer)
 }
 
 /*
-    Установка ошибки разбора
+    РЈСЃС‚Р°РЅРѕРІРєР° РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°
 */
 
 void JsonLexer::SetError (JsonLexerStatus error, const char* error_position = 0)
@@ -55,7 +55,7 @@ void JsonLexer::SetError (JsonLexerStatus error, const char* error_position = 0)
 }
 
 /*
-    Утилиты разбора
+    РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
 */
 
 void JsonLexer::NextLine ()
@@ -163,7 +163,7 @@ void JsonLexer::ReadSymbolReference (char*& write_position)
 
     for (size_t i=0; i<markers_count; i++, m++)
     {
-      if (m->marker == next_symbol) //соответствие найдено
+      if (m->marker == next_symbol) //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅР°Р№РґРµРЅРѕ
       {
         position += 1;
         write_position [0] = m->replacement;
@@ -172,7 +172,7 @@ void JsonLexer::ReadSymbolReference (char*& write_position)
       }
     }
 
-    if (m == markers + markers_count) //если соответствие не найдено
+    if (m == markers + markers_count) //РµСЃР»Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ
       SetError (JsonLexerStatus_InvalidCharacterReference, current_token);
   }
 }
@@ -301,7 +301,7 @@ void JsonLexer::ReadKeyword (JsonLexem lexem, const char* keyword)
 
   for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
 
-  if (*s1) //соответствие не найдено
+  if (*s1) //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ
   {
     SetError (JsonLexerStatus_WrongKeyword, current_token);
     position++;
@@ -410,7 +410,7 @@ JsonLexem JsonLexer::NextLexem ()
 }
 
 /*
-   Проверка есть ли в текущем массиве вложенные массивы или объекты
+   РџСЂРѕРІРµСЂРєР° РµСЃС‚СЊ Р»Рё РІ С‚РµРєСѓС‰РµРј РјР°СЃСЃРёРІРµ РІР»РѕР¶РµРЅРЅС‹Рµ РјР°СЃСЃРёРІС‹ РёР»Рё РѕР±СЉРµРєС‚С‹
 */
 
 bool JsonLexer::ArrayHasObjects ()

@@ -6,23 +6,23 @@ using namespace physics::low_level::bullet;
 namespace
 {
 
-const size_t JOINT_BODIES_COUNT = 2;     //количество тел в одном соединении
+const size_t JOINT_BODIES_COUNT = 2;     //РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµР» РІ РѕРґРЅРѕРј СЃРѕРµРґРёРЅРµРЅРёРё
 
 typedef xtl::signal<void (Joint*)> BeforeDestroySignal;
 
 }
 
 /*
-    Описание реализации соединения тел
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ С‚РµР»
 */
 
 struct Joint::Impl
 {
-  size_t               bodies_count;                                  //количество тел
-  RigidBody*           bodies [JOINT_BODIES_COUNT];                   //первое тело
-  btTypedConstraint*   joint;                                         //соединение
-  BeforeDestroySignal  before_destroy_signal;                         //сигнал удаления соединения
-  xtl::auto_connection body_destroy_connections [JOINT_BODIES_COUNT]; //соединения удаления тел
+  size_t               bodies_count;                                  //РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµР»
+  RigidBody*           bodies [JOINT_BODIES_COUNT];                   //РїРµСЂРІРѕРµ С‚РµР»Рѕ
+  btTypedConstraint*   joint;                                         //СЃРѕРµРґРёРЅРµРЅРёРµ
+  BeforeDestroySignal  before_destroy_signal;                         //СЃРёРіРЅР°Р» СѓРґР°Р»РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
+  xtl::auto_connection body_destroy_connections [JOINT_BODIES_COUNT]; //СЃРѕРµРґРёРЅРµРЅРёСЏ СѓРґР°Р»РµРЅРёСЏ С‚РµР»
 
   Impl (RigidBody* body1, RigidBody* body2, btTypedConstraint* in_joint)
     : bodies_count (JOINT_BODIES_COUNT), joint (in_joint)
@@ -46,7 +46,7 @@ struct Joint::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Joint::Joint (RigidBody* body1, RigidBody* body2, btTypedConstraint* joint)
@@ -60,7 +60,7 @@ Joint::~Joint ()
 
 
 /*
-   Получение объектов
+   РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ
 */
 
 size_t Joint::ObjectsCount ()
@@ -77,7 +77,7 @@ IRigidBody* Joint::GetObject (size_t index)
 }
 
 /*
-   Получение bullet соединения
+   РџРѕР»СѓС‡РµРЅРёРµ bullet СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 btTypedConstraint* Joint::BulletJoint ()
@@ -86,7 +86,7 @@ btTypedConstraint* Joint::BulletJoint ()
 }
 
 /*
-   Подписка на удаление объекта
+   РџРѕРґРїРёСЃРєР° РЅР° СѓРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р°
 */
 
 xtl::connection Joint::RegisterDestroyHandler (const BeforeDestroyHandler& handler)

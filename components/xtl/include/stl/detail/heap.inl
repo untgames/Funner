@@ -1,5 +1,5 @@
 /*
-    Помещение элемента last-1 в кучу [first;last-1)
+    РџРѕРјРµС‰РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° last-1 РІ РєСѓС‡Сѓ [first;last-1)
 */
 
 template <class Iter,class Compare>
@@ -7,7 +7,7 @@ inline void __push_heap
  (Iter    first,
   typename iterator_traits<Iter>::difference_type   holeIndex,
   typename iterator_traits<Iter>::difference_type   topIndex,
-  const typename iterator_traits<Iter>::value_type& value, //value - не из интервала!
+  const typename iterator_traits<Iter>::value_type& value, //value - РЅРµ РёР· РёРЅС‚РµСЂРІР°Р»Р°!
   Compare less)
 {
   typename iterator_traits<Iter>::difference_type parent = (holeIndex - 1) / 2;
@@ -37,7 +37,7 @@ inline void push_heap (Iter first,Iter last)
 }
 
 /*
-    Извлечение наибольшего элемента из кучи [first;last) и помещение в last-1
+    РР·РІР»РµС‡РµРЅРёРµ РЅР°РёР±РѕР»СЊС€РµРіРѕ СЌР»РµРјРµРЅС‚Р° РёР· РєСѓС‡Рё [first;last) Рё РїРѕРјРµС‰РµРЅРёРµ РІ last-1
 */
 
 template <class Iter,class Compare>
@@ -45,7 +45,7 @@ inline void __adjust_heap
  (Iter    first,
   typename iterator_traits<Iter>::difference_type   holeIndex,
   typename iterator_traits<Iter>::difference_type   len,
-  const typename iterator_traits<Iter>::value_type& value, //value - не из интервала!
+  const typename iterator_traits<Iter>::value_type& value, //value - РЅРµ РёР· РёРЅС‚РµСЂРІР°Р»Р°!
   Compare less)
 {
   typename iterator_traits<Iter>::difference_type topIndex = holeIndex, secondChild = 2 * holeIndex + 2;
@@ -86,7 +86,7 @@ inline void pop_heap (Iter first,Iter last)
 }
 
 /*
-    Создание кучи из диапозона [first;last)
+    РЎРѕР·РґР°РЅРёРµ РєСѓС‡Рё РёР· РґРёР°РїРѕР·РѕРЅР° [first;last)
 */
 
 template <class Iter,class Compare>
@@ -115,7 +115,7 @@ inline void make_heap (Iter first,Iter last)
 }
 
 /*
-    Преобразование кучи [first;last) в отсортированный диапозон
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєСѓС‡Рё [first;last) РІ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РґРёР°РїРѕР·РѕРЅ
 */
 
 template <class Iter,class Compare>
@@ -132,7 +132,7 @@ inline void sort_heap (Iter first,Iter last)
 }
 
 /*
-    Предикат определяющий является ли [first;last) кучей
+    РџСЂРµРґРёРєР°С‚ РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ СЏРІР»СЏРµС‚СЃСЏ Р»Рё [first;last) РєСѓС‡РµР№
 */    
 
 template <class Iter,class Compare>

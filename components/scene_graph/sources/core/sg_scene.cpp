@@ -7,7 +7,7 @@ using namespace common;
 using namespace xtl;
 
 /*
-    Описание реализации сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃС†РµРЅС‹
 */
 
 //typedef xtl::com_ptr<ISceneManager> SceneManagerPtr;
@@ -15,9 +15,9 @@ typedef com_ptr<Node> NodePtr;
 
 struct Scene::Impl: public SceneSpace, public xtl::instance_counter<Scene>
 {
-//  SceneManagerPtr scene_manager; //менеджер сцены
-  string  name; //имя сцены  
-  NodePtr root; //корень сцены
+//  SceneManagerPtr scene_manager; //РјРµРЅРµРґР¶РµСЂ СЃС†РµРЅС‹
+  string  name; //РёРјСЏ СЃС†РµРЅС‹  
+  NodePtr root; //РєРѕСЂРµРЅСЊ СЃС†РµРЅС‹
   
   template <class Fn>
   void ForEach (Fn& fn)
@@ -30,19 +30,19 @@ struct Scene::Impl: public SceneSpace, public xtl::instance_counter<Scene>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Scene::Scene ()
   : impl (new Impl)
 {
-    //создание корневого узла сцены
+    //СЃРѕР·РґР°РЅРёРµ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р° СЃС†РµРЅС‹
     
   try
   {
     impl->root = Node::Create ();
     
-      //установка указателя на данную сцену
+      //СѓСЃС‚Р°РЅРѕРІРєР° СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РґР°РЅРЅСѓСЋ СЃС†РµРЅСѓ
 
     impl->root->SetScene (this);        
   }
@@ -55,17 +55,17 @@ Scene::Scene ()
 
 Scene::~Scene ()
 {
-    //освобождение корня сцены
+    //РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РєРѕСЂРЅСЏ СЃС†РµРЅС‹
 
   impl->root->UnbindAllChildren ();
 
-    //удаление реализации
+    //СѓРґР°Р»РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
   
   delete impl;
 }
     
 /*
-    Имя сцены
+    РРјСЏ СЃС†РµРЅС‹
 */
 
 void Scene::SetName (const char* name)
@@ -82,7 +82,7 @@ const char* Scene::Name () const
 }
 
 /*
-    Корень сцены
+    РљРѕСЂРµРЅСЊ СЃС†РµРЅС‹
 */
 
 Node& Scene::Root ()
@@ -96,7 +96,7 @@ const Node& Scene::Root () const
 }
 
 /*
-    Количество объектов в сцене
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЉРµРєС‚РѕРІ РІ СЃС†РµРЅРµ
 */
 
 size_t Scene::EntitiesCount () const
@@ -105,7 +105,7 @@ size_t Scene::EntitiesCount () const
 }
 
 /*
-    Регистрация объектов сцены
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЉРµРєС‚РѕРІ СЃС†РµРЅС‹
 */
 
 void Scene::Attach (SceneObject& object)
@@ -114,13 +114,13 @@ void Scene::Attach (SceneObject& object)
 }
 
 /*
-    Функторы для обхода объектов сцены
+    Р¤СѓРЅРєС‚РѕСЂС‹ РґР»СЏ РѕР±С…РѕРґР° РѕР±СЉРµРєС‚РѕРІ СЃС†РµРЅС‹
 */
 
 namespace
 {
 
-//враппер над вызовами посетителя
+//РІСЂР°РїРїРµСЂ РЅР°Рґ РІС‹Р·РѕРІР°РјРё РїРѕСЃРµС‚РёС‚РµР»СЏ
 struct VisitorWrapper
 {
   VisitorWrapper (Scene::Visitor& in_visitor) : visitor (in_visitor) {}
@@ -133,7 +133,7 @@ struct VisitorWrapper
   Scene::Visitor& visitor;
 };
 
-//враппер над вызовами функторов с проверкой попадания обьъекта в ограничивающий объём
+//РІСЂР°РїРїРµСЂ РЅР°Рґ РІС‹Р·РѕРІР°РјРё С„СѓРЅРєС‚РѕСЂРѕРІ СЃ РїСЂРѕРІРµСЂРєРѕР№ РїРѕРїР°РґР°РЅРёСЏ РѕР±СЊСЉРµРєС‚Р° РІ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј
 template <class Bound, class Fn>
 struct BoundsCheckFunction
 {
@@ -141,7 +141,7 @@ struct BoundsCheckFunction
   
   template <class Entity> void operator () (Entity& entity) const
   {
-      //если объект имеет бесконечные ограничивающие объёмы - обрабатываем его
+      //РµСЃР»Рё РѕР±СЉРµРєС‚ РёРјРµРµС‚ Р±РµСЃРєРѕРЅРµС‡РЅС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ - РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РµРіРѕ
 
     if (entity.IsInfiniteBounds ())
     {
@@ -149,7 +149,7 @@ struct BoundsCheckFunction
       return;
     }
 
-      //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
+      //РµСЃР»Рё РѕР±СЉРµРєС‚ РёРјРµРµС‚ РєРѕРЅРµС‡РЅС‹Рµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёРµ РѕР±СЉС‘РјС‹ - РїСЂРѕРІРµСЂСЏРµРј РµРіРѕ РїРѕРїР°РґР°РЅРёРµ РІ Р·Р°РґР°РЅРЅС‹Р№ РѕР±СЉС‘Рј
 
     if (intersects (bound, entity.WorldBoundBox ()))
       fn (entity);
@@ -162,7 +162,7 @@ struct BoundsCheckFunction
 }
 
 /*
-    Обход объектов, принадлежащих сцене
+    РћР±С…РѕРґ РѕР±СЉРµРєС‚РѕРІ, РїСЂРёРЅР°РґР»РµР¶Р°С‰РёС… СЃС†РµРЅРµ
 */
 
 void Scene::Traverse (const TraverseFunction& fn) const
@@ -183,7 +183,7 @@ void Scene::VisitEach (Visitor& visitor) const
 }
 
 /*
-    Обход объектов, принадлежащих сцене и входящих в ограничивающий объём
+    РћР±С…РѕРґ РѕР±СЉРµРєС‚РѕРІ, РїСЂРёРЅР°РґР»РµР¶Р°С‰РёС… СЃС†РµРЅРµ Рё РІС…РѕРґСЏС‰РёС… РІ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј
 */
 
 void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn) const

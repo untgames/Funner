@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputPort::InputPort (Viewport& in_viewport, bool& in_z_order_changed)
@@ -35,7 +35,7 @@ InputPort::~InputPort ()
 }
 
 /*
-    Обработчики событий
+    РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№
 */
 
 void InputPort::OnViewportChangeArea (const Rect&, float, float)
@@ -99,7 +99,7 @@ void InputPort::OnViewportChangeInputState (bool)
 }
 
 /*
-    Размер тача
+    Р Р°Р·РјРµСЂ С‚Р°С‡Р°
 */
 
 void InputPort::SetTouchSize (float size, InputTransformSpace space)
@@ -110,7 +110,7 @@ void InputPort::SetTouchSize (float size, InputTransformSpace space)
 }
 
 /*
-    Обновление параметров области ввода
+    РћР±РЅРѕРІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РѕР±Р»Р°СЃС‚Рё РІРІРѕРґР°
 */
 
 void InputPort::Update ()
@@ -163,7 +163,7 @@ void InputPort::Update ()
 }
 
 /*
-    Обработка события нажатия
+    РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РЅР°Р¶Р°С‚РёСЏ
 */
 
 void InputPort::OnTouch (TouchProcessingContext& touch_context, const math::vec3f& touch_world_position)
@@ -173,7 +173,7 @@ void InputPort::OnTouch (TouchProcessingContext& touch_context, const math::vec3
     if (!input_scene || !is_active)
       return;
     
-      //оповещение сцены о возникновении события
+      //РѕРїРѕРІРµС‰РµРЅРёРµ СЃС†РµРЅС‹ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 
     InputPortPtr self_lock (this);      
       
@@ -196,7 +196,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
     if (need_update)
       Update ();
 
-      //перевод координаты в мировую систему координат
+      //РїРµСЂРµРІРѕРґ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РјРёСЂРѕРІСѓСЋ СЃРёСЃС‚РµРјСѓ РєРѕРѕСЂРґРёРЅР°С‚
 
     math::vec4f source_position_z_near (touch_context.event.position.x, touch_context.event.position.y, 0.0f, 1.0f),
                 source_position_z_far (touch_context.event.position.x, touch_context.event.position.y, 1.0f, 1.0f),
@@ -206,7 +206,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
     world_position_z_near /= world_position_z_near.w;
     world_position_z_far  /= world_position_z_far.w;
 
-      //получение пирамиды тача
+      //РїРѕР»СѓС‡РµРЅРёРµ РїРёСЂР°РјРёРґС‹ С‚Р°С‡Р°
       
     math::vec4f normalized_position = normalized_position_tm * source_position_z_near;
 
@@ -221,7 +221,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
 
     add_frustum (touch_tm, touch_frustum);
 
-      //поиск зоны
+      //РїРѕРёСЃРє Р·РѕРЅС‹
       
     out_touch_world_position = math::vec3f (world_position_z_near);
 
@@ -235,7 +235,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
 }
 
 /*
-    Сброс состояния нажатий
+    РЎР±СЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РЅР°Р¶Р°С‚РёР№
 */
 
 void InputPort::ResetTouchState ()

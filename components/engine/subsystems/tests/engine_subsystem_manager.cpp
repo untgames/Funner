@@ -15,11 +15,11 @@ const char* SUBSYSTEM3_NAME         = "Group1_Subsystem2";
 class Subsystem1 : public engine::ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     Subsystem1 () { printf ("Subsystem1::Subsystem1\n"); }
     ~Subsystem1 () { printf ("Subsystem1::~Subsystem1\n"); }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 };
@@ -27,11 +27,11 @@ class Subsystem1 : public engine::ISubsystem, public xtl::reference_counter
 class Subsystem2 : public engine::ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     Subsystem2 () { printf ("Subsystem2::Subsystem2\n"); }
     ~Subsystem2 () { printf ("Subsystem2::~Subsystem2\n"); }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 };
@@ -39,11 +39,11 @@ class Subsystem2 : public engine::ISubsystem, public xtl::reference_counter
 class Subsystem3 : public engine::ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     Subsystem3 () { printf ("Subsystem3::Subsystem3\n"); }
     ~Subsystem3 () { printf ("Subsystem3::~Subsystem3\n"); }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 };

@@ -4,7 +4,7 @@ using namespace sound::low_level;
 using namespace sound::low_level::openal;
 
 /*
-   Класс работы с сэмплами, хранящий декодированный буфер звука
+   РљР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃ СЃСЌРјРїР»Р°РјРё, С…СЂР°РЅСЏС‰РёР№ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅС‹Р№ Р±СѓС„РµСЂ Р·РІСѓРєР°
 */
 
 typedef xtl::uninitialized_storage<char> ByteBuffer;
@@ -23,7 +23,7 @@ struct BufferedSampleDecoder::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 BufferedSampleDecoder::BufferedSampleDecoder (const char* name)
@@ -80,7 +80,7 @@ BufferedSampleDecoder::~BufferedSampleDecoder ()
 }
 
 /*
-   Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
+   Р§С‚РµРЅРёРµ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅРѕРіРѕ Р·РІСѓРєР° РєРѕР»РёС‡РµСЃС‚РІРѕРј samples_count СЃСЌРјРїР»РѕРІ РЅР°С‡РёРЅР°СЏ СЃ first sample РІ data
 */
 
 unsigned int BufferedSampleDecoder::Read (unsigned int first_sample, unsigned int samples_count, void* data)
@@ -104,7 +104,7 @@ unsigned int BufferedSampleDecoder::Read (unsigned int first_sample, unsigned in
 }
 
 /*
-   Клонирование
+   РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 BufferedSampleDecoder* BufferedSampleDecoder::Clone ()

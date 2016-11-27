@@ -3,11 +3,11 @@ template <class T> struct plane_list<T>::implementation : public xtl::reference_
   typedef math::plane<T>          plane_type;
   typedef stl::vector<plane_type> plane_array;
 
-  plane_array planes; //Плоскости
+  plane_array planes; //РџР»РѕСЃРєРѕСЃС‚Рё
 };
 
 /*
-   Конструкторы / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class T>
@@ -24,7 +24,7 @@ template <class T>
 plane_list<T>::plane_list (const plane_list& source)
   : impl (source.impl)
 {
-  xtl::reference_counter* ref_count = impl;  //Обход бага компиляции gcc 4.0 на мак
+  xtl::reference_counter* ref_count = impl;  //РћР±С…РѕРґ Р±Р°РіР° РєРѕРјРїРёР»СЏС†РёРё gcc 4.0 РЅР° РјР°Рє
 
   addref (ref_count);
 }
@@ -43,7 +43,7 @@ plane_list<T>& plane_list<T>::operator = (const plane_list& source)
 }
 
 /*
-   Копирование
+   РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class T>
@@ -53,7 +53,7 @@ plane_list<T> plane_list<T>::clone () const
 }
 
 /*
-   Получение количества плоскостей/проверка на пустоту
+   РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РїР»РѕСЃРєРѕСЃС‚РµР№/РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T>
@@ -69,7 +69,7 @@ bool plane_list<T>::empty () const
 }
 
 /*
-   Резервирование плоскостей
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР»РѕСЃРєРѕСЃС‚РµР№
 */
 
 template <class T>
@@ -85,7 +85,7 @@ size_t plane_list<T>::capacity () const
 }
 
 /*
-   Получение плоскости
+   РџРѕР»СѓС‡РµРЅРёРµ РїР»РѕСЃРєРѕСЃС‚Рё
 */
 
 template <class T>
@@ -116,7 +116,7 @@ typename plane_list<T>::plane_type& plane_list<T>::at (size_t index)
 }
 
 /*
-   Добавление плоскости
+   Р”РѕР±Р°РІР»РµРЅРёРµ РїР»РѕСЃРєРѕСЃС‚Рё
 */
 
 template <class T>
@@ -137,7 +137,7 @@ size_t plane_list<T>::add (const plane_type& p)
 }
 
 /*
-   Удаление плоскостей
+   РЈРґР°Р»РµРЅРёРµ РїР»РѕСЃРєРѕСЃС‚РµР№
 */
 
 template <class T>
@@ -158,7 +158,7 @@ void plane_list<T>::clear ()
 }
 
 /*
-   Добавление примитивов в ограничивающий объём
+   Р”РѕР±Р°РІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ РІ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РѕР±СЉС‘Рј
 */
 
 template <class T>
@@ -192,7 +192,7 @@ plane_list<T> plane_list<T>::operator + (const plane_type& p) const
 }
 
 /*
-   Сравнение
+   РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -208,7 +208,7 @@ bool plane_list<T>::operator != (const plane_list& p) const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>
@@ -218,7 +218,7 @@ void plane_list<T>::swap (plane_list<T>& p)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 template <class T>
@@ -228,7 +228,7 @@ void swap (plane_list<T>& p1, plane_list<T>& p2)
 }
 
 /*
-   Проверка пересечения ограничивающей сферы с различными примитивами
+   РџСЂРѕРІРµСЂРєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµР№ СЃС„РµСЂС‹ СЃ СЂР°Р·Р»РёС‡РЅС‹РјРё РїСЂРёРјРёС‚РёРІР°РјРё
 */
 
 template <class T>
@@ -308,7 +308,7 @@ bool intersects (const plane_list<T>& p, const sphere<T>& s, const T& eps)
 }
 
 /*
-   Проверка эквивалентности
+   РџСЂРѕРІРµСЂРєР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
 */
 
 template <class T>
@@ -327,7 +327,7 @@ bool equal (const plane_list<T>& p1, const plane_list<T>& p2, const T& eps)
 }
 
 /*
-   Создание по матрице
+   РЎРѕР·РґР°РЅРёРµ РїРѕ РјР°С‚СЂРёС†Рµ
 */
 
 template <class T>

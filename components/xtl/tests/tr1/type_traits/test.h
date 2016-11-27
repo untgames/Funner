@@ -8,7 +8,7 @@
 
 using namespace tr1;
 
-//проверка значения выражения
+//РїСЂРѕРІРµСЂРєР° Р·РЅР°С‡РµРЅРёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
 #define CHECK_INTEGRAL_CONSTANT(EXPRESSION, CORRECT_VALUE)  \
 { \
   int result = EXPRESSION, correct_result = CORRECT_VALUE; \
@@ -58,10 +58,10 @@ void name(){ TRANSFORM_CHECK(type, DUMMY_MACRO_PARAM, to) }
 void name(){ TRANSFORM_CHECK(type, DUMMY_MACRO_PARAM, DUMMY_MACRO_PARAM) }   
 
 /*
-    Тестовые типы данных
+    РўРµСЃС‚РѕРІС‹Рµ С‚РёРїС‹ РґР°РЅРЅС‹С…
 */
 
-//тестовые перечисления
+//С‚РµСЃС‚РѕРІС‹Рµ РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ
 enum enum_UDT{ one, two, three };
 
 enum enum1
@@ -74,7 +74,7 @@ enum enum2
    three_,four_
 };
 
-//тестовое объединение
+//С‚РµСЃС‚РѕРІРѕРµ РѕР±СЉРµРґРёРЅРµРЅРёРµ
 union union_UDT
 {
   int x;
@@ -95,7 +95,7 @@ union empty_union_UDT
 
 union empty_POD_union_UDT{};
 
-//тип данных с размером не равным 0
+//С‚РёРї РґР°РЅРЅС‹С… СЃ СЂР°Р·РјРµСЂРѕРј РЅРµ СЂР°РІРЅС‹Рј 0
 struct UDT
 {
    UDT(){};
@@ -110,7 +110,7 @@ struct UDT
    int f4(int, float);
 };
 
-//тип данных с размером равным 0
+//С‚РёРї РґР°РЅРЅС‹С… СЃ СЂР°Р·РјРµСЂРѕРј СЂР°РІРЅС‹Рј 0
 struct empty_UDT
 {
    empty_UDT(){};
@@ -130,7 +130,7 @@ struct non_empty
      non_empty& operator = (const non_empty&);
 };
 
-//POD тип данных
+//POD С‚РёРї РґР°РЅРЅС‹С…
 struct POD_UDT { int x; };
 
 struct nothrow_copy_UDT
@@ -163,7 +163,7 @@ struct nothrow_construct_UDT
    { return true; }
 };
 
-//абстрактные базовые классы
+//Р°Р±СЃС‚СЂР°РєС‚РЅС‹Рµ Р±Р°Р·РѕРІС‹Рµ РєР»Р°СЃСЃС‹
 struct test_abc1
 {
    test_abc1();
@@ -186,10 +186,10 @@ struct test_abc3 : public test_abc1
    virtual void foo3() = 0;
 };
 
-//неопределённый тип
+//РЅРµРѕРїСЂРµРґРµР»С‘РЅРЅС‹Р№ С‚РёРї
 struct incomplete_type;
 
-//используется для проверки того, что is_pointer не возвращает true для классов с ooperator void* ()
+//РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїСЂРѕРІРµСЂРєРё С‚РѕРіРѕ, С‡С‚Рѕ is_pointer РЅРµ РІРѕР·РІСЂР°С‰Р°РµС‚ true РґР»СЏ РєР»Р°СЃСЃРѕРІ СЃ ooperator void* ()
 struct non_pointer
 {
    operator void*(){return this;}
@@ -246,14 +246,14 @@ struct VD : VB
    ~VD(){};
 };
 
-//функции
+//С„СѓРЅРєС†РёРё
 typedef void foo0_t();
 typedef void foo1_t(int);
 typedef void foo2_t(int&, double);
 typedef void foo3_t(int&, bool, int, int);
 typedef void foo4_t(int, bool, int*, int[], int, int, int, int, int);
 
-//указатели на функции
+//СѓРєР°Р·Р°С‚РµР»Рё РЅР° С„СѓРЅРєС†РёРё
 typedef void(*f1)();
 typedef int(*f2)(int);
 typedef int(*f3)(int, bool);
@@ -269,7 +269,7 @@ typedef int (UDT::*cmf)(int) const;
   #pragma warning (disable: 4181)
 #endif
 
-//ссылочные типы
+//СЃСЃС‹Р»РѕС‡РЅС‹Рµ С‚РёРїС‹
 typedef int& r_type;
 typedef const r_type cr_type;
 

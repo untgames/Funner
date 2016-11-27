@@ -3,7 +3,7 @@
 using namespace network;
 
 /*
-    Описание реализации адреса сокета
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґСЂРµСЃР° СЃРѕРєРµС‚Р°
 */
 
 struct SocketAddress::Impl: public xtl::reference_counter
@@ -18,7 +18,7 @@ struct SocketAddress::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SocketAddress::SocketAddress ()
@@ -55,7 +55,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& address)
 }
 
 /*
-    Сетевой адрес / порт
+    РЎРµС‚РµРІРѕР№ Р°РґСЂРµСЃ / РїРѕСЂС‚
 */
 
 const InetAddress& SocketAddress::InetAddress () const
@@ -69,7 +69,7 @@ unsigned short SocketAddress::Port () const
 }
 
 /*
-    Сравнение двух адресов
+    РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… Р°РґСЂРµСЃРѕРІ
 */
 
 bool SocketAddress::operator == (const SocketAddress& address) const
@@ -83,7 +83,7 @@ bool SocketAddress::operator != (const SocketAddress& address) const
 }
 
 /*
-    Строковое представление
+    РЎС‚СЂРѕРєРѕРІРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ
 */
 
 const char* SocketAddress::ToString () const
@@ -97,7 +97,7 @@ const char* SocketAddress::ToString () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SocketAddress::Swap (SocketAddress& address)

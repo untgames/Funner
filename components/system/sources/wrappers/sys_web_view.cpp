@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* LOG_NAME = "system.web_view";
@@ -14,7 +14,7 @@ const char* LOG_NAME = "system.web_view";
 }
 
 /*
-    Описание реализации WebView
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё WebView
 */
 
 typedef xtl::signal<void (WebView& view, WebViewEvent event)>  EventSignal;
@@ -22,16 +22,16 @@ typedef xtl::signal<bool (WebView& view, const char* request)> FilterSignal;
 
 struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
 {
-  WebView*       owner;                     //обратная ссылка на владельца
-  web_view_t     handle;                    //дескриптор области вывода
-  syslib::Window window;                    //присоединенное окно
-  FilterSignal   filters;                   //фильтры
-  EventSignal    events [WebViewEvent_Num]; //события
-  stl::string    status;                    //статус
-  stl::string    request;                   //запрос
-  common::Log    log;                       //протокол отладочных сообщений
+  WebView*       owner;                     //РѕР±СЂР°С‚РЅР°СЏ СЃСЃС‹Р»РєР° РЅР° РІР»Р°РґРµР»СЊС†Р°
+  web_view_t     handle;                    //РґРµСЃРєСЂРёРїС‚РѕСЂ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  syslib::Window window;                    //РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
+  FilterSignal   filters;                   //С„РёР»СЊС‚СЂС‹
+  EventSignal    events [WebViewEvent_Num]; //СЃРѕР±С‹С‚РёСЏ
+  stl::string    status;                    //СЃС‚Р°С‚СѓСЃ
+  stl::string    request;                   //Р·Р°РїСЂРѕСЃ
+  common::Log    log;                       //РїСЂРѕС‚РѕРєРѕР» РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (WebView* in_owner)
     : owner (in_owner)
     , handle (Platform::CreateWebView (this))
@@ -40,7 +40,7 @@ struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
   {
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -57,7 +57,7 @@ struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
     }
   }
 
-///События загрузки
+///РЎРѕР±С‹С‚РёСЏ Р·Р°РіСЂСѓР·РєРё
   void OnLoadStarted (const char* request)
   {
     try
@@ -125,7 +125,7 @@ struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
     }
   }
   
-///События взаимодействия с окном
+///РЎРѕР±С‹С‚РёСЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕРєРЅРѕРј
   void OnClose ()
   {
     try
@@ -146,7 +146,7 @@ struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
     }    
   }
 
-///Проверка необходимости открытия ссылки
+///РџСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕС‚РєСЂС‹С‚РёСЏ СЃСЃС‹Р»РєРё
   bool ShouldStartLoading (const char* request)
   {
     try
@@ -174,7 +174,7 @@ struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 WebView::WebView ()
@@ -209,7 +209,7 @@ WebView::~WebView ()
 }
 
 /*
-    Присоединенное окно
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 const syslib::Window& WebView::Window () const
@@ -223,7 +223,7 @@ syslib::Window& WebView::Window ()
 }
 
 /*
-    Загрузка данных
+    Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void WebView::LoadRequest (const char* uri)
@@ -268,7 +268,7 @@ void WebView::LoadData (const char* data, size_t data_size, const char* mime_typ
 }
 
 /*
-    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void WebView::Reload ()
@@ -311,7 +311,7 @@ bool WebView::IsLoading () const
 }
 
 /*
-    Значение текущего запроса / статус выполнения запроса
+    Р—РЅР°С‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ Р·Р°РїСЂРѕСЃР° / СЃС‚Р°С‚СѓСЃ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР°
 */
 
 const char* WebView::Request () const
@@ -325,7 +325,7 @@ const char* WebView::Status () const
 }
 
 /*
-    Средства навигации
+    РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool WebView::CanGoBack () const
@@ -381,7 +381,7 @@ void WebView::GoForward ()
 }
 
 /*
-    Фильтр контента
+    Р¤РёР»СЊС‚СЂ РєРѕРЅС‚РµРЅС‚Р°
 */
 
 xtl::connection WebView::RegisterFilter (const Filter& filter) const
@@ -390,7 +390,7 @@ xtl::connection WebView::RegisterFilter (const Filter& filter) const
 }
 
 /*
-    События
+    РЎРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection WebView::RegisterEventHandler (WebViewEvent event, const EventHandler& handler) const

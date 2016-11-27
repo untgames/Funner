@@ -2,14 +2,14 @@
 
 using namespace store;
 
-///Реализация продукта
+///Р РµР°Р»РёР·Р°С†РёСЏ РїСЂРѕРґСѓРєС‚Р°
 struct Product::Impl : public xtl::reference_counter
 {
-  stl::string           description;             //описание
-  stl::string           id;                      //идентификатор
-  common::PropertyMap   properties;              //другие свойства
-  const void*           handle;                  //низкоуровневый дескриптор
-  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
+  stl::string           description;             //РѕРїРёСЃР°РЅРёРµ
+  stl::string           id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  common::PropertyMap   properties;              //РґСЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
+  const void*           handle;                  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction handle_release_function; //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl ()
     : handle (0)
@@ -23,7 +23,7 @@ struct Product::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Product::Product ()
@@ -49,7 +49,7 @@ Product& Product::operator = (const Product& source)
 }
 
 /*
-   Описание
+   РћРїРёСЃР°РЅРёРµ
 */
 
 const char* Product::Description () const
@@ -66,7 +66,7 @@ void Product::SetDescription (const char* description)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 const char* Product::Id () const
@@ -83,7 +83,7 @@ void Product::SetId (const char* id) const
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& Product::Properties () const
@@ -102,7 +102,7 @@ void Product::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Низкоуровневый дескриптора
+   РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 const void* Product::Handle () const
@@ -120,7 +120,7 @@ void Product::SetHandle (const void* handle, const ReleaseHandleFunction& releas
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Product::Swap (Product& source)
@@ -132,7 +132,7 @@ namespace store
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Product& product1, Product& product2)

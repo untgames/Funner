@@ -40,7 +40,7 @@ int main ()
   entity3->SetBoundBox (aaboxf (-20.0f, -10.0f));
   entity3->BindToScene (scene);
   
-    //®΅ε®¤ ®΅κ¥ªβ®Ά ―®― ¤ ξι¨ε Ά ®΅κρ¬
+    //Β®ΠΠµΒ®Β¤ Β®ΠΠΊÒΠ„Π²Β®Ρ Π‡Β®Π‡Β Β¤Β ΠΎΠΉΠΠµ Ρ Β®ΠΠΊΡΒ¬
     
   printf ("traverse\n");
   scene.Traverse (aaboxf (-5.0f, 5.0f), &traverse_fn);

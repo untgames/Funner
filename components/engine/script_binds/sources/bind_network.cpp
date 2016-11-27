@@ -12,23 +12,23 @@ namespace network_script_bind
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* TCP_CLIENT_LIBRARY = "Network.TcpClient";
 const char* COMPONENT_NAME     = "script.binds.Network";
 const char* BINDER_NAME        = "Network";
 
-///враппер для TcpClient в скриптах
+///РІСЂР°РїРїРµСЂ РґР»СЏ TcpClient РІ СЃРєСЂРёРїС‚Р°С…
 class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
 {
   public:
     typedef xtl::shared_ptr<ScriptTcpClient> Pointer;
     
-///Конструктор    
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ    
     ScriptTcpClient (const char* host, unsigned short port, unsigned int timeout) : TcpClient (host, port, timeout) {}
     
-///Приём данных
+///РџСЂРёС‘Рј РґР°РЅРЅС‹С…
     stl::string Receive ()
     {
       stl::string result;      
@@ -48,7 +48,7 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
 
     void SwitchToAsyncReceiving () { TcpClient::SwitchToAsyncReceiving (); }
 
-///Регистрация обработчика асинхронного получения данных
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р°СЃРёРЅС…СЂРѕРЅРЅРѕРіРѕ РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С…
     typedef xtl::function<void (const stl::string&)> AsyncReceivingEventHandler;
 
     xtl::connection RegisterAsyncReceivingEventHandler (const AsyncReceivingEventHandler& handler)
@@ -56,7 +56,7 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
       return TcpClient::RegisterAsyncReceivingEventHandler (AsyncReceivingAdaptor (handler));
     }
    
-///Порождающие функции
+///РџРѕСЂРѕР¶РґР°СЋС‰РёРµ С„СѓРЅРєС†РёРё
     static Pointer Create (const char* host, unsigned short port)
     {
       return CreateWithTimeout (host, port, 0);
@@ -85,11 +85,11 @@ void bind_tcp_client_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (TCP_CLIENT_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (&ScriptTcpClient::CreateWithTimeout), make_invoker (&ScriptTcpClient::Create)));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("Close",                               make_invoker (&ScriptTcpClient::Close));
   lib.Register ("Send",                                make_invoker (xtl::implicit_cast<void (ScriptTcpClient::*)(const char*)> (&ScriptTcpClient::Send)));
@@ -111,7 +111,7 @@ void bind_tcp_client_library (Environment& environment)
   lib.Register ("get_AsyncSending",      make_invoker (&ScriptTcpClient::IsAsyncSendingEnabled));
   lib.Register ("get_AsyncReceiving",    make_invoker (&ScriptTcpClient::IsAsyncReceivingEnabled));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<ScriptTcpClient> (TCP_CLIENT_LIBRARY);  
 }
@@ -122,7 +122,7 @@ void bind_network_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

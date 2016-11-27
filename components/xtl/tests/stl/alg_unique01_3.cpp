@@ -1,4 +1,4 @@
-//Тестирование алгоритма unique_copy (first,last,result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° unique_copy (first,last,result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

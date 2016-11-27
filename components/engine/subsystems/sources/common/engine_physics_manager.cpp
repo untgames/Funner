@@ -12,21 +12,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "PhysicsManager";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.PhysicsManager"; //имя компонента
-const char* LOG_NAME       = COMPONENT_NAME;                     //имя лога
+const char* SUBSYSTEM_NAME = "PhysicsManager";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.PhysicsManager"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* LOG_NAME       = COMPONENT_NAME;                     //РёРјСЏ Р»РѕРіР°
 
 /*
-   Подсистема управления физикой
+   РџРѕРґСЃРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ С„РёР·РёРєРѕР№
 */
 
 class PhysicsManagerSubsystem : public ISubsystem, public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     PhysicsManagerSubsystem (common::ParseNode& node)
       : log (LOG_NAME),
         physics_manager (get<const char*> (node, "DriverName", "*"))
@@ -49,7 +49,7 @@ class PhysicsManagerSubsystem : public ISubsystem, public media::rms::ICustomSer
       resource_server.reset ();
     }
 
-///Управление ресурсами
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
     void PrefetchResource (const char* resource_name)
     {
       //??????: do this !!!!!!!!!
@@ -97,7 +97,7 @@ class PhysicsManagerSubsystem : public ISubsystem, public media::rms::ICustomSer
       }
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -120,13 +120,13 @@ namespace scene_player_subsystem
 {
 
 /*
-   Компонент регистрации проигрывателя сцены
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ СЃС†РµРЅС‹
 */
 
 class PhysicsManagerComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     PhysicsManagerComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

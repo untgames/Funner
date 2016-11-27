@@ -3,7 +3,7 @@
 using namespace render::scene::client;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SceneObject::SceneObject (SceneManager& in_scene_manager)
@@ -29,7 +29,7 @@ SceneObject::~SceneObject ()
 }
 
 /*
-    Имя объекта
+    РРјСЏ РѕР±СЉРµРєС‚Р°
 */
 
 const char* SceneObject::NameCore ()
@@ -38,7 +38,7 @@ const char* SceneObject::NameCore ()
 }
 
 /*
-    Запрос синхронизации
+    Р—Р°РїСЂРѕСЃ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
 */
 
 void SceneObject::UpdateNotify ()
@@ -58,7 +58,7 @@ void SceneObject::UpdateNotify ()
 }
 
 /*
-    Синхронизация
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
 */
 
 void SceneObject::Update (Context& context)

@@ -11,13 +11,13 @@ using namespace common;
 namespace
 {
 
-//мьютекс
+//РјСЊСЋС‚РµРєСЃ
 struct Mutex
 {
   pthread_mutex_t handle;
 };
 
-//генерация исключения с кодом ошибки
+//РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ РєРѕРґРѕРј РѕС€РёР±РєРё
 void pthread_raise_error (const char* source, int status)
 {
   throw xtl::format_operation_exception (source, "Operation failed. Reason: %s (function exit with code %d)", common::strerror (status), status);
@@ -26,7 +26,7 @@ void pthread_raise_error (const char* source, int status)
 }
 
 /*
-    Работа с блокировками
+    Р Р°Р±РѕС‚Р° СЃ Р±Р»РѕРєРёСЂРѕРІРєР°РјРё
 */
 
 void UnistdPlatform::InitLockable (lockable_t& lockable)

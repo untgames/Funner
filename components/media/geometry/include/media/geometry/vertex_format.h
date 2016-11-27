@@ -11,14 +11,14 @@ namespace geometry
 {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-///Семантика атрибута вершины
+///РЎРµРјР°РЅС‚РёРєР° Р°С‚СЂРёР±СѓС‚Р° РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum VertexAttributeSemantic
 {
-  VertexAttributeSemantic_Position,  //положение
-  VertexAttributeSemantic_Normal,    //нормаль
-  VertexAttributeSemantic_Color,     //цвет
-  VertexAttributeSemantic_TexCoord0, //каналы текстурных координат
+  VertexAttributeSemantic_Position,  //РїРѕР»РѕР¶РµРЅРёРµ
+  VertexAttributeSemantic_Normal,    //РЅРѕСЂРјР°Р»СЊ
+  VertexAttributeSemantic_Color,     //С†РІРµС‚
+  VertexAttributeSemantic_TexCoord0, //РєР°РЅР°Р»С‹ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
   VertexAttributeSemantic_TexCoord1,
   VertexAttributeSemantic_TexCoord2,
   VertexAttributeSemantic_TexCoord3,
@@ -26,109 +26,109 @@ enum VertexAttributeSemantic
   VertexAttributeSemantic_TexCoord5,
   VertexAttributeSemantic_TexCoord6,  
   VertexAttributeSemantic_TexCoord7,
-  VertexAttributeSemantic_Influence, //индексы отрезка индексных весов
-  VertexAttributeSemantic_Custom,    //пользовательский атрибут
+  VertexAttributeSemantic_Influence, //РёРЅРґРµРєСЃС‹ РѕС‚СЂРµР·РєР° РёРЅРґРµРєСЃРЅС‹С… РІРµСЃРѕРІ
+  VertexAttributeSemantic_Custom,    //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№ Р°С‚СЂРёР±СѓС‚
   
   VertexAttributeSemantic_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип атрибута вершины
+///РўРёРї Р°С‚СЂРёР±СѓС‚Р° РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum VertexAttributeType
 {
-  VertexAttributeType_Float2,    //вектор из 2-х вещественных величин
-  VertexAttributeType_Float3,    //вектор из 3-х вещественных величин
-  VertexAttributeType_Float4,    //вектор из 4-х вещественных величин
-  VertexAttributeType_Short2,    //вектор из 2-х целочисленных величин
-  VertexAttributeType_Short3,    //вектор из 3-х целочисленных величин
-  VertexAttributeType_Short4,    //вектор из 4-х целочисленных величин
-  VertexAttributeType_UByte4,    //вектор из 4-х беззнаковый байт
-  VertexAttributeType_Influence, //см. структуру VertexInfluence
+  VertexAttributeType_Float2,    //РІРµРєС‚РѕСЂ РёР· 2-С… РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_Float3,    //РІРµРєС‚РѕСЂ РёР· 3-С… РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_Float4,    //РІРµРєС‚РѕСЂ РёР· 4-С… РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_Short2,    //РІРµРєС‚РѕСЂ РёР· 2-С… С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_Short3,    //РІРµРєС‚РѕСЂ РёР· 3-С… С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_Short4,    //РІРµРєС‚РѕСЂ РёР· 4-С… С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… РІРµР»РёС‡РёРЅ
+  VertexAttributeType_UByte4,    //РІРµРєС‚РѕСЂ РёР· 4-С… Р±РµР·Р·РЅР°РєРѕРІС‹Р№ Р±Р°Р№С‚
+  VertexAttributeType_Influence, //СЃРј. СЃС‚СЂСѓРєС‚СѓСЂСѓ VertexInfluence
   
   VertexAttributeType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Атрибут вершины
+///РђС‚СЂРёР±СѓС‚ РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma pack(push, 1) //without packing structure is padded with 4 random bytes which brokes hash
 
 struct VertexAttribute
 {
-  const char*             name;     //имя атрибута
-  VertexAttributeSemantic semantic; //семантика
-  VertexAttributeType     type;     //тип элементов
-  uint32_t                offset;   //смещение от начала вершины
+  const char*             name;     //РёРјСЏ Р°С‚СЂРёР±СѓС‚Р°
+  VertexAttributeSemantic semantic; //СЃРµРјР°РЅС‚РёРєР°
+  VertexAttributeType     type;     //С‚РёРї СЌР»РµРјРµРЅС‚РѕРІ
+  uint32_t                offset;   //СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РІРµСЂС€РёРЅС‹
 };
 
 #pragma pack(pop)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формат вершины
+///Р¤РѕСЂРјР°С‚ РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class VertexFormat
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexFormat  ();
     VertexFormat  (const VertexFormat&);
     ~VertexFormat ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Присваивание
+///РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexFormat& operator = (const VertexFormat&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Клонирование
+///РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexFormat Clone () const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество атрибутов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t AttributesCount () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение массива атрибутов
+///РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° Р°С‚СЂРёР±СѓС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const VertexAttribute* Attributes () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение атрибута
+///РџРѕР»СѓС‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const VertexAttribute& Attribute     (uint32_t index) const;
     const char*            AttributeName (uint32_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование количества атрибутов
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° Р°С‚СЂРёР±СѓС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void     ReserveAttributes       (uint32_t count, uint32_t name_buffer_size=0);
     uint32_t ReservedAttributesCount () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление атрибутов
+///Р”РѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    uint32_t AddAttribute  (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset); //return: индекс вершинного атрибута
-    uint32_t AddAttribute  (const char* name, VertexAttributeType type, uint32_t offset); //return: индекс вершинного атрибута
-    uint32_t AddAttribute  (VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset); //return: индекс вершинного атрибута
-    uint32_t AddAttributes (const VertexFormat&); //return: инедкс последнего добавленного атрибута
+    uint32_t AddAttribute  (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset); //return: РёРЅРґРµРєСЃ РІРµСЂС€РёРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
+    uint32_t AddAttribute  (const char* name, VertexAttributeType type, uint32_t offset); //return: РёРЅРґРµРєСЃ РІРµСЂС€РёРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
+    uint32_t AddAttribute  (VertexAttributeSemantic semantic, VertexAttributeType type, uint32_t offset); //return: РёРЅРґРµРєСЃ РІРµСЂС€РёРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
+    uint32_t AddAttributes (const VertexFormat&); //return: РёРЅРµРґРєСЃ РїРѕСЃР»РµРґРЅРµРіРѕ РґРѕР±Р°РІР»РµРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление атрибутов
+///РЈРґР°Р»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RemoveAttribute  (uint32_t position); //nothrow
     void RemoveAttribute  (const char* name); //nothrow
     void RemoveAttributes (VertexAttributeSemantic semantic); //nothrow
     void RemoveAttributes (const VertexFormat&);
-    void Clear            (); //удаление всех атрибутов, nothrow
+    void Clear            (); //СѓРґР°Р»РµРЅРёРµ РІСЃРµС… Р°С‚СЂРёР±СѓС‚РѕРІ, nothrow
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перегрузка операторов
+///РџРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VertexFormat& operator += (const VertexFormat&);
     VertexFormat& operator -= (const VertexFormat&);    
@@ -136,28 +136,28 @@ class VertexFormat
     VertexFormat  operator -  (const VertexFormat&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск атрибута по семантике
+///РџРѕРёСЃРє Р°С‚СЂРёР±СѓС‚Р° РїРѕ СЃРµРјР°РЅС‚РёРєРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const VertexAttribute* FindAttribute (VertexAttributeSemantic semantic, const VertexAttribute* after = 0) const; //nothrow
     const VertexAttribute* FindAttribute (const char* name) const; //nothrow
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение минимального размера вершины
+///РџРѕР»СѓС‡РµРЅРёРµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t GetMinimalVertexSize () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение хэша для данного вершинного формата
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РґР»СЏ РґР°РЅРЅРѕРіРѕ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Hash () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен
+///РћР±РјРµРЅ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (VertexFormat&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сравнение
+///РЎСЂР°РІРЅРµРЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool operator == (const VertexFormat&) const;
     bool operator != (const VertexFormat&) const;
@@ -168,27 +168,27 @@ class VertexFormat
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен
+///РћР±РјРµРЅ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (VertexFormat&, VertexFormat&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение характеристик
+///РџРѕР»СѓС‡РµРЅРёРµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const char*    get_semantic_name    (VertexAttributeSemantic); //имя семантики
-const char*    get_type_name        (VertexAttributeType);     //имя типа
-unsigned short get_type_size        (VertexAttributeType);     //размер типа атрибута вершин в байтах
-unsigned char  get_components_count (VertexAttributeType);     //количество компонентов
-bool           is_compatible        (VertexAttributeSemantic, VertexAttributeType); //проверка совместимости
+const char*    get_semantic_name    (VertexAttributeSemantic); //РёРјСЏ СЃРµРјР°РЅС‚РёРєРё
+const char*    get_type_name        (VertexAttributeType);     //РёРјСЏ С‚РёРїР°
+unsigned short get_type_size        (VertexAttributeType);     //СЂР°Р·РјРµСЂ С‚РёРїР° Р°С‚СЂРёР±СѓС‚Р° РІРµСЂС€РёРЅ РІ Р±Р°Р№С‚Р°С…
+unsigned char  get_components_count (VertexAttributeType);     //РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
+bool           is_compatible        (VertexAttributeSemantic, VertexAttributeType); //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 
-//получение семантики по имени
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРµРјР°РЅС‚РёРєРё РїРѕ РёРјРµРЅРё
 VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic=VertexAttributeSemantic_Num);
 
-//получение типа по имени
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РїРѕ РёРјРµРЅРё
 VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttributeType default_type=VertexAttributeType_Num);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение формата вершины
+///РџРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Vertex>
 const VertexFormat& get_vertex_format ();

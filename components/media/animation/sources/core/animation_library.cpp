@@ -4,7 +4,7 @@ using namespace media;
 using namespace media::animation;
 
 /*
-   Реализация библиотеки анимаций
+   Р РµР°Р»РёР·Р°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё Р°РЅРёРјР°С†РёР№
 */
 
 typedef ResourceLibrary<Animation> AnimationLibraryHolder;
@@ -15,7 +15,7 @@ struct AnimationLibrary::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AnimationLibrary::AnimationLibrary ()
@@ -61,7 +61,7 @@ AnimationLibrary& AnimationLibrary::operator = (const AnimationLibrary& source)
 }
 
 /*
-   Количество элементов в библиотеке / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РІ Р±РёР±Р»РёРѕС‚РµРєРµ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 unsigned int AnimationLibrary::Size () const
@@ -75,7 +75,7 @@ bool AnimationLibrary::IsEmpty () const
 }
 
 /*
-   Перебор
+   РџРµСЂРµР±РѕСЂ
 */
 
 AnimationLibrary::Iterator AnimationLibrary::CreateIterator ()
@@ -89,7 +89,7 @@ AnimationLibrary::ConstIterator AnimationLibrary::CreateIterator () const
 }
     
 /*
-   Получение идентификатора элемента библиотеки
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЌР»РµРјРµРЅС‚Р° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 const char* AnimationLibrary::ItemId (const ConstIterator& iter) const
@@ -98,7 +98,7 @@ const char* AnimationLibrary::ItemId (const ConstIterator& iter) const
 }
 
 /*
-   Поиск
+   РџРѕРёСЃРє
 */
 
 Animation* AnimationLibrary::Find (const char* id)
@@ -112,7 +112,7 @@ const Animation* AnimationLibrary::Find (const char* id) const
 }
     
 /*
-   Добавление / удаление элементов
+   Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 void AnimationLibrary::Attach (const char* id, Animation& animation)
@@ -134,7 +134,7 @@ void AnimationLibrary::DetachAll ()
 }
     
 /*
-   Загрузка / сохранение
+   Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void AnimationLibrary::Load (const char* file_name)
@@ -174,7 +174,7 @@ void AnimationLibrary::Save (const char* file_name)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void AnimationLibrary::Swap (AnimationLibrary& source)
@@ -189,7 +189,7 @@ namespace animation
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (AnimationLibrary& library1, AnimationLibrary& library2)

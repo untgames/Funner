@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FboFrameBufferManager::FboFrameBufferManager (const ContextManager& context_manager)
@@ -14,7 +14,7 @@ FboFrameBufferManager::FboFrameBufferManager (const ContextManager& context_mana
 }
 
 /*
-    Создание буферов рендеринга
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 ITexture* FboFrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
@@ -31,10 +31,10 @@ ITexture* FboFrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
 }
 
 /*
-    Создание буферов кадра
+    РЎРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
 */
 
-//проверка возможности создания буфера кадра
+//РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
 bool FboFrameBufferManager::IsSupported (View* color_view, View* depth_stencil_view)
 {
   View* views [2] = {color_view, depth_stencil_view};
@@ -51,7 +51,7 @@ bool FboFrameBufferManager::IsSupported (View* color_view, View* depth_stencil_v
   return true;
 }
 
-//создание буфера кадра
+//СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР° РєР°РґСЂР°
 IFrameBuffer* FboFrameBufferManager::CreateFrameBuffer (View* color_view, View* depth_stencil_view)
 {
   try
@@ -66,46 +66,46 @@ IFrameBuffer* FboFrameBufferManager::CreateFrameBuffer (View* color_view, View* 
 }
 
 /*
-    Установка текущего буфера кадра
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 void FboFrameBufferManager::SetFrameBuffer (unsigned int fbo_id, size_t cache_id)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FboFrameBufferManager::SetFrameBuffer";
 
-    //проверка необходимости переустановки буфера
+    //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРєРё Р±СѓС„РµСЂР°
 
   const size_t current_id = GetContextCacheValue (CacheEntry_FrameBufferId);
   
   if (current_id == cache_id)
     return;
 
-    //установка текущего контекста  
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°  
 
   MakeContextCurrent ();
 
-    //проверка наличия необходимого расширения
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ СЂР°СЃС€РёСЂРµРЅРёСЏ
     
   const ContextCaps& caps = GetCaps ();
 
   if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
-    //установка буфера в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   caps.glBindFramebuffer_fn (GL_FRAMEBUFFER, fbo_id);
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 
-    //установка значений кэш-переменных
+    //СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёР№ РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
   SetContextCacheValue (CacheEntry_FrameBufferId, cache_id);
 }
 
 /*
-    Регистрация обработчиков создания буферов рендеринга и буферов кадра
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР·РґР°РЅРёСЏ Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР° Рё Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
 */
 
 namespace render

@@ -10,12 +10,12 @@ namespace ogg_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "media.sound.ogg"; //имя потока протоколирования
+const char* LOG_NAME = "media.sound.ogg"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-//поток декодированияogg
+//РїРѕС‚РѕРє РґРµРєРѕРґРёСЂРѕРІР°РЅРёСЏogg
 class OggInputStream : public media::ISoundInputStream, public xtl::reference_counter
 {
   public:
@@ -33,7 +33,7 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 };
 
 /*
-    Протоколирование исключения
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 struct LogHolder
@@ -249,13 +249,13 @@ ISoundInputStream* default_ogg_loader (const char* file_name, SoundSampleInfo& s
 }
 
 /*
-   Компонент работы с звуками
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂР°Р±РѕС‚С‹ СЃ Р·РІСѓРєР°РјРё
 */
 
 class OggLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     OggLoaderComponent ()
     {
       SoundSampleManager::RegisterLoader ("ogg", &default_ogg_loader);

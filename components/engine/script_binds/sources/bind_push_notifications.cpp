@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* BINDER_NAME          = "PushNotifications";
@@ -53,7 +53,7 @@ namespace push_notifications_script_binds
 {
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

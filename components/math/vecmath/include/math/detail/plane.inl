@@ -1,5 +1,5 @@
 /*
-   Конструкторы
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -18,7 +18,7 @@ plane<T>::plane (const value_type& in_a, const value_type& in_b, const value_typ
   {}
 
 /*
-   Получение параметров
+   РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 template <class T>
@@ -34,7 +34,7 @@ typename plane<T>::vec_type& plane<T>::normal ()
 }
 
 /*
-   Индексирование
+   РРЅРґРµРєСЃРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class T>
@@ -50,7 +50,7 @@ const typename plane<T>::value_type& plane<T>::operator [] (unsigned int index) 
 }
 
 /*
-   Сравнение
+   РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -70,7 +70,7 @@ bool plane<T>::operator != (const plane& p) const
 }
 
 /*
-   Проверка эквивалентности
+   РџСЂРѕРІРµСЂРєР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё
 */
 
 template <class T>
@@ -88,7 +88,7 @@ bool equal (const plane<T>& p1, const plane<T>& p2, const T& eps)
 }
 
 /*
-   Возвращает нормированную плоскость
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅРѕСЂРјРёСЂРѕРІР°РЅРЅСѓСЋ РїР»РѕСЃРєРѕСЃС‚СЊ
 */
 
 template <class T>
@@ -100,7 +100,7 @@ plane<T> normalize (const plane<T>& p)
 }
 
 /*
-   Возвращает дистанцию от точки до плоскости
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РґРёСЃС‚Р°РЅС†РёСЋ РѕС‚ С‚РѕС‡РєРё РґРѕ РїР»РѕСЃРєРѕСЃС‚Рё
 */
 
 template <class T>
@@ -110,7 +110,7 @@ typename plane<T>::value_type distance (const plane<T>& p, const vector<T, 3>& p
 }
 
 /*
-   Возвращает проекцию вектора на плоскость
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РїСЂРѕРµРєС†РёСЋ РІРµРєС‚РѕСЂР° РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ
 */
 
 template <class T>
@@ -134,7 +134,7 @@ vector<T, 3> project (const plane<T>& p, const vector<T, 3>& v)
 }
 
 /*
-   Возвращает с какой стороны плоскости находится точка
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃ РєР°РєРѕР№ СЃС‚РѕСЂРѕРЅС‹ РїР»РѕСЃРєРѕСЃС‚Рё РЅР°С…РѕРґРёС‚СЃСЏ С‚РѕС‡РєР°
 */
 
 template <class T>
@@ -152,7 +152,7 @@ plane_side side (const plane<T>& p, const vector<T, 3>& point, const T& eps)
 }
 
 /*
-    Возвращает точку пересечения луча с плоскостью
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РѕС‡РєСѓ РїРµСЂРµСЃРµС‡РµРЅРёСЏ Р»СѓС‡Р° СЃ РїР»РѕСЃРєРѕСЃС‚СЊСЋ
 */
 
 template <class T>

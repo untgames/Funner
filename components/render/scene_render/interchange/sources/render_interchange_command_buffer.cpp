@@ -3,14 +3,14 @@
 using namespace render::scene::interchange;
 
 /*
-    Описание реализации буфера команд
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±СѓС„РµСЂР° РєРѕРјР°РЅРґ
 */
 
 typedef xtl::uninitialized_storage<char> Buffer;
 
 struct CommandBuffer::Impl: public xtl::reference_counter
 {
-  Buffer buffer; //буфер с данными
+  Buffer buffer; //Р±СѓС„РµСЂ СЃ РґР°РЅРЅС‹РјРё
 
   static Impl* GetDefault ()
   {
@@ -37,7 +37,7 @@ struct CommandBuffer::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 CommandBuffer::CommandBuffer ()
@@ -65,7 +65,7 @@ CommandBuffer& CommandBuffer::operator = (const CommandBuffer& buffer)
 }
 
 /*
-    Счетчик ссылок
+    РЎС‡РµС‚С‡РёРє СЃСЃС‹Р»РѕРє
 */
 
 size_t CommandBuffer::UseCount () const
@@ -74,7 +74,7 @@ size_t CommandBuffer::UseCount () const
 }
 
 /*
-    Размер буфера
+    Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР°
 */
 
 size_t CommandBuffer::Size () const
@@ -83,7 +83,7 @@ size_t CommandBuffer::Size () const
 }
 
 /*
-    Доступ к данным
+    Р”РѕСЃС‚СѓРї Рє РґР°РЅРЅС‹Рј
 */
 
 const void* CommandBuffer::Data () const
@@ -97,7 +97,7 @@ void* CommandBuffer::Data ()
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 void CommandBuffer::Resize (size_t new_size, bool copy_data)
@@ -111,7 +111,7 @@ void CommandBuffer::Resize (size_t new_size, bool copy_data)
 }
 
 /*
-    Резервирование размера
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 size_t CommandBuffer::Capacity () const
@@ -128,7 +128,7 @@ void CommandBuffer::Reserve (size_t new_size)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void CommandBuffer::Swap (CommandBuffer& buffer)

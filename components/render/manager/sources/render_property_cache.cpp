@@ -6,36 +6,36 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const unsigned int RESERVED_BUFFER_POOL_SIZE = 256;
 const unsigned int MIN_BUFER_SIZE            = 64;
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-///Элемент пула буферов
+///Р­Р»РµРјРµРЅС‚ РїСѓР»Р° Р±СѓС„РµСЂРѕРІ
 struct BufferPoolEntry
 {
-  LowLevelBufferPtr buffer;          //буфер данных
-  FrameTime         last_use_time;   //последнее время использования
-  FrameId           last_use_frame;  //последний кадр использования
+  LowLevelBufferPtr buffer;          //Р±СѓС„РµСЂ РґР°РЅРЅС‹С…
+  FrameTime         last_use_time;   //РїРѕСЃР»РµРґРЅРµРµ РІСЂРµРјСЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
+  FrameId           last_use_frame;  //РїРѕСЃР»РµРґРЅРёР№ РєР°РґСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
 };
 
 typedef stl::vector<BufferPoolEntry> BufferArray;
 
-///Пул буферов свойств
+///РџСѓР» Р±СѓС„РµСЂРѕРІ СЃРІРѕР№СЃС‚РІ
 struct BufferPool: public xtl::reference_counter, private Cache
 {
-  BufferArray                   buffers;               //все доступные буферы
-  size_t                        first_available_index; //индекс первого доступого буфера
-  render::low_level::BufferDesc buffer_desc;           //описатель буфера
-  SettingsPtr                   settings;              //настройки
-  Log                           log;                   //поток отладочного вывода
+  BufferArray                   buffers;               //РІСЃРµ РґРѕСЃС‚СѓРїРЅС‹Рµ Р±СѓС„РµСЂС‹
+  size_t                        first_available_index; //РёРЅРґРµРєСЃ РїРµСЂРІРѕРіРѕ РґРѕСЃС‚СѓРїРѕРіРѕ Р±СѓС„РµСЂР°
+  render::low_level::BufferDesc buffer_desc;           //РѕРїРёСЃР°С‚РµР»СЊ Р±СѓС„РµСЂР°
+  SettingsPtr                   settings;              //РЅР°СЃС‚СЂРѕР№РєРё
+  Log                           log;                   //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РІС‹РІРѕРґР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   BufferPool (unsigned int buffer_size, const DeviceManagerPtr& device_manager)
     : Cache (&device_manager->CacheManager ())
     , first_available_index (0)
@@ -57,20 +57,20 @@ struct BufferPool: public xtl::reference_counter, private Cache
       log.Printf ("Property cache buffer pool created for buffer size %u", buffer_size);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~BufferPool ()
   {
     if (settings->HasDebugLog ())
       log.Printf ("Property cache buffer pool destroyed for buffer size %u", buffer_desc.size);
   }
   
-///Сброс
+///РЎР±СЂРѕСЃ
   void Reset ()
   {
     first_available_index = 0;
   }
   
-///Выделение буфера
+///Р’С‹РґРµР»РµРЅРёРµ Р±СѓС„РµСЂР°
   LowLevelBufferPtr Allocate (render::low_level::IDevice& device)
   {
     if (first_available_index < buffers.size ())
@@ -101,7 +101,7 @@ struct BufferPool: public xtl::reference_counter, private Cache
     return result;
   }
   
-///Сброс закэшированных элементов
+///РЎР±СЂРѕСЃ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
   void FlushCache ()
   {
     if (buffers.empty ())
@@ -130,7 +130,7 @@ struct BufferPool: public xtl::reference_counter, private Cache
 
 typedef xtl::intrusive_ptr<BufferPool> BufferPoolPtr;
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 unsigned int get_next_higher_power_of_two (unsigned int k)
 {
   if (!k)
@@ -147,21 +147,21 @@ unsigned int get_next_higher_power_of_two (unsigned int k)
 }
 
 /*
-    Описание реализации кэша
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСЌС€Р°
 */
 
 typedef CacheMap<size_t, BufferPoolPtr> PoolMap;
 
 struct PropertyCache::Impl
 {
-  DeviceManagerPtr           device_manager;   //менеджер устройства отрисовки
-  PoolMap                    pools;            //пулы буферов свойств
-  size_t                     last_hash;        //последний запрошенный хэш
-  size_t                     last_buffer_size; //последний запрошенный размер буфера
-  ProgramParametersLayoutPtr last_layout;      //последний запрошенный лэйаут
-  BufferPoolPtr              last_pool;        //последний запрошенный пул
+  DeviceManagerPtr           device_manager;   //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  PoolMap                    pools;            //РїСѓР»С‹ Р±СѓС„РµСЂРѕРІ СЃРІРѕР№СЃС‚РІ
+  size_t                     last_hash;        //РїРѕСЃР»РµРґРЅРёР№ Р·Р°РїСЂРѕС€РµРЅРЅС‹Р№ С…СЌС€
+  size_t                     last_buffer_size; //РїРѕСЃР»РµРґРЅРёР№ Р·Р°РїСЂРѕС€РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
+  ProgramParametersLayoutPtr last_layout;      //РїРѕСЃР»РµРґРЅРёР№ Р·Р°РїСЂРѕС€РµРЅРЅС‹Р№ Р»СЌР№Р°СѓС‚
+  BufferPoolPtr              last_pool;        //РїРѕСЃР»РµРґРЅРёР№ Р·Р°РїСЂРѕС€РµРЅРЅС‹Р№ РїСѓР»
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
     , pools (&device_manager->CacheManager ())
@@ -172,7 +172,7 @@ struct PropertyCache::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PropertyCache::PropertyCache (const DeviceManagerPtr& device_manager)
@@ -196,7 +196,7 @@ PropertyCache::~PropertyCache ()
 }
 
 /*
-    Получение объекта параметров
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBufferPtr& result_buffer, ProgramParametersLayoutPtr& result_layout)
@@ -209,7 +209,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
     unsigned int buffer_size           = (unsigned int)layout.BufferSize (),
                  corrected_buffer_size = stl::max (get_next_higher_power_of_two (buffer_size), MIN_BUFER_SIZE);
            
-      //поиск лэйаута
+      //РїРѕРёСЃРє Р»СЌР№Р°СѓС‚Р°
       
     if (impl->last_hash != hash)
     {
@@ -217,7 +217,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
       impl->last_hash   = hash;
     }    
     
-      //поиск пула буферов
+      //РїРѕРёСЃРє РїСѓР»Р° Р±СѓС„РµСЂРѕРІ
       
     if (impl->last_buffer_size != corrected_buffer_size)
     {
@@ -237,15 +237,15 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
       impl->last_buffer_size = corrected_buffer_size;
     }
     
-      //выделение буфера
+      //РІС‹РґРµР»РµРЅРёРµ Р±СѓС„РµСЂР°
 
     LowLevelBufferPtr buffer = impl->last_pool->Allocate (impl->device_manager->Device ());
 
-      //установка данных
+      //СѓСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 
     buffer->SetData (0, buffer_size, source_map.BufferData ());
 
-      //сохранение результата
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р°
     
     result_buffer = buffer;
     result_layout = impl->last_layout;
@@ -259,7 +259,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
 }
 
 /*
-    Сброс кэша
+    РЎР±СЂРѕСЃ РєСЌС€Р°
 */
 
 namespace

@@ -11,7 +11,7 @@ struct syslib::semaphore_handle
   #undef CreateSemaphore
 #endif
 
-//создание семафора
+//СЃРѕР·РґР°РЅРёРµ СЃРµРјР°С„РѕСЂР°
 semaphore_t WindowsThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
@@ -32,7 +32,7 @@ semaphore_t WindowsThreadManager::CreateSemaphore (size_t initial_value)
   }
 }
 
-//уничтожение семафора
+//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРµРјР°С„РѕСЂР°
 void WindowsThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle || !handle->semaphore)
@@ -43,13 +43,13 @@ void WindowsThreadManager::DestroySemaphore (semaphore_t handle)
   delete handle;
 }
 
-//ожидание следующей задачи
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void WindowsThreadManager::WaitSemaphore (semaphore_t handle)
 {
   WaitSemaphore (handle, INFINITE);
 }
 
-//ожидание следующей задачи с таймаутом
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 bool WindowsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
@@ -74,7 +74,7 @@ bool WindowsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_mil
   }
 }
 
-//попытка ожидания следующей задачи
+//РїРѕРїС‹С‚РєР° РѕР¶РёРґР°РЅРёСЏ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 bool WindowsThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
@@ -100,7 +100,7 @@ bool WindowsThreadManager::TryWaitSemaphore (semaphore_t handle)
   }
 }
 
-//посылка следующей задачи
+//РїРѕСЃС‹Р»РєР° СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void WindowsThreadManager::PostSemaphore (semaphore_t handle)
 {
   try

@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -12,7 +12,7 @@ inline hash_set_base<Value,HashFn,EqualKey,Allocator>::hash_set_base
 { }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -23,7 +23,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::get_allocator () const
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -62,7 +62,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::key_eq () const
 
 
 /*
-    Итераторы
+    РС‚РµСЂР°С‚РѕСЂС‹
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -94,7 +94,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::rend () const
 }
 
 /*
-    Информация о пакетах
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїР°РєРµС‚Р°С…
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -119,7 +119,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::elems_in_bucket (size_type bucke
 }
 
 /*
-    Изменение размера таблицы
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С‚Р°Р±Р»РёС†С‹
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -129,7 +129,7 @@ inline void hash_set_base<Value,HashFn,EqualKey,Allocator>::resize (size_type si
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -158,7 +158,7 @@ inline void hash_set_base<Value,HashFn,EqualKey,Allocator>::clear ()
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -184,7 +184,7 @@ hash_set_base<Value,HashFn,EqualKey,Allocator>::equal_range (const key_type& x) 
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -224,7 +224,7 @@ inline bool hash_set_base<Value,HashFn,EqualKey,Allocator>::operator >= (const h
 }
 
 /*
-    Множество с уникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ СѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>
@@ -282,7 +282,7 @@ inline void swap (hash_set<Value,HashFn,EqualKey,Allocator>& a,hash_set<Value,Ha
 }
 
 /*
-    Множество с неуникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ РЅРµСѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Value,class HashFn,class EqualKey,class Allocator>

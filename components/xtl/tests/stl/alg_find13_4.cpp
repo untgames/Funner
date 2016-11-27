@@ -1,4 +1,4 @@
-//Тестирование алгоритма count_if (first, last, pred, n)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° count_if (first, last, pred, n)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

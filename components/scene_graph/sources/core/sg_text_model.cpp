@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации текстовой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚РѕРІРѕР№ РјРѕРґРµР»Рё
 */
 
 typedef xtl::signal<void (TextModel& sender, TextModelEvent event_id)> TextModelSignal;
@@ -11,16 +11,16 @@ typedef xtl::uninitialized_storage<CharDesc>                           CharArray
 
 struct TextModel::Impl
 {
-  media::FontLibrary font_library;                 //библиотека шрифтов
-  CharArray          chars;                        //массив символов
-  stl::string        material;                     //имя материала
-  size_t             material_hash;                //хэш имени материала
-  stl::string        texture_semantic;             //имя текстурной семантики
-  size_t             texture_semantic_hash;        //хэш имени текстурной семантики
-  TextModelSignal    signals [TextModelEvent_Num]; //сигналы модели 
-  bool               need_rebuild_chars;           //требуется обновление таблицы символов
+  media::FontLibrary font_library;                 //Р±РёР±Р»РёРѕС‚РµРєР° С€СЂРёС„С‚РѕРІ
+  CharArray          chars;                        //РјР°СЃСЃРёРІ СЃРёРјРІРѕР»РѕРІ
+  stl::string        material;                     //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  size_t             material_hash;                //С…СЌС€ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string        texture_semantic;             //РёРјСЏ С‚РµРєСЃС‚СѓСЂРЅРѕР№ СЃРµРјР°РЅС‚РёРєРё
+  size_t             texture_semantic_hash;        //С…СЌС€ РёРјРµРЅРё С‚РµРєСЃС‚СѓСЂРЅРѕР№ СЃРµРјР°РЅС‚РёРєРё
+  TextModelSignal    signals [TextModelEvent_Num]; //СЃРёРіРЅР°Р»С‹ РјРѕРґРµР»Рё 
+  bool               need_rebuild_chars;           //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃРёРјРІРѕР»РѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const media::FontLibrary& in_font_library)
     : font_library (in_font_library)
     , material_hash (0xffffffff)
@@ -29,7 +29,7 @@ struct TextModel::Impl
   {
   }
 
-/// Оповещение о событии
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (TextModel& sender, TextModelEvent event_id)
   {
     try
@@ -41,13 +41,13 @@ struct TextModel::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextModel::TextModel (const media::FontLibrary& font_library)
@@ -60,7 +60,7 @@ TextModel::~TextModel ()
 }
 
 /*
-    Материал
+    РњР°С‚РµСЂРёР°Р»
 */
 
 void TextModel::SetMaterial (const char* in_material)
@@ -90,7 +90,7 @@ size_t TextModel::MaterialHash () const
 }
 
 /*
-    Семантика текстуры-маски
+    РЎРµРјР°РЅС‚РёРєР° С‚РµРєСЃС‚СѓСЂС‹-РјР°СЃРєРё
 */
 
 void TextModel::SetTextureSemantic (const char* in_texture_semantic)
@@ -120,7 +120,7 @@ size_t TextModel::TextureSemanticHash () const
 }
 
 /*
-    Перестроение таблицы символов
+    РџРµСЂРµСЃС‚СЂРѕРµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃРёРјРІРѕР»РѕРІ
 */
 
 void TextModel::RebuildChars ()
@@ -142,7 +142,7 @@ void TextModel::RebuildChars ()
 }
 
 /*
-    Получение символов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
 */
 
 size_t TextModel::CharsCount () const
@@ -165,7 +165,7 @@ CharDesc* TextModel::CharsForUpdate ()
 }
 
 /*
-    Изменение символов
+    РР·РјРµРЅРµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
 */
 
 void TextModel::ResizeChars (size_t count)
@@ -186,7 +186,7 @@ void TextModel::UpdateCharsNotify ()
 }
 
 /*
-    Резервирование символов
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЃРёРјРІРѕР»РѕРІ
 */
 
 size_t TextModel::CharsCapacity () const
@@ -200,7 +200,7 @@ void TextModel::ReserveChars (size_t count)
 }
 
 /*
-    Подписка на события модели
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРѕРґРµР»Рё
 */
 
 xtl::connection TextModel::RegisterEventHandler (TextModelEvent event, const EventHandler& handler)
@@ -218,7 +218,7 @@ xtl::connection TextModel::RegisterEventHandler (TextModelEvent event, const Eve
 }
 
 /*
-    Оповещение о необходимости перестроения шрифтов
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‚СЂРѕРµРЅРёСЏ С€СЂРёС„С‚РѕРІ
 */
 
 void TextModel::UpdateFontsNotify ()
@@ -229,7 +229,7 @@ void TextModel::UpdateFontsNotify ()
 }
 
 /*
-    Библиотека шрифтов
+    Р‘РёР±Р»РёРѕС‚РµРєР° С€СЂРёС„С‚РѕРІ
 */
 
 const media::FontLibrary& TextModel::FontLibrary () const
@@ -243,7 +243,7 @@ media::FontLibrary& TextModel::FontLibrary ()
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void TextModel::AcceptCore (Visitor& visitor)

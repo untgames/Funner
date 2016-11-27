@@ -4,19 +4,19 @@ using namespace syslib;
 
 /*
 ===================================================================================================
-    Экран
+    Р­РєСЂР°РЅ
 ===================================================================================================
 */
 
 /*
-    Описание реализации экрана
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌРєСЂР°РЅР°
 */
 
 struct Screen::Impl: public xtl::reference_counter
 {
-  screen_t handle; //платформо-зависимый дескриптор экрана
+  screen_t handle; //РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ СЌРєСЂР°РЅР°
   
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   Impl (size_t index)
     : handle ()
   {
@@ -33,7 +33,7 @@ struct Screen::Impl: public xtl::reference_counter
       throw xtl::format_operation_exception ("", "Internal error: can't create screen (handle is null)");
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -47,7 +47,7 @@ struct Screen::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Screen::Screen (size_t screen_index)
@@ -87,7 +87,7 @@ Screen& Screen::operator = (const Screen& screen)
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* Screen::Name () const
@@ -104,7 +104,7 @@ const char* Screen::Name () const
 }
 
 /*
-    Размеры экрана
+    Р Р°Р·РјРµСЂС‹ СЌРєСЂР°РЅР°
 */
 
 unsigned int Screen::Width () const
@@ -146,7 +146,7 @@ unsigned int Screen::Height () const
 }
 
 /*
-    Количество бит на пиксель
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р±РёС‚ РЅР° РїРёРєСЃРµР»СЊ
 */
 
 unsigned short Screen::ColorBits () const
@@ -169,7 +169,7 @@ unsigned short Screen::ColorBits () const
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 unsigned short Screen::RefreshRate () const
@@ -192,7 +192,7 @@ unsigned short Screen::RefreshRate () const
 }
 
 /*
-   Плотность пикселей на дюйм
+   РџР»РѕС‚РЅРѕСЃС‚СЊ РїРёРєСЃРµР»РµР№ РЅР° РґСЋР№Рј
 */
 
 unsigned short Screen::Xdpi () const
@@ -234,7 +234,7 @@ unsigned short Screen::Ydpi () const
 }
 
 /*
-    Получение списка видео-режимов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Screen::ModesCount () const
@@ -264,7 +264,7 @@ void Screen::GetMode (size_t mode_index, ScreenModeDesc& mode_desc) const
 }
 
 /*
-    Установка текущего видео-режима
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void Screen::SetCurrentMode (const ScreenModeDesc& mode_desc)
@@ -323,7 +323,7 @@ void Screen::GetDefaultMode (ScreenModeDesc& mode_desc) const
 }
 
 /*
-    Управление гамма-коррекцией
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Screen::SetGammaRamp (const Color3f table [256])
@@ -353,7 +353,7 @@ void Screen::GetGammaRamp (Color3f table [256]) const
 }
 
 /*
-    Платформо-зависимый дескриптор экрана
+    РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ СЌРєСЂР°РЅР°
 */
 
 const void* Screen::Handle () const
@@ -370,7 +370,7 @@ const void* Screen::Handle () const
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void Screen::GetProperties (common::PropertyMap& properties)
@@ -389,7 +389,7 @@ void Screen::GetProperties (common::PropertyMap& properties)
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 Screen Screen::ContainingScreen (const void* window_native_handle)
@@ -406,7 +406,7 @@ Screen Screen::ContainingScreen (const void* window_native_handle)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Screen::Swap (Screen& screen)
@@ -425,7 +425,7 @@ void swap (Screen& screen1, Screen& screen2)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 bool Screen::operator == (const Screen& screen) const
@@ -440,12 +440,12 @@ bool Screen::operator != (const Screen& screen) const
 
 /*
 ===================================================================================================
-    Менеджер экранов
+    РњРµРЅРµРґР¶РµСЂ СЌРєСЂР°РЅРѕРІ
 ===================================================================================================
 */
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t ScreenManager::ScreensCount ()

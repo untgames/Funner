@@ -25,21 +25,21 @@ namespace scene_render_server_subsystem
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENT_NAME = "engine.subsystems.SceneRenderServer"; //имя компонента
-const char* SUBSYSTEM_NAME = "SceneRenderServer";                   //имя подсистемы
+const char* COMPONENT_NAME = "engine.subsystems.SceneRenderServer"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* SUBSYSTEM_NAME = "SceneRenderServer";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
 
 namespace
 {
 
-///Преобразователь
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ
 struct ParseNodeConverter
 {
-  common::PropertyMap result; //результирующая карта свойств
+  common::PropertyMap result; //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ РєР°СЂС‚Р° СЃРІРѕР№СЃС‚РІ
   
-///Чтение свойства
+///Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР°
   void ReadValue (common::Parser::AttributeIterator iter, const char* name)
   {
     stl::string value;
@@ -55,7 +55,7 @@ struct ParseNodeConverter
     result.SetProperty (name, value.c_str ());
   }
   
-///Преобразование
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
   void Convert (const common::ParseNode& node, const char* prefix = "")
   {
     stl::string name;  
@@ -75,7 +75,7 @@ struct ParseNodeConverter
   }
 };
 
-///Преобразование узла конфигурации в карту свойств
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СѓР·Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РІ РєР°СЂС‚Сѓ СЃРІРѕР№СЃС‚РІ
 common::PropertyMap to_properties (const common::ParseNode& node)
 {
   ParseNodeConverter converter;
@@ -89,13 +89,13 @@ common::PropertyMap to_properties (const common::ParseNode& node)
 }
 
 /*
-    Подсистема инициализации оконной системы рендеринга
+    РџРѕРґСЃРёСЃС‚РµРјР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РѕРєРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 class SceneRenderServerSubsystem: public ISubsystem, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SceneRenderServerSubsystem (ParseNode& node)    
     {
       const char* name                 = get<const char*> (node, "Id");
@@ -128,16 +128,16 @@ class SceneRenderServerSubsystem: public ISubsystem, public xtl::reference_count
       }
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }
     void Release () { release (this); }
 
   private:
-    stl::auto_ptr<Server> server; //сервер систмы рендеринга
+    stl::auto_ptr<Server> server; //СЃРµСЂРІРµСЂ СЃРёСЃС‚РјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 };
 
 /*
-   Компонент регистрации оконной системы рендеринга
+   РљРѕРјРїРѕРЅРµРЅС‚ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕРєРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 class SceneRenderServerComponent

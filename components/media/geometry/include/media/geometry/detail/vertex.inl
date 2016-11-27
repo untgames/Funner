@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Определение идентификатора типа
+    РћРїСЂРµРґРµР»РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РёРїР°
 */
 
 template <VertexAttributeType in_value> struct attribute_type_helper
@@ -21,7 +21,7 @@ template <> struct attribute_type<math::vector<short, 4> >         : public attr
 template <> struct attribute_type<math::vector<unsigned char, 4> > : public attribute_type_helper<VertexAttributeType_UByte4> {};
 
 /*
-    Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ РїРѕР»СЏ РІ СЃС‚СЂСѓРєС‚СѓСЂРµ (Р°РЅР°Р»РѕРі offsetof, РєРѕРјРїРёР»РёСЂСѓРµРјС‹Р№ Р±РµР· РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№ РЅР° gcc)
 */
 
 #if defined (_MSC_VER) || defined (__APPLE_CC__)
@@ -31,7 +31,7 @@ template <> struct attribute_type<math::vector<unsigned char, 4> > : public attr
 #endif
 
 /*
-    Определение формата атрибутов вершины
+    РћРїСЂРµРґРµР»РµРЅРёРµ С„РѕСЂРјР°С‚Р° Р°С‚СЂРёР±СѓС‚РѕРІ РІРµСЂС€РёРЅС‹
 */
 
 template <class Vertex, class T> struct vertex_format
@@ -149,7 +149,7 @@ template <class Vertex> struct vertex_format<Vertex, EmptyAttribute>
 #undef GEOMETRY_OFFSETOF
 
 /*
-    Определение формата вершины
+    РћРїСЂРµРґРµР»РµРЅРёРµ С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅС‹
 */
 
 template <class Composite, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
@@ -171,13 +171,13 @@ struct vertex_format<Composite, Vertex<T0, T1, T2, T3, T4, T5, T6, T7> >
 }
 
 /*
-    Генерация вершины
+    Р“РµРЅРµСЂР°С†РёСЏ РІРµСЂС€РёРЅС‹
 */
 
-//хранилище для вершинного атрибута
+//С…СЂР°РЅРёР»РёС‰Рµ РґР»СЏ РІРµСЂС€РёРЅРЅРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
 template <class T> struct VertexAttributeHolder: public T {};
 
-//специализация для списка типов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРїРёСЃРєР° С‚РёРїРѕРІ
 template <class Head, class Tail>
 struct VertexAttributeHolder<xtl::mpl::type_node<Head, Tail> >: public VertexAttributeHolder<Head>, public VertexAttributeHolder<Tail> {};
 
@@ -189,7 +189,7 @@ struct Vertex: public VertexAttributeHolder<T0>, public Vertex<T1, T2, T3, T4, T
 template <> struct Vertex<>: public EmptyAttribute {};
 
 /*
-    Определение формата вершины
+    РћРїСЂРµРґРµР»РµРЅРёРµ С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅС‹
 */
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>

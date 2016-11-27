@@ -5,25 +5,25 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
 /*
-    Описание реализации PBuffer
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PBuffer
 */
 
 typedef xtl::com_ptr<PrimarySwapChain> SwapChainPtr;
 
 struct PBuffer::Impl
 {
-  Log                         log;                   //протокол
-  SwapChainPtr                primary_swap_chain;    //основная цепочка обмена
-  AdapterLibraryPtr           library;               //библиотека OpenGL
-  SwapChainDesc               desc;                  //дескриптор буфера
-  Display*                    display;               //соединение с дисплеем
-  GLXPbuffer                  pbuffer;               //дескриптор PBuffer'а
-  GLXFBConfig                 fbconfig;              //конфигурация буфера кадра
-  bool                        create_largest_flag;   //флаг необходимости создания максимально возможного pbuffer'а
-  xtl::auto_connection        cds_connection;        //соединение с сигналом, оповещающим об изменении видео-режима
-  const GlxExtensionsEntries* glx_extensions_entries; //таблица GLX-расширений
+  Log                         log;                   //РїСЂРѕС‚РѕРєРѕР»
+  SwapChainPtr                primary_swap_chain;    //РѕСЃРЅРѕРІРЅР°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  AdapterLibraryPtr           library;               //Р±РёР±Р»РёРѕС‚РµРєР° OpenGL
+  SwapChainDesc               desc;                  //РґРµСЃРєСЂРёРїС‚РѕСЂ Р±СѓС„РµСЂР°
+  Display*                    display;               //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  GLXPbuffer                  pbuffer;               //РґРµСЃРєСЂРёРїС‚РѕСЂ PBuffer'Р°
+  GLXFBConfig                 fbconfig;              //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р±СѓС„РµСЂР° РєР°РґСЂР°
+  bool                        create_largest_flag;   //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅРѕРіРѕ pbuffer'Р°
+  xtl::auto_connection        cds_connection;        //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј, РѕРїРѕРІРµС‰Р°СЋС‰РёРј РѕР± РёР·РјРµРЅРµРЅРёРё РІРёРґРµРѕ-СЂРµР¶РёРјР°
+  const GlxExtensionsEntries* glx_extensions_entries; //С‚Р°Р±Р»РёС†Р° GLX-СЂР°СЃС€РёСЂРµРЅРёР№
 
-///Конструктор / деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (PrimarySwapChain* swap_chain)
     : pbuffer (0)
   {
@@ -59,14 +59,14 @@ struct PBuffer::Impl
     Destroy ();
   }
 
-///Обработка события смены видео-режима
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СЃРјРµРЅС‹ РІРёРґРµРѕ-СЂРµР¶РёРјР°
   void OnDisplayModeChange ()
   {
-      //проверка состояния P-buffer
+      //РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ P-buffer
 
     int is_lost = 0;
 
-      //если буфер потерял своё содержимое - пересоздаём его
+      //РµСЃР»Рё Р±СѓС„РµСЂ РїРѕС‚РµСЂСЏР» СЃРІРѕС‘ СЃРѕРґРµСЂР¶РёРјРѕРµ - РїРµСЂРµСЃРѕР·РґР°С‘Рј РµРіРѕ
 
     if (is_lost)    
     {
@@ -75,14 +75,14 @@ struct PBuffer::Impl
     }
   }
 
-///Создание / уничтожение буфера
+///РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ Р±СѓС„РµСЂР°
   void Create ()
   {
     try
     {
       log.Printf ("Create PBuffer...");
       
-        //создание PBuffer
+        //СЃРѕР·РґР°РЅРёРµ PBuffer
 
       int pbuffer_attributes []  = { GLX_PBUFFER_WIDTH, desc.frame_buffer.width,
                                      GLX_PBUFFER_HEIGHT, desc.frame_buffer.height,
@@ -96,7 +96,7 @@ struct PBuffer::Impl
       if (!pbuffer)
         raise_error ("glxCreatePbuffer");
         
-        //получение контекста вывода
+        //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РІС‹РІРѕРґР°
 /*        
       log.Printf ("...call wglGetPbufferDCARB");
         
@@ -105,12 +105,12 @@ struct PBuffer::Impl
       if (!output_context)
         raise_error ("wglGetPbufferDCARB");
 
-        //установка формата пикселей
+        //СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
       if (!PixelFormatManager::CopyPixelFormat (primary_device_context, output_context))
         throw xtl::format_operation_exception ("render::low_level::opengl::PBuffer::Impl::Create", "PixelFormatManager::CopyPixelFormat failed");
 
-        //получение размеров созданного PBuffer'а
+        //РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ СЃРѕР·РґР°РЅРЅРѕРіРѕ PBuffer'Р°
         
       log.Printf ("...call wglQueryPBufferARB");
         
@@ -163,7 +163,7 @@ struct PBuffer::Impl
     }
     catch (...)
     {
-      //подавляем все исключения
+      //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
 
     pbuffer = 0;
@@ -173,7 +173,7 @@ struct PBuffer::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PBuffer::PBuffer (PrimarySwapChain* swap_chain, size_t width, size_t height)
@@ -181,12 +181,12 @@ PBuffer::PBuffer (PrimarySwapChain* swap_chain, size_t width, size_t height)
 {
   impl->create_largest_flag = false;
 
-    //заполнение дескриптора
+    //Р·Р°РїРѕР»РЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   impl->desc.frame_buffer.width  = width;
   impl->desc.frame_buffer.height = height;
 
-    //создание буфера
+    //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
   impl->Create ();
 }
@@ -196,7 +196,7 @@ PBuffer::PBuffer (PrimarySwapChain* swap_chain)
 {
   impl->create_largest_flag = true;
 
-    //создание буфера
+    //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
   impl->Create ();
 }
@@ -206,7 +206,7 @@ PBuffer::~PBuffer ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PBuffer::GetDesc (SwapChainDesc& out_desc)
@@ -215,7 +215,7 @@ void PBuffer::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PBuffer::GetContainingOutput ()
@@ -224,7 +224,7 @@ IOutput* PBuffer::GetContainingOutput ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PBuffer::Present ()
@@ -232,7 +232,7 @@ void PBuffer::Present ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PBuffer::SetFullscreenState (bool)
@@ -245,7 +245,7 @@ bool PBuffer::GetFullscreenState ()
 }
 
 /*
-    Получение
+    РџРѕР»СѓС‡РµРЅРёРµ
 */
 
 IAdapter* PBuffer::GetAdapter ()
@@ -254,16 +254,16 @@ IAdapter* PBuffer::GetAdapter ()
 }
 
 /*
-   Реалиация интерфейса ISwapChainImpl
+   Р РµР°Р»РёР°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР° ISwapChainImpl
 */
 
-//получение реализации адаптера
+//РїРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґР°РїС‚РµСЂР°
 Adapter* PBuffer::GetAdapterImpl ()
 {
   return impl->primary_swap_chain->GetAdapterImpl ();
 }
 
-//получение контекста устройства вывода
+//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 Display* PBuffer::GetDisplay ()
 {
   return impl->display;
@@ -275,13 +275,13 @@ Window PBuffer::GetWindow ()
   return impl->primary_swap_chain->GetWindow ();
 }
 
-//получение формата пикселей цепочки обмена
+//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 GLXFBConfig PBuffer::GetFBConfig ()
 {
   return impl->fbconfig;
 }
 
-//получение точек входа
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РѕС‡РµРє РІС…РѕРґР°
 const GlxExtensionsEntries& PBuffer::GetGlxExtensionsEntries ()
 {
   return *impl->glx_extensions_entries;

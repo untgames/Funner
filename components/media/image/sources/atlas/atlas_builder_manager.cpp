@@ -6,7 +6,7 @@ namespace
 {
 
 /*
-    Реализация менеджера построителей атласа изображений
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїРѕСЃС‚СЂРѕРёС‚РµР»РµР№ Р°С‚Р»Р°СЃР° РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 class AtlasBuilderManagerImpl
@@ -71,11 +71,11 @@ typedef common::Singleton<AtlasBuilderManagerImpl> AtlasBuilderManagerSingleton;
 }
 
 /*
-   Менеджер построителей атласа изображений
+   РњРµРЅРµРґР¶РµСЂ РїРѕСЃС‚СЂРѕРёС‚РµР»РµР№ Р°С‚Р»Р°СЃР° РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 /*
-   Получение упаковщика атласа
+   РџРѕР»СѓС‡РµРЅРёРµ СѓРїР°РєРѕРІС‰РёРєР° Р°С‚Р»Р°СЃР°
 */
 
 const AtlasBuilderManager::PackHandler& AtlasBuilderManager::GetPacker (const char* name)
@@ -84,7 +84,7 @@ const AtlasBuilderManager::PackHandler& AtlasBuilderManager::GetPacker (const ch
 }
 
 /*
-   Регистрация упаковщиков атласа
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ СѓРїР°РєРѕРІС‰РёРєРѕРІ Р°С‚Р»Р°СЃР°
 */
 
 void AtlasBuilderManager::RegisterPacker (const char* name, const PackHandler& handler)

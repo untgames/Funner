@@ -4,25 +4,25 @@ using namespace render::manager;
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int MIN_BUFFER_SIZE = 16; //минимальный размер буфера констант
+const unsigned int MIN_BUFFER_SIZE = 16; //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РєРѕРЅСЃС‚Р°РЅС‚
 
 /*
-    Описание реализации буфера свойств
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±СѓС„РµСЂР° СЃРІРѕР№СЃС‚РІ
 */
 
 struct PropertyBuffer::Impl
 {
-  DeviceManagerPtr     device_manager;     //менеджер устройства отрисовки
-  LowLevelBufferPtr    buffer;             //константный буфер
-  common::PropertyMap  properties;         //исходные свойства
-  xtl::auto_connection update_connection;  //соединение обновления свойств
-  bool                 need_update;        //флаг необходимости обновления буфера
-  unsigned int         cached_buffer_size; //закэшированный размер буфера
+  DeviceManagerPtr     device_manager;     //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  LowLevelBufferPtr    buffer;             //РєРѕРЅСЃС‚Р°РЅС‚РЅС‹Р№ Р±СѓС„РµСЂ
+  common::PropertyMap  properties;         //РёСЃС…РѕРґРЅС‹Рµ СЃРІРѕР№СЃС‚РІР°
+  xtl::auto_connection update_connection;  //СЃРѕРµРґРёРЅРµРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  bool                 need_update;        //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ Р±СѓС„РµСЂР°
+  unsigned int         cached_buffer_size; //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
     , need_update (true)
@@ -32,7 +32,7 @@ struct PropertyBuffer::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PropertyBuffer::PropertyBuffer (const DeviceManagerPtr& device_manager)
@@ -46,7 +46,7 @@ PropertyBuffer::~PropertyBuffer ()
 }
 
 /*
-    Установка свойств
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyBuffer::SetProperties (const common::PropertyMap& in_properties)
@@ -67,7 +67,7 @@ const common::PropertyMap& PropertyBuffer::Properties ()
 }
 
 /*
-    Свойства обновлены
+    РЎРІРѕР№СЃС‚РІР° РѕР±РЅРѕРІР»РµРЅС‹
 */
 
 void PropertyBuffer::OnPropertiesUpdated ()
@@ -81,7 +81,7 @@ void PropertyBuffer::OnPropertiesUpdated ()
 }
 
 /*
-    Получение буфера
+    РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР°
 */
 
 const LowLevelBufferPtr& PropertyBuffer::Buffer ()
@@ -103,7 +103,7 @@ const LowLevelBufferPtr& PropertyBuffer::Buffer ()
 }
 
 /*
-    Обновление кэша
+    РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
 */
 
 void PropertyBuffer::UpdateCacheCore ()
@@ -119,7 +119,7 @@ void PropertyBuffer::UpdateCacheCore ()
     
     if (need_recreate_buffer)
     {
-        //создание нового буфера
+        //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р±СѓС„РµСЂР°
         
       render::low_level::BufferDesc desc;
 

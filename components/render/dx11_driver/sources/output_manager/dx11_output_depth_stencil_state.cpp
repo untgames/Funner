@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace
@@ -59,7 +59,7 @@ void convert (const StencilDesc& desc, D3D11_DEPTH_STENCILOP_DESC& dx_desc, cons
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DepthStencilState::DepthStencilState (const DeviceManager& manager, const DepthStencilDesc& in_desc)
@@ -68,7 +68,7 @@ DepthStencilState::DepthStencilState (const DeviceManager& manager, const DepthS
 {
   try
   {
-      //преобразование дескриптора
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     D3D11_DEPTH_STENCIL_DESC dx_desc;
 
@@ -84,7 +84,7 @@ DepthStencilState::DepthStencilState (const DeviceManager& manager, const DepthS
     convert (desc.stencil_desc [FaceMode_Front], dx_desc.FrontFace, "desc.stencil_desc[FaceMode_Front]");
     convert (desc.stencil_desc [FaceMode_Back], dx_desc.BackFace, "desc.stencil_desc[FaceMode_Back]");
 
-      //создание состояния
+      //СЃРѕР·РґР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 
     ID3D11DepthStencilState* dx_state = 0;
 
@@ -107,7 +107,7 @@ DepthStencilState::~DepthStencilState ()
 }
 
 /*
-    Установка/изменение дескриптора
+    РЈСЃС‚Р°РЅРѕРІРєР°/РёР·РјРµРЅРµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void DepthStencilState::GetDesc (DepthStencilDesc& out_desc)

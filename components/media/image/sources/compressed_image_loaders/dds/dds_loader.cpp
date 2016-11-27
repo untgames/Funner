@@ -25,7 +25,7 @@ namespace dds_loader
 {
 
 /*
-    Описание формата DDS
+    РћРїРёСЃР°РЅРёРµ С„РѕСЂРјР°С‚Р° DDS
  */
 
 #if !defined(MAKEFOURCC)
@@ -37,7 +37,7 @@ namespace dds_loader
 typedef unsigned int  uint32;
 typedef unsigned char uint8;
 
-///Идентификатор файла DDS
+///РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С„Р°Р№Р»Р° DDS
 const char DDS_MAGIC_ID [4] = {'D', 'D', 'S', ' '};
 
 // surface description flags
@@ -81,7 +81,7 @@ const unsigned long FOURCC_L8            = 50;
 const unsigned long FOURCC_A8L8          = 51;
 const unsigned long FOURCC_A4L4          = 52;
 
-///Блоки форматов DDS
+///Р‘Р»РѕРєРё С„РѕСЂРјР°С‚РѕРІ DDS
 const uint32 FOURCC_DXT1                            = MAKEFOURCC ('D', 'X', 'T', '1');
 const uint32 FOURCC_DXT2                            = MAKEFOURCC ('D', 'X', 'T', '2');
 const uint32 FOURCC_DXT3                            = MAKEFOURCC ('D', 'X', 'T', '3');
@@ -115,7 +115,7 @@ const unsigned long FOURCC_R32F          = 114;
 const unsigned long FOURCC_G32R32F       = 115;
 const unsigned long FOURCC_A32B32G32R32F = 116;
 
-///Флаги заголовка DDS файла
+///Р¤Р»Р°РіРё Р·Р°РіРѕР»РѕРІРєР° DDS С„Р°Р№Р»Р°
 enum
 {
   DDSD_CAPS        = 0x1,      //Required in every .dds file
@@ -128,7 +128,7 @@ enum
   DDSD_DEPTH       = 0x800000, //Required in a depth texture
 };
 
-///Флаги формата пикселей DDS файла
+///Р¤Р»Р°РіРё С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ DDS С„Р°Р№Р»Р°
 enum
 {
   DDPF_ALPHAPIXELS  = 0x1,     //Texture contains alpha data; dwRGBAlphaBitMask contains valid data
@@ -139,7 +139,7 @@ enum
   DDPF_LUMINANCE    = 0x20000, //Used in some older DDS files for single channel color uncompressed data (dwRGBBitCount contains the luminance channel bit count; dwRBitMask contains the channel mask). Can be combined with DDPF_ALPHAPIXELS for a two channel DDS file
 };
 
-///Флаги Caps
+///Р¤Р»Р°РіРё Caps
 enum
 {
   DDSCAPS_COMPLEX = 0x8,      //Optional; must be used on any file that contains more than one surface (a mipmap, a cubic environment map, or volume texture)
@@ -147,7 +147,7 @@ enum
   DDSCAPS_TEXTURE = 0x1000,   //Required
 };
 
-///Флаги Caps2
+///Р¤Р»Р°РіРё Caps2
 enum
 {
   DDSCAPS2_CUBEMAP           = 0x200,      //Required for a cube map
@@ -161,7 +161,7 @@ enum
   DDSCAPS2_CUBEMAP_ALL_FACES = 0x0000FC00U //Required when all cubemap faces are stored in a cube map
 };
 
-///Тип ресурса
+///РўРёРї СЂРµСЃСѓСЂСЃР°
 enum
 {
   D3D10_RESOURCE_DIMENSION_UNKNOWN   = 0,
@@ -171,7 +171,7 @@ enum
   D3D10_RESOURCE_DIMENSION_TEXTURE3D = 4,
 };
 
-///Формат пикселей DDS файла
+///Р¤РѕСЂРјР°С‚ РїРёРєСЃРµР»РµР№ DDS С„Р°Р№Р»Р°
 struct DdsPixelFormat
 {
   uint32 dwSize;        //Structure size; set to 32 (bytes)
@@ -184,7 +184,7 @@ struct DdsPixelFormat
   uint32 dwABitMask;    //Alpha mask for reading alpha data. dwFlags must include DDPF_ALPHAPIXELS or DDPF_ALPHA. For instance, given the A8R8G8B8 format, the alpha mask would be 0xff000000
 };
 
-///Заголовок DDS файла
+///Р—Р°РіРѕР»РѕРІРѕРє DDS С„Р°Р№Р»Р°
 struct DdsHeader
 {
   uint32         dwSize;            //Size of structure. This member must be set to 124
@@ -203,7 +203,7 @@ struct DdsHeader
   uint32         dwReserved2;       //Unused
 };
 
-///Дополнительный заголовок для поддержки массивов текстур DX10
+///Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє РґР»СЏ РїРѕРґРґРµСЂР¶РєРё РјР°СЃСЃРёРІРѕРІ С‚РµРєСЃС‚СѓСЂ DX10
 struct DdsHeaderDx10
 {
   uint32 dxgiFormat;         //The surface pixel format
@@ -214,7 +214,7 @@ struct DdsHeaderDx10
 };
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
  */
 
 template <class T>
@@ -225,13 +225,13 @@ void read (File& file, const char* file_name, T& value)
 }
 
 /*
-    Изображение, сжатое в формате DDS
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ, СЃР¶Р°С‚РѕРµ РІ С„РѕСЂРјР°С‚Рµ DDS
  */
 
 class DdsCompressedImage: public ICustomCompressedImage
 {
   public:
-    ///Загрузка изображения
+    ///Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     DdsCompressedImage (const char* file_name)
       : bytes_per_block (0)
     {
@@ -244,7 +244,7 @@ class DdsCompressedImage: public ICustomCompressedImage
       {
         InputFile file (file_name);
 
-        //чтение заголовков
+        //С‡С‚РµРЅРёРµ Р·Р°РіРѕР»РѕРІРєРѕРІ
 
         char id [4];
 
@@ -261,22 +261,22 @@ class DdsCompressedImage: public ICustomCompressedImage
 
         if ((header.ddpf.dwFlags & DDPF_FOURCC) && (header.ddpf.dwFourCC == FOURCC_DX10))
         {
-          //чтение дополнительного заголовка для поддержки DX10
+          //С‡С‚РµРЅРёРµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ Р·Р°РіРѕР»РѕРІРєР° РґР»СЏ РїРѕРґРґРµСЂР¶РєРё DX10
 
           read (file, file_name, header_dx10);
 
   //        has_dx10_header = true;
         }
 
-        //проверка корректности
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё
 
         CheckSupported (header, &header_dx10);
 
-        //варианты загрузки
+        //РІР°СЂРёР°РЅС‚С‹ Р·Р°РіСЂСѓР·РєРё
         /*
           if (has_dx10_header)
           {
-            //пока не поддерживаем
+            //РїРѕРєР° РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµРј
           }
          */
         // check if image is a volume texture
@@ -376,7 +376,7 @@ class DdsCompressedImage: public ICustomCompressedImage
           }
         }
 
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
         unsigned int data_size = 0;
 
@@ -462,31 +462,31 @@ class DdsCompressedImage: public ICustomCompressedImage
       }
     }
 
-    ///Ширина изображения
+    ///РЁРёСЂРёРЅР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     unsigned int Width ()
     {
       return width;
     }
 
-    ///Высота изображения
+    ///Р’С‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     unsigned int Height ()
     {
       return height;
     }
 
-    ///Количество слоёв
+    ///РљРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‘РІ
     unsigned int LayersCount ()
     {
       return layers_count;
     }
 
-    ///Количество мип-уровней
+    ///РљРѕР»РёС‡РµСЃС‚РІРѕ РјРёРї-СѓСЂРѕРІРЅРµР№
     unsigned int MipsCount ()
     {
       return mips_count;
     }
 
-    ///Формат изображения
+    ///Р¤РѕСЂРјР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     const char* Format ()
     {
       switch (format)
@@ -506,20 +506,20 @@ class DdsCompressedImage: public ICustomCompressedImage
       }
     }
 
-    ///Возвращение буфера данных
+    ///Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
     const void* Data ()
     {
       return data.data ();
     }
 
-    ///Возвращение блоков
+    ///Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р±Р»РѕРєРѕРІ
     const CompressedImageBlockDesc* Blocks ()
     {
       return &blocks [0];
     }
 
   private:
-    //Разворот по вертикали
+    //Р Р°Р·РІРѕСЂРѕС‚ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
     void FlipDXT1BlockFull(unsigned char *data)
     // A DXT1 block layout is:
     // [0-1] color0.
@@ -653,7 +653,7 @@ class DdsCompressedImage: public ICustomCompressedImage
 
       if (header_dx10)
       {
-        return; //поддерживаются все варианты
+        return; //РїРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ РІСЃРµ РІР°СЂРёР°РЅС‚С‹
       }
       else
       {
@@ -744,19 +744,19 @@ class DdsCompressedImage: public ICustomCompressedImage
     typedef stl::vector<CompressedImageBlockDesc> BlockDescArray;
 
   private:
-    unsigned int   bytes_per_block; //размер блока данных
-    uint32         format;          //формат изображения
-    unsigned int   width;           //ширина изображения
-    unsigned int   height;          //высота изображения
-    unsigned int   depth;           //глубина изображения
-    unsigned int   layers_count;    //количество слоёв
-    unsigned int   mips_count;      //количество mip-уровней
-    Buffer         data;            //данные изображения
-    BlockDescArray blocks;          //дескрипторы блоков
+    unsigned int   bytes_per_block; //СЂР°Р·РјРµСЂ Р±Р»РѕРєР° РґР°РЅРЅС‹С…
+    uint32         format;          //С„РѕСЂРјР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    unsigned int   width;           //С€РёСЂРёРЅР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    unsigned int   height;          //РІС‹СЃРѕС‚Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    unsigned int   depth;           //РіР»СѓР±РёРЅР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    unsigned int   layers_count;    //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‘РІ
+    unsigned int   mips_count;      //РєРѕР»РёС‡РµСЃС‚РІРѕ mip-СѓСЂРѕРІРЅРµР№
+    Buffer         data;            //РґР°РЅРЅС‹Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    BlockDescArray blocks;          //РґРµСЃРєСЂРёРїС‚РѕСЂС‹ Р±Р»РѕРєРѕРІ
 };
 
 /*
-   Компонент
+   РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

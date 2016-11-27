@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Класс для проверки: есть ли приведение из A* в B*
+    РљР»Р°СЃСЃ РґР»СЏ РїСЂРѕРІРµСЂРєРё: РµСЃС‚СЊ Р»Рё РїСЂРёРІРµРґРµРЅРёРµ РёР· A* РІ B*
 */
 
 template <class From, class To> struct light_is_convertible
@@ -17,7 +17,7 @@ template <class From, class To> struct light_is_convertible
 };
 
 /*
-    Селектор вызова функционального объекта
+    РЎРµР»РµРєС‚РѕСЂ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 template <int value> struct funcall_tag {};
@@ -47,73 +47,73 @@ template <class Ret, class T1, class T2> struct funcall_selector<Ret T1::*, T2, 
 template <class Fn> struct funcall_selector<Fn, void, true>;
 
 /*
-    Перегрузки вызовов функциональных объектов
+    РџРµСЂРµРіСЂСѓР·РєРё РІС‹Р·РѕРІРѕРІ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 */
 
-//перегрузка для функционального объекта без аргументов
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret, class Fn>
 inline Ret funcall_dispatch (Fn& fn, default_funcall)
 {
   return static_cast<Ret> (fn ());
 }
 
-//перегрузка для функционального объекта с 1-м аргументом
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Ret, class Fn, class T1>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, default_funcall)
 {
   return static_cast<Ret> (fn (arg1));
 }
 
-//перегрузка для функционального объекта с 2-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2));
 }
 
-//перегрузка для функционального объекта с 3-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3));
 }
 
-//перегрузка для функционального объекта с 4-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3, arg4));
 }
 
-//перегрузка для функционального объекта с 5-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5));
 }
 
-//перегрузка для функционального объекта с 6-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6));
 }
 
-//перегрузка для функционального объекта с 7-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
-//перегрузка для функционального объекта с 8-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, default_funcall)
 {
   return static_cast<Ret> (fn (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
-//перегрузка для функционального объекта с 9-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, default_funcall)
 {
@@ -121,10 +121,10 @@ inline Ret funcall_dispatch (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5&
 }
 
 /*
-    Перегрузки вызовов указателей на функцию-член класса
+    РџРµСЂРµРіСЂСѓР·РєРё РІС‹Р·РѕРІРѕРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР°
 */
 
-//перегрузка для указателя на функцию-член класса с 1-м аргументом
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Ret, class Fn, class T1>
 inline Ret funcall_dispatch (Fn& fn, T1& object, memfun_ref_funcall)
 {
@@ -137,7 +137,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, memfun_ptr_funcall)
   return static_cast<Ret> (((*object_ptr).*fn)());
 }
 
-//перегрузка для указателя на функцию-член класса с 2-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, memfun_ref_funcall)
 {
@@ -150,7 +150,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, memfun_ptr_funcal
   return static_cast<Ret> (((*object_ptr).*fn)(arg2));
 }
 
-//перегрузка для указателя на функцию-член класса с 3-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, memfun_ref_funcall)
 {
@@ -163,7 +163,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, memfun_
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3));
 }
 
-//перегрузка для указателя на функцию-член класса с 4-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, memfun_ref_funcall)
 {
@@ -176,7 +176,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4));
 }
 
-//перегрузка для указателя на функцию-член класса с 5-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, memfun_ref_funcall)
 {
@@ -189,7 +189,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5));
 }
 
-//перегрузка для указателя на функцию-член класса с 6-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, memfun_ref_funcall)
 {
@@ -202,7 +202,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6));
 }
 
-//перегрузка для указателя на функцию-член класса с 7-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, memfun_ref_funcall)
 {
@@ -215,7 +215,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7));
 }
 
-//перегрузка для указателя на функцию-член класса с 8-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, memfun_ref_funcall)
 {
@@ -228,7 +228,7 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
   return static_cast<Ret> (((*object_ptr).*fn)(arg2, arg3, arg4, arg5, arg6, arg7, arg8));
 }
 
-//перегрузка для указателя на функцию-член класса с 9-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (Fn& fn, T1& object, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, memfun_ref_funcall)
 {
@@ -242,10 +242,10 @@ inline Ret funcall_dispatch (Fn& fn, T1& object_ptr, T2& arg2, T3& arg3, T4& arg
 }
 
 /*
-    Перегрузки вызовов указателей на объект-член класса
+    РџРµСЂРµРіСЂСѓР·РєРё РІС‹Р·РѕРІРѕРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР°
 */
 
-//перегрузка для указателя на объект-член класса с 1-м аргументом
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Ret, class R, class T, class T1>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, memptr_ref_funcall)
 {
@@ -258,7 +258,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, memptr_ptr_funcall)
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 2-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, memptr_ref_funcall)
 {
@@ -271,7 +271,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, memptr_ptr_funcal
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 3-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, memptr_ref_funcall)
 {
@@ -284,7 +284,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, memptr_ptr_f
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 4-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, memptr_ref_funcall)
 {
@@ -297,7 +297,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, memptr_
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 5-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, memptr_ref_funcall)
 {
@@ -310,7 +310,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, me
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 6-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, memptr_ref_funcall)
 {
@@ -323,7 +323,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 7-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, memptr_ref_funcall)
 {
@@ -336,7 +336,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 8-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, memptr_ref_funcall)
 {
@@ -349,7 +349,7 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6
   return static_cast<Ret> (const_cast<T&> (*object_ptr).*ptr);
 }
 
-//перегрузка для указателя на объект-член класса с 9-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РѕР±СЉРµРєС‚-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class R, class T, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall_dispatch (R T::*& ptr, T1& object, T2&, T3&, T4&, T5&, T6&, T7&, T8&, T9&, memptr_ref_funcall)
 {
@@ -365,73 +365,73 @@ inline Ret funcall_dispatch (R T::*& ptr, T1& object_ptr, T2&, T3&, T4&, T5&, T6
 }
 
 /*
-    Диспетчеризация вызовов функциональных объектов
+    Р”РёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ РІС‹Р·РѕРІРѕРІ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 */
 
-//перегрузка для функционального объекта без аргументов
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret, class Fn>
 inline Ret funcall (Fn& fn)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), typename detail::funcall_selector<Fn>::type ());
 }
 
-//перегрузка для функционального объекта с 1-м аргументом
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Ret, class Fn, class T1>
 inline Ret funcall (Fn& fn, T1& arg1)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 2-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 3-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 4-мя аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 5-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 6-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 7-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, arg7, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 8-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8)
 {
   return detail::funcall_dispatch<Ret> (unwrap (fn), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, typename detail::funcall_selector<Fn, T1>::type ());
 }
 
-//перегрузка для функционального объекта с 9-ю аргументами
+//РїРµСЂРµРіСЂСѓР·РєР° РґР»СЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline Ret funcall (Fn& fn, T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9)
 {

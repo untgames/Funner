@@ -1,5 +1,5 @@
 /*
-    Лексикографическое преобразование
+    Р›РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
 */
 
 template <class DstT, class SrcT>
@@ -24,7 +24,7 @@ inline DstT lexical_cast (const SrcT& value)
 }
 
 /*
-    Преобразования тип -> строка
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚РёРї -> СЃС‚СЂРѕРєР°
 */
 
 inline void to_string (stl::string& buffer, const stl::string& value)
@@ -75,7 +75,7 @@ namespace detail
 
 inline void integer_to_string (stl::string& buffer, long long value, bool sign)
 {
-  const size_t MAX_INTEGER_STRING_SIZE = 16; //максимальное количество знаков для символьного представления целого числа 
+  const size_t MAX_INTEGER_STRING_SIZE = 16; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РґР»СЏ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ С†РµР»РѕРіРѕ С‡РёСЃР»Р° 
 
   char char_buffer [MAX_INTEGER_STRING_SIZE];
 
@@ -161,7 +161,7 @@ inline void to_string (stl::string& buffer, const volatile bool& value)
 
 inline void to_string (stl::string& buffer, const double& value)
 {
-  const size_t MAX_REAL_STRING_SIZE = 32; //максимальное количество знаков для символьного представления вещественного числа 
+  const size_t MAX_REAL_STRING_SIZE = 32; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РґР»СЏ СЃРёРјРІРѕР»СЊРЅРѕРіРѕ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ С‡РёСЃР»Р° 
   
   char char_buffer [MAX_REAL_STRING_SIZE];
   
@@ -202,7 +202,7 @@ inline stl::string to_string (const T& value)
 }
 
 /*
-    Преобразования строка -> тип
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃС‚СЂРѕРєР° -> С‚РёРї
 */
 
 namespace detail
@@ -353,7 +353,7 @@ inline T to_value (const stl::string& buffer)
 }
 
 /*
-  Вывод диапазонов
+  Р’С‹РІРѕРґ РґРёР°РїР°Р·РѕРЅРѕРІ
 */
 
 template <class Iter>
@@ -381,7 +381,7 @@ void to_string (stl::string& buffer, Iter first, Iter last, const char* separato
 }
 
 /*
-    Приведение к строке математических типов
+    РџСЂРёРІРµРґРµРЅРёРµ Рє СЃС‚СЂРѕРєРµ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёС… С‚РёРїРѕРІ
 */
 
 template <class String, class T, unsigned int Size>

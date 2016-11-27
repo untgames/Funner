@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -179,7 +179,7 @@ SamplerState::~SamplerState ()
 }
 
 /*
-    Изменение / получение дескриптора
+    РР·РјРµРЅРµРЅРёРµ / РїРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void SamplerState::SetDesc (const SamplerDesc&)

@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc, const void* data)
@@ -14,7 +14,7 @@ SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc, const voi
 {
   try
   {
-      //проверка корректности режима использования буфера
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР¶РёРјР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р±СѓС„РµСЂР°
 
     switch (desc.usage_mode)
     {
@@ -27,7 +27,7 @@ SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc, const voi
         throw xtl::make_argument_exception ("", "desc.usage_mode", desc.usage_mode);
     }
 
-      //проверка корректности флагов доступа
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„Р»Р°РіРѕРІ РґРѕСЃС‚СѓРїР°
 
     switch (desc.access_flags)
     {
@@ -59,7 +59,7 @@ SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc, const voi
 }
 
 /*
-    Получение дескриптора буфера
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° Р±СѓС„РµСЂР°
 */
 
 void SourceConstantBuffer::GetDesc (BufferDesc& out_desc)
@@ -68,7 +68,7 @@ void SourceConstantBuffer::GetDesc (BufferDesc& out_desc)
 }
 
 /*
-    Чтение / запись из буфера
+    Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РёР· Р±СѓС„РµСЂР°
 */
 
 void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
@@ -77,12 +77,12 @@ void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data
   {
     cast_object<DeviceObject> (context, "", "context");
 
-      //проверка возможности установки данных
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
       
     if (!(desc.access_flags & AccessFlag_Write))
       throw xtl::format_operation_exception ("", "Can't set buffer data (no AccessFlag_Write in desc.access_flags)");
 
-      //отсечение
+      //РѕС‚СЃРµС‡РµРЅРёРµ
 
     if (offset >= desc.size)
       return;
@@ -93,12 +93,12 @@ void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data
     if (!size)
       return;
 
-      //проверка корректности переданных данных
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїРµСЂРµРґР°РЅРЅС‹С… РґР°РЅРЅС‹С…
 
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
-      //установка данных
+      //СѓСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 
     memcpy (buffer.data () + offset, data, size);
 
@@ -117,12 +117,12 @@ void SourceConstantBuffer::GetData (size_t offset, size_t size, void* data, IDev
   {
     cast_object<DeviceObject> (context, "", "context");
 
-      //проверка возможности установки данных
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
       
     if (!(desc.access_flags & AccessFlag_Read))
       throw xtl::format_operation_exception ("", "Can't get buffer data (no AccessFlag_Read in desc.access_flags)");
 
-      //отсечение
+      //РѕС‚СЃРµС‡РµРЅРёРµ
 
     if (offset >= desc.size)
       return;
@@ -133,12 +133,12 @@ void SourceConstantBuffer::GetData (size_t offset, size_t size, void* data, IDev
     if (!size)
       return;
 
-      //проверка корректности результирующего буфера
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР°
 
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
-      //чтение данных
+      //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
     memcpy (data, buffer.data () + offset, size);   
   }
@@ -150,7 +150,7 @@ void SourceConstantBuffer::GetData (size_t offset, size_t size, void* data, IDev
 }
 
 /*
-    Хэш данных
+    РҐСЌС€ РґР°РЅРЅС‹С…
 */
 
 size_t SourceConstantBuffer::GetHash () const

@@ -3,7 +3,7 @@
 using namespace syslib;
 
 /*
-   Политика приема cookie
+   РџРѕР»РёС‚РёРєР° РїСЂРёРµРјР° cookie
 */
 
 void CookieManager::SetAcceptCookie (bool policy)
@@ -33,7 +33,7 @@ bool CookieManager::AcceptCookie ()
 }
 
 /*
-   Удаление cookie
+   РЈРґР°Р»РµРЅРёРµ cookie
 */
 
 void CookieManager::DeleteCookies (const char* uri)

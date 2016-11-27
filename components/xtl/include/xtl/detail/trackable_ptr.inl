@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Функтор, сбрасывающий значение указателя
+    Р¤СѓРЅРєС‚РѕСЂ, СЃР±СЂР°СЃС‹РІР°СЋС‰РёР№ Р·РЅР°С‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T>
@@ -18,7 +18,7 @@ struct trackable_ptr_reseter
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 #ifdef _MSC_VER
@@ -65,7 +65,7 @@ inline trackable_ptr<T>::trackable_ptr (const trackable_ptr<T1>& p)
 #endif
 
 /*
-    Получение trackable-объекта
+    РџРѕР»СѓС‡РµРЅРёРµ trackable-РѕР±СЉРµРєС‚Р°
 */
 
 inline trackable& get_trackable (trackable& t)
@@ -95,7 +95,7 @@ inline int& get_trackable (const default_cast_type&)
 }
 
 /*
-    Регистрация обработчика удаления хранимого объекта
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СѓРґР°Р»РµРЅРёСЏ С…СЂР°РЅРёРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 namespace detail
@@ -130,7 +130,7 @@ void trackable_ptr<T>::update ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -186,7 +186,7 @@ inline void trackable_ptr<T>::reset (T1* in_ptr)
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T>
@@ -220,7 +220,7 @@ inline T* get_pointer (trackable_ptr<T>& p)
 }
 
 /*
-    Информация о состоянии указателя
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T>
@@ -230,7 +230,7 @@ inline bool trackable_ptr<T>::operator ! () const
 }
 
 /*
-    Добавление/удаление обработчиков изменения состояния указателя
+    Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РёР·РјРµРЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T>
@@ -258,7 +258,7 @@ inline void trackable_ptr<T>::disconnect_all ()
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T> template <class T1>

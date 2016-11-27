@@ -17,91 +17,91 @@ namespace type_traits
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к базовым категориям типов
+///РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє Р±Р°Р·РѕРІС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct is_void;                     //T является типом void
-template <class T> struct is_integral;                 //T является целочисленным типом
-template <class T> struct is_floating_point;           //T является вещественным типом
-template <class T> struct is_array;                    //T является массивом
-template <class T> struct is_pointer;                  //T является указателем
-template <class T> struct is_reference;                //T является ссылкой
-template <class T> struct is_member_object_pointer;    //T является указателем на член класса
-template <class T> struct is_member_function_pointer;  //T является указателем на функцию
-template <class T> struct is_enum;                     //T является перечислением
-template <class T> struct is_union;                    //T является объединением
-template <class T> struct is_class;                    //T является классом
-template <class T> struct is_function;                 //T является функцией
+template <class T> struct is_void;                     //T СЏРІР»СЏРµС‚СЃСЏ С‚РёРїРѕРј void
+template <class T> struct is_integral;                 //T СЏРІР»СЏРµС‚СЃСЏ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Рј С‚РёРїРѕРј
+template <class T> struct is_floating_point;           //T СЏРІР»СЏРµС‚СЃСЏ РІРµС‰РµСЃС‚РІРµРЅРЅС‹Рј С‚РёРїРѕРј
+template <class T> struct is_array;                    //T СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј
+template <class T> struct is_pointer;                  //T СЏРІР»СЏРµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»РµРј
+template <class T> struct is_reference;                //T СЏРІР»СЏРµС‚СЃСЏ СЃСЃС‹Р»РєРѕР№
+template <class T> struct is_member_object_pointer;    //T СЏРІР»СЏРµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С‡Р»РµРЅ РєР»Р°СЃСЃР°
+template <class T> struct is_member_function_pointer;  //T СЏРІР»СЏРµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С„СѓРЅРєС†РёСЋ
+template <class T> struct is_enum;                     //T СЏРІР»СЏРµС‚СЃСЏ РїРµСЂРµС‡РёСЃР»РµРЅРёРµРј
+template <class T> struct is_union;                    //T СЏРІР»СЏРµС‚СЃСЏ РѕР±СЉРµРґРёРЅРµРЅРёРµРј
+template <class T> struct is_class;                    //T СЏРІР»СЏРµС‚СЃСЏ РєР»Р°СЃСЃРѕРј
+template <class T> struct is_function;                 //T СЏРІР»СЏРµС‚СЃСЏ С„СѓРЅРєС†РёРµР№
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к объединённым категориям типов
+///РџСЂРѕРІРµСЂРєР° РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚Рё С‚РёРїР° Рє РѕР±СЉРµРґРёРЅС‘РЅРЅС‹Рј РєР°С‚РµРіРѕСЂРёСЏРј С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct is_arithmetic;      //T является арифметическим типом 
-template <class T> struct is_fundamental;     //T является фундаментальным типом 
-template <class T> struct is_object;          //T является объектным типом (не ссылка, void или функция)
-template <class T> struct is_scalar;          //T является скалярным типом данных (is_arithmetic, enum, pointer, member_pointer)
-template <class T> struct is_compound;        //T является не фундаментальным типом
-template <class T> struct is_member_pointer;  //T является указателем на функцию или член класса
+template <class T> struct is_arithmetic;      //T СЏРІР»СЏРµС‚СЃСЏ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРј С‚РёРїРѕРј 
+template <class T> struct is_fundamental;     //T СЏРІР»СЏРµС‚СЃСЏ С„СѓРЅРґР°РјРµРЅС‚Р°Р»СЊРЅС‹Рј С‚РёРїРѕРј 
+template <class T> struct is_object;          //T СЏРІР»СЏРµС‚СЃСЏ РѕР±СЉРµРєС‚РЅС‹Рј С‚РёРїРѕРј (РЅРµ СЃСЃС‹Р»РєР°, void РёР»Рё С„СѓРЅРєС†РёСЏ)
+template <class T> struct is_scalar;          //T СЏРІР»СЏРµС‚СЃСЏ СЃРєР°Р»СЏСЂРЅС‹Рј С‚РёРїРѕРј РґР°РЅРЅС‹С… (is_arithmetic, enum, pointer, member_pointer)
+template <class T> struct is_compound;        //T СЏРІР»СЏРµС‚СЃСЏ РЅРµ С„СѓРЅРґР°РјРµРЅС‚Р°Р»СЊРЅС‹Рј С‚РёРїРѕРј
+template <class T> struct is_member_pointer;  //T СЏРІР»СЏРµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° С„СѓРЅРєС†РёСЋ РёР»Рё С‡Р»РµРЅ РєР»Р°СЃСЃР°
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка свойств типа
+///РџСЂРѕРІРµСЂРєР° СЃРІРѕР№СЃС‚РІ С‚РёРїР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct is_const;                 //T имеет квалификатор const
-template <class T> struct is_volatile;              //T имеет квалификатор volatile
-template <class T> struct is_pod;                   //T является POD-типом
-template <class T> struct is_empty;                 //T является пустым классом
-template <class T> struct is_polymorphic;           //T является полиморфным типом (содержит виртуальные функции)
-template <class T> struct is_abstract;              //T является абстрактным типом (содержит хотя бы одну чисто виртуальную функцию)
-template <class T> struct has_trivial_constructor;  //T имеет тривиальный конструктор по умолчанию
-template <class T> struct has_trivial_copy;         //T имеет тривиальный конструктор копирования
-template <class T> struct has_trivial_assign;       //T имеет тривиальный оператор присваивания
-template <class T> struct has_trivial_destructor;   //T имеет тривиальный деструктор
-template <class T> struct has_nothrow_constructor;  //T имеет бессбойный конструктор по умолчанию (не выбрасывает исключений)
-template <class T> struct has_nothrow_copy;         //T имеет бессбойный конструктор копирования (не выбрасывает исключений)
-template <class T> struct has_nothrow_assign;       //T имеет бессбойный оператор присваивания (не выбрасывает исключений)
-template <class T> struct has_virtual_destructor;   //T имеет виртуальный деструктор
-template <class T> struct is_signed;                //T является знаковым типом
-template <class T> struct is_unsigned;              //T является беззнаковым типом
-template <class T> struct alignment_of;             //определение выравнивание типа данных
-template <class T> struct rank;                     //определение ранга массива (массив a [4][5][6] имеет ранг 3)
-template <class T, unsigned I = 0> struct extent;   //определение размера I-й размерности массива
+template <class T> struct is_const;                 //T РёРјРµРµС‚ РєРІР°Р»РёС„РёРєР°С‚РѕСЂ const
+template <class T> struct is_volatile;              //T РёРјРµРµС‚ РєРІР°Р»РёС„РёРєР°С‚РѕСЂ volatile
+template <class T> struct is_pod;                   //T СЏРІР»СЏРµС‚СЃСЏ POD-С‚РёРїРѕРј
+template <class T> struct is_empty;                 //T СЏРІР»СЏРµС‚СЃСЏ РїСѓСЃС‚С‹Рј РєР»Р°СЃСЃРѕРј
+template <class T> struct is_polymorphic;           //T СЏРІР»СЏРµС‚СЃСЏ РїРѕР»РёРјРѕСЂС„РЅС‹Рј С‚РёРїРѕРј (СЃРѕРґРµСЂР¶РёС‚ РІРёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё)
+template <class T> struct is_abstract;              //T СЏРІР»СЏРµС‚СЃСЏ Р°Р±СЃС‚СЂР°РєС‚РЅС‹Рј С‚РёРїРѕРј (СЃРѕРґРµСЂР¶РёС‚ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ С‡РёСЃС‚Рѕ РІРёСЂС‚СѓР°Р»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ)
+template <class T> struct has_trivial_constructor;  //T РёРјРµРµС‚ С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+template <class T> struct has_trivial_copy;         //T РёРјРµРµС‚ С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
+template <class T> struct has_trivial_assign;       //T РёРјРµРµС‚ С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
+template <class T> struct has_trivial_destructor;   //T РёРјРµРµС‚ С‚СЂРёРІРёР°Р»СЊРЅС‹Р№ РґРµСЃС‚СЂСѓРєС‚РѕСЂ
+template <class T> struct has_nothrow_constructor;  //T РёРјРµРµС‚ Р±РµСЃСЃР±РѕР№РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ (РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёР№)
+template <class T> struct has_nothrow_copy;         //T РёРјРµРµС‚ Р±РµСЃСЃР±РѕР№РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ (РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёР№)
+template <class T> struct has_nothrow_assign;       //T РёРјРµРµС‚ Р±РµСЃСЃР±РѕР№РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ (РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёР№)
+template <class T> struct has_virtual_destructor;   //T РёРјРµРµС‚ РІРёСЂС‚СѓР°Р»СЊРЅС‹Р№ РґРµСЃС‚СЂСѓРєС‚РѕСЂ
+template <class T> struct is_signed;                //T СЏРІР»СЏРµС‚СЃСЏ Р·РЅР°РєРѕРІС‹Рј С‚РёРїРѕРј
+template <class T> struct is_unsigned;              //T СЏРІР»СЏРµС‚СЃСЏ Р±РµР·Р·РЅР°РєРѕРІС‹Рј С‚РёРїРѕРј
+template <class T> struct alignment_of;             //РѕРїСЂРµРґРµР»РµРЅРёРµ РІС‹СЂР°РІРЅРёРІР°РЅРёРµ С‚РёРїР° РґР°РЅРЅС‹С…
+template <class T> struct rank;                     //РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°РЅРіР° РјР°СЃСЃРёРІР° (РјР°СЃСЃРёРІ a [4][5][6] РёРјРµРµС‚ СЂР°РЅРі 3)
+template <class T, unsigned I = 0> struct extent;   //РѕРїСЂРµРґРµР»РµРЅРёРµ СЂР°Р·РјРµСЂР° I-Р№ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка отношений между типами
+///РџСЂРѕРІРµСЂРєР° РѕС‚РЅРѕС€РµРЅРёР№ РјРµР¶РґСѓ С‚РёРїР°РјРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T, class U>          struct is_same;        //T и U являются одним и тем же типом
-template <class Base, class Derived> struct is_base_of;     //Base является базовым для Derived
-template <class From, class To>      struct is_convertible; //возможно неявное преобразования из From в To
+template <class T, class U>          struct is_same;        //T Рё U СЏРІР»СЏСЋС‚СЃСЏ РѕРґРЅРёРј Рё С‚РµРј Р¶Рµ С‚РёРїРѕРј
+template <class Base, class Derived> struct is_base_of;     //Base СЏРІР»СЏРµС‚СЃСЏ Р±Р°Р·РѕРІС‹Рј РґР»СЏ Derived
+template <class From, class To>      struct is_convertible; //РІРѕР·РјРѕР¶РЅРѕ РЅРµСЏРІРЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РёР· From РІ To
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования константности типов
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕСЃС‚Рё С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct remove_const;    //удаление квалификатора const
-template <class T> struct remove_volatile; //удаление квалификатора volatile
-template <class T> struct remove_cv;       //удаление квалификатора const volatile
-template <class T> struct add_const;       //добавление квалификатора const
-template <class T> struct add_volatile;    //добавление квалификатора volatile
-template <class T> struct add_cv;          //добавление квалификатора const volatile
+template <class T> struct remove_const;    //СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const
+template <class T> struct remove_volatile; //СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° volatile
+template <class T> struct remove_cv;       //СѓРґР°Р»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const volatile
+template <class T> struct add_const;       //РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const
+template <class T> struct add_volatile;    //РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° volatile
+template <class T> struct add_cv;          //РґРѕР±Р°РІР»РµРЅРёРµ РєРІР°Р»РёС„РёРєР°С‚РѕСЂР° const volatile
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования ссылочных типов
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃСЃС‹Р»РѕС‡РЅС‹С… С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct remove_reference; //удаление ссылки
-template <class T> struct add_reference;    //добавление ссылки
+template <class T> struct remove_reference; //СѓРґР°Р»РµРЅРёРµ СЃСЃС‹Р»РєРё
+template <class T> struct add_reference;    //РґРѕР±Р°РІР»РµРЅРёРµ СЃСЃС‹Р»РєРё
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление размерностей массива
+///РЈРґР°Р»РµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct remove_extent;      //удаление крайней справа размерности массива
-template <class T> struct remove_all_extents; //удаление всех размерностей массива
+template <class T> struct remove_extent;      //СѓРґР°Р»РµРЅРёРµ РєСЂР°Р№РЅРµР№ СЃРїСЂР°РІР° СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РјР°СЃСЃРёРІР°
+template <class T> struct remove_all_extents; //СѓРґР°Р»РµРЅРёРµ РІСЃРµС… СЂР°Р·РјРµСЂРЅРѕСЃС‚РµР№ РјР°СЃСЃРёРІР°
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования указателей
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СѓРєР°Р·Р°С‚РµР»РµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct remove_pointer;  //удаление указателя
-template <class T> struct add_pointer;     //добавление указателя
+template <class T> struct remove_pointer;  //СѓРґР°Р»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
+template <class T> struct add_pointer;     //РґРѕР±Р°РІР»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Хранилище (буфер) для объекта размером Len и выравниванием Align
+///РҐСЂР°РЅРёР»РёС‰Рµ (Р±СѓС„РµСЂ) РґР»СЏ РѕР±СЉРµРєС‚Р° СЂР°Р·РјРµСЂРѕРј Len Рё РІС‹СЂР°РІРЅРёРІР°РЅРёРµРј Align
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <size_t Len, size_t Align=-1> struct aligned_storage;
 

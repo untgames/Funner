@@ -3,14 +3,14 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации текстуры
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂС‹
 */
 
 struct Texture::Impl
 {
-  Context&    context;           //контекст
-  stl::string name;              //имя текстуры
-  bool        remove_on_destroy; //удалять ли в деструкторе
+  Context&    context;           //РєРѕРЅС‚РµРєСЃС‚
+  stl::string name;              //РёРјСЏ С‚РµРєСЃС‚СѓСЂС‹
+  bool        remove_on_destroy; //СѓРґР°Р»СЏС‚СЊ Р»Рё РІ РґРµСЃС‚СЂСѓРєС‚РѕСЂРµ
 
   Impl (Context& in_context, const char* in_name, bool in_remove_on_destroy)
     : context (in_context)
@@ -21,7 +21,7 @@ struct Texture::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture::Texture (Context& context, const char* name, bool remove_on_destroy)
@@ -71,7 +71,7 @@ Texture::~Texture ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* Texture::Name ()
@@ -80,7 +80,7 @@ const char* Texture::Name ()
 }
 
 /*
-    Обновление текстуры
+    РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void Texture::Update (const media::Image& image)

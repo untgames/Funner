@@ -22,9 +22,9 @@ const size_t LONG_OPTION_NAME_PREFIX_LENGTH = xtl::xstrlen (LONG_OPTION_NAME_PRE
 
 struct SwitchHandlerDesc
 {
-  char                       switch_short_name; //короткое имя
-  stl::string                arg_name;          //имя аргумента
-  CommandLine::SwitchHandler handler;           //функция-обработчик опции
+  char                       switch_short_name; //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  stl::string                arg_name;          //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  CommandLine::SwitchHandler handler;           //С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїС†РёРё
 
   SwitchHandlerDesc (char in_switch_short_name, const char* in_arg_name, const CommandLine::SwitchHandler& in_handler)
     : switch_short_name (in_switch_short_name), arg_name (in_arg_name ? in_arg_name : ""), handler (in_handler)
@@ -40,7 +40,7 @@ struct CommandLine::Impl
   SwitchHandlerMap switch_handlers;
   StringArray      params;
 
-  ///Регистрация обработчиков параметров коммандной строки
+  ///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
   void SetSwitchHandler (const char* switch_long_name, char switch_short_name, const char* arg_name, const CommandLine::SwitchHandler& handler)
   {
     static const char* METHOD_NAME = "common::CommandLine::SetSwitchHandler";
@@ -56,14 +56,14 @@ struct CommandLine::Impl
     switch_handlers.insert_pair (switch_long_name, SwitchHandlerDesc (switch_short_name, arg_name, handler));
   }
 
-  ///Обработка коммандной строки
+  ///РћР±СЂР°Р±РѕС‚РєР° РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
   void Process (int argc, const char** argv)
   {
     try
     {
       params.Clear ();
 
-        //Чтение ссылок на аргументы во внешних файлах
+        //Р§С‚РµРЅРёРµ СЃСЃС‹Р»РѕРє РЅР° Р°СЂРіСѓРјРµРЅС‚С‹ РІРѕ РІРЅРµС€РЅРёС… С„Р°Р№Р»Р°С…
       StringArray args;
 
       args.Reserve (argc - 1);
@@ -86,7 +86,7 @@ struct CommandLine::Impl
         }
       }
 
-        //разбор аргументов
+        //СЂР°Р·Р±РѕСЂ Р°СЂРіСѓРјРµРЅС‚РѕРІ
       for (size_t i = 0, args_count = args.Size (); i < args_count; i++)
       {
         const char* arg = args [i];
@@ -105,7 +105,7 @@ struct CommandLine::Impl
 
         SwitchHandlerMap::iterator option = switch_handlers.end ();
 
-          //разбор длинных опций
+          //СЂР°Р·Р±РѕСЂ РґР»РёРЅРЅС‹С… РѕРїС†РёР№
 
         if (long_option)
         {
@@ -133,7 +133,7 @@ struct CommandLine::Impl
           option_name = LONG_OPTION_NAME_PREFIX + option_name;
         }
 
-          //разбор коротких опций
+          //СЂР°Р·Р±РѕСЂ РєРѕСЂРѕС‚РєРёС… РѕРїС†РёР№
 
         if (short_option)
         {
@@ -169,7 +169,7 @@ struct CommandLine::Impl
             arg = "";
         }
 
-          //получение аргумента
+          //РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 
         for (;*arg; arg++)
         {
@@ -213,7 +213,7 @@ struct CommandLine::Impl
     }
   }
 
-  ///Получение списка параметров (аргументы в коммандной строке без ключа)
+  ///РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ (Р°СЂРіСѓРјРµРЅС‚С‹ РІ РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРµ Р±РµР· РєР»СЋС‡Р°)
   size_t ParamsCount ()
   {
     return params.Size ();
@@ -226,7 +226,7 @@ struct CommandLine::Impl
 };
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CommandLine::CommandLine ()
@@ -239,7 +239,7 @@ CommandLine::~CommandLine ()
 }
 
 /*
-   Регистрация обработчиков параметров коммандной строки
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 void CommandLine::SetSwitchHandler (const char* switch_long_name, char switch_short_name, const char* arg_name, const SwitchHandler& handler)
@@ -253,7 +253,7 @@ void CommandLine::SetSwitchHandler (const char* switch_long_name, char switch_sh
 }
 
 /*
-   Обработка коммандной строки
+   РћР±СЂР°Р±РѕС‚РєР° РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 void CommandLine::Process (int argc, const char** argv)
@@ -262,7 +262,7 @@ void CommandLine::Process (int argc, const char** argv)
 }
 
 /*
-   Получение списка параметров (аргументы в коммандной строке без ключа)
+   РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ (Р°СЂРіСѓРјРµРЅС‚С‹ РІ РєРѕРјРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРµ Р±РµР· РєР»СЋС‡Р°)
 */
 
 size_t CommandLine::ParamsCount () const

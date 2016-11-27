@@ -1,4 +1,4 @@
-//Тестирование алгоритма is_sorted (first, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° is_sorted (first, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

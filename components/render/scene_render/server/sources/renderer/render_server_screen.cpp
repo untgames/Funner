@@ -7,30 +7,30 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVED_VIEWPORTS_COUNT                       = 8;                         //резервируемое количество областей вывода
-const char*  DEPTH_STENCIL_BINDING_PROPERTY_NAME            = "depth_stencil_binding";   //имя свойства биндинга буфера глубины
-const char*  COLOR_BINDING_PROPERTY_NAME                    = "color_binding";           //имя свойства биндинга буфера цвета
-const char*  CLEARING_EFFECT_BINDING_PROPERTY_NAME          = "clearing_effect_binding"; //имя эффекта очистки экрана
-const char*  DEFAULT_COLOR_BINDING_PROPERTY_VALUE           = "default_color";           //значение по умолчанию свойства биндинга буфера цвета
-const char*  DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE   = "default_depth_stencil";   //значение по умолчанию буфера глубины
-const char*  DEFAULT_CLEARING_EFFECT_BINDING_PROPERTY_VALUE = "clearing";                //значение по умолчанию имени эффекта очистки экрана
+const size_t RESERVED_VIEWPORTS_COUNT                       = 8;                         //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+const char*  DEPTH_STENCIL_BINDING_PROPERTY_NAME            = "depth_stencil_binding";   //РёРјСЏ СЃРІРѕР№СЃС‚РІР° Р±РёРЅРґРёРЅРіР° Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹
+const char*  COLOR_BINDING_PROPERTY_NAME                    = "color_binding";           //РёРјСЏ СЃРІРѕР№СЃС‚РІР° Р±РёРЅРґРёРЅРіР° Р±СѓС„РµСЂР° С†РІРµС‚Р°
+const char*  CLEARING_EFFECT_BINDING_PROPERTY_NAME          = "clearing_effect_binding"; //РёРјСЏ СЌС„С„РµРєС‚Р° РѕС‡РёСЃС‚РєРё СЌРєСЂР°РЅР°
+const char*  DEFAULT_COLOR_BINDING_PROPERTY_VALUE           = "default_color";           //Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЃРІРѕР№СЃС‚РІР° Р±РёРЅРґРёРЅРіР° Р±СѓС„РµСЂР° С†РІРµС‚Р°
+const char*  DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE   = "default_depth_stencil";   //Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹
+const char*  DEFAULT_CLEARING_EFFECT_BINDING_PROPERTY_VALUE = "clearing";                //Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РёРјРµРЅРё СЌС„С„РµРєС‚Р° РѕС‡РёСЃС‚РєРё СЌРєСЂР°РЅР°
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-/// Дескриптор области вывода
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 struct ViewportDesc: public xtl::reference_counter, public IViewportListener
 {
-  Viewport    viewport;     //область вывода
-  int         zorder;       //порядок отрисовки
-  object_id_t id;           //идентификатор области вывода
-  bool&       need_reorder; //флаг необходимости сортировки областей вывода
+  Viewport    viewport;     //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
+  int         zorder;       //РїРѕСЂСЏРґРѕРє РѕС‚СЂРёСЃРѕРІРєРё
+  object_id_t id;           //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  bool&       need_reorder; //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃРѕСЂС‚РёСЂРѕРІРєРё РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ViewportDesc (const Viewport& in_viewport, object_id_t in_id, bool& in_need_reorder)
     : viewport (in_viewport)
     , zorder (viewport.ZOrder ())
@@ -42,13 +42,13 @@ struct ViewportDesc: public xtl::reference_counter, public IViewportListener
     need_reorder = true;
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ViewportDesc ()
   {
     viewport.DetachListener (this);
   }
 
-/// Оповещение об изменении порядка отрисовки
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РїРѕСЂСЏРґРєР° РѕС‚СЂРёСЃРѕРІРєРё
   void OnViewportZOrderUpdated (int in_zorder)
   {
     zorder       = in_zorder;
@@ -62,28 +62,28 @@ typedef stl::vector<ViewportPtr>         ViewportDescList;
 }
 
 /*
-    Описание реализации экрана
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌРєСЂР°РЅР°
 */
 
 struct Screen::Impl: public xtl::reference_counter
 {
-  RenderManager                 render_manager;              //менеджер рендеринга
-  RenderTargetMap               render_targets;              //цели рендеринга
-  stl::string                   name;                        //имя экрана
-  bool                          active;                      //активность экрана
-  Rect                          area;                        //область экрана
-  bool                          background_state;            //состояние заднего фона
-  math::vec4f                   background_color;            //цвет заднего фона
-  bool                          need_reorder;                //необходимость пересортировки областей вывода
-  ViewportManager               viewport_manager;            //менеджер областей вывода
-  ViewportDescList              viewports;                   //области вывода
-  ViewportDrawList              drawing_viewports;           //отрисовываемые области вывода
-  manager::Window*              window;                      //связанное окно
-  xtl::auto_connection          on_window_resize_connection; //соединение с сигналом оповещения об изменении размеров окна
-  xtl::auto_connection          on_window_update_connection; //соединение с сигналом оповещения об обновлении окна
-  stl::auto_ptr<manager::Frame> clear_frame;                 //кадр очистки
+  RenderManager                 render_manager;              //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  RenderTargetMap               render_targets;              //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  stl::string                   name;                        //РёРјСЏ СЌРєСЂР°РЅР°
+  bool                          active;                      //Р°РєС‚РёРІРЅРѕСЃС‚СЊ СЌРєСЂР°РЅР°
+  Rect                          area;                        //РѕР±Р»Р°СЃС‚СЊ СЌРєСЂР°РЅР°
+  bool                          background_state;            //СЃРѕСЃС‚РѕСЏРЅРёРµ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  math::vec4f                   background_color;            //С†РІРµС‚ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  bool                          need_reorder;                //РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РїРµСЂРµСЃРѕСЂС‚РёСЂРѕРІРєРё РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+  ViewportManager               viewport_manager;            //РјРµРЅРµРґР¶РµСЂ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
+  ViewportDescList              viewports;                   //РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  ViewportDrawList              drawing_viewports;           //РѕС‚СЂРёСЃРѕРІС‹РІР°РµРјС‹Рµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  manager::Window*              window;                      //СЃРІСЏР·Р°РЅРЅРѕРµ РѕРєРЅРѕ
+  xtl::auto_connection          on_window_resize_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РёР·РјРµРЅРµРЅРёРё СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
+  xtl::auto_connection          on_window_update_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РѕРєРЅР°
+  stl::auto_ptr<manager::Frame> clear_frame;                 //РєР°РґСЂ РѕС‡РёСЃС‚РєРё
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* in_name, const char* init_string, WindowManager& window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
     : render_manager (in_render_manager)
     , name (in_name)
@@ -100,16 +100,16 @@ struct Screen::Impl: public xtl::reference_counter
 
     common::PropertyMap properties = common::parse_init_string (init_string);
 
-      //инициализация параметров очистки
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё
 
     InitClearing (properties);
 
-      //инициализация целей рендеринга
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
     InitRenderTargets (window_manager, properties);
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     for (ViewportDescList::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
@@ -118,21 +118,21 @@ struct Screen::Impl: public xtl::reference_counter
     viewports.clear ();
   }
 
-/// Инициализация целей отрисовки
+/// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С†РµР»РµР№ РѕС‚СЂРёСЃРѕРІРєРё
   void InitRenderTargets (WindowManager& window_manager, const common::PropertyMap& properties)
   {
     try
     {
-        //поиск окна
+        //РїРѕРёСЃРє РѕРєРЅР°
 
       manager::Window& window = window_manager.GetWindow (name.c_str ());
 
-        //регистрация обработчиков событий окна
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 
       on_window_resize_connection = window.RegisterEventHandler (manager::WindowEvent_OnResize, xtl::bind (&Impl::OnWindowResize, this));
       on_window_update_connection = window.RegisterEventHandler (manager::WindowEvent_OnUpdate, xtl::bind (&Impl::OnWindowUpdate, this));
 
-        //заполнение биндингов цели отрисовки
+        //Р·Р°РїРѕР»РЅРµРЅРёРµ Р±РёРЅРґРёРЅРіРѕРІ С†РµР»Рё РѕС‚СЂРёСЃРѕРІРєРё
 
       const char *color_binding         = properties.IsPresent (COLOR_BINDING_PROPERTY_NAME) ? properties.GetString (COLOR_BINDING_PROPERTY_NAME) : DEFAULT_COLOR_BINDING_PROPERTY_VALUE,
                  *depth_stencil_binding = properties.IsPresent (DEPTH_STENCIL_BINDING_PROPERTY_NAME) ? properties.GetString (DEPTH_STENCIL_BINDING_PROPERTY_NAME) : DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE;
@@ -157,7 +157,7 @@ struct Screen::Impl: public xtl::reference_counter
     }
   }
 
-/// Инициализация параметров очистки
+/// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё
   void InitClearing (const common::PropertyMap& properties)
   {
     try
@@ -178,7 +178,7 @@ struct Screen::Impl: public xtl::reference_counter
     }
   }
 
-/// Оповещение об изменении размеров окна
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
   void OnWindowResize ()
   {
     try
@@ -192,7 +192,7 @@ struct Screen::Impl: public xtl::reference_counter
     }
   }
 
-/// Оповещение об обновлении окна
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РѕРєРЅР°
   void OnWindowUpdate ()
   {
     try
@@ -206,7 +206,7 @@ struct Screen::Impl: public xtl::reference_counter
     }
   }
 
-/// Компаратор областей вывода
+/// РљРѕРјРїР°СЂР°С‚РѕСЂ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
   struct ViewComparator
   {
     bool operator () (const ViewportPtr& viewport1, const ViewportPtr& viewport2) const
@@ -215,7 +215,7 @@ struct Screen::Impl: public xtl::reference_counter
     }
   };
 
-/// Сортировка областей вывода
+/// РЎРѕСЂС‚РёСЂРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
   void Reorder ()
   {
     if (!need_reorder)
@@ -226,7 +226,7 @@ struct Screen::Impl: public xtl::reference_counter
     need_reorder = false;
   }
 
-/// Обновление
+/// РћР±РЅРѕРІР»РµРЅРёРµ
   void Update (manager::Frame* parent_frame)
   {
     try
@@ -234,12 +234,12 @@ struct Screen::Impl: public xtl::reference_counter
       if (!active)
         return;
 
-        //сортировки областей вывода
+        //СЃРѕСЂС‚РёСЂРѕРІРєРё РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
       if (need_reorder)
         Reorder ();
 
-        //очистка
+        //РѕС‡РёСЃС‚РєР°
 
       if (clear_frame && background_state)
       {
@@ -247,7 +247,7 @@ struct Screen::Impl: public xtl::reference_counter
         else              clear_frame->Draw ();
       }
 
-        //обход областей вывода
+        //РѕР±С…РѕРґ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
       for (ViewportDescList::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
       {
@@ -267,12 +267,12 @@ struct Screen::Impl: public xtl::reference_counter
         }      
       }
 
-        //очистка данных
+        //РѕС‡РёСЃС‚РєР° РґР°РЅРЅС‹С…
 
       if (!parent_frame)
         drawing_viewports.CleanupViewports ();
 
-       //вывод на экран
+       //РІС‹РІРѕРґ РЅР° СЌРєСЂР°РЅ
 
       if (window)
         window->SwapBuffers ();
@@ -286,7 +286,7 @@ struct Screen::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Screen::Screen (const char* name, const char* init_string, WindowManager& window_manager, const RenderManager& render_manager, const ViewportManager& viewport_manager)
@@ -329,7 +329,7 @@ Screen& Screen::operator = (const Screen& s)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* Screen::Name () const
@@ -338,7 +338,7 @@ const char* Screen::Name () const
 }
 
 /*
-    Активность экрана
+    РђРєС‚РёРІРЅРѕСЃС‚СЊ СЌРєСЂР°РЅР°
 */
 
 void Screen::SetActive (bool active)
@@ -352,7 +352,7 @@ bool Screen::IsActive () const
 }
 
 /*
-    Область экрана
+    РћР±Р»Р°СЃС‚СЊ СЌРєСЂР°РЅР°
 */
 
 void Screen::SetArea (const Rect& rect)
@@ -376,7 +376,7 @@ const Rect& Screen::Area () const
 }
 
 /*
-    Задний фон
+    Р—Р°РґРЅРёР№ С„РѕРЅ
 */
 
 void Screen::SetBackground (bool state, const math::vec4f& color)
@@ -417,7 +417,7 @@ const math::vec4f& Screen::BackgroundColor () const
 }
 
 /*
-    Связывание с областями вывода
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃ РѕР±Р»Р°СЃС‚СЏРјРё РІС‹РІРѕРґР°
 */
 
 Viewport Screen::AttachViewport (object_id_t id)
@@ -460,7 +460,7 @@ void Screen::DetachViewport (object_id_t id)
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void Screen::Update (manager::Frame* parent_frame)

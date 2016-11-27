@@ -14,13 +14,13 @@ using namespace sound::low_level::openal;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Константы
+///РљРѕРЅСЃС‚Р°РЅС‚С‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const unsigned short MAX_DEVICE_CHANNELS_COUNT  = 1024;   //максимальное количество каналов проигрывания
-const unsigned short MAX_SOUND_CHANNELS         = 2;      //максимальное количество каналов
-const unsigned char  MAX_SOUND_BYTES_PER_SAMPLE = 2;      //максимальная разрядность звука
+const unsigned short MAX_DEVICE_CHANNELS_COUNT  = 1024;   //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+const unsigned short MAX_SOUND_CHANNELS         = 2;      //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ
+const unsigned char  MAX_SOUND_BYTES_PER_SAMPLE = 2;      //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЂР°Р·СЂСЏРґРЅРѕСЃС‚СЊ Р·РІСѓРєР°
 
-//время обновления буферов источника в миллисекундах
+//РІСЂРµРјСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ Р±СѓС„РµСЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С…
 const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
 
 const float  DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
@@ -68,7 +68,7 @@ void process_init_string (const char* property, const char* value, OpenALDeviceP
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, const char* init_string)
@@ -98,7 +98,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
     context_manager->SetCurrentContext (context);
     
-      //формирование имени устройства
+      //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
     name = format ("%s::%s", driver_name ? driver_name : "", device_name ? device_name : "");
 
@@ -108,7 +108,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
     channels.reserve (properties.max_channels_count);
 
-      //создание каналов проигрывания
+      //СЃРѕР·РґР°РЅРёРµ РєР°РЅР°Р»РѕРІ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 
     for (unsigned short i = 0; i < properties.max_channels_count; i++)
     {
@@ -173,19 +173,19 @@ OpenALDevice::~OpenALDevice ()
 }
 
 /*
-    Удаление каналов и буферов
+    РЈРґР°Р»РµРЅРёРµ РєР°РЅР°Р»РѕРІ Рё Р±СѓС„РµСЂРѕРІ
 */
 
 void OpenALDevice::ClearALData ()
 {
   common::Lock lock (*this);
 
-    //удаление каналов
+    //СѓРґР°Р»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
 
   for (size_t i = 0; i < channels.size (); i++)
     delete channels [i];
 
-    //очистка пула буферов
+    //РѕС‡РёСЃС‚РєР° РїСѓР»Р° Р±СѓС„РµСЂРѕРІ
 
   if (al_buffers_pool_size)
   {
@@ -198,7 +198,7 @@ void OpenALDevice::ClearALData ()
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void OpenALDevice::AddRef ()
@@ -212,7 +212,7 @@ void OpenALDevice::Release ()
 }
 
 /*
-   Имя устройства
+   РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* OpenALDevice::Name ()
@@ -223,7 +223,7 @@ const char* OpenALDevice::Name ()
 }
 
 /*
-   Получение информации об устройстве
+   РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СѓСЃС‚СЂРѕР№СЃС‚РІРµ
 */
 
 void OpenALDevice::GetCapabilities (Capabilities& target_info)
@@ -234,7 +234,7 @@ void OpenALDevice::GetCapabilities (Capabilities& target_info)
 }
 
 /*
-   Количество микшируемых каналов
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РјРёРєС€РёСЂСѓРµРјС‹С… РєР°РЅР°Р»РѕРІ
 */
 
 unsigned short OpenALDevice::ChannelsCount ()
@@ -245,7 +245,7 @@ unsigned short OpenALDevice::ChannelsCount ()
 }
 
 /*
-    Оповещение о необходимости обновления слушателя
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 void OpenALDevice::UpdateListenerNotify ()
@@ -258,7 +258,7 @@ void OpenALDevice::UpdateListenerNotify ()
 }
 
 /*
-   Установка уровня громкости для устройства
+   РЈСЃС‚Р°РЅРѕРІРєР° СѓСЂРѕРІРЅСЏ РіСЂРѕРјРєРѕСЃС‚Рё РґР»СЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void OpenALDevice::SetVolume (float in_gain)
@@ -282,7 +282,7 @@ float OpenALDevice::GetVolume ()
 }
 
 /*
-   Блокировка проигрывания звука
+   Р‘Р»РѕРєРёСЂРѕРІРєР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР°
 */
 
 void OpenALDevice::SetMute (bool state)
@@ -302,7 +302,7 @@ bool OpenALDevice::IsMuted ()
 }
 
 /*
-    Установка параметров слушателя
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 void OpenALDevice::SetListener (const Listener& in_listener)
@@ -322,7 +322,7 @@ void OpenALDevice::GetListener (Listener& target_listener)
 }
 
 /*
-   Работа со списком активных источников
+   Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРєРѕРј Р°РєС‚РёРІРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ
 */
 
 void OpenALDevice::SetFirstActiveSource (OpenALSource* source)
@@ -340,7 +340,7 @@ OpenALSource* OpenALDevice::GetFirstActiveSource () const
 }
 
 /*
-   OpenAL контекст
+   OpenAL РєРѕРЅС‚РµРєСЃС‚
 */
 
 const OpenALContext& OpenALDevice::Context () const
@@ -356,7 +356,7 @@ OpenALContext& OpenALDevice::Context ()
 }
 
 /*
-   Буфер сэмплирования
+   Р‘СѓС„РµСЂ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 const void* OpenALDevice::GetSampleBuffer () const
@@ -379,7 +379,7 @@ unsigned int OpenALDevice::GetSampleBufferSize () const
 }
 
 /*
-   Создание сэмпла для проигрывания
+   РЎРѕР·РґР°РЅРёРµ СЃСЌРјРїР»Р° РґР»СЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 ISample* OpenALDevice::CreateSample (const char* name)
@@ -416,7 +416,7 @@ ISample* OpenALDevice::CreateSample (const SampleDesc& desc, const SampleReadFun
 }
 
 /*
-    Установка текущего проигрываемого звука
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РїСЂРѕРёРіСЂС‹РІР°РµРјРѕРіРѕ Р·РІСѓРєР°
 */
 
 void OpenALDevice::SetSample (unsigned short channel, ISample* sample)
@@ -447,7 +447,7 @@ ISample* OpenALDevice::GetSample (unsigned short channel)
 }
 
 /*
-    Проверка цикличности проигрывания канала
+    РџСЂРѕРІРµСЂРєР° С†РёРєР»РёС‡РЅРѕСЃС‚Рё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РєР°РЅР°Р»Р°
 */
 
 bool OpenALDevice::IsLooped (unsigned short channel)
@@ -461,7 +461,7 @@ bool OpenALDevice::IsLooped (unsigned short channel)
 }
 
 /*
-    Установка параметров источника
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void OpenALDevice::SetSource (unsigned short channel, const Source& source)
@@ -485,7 +485,7 @@ void OpenALDevice::GetSource (unsigned short channel, Source& source)
 }
 
 /*
-    Управление проигрыванием
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµРј
 */
 
 void OpenALDevice::Play (unsigned short channel, bool looping)
@@ -549,7 +549,7 @@ bool OpenALDevice::IsPlaying (unsigned short channel)
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 int OpenALDevice::BufferUpdateLoop ()
@@ -585,12 +585,12 @@ void OpenALDevice::BufferUpdate ()
 {
   common::Lock lock (*this);
 
-    //если нет активных источников нет необходимости что-либо обновлять
+    //РµСЃР»Рё РЅРµС‚ Р°РєС‚РёРІРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё С‡С‚Рѕ-Р»РёР±Рѕ РѕР±РЅРѕРІР»СЏС‚СЊ
 
   if (!first_active_source)
     return;
 
-    //обновление источников
+    //РѕР±РЅРѕРІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 
   for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
     source->BufferUpdate ();  
@@ -600,12 +600,12 @@ void OpenALDevice::SourceUpdate ()
 {
   common::Lock lock (*this);
 
-    //если нет активных источников нет необходимости что-либо обновлять
+    //РµСЃР»Рё РЅРµС‚ Р°РєС‚РёРІРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё С‡С‚Рѕ-Р»РёР±Рѕ РѕР±РЅРѕРІР»СЏС‚СЊ
 
   if (!first_active_source)
     return;
 
-    //обновление источников
+    //РѕР±РЅРѕРІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєРѕРІ
 
   for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
     source->PropertiesUpdate ();
@@ -615,12 +615,12 @@ void OpenALDevice::ListenerUpdate ()
 {
   common::Lock lock (*this);
 
-    //если нет активных источников нет необходимости что-либо обновлять
+    //РµСЃР»Рё РЅРµС‚ Р°РєС‚РёРІРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё С‡С‚Рѕ-Р»РёР±Рѕ РѕР±РЅРѕРІР»СЏС‚СЊ
 
   if (!first_active_source)
     return;
 
-    //обновление слушателя
+    //РѕР±РЅРѕРІР»РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 
   if (listener_need_update)
   {
@@ -641,7 +641,7 @@ void OpenALDevice::ListenerUpdate ()
 }
 
 /*
-    Установка параметров устройства
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* OpenALDevice::GetParamsNames ()
@@ -678,7 +678,7 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
   if (!name)
     throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "name");
 
-    //заменить на дефолтные значения!!!
+    //Р·Р°РјРµРЅРёС‚СЊ РЅР° РґРµС„РѕР»С‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ!!!
 
   if (!value)
     throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "value");
@@ -789,7 +789,7 @@ const char* OpenALDevice::GetStringParam (const char* name)
 }
 
 /*
-    Управление распределением буферов проигрывания
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµРј Р±СѓС„РµСЂРѕРІ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
 */
 
 ALuint OpenALDevice::AllocateSourceBuffer ()

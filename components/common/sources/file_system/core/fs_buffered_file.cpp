@@ -6,22 +6,22 @@ using namespace stl;
 typedef xtl::uninitialized_storage<char> Buffer;
 
 /*
-    Îïèñàíèå ðåàëèçàöèè áóôåðèçèðîâàííîãî ôàéëà
+    ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð±ÑƒÑ„ÐµÑ€Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°
 */
 
 struct BufferedFileImpl::Impl
 {
-  FileImplPtr base_file;            //áàçîâûé ôàéë
-  Buffer      buffer;               //ôàéëîâûé áóôåð
-  filesize_t  file_size;            //ðàçìåð ôàéëà
-  filepos_t   file_pos;             //ôàéëîâàÿ ïîçèöèÿ
-  filepos_t   data_start_pos;       //ïîçèöèÿ íà÷àëà äàííûõ
-  filepos_t   data_end_pos;         //ïîçèöèÿ êîíöà äàííûõ äëÿ ÷òåíèÿ
-  filepos_t   data_dirty_start_pos; //ôàéëîâàÿ ïîçèöèÿ íà÷àëà áëîêà äàííûõ, òðåáóþùåãî âûãðóçêè íà äèñê
-  filepos_t   data_dirty_end_pos;   //ôàéëîâàÿ ïîçèöèÿ êîíöà áëîêà äàííûõ, òðåáóþùåãî âûãðóçêè íà äèñê
-  filepos_t   data_tail_start_pos;  //ôàéëîâàÿ ïîçèöèÿ íà÷àëà áëîêà íåçàïèñàííûõ äàííûõ
+  FileImplPtr base_file;            //Ð±Ð°Ð·Ð¾Ð²Ñ‹Ð¹ Ñ„Ð°Ð¹Ð»
+  Buffer      buffer;               //Ñ„Ð°Ð¹Ð»Ð¾Ð²Ñ‹Ð¹ Ð±ÑƒÑ„ÐµÑ€
+  filesize_t  file_size;            //Ñ€Ð°Ð·Ð¼ÐµÑ€ Ñ„Ð°Ð¹Ð»Ð°
+  filepos_t   file_pos;             //Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+  filepos_t   data_start_pos;       //Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…
+  filepos_t   data_end_pos;         //Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ ÐºÐ¾Ð½Ñ†Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð´Ð»Ñ Ñ‡Ñ‚ÐµÐ½Ð¸Ñ
+  filepos_t   data_dirty_start_pos; //Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð±Ð»Ð¾ÐºÐ° Ð´Ð°Ð½Ð½Ñ‹Ñ…, Ñ‚Ñ€ÐµÐ±ÑƒÑŽÑ‰ÐµÐ³Ð¾ Ð²Ñ‹Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð½Ð° Ð´Ð¸ÑÐº
+  filepos_t   data_dirty_end_pos;   //Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ ÐºÐ¾Ð½Ñ†Ð° Ð±Ð»Ð¾ÐºÐ° Ð´Ð°Ð½Ð½Ñ‹Ñ…, Ñ‚Ñ€ÐµÐ±ÑƒÑŽÑ‰ÐµÐ³Ð¾ Ð²Ñ‹Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð½Ð° Ð´Ð¸ÑÐº
+  filepos_t   data_tail_start_pos;  //Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð±Ð»Ð¾ÐºÐ° Ð½ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ð½Ð½Ñ‹Ñ… Ð´Ð°Ð½Ð½Ñ‹Ñ…
   
-///Êîíñòðóêòîð
+///ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
   Impl (FileImplPtr in_base_file, size_t buffer_size)
     : base_file (in_base_file)  
     , file_size (base_file->Size ())
@@ -35,7 +35,7 @@ struct BufferedFileImpl::Impl
     buffer.resize (buffer_size);    
   }
   
-///Ñáðîñ áóôåðà
+///Ð¡Ð±Ñ€Ð¾Ñ Ð±ÑƒÑ„ÐµÑ€Ð°
   void FlushBuffer ()
   {
     try
@@ -69,7 +69,7 @@ struct BufferedFileImpl::Impl
     }
   }  
 
-///Ïîäãîòîâêà äàííûõ
+///ÐŸÐ¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð´Ð°Ð½Ð½Ñ‹Ñ…
   void PrepareData (filepos_t pos)
   {
     if (pos >= data_start_pos && pos < data_end_pos)
@@ -77,7 +77,7 @@ struct BufferedFileImpl::Impl
 
     try
     {
-        //ñáðîñ áóôåðà äàííûõ
+        //ÑÐ±Ñ€Ð¾Ñ Ð±ÑƒÑ„ÐµÑ€Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
       FlushBuffer ();
 
@@ -88,7 +88,7 @@ struct BufferedFileImpl::Impl
         if (base_file->Mode () & FileMode_Read)
         {
 
-            //èçìåíåíèå ðàçìåðîâ áóôåðîâ
+            //Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð¾Ð² Ð±ÑƒÑ„ÐµÑ€Ð¾Ð²
 
           filesize_t available_size = base_file->Size () - data_start_pos;
 
@@ -101,7 +101,7 @@ struct BufferedFileImpl::Impl
           if (available_size > buffer.size ())
             available_size = buffer.size ();
 
-            //÷òåíèå äàííûõ
+            //Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ…
         
           if (available_size)
           {
@@ -139,7 +139,7 @@ struct BufferedFileImpl::Impl
 };
 
 /*
-    Êîíñòðóêòîð / äåñòðóêòîð
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ / Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
 */
 
 BufferedFileImpl::BufferedFileImpl (FileImplPtr in_base_file, size_t buffer_size)
@@ -156,12 +156,12 @@ BufferedFileImpl::~BufferedFileImpl ()
   }
   catch (...)
   {
-    //ïîäàâëåíèå âñåõ èñêëþ÷åíèé
+    //Ð¿Ð¾Ð´Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
   }
 }
 
 /*
-    Ïîëó÷åíèå ïóòè ê ôàéëó
+    ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¿ÑƒÑ‚Ð¸ Ðº Ñ„Ð°Ð¹Ð»Ñƒ
 */
 
 const char* BufferedFileImpl::GetPath ()
@@ -170,7 +170,7 @@ const char* BufferedFileImpl::GetPath ()
 }
 
 /*
-    Ðàçìåð áóôåðà
+    Ð Ð°Ð·Ð¼ÐµÑ€ Ð±ÑƒÑ„ÐµÑ€Ð°
 */
 
 size_t BufferedFileImpl::GetBufferSize ()
@@ -179,7 +179,7 @@ size_t BufferedFileImpl::GetBufferSize ()
 }
 
 /*
-    Óïðàâëåíèå ôàéëîâûì óêàçàòåëåì
+    Ð£Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð¾Ð²Ñ‹Ð¼ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÐµÐ¼
 */
 
 filepos_t BufferedFileImpl::Tell ()
@@ -203,7 +203,7 @@ void BufferedFileImpl::Rewind ()
 }
 
 /*
-    Ðàçìåð ôàéëà
+    Ð Ð°Ð·Ð¼ÐµÑ€ Ñ„Ð°Ð¹Ð»Ð°
 */
 
 
@@ -231,21 +231,21 @@ bool BufferedFileImpl::Eof ()
 }
 
 /*
-    ×òåíèå / çàïèñü
+    Ð§Ñ‚ÐµÐ½Ð¸Ðµ / Ð·Ð°Ð¿Ð¸ÑÑŒ
 */
 
 size_t BufferedFileImpl::Read (void* buf, size_t size)
 {
   try
   {
-      //óñå÷åíèå ôàéëà ïðè ÷òåíèè
+      //ÑƒÑÐµÑ‡ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð¿Ñ€Ð¸ Ñ‡Ñ‚ÐµÐ½Ð¸Ð¸
 
     if (impl->file_size - impl->file_pos < size)
       size = (size_t)(impl->file_size - impl->file_pos);
 
     if (size > impl->buffer.capacity ())
     {      
-        //÷òåíèå â îáõîä êýøà
+        //Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ Ð² Ð¾Ð±Ñ…Ð¾Ð´ ÐºÑÑˆÐ°
         
       impl->FlushBuffer ();
 
@@ -262,39 +262,39 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
       return read_size;
     }    
 
-      //ïîñëåäîâàòåëüíîå ÷òåíèå áëîêîâ äàííûõ
+      //Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ Ð±Ð»Ð¾ÐºÐ¾Ð² Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
     filepos_t pos = impl->file_pos;
     char*     dst = (char*)buf;      
 
     while (size)
     {
-        //ïîäãîòîâêà áóôåðà äàííûõ
+        //Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð±ÑƒÑ„ÐµÑ€Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
       impl->PrepareData (pos);
 
-        //êîïèðîâàíèå äàííûõ
+        //ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
       filepos_t   offset         = pos - impl->data_start_pos;
       filesize_t  available_size = impl->data_end_pos - pos;
       size_t      read_size      = size < available_size ? size : (size_t)available_size;
       const char* src            = impl->buffer.data () + offset;
 
-        //ïðîâåðêà âîçìîæíîñòè ÷òåíèÿ
+        //Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ñ‡Ñ‚ÐµÐ½Ð¸Ñ
 
       if (!read_size)
         break; //end of file
 
       memcpy (dst, src, read_size);
 
-        //ïåðåõîä ê ñëåäóþùåìó áëîêó
+        //Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´ Ðº ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ¼Ñƒ Ð±Ð»Ð¾ÐºÑƒ
 
       size -= read_size;
       dst  += read_size;
       pos  += read_size;
     }
 
-      //îáíîâëåíèå ôàéëîâîãî óêàçàòåëÿ
+      //Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð¾Ð³Ð¾ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»Ñ
 
     filesize_t result = pos - impl->file_pos;
 
@@ -324,7 +324,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
     if (size > impl->buffer.capacity ())
     {
-      //çàïèñü â îáõîä êýøà
+      //Ð·Ð°Ð¿Ð¸ÑÑŒ Ð² Ð¾Ð±Ñ…Ð¾Ð´ ÐºÑÑˆÐ°
 
       impl->FlushBuffer ();
 
@@ -344,18 +344,18 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
       return write_size;
     }    
 
-      //ïîñëåäîâàòåëüíàÿ çàïèñü áëîêîâ äàííûõ
+      //Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð°Ñ Ð·Ð°Ð¿Ð¸ÑÑŒ Ð±Ð»Ð¾ÐºÐ¾Ð² Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
     filepos_t   pos = impl->file_pos;
     const char* src = (const char*)buf;
 
     while (size)
     {
-        //ïîäãîòîâêà áóôåðà äàííûõ
+        //Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð±ÑƒÑ„ÐµÑ€Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
       impl->PrepareData (pos);
 
-        //êîïèðîâàíèå äàííûõ
+        //ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ…
 
       filepos_t  offset         = pos - impl->data_start_pos;
       filesize_t available_size = impl->data_end_pos - pos;
@@ -378,14 +378,14 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
         if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos) impl->data_dirty_end_pos   = pos + write_size;
       }
 
-        //ïåðåõîä ê ñëåäóþùåìó áëîêó
+        //Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´ Ðº ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ¼Ñƒ Ð±Ð»Ð¾ÐºÑƒ
 
       src  += write_size;
       pos  += write_size;
       size -= write_size;        
     }
 
-      //îáíîâëåíèå ôàéëîâîãî óêàçàòåëÿ
+      //Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð¾Ð³Ð¾ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»Ñ
 
     filesize_t result = pos - impl->file_pos;
 

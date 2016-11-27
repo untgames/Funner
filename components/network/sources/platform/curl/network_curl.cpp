@@ -18,7 +18,7 @@
 
 #include <network/url_connection.h>
 
-//TODO: custom управление памятью
+//TODO: custom СѓРїСЂР°РІР»РµРЅРёРµ РїР°РјСЏС‚СЊСЋ
 
 using namespace network;
 
@@ -29,16 +29,16 @@ namespace curl_stream_manager
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "network.curl"; //название потока протоколирования
+const char* LOG_NAME = "network.curl"; //РЅР°Р·РІР°РЅРёРµ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
-const long MIN_DOWNLOAD_SPEED          = 50;  //Минимальная скорость закачки в байтах в секунду, при падении до которой закачка будет оборвана
-const long MIN_DOWNLOAD_SPEED_DURATION = 45;   //Длительность закачки с минимальной скоростью, после которой будет выдана ошибка
+const long MIN_DOWNLOAD_SPEED          = 50;  //РњРёРЅРёРјР°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ Р·Р°РєР°С‡РєРё РІ Р±Р°Р№С‚Р°С… РІ СЃРµРєСѓРЅРґСѓ, РїСЂРё РїР°РґРµРЅРёРё РґРѕ РєРѕС‚РѕСЂРѕР№ Р·Р°РєР°С‡РєР° Р±СѓРґРµС‚ РѕР±РѕСЂРІР°РЅР°
+const long MIN_DOWNLOAD_SPEED_DURATION = 45;   //Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р·Р°РєР°С‡РєРё СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ СЃРєРѕСЂРѕСЃС‚СЊСЋ, РїРѕСЃР»Рµ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РІС‹РґР°РЅР° РѕС€РёР±РєР°
 
 /*
-    Библиотека CURL
+    Р‘РёР±Р»РёРѕС‚РµРєР° CURL
 */
 
 void check_code (CURLcode code, const char* method)
@@ -62,13 +62,13 @@ void check_shcode (CURLSHcode code, const char* method)
 class CurlLibrary
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     CurlLibrary ()
     {
       check_code (curl_global_init (CURL_GLOBAL_ALL), "::curl_global_init");
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~CurlLibrary ()
     {
       curl_global_cleanup ();
@@ -78,13 +78,13 @@ class CurlLibrary
 typedef common::Singleton<CurlLibrary> CurlLibrarySingleton;
 
 /*
-    URL поток
+    URL РїРѕС‚РѕРє
 */
 
 class CurlStream: public IUrlStream
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     CurlStream (const char* in_url, const char* in_params, IListener& in_listener)
       : log (LOG_NAME)
       , listener (in_listener)
@@ -109,7 +109,7 @@ class CurlStream: public IUrlStream
       }
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~CurlStream ()
     {
       cancel_operation = true;
@@ -123,7 +123,7 @@ class CurlStream: public IUrlStream
         curl_easy_cleanup (stream);
     }
             
-///Параметры потока
+///РџР°СЂР°РјРµС‚СЂС‹ РїРѕС‚РѕРєР°
     size_t GetContentLength ()
     {
       syslib::Lock lock (mutex);
@@ -161,7 +161,7 @@ class CurlStream: public IUrlStream
     }        
     
   private:
-///Ожидание заголовков
+///РћР¶РёРґР°РЅРёРµ Р·Р°РіРѕР»РѕРІРєРѕРІ
     void WaitHeaders ()
     {
       while (!headers_received)
@@ -178,7 +178,7 @@ class CurlStream: public IUrlStream
       headers_condition.NotifyAll ();
     }
 
-///Обработчик нити
+///РћР±СЂР°Р±РѕС‚С‡РёРє РЅРёС‚Рё
     int ThreadRoutine ()
     {
       try
@@ -194,7 +194,7 @@ class CurlStream: public IUrlStream
           
         try
         {
-            //общая часть конфигурации соединения
+            //РѕР±С‰Р°СЏ С‡Р°СЃС‚СЊ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ
             
           log.Printf ("URL request '%s'", url.c_str ());
           
@@ -212,7 +212,7 @@ class CurlStream: public IUrlStream
           check_code (curl_easy_setopt (stream, CURLOPT_LOW_SPEED_LIMIT, MIN_DOWNLOAD_SPEED), "::curl_easy_setopt(CURLOPT_LOW_SPEED_LIMIT)");
           check_code (curl_easy_setopt (stream, CURLOPT_LOW_SPEED_TIME, MIN_DOWNLOAD_SPEED_DURATION), "::curl_easy_setopt(CURLOPT_LOW_SPEED_TIME)");
           
-            //конфигурация соединения, зависящая от параметров
+            //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ, Р·Р°РІРёСЃСЏС‰Р°СЏ РѕС‚ РїР°СЂР°РјРµС‚СЂРѕРІ
             
           curl_slist* http_header = 0;
           
@@ -246,7 +246,7 @@ class CurlStream: public IUrlStream
           if (http_header)
             check_code (curl_easy_setopt (stream, CURLOPT_HTTPHEADER, http_header), "curl_easy_setopt(CURLOPT_HTTPHEADER");          
 
-            //запуск соединения
+            //Р·Р°РїСѓСЃРє СЃРѕРµРґРёРЅРµРЅРёСЏ
 
           check_code (curl_easy_perform (stream), "::curl_perform");
 
@@ -299,7 +299,7 @@ class CurlStream: public IUrlStream
       }
     }
 
-///Установка статуса
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃС‚Р°С‚СѓСЃР°
     void SetStatus (const char* in_status)
     {
       syslib::Lock lock (mutex);
@@ -309,7 +309,7 @@ class CurlStream: public IUrlStream
       HeadersReceivedNotify ();
     }
     
-///Обработчик получения заголовка
+///РћР±СЂР°Р±РѕС‚С‡РёРє РїРѕР»СѓС‡РµРЅРёСЏ Р·Р°РіРѕР»РѕРІРєР°
     static size_t WriteHeaderCallback (void *ptr, size_t size, size_t nmemb, void *userdata)
     {
       if (!userdata)
@@ -381,13 +381,13 @@ class CurlStream: public IUrlStream
       return 0;     
     }
 
-///Отменена ли операция
+///РћС‚РјРµРЅРµРЅР° Р»Рё РѕРїРµСЂР°С†РёСЏ
     bool IsCanceled ()
     {
       return cancel_operation;
     }
 
-///Обработчик получения данных от CURL
+///РћР±СЂР°Р±РѕС‚С‡РёРє РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С… РѕС‚ CURL
     static size_t WriteDataCallback (void *ptr, size_t size, size_t nmemb, void* userdata)
     {
       if (!userdata)
@@ -427,7 +427,7 @@ class CurlStream: public IUrlStream
       return 0;
     }
     
-///Обработчик отсылки данных от CURL
+///РћР±СЂР°Р±РѕС‚С‡РёРє РѕС‚СЃС‹Р»РєРё РґР°РЅРЅС‹С… РѕС‚ CURL
     static size_t ReadDataCallback (void *ptr, size_t size, size_t nmemb, void* userdata)
     {
       if (!userdata)
@@ -461,7 +461,7 @@ class CurlStream: public IUrlStream
       return 0;
     }
     
-///Отладочное протоколирование
+///РћС‚Р»Р°РґРѕС‡РЅРѕРµ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
     static int DebugCallback (CURL*, curl_infotype type, char* data, size_t size, void* userdata)
     {
       if (!userdata)
@@ -532,30 +532,30 @@ class CurlStream: public IUrlStream
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
    
   private:
-    syslib::Mutex                 mutex;             //блокировка
-    common::Log                   log;               //поток протоколирования
-    IListener&                    listener;          //слушатель событий потока
-    CURL*                         stream;            //поток CURL
+    syslib::Mutex                 mutex;             //Р±Р»РѕРєРёСЂРѕРІРєР°
+    common::Log                   log;               //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    IListener&                    listener;          //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ РїРѕС‚РѕРєР°
+    CURL*                         stream;            //РїРѕС‚РѕРє CURL
     stl::string                   url;               //URL
-    stl::string                   params;            //параметры
-    stl::auto_ptr<syslib::Thread> thread;            //нить
-    stl::string                   content_type;      //тип контента
-    stl::string                   content_encoding;  //тип кодировки контента
-    stl::string                   status;            //статус
-    size_t                        content_length;    //длина контента
-    bool                          headers_received;  //заголовки приняты
-    syslib::Condition             headers_condition; //событие ожидания заголовков
-    volatile bool                 cancel_operation;  //отмена закачки
+    stl::string                   params;            //РїР°СЂР°РјРµС‚СЂС‹
+    stl::auto_ptr<syslib::Thread> thread;            //РЅРёС‚СЊ
+    stl::string                   content_type;      //С‚РёРї РєРѕРЅС‚РµРЅС‚Р°
+    stl::string                   content_encoding;  //С‚РёРї РєРѕРґРёСЂРѕРІРєРё РєРѕРЅС‚РµРЅС‚Р°
+    stl::string                   status;            //СЃС‚Р°С‚СѓСЃ
+    size_t                        content_length;    //РґР»РёРЅР° РєРѕРЅС‚РµРЅС‚Р°
+    bool                          headers_received;  //Р·Р°РіРѕР»РѕРІРєРё РїСЂРёРЅСЏС‚С‹
+    syslib::Condition             headers_condition; //СЃРѕР±С‹С‚РёРµ РѕР¶РёРґР°РЅРёСЏ Р·Р°РіРѕР»РѕРІРєРѕРІ
+    volatile bool                 cancel_operation;  //РѕС‚РјРµРЅР° Р·Р°РєР°С‡РєРё
 };
 
 
 /*
-    Компонент запуска CURL
+    РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РїСѓСЃРєР° CURL
 */
 
 class CurlStreamManagerComponent

@@ -4,12 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджера выходного уровня
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 struct OutputManager::Impl: public DeviceObject
 {
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
   {
@@ -17,7 +17,7 @@ struct OutputManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputManager::OutputManager (const DeviceManager& device_manager)
@@ -30,7 +30,7 @@ OutputManager::~OutputManager ()
 }
 
 /*
-    Создание состояний выходного уровня
+    РЎРѕР·РґР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёР№ РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 IBlendState* OutputManager::CreateBlendState (const BlendDesc& desc)

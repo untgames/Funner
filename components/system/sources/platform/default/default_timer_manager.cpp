@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Создание / уничтожение таймера
+    РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 syslib::timer_t DefaultTimerManager::CreateTimer (size_t, TimerHandler, void*)

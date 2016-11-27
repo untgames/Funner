@@ -114,7 +114,7 @@ void on_score_posted (const char* source, GKScore *ns_score, NSError *error, com
 }
 
 /*
-   Таблицы рекордов
+   РўР°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ
 */
 
 void GameKitSessionImpl::LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties)
@@ -296,7 +296,7 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const char
 }
 
 /*
-   Публикация
+   РџСѓР±Р»РёРєР°С†РёСЏ
 */
 
 void GameKitSessionImpl::SendScore (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties)

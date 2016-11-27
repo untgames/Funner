@@ -1,4 +1,4 @@
-// Тестирование функции count
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ С„СѓРЅРєС†РёРё count
 #include <stdio.h>
 #include <stl/map>
 #include "test.h"

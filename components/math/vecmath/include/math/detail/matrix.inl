@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Бинарные операции
+    Р‘РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 struct matrix_add {
@@ -199,7 +199,7 @@ struct vec_mul_matrix {
 };
 
 /*
-    Унарные операции
+    РЈРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 struct matrix_copy {
@@ -408,7 +408,7 @@ struct matrix_normalize {
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T, unsigned int Size>
@@ -450,7 +450,7 @@ matrix<T, Size>::matrix (const T1& a, const T2& b, const T3& c, Fn fn, return_va
 }
 
 /*
-    Индексирование
+    РРЅРґРµРєСЃРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class T, unsigned int Size>
@@ -491,7 +491,7 @@ matrix<T, Size>& matrix<T, Size>::operator = (const value_type& a)
 }
 
 /*
-    Унарные операции
+    РЈРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T, unsigned int Size>
@@ -507,7 +507,7 @@ matrix<T, Size> matrix<T, Size>::operator - () const
 }
 
 /*
-    Бинарные операции
+    Р‘РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T, unsigned int Size> 
@@ -618,7 +618,7 @@ vector<T, Size>& operator *= (vector<T, Size>& v, const matrix<T, Size+1>& m)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T, unsigned int Size> 
@@ -648,7 +648,7 @@ bool equal (const matrix<T, Size>& a, const matrix<T, Size>& b, const T& eps)
 } 
 
 /*
-    Операции над матрицей
+    РћРїРµСЂР°С†РёРё РЅР°Рґ РјР°С‚СЂРёС†РµР№
 */
 
 template <class T, unsigned int Size>
@@ -670,7 +670,7 @@ matrix<T, Size> normalize (const matrix<T, Size>& m)
 } 
 
 /*
-    Нахождение определителя
+    РќР°С…РѕР¶РґРµРЅРёРµ РѕРїСЂРµРґРµР»РёС‚РµР»СЏ
 */
 
 template <class T, unsigned int Size> 

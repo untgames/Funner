@@ -4,20 +4,20 @@ using namespace media;
 using namespace stl;
 using namespace common;
 
-const size_t SAMPLE_ARRAY_RESERVE_SIZE = 4;    //резервируемое количество сэмплов
-const float  INFINITY_DISTANCE         = 1e6f; //расстояние "бесконечности"
+const size_t SAMPLE_ARRAY_RESERVE_SIZE = 4;    //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃСЌРјРїР»РѕРІ
+const float  INFINITY_DISTANCE         = 1e6f; //СЂР°СЃСЃС‚РѕСЏРЅРёРµ "Р±РµСЃРєРѕРЅРµС‡РЅРѕСЃС‚Рё"
 
 /*
-    Описание реализации SoundDeclaration
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё SoundDeclaration
 */
 
 struct SoundDeclaration::Impl: public xtl::reference_counter
 {
-  string          name;                    //имя
-  string          type;                    //тип звука
-  bool            looping;                 //цикличность
-  vector <string> samples;                 //список сэмплов
-  float           params [SoundParam_Num]; //параметры
+  string          name;                    //РёРјСЏ
+  string          type;                    //С‚РёРї Р·РІСѓРєР°
+  bool            looping;                 //С†РёРєР»РёС‡РЅРѕСЃС‚СЊ
+  vector <string> samples;                 //СЃРїРёСЃРѕРє СЃСЌРјРїР»РѕРІ
+  float           params [SoundParam_Num]; //РїР°СЂР°РјРµС‚СЂС‹
 
   
   Impl ();
@@ -45,7 +45,7 @@ SoundDeclaration::Impl::Impl ()
 }
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SoundDeclaration::SoundDeclaration ()
@@ -65,7 +65,7 @@ SoundDeclaration::~SoundDeclaration ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SoundDeclaration& SoundDeclaration::operator = (const SoundDeclaration& sound_decl)
@@ -76,7 +76,7 @@ SoundDeclaration& SoundDeclaration::operator = (const SoundDeclaration& sound_de
 }
 
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 SoundDeclaration SoundDeclaration::Clone () const
@@ -85,7 +85,7 @@ SoundDeclaration SoundDeclaration::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t SoundDeclaration::Id () const
@@ -94,7 +94,7 @@ size_t SoundDeclaration::Id () const
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* SoundDeclaration::Name () const
@@ -111,7 +111,7 @@ void SoundDeclaration::Rename (const char* name)
 }
 
 /*
-    Тип звука
+    РўРёРї Р·РІСѓРєР°
 */
 
 const char* SoundDeclaration::Type () const
@@ -128,7 +128,7 @@ void SoundDeclaration::SetType (const char* type)
 }
   
 /*
-    Цикличность воспроизведения
+    Р¦РёРєР»РёС‡РЅРѕСЃС‚СЊ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ
 */
 
 void SoundDeclaration::SetLooping (bool looping)
@@ -142,7 +142,7 @@ bool SoundDeclaration::Looping () const
 }
   
 /*
-    Работа с сэмплами
+    Р Р°Р±РѕС‚Р° СЃ СЃСЌРјРїР»Р°РјРё
 */
 
 size_t SoundDeclaration::SamplesCount () const
@@ -182,7 +182,7 @@ void SoundDeclaration::RemoveAllSamples ()
 }
 
 /*
-    Параметры
+    РџР°СЂР°РјРµС‚СЂС‹
 */
 
 void SoundDeclaration::SetParam (SoundParam param, float value)
@@ -202,7 +202,7 @@ float SoundDeclaration::Param (SoundParam param) const
 }
      
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SoundDeclaration::Swap (SoundDeclaration& sound_decl)

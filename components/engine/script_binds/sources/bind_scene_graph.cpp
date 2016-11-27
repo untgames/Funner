@@ -7,7 +7,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* SCENE_STATIC_NODE_BIND_MODE_LIBRARY           = "Scene.NodeBindMode";
@@ -64,7 +64,7 @@ namespace scene_graph_script_bind
 {
 
 /*
-    Регистрация библиотеки работы со сценой
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃС†РµРЅРѕР№
 */
 
 void bind_scene_graph_library (Environment& environment)
@@ -108,7 +108,7 @@ void bind_scene_graph_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

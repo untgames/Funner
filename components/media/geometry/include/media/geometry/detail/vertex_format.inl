@@ -1,7 +1,7 @@
 namespace detail
 {
 
-//хранилище формата вершины
+//С…СЂР°РЅРёР»РёС‰Рµ С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅС‹
 template <class Vertex> struct VertexFormatHolder
 {
   VertexFormatHolder () { get_vertex_format (static_cast<const Vertex*> (0), format); }
@@ -12,7 +12,7 @@ template <class Vertex> struct VertexFormatHolder
 }
 
 /*
-    Получение формата вершин
+    РџРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РІРµСЂС€РёРЅ
 */
 
 template <class Vertex>

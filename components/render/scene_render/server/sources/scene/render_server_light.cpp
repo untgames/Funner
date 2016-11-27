@@ -4,15 +4,15 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации отображаемой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕР№ РјРѕРґРµР»Рё
 */
 
 namespace
 {
 
-const float DEFAULT_LIGHT_RANGE  = 1e9f;   //расстояние действия источника света по умолчанию
-const float DEFAULT_LIGHT_RADIUS = 1e9f;   //радиус действия источника света по умолчанию
-const float ZNEAR_FACTOR         = 1e-06f; //коэффициент перехода от znear к zfar
+const float DEFAULT_LIGHT_RANGE  = 1e9f;   //СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const float DEFAULT_LIGHT_RADIUS = 1e9f;   //СЂР°РґРёСѓСЃ РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const float ZNEAR_FACTOR         = 1e-06f; //РєРѕСЌС„С„РёС†РёРµРЅС‚ РїРµСЂРµС…РѕРґР° РѕС‚ znear Рє zfar
 
 typedef xtl::shared_ptr<Camera> CameraPtr;
 typedef stl::vector<CameraPtr>  CameraArray;
@@ -21,12 +21,12 @@ typedef stl::vector<CameraPtr>  CameraArray;
 
 struct Light::Impl
 {
-  interchange::NodeType node_type;           //тип источника
-  LightParams           params;              //параметры источника
-  CameraArray           cameras;             //камеры "из источника"
-  bool                  need_update_cameras; //камеры нужно обновить
+  interchange::NodeType node_type;           //С‚РёРї РёСЃС‚РѕС‡РЅРёРєР°
+  LightParams           params;              //РїР°СЂР°РјРµС‚СЂС‹ РёСЃС‚РѕС‡РЅРёРєР°
+  CameraArray           cameras;             //РєР°РјРµСЂС‹ "РёР· РёСЃС‚РѕС‡РЅРёРєР°"
+  bool                  need_update_cameras; //РєР°РјРµСЂС‹ РЅСѓР¶РЅРѕ РѕР±РЅРѕРІРёС‚СЊ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (interchange::NodeType in_node_type)
     : node_type (in_node_type)
     , need_update_cameras (true)
@@ -50,7 +50,7 @@ struct Light::Impl
     }
   }
 
-///Обновление камер
+///РћР±РЅРѕРІР»РµРЅРёРµ РєР°РјРµСЂ
   void UpdateCameras (const Light& owner)
   {
     if (!need_update_cameras)
@@ -169,7 +169,7 @@ struct Light::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Light::Light (interchange::NodeType node_type)
@@ -182,7 +182,7 @@ Light::~Light ()
 }
 
 /*
-    Тип источника
+    РўРёРї РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 interchange::NodeType Light::Type () const
@@ -191,7 +191,7 @@ interchange::NodeType Light::Type () const
 }
 
 /*
-    Параметры источника
+    РџР°СЂР°РјРµС‚СЂС‹ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void Light::SetParams (const LightParams& params)
@@ -206,7 +206,7 @@ const LightParams& Light::Params () const
 }
 
 /*
-    Перечисление камер из источника
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РєР°РјРµСЂ РёР· РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 size_t Light::CamerasCount () const
@@ -231,7 +231,7 @@ const Camera& Light::Camera (size_t index) const
 }
 
 /*
-    Оповещение об обновлении мировой матрицы
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РјРёСЂРѕРІРѕР№ РјР°С‚СЂРёС†С‹
 */
 
 void Light::OnWorldMatrixUpdated ()
@@ -242,7 +242,7 @@ void Light::OnWorldMatrixUpdated ()
 }
 
 /*
-    Обход
+    РћР±С…РѕРґ
 */
 
 void Light::VisitCore (ISceneVisitor& visitor)

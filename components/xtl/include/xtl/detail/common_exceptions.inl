@@ -1,5 +1,5 @@
 /*
-    Неверное значение аргумента переданного функции
+    РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РїРµСЂРµРґР°РЅРЅРѕРіРѕ С„СѓРЅРєС†РёРё
 */
 
 inline message_exception<argument_exception> make_argument_exception (const char* source, const char* argument_name)
@@ -38,7 +38,7 @@ inline message_exception<argument_exception> make_argument_exception (const char
 }
 
 /*
-    Нулевое значение аргумента
+    РќСѓР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 */
 
 inline message_exception<null_argument_exception> make_null_argument_exception (const char* source, const char* argument_name)
@@ -47,7 +47,7 @@ inline message_exception<null_argument_exception> make_null_argument_exception (
 }
 
 /*
-    Значение аргумента выходит за пределы допустимых значений
+    Р—РЅР°С‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РІС‹С…РѕРґРёС‚ Р·Р° РїСЂРµРґРµР»С‹ РґРѕРїСѓСЃС‚РёРјС‹С… Р·РЅР°С‡РµРЅРёР№
 */
 
 inline message_exception<bad_range> make_range_exception (const char* source, const char* argument_name)
@@ -81,7 +81,7 @@ inline message_exception<bad_range> make_range_exception (const char* source, co
 }
 
 /*
-    Неверная операция
+    РќРµРІРµСЂРЅР°СЏ РѕРїРµСЂР°С†РёСЏ
 */
 
 inline message_exception<operation_exception> format_operation_exception (const char* source, const char* format, ...)
@@ -99,7 +99,7 @@ inline message_exception<operation_exception> vformat_operation_exception (const
 }
 
 /*
-    Функция не реализована
+    Р¤СѓРЅРєС†РёСЏ РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅР°
 */
 
 inline message_exception<not_implemented_exception> make_not_implemented_exception (const char* source)
@@ -108,7 +108,7 @@ inline message_exception<not_implemented_exception> make_not_implemented_excepti
 }
 
 /*
-    Функция не поддерживается
+    Р¤СѓРЅРєС†РёСЏ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ
 */
 
 inline message_exception<not_supported_exception> format_not_supported_exception  (const char* source)
@@ -131,7 +131,7 @@ inline message_exception<not_supported_exception> vformat_not_supported_exceptio
 }
 
 /*
-    Платформа не поддерживается
+    РџР»Р°С‚С„РѕСЂРјР° РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ
 */
 
 inline message_exception<bad_platform> make_unsupported_platform_exception (const char* source, const char* platform)

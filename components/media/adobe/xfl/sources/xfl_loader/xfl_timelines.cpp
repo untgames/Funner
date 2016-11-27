@@ -11,7 +11,7 @@ const size_t DEFAULT_LAYERS_COUNT = 512;
 }
 
 /*
-    Разбор библиотеки анимаций
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё Р°РЅРёРјР°С†РёР№
 */
 
 void XflParser::ParseTimelines (common::Parser::Iterator iter)
@@ -27,7 +27,7 @@ void XflParser::ParseTimelines (common::Parser::Iterator iter)
 }
 
 /*
-    Разбор анимации
+    Р Р°Р·Р±РѕСЂ Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseTimeline (Parser::Iterator iter, Timeline& timeline)

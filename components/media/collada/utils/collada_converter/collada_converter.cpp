@@ -28,7 +28,7 @@ using namespace common;
 using namespace media::collada;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* APPLICATION_NAME = "collada_converter";
@@ -38,7 +38,7 @@ const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 const float EPSILON = 0.001f;
 
 /*
-    Типы
+    РўРёРїС‹
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, stl::string>           ImagesMap;
@@ -48,53 +48,53 @@ struct Params;
 
 typedef void (*ProcessOption)(const char* arg, Params& params);
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  ProcessOption process;       //функция-обработчик опции
-  const char*   name;          //имя команды
-  char          short_name;    //короткое имя
-  const char*   argument_name; //имя аргумента
-  const char*   tip;           //подсказка
+  ProcessOption process;       //С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїС†РёРё
+  const char*   name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char          short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*   argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*   tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                      //массив опций
-  size_t        options_count;                //количество опций
-  stl::string   source_name;                  //имя исходного файла
-  StringArray   source_search_paths;          //пути к каталогам поиск ресурсов
-  stl::string   output_textures_dir_name;     //имя каталога с сохранёнными текстурами
-  stl::string   output_textures_format;       //формат текстур
-  stl::string   material_textures_format;     //формат текстур сохраняемых в материале
-  stl::string   material_textures_dir_name;   //имя каталога с сохранёнными текстурами сохраняемых в материале
-  stl::string   output_materials_file_name;   //файл материалов
-  stl::string   output_scene_file_name;       //файл сцены
-  stl::string   output_animations_file_name;  //файл анимаций
-  stl::string   output_meshes_file_name;      //имя файла с сохранёнными мешами
-  stl::string   output_phys_meshes_file_name; //имя файла с сохранёнными мешами для физики
-  stl::string   convex_phys_meshes;           //список масок имен физических мешей, являющихся конвексами
-  stl::string   output_remove_file_prefix;    //отбрасываемый префикс имён файлов
-  stl::string   output_resources_namespace;   //пространство имён, применяемое при сохранении ресурсов
-  stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
-  stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
-  unsigned int  max_texture_size;             //максимальный размер текстуры
-  bool          convert_to_meters;            //нужно ли переводить единицы измерения в метры
-  bool          fix_zero_tangents;            //нужно ли генерировать вместо нулевых касательных произвольные
-  bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
-  bool          silent;                       //минимальное число сообщений
-  bool          remove_unused_resources;      //нужно ли выбрасывать неиспользуемые ресурсы
-  bool          print_help;                   //нужно ли печатать сообщение помощи
+  const Option* options;                      //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;                //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string   source_name;                  //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  StringArray   source_search_paths;          //РїСѓС‚Рё Рє РєР°С‚Р°Р»РѕРіР°Рј РїРѕРёСЃРє СЂРµСЃСѓСЂСЃРѕРІ
+  stl::string   output_textures_dir_name;     //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё С‚РµРєСЃС‚СѓСЂР°РјРё
+  stl::string   output_textures_format;       //С„РѕСЂРјР°С‚ С‚РµРєСЃС‚СѓСЂ
+  stl::string   material_textures_format;     //С„РѕСЂРјР°С‚ С‚РµРєСЃС‚СѓСЂ СЃРѕС…СЂР°РЅСЏРµРјС‹С… РІ РјР°С‚РµСЂРёР°Р»Рµ
+  stl::string   material_textures_dir_name;   //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё С‚РµРєСЃС‚СѓСЂР°РјРё СЃРѕС…СЂР°РЅСЏРµРјС‹С… РІ РјР°С‚РµСЂРёР°Р»Рµ
+  stl::string   output_materials_file_name;   //С„Р°Р№Р» РјР°С‚РµСЂРёР°Р»РѕРІ
+  stl::string   output_scene_file_name;       //С„Р°Р№Р» СЃС†РµРЅС‹
+  stl::string   output_animations_file_name;  //С„Р°Р№Р» Р°РЅРёРјР°С†РёР№
+  stl::string   output_meshes_file_name;      //РёРјСЏ С„Р°Р№Р»Р° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё РјРµС€Р°РјРё
+  stl::string   output_phys_meshes_file_name; //РёРјСЏ С„Р°Р№Р»Р° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё РјРµС€Р°РјРё РґР»СЏ С„РёР·РёРєРё
+  stl::string   convex_phys_meshes;           //СЃРїРёСЃРѕРє РјР°СЃРѕРє РёРјРµРЅ С„РёР·РёС‡РµСЃРєРёС… РјРµС€РµР№, СЏРІР»СЏСЋС‰РёС…СЃСЏ РєРѕРЅРІРµРєСЃР°РјРё
+  stl::string   output_remove_file_prefix;    //РѕС‚Р±СЂР°СЃС‹РІР°РµРјС‹Р№ РїСЂРµС„РёРєСЃ РёРјС‘РЅ С„Р°Р№Р»РѕРІ
+  stl::string   output_resources_namespace;   //РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ РёРјС‘РЅ, РїСЂРёРјРµРЅСЏРµРјРѕРµ РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё СЂРµСЃСѓСЂСЃРѕРІ
+  stl::string   exclude_nodes;                //РЅРµСЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Рµ СѓР·Р»С‹ СЃС†РµРЅС‹
+  stl::string   merge_animation;              //РёРјСЏ Р°РЅРёРјР°С†РёРё РІ РєРѕС‚РѕСЂСѓСЋ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІРєР»РµРµРЅС‹ РІСЃРµ РѕСЃС‚Р°Р»СЊРЅС‹Рµ Р°РЅРёРјР°С†РёРё
+  unsigned int  max_texture_size;             //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С‚РµРєСЃС‚СѓСЂС‹
+  bool          convert_to_meters;            //РЅСѓР¶РЅРѕ Р»Рё РїРµСЂРµРІРѕРґРёС‚СЊ РµРґРёРЅРёС†С‹ РёР·РјРµСЂРµРЅРёСЏ РІ РјРµС‚СЂС‹
+  bool          fix_zero_tangents;            //РЅСѓР¶РЅРѕ Р»Рё РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РІРјРµСЃС‚Рѕ РЅСѓР»РµРІС‹С… РєР°СЃР°С‚РµР»СЊРЅС‹С… РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ
+  bool          pot;                          //РЅСѓР¶РЅРѕ Р»Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
+  bool          silent;                       //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool          remove_unused_resources;      //РЅСѓР¶РЅРѕ Р»Рё РІС‹Р±СЂР°СЃС‹РІР°С‚СЊ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ СЂРµСЃСѓСЂСЃС‹
+  bool          print_help;                   //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
 typedef xtl::shared_ptr<media::Image> TexturePtr;
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
-//получение ближайшей сверху степени двойки
+//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµР№ СЃРІРµСЂС…Сѓ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
@@ -111,7 +111,7 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
-//печать ошибки с выходом из программы
+//РїРµС‡Р°С‚СЊ РѕС€РёР±РєРё СЃ РІС‹С…РѕРґРѕРј РёР· РїСЂРѕРіСЂР°РјРјС‹
 void error (const char* format, ...)
 {
   va_list args;
@@ -126,7 +126,7 @@ void error (const char* format, ...)
   exit (1);
 }
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -153,133 +153,133 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка имени пути исходных текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСѓС‚Рё РёСЃС…РѕРґРЅС‹С… С‚РµРєСЃС‚СѓСЂ
 void command_line_source_search_path (const char* path, Params& params)
 {
   params.source_search_paths.Add (path);
 }
 
-//установка имени каталога с сохраненными текстурами
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅРµРЅРЅС‹РјРё С‚РµРєСЃС‚СѓСЂР°РјРё
 void command_line_output_textures_dir_name (const char* dir, Params& params)
 {
   params.output_textures_dir_name = dir;
 }
 
-//установка формата сохранения текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ
 void command_line_output_textures_format (const char* format, Params& params)
 {
   params.output_textures_format = format;
 }
 
-//установка формата сохранения текстур в материале
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ РІ РјР°С‚РµСЂРёР°Р»Рµ
 void command_line_material_textures_format (const char* format, Params& params)
 {
   params.material_textures_format = format;
 }
 
-//установка каталога сохранения текстур в материале
+//СѓСЃС‚Р°РЅРѕРІРєР° РєР°С‚Р°Р»РѕРіР° СЃРѕС…СЂР°РЅРµРЅРёСЏ С‚РµРєСЃС‚СѓСЂ РІ РјР°С‚РµСЂРёР°Р»Рµ
 void command_line_material_textures_dir_name (const char* dir, Params& params)
 {
   params.material_textures_dir_name = dir;
 }
 
-//установка максимального размера текстуры
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° С‚РµРєСЃС‚СѓСЂС‹
 void command_line_output_max_texture_size (const char* value, Params& params)
 {
   params.max_texture_size = (size_t)atoi (value);
 }
 
-//установка файла материалов
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° РјР°С‚РµСЂРёР°Р»РѕРІ
 void command_line_output_materials_file_name (const char* file_name, Params& params)
 {
   params.output_materials_file_name = file_name;
 }
 
-//установка файла сцены
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° СЃС†РµРЅС‹
 void command_line_output_scene_file_name (const char* file_name, Params& params)
 {
   params.output_scene_file_name = file_name;
 }
 
-//установка файла анимаций
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р°Р№Р»Р° Р°РЅРёРјР°С†РёР№
 void command_line_output_animations_file_name (const char* file_name, Params& params)
 {
   params.output_animations_file_name = file_name;
 }
 
-//установка папки мешей
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°РїРєРё РјРµС€РµР№
 void command_line_output_meshes_file_name (const char* file_name, Params& params)
 {
   params.output_meshes_file_name = file_name;
 }
 
-//установка пути физических мешей
+//СѓСЃС‚Р°РЅРѕРІРєР° РїСѓС‚Рё С„РёР·РёС‡РµСЃРєРёС… РјРµС€РµР№
 void command_line_output_phys_meshes_file_name (const char* file_name, Params& params)
 {
   params.output_phys_meshes_file_name = file_name;
 }
 
-//установка списка конвексных физических мешей
+//СѓСЃС‚Р°РЅРѕРІРєР° СЃРїРёСЃРєР° РєРѕРЅРІРµРєСЃРЅС‹С… С„РёР·РёС‡РµСЃРєРёС… РјРµС€РµР№
 void command_line_convex_phys_meshes (const char* wildcard_list, Params& params)
 {
   params.convex_phys_meshes = wildcard_list;
 }
 
-//установка неэкспортируемых узлов сцены
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµСЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… СѓР·Р»РѕРІ СЃС†РµРЅС‹
 void command_line_exclude_nodes (const char* string, Params& params)
 {
   params.exclude_nodes = string;
 }
 
-//установка имени анимации для склеивания
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё Р°РЅРёРјР°С†РёРё РґР»СЏ СЃРєР»РµРёРІР°РЅРёСЏ
 void command_line_merge_animation (const char* string, Params& params)
 {
   params.merge_animation = string;
 }
 
-//установка необходимости не корректировать единицы длины
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РЅРµ РєРѕСЂСЂРµРєС‚РёСЂРѕРІР°С‚СЊ РµРґРёРЅРёС†С‹ РґР»РёРЅС‹
 void command_line_dont_convert_to_meters (const char*, Params& params)
 {
   params.convert_to_meters = false;
 }
 
-//установка необходимости масштабировать текстуры до ближайшей степени двойки
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 void command_line_fix_zero_tangents (const char*, Params& params)
 {
   params.fix_zero_tangents = true;
 }
 
-//установка необходимости масштабировать текстуры до ближайшей степени двойки
+//СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 void command_line_pot (const char*, Params& params)
 {
   params.pot = true;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра удаления не используемых ресурсов
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° СѓРґР°Р»РµРЅРёСЏ РЅРµ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 void command_line_remove_unused_resources (const char*, Params& params)
 {
   params.remove_unused_resources = true;
 }
 
-//установка отбрасываемого префикса имён файлов
+//СѓСЃС‚Р°РЅРѕРІРєР° РѕС‚Р±СЂР°СЃС‹РІР°РµРјРѕРіРѕ РїСЂРµС„РёРєСЃР° РёРјС‘РЅ С„Р°Р№Р»РѕРІ
 void command_line_set_remove_file_prefix (const char* prefix, Params& params)
 {
   params.output_remove_file_prefix = prefix;
 }
 
-//установка пространства имён ресурсов
+//СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РёРјС‘РЅ СЂРµСЃСѓСЂСЃРѕРІ
 void command_line_set_resources_namespace (const char* prefix, Params& params)
 {
   params.output_resources_namespace = prefix;
 }
 
-//разбор командной строки
+//СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
@@ -312,7 +312,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   params.options       = options;
   params.options_count = options_count;
 
-    //разбор командной строки
+    //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
   for (int i=1; i<argc; i++)
   {
@@ -341,7 +341,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     stl::string   option_argument;
     const Option* option = 0;
 
-      //разбор длинных опций
+      //СЂР°Р·Р±РѕСЂ РґР»РёРЅРЅС‹С… РѕРїС†РёР№
 
     if (long_option)
     {
@@ -383,7 +383,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
       option_name = LONG_OPTION_NAME_PREFIX + option_name;
     }
 
-      //разбор коротких опций
+      //СЂР°Р·Р±РѕСЂ РєРѕСЂРѕС‚РєРёС… РѕРїС†РёР№
 
     if (short_option)
     {
@@ -432,7 +432,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
         arg = "";
     }
 
-      //получение аргумента
+      //РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 
     for (;*arg; arg++)
     {
@@ -483,7 +483,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-//сохранение мешей
+//СЃРѕС…СЂР°РЅРµРЅРёРµ РјРµС€РµР№
 void save_meshes (const Params& params, const Model& model)
 {
   if (!params.silent)
@@ -541,7 +541,7 @@ void save_meshes (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
-//сохранение физических мешей
+//СЃРѕС…СЂР°РЅРµРЅРёРµ С„РёР·РёС‡РµСЃРєРёС… РјРµС€РµР№
 void save_physics_meshes (const Params& params, const Model& model)
 {
   if (!params.silent)
@@ -614,7 +614,7 @@ void save_physics_meshes (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
-//сохранение анимаций
+//СЃРѕС…СЂР°РЅРµРЅРёРµ Р°РЅРёРјР°С†РёР№
 void save_animations (const Params& params, const Model& model)
 {
   media::animation::AnimationLibrary animation_library;
@@ -627,7 +627,7 @@ void save_animations (const Params& params, const Model& model)
   animation_library.Save (params.output_animations_file_name.c_str ());
 }
 
-//имя параметра источника света
+//РёРјСЏ РїР°СЂР°РјРµС‚СЂР° РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 const char* light_param_name (LightParam param)
 {
   switch (param)
@@ -641,7 +641,7 @@ const char* light_param_name (LightParam param)
   }
 }
 
-//сохранение узла
+//СЃРѕС…СЂР°РЅРµРЅРёРµ СѓР·Р»Р°
 void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volumes, const Node& node, XmlWriter& writer)
 {
   static const char* METHOD_NAME = "::save_node";
@@ -681,7 +681,7 @@ void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volume
     writer.WriteData (node.UserProperties ());
   }
 
-    //метод экспорта связан с правилами именования инстанцированных мешей в конвертере
+    //РјРµС‚РѕРґ СЌРєСЃРїРѕСЂС‚Р° СЃРІСЏР·Р°РЅ СЃ РїСЂР°РІРёР»Р°РјРё РёРјРµРЅРѕРІР°РЅРёСЏ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… РјРµС€РµР№ РІ РєРѕРЅРІРµСЂС‚РµСЂРµ
 
   size_t mesh_index = 0;
 
@@ -744,7 +744,7 @@ void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volume
     save_node (params, meshes_bound_volumes, *iter, writer);
 }
 
-//сохранение сцены
+//СЃРѕС…СЂР°РЅРµРЅРёРµ СЃС†РµРЅС‹
 void save_scene (const Params& params, const Model& model)
 {
   if (!params.silent)
@@ -759,7 +759,7 @@ void save_scene (const Params& params, const Model& model)
 
   XmlWriter::Scope scope (writer, "scene");
 
-    //построение ограничивающих объемов для мешей
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РёС… РѕР±СЉРµРјРѕРІ РґР»СЏ РјРµС€РµР№
   BoundVolumesMap meshes_bound_volumes;
 
   const MeshLibrary& mesh_library = model.Meshes ();
@@ -816,7 +816,7 @@ void save_scene (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
-//загрузка текстуры
+//Р·Р°РіСЂСѓР·РєР° С‚РµРєСЃС‚СѓСЂС‹
 TexturePtr load_texture (const Params& params, const char* path)
 {
   const char** search_paths = params.source_search_paths.Data ();
@@ -828,9 +828,9 @@ TexturePtr load_texture (const Params& params, const char* path)
     stl::string texture_path = common::format ("%s/%s", dir, path);
 
     if (!FileSystem::IsFileExist (texture_path.c_str ()))
-      continue; //файл не найден
+      continue; //С„Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ
 
-      //загрузка картинки
+      //Р·Р°РіСЂСѓР·РєР° РєР°СЂС‚РёРЅРєРё
 
     TexturePtr texture (new media::Image (texture_path.c_str ()));
 
@@ -890,7 +890,7 @@ stl::string get_texture_name (const char* texture_format, const char* dir_name, 
   }
 }
 
-//сохранение изображений
+//СЃРѕС…СЂР°РЅРµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёР№
 void save_images (const Params& params, const Model& model, ImagesMap& images_map)
 {
   if (!params.silent)
@@ -910,7 +910,7 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
       
     stl::string image_path;
 
-      //проверка есть ли картинка по указанному пути
+      //РїСЂРѕРІРµСЂРєР° РµСЃС‚СЊ Р»Рё РєР°СЂС‚РёРЅРєР° РїРѕ СѓРєР°Р·Р°РЅРЅРѕРјСѓ РїСѓС‚Рё
 
     const char** search_paths = params.source_search_paths.Data ();
 
@@ -927,7 +927,7 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
       }
     }
 
-      //если по указанному пути картинка не найдена, обрезание пути
+      //РµСЃР»Рё РїРѕ СѓРєР°Р·Р°РЅРЅРѕРјСѓ РїСѓС‚Рё РєР°СЂС‚РёРЅРєР° РЅРµ РЅР°Р№РґРµРЅР°, РѕР±СЂРµР·Р°РЅРёРµ РїСѓС‚Рё
 
     if (image_path.empty ())
       image_path = common::notdir (image.Path ());
@@ -967,7 +967,7 @@ int get_texture_channel_number (const char* texture_channel)
   return atoi (texture_channel + xtl::xstrlen ("TEX"));
 }
 
-//получение пути к текстуре
+//РїРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё Рє С‚РµРєСЃС‚СѓСЂРµ
 stl::string get_texture_path (const Params& params, ImagesMap& images_map, const Texture& texture)
 {
   const char* path = images_map [texture.Image ()].c_str ();
@@ -980,7 +980,7 @@ stl::string get_texture_path (const Params& params, ImagesMap& images_map, const
   return path;
 }
 
-//сохранение материалов
+//СЃРѕС…СЂР°РЅРµРЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 void add_texmap (const Params& params, const Effect& effect, TextureMap map, ImagesMap& images_map, media::rfx::Material& material)
 {
   if (!effect.HasTexture (map))
@@ -1104,13 +1104,13 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
     printf ("Ok\n");
 }
 
-//печать протокола
+//РїРµС‡Р°С‚СЊ РїСЂРѕС‚РѕРєРѕР»Р°
 void print (const char* message)
 {
   printf ("%s\n", message);
 }
 
-//экспорт
+//СЌРєСЃРїРѕСЂС‚
 void export_data (Params& params)
 {
   if (params.material_textures_format.empty ())
@@ -1161,7 +1161,7 @@ void export_data (Params& params)
     save_animations (params, model);
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.source_name.empty ())
@@ -1176,7 +1176,7 @@ int main (int argc, const char *argv[])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     Params params;
 
     params.options                 = 0;
@@ -1191,20 +1191,20 @@ int main (int argc, const char *argv[])
     
     params.source_search_paths.Add (".");
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
     command_line_parse (argc, argv, params);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 
     if (params.print_help)
       return 0;
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
     validate (params);
 
-      //экспорт
+      //СЌРєСЃРїРѕСЂС‚
 
     export_data (params);
   }

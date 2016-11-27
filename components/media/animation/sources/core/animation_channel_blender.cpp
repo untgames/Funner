@@ -6,15 +6,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVED_CHANNELS_COUNT = 4; //резервируемое число каналов
+const size_t RESERVED_CHANNELS_COUNT = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РєР°РЅР°Р»РѕРІ
 
 }
 
 /*
-    Описание реализации блендер каналов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±Р»РµРЅРґРµСЂ РєР°РЅР°Р»РѕРІ
 */
 
 struct ChannelBlenderBase::Impl: public xtl::reference_counter
@@ -32,12 +32,12 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
   typedef stl::vector<SourceImplPtr>              SourceImplArray;  
   typedef xtl::signal<void (ChannelBlenderEvent)> Signal;
 
-  const std::type_info* value_type;                        //тип значений
-  SourceArray           sources;                           //массив дескрипторов каналов
-  SourceImplArray       source_impls;                      //каналы
-  Signal                signals [ChannelBlenderEvent_Num]; //сигналы
+  const std::type_info* value_type;                        //С‚РёРї Р·РЅР°С‡РµРЅРёР№
+  SourceArray           sources;                           //РјР°СЃСЃРёРІ РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ РєР°РЅР°Р»РѕРІ
+  SourceImplArray       source_impls;                      //РєР°РЅР°Р»С‹
+  Signal                signals [ChannelBlenderEvent_Num]; //СЃРёРіРЅР°Р»С‹
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const std::type_info& in_value_type)
     : value_type (&in_value_type)
   {
@@ -45,7 +45,7 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
     source_impls.reserve (RESERVED_CHANNELS_COUNT);
   }
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void Notify (ChannelBlenderEvent event)
   {
     if (event < 0 || event >= ChannelBlenderEvent_Num)
@@ -57,11 +57,11 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   
-///Удаление каналов
+///РЈРґР°Р»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
   void RemoveSourcesByState (AnimationStateImpl* state)
   {
     bool removed = false;
@@ -105,7 +105,7 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ChannelBlenderBase::ChannelBlenderBase (const std::type_info& value_type)
@@ -132,7 +132,7 @@ ChannelBlenderBase& ChannelBlenderBase::operator = (const ChannelBlenderBase& bl
 }
 
 /*
-    Тип значений
+    РўРёРї Р·РЅР°С‡РµРЅРёР№
 */
 
 const std::type_info& ChannelBlenderBase::ValueType () const
@@ -141,7 +141,7 @@ const std::type_info& ChannelBlenderBase::ValueType () const
 }
 
 /*
-    Количество каналов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ
 */
 
 size_t ChannelBlenderBase::SourcesCount () const
@@ -150,7 +150,7 @@ size_t ChannelBlenderBase::SourcesCount () const
 }
 
 /*
-    Получение каналов и анимационных состояний
+    РџРѕР»СѓС‡РµРЅРёРµ РєР°РЅР°Р»РѕРІ Рё Р°РЅРёРјР°С†РёРѕРЅРЅС‹С… СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 const ChannelBlenderBase::Source* ChannelBlenderBase::Sources () const
@@ -162,14 +162,14 @@ const ChannelBlenderBase::Source* ChannelBlenderBase::Sources () const
 }
 
 /*
-    Добавление и удаление каналов
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
 */
 
 void ChannelBlenderBase::AddSource (const media::animation::AnimationState& state, const media::animation::Channel& channel)
 {
   static const char* METHOD_NAME = "media::animation::ChannelBlenderBase::AddSource";
 
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   Source desc;
   
@@ -183,7 +183,7 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
     throw xtl::format_operation_exception (METHOD_NAME, "Attempt to add animation channel with value type '%s' to blender with value type '%s'", desc.evaluator->ValueType ().name (),
       impl->value_type->name ());
       
-    //добавление в карту
+    //РґРѕР±Р°РІР»РµРЅРёРµ РІ РєР°СЂС‚Сѓ
     
   Impl::SourceImplPtr channel_impl (new Impl::SourceImpl, false);
   
@@ -196,7 +196,7 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
   impl->sources.push_back (desc);
   impl->source_impls.push_back (channel_impl);
 
-    //оповещени о возникновении события
+    //РѕРїРѕРІРµС‰РµРЅРё Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
 
   impl->Notify (ChannelBlenderEvent_OnSourcesAdded);
 }
@@ -220,7 +220,7 @@ void ChannelBlenderBase::RemoveAllSources ()
 }
 
 /*
-    Подписка на события блендера каналов
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ Р±Р»РµРЅРґРµСЂР° РєР°РЅР°Р»РѕРІ
 */
 
 xtl::connection ChannelBlenderBase::RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler) const
@@ -232,7 +232,7 @@ xtl::connection ChannelBlenderBase::RegisterEventHandler (ChannelBlenderEvent ev
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ChannelBlenderBase::Swap (ChannelBlenderBase& blender)

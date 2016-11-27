@@ -1,7 +1,7 @@
 namespace detail
 {
 
-//базовый интерфейс результата асинхронной операции
+//Р±Р°Р·РѕРІС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ СЂРµР·СѓР»СЊС‚Р°С‚Р° Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 class IAsyncResult
 {
   public:
@@ -12,14 +12,14 @@ class IAsyncResult
     virtual ~IAsyncResult () {}
 };
 
-//интерфейс возвращения результата
+//РёРЅС‚РµСЂС„РµР№СЃ РІРѕР·РІСЂР°С‰РµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р°
 template <class Ret> class IAsyncResultHolder: public IAsyncResult
 {
   public:
     virtual Ret* GetResult () = 0;
 };
 
-//возвращение результата операции
+//РІРѕР·РІСЂР°С‰РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РѕРїРµСЂР°С†РёРё
 template <class Ret> class AsyncResultHolder: public IAsyncResultHolder<Ret>
 {
   public:
@@ -58,7 +58,7 @@ template <> class AsyncResultHolder<void>: public IAsyncResultHolder<void>
     void Release () {}
 };
 
-//перегенерация исключения, возникающего при получении результата асинхронной операции
+//РїРµСЂРµРіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ, РІРѕР·РЅРёРєР°СЋС‰РµРіРѕ РїСЂРё РїРѕР»СѓС‡РµРЅРёРё СЂРµР·СѓР»СЊС‚Р°С‚Р° Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 template <class Ret> class AsyncResultException: public IAsyncResultHolder<Ret>
 {
   public:
@@ -75,7 +75,7 @@ template <class Ret> class AsyncResultException: public IAsyncResultHolder<Ret>
     AsyncException exception;
 };
 
-//интерфейс асинхронной операции
+//РёРЅС‚РµСЂС„РµР№СЃ Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 class IAsyncAction
 {
   public:
@@ -118,7 +118,7 @@ class AsyncAction: public IAsyncAction
 }
 
 /*
-    Выполнение асинхронной операции
+    Р’С‹РїРѕР»РЅРµРЅРёРµ Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Ret>
@@ -140,7 +140,7 @@ inline AsyncResult async_invoke (const xtl::function<Ret ()>& action, ActionThre
 }
 
 /*
-    Возвращение результата асинхронной операции
+    Р’РѕР·РІСЂР°С‰РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Ret>

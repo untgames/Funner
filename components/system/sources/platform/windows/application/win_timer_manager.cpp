@@ -4,7 +4,7 @@ using namespace syslib;
 using namespace common;
 
 /*
-    Описание реализации таймера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚Р°Р№РјРµСЂР°
 */
 
 namespace
@@ -26,9 +26,9 @@ class Win32Timer
     typedef common::Singleton<TimerMap>          TimerMapSingleton;    
 
   private:  
-    UINT_PTR     timer;     //дескриптор таймера
-    TimerHandler handler;   //обработчик
-    void*        user_data; //пользовательские данные
+    UINT_PTR     timer;     //РґРµСЃРєСЂРёРїС‚РѕСЂ С‚Р°Р№РјРµСЂР°
+    TimerHandler handler;   //РѕР±СЂР°Р±РѕС‚С‡РёРє
+    void*        user_data; //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
 };
 
 }
@@ -75,7 +75,7 @@ Win32Timer::~Win32Timer ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 
   KillTimer (0, timer);
@@ -100,13 +100,13 @@ VOID CALLBACK Win32Timer::TimerProc (HWND, UINT, UINT_PTR timer, DWORD)
   }
   catch (...)
   {
-    //подавляем все исключения
-    //в будущем желательно протоколировать информацию об исключениях в Platform::DebugLog
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
+    //РІ Р±СѓРґСѓС‰РµРј Р¶РµР»Р°С‚РµР»СЊРЅРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РёСЃРєР»СЋС‡РµРЅРёСЏС… РІ Platform::DebugLog
   }
 }
 
 /*
-    Создание / уничтожение таймера
+    РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 timer_t WindowsTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)

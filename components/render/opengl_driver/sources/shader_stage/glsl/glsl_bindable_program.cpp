@@ -8,27 +8,27 @@ using namespace render::low_level::opengl;
 #endif
 
 /*
-    Описание параметра и группы параметров программы
+    РћРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР° Рё РіСЂСѓРїРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 struct GlslBindableProgram::Parameter
 {
-  int                  location;  //имя константы
-  ProgramParameterType type;      //тип константы
-  unsigned int         count;     //количество элементов массива
-  unsigned int         offset;    //смещение относительно начала константного буфера
+  int                  location;  //РёРјСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹
+  ProgramParameterType type;      //С‚РёРї РєРѕРЅСЃС‚Р°РЅС‚С‹
+  unsigned int         count;     //РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР°
+  unsigned int         offset;    //СЃРјРµС‰РµРЅРёРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 };
 
 struct GlslBindableProgram::Group
 {
-  unsigned int slot;       //номер слота с константым буфером
-  size_t       data_hash;  //хеш данных константного буфера
-  unsigned int count;      //количество элементов группы
-  Parameter*   parameters; //указатель на начало области с элементами
+  unsigned int slot;       //РЅРѕРјРµСЂ СЃР»РѕС‚Р° СЃ РєРѕРЅСЃС‚Р°РЅС‚С‹Рј Р±СѓС„РµСЂРѕРј
+  size_t       data_hash;  //С…РµС€ РґР°РЅРЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
+  unsigned int count;      //РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РіСЂСѓРїРїС‹
+  Parameter*   parameters; //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ РѕР±Р»Р°СЃС‚Рё СЃ СЌР»РµРјРµРЅС‚Р°РјРё
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 GlslBindableProgram::GlslBindableProgram
@@ -47,16 +47,16 @@ GlslBindableProgram::GlslBindableProgram
 
     if (parameters_layout && parameters_layout->GetParametersCount ())
     {
-        //резервирование места для хранения параметров и групп параметров
+        //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё РіСЂСѓРїРї РїР°СЂР°РјРµС‚СЂРѕРІ
 
       parameters.reserve (parameters_layout->GetParametersCount ());
       groups.reserve     (parameters_layout->GetGroupsCount ());
 
-        //получение таблицы расширенных настроек контекста
+        //РїРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СЂР°СЃС€РёСЂРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕРµРє РєРѕРЅС‚РµРєСЃС‚Р°
 
       const ContextCaps& caps = GetCaps ();  
 
-        //преобразование параметров
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
         
       GLhandleARB handle = program.GetHandle ();
 
@@ -74,7 +74,7 @@ GlslBindableProgram::GlslBindableProgram
           dst_parameter.location = caps.glGetUniformLocation_fn (handle, src_parameter.name);      
 
           if (dst_parameter.location == -1)
-            continue; //пропускаем параметры, отсутствующие в программе
+            continue; //РїСЂРѕРїСѓСЃРєР°РµРј РїР°СЂР°РјРµС‚СЂС‹, РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ РІ РїСЂРѕРіСЂР°РјРјРµ
 
           size_t                        name_hash  = common::strhash (src_parameter.name);
           const GlslProgram::Parameter* uniform    = 0;
@@ -101,15 +101,15 @@ GlslBindableProgram::GlslBindableProgram
             uniform_linked [uniform - uniforms] = true;
 
           dst_parameter.type   = src_parameter.type;
-          dst_parameter.count  = uniform ? stl::min (src_parameter.count, uniform->elements_count) : src_parameter.count; //расположение параметров может содержать больше число эелементов, чем требуется программе
+          dst_parameter.count  = uniform ? stl::min (src_parameter.count, uniform->elements_count) : src_parameter.count; //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ Р±РѕР»СЊС€Рµ С‡РёСЃР»Рѕ СЌРµР»РµРјРµРЅС‚РѕРІ, С‡РµРј С‚СЂРµР±СѓРµС‚СЃСЏ РїСЂРѕРіСЂР°РјРјРµ
           dst_parameter.offset = src_parameter.offset;
 
-            //добавление нового параметра
+            //РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 
           parameters.push_back (dst_parameter);
         }
 
-          //добавление новой группы
+          //РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ РіСЂСѓРїРїС‹
 
         Group dst_group;
 
@@ -119,13 +119,13 @@ GlslBindableProgram::GlslBindableProgram
         dst_group.parameters = &parameters [start_parameters_count];
 
         if (!dst_group.count)
-          continue; //пропускаем пустые группы
+          continue; //РїСЂРѕРїСѓСЃРєР°РµРј РїСѓСЃС‚С‹Рµ РіСЂСѓРїРїС‹
 
         groups.push_back (dst_group);
       }    
     }
     
-      //проверка связанности всех параметров программы
+      //РїСЂРѕРІРµСЂРєР° СЃРІСЏР·Р°РЅРЅРѕСЃС‚Рё РІСЃРµС… РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹
 
     for (unsigned int i=0; i<uniforms_count; i++)
       if (!uniform_linked [i])
@@ -140,43 +140,43 @@ GlslBindableProgram::GlslBindableProgram
 }
 
 /*
-    Установка в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::GlslBindableProgram::Bind";
 
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!constant_buffers)
     throw xtl::make_null_argument_exception (METHOD_NAME, "constant_buffers");
 
-    //установка текущего контекста
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   MakeContextCurrent ();
   
-    //получение данных из кэша контекста
+    //РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· РєСЌС€Р° РєРѕРЅС‚РµРєСЃС‚Р°
 
   const ContextCaps& caps            = GetCaps ();
   const size_t       current_program = GetContextCacheValue (CacheEntry_UsedProgram);
 
   if (current_program != program.GetId ())
   {
-      //установка программы шейдинга в контекст OpenGL
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
     caps.glUseProgram_fn (program.GetHandle ());    
 
     SetContextCacheValue (CacheEntry_UsedProgram, program.GetId ());
   }
   
-    //обновление информации о текущей программе (во избежание ошибочного кэширования glUniform от другой GlslBindableProgram связанной с GlslProgram данной программы)
+    //РѕР±РЅРѕРІР»РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ РїСЂРѕРіСЂР°РјРјРµ (РІРѕ РёР·Р±РµР¶Р°РЅРёРµ РѕС€РёР±РѕС‡РЅРѕРіРѕ РєСЌС€РёСЂРѕРІР°РЅРёСЏ glUniform РѕС‚ РґСЂСѓРіРѕР№ GlslBindableProgram СЃРІСЏР·Р°РЅРЅРѕР№ СЃ GlslProgram РґР°РЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹)
     
   bool use_cache = program.GetLastBindableProgramId () == GetId ();
     
   program.SetLastBindableProgramId (GetId ());
 
-    //установка параметров программы в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   for (GroupArray::iterator iter=groups.begin (), end=groups.end (); iter!=end; ++iter)
   {
@@ -190,11 +190,11 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     if (use_cache && group.data_hash == constant_buffer_hash)
       continue;
 
-      //обновление хэша параметров группы
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С…СЌС€Р° РїР°СЂР°РјРµС‚СЂРѕРІ РіСЂСѓРїРїС‹
 
     group.data_hash = constant_buffer_hash;
 
-      //установка параметров
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
 
     char* buffer_base = (char*)constant_buffers [group.slot]->GetDataPointer ();
 
@@ -227,13 +227,13 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     }
   }  
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-   Получение транспонированных матриц
+   РџРѕР»СѓС‡РµРЅРёРµ С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРЅС‹С… РјР°С‚СЂРёС†
 */
 
 template <unsigned int Size>
@@ -251,7 +251,7 @@ float* GlslBindableProgram::GetTransposedMatrixes (unsigned int count, float* da
 }
 
 /*
-    Проверка корректности контекста выполнения программы
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚Р° РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 void GlslBindableProgram::Validate ()
@@ -260,7 +260,7 @@ void GlslBindableProgram::Validate ()
   {
     GLhandleARB handle = program.GetHandle ();
     
-      //проверка состояния программы
+      //РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРѕРіСЂР°РјРјС‹
 
     if (glValidateProgram)
     {
@@ -286,7 +286,7 @@ void GlslBindableProgram::Validate ()
     }
 #endif
     
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
     
     CheckErrors ("");          
     

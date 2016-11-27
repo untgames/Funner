@@ -7,33 +7,33 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVED_ENTITIES_COUNT = 512; //резервируемое количество отображаемых объектов
-const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображаемых фреймов
+const size_t RESERVED_ENTITIES_COUNT = 512; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹С… РѕР±СЉРµРєС‚РѕРІ
+const size_t RESERVED_FRAMES_COUNT   = 32;  //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹С… С„СЂРµР№РјРѕРІ
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr> TextureMap;
 
 /*
-    Хранилище для эффекта
+    РҐСЂР°РЅРёР»РёС‰Рµ РґР»СЏ СЌС„С„РµРєС‚Р°
 */
 
 struct EffectHolder: public CacheSource
 {
-  FrameImpl&                 frame;                  //ссылка на кадр
-  DeviceManagerPtr           device_manager;         //менеджер устройства отрисовки
-  EffectManagerPtr           effect_manager;         //ссылка на менеджер эффектов
-  EffectProxy                effect;                 //эффект кадра
-  EffectRendererPtr          effect_renderer;        //рендер эффекта
-  EffectPtr                  cached_effect;          //закэшированный эффект
-  ProgramParametersLayoutPtr properties_layout;      //расположение свойств
+  FrameImpl&                 frame;                  //СЃСЃС‹Р»РєР° РЅР° РєР°РґСЂ
+  DeviceManagerPtr           device_manager;         //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  EffectManagerPtr           effect_manager;         //СЃСЃС‹Р»РєР° РЅР° РјРµРЅРµРґР¶РµСЂ СЌС„С„РµРєС‚РѕРІ
+  EffectProxy                effect;                 //СЌС„С„РµРєС‚ РєР°РґСЂР°
+  EffectRendererPtr          effect_renderer;        //СЂРµРЅРґРµСЂ СЌС„С„РµРєС‚Р°
+  EffectPtr                  cached_effect;          //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ СЌС„С„РµРєС‚
+  ProgramParametersLayoutPtr properties_layout;      //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager, FrameImpl& in_frame)
     : frame (in_frame)
     , device_manager (in_device_manager)
@@ -44,7 +44,7 @@ struct EffectHolder: public CacheSource
     effect.AttachCacheHolder (*this);
   }
   
-///Установка эффекта
+///РЈСЃС‚Р°РЅРѕРІРєР° СЌС„С„РµРєС‚Р°
   void SetEffect (const char* name)
   {
     effect.DetachCacheHolder (*this);
@@ -56,7 +56,7 @@ struct EffectHolder: public CacheSource
     InvalidateCache ();
   }
 
-///Работа с кэшем
+///Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     cached_effect   = EffectPtr ();
@@ -87,15 +87,15 @@ struct EffectHolder: public CacheSource
 };
 
 /*
-    Описание объекта рендеринга
+    РћРїРёСЃР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct EntityDesc
 {
-  EntityPtr                  entity;          //объект
-  void*                      user_data;       //пользовательские данные
-  LowLevelBufferPtr          property_buffer; //буфер динамических свойств объекта
-  ProgramParametersLayoutPtr layout;          //расположение динамических свойств объекта
+  EntityPtr                  entity;          //РѕР±СЉРµРєС‚
+  void*                      user_data;       //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+  LowLevelBufferPtr          property_buffer; //Р±СѓС„РµСЂ РґРёРЅР°РјРёС‡РµСЃРєРёС… СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р°
+  ProgramParametersLayoutPtr layout;          //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р°
   
   EntityDesc (const EntityPtr& in_entity, void* in_user_data)
     : entity (in_entity)
@@ -107,7 +107,7 @@ struct EntityDesc
 }
 
 /*
-    Описание реализации кадра
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°РґСЂР°
 */
 
 typedef stl::vector<FramePtr>   FrameArray;
@@ -115,28 +115,28 @@ typedef stl::vector<EntityDesc> EntityArray;
 
 struct FrameImpl::Impl: public CacheHolder
 {
-  stl::auto_ptr<EffectHolder>          effect_holder;           //хранилище эффекта
-  EntityArray                          entities;                //список объектов, отображаемых в кадре
-  FrameArray                           frames;                  //список вложенных кадров
-  PropertyBuffer                       properties;              //свойства кадра
-  PropertyCachePtr                     entities_properties;     //динамические свойства объектов
-  render::manager::ShaderOptionsCache  shader_options_cache;    //кэш опций шейдера
-  RenderTargetMapPtr                   render_targets;          //целевые буферы отрисовки
-  TextureMap                           textures;                //локальные текстуры фрейма
-  bool                                 scissor_state;           //включено ли отсечение
-  size_t                               clear_flags;             //флаги очистки
-  math::vec4f                          clear_color;             //цвет очистки фона
-  float                                clear_depth_value;       //значение буфера глубины после очистки
-  unsigned char                        clear_stencil_index;     //значение буфера трафарета после очистки
-  LowLevelBufferPtr                    cached_properties;       //закэшированные свойства
-  EntityDrawFunction                   entity_draw_handler;     //обработчик рисования объектов
-  EntityDrawParams                     entity_draw_params;      //параметры рисования объектов (кэш)
-  math::mat4f                          view_proj_tm;            //матрица view * projection
-  LowLevelBufferPtr                    entity_independent_property_buffer; //буфер динамических свойств объекта (начальное состояние)
-  ProgramParametersLayoutPtr           entity_independent_layout;          //расположение динамических свойств объекта (начальное состояние)
-  bool                                 auto_cleanup_state;                 //самоочистка кадра после отрисовки
+  stl::auto_ptr<EffectHolder>          effect_holder;           //С…СЂР°РЅРёР»РёС‰Рµ СЌС„С„РµРєС‚Р°
+  EntityArray                          entities;                //СЃРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ, РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹С… РІ РєР°РґСЂРµ
+  FrameArray                           frames;                  //СЃРїРёСЃРѕРє РІР»РѕР¶РµРЅРЅС‹С… РєР°РґСЂРѕРІ
+  PropertyBuffer                       properties;              //СЃРІРѕР№СЃС‚РІР° РєР°РґСЂР°
+  PropertyCachePtr                     entities_properties;     //РґРёРЅР°РјРёС‡РµСЃРєРёРµ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚РѕРІ
+  render::manager::ShaderOptionsCache  shader_options_cache;    //РєСЌС€ РѕРїС†РёР№ С€РµР№РґРµСЂР°
+  RenderTargetMapPtr                   render_targets;          //С†РµР»РµРІС‹Рµ Р±СѓС„РµСЂС‹ РѕС‚СЂРёСЃРѕРІРєРё
+  TextureMap                           textures;                //Р»РѕРєР°Р»СЊРЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹ С„СЂРµР№РјР°
+  bool                                 scissor_state;           //РІРєР»СЋС‡РµРЅРѕ Р»Рё РѕС‚СЃРµС‡РµРЅРёРµ
+  size_t                               clear_flags;             //С„Р»Р°РіРё РѕС‡РёСЃС‚РєРё
+  math::vec4f                          clear_color;             //С†РІРµС‚ РѕС‡РёСЃС‚РєРё С„РѕРЅР°
+  float                                clear_depth_value;       //Р·РЅР°С‡РµРЅРёРµ Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹ РїРѕСЃР»Рµ РѕС‡РёСЃС‚РєРё
+  unsigned char                        clear_stencil_index;     //Р·РЅР°С‡РµРЅРёРµ Р±СѓС„РµСЂР° С‚СЂР°С„Р°СЂРµС‚Р° РїРѕСЃР»Рµ РѕС‡РёСЃС‚РєРё
+  LowLevelBufferPtr                    cached_properties;       //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Рµ СЃРІРѕР№СЃС‚РІР°
+  EntityDrawFunction                   entity_draw_handler;     //РѕР±СЂР°Р±РѕС‚С‡РёРє СЂРёСЃРѕРІР°РЅРёСЏ РѕР±СЉРµРєС‚РѕРІ
+  EntityDrawParams                     entity_draw_params;      //РїР°СЂР°РјРµС‚СЂС‹ СЂРёСЃРѕРІР°РЅРёСЏ РѕР±СЉРµРєС‚РѕРІ (РєСЌС€)
+  math::mat4f                          view_proj_tm;            //РјР°С‚СЂРёС†Р° view * projection
+  LowLevelBufferPtr                    entity_independent_property_buffer; //Р±СѓС„РµСЂ РґРёРЅР°РјРёС‡РµСЃРєРёС… СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р° (РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ)
+  ProgramParametersLayoutPtr           entity_independent_layout;          //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… СЃРІРѕР№СЃС‚РІ РѕР±СЉРµРєС‚Р° (РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ)
+  bool                                 auto_cleanup_state;                 //СЃР°РјРѕРѕС‡РёСЃС‚РєР° РєР°РґСЂР° РїРѕСЃР»Рµ РѕС‚СЂРёСЃРѕРІРєРё
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (FrameImpl& owner, const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
     : effect_holder (new EffectHolder (effect_manager, device_manager, owner))
     , properties (device_manager)
@@ -159,13 +159,13 @@ struct FrameImpl::Impl: public CacheHolder
     frames.reserve (RESERVED_FRAMES_COUNT);
   }
   
-///Получение номера уровня детализации по расстоянию
+///РџРѕР»СѓС‡РµРЅРёРµ РЅРѕРјРµСЂР° СѓСЂРѕРІРЅСЏ РґРµС‚Р°Р»РёР·Р°С†РёРё РїРѕ СЂР°СЃСЃС‚РѕСЏРЅРёСЋ
   unsigned int GetLod (double distance)
   {
     return (unsigned int)log (distance);
   }
   
-///Работа с кэшем
+///Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     cached_properties = LowLevelBufferPtr ();
@@ -191,7 +191,7 @@ struct FrameImpl::Impl: public CacheHolder
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& property_cache)
@@ -221,7 +221,7 @@ FrameImpl::~FrameImpl ()
 }
 
 /*
-    Карта целей рендеринга
+    РљР°СЂС‚Р° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void FrameImpl::SetRenderTargets (RenderTargetMapImpl& map)
@@ -235,7 +235,7 @@ RenderTargetMapImpl& FrameImpl::RenderTargets ()
 }
 
 /*
-    Область отсечения
+    РћР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void FrameImpl::SetScissorState (bool state)
@@ -249,7 +249,7 @@ bool FrameImpl::ScissorState ()
 }
 
 /*
-    Флаги очистки кадра
+    Р¤Р»Р°РіРё РѕС‡РёСЃС‚РєРё РєР°РґСЂР°
 */
 
 void FrameImpl::SetClearFlags (size_t clear_flags)
@@ -263,7 +263,7 @@ size_t FrameImpl::ClearFlags ()
 }
 
 /*
-    Параметры очистки буфера цвета
+    РџР°СЂР°РјРµС‚СЂС‹ РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° С†РІРµС‚Р°
 */
 
 void FrameImpl::SetClearColor (const math::vec4f& color)
@@ -277,7 +277,7 @@ const math::vec4f& FrameImpl::ClearColor ()
 }
 
 /*
-    Параметры очистки буфера попиксельного отсечения
+    РџР°СЂР°РјРµС‚СЂС‹ РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void FrameImpl::SetClearDepthValue (float depth_value)
@@ -301,7 +301,7 @@ unsigned char FrameImpl::ClearStencilIndex ()
 }
 
 /*
-    Локальные текстуры
+    Р›РѕРєР°Р»СЊРЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void FrameImpl::SetLocalTexture (const char* name, const TexturePtr& texture)
@@ -342,7 +342,7 @@ void FrameImpl::RemoveAllLocalTextures ()
 }
 
 /*
-    Получение локальной текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ Р»РѕРєР°Р»СЊРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 TexturePtr FrameImpl::FindLocalTexture (const char* name)
@@ -375,7 +375,7 @@ TexturePtr FrameImpl::LocalTexture (const char* name)
 }
 
 /*
-    Установка эффекта рендеринга
+    РЈСЃС‚Р°РЅРѕРІРєР° СЌС„С„РµРєС‚Р° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void FrameImpl::SetEffect (const char* name)
@@ -403,7 +403,7 @@ const char* FrameImpl::Effect ()
 }
 
 /*
-    Рендер эффекта
+    Р РµРЅРґРµСЂ СЌС„С„РµРєС‚Р°
 */
 
 EffectRendererPtr FrameImpl::EffectRenderer ()
@@ -422,7 +422,7 @@ EffectRendererPtr FrameImpl::EffectRenderer ()
 }
 
 /*
-    Свойства рендеринга
+    РЎРІРѕР№СЃС‚РІР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void FrameImpl::SetProperties (const common::PropertyMap& properties)
@@ -446,7 +446,7 @@ const common::PropertyMap& FrameImpl::Properties ()
 }
 
 /*
-    Получение буфера свойств
+    РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° СЃРІРѕР№СЃС‚РІ
 */
 
 const LowLevelBufferPtr& FrameImpl::DevicePropertyBuffer ()
@@ -465,7 +465,7 @@ const LowLevelBufferPtr& FrameImpl::DevicePropertyBuffer ()
 }
 
 /*
-    Макро-определения шейдера
+    РњР°РєСЂРѕ-РѕРїСЂРµРґРµР»РµРЅРёСЏ С€РµР№РґРµСЂР°
 */
 
 void FrameImpl::SetShaderOptions (const common::PropertyMap& properties)
@@ -492,7 +492,7 @@ ShaderOptionsCache& FrameImpl::ShaderOptionsCache ()
 }
 
 /*
-    Список отрисовки
+    РЎРїРёСЃРѕРє РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 size_t FrameImpl::EntitiesCount ()
@@ -511,7 +511,7 @@ void FrameImpl::RemoveAllEntities ()
 }
 
 /*
-    Добавление вложенных кадров
+    Р”РѕР±Р°РІР»РµРЅРёРµ РІР»РѕР¶РµРЅРЅС‹С… РєР°РґСЂРѕРІ
 */
 
 size_t FrameImpl::FramesCount ()
@@ -530,7 +530,7 @@ void FrameImpl::RemoveAllFrames ()
 }
 
 /*
-    Автоматическая очистка кадра после отрисовки
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ РѕС‡РёСЃС‚РєР° РєР°РґСЂР° РїРѕСЃР»Рµ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void FrameImpl::SetAutoCleanup (bool state)
@@ -544,7 +544,7 @@ bool FrameImpl::IsAutoCleanupEnabled ()
 }
 
 /*
-    Установка пользовательского обработчика рисования объектов
+    РЈСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЂРёСЃРѕРІР°РЅРёСЏ РѕР±СЉРµРєС‚РѕРІ
 */
 
 void FrameImpl::SetEntityDrawHandler (const EntityDrawFunction& handler)
@@ -558,7 +558,7 @@ const Frame::EntityDrawFunction& FrameImpl::EntityDrawHandler ()
 }
 
 /*
-    Установка свойств пары frame-entity
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ РїР°СЂС‹ frame-entity
 */
 
 void FrameImpl::SetEntityDependentProperties (const common::PropertyMap& properties)
@@ -572,7 +572,7 @@ const common::PropertyMap& FrameImpl::EntityDependentProperties ()
 }
 
 /*
-    Установка матрицы vipew * projection
+    РЈСЃС‚Р°РЅРѕРІРєР° РјР°С‚СЂРёС†С‹ vipew * projection
 */
 
 void FrameImpl::SetViewProjectionMatrix (const math::mat4f& tm)
@@ -586,12 +586,12 @@ const math::mat4f& FrameImpl::ViewProjectionMatrix ()
 }
 
 /*
-    Подготовка к отрисовке кадра
+    РџРѕРґРіРѕС‚РѕРІРєР° Рє РѕС‚СЂРёСЃРѕРІРєРµ РєР°РґСЂР°
 */
 
 void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 {
-    //кэширование переменных
+    //РєСЌС€РёСЂРѕРІР°РЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
     
   render::manager::EffectRenderer& renderer                = *impl->effect_holder->effect_renderer;    
   Frame                            frame                   = Wrappers::Wrap<Frame> (this);
@@ -599,35 +599,35 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
   EntityDrawParams&                entity_draw_params      = impl->entity_draw_params;
   PropertyCache&                   entities_properties     = *impl->entities_properties;
 
-    //заполнение константного буфера соответствующего паре frame-entity (начальное состояние)
+    //Р·Р°РїРѕР»РЅРµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїР°СЂРµ frame-entity (РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ)
 
   LowLevelBufferPtr&          entity_independent_property_buffer = impl->entity_independent_property_buffer;
   ProgramParametersLayoutPtr& entity_independent_layout          = impl->entity_independent_layout;
 
   entities_properties.Convert (entity_draw_params.properties, entity_independent_property_buffer, entity_independent_layout);
 
-    //удаление предыдущих операций
+    //СѓРґР°Р»РµРЅРёРµ РїСЂРµРґС‹РґСѓС‰РёС… РѕРїРµСЂР°С†РёР№
   
   renderer.RemoveAllOperations ();
 
-    //построение списка операций
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РѕРїРµСЂР°С†РёР№
 
   for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
   {
     EntityDesc& desc = *iter;
     
-      //пропуск рисования пустых объектов
+      //РїСЂРѕРїСѓСЃРє СЂРёСЃРѕРІР°РЅРёСЏ РїСѓСЃС‚С‹С… РѕР±СЉРµРєС‚РѕРІ
     
     if (!desc.entity->LodsCount ())
       continue;
       
-      //обновление динамических текстур
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ
       
     DynamicTextureEntityStorage& dynamic_textures = desc.entity->DynamicTextureStorage ();
     
     dynamic_textures.Update (this);
       
-      //вызов обработчика
+      //РІС‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 
     unsigned int eye_distance = 0, lod = 0;
       
@@ -637,7 +637,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 
       entity_draw_handler (frame, entity_wrap, desc.user_data, entity_draw_params);
             
-        //расчёт расстояния от z-near до объекта
+        //СЂР°СЃС‡С‘С‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РѕС‚ z-near РґРѕ РѕР±СЉРµРєС‚Р°
         
       math::vec4f mvp_lod_point       = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
       double      normalized_distance = (stl::max (stl::min (mvp_lod_point.z / mvp_lod_point.w, 1.0f), -1.0f) + 1.0f) * 0.5f,
@@ -647,11 +647,11 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       lod          = impl->GetLod (distance);
     }    
 
-      //получение информации об уровне детализации
+      //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СѓСЂРѕРІРЅРµ РґРµС‚Р°Р»РёР·Р°С†РёРё
 
     const EntityLodDesc& lod_desc = desc.entity->GetLod (lod, true); 
 
-      //заполнение константного буфера соответствующего паре frame-entity
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїР°СЂРµ frame-entity
 
     if (has_entity_draw_handler && lod_desc.has_frame_independent_operations)
     {
@@ -663,7 +663,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       desc.layout          = ProgramParametersLayoutPtr ();
     }
 
-      //добавление операций рендеринга
+      //РґРѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
     renderer.AddOperations (lod_desc.operations, eye_distance, impl->view_proj_tm, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get (),
       entity_independent_property_buffer.get (), entity_independent_layout.get ());
@@ -676,40 +676,40 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 }
 
 /*
-    Рисование кадра
+    Р РёСЃРѕРІР°РЅРёРµ РєР°РґСЂР°
 */
 
 void FrameImpl::Draw (RenderingContext* previous_context)
 {
   try
   {
-      //обновление кэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
 
     UpdateCache ();
 
-      //обновление маркеров отрисовки для корневых кадров
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РјР°СЂРєРµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё РґР»СЏ РєРѕСЂРЅРµРІС‹С… РєР°РґСЂРѕРІ
     
     if (!previous_context)
       impl->effect_holder->device_manager->CacheManager ().UpdateMarkers ();
 
     try
     {
-        //формирование контекста отрисовки
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РѕС‚СЂРёСЃРѕРІРєРё
       
       RenderingContext context (*this, impl->view_proj_tm, previous_context);
       
       if (!impl->effect_holder->effect_renderer)
         throw xtl::format_operation_exception ("", "No effect assigned");
 
-        //построение списка операций
+        //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РѕРїРµСЂР°С†РёР№
         
       Prerender (impl->entity_draw_handler);
 
-        //выполнение операций рендеринга
+        //РІС‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№ СЂРµРЅРґРµСЂРёРЅРіР°
 
       impl->effect_holder->effect_renderer->ExecuteOperations (context);
 
-        //самоочистка кадра
+        //СЃР°РјРѕРѕС‡РёСЃС‚РєР° РєР°РґСЂР°
 
       if (impl->auto_cleanup_state)
       {
@@ -717,12 +717,12 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         RemoveAllEntities ();
       }
 
-        //сброс вспомогательных структур
+        //СЃР±СЂРѕСЃ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… СЃС‚СЂСѓРєС‚СѓСЂ
 
       impl->entity_independent_property_buffer = LowLevelBufferPtr ();
       impl->entity_independent_layout          = ProgramParametersLayoutPtr ();
 
-        //очистка временных данных
+        //РѕС‡РёСЃС‚РєР° РІСЂРµРјРµРЅРЅС‹С… РґР°РЅРЅС‹С…
       
       if (!previous_context)
         Cleanup ();
@@ -743,7 +743,7 @@ void FrameImpl::Draw (RenderingContext* previous_context)
 }
 
 /*
-    Очистка после рисования кадра
+    РћС‡РёСЃС‚РєР° РїРѕСЃР»Рµ СЂРёСЃРѕРІР°РЅРёСЏ РєР°РґСЂР°
 */
 
 void FrameImpl::Cleanup ()
@@ -753,7 +753,7 @@ void FrameImpl::Cleanup ()
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void FrameImpl::UpdateCache ()

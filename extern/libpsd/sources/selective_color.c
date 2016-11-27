@@ -67,13 +67,13 @@ psd_status psd_get_layer_selective_color(psd_context * context, psd_layer_record
 	// blues, magentas, whites, neutrals, blacks.
 	for(i = 0; i < 10; i ++)
 	{
-		// Amount of cyan correction. Short integer from ｨC100...100.
+		// Amount of cyan correction. Short integer from ﾐ，100...100.
 		data->cyan_correction[i] = psd_stream_get_short(context);
-		// Amount of magenta correction. Short integer from ｨC100...100.
+		// Amount of magenta correction. Short integer from ﾐ，100...100.
 		data->magenta_correction[i] = psd_stream_get_short(context);
-		// Amount of yellow correction. Short integer from ｨC100...100.
+		// Amount of yellow correction. Short integer from ﾐ，100...100.
 		data->yellow_correction[i] = psd_stream_get_short(context);
-		// Amount of black correction. Short integer from ｨC100...100.
+		// Amount of black correction. Short integer from ﾐ，100...100.
 		data->black_correction[i] = psd_stream_get_short(context);
 		psd_assert(data->cyan_correction[i] >= -100 && data->cyan_correction[i] <= 100);
 		psd_assert(data->magenta_correction[i] >= -100 && data->cyan_correction[i] <= 100);

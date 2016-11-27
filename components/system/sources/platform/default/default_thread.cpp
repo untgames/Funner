@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -18,7 +18,7 @@ void raise (const char* method_name)
 }
 
 /*
-    Создание / удаление нити
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ РЅРёС‚Рё
 */
 
 thread_t DefaultThreadManager::CreateThread (IThreadCallback*)
@@ -33,7 +33,7 @@ void DefaultThreadManager::DestroyThread (thread_t)
 }
 
 /*
-    Ожидание завершения нити
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РЅРёС‚Рё
 */
 
 void DefaultThreadManager::JoinThread (thread_t)
@@ -42,7 +42,7 @@ void DefaultThreadManager::JoinThread (thread_t)
 }
 
 /*
-   Получение идентификатора нити
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РЅРёС‚Рё
 */
 
 size_t DefaultThreadManager::GetThreadId (thread_t thread)
@@ -57,7 +57,7 @@ size_t DefaultThreadManager::GetCurrentThreadId ()
 }
 
 /*
-    Установка приоритета нити
+    РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРѕСЂРёС‚РµС‚Р° РЅРёС‚Рё
 */
 
 void DefaultThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)

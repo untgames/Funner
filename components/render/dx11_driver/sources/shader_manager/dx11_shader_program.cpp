@@ -4,13 +4,13 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVED_SLOTS_COUNT = 4; //резервируемое количество слотов
+const size_t RESERVED_SLOTS_COUNT = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‚РѕРІ
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -37,7 +37,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!shader_descs)
       throw xtl::make_null_argument_exception ("", "shader_descs");
@@ -45,7 +45,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
     if (!shaders_count)
       throw xtl::make_null_argument_exception ("", "shaders_count");
 
-      //создание шейдеров
+      //СЃРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂРѕРІ
 
     size_t buffers_count = 0;
 
@@ -55,7 +55,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
 
       ShaderPtr shader = library.CreateShader (desc, error_log);
 
-        //диспетчеризация типа шейдера
+        //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ С‚РёРїР° С€РµР№РґРµСЂР°
 
       ShaderType type = shader->GetType ();
 
@@ -73,11 +73,11 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
       buffers_count += shader->GetConstantBufferLayoutsCount ();
     }
 
-      //расчёт хэша вершинного шейдера
+      //СЂР°СЃС‡С‘С‚ С…СЌС€Р° РІРµСЂС€РёРЅРЅРѕРіРѕ С€РµР№РґРµСЂР°
 
     vertex_shader_code_hash = shaders [ShaderType_Vertex].holder ? shaders [ShaderType_Vertex].holder->GetShaderCode ().GetCompiledDataHash () : 0;
 
-      //копирование лэйаутов
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ Р»СЌР№Р°СѓС‚РѕРІ
 
     buffer_layouts.reserve (buffers_count);
 
@@ -131,7 +131,7 @@ Program::~Program ()
 }
 
 /*
-    Установка программы в контекст
+    РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 template <class T, ShaderType Type>
@@ -144,7 +144,7 @@ void Program::Bind (ID3D11DeviceContext& context) const
 {
   try
   {
-      //установка шейдеров
+      //СѓСЃС‚Р°РЅРѕРІРєР° С€РµР№РґРµСЂРѕРІ
 
     context.CSSetShader (Get<ID3D11ComputeShader, ShaderType_Compute> (), 0, 0);
     context.DSSetShader (Get<ID3D11DomainShader, ShaderType_Domain> (), 0, 0);
@@ -161,14 +161,14 @@ void Program::Bind (ID3D11DeviceContext& context) const
 }
 
 /*
-    Создание входного лэйаута
+    РЎРѕР·РґР°РЅРёРµ РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 */
 
 DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* descs, size_t descs_count) const
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!descs)
       throw xtl::make_null_argument_exception ("", "descs");
@@ -183,7 +183,7 @@ DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* des
 
     const ShaderCode& code = vs_slot.holder->GetShaderCode ();
 
-      //создание лэйаута
+      //СЃРѕР·РґР°РЅРёРµ Р»СЌР№Р°СѓС‚Р°
 
     ID3D11InputLayout* dx_layout = 0;
 
@@ -246,7 +246,7 @@ DxInputLayoutPtr Program::GetInputLayout (ShaderLibrary& library, const InputLay
 }
 
 /*
-    Перечисление константных буферов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅС‹С… Р±СѓС„РµСЂРѕРІ
 */
 
 const ProgramBufferLayout& Program::GetConstantBufferLayout (size_t index) const

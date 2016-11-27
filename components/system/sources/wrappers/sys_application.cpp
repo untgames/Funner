@@ -9,18 +9,18 @@ typedef xtl::com_ptr<IApplicationDelegate> DelegatePtr;
 namespace
 {
 
-const char* LOG_NAME = "system.application"; //имя потока протоколирования
+const char* LOG_NAME = "system.application"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
 /*
-    Описание реализации приложения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 class ApplicationImpl: private IApplicationListener
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationImpl ()
       : log (LOG_NAME)
     {
@@ -33,7 +33,7 @@ class ApplicationImpl: private IApplicationListener
       UpdateIdleState ();
     }      
     
-///Работа с делегатами
+///Р Р°Р±РѕС‚Р° СЃ РґРµР»РµРіР°С‚Р°РјРё
     void BeginDelegate (IApplicationDelegate* delegate)
     {          
       try
@@ -84,7 +84,7 @@ class ApplicationImpl: private IApplicationListener
       }
     }
 
-///Работа с очередью сообщений
+///Р Р°Р±РѕС‚Р° СЃ РѕС‡РµСЂРµРґСЊСЋ СЃРѕРѕР±С‰РµРЅРёР№
     void EnterMessageLoop ()
     {            
       if (!message_loop_count++)
@@ -106,7 +106,7 @@ class ApplicationImpl: private IApplicationListener
       return message_loop_count > 0;
     }    
     
-///Прекращение работы приложения
+///РџСЂРµРєСЂР°С‰РµРЅРёРµ СЂР°Р±РѕС‚С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code, bool need_notify_delegate = true)
     {
       if (is_exit_detected)
@@ -124,7 +124,7 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        ///подавление всех исключений
+        ///РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
         
@@ -133,7 +133,7 @@ class ApplicationImpl: private IApplicationListener
       return exit_code; 
     }
 
-///Подписка на события приложения
+///РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
     connection RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
     {
       try
@@ -167,7 +167,7 @@ class ApplicationImpl: private IApplicationListener
       }
     }
 
-///Подписка на сообщения / посылка сообщений
+///РџРѕРґРїРёСЃРєР° РЅР° СЃРѕРѕР±С‰РµРЅРёСЏ / РїРѕСЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёР№
     connection RegisterNotificationHandler (const char* notification_wildcard, const Application::NotificationHandler& handler)
     {
       return notification_signal.connect (xtl::bind (&ApplicationImpl::HandleNotification, _1, stl::string (notification_wildcard), handler));
@@ -178,16 +178,16 @@ class ApplicationImpl: private IApplicationListener
       notification_signal (notification);
     }
     
-///Подписка на событие обновления системных свойств
+///РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
     PropertyMap& CustomProperties () { return custom_properties; }
 
-///Включен ли Idle режим?
+///Р’РєР»СЋС‡РµРЅ Р»Рё Idle СЂРµР¶РёРј?
     bool IsIdleEnabled ()
     {
       return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (main_thread_id) != 0;
     }
 
-///Обработка действий
+///РћР±СЂР°Р±РѕС‚РєР° РґРµР№СЃС‚РІРёР№
     static void ProcessActions (ActionThread thread)
     {
       try
@@ -224,7 +224,7 @@ class ApplicationImpl: private IApplicationListener
     typedef xtl::signal<void ()>             ApplicationSignal;
     typedef xtl::signal<void (const char*)>  NotificationSignal;
     
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
     void Notify (ApplicationEvent event)
     {
       try
@@ -241,7 +241,7 @@ class ApplicationImpl: private IApplicationListener
       }
     }             
 
-///Обновление idle-режима
+///РћР±РЅРѕРІР»РµРЅРёРµ idle-СЂРµР¶РёРјР°
     void UpdateIdleState ()
     {
       try
@@ -256,7 +256,7 @@ class ApplicationImpl: private IApplicationListener
       }
     }
 
-///Обработка инициализации приложения
+///РћР±СЂР°Р±РѕС‚РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnInitialize ()
     {
       try
@@ -265,11 +265,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Обработка приостановки приложения
+///РћР±СЂР°Р±РѕС‚РєР° РїСЂРёРѕСЃС‚Р°РЅРѕРІРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnPause ()
     {
       try
@@ -278,11 +278,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Обработка восстановления приложения
+///РћР±СЂР°Р±РѕС‚РєР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnResume ()
     {
       try
@@ -291,11 +291,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Обработка остановки приложения
+///РћР±СЂР°Р±РѕС‚РєР° РѕСЃС‚Р°РЅРѕРІРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnStop ()
     {
       try
@@ -304,11 +304,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Обработка восстановления приложения
+///РћР±СЂР°Р±РѕС‚РєР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnStart ()
     {
       try
@@ -317,11 +317,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Обработка недостаточности памяти
+///РћР±СЂР°Р±РѕС‚РєР° РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕСЃС‚Рё РїР°РјСЏС‚Рё
     void OnMemoryWarning ()
     {
       try
@@ -330,11 +330,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Обработка idle
+///РћР±СЂР°Р±РѕС‚РєР° idle
     void OnIdle ()
     {
       try
@@ -351,11 +351,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        ///подавление всех исключений
+        ///РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Обработка событий exit
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ exit
     void OnExit (int code)
     {
       try
@@ -364,11 +364,11 @@ class ApplicationImpl: private IApplicationListener
       }
       catch (...)
       {
-        ///подавление всех исключений
+        ///РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
        
-///Событие добавлено в очередь событий
+///РЎРѕР±С‹С‚РёРµ РґРѕР±Р°РІР»РµРЅРѕ РІ РѕС‡РµСЂРµРґСЊ СЃРѕР±С‹С‚РёР№
     void OnPushAction (ActionThread thread, Action& action)
     {
       //TODO: synchronization for UpdateIdleState
@@ -395,7 +395,7 @@ class ApplicationImpl: private IApplicationListener
       }              
     }    
 
-///Обработка сообщений
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№
     static void HandleNotification (const char* notification, const stl::string& notification_wildcard, const Application::NotificationHandler& handler)
     {
       if (!common::wcmatch (notification, notification_wildcard.c_str ()))
@@ -410,22 +410,22 @@ class ApplicationImpl: private IApplicationListener
     }
 
   private:
-    common::Log             log;                            //протоколирование
-    DelegatePtr             current_delegate;               //текущий делегат приложения
-    ApplicationSignal       signals [ApplicationEvent_Num]; //сигналы приложения
-    NotificationSignal      notification_signal;            //сигнал сообщений
-    PropertyMap             custom_properties;              //пользовательские свойства
-    int                     exit_code;                      //код завершения приложения
-    bool                    is_exit_detected;               //получен сигнал завершения приложения
-    size_t                  message_loop_count;             //количество вхождений в обработчик очереди сообщений
-    xtl::auto_connection    on_push_action;                 //в очередь добавлено действие
-    size_t                  main_thread_id;                 //идентификатор главной нити
+    common::Log             log;                            //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
+    DelegatePtr             current_delegate;               //С‚РµРєСѓС‰РёР№ РґРµР»РµРіР°С‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    ApplicationSignal       signals [ApplicationEvent_Num]; //СЃРёРіРЅР°Р»С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    NotificationSignal      notification_signal;            //СЃРёРіРЅР°Р» СЃРѕРѕР±С‰РµРЅРёР№
+    PropertyMap             custom_properties;              //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ СЃРІРѕР№СЃС‚РІР°
+    int                     exit_code;                      //РєРѕРґ Р·Р°РІРµСЂС€РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    bool                    is_exit_detected;               //РїРѕР»СѓС‡РµРЅ СЃРёРіРЅР°Р» Р·Р°РІРµСЂС€РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    size_t                  message_loop_count;             //РєРѕР»РёС‡РµСЃС‚РІРѕ РІС…РѕР¶РґРµРЅРёР№ РІ РѕР±СЂР°Р±РѕС‚С‡РёРє РѕС‡РµСЂРµРґРё СЃРѕРѕР±С‰РµРЅРёР№
+    xtl::auto_connection    on_push_action;                 //РІ РѕС‡РµСЂРµРґСЊ РґРѕР±Р°РІР»РµРЅРѕ РґРµР№СЃС‚РІРёРµ
+    size_t                  main_thread_id;                 //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РіР»Р°РІРЅРѕР№ РЅРёС‚Рё
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;
 
 /*
-    Обёртки над вызовами
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё
 */
 
 void Application::BeginDelegate (IApplicationDelegate* delegate)
@@ -604,7 +604,7 @@ bool Application::ScreenSaverState ()
 }
 
 /*
-    Управление режимом работы в фоне
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј СЂР°Р±РѕС‚С‹ РІ С„РѕРЅРµ
 */
 
 void Application::SetBackgroundMode (ApplicationBackgroundMode mode)
@@ -643,7 +643,7 @@ ApplicationBackgroundMode Application::BackgroundMode ()
 }
 
 /*
-    Получение платформо-зависимых системных свойств
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 common::PropertyMap Application::SystemProperties ()
@@ -699,6 +699,6 @@ void Application::RemoveSystemProperty (const char* name)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }

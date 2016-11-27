@@ -2,7 +2,7 @@
     reverse_iterator
 */
 
-//конструкторы
+//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 template <class Iter>
 inline reverse_iterator<Iter>::reverse_iterator (Iter i)
  : current (i)
@@ -18,7 +18,7 @@ reverse_iterator<Iter>::reverse_iterator (const reverse_iterator<Iter1>& x)
   : current (x.base ())
 { }
 
-//операции доступа и индексирования
+//РѕРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР° Рё РёРЅРґРµРєСЃРёСЂРѕРІР°РЅРёСЏ
 template <class Iter>
 inline typename reverse_iterator<Iter>::reference reverse_iterator<Iter>::operator * () const
 {
@@ -38,7 +38,7 @@ inline typename reverse_iterator<Iter>::pointer reverse_iterator<Iter>::operator
   return &(operator*());
 }
 
-//арифметические операции
+//Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё
 template <class Iter>
 inline reverse_iterator<Iter>& reverse_iterator<Iter>::operator ++ ()
 {
@@ -97,7 +97,7 @@ inline typename reverse_iterator<Iter>::difference_type reverse_iterator<Iter>::
   return x.base() - base();
 }
 
-//сравнение двух итераторов обратного перебора
+//СЃСЂР°РІРЅРµРЅРёРµ РґРІСѓС… РёС‚РµСЂР°С‚РѕСЂРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 template <class Iter>
 inline bool reverse_iterator<Iter>::operator == (const reverse_iterator& x) const
 {

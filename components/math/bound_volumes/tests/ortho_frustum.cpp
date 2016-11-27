@@ -16,7 +16,7 @@ int main()
 
   math::mat4f proj_matrix;
 
-  //������� ������� �������������, ������������ gluOrtho2D
+  //РІС‹Р±СЂР°РЅР° РјР°С‚СЂРёС†Р° РїСЂРѕРµС†РёСЂРѕРІР°РЅРёСЏ, РёСЃРїРѕР»СЊР·СѓРµРјР°СЏ gluOrtho2D
   proj_matrix [0] = vec4f (2.0f / width, 0, 0, - (right + left) / width);
   proj_matrix [1] = vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
   proj_matrix [2] = vec4f (0, 0, 2.0f / depth, - (z_near + z_far) / depth);

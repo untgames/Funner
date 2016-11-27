@@ -123,7 +123,7 @@ void destroy (Window& window, WindowEvent, const WindowEventContext&)
   printf ("window '%s': destroyed\n", window.Title ());
   fflush (stdout);  
 
-  throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
+  throw std::bad_alloc (); //С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ РёСЃРєР»СЋС‡РµРЅРёР№ РІ РѕР±СЂР°Р±РѕС‚С‡РёРєР°С… СЃРѕР±С‹С‚РёР№
 }
 
 void print_event (Window& window, WindowEvent event, const WindowEventContext& context)

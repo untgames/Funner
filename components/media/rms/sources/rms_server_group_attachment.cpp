@@ -3,7 +3,7 @@
 using namespace media::rms;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ServerGroupAttachment::ServerGroupAttachment (const char* name, ICustomServer& in_server)
@@ -20,7 +20,7 @@ ServerGroupAttachment::~ServerGroupAttachment ()
 }
 
 /*
-    Получение группы и сервера
+    РџРѕР»СѓС‡РµРЅРёРµ РіСЂСѓРїРїС‹ Рё СЃРµСЂРІРµСЂР°
 */
 
 ICustomServer& ServerGroupAttachment::Server () const
@@ -34,7 +34,7 @@ media::rms::ServerGroup ServerGroupAttachment::ServerGroup () const
 }
 
 /*
-    Управление оповещениями
+    РЈРїСЂР°РІР»РµРЅРёРµ РѕРїРѕРІРµС‰РµРЅРёСЏРјРё
 */
 
 void ServerGroupAttachment::SetNotificationsState (bool state)
@@ -54,7 +54,7 @@ bool ServerGroupAttachment::NotificationsState () const
 }
 
 /*
-    Управление ресурсами
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 void ServerGroupAttachment::PrefetchResource (const char* resource_name)

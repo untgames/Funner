@@ -6,23 +6,23 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t MIN_PARSE_TREE_BUFFER_SIZE = 4096;               //минимальный размер буфера дерева грамматического разбора
-const size_t MAX_PARSE_TREE_BUFFER_SIZE = 1024 * 1024 * 1024; //максимальный размер буфера дерева грамматического разбора
-const size_t NODES_STACK_RESERVE_SIZE   = 32;                 //резервируемый размер стека вложений узлов грамматического разбора
-const char*  DUMMY_NODE_NAME            = "";                 //имя пустого узла
-const char*  ROOT_NODE_NAME             = "root";             //имя корневого узла
+const size_t MIN_PARSE_TREE_BUFFER_SIZE = 4096;               //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґРµСЂРµРІР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+const size_t MAX_PARSE_TREE_BUFFER_SIZE = 1024 * 1024 * 1024; //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґРµСЂРµРІР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+const size_t NODES_STACK_RESERVE_SIZE   = 32;                 //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ СЃС‚РµРєР° РІР»РѕР¶РµРЅРёР№ СѓР·Р»РѕРІ РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+const char*  DUMMY_NODE_NAME            = "";                 //РёРјСЏ РїСѓСЃС‚РѕРіРѕ СѓР·Р»Р°
+const char*  ROOT_NODE_NAME             = "root";             //РёРјСЏ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р°
 
 /*
-    Элемент стека узлов
+    Р­Р»РµРјРµРЅС‚ СЃС‚РµРєР° СѓР·Р»РѕРІ
 */
 
 struct NodeStackItem
 {
-  size_t node_offset;       //смещение узла
-  size_t last_child_offset; //смещение последнего ребёнка
+  size_t node_offset;       //СЃРјРµС‰РµРЅРёРµ СѓР·Р»Р°
+  size_t last_child_offset; //СЃРјРµС‰РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЂРµР±С‘РЅРєР°
 
   NodeStackItem (size_t in_node_offset) : node_offset (in_node_offset), last_child_offset (0) {}
 };
@@ -30,24 +30,24 @@ struct NodeStackItem
 }
 
 /*
-    Описание реализации ParseTreeBuilder
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё ParseTreeBuilder
 */
 
 typedef stl::vector<NodeStackItem> NodeStack;
 
 struct ParseTreeBuilder::Impl
 {
-  char*           front_offset;                  //текущая позиция выделения памяти в передней части буфера
-  char*           back_offset;                   //текущая позиция выделения памяти в задней части буфера
-  ParseTreeBuffer buffer;                        //буфер дерева разбора
-  NodeStack       nodes_stack;                   //стек смещений кадров
-  size_t          total_nodes_count;             //общее количество узлов
-  size_t          total_attributes_count;        //общее количество атрибутов
-  size_t          current_source_offset;         //смещение до имени текущего исходного текста
-  size_t          current_line_number;           //номер текущей строки в исходном тексте
-  size_t*         current_node_attributes_count; //текущее количество атрибутов в узле
+  char*           front_offset;                  //С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РІ РїРµСЂРµРґРЅРµР№ С‡Р°СЃС‚Рё Р±СѓС„РµСЂР°
+  char*           back_offset;                   //С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РІ Р·Р°РґРЅРµР№ С‡Р°СЃС‚Рё Р±СѓС„РµСЂР°
+  ParseTreeBuffer buffer;                        //Р±СѓС„РµСЂ РґРµСЂРµРІР° СЂР°Р·Р±РѕСЂР°
+  NodeStack       nodes_stack;                   //СЃС‚РµРє СЃРјРµС‰РµРЅРёР№ РєР°РґСЂРѕРІ
+  size_t          total_nodes_count;             //РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓР·Р»РѕРІ
+  size_t          total_attributes_count;        //РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ
+  size_t          current_source_offset;         //СЃРјРµС‰РµРЅРёРµ РґРѕ РёРјРµРЅРё С‚РµРєСѓС‰РµРіРѕ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р°
+  size_t          current_line_number;           //РЅРѕРјРµСЂ С‚РµРєСѓС‰РµР№ СЃС‚СЂРѕРєРё РІ РёСЃС…РѕРґРЅРѕРј С‚РµРєСЃС‚Рµ
+  size_t*         current_node_attributes_count; //С‚РµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РІ СѓР·Р»Рµ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     front_offset                  = 0;
@@ -61,7 +61,7 @@ struct ParseTreeBuilder::Impl
     nodes_stack.reserve (NODES_STACK_RESERVE_SIZE);
   }
 
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
   Impl (const Impl& impl)
     : nodes_stack (impl.nodes_stack)
   {
@@ -75,7 +75,7 @@ struct ParseTreeBuilder::Impl
     current_line_number    = impl.current_line_number;
   }
 
-///Копирование буфера
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂР°
   void CopyBufferTo (Impl& impl, size_t buffer_size) const
   {
     size_t old_front_offset                 = front_offset - buffer.data (),
@@ -97,7 +97,7 @@ struct ParseTreeBuilder::Impl
     impl.buffer.swap (new_buffer);
   }
 
-///Заказ памяти в буфере
+///Р—Р°РєР°Р· РїР°РјСЏС‚Рё РІ Р±СѓС„РµСЂРµ
   void Alloc (size_t new_size)
   {
     if (size_t (back_offset - front_offset) > new_size)
@@ -106,7 +106,7 @@ struct ParseTreeBuilder::Impl
     Reserve (buffer.size () + new_size);
   }
 
-///Резервирование места в буфере
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РІ Р±СѓС„РµСЂРµ
   void Reserve (size_t new_size)
   {
     if (buffer.size () >= new_size)
@@ -134,7 +134,7 @@ struct ParseTreeBuilder::Impl
     CopyBufferTo (*this, new_size);
   }
 
-///Резервирование места в передней части буфера
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РІ РїРµСЂРµРґРЅРµР№ С‡Р°СЃС‚Рё Р±СѓС„РµСЂР°
   char* AllocFront (size_t size)
   {
     Alloc (size);
@@ -146,7 +146,7 @@ struct ParseTreeBuilder::Impl
     return res;
   }
 
-///Резервирование места в задней части буфера
+///Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РІ Р·Р°РґРЅРµР№ С‡Р°СЃС‚Рё Р±СѓС„РµСЂР°
   char* AllocBack (size_t size)
   {
     Alloc (size);
@@ -158,18 +158,18 @@ struct ParseTreeBuilder::Impl
 };
 
 /*
-    Конструктор / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ParseTreeBuilder::ParseTreeBuilder ()
   : impl (new Impl)
 {
-    //создание пустого узла
+    //СЃРѕР·РґР°РЅРёРµ РїСѓСЃС‚РѕРіРѕ СѓР·Р»Р°
 
   BeginNode (DUMMY_NODE_NAME);
   EndNode   ();
 
-    //создание корневого узла
+    //СЃРѕР·РґР°РЅРёРµ РєРѕСЂРЅРµРІРѕРіРѕ СѓР·Р»Р°
 
   impl->nodes_stack.clear ();
   impl->total_nodes_count = 0;
@@ -194,10 +194,10 @@ ParseTreeBuilder& ParseTreeBuilder::operator = (const ParseTreeBuilder& builder)
 }
 
 /*
-    Информация о контексте
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РєРѕРЅС‚РµРєСЃС‚Рµ
 */
 
-//имя текущего узла
+//РёРјСЏ С‚РµРєСѓС‰РµРіРѕ СѓР·Р»Р°
 const char* ParseTreeBuilder::NodeName () const
 {
   if (!impl->buffer.data () || impl->nodes_stack.empty ())
@@ -206,32 +206,32 @@ const char* ParseTreeBuilder::NodeName () const
   return impl->buffer.data () + impl->nodes_stack.back ().node_offset + sizeof (ParseNodeImpl);
 }
 
-//уровень вложенности узлов (корень на нулевом уровне)
+//СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СѓР·Р»РѕРІ (РєРѕСЂРµРЅСЊ РЅР° РЅСѓР»РµРІРѕРј СѓСЂРѕРІРЅРµ)
 size_t ParseTreeBuilder::NodeDepth () const
 {
   return impl->nodes_stack.size () - 1;
 }
 
-//общее количество узлов
+//РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓР·Р»РѕРІ
 size_t ParseTreeBuilder::TotalNodesCount () const
 {
   return impl->total_nodes_count;
 }
 
-//общее количество атрибутов
+//РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ
 size_t ParseTreeBuilder::TotalAttributesCount () const
 {
   return impl->total_attributes_count;
 }
 
-//размер буфера разбора
+//СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 size_t ParseTreeBuilder::BufferSize () const
 {
   return impl->buffer.size ();
 }
 
 /*
-    Имя текущего разбираемого исходного текста
+    РРјСЏ С‚РµРєСѓС‰РµРіРѕ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р°
 */
 
 void ParseTreeBuilder::SetSource (const char* name)
@@ -255,7 +255,7 @@ const char* ParseTreeBuilder::Source () const
 }
 
 /*
-    Определение границ узла
+    РћРїСЂРµРґРµР»РµРЅРёРµ РіСЂР°РЅРёС† СѓР·Р»Р°
 */
 
 void ParseTreeBuilder::BeginNode (const char* name)
@@ -265,12 +265,12 @@ void ParseTreeBuilder::BeginNode (const char* name)
 
 void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 {
-    //проверка корректности аргументов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
   if (!name)
     throw xtl::make_null_argument_exception ("common::ParseTreeBuilder::BeginNode(const char*, size_t)", "name");
 
-    //резервирование памяти для расположения узла
+    //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СѓР·Р»Р°
 
   size_t name_size   = strlen (name) + 1,
          node_offset = impl->front_offset - impl->buffer.data (),
@@ -278,7 +278,7 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 
   ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (impl->AllocFront (node_size));
 
-    //инициализация узла
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СѓР·Р»Р°
 
   node->attributes_count              = 0;
   node->name_hash                     = strhash (name);
@@ -293,7 +293,7 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 
   strcpy (reinterpret_cast<char*> (node) + sizeof (ParseNodeImpl), name);
 
-    //обновление ссылок на узел
+    //РѕР±РЅРѕРІР»РµРЅРёРµ СЃСЃС‹Р»РѕРє РЅР° СѓР·РµР»
 
   impl->nodes_stack.push_back (NodeStackItem (node_offset));
 
@@ -317,7 +317,7 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
     parent.last_child_offset = node_offset;
   }
 
-    //увеличение числа узлов
+    //СѓРІРµР»РёС‡РµРЅРёРµ С‡РёСЃР»Р° СѓР·Р»РѕРІ
 
   impl->total_nodes_count++;
 }
@@ -333,7 +333,7 @@ void ParseTreeBuilder::EndNode ()
 }
 
 /*
-    Добавление атрибутов
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 void ParseTreeBuilder::AddAttribute (const char* value)
@@ -345,7 +345,7 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
 {
   static const char* METHOD_NAME = "common::ParseTreeBuilder::AddAttributes";
 
-    //проверка корректности аргументов и подсчёт количества памяти, необходимого для хранения значений атрибутов
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РїРѕРґСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІР° РїР°РјСЏС‚Рё, РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёР№ Р°С‚СЂРёР±СѓС‚РѕРІ
 
   if (!impl->current_node_attributes_count)
     throw xtl::format_operation_exception (METHOD_NAME, "Attributes section closed");
@@ -365,7 +365,7 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
     attribute_values_size += strlen (value) + 1;
   }
 
-    //резервирование памяти
+    //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 
   impl->Alloc (attribute_values_size + count * sizeof (size_t));
 
@@ -374,7 +374,7 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
 
   dst_value += attribute_values_size;
 
-    //копирование атрибутов в буфер
+    //РєРѕРїРёСЂРѕРІР°РЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ РІ Р±СѓС„РµСЂ
 
   for (size_t i=0; i<count; i++, dst_offset++)
   {
@@ -387,14 +387,14 @@ void ParseTreeBuilder::AddAttributes (size_t count, const char** values)
     *dst_offset = impl->buffer.data () + impl->buffer.size () - dst_value;
   }
 
-    //увеличение числа атрибутов
+    //СѓРІРµР»РёС‡РµРЅРёРµ С‡РёСЃР»Р° Р°С‚СЂРёР±СѓС‚РѕРІ
 
   *impl->current_node_attributes_count += count;
   impl->total_attributes_count         += count;
 }
 
 /*
-    Резервирование буфера разбора
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 */
 
 void ParseTreeBuilder::ReserveBuffer (size_t size)
@@ -403,7 +403,7 @@ void ParseTreeBuilder::ReserveBuffer (size_t size)
 }
 
 /*
-    Завершение построения
+    Р—Р°РІРµСЂС€РµРЅРёРµ РїРѕСЃС‚СЂРѕРµРЅРёСЏ
 */
 
 ParseNode ParseTreeBuilder::BuildCore (const ParseLog* log)
@@ -430,7 +430,7 @@ ParseNode ParseTreeBuilder::Build (const ParseLog& log)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ParseTreeBuilder::Swap (ParseTreeBuilder& builder)

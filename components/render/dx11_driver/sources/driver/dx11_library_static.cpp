@@ -6,7 +6,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Library::Library ()
@@ -29,7 +29,7 @@ Library& Library::operator = (const Library&)
 }
 
 /*
-    Создание устройства
+    РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 HRESULT Library::D3D11CreateDevice (
@@ -48,7 +48,7 @@ HRESULT Library::D3D11CreateDevice (
 }
 
 /*
-    Создание DXGI фабрики
+    РЎРѕР·РґР°РЅРёРµ DXGI С„Р°Р±СЂРёРєРё
 */
 
 HRESULT Library::CreateDXGIFactory (REFIID riid, void** ppFactory)
@@ -57,7 +57,7 @@ HRESULT Library::CreateDXGIFactory (REFIID riid, void** ppFactory)
 }
 
 /*
-    Компиляция шейдера
+    РљРѕРјРїРёР»СЏС†РёСЏ С€РµР№РґРµСЂР°
 */
 
 HRESULT Library::D3DX11CompileFromMemory 
@@ -83,7 +83,7 @@ HRESULT Library::D3DX11CompileFromMemory
 }
 
 /*
-    Получение информации о шейдере  
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С€РµР№РґРµСЂРµ  
 */
 
 HRESULT Library::D3DReflect (LPCVOID pSrcData, SIZE_T SrcDataSize, REFIID pInterface, void** ppReflector)

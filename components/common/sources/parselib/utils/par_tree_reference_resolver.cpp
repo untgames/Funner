@@ -13,7 +13,7 @@ namespace
 
 typedef xtl::function<void (const char* reference_name, stl::string& reference_value)> ResolveHandler;
 
-//Обход дерева и разрешение ссылок в атрибутах
+//РћР±С…РѕРґ РґРµСЂРµРІР° Рё СЂР°Р·СЂРµС€РµРЅРёРµ СЃСЃС‹Р»РѕРє РІ Р°С‚СЂРёР±СѓС‚Р°С…
 struct ParseResolver
 {
   ParseResolver (const ResolveHandler& in_resolve_handler) : resolve_handler (in_resolve_handler) {}
@@ -105,7 +105,7 @@ struct ParseResolver
   ResolveHandler   resolve_handler;
 };
 
-//Разрешение ссылок исходя из узла дерева
+//Р Р°Р·СЂРµС€РµРЅРёРµ СЃСЃС‹Р»РѕРє РёСЃС…РѕРґСЏ РёР· СѓР·Р»Р° РґРµСЂРµРІР°
 struct ParseNodeResolver
 {
   ParseNodeResolver (const ParseNode& in_node)
@@ -126,7 +126,7 @@ struct ParseNodeResolver
   ParseNode node;
 };
 
-//Разрешение ссылок исходя из карты свойств
+//Р Р°Р·СЂРµС€РµРЅРёРµ СЃСЃС‹Р»РѕРє РёСЃС…РѕРґСЏ РёР· РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 struct PropertyMapResolver
 {
   PropertyMapResolver (const PropertyMap& in_properties) : properties (in_properties) {}
@@ -145,7 +145,7 @@ namespace common
 {
 
 /*
-    Разрешение ссылок в дереве разбора
+    Р Р°Р·СЂРµС€РµРЅРёРµ СЃСЃС‹Р»РѕРє РІ РґРµСЂРµРІРµ СЂР°Р·Р±РѕСЂР°
 */
 
 ParseNode resolve_references (const ParseNode& source_tree, const ResolveHandler& resolve_handler)

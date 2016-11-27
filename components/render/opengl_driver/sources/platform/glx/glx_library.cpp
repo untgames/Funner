@@ -6,7 +6,7 @@ using namespace render::low_level::opengl::glx;
 
 /*
 ===================================================================================================
-    Точки входа GLX драйвера
+    РўРѕС‡РєРё РІС…РѕРґР° GLX РґСЂР°Р№РІРµСЂР°
 ===================================================================================================
 */
 
@@ -32,7 +32,7 @@ typedef GLXDrawable  (*glXGetCurrentReadDrawableFn) (void);
 
 /*
 ===================================================================================================
-    Динамическая библиотека
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
 ===================================================================================================
 */
 
@@ -51,20 +51,20 @@ namespace glx
 class DynamicLibrary
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DynamicLibrary (const char* in_path)
       : library (0)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::glx::DynamicLibrary::DynamicLibrary";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!in_path)
         throw xtl::make_null_argument_exception (METHOD_NAME, "path");
         
       path = in_path;
       
-        //загрузка библиотеки
+        //Р·Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
         
       size_t dlopen_flags = RTLD_NOW | RTLD_GLOBAL;
 
@@ -74,26 +74,26 @@ class DynamicLibrary
         raise_error (common::format ("::dlopen('%S', %lu)", in_path, dlopen_flags).c_str ());
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~DynamicLibrary ()
     {
       //if (dlclose (library))
       //  raise_error ("::dlclose");
     }
     
-///Получение дескриптора библиотеки
+///РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° Р±РёР±Р»РёРѕС‚РµРєРё
     void* GetLibrary ()
     {
       return library;
     }
     
-///Получение пути к библиотеке
+///РџРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё Рє Р±РёР±Р»РёРѕС‚РµРєРµ
     const char* GetPath ()
     {
       return path.c_str ();
     }
     
-///Получение точки входа
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РѕС‡РєРё РІС…РѕРґР°
     void* GetSymbol (const char* symbol_name)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::glx::DynamicLibrary::GetSymbol";
@@ -107,8 +107,8 @@ class DynamicLibrary
     }
 
   private:
-    void*       library; //дескриптор библиотеки
-    stl::string path;    //путь к библиотеке
+    void*       library; //РґРµСЃРєСЂРёРїС‚РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
+    stl::string path;    //РїСѓС‚СЊ Рє Р±РёР±Р»РёРѕС‚РµРєРµ
 };
 
 typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
@@ -123,18 +123,18 @@ typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
 
 /*
 ===================================================================================================
-    GLX библиотека
+    GLX Р±РёР±Р»РёРѕС‚РµРєР°
 ===================================================================================================
 */
 
 struct AdapterLibrary::Impl
 {
-  Log                    log;             //протокол
-  DynamicLibraryPtr      dll;             //динамическая библиотека
-  IContextLostListener  *listener;        //слушатель события потери контекста
-  AdapterLibrary        *prev;            //предыдущая библиотека
-  AdapterLibrary        *next;            //следующая библиотека
-  static AdapterLibrary *first;           //первая библиотека
+  Log                    log;             //РїСЂРѕС‚РѕРєРѕР»
+  DynamicLibraryPtr      dll;             //РґРёРЅР°РјРёС‡РµСЃРєР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+  IContextLostListener  *listener;        //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёСЏ РїРѕС‚РµСЂРё РєРѕРЅС‚РµРєСЃС‚Р°
+  AdapterLibrary        *prev;            //РїСЂРµРґС‹РґСѓС‰Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+  AdapterLibrary        *next;            //СЃР»РµРґСѓСЋС‰Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
+  static AdapterLibrary *first;           //РїРµСЂРІР°СЏ Р±РёР±Р»РёРѕС‚РµРєР°
   
   glXCreateNewContextFn       fglXCreateNewContext;
   glXDestroyContextFn         fglXDestroyContext;
@@ -156,18 +156,18 @@ struct AdapterLibrary::Impl
   glXChooseFBConfigFn         fglXChooseFBConfig;
   glXQueryExtensionsStringFn  fglXQueryExtensionsString;
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (DynamicLibraryPtr& in_dll)
     : dll (in_dll)
     , listener (0)
   {
     try
     {
-        //регистрация библиотеки
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
       
       log.Printf ("...get default GLX-entries");
       
-        //инициализация точек входа
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР°
 
       GetSymbol ("glXCreateNewContext",       fglXCreateNewContext);
       GetSymbol ("glXDestroyContext",         fglXDestroyContext);
@@ -188,7 +188,7 @@ struct AdapterLibrary::Impl
       GetSymbol ("glXChooseFBConfig",         fglXChooseFBConfig);
       GetSymbol ("glXQueryExtensionsString",  fglXQueryExtensionsString);
 
-        //вывод общей информации
+        //РІС‹РІРѕРґ РѕР±С‰РµР№ РёРЅС„РѕСЂРјР°С†РёРё
       
       Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
       
@@ -217,7 +217,7 @@ struct AdapterLibrary::Impl
 
   }
     
-///Определение адреса точки входа с приведением типов и проверкой корректности аргументов
+///РћРїСЂРµРґРµР»РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР° СЃ РїСЂРёРІРµРґРµРЅРёРµРј С‚РёРїРѕРІ Рё РїСЂРѕРІРµСЂРєРѕР№ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
   template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
   {
     fn = (Fn)dll->GetSymbol (symbol);
@@ -227,7 +227,7 @@ struct AdapterLibrary::Impl
         "Symbol '%s' not found in library '%s'", symbol, dll->GetPath ());
   }        
     
-///Поиск библиотеки
+///РџРѕРёСЃРє Р±РёР±Р»РёРѕС‚РµРєРё
   static AdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
   {
     void *library = dll->GetLibrary ();
@@ -243,7 +243,7 @@ struct AdapterLibrary::Impl
 AdapterLibrary* AdapterLibrary::Impl::first = 0;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
@@ -259,7 +259,7 @@ AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
 
 AdapterLibrary::~AdapterLibrary ()
 { 
-    //отмена регистрации библиотеки
+    //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
     
   if (impl->prev) impl->prev->impl->next = impl->next;
   else            impl->first            = impl->next;
@@ -268,7 +268,7 @@ AdapterLibrary::~AdapterLibrary ()
 }
 
 /*
-    Загрузка библиотеки
+    Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
@@ -282,13 +282,13 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
   {
     Log log;        
     
-      //загрузка динамической библиотеки
+      //Р·Р°РіСЂСѓР·РєР° РґРёРЅР°РјРёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
       
     log.Printf ("...load library '%s'", path);
       
     DynamicLibraryPtr dll (new DynamicLibrary (path));
     
-      //попытка найти уже загруженную библиотеку
+      //РїРѕРїС‹С‚РєР° РЅР°Р№С‚Рё СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРЅСѓСЋ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
     AdapterLibrary* library = AdapterLibrary::Impl::FindLibrary (dll);
 
@@ -298,7 +298,7 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
       return library;
     }
 
-      //создание новой библиотеки
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
       
     return AdapterLibraryPtr (new AdapterLibrary (dll), false);
   }
@@ -310,7 +310,7 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
 }
 
 /*
-    Получение имени библиотеки
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё
 */
     
 const char* AdapterLibrary::GetName ()
@@ -319,7 +319,7 @@ const char* AdapterLibrary::GetName ()
 }
 
 /*
-    Создание внеэкранной области рендеринга
+    РЎРѕР·РґР°РЅРёРµ РІРЅРµСЌРєСЂР°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 GLXPbuffer AdapterLibrary::CreatePbuffer (Display *dpy, GLXFBConfig config, const int *attrib_list)
@@ -341,7 +341,7 @@ GLXPbuffer AdapterLibrary::CreatePbuffer (Display *dpy, GLXFBConfig config, cons
 }
 
 /*
-    Уничтожение внеэкранной области рендеринга
+    РЈРЅРёС‡С‚РѕР¶РµРЅРёРµ РІРЅРµСЌРєСЂР°РЅРЅРѕР№ РѕР±Р»Р°СЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
     
 void AdapterLibrary::DestroyPbuffer (Display *dpy, GLXPbuffer pbuf)
@@ -350,7 +350,7 @@ void AdapterLibrary::DestroyPbuffer (Display *dpy, GLXPbuffer pbuf)
 }
 
 /*
-    Создание нового контекста GLX-рендеринга
+    РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° GLX-СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 GLXContext AdapterLibrary::CreateContext (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct)
@@ -372,7 +372,7 @@ GLXContext AdapterLibrary::CreateContext (Display *dpy, GLXFBConfig config, int 
 }
 
 /*
-    Создание контекста GLX
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° GLX
 */
 
 void AdapterLibrary::DestroyContext (Display *dpy, GLXContext ctx)
@@ -381,12 +381,12 @@ void AdapterLibrary::DestroyContext (Display *dpy, GLXContext ctx)
 }
 
 /*
-    Установка текущего контекста
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext ctx, IContextLostListener* new_listener)
 {
-    //сброс текущего контекста
+    //СЃР±СЂРѕСЃ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
   if (impl->listener)
   {
@@ -396,7 +396,7 @@ bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
@@ -406,7 +406,7 @@ bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext
 }
 
 /*
-    Получение текущего контекста
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
     
 GLXContext AdapterLibrary::GetCurrentContext ()
@@ -415,7 +415,7 @@ GLXContext AdapterLibrary::GetCurrentContext ()
 }
 
 /*
-    Получение текущей области drawable
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё drawable
 */
     
 GLXDrawable AdapterLibrary::GetCurrentDrawable ()
@@ -424,7 +424,7 @@ GLXDrawable AdapterLibrary::GetCurrentDrawable ()
 }
 
 /*
-    Получение текущей области drawable для чтения
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё drawable РґР»СЏ С‡С‚РµРЅРёСЏ
 */
     
 GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
@@ -433,7 +433,7 @@ GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
 }
 
 /*
-    возвращает информацию о конфигурации GLX-буфера кадра
+    РІРѕР·РІСЂР°С‰Р°РµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РєРѕРЅС„РёРіСѓСЂР°С†РёРё GLX-Р±СѓС„РµСЂР° РєР°РґСЂР°
 */
 
 int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value)
@@ -442,7 +442,7 @@ int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int att
 }
 
 /*
-    Возвращает список всех конфигураций GLX-буфера кадра для данного экрана
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… РєРѕРЅС„РёРіСѓСЂР°С†РёР№ GLX-Р±СѓС„РµСЂР° РєР°РґСЂР° РґР»СЏ РґР°РЅРЅРѕРіРѕ СЌРєСЂР°РЅР°
 */
 
 GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *nelements)
@@ -451,7 +451,7 @@ GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *neleme
 }
 
 /*
-    Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РєРѕРЅС„РёРіСѓСЂР°С†РёР№ GLX-Р±СѓС„РµСЂР° РєР°РґСЂР°, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… Р·Р°РґР°РЅРЅС‹Рј Р°С‚СЂРёР±СѓС‚Р°Рј
 */
 
 GLXFBConfig* AdapterLibrary::ChooseFBConfig (Display *dpy, int screen, int *attrib_list, int *nelements)
@@ -460,7 +460,7 @@ GLXFBConfig* AdapterLibrary::ChooseFBConfig (Display *dpy, int screen, int *attr
 }
 
 /*
-    Обменивает содержимое рабочего и фонового буферов
+    РћР±РјРµРЅРёРІР°РµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ СЂР°Р±РѕС‡РµРіРѕ Рё С„РѕРЅРѕРІРѕРіРѕ Р±СѓС„РµСЂРѕРІ
 */
 
 void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
@@ -469,7 +469,7 @@ void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
 }
 
 /*
-    Получение списка поддерживаемых расширений
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 */
 
 const char* AdapterLibrary::GetExtensionsString (Display *dpy, int screen)
@@ -478,7 +478,7 @@ const char* AdapterLibrary::GetExtensionsString (Display *dpy, int screen)
 }
     
 /*
-    Получение адреса точки входа
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР°
 */
 
 void* AdapterLibrary::GetProcAddress (const char* name, unsigned int search_flags)

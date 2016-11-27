@@ -45,7 +45,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание спрайта
+    РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
 */
 
 Sprite::Pointer create_sprite ()
@@ -59,7 +59,7 @@ SpriteList::Pointer create_sprite_list ()
 }
 
 /*
-     Регистрация библиотеки работы с спрайтовыми моделями
+     Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃРїСЂР°Р№С‚РѕРІС‹РјРё РјРѕРґРµР»СЏРјРё
 */
 
 void bind_static_sprite_model_library (Environment& environment)
@@ -84,15 +84,15 @@ void bind_sprite_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
 
-    //регистрация статических библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… Р±РёР±Р»РёРѕС‚РµРє
 
   bind_static_sprite_model_library (environment);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Material", make_invoker (&SpriteModel::SetMaterial));
   lib.Register ("get_Material", make_invoker (&SpriteModel::Material));
@@ -105,28 +105,28 @@ void bind_sprite_model_library (Environment& environment)
   lib.Register ("set_OrtUp",    make_invoker (&SpriteModel::SetOrtUp));
   lib.Register ("get_OrtUp",    make_invoker (&SpriteModel::OrtUp));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<SpriteModel> (SCENE_SPRITE_MODEL_LIBRARY);
 }
 
 /*
-     Регистрация библиотеки работы с спрайтами
+     Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃРїСЂР°Р№С‚Р°РјРё
 */
 
 void bind_sprite_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SPRITE_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_SPRITE_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_sprite));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_TexOffset",  make_invoker (&Sprite::SetTexOffset));
   lib.Register ("get_TexOffset",  make_invoker (&Sprite::TexOffset));
@@ -140,13 +140,13 @@ void bind_sprite_library (Environment& environment)
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (Sprite::*) (float, float, float, float)> (&Sprite::SetColor)),
                                           make_invoker (implicit_cast<void (Sprite::*) (float, float, float)>        (&Sprite::SetColor))));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Sprite> (SCENE_SPRITE_LIBRARY);
 }
 
 /*
-    Создание линии
+    РЎРѕР·РґР°РЅРёРµ Р»РёРЅРёРё
 */
 
 Line::Pointer create_line ()
@@ -160,7 +160,7 @@ LineList::Pointer create_line_list ()
 }
 
 /*
-     Регистрация библиотеки работы с спрайтовыми моделями
+     Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃРїСЂР°Р№С‚РѕРІС‹РјРё РјРѕРґРµР»СЏРјРё
 */
 
 void bind_static_line_model_library (Environment& environment)
@@ -179,15 +179,15 @@ void bind_line_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_LINE_MODEL_LIBRARY);
 
-    //регистрация статических библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… Р±РёР±Р»РёРѕС‚РµРє
 
   bind_static_line_model_library (environment);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Material", make_invoker (&LineModel::SetMaterial));
   lib.Register ("get_Material", make_invoker (&LineModel::Material));
@@ -196,28 +196,28 @@ void bind_line_model_library (Environment& environment)
   lib.Register ("set_Usage",    make_invoker (&LineModel::SetUsage));
   lib.Register ("get_Usage",    make_invoker (&LineModel::Usage));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<LineModel> (SCENE_LINE_MODEL_LIBRARY);
 }
 
 /*
-     Регистрация библиотеки работы с линиями
+     Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ Р»РёРЅРёСЏРјРё
 */
 
 void bind_line_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_LINE_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_LINE_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_line));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_TexOffset",  make_invoker (&Line::SetTexOffset));
   lib.Register ("get_TexOffset",  make_invoker (&Line::TexOffset));
@@ -235,13 +235,13 @@ void bind_line_library (Environment& environment)
                                           make_invoker (implicit_cast<void (Line::*) (size_t, float, float, float)>        (&Line::SetColor)),
                                           make_invoker (implicit_cast<void (Line::*) (size_t, const math::vec4f&)>         (&Line::SetColor))));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Line> (SCENE_LINE_LIBRARY);
 }
 
 /*
-    Создание линии текста
+    РЎРѕР·РґР°РЅРёРµ Р»РёРЅРёРё С‚РµРєСЃС‚Р°
 */
 
 TextLine::Pointer create_text_line (media::FontLibrary& font_library)
@@ -250,18 +250,18 @@ TextLine::Pointer create_text_line (media::FontLibrary& font_library)
 }
 
 /*
-   Регистрация библиотеки работы с текстом
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ С‚РµРєСЃС‚РѕРј
 */
 
 void bind_text_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_TEXT_MODEL_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация операций и свойств
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№ Рё СЃРІРѕР№СЃС‚РІ
 
   lib.Register ("get_Material",        make_invoker (&TextModel::Material));
   lib.Register ("set_Material",        make_invoker (&TextModel::SetMaterial));
@@ -270,7 +270,7 @@ void bind_text_model_library (Environment& environment)
   lib.Register ("get_CharsCapacity",   make_invoker (&TextModel::CharsCapacity));
   lib.Register ("set_CharsCapacity",   make_invoker (&TextModel::ReserveChars));
 
-    //регистрация типа
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїР°
 
   environment.RegisterType<TextModel> (SCENE_TEXT_MODEL_LIBRARY);
 }
@@ -296,19 +296,19 @@ void bind_text_line_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_TEXT_MODEL_LIBRARY);
 
-    //регистрация статических переменных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РїРµСЂРµРјРµРЅРЅС‹С…
 
   bind_static_text_line_library (environment);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_text_line));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Text",                make_invoker (implicit_cast<void (TextLine::*) (const char*)> (&TextLine::SetTextUtf8)));
   lib.Register ("get_Text",                make_invoker (&TextLine::TextUtf8));
@@ -339,7 +339,7 @@ void bind_text_line_library (Environment& environment)
 }
 
 /*
-    Создание модели
+    РЎРѕР·РґР°РЅРёРµ РјРѕРґРµР»Рё
 */
 
 StaticMesh::Pointer create_static_mesh ()
@@ -348,7 +348,7 @@ StaticMesh::Pointer create_static_mesh ()
 }
 
 /*
-   Регистрация библиотеки работы с моделями
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РјРѕРґРµР»СЏРјРё
 */
 
 void set_bound_box (StaticMesh& entity, const bound_volumes::aaboxf& box)
@@ -360,15 +360,15 @@ void bind_static_mesh_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_STATIC_MESH_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_static_mesh));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_MeshName", make_invoker (&StaticMesh::SetMeshName));
   lib.Register ("get_MeshName", make_invoker (&StaticMesh::MeshName));
@@ -378,7 +378,7 @@ void bind_static_mesh_library (Environment& environment)
 }
 
 /*
-    Создание карты высот
+    РЎРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹ РІС‹СЃРѕС‚
 */
 
 HeightMap::Pointer create_height_map ()
@@ -417,22 +417,22 @@ math::vec4f& get_height_map_cell_color (HeightMap& map, size_t row, size_t colum
 }
 
 /*
-   Регистрация библиотеки работы с картами высот
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РєР°СЂС‚Р°РјРё РІС‹СЃРѕС‚
 */
 
 void bind_height_map_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_HEIGHT_MAP_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_height_map));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   lib.Register ("set_Material", make_invoker (&HeightMap::SetMaterial));
   lib.Register ("get_Material", make_invoker (&HeightMap::Material));

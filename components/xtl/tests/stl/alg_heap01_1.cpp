@@ -1,4 +1,4 @@
-//Тестирование алгоритма make_heap (first, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° make_heap (first, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

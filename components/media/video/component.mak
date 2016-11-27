@@ -1,5 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := MEDIA.VIDEO.CORE MEDIA.VIDEO.THEORA.SOURCES MEDIA.VIDEO.TESTS MEDIA.VIDEO.INFO
 
@@ -20,7 +20,7 @@ MEDIA.VIDEO.TESTS.TYPE        := test-suite
 MEDIA.VIDEO.TESTS.SOURCE_DIRS := tests/core tests/theora
 MEDIA.VIDEO.TESTS.IMPORTS     := compile.media.video link.media.video compile.media.image link.media.video.theora
 
-#Цель - сборка документации
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРѕРєСѓРјРµРЅС‚Р°С†РёРё
 MEDIA.VIDEO.INFO.TYPE        := doxygen-info
 MEDIA.VIDEO.INFO.CHM_NAME    := funner.media.video
 MEDIA.VIDEO.INFO.SOURCE_DIRS := include

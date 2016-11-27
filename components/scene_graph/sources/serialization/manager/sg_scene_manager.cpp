@@ -6,25 +6,25 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* DEFAULT_LOADER_LOG_NAME = "scene.loader"; //имя лога
+const char* DEFAULT_LOADER_LOG_NAME = "scene.loader"; //РёРјСЏ Р»РѕРіР°
 
 /*
-    Описание реализации менеджера сцен
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЃС†РµРЅ
 */
 
 typedef xtl::shared_ptr<ISceneFactory> FactoryPtr;
 
-///Дескриптор фабрики сцен
+///Р”РµСЃРєСЂРёРїС‚РѕСЂ С„Р°Р±СЂРёРєРё СЃС†РµРЅ
 struct FactoryDesc: public xtl::reference_counter, public xtl::instance_counter<FactoryDesc>
 {
-  stl::string name;        //имя фабрики
-  stl::string name_prefix; //префикс имени
-  FactoryPtr  factory;     //фабрика
+  stl::string name;        //РёРјСЏ С„Р°Р±СЂРёРєРё
+  stl::string name_prefix; //РїСЂРµС„РёРєСЃ РёРјРµРЅРё
+  FactoryPtr  factory;     //С„Р°Р±СЂРёРєР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   FactoryDesc (const char* in_name, const char* in_name_prefix, const FactoryPtr& in_factory)
     : name (in_name)
     , name_prefix (in_name_prefix)
@@ -43,10 +43,10 @@ typedef xtl::signal<void (SceneContext&)> SceneContextCreatorSignal;
 
 struct SceneManager::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneManager>
 {
-  FactoryDescList           factories;           //список фабрик
-  SceneContextCreatorSignal scene_creator;       //сигнал создания нового контекста сцены
-  common::Log               default_log;         //поток протоколирования по умолчанию
-  LogHandler                default_log_handler; //обработчик протоколирования по умолчанию
+  FactoryDescList           factories;           //СЃРїРёСЃРѕРє С„Р°Р±СЂРёРє
+  SceneContextCreatorSignal scene_creator;       //СЃРёРіРЅР°Р» СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° СЃС†РµРЅС‹
+  common::Log               default_log;         //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  LogHandler                default_log_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   
   Impl ()
     : default_log (DEFAULT_LOADER_LOG_NAME)
@@ -61,7 +61,7 @@ struct SceneManager::Impl: public xtl::reference_counter, public xtl::instance_c
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SceneManager::SceneManager ()
@@ -88,7 +88,7 @@ SceneManager& SceneManager::operator = (const SceneManager& manager)
 }
 
 /*
-    Загрузка ресурсов
+    Р—Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 namespace
@@ -117,7 +117,7 @@ void SceneManager::LoadScene (const char* file_name, const char* name_prefix, co
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
@@ -125,7 +125,7 @@ void SceneManager::LoadScene (const char* file_name, const char* name_prefix, co
     if (!name_prefix)
       throw xtl::make_null_argument_exception ("", "name_prefix");
       
-      //проверка наличия сцены
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃС†РµРЅС‹
 
     for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)
     {
@@ -135,21 +135,21 @@ void SceneManager::LoadScene (const char* file_name, const char* name_prefix, co
         throw xtl::format_operation_exception ("", "Scene '%s' has already loaded");
     }
     
-      //проверка корректности лога
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р»РѕРіР°
       
     LogHandler log_handler = in_log_handler;
     
     if (!log_handler)
       log_handler = DefaultLogger ();    
 
-      //создание новой фабрики
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ С„Р°Р±СЂРёРєРё
       
     static common::ComponentLoader loader ("scene.loaders.*");
 
     FactoryPtr     factory (SceneSerializationManagerImpl::GetLoader (file_name, common::SerializerFindMode_ByName)(file_name, log_handler));
     FactoryDescPtr desc (new FactoryDesc (file_name, name_prefix, factory), false);
 
-      //регистрация фабрики
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„Р°Р±СЂРёРєРё
       
     impl->factories.push_front (desc);
   }
@@ -179,7 +179,7 @@ void SceneManager::UnloadScene (const char* file_name)
 }
 
 /*
-    Проверка наличия сцены
+    РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЃС†РµРЅС‹
 */
 
 bool SceneManager::HasScene (const char* scene_name) const
@@ -205,7 +205,7 @@ bool SceneManager::HasScene (const char* scene_name) const
 }
 
 /*
-    Получение группы ресурсов сцены
+    РџРѕР»СѓС‡РµРЅРёРµ РіСЂСѓРїРїС‹ СЂРµСЃСѓСЂСЃРѕРІ СЃС†РµРЅС‹
 */
 
 ResourceGroup SceneManager::SceneResources (const char* scene_name) const
@@ -278,7 +278,7 @@ ResourceGroup SceneManager::Resources () const
 }
 
 /*
-    Создание контекста сцены
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃС†РµРЅС‹
 */
 
 SceneContext SceneManager::CreateSceneContext () const
@@ -306,7 +306,7 @@ xtl::connection SceneManager::RegisterSceneContextCreator (const SceneContextCre
 }
 
 /*
-    Создание сцены
+    РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 */
 
 Node::Pointer SceneManager::CreateScene (const char* scene_name) const
@@ -331,11 +331,11 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
     if (!scene_name)
       throw xtl::make_null_argument_exception ("", "scene_name");
       
-      //создание родительского узла
+      //СЃРѕР·РґР°РЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ СѓР·Р»Р°
       
     Node::Pointer root = Node::Create ();
     
-      //поиск сцены
+      //РїРѕРёСЃРє СЃС†РµРЅС‹
 
     for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)      
     {
@@ -351,13 +351,13 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
         if (!desc.factory->GetSceneInfo (scene_name + desc.name_prefix.size (), &resources))
           continue;
 
-          //создание сцены
+          //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
         desc.factory->CreateScene (scene_name + desc.name_prefix.size (), *root, context);
         
         root->SetName (scene_name);
 
-          //присоединение ресурсов
+          //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ
           
         media::rms::Binding binding = media::rms::ResourceManager::CreateBinding (resources);
         
@@ -381,7 +381,7 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
 }
 
 /*
-    Сохранение сцены
+    РЎРѕС…СЂР°РЅРµРЅРёРµ СЃС†РµРЅС‹
 */
 
 void SceneManager::SaveScene (const char* file_name, Node& node)
@@ -403,7 +403,7 @@ void SceneManager::SaveScene (const char* file_name, Node& node)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SceneManager::Swap (SceneManager& manager)

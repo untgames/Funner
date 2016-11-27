@@ -91,7 +91,7 @@ using namespace syslib;
 namespace
 {
 
-//Типы сенсоров
+//РўРёРїС‹ СЃРµРЅСЃРѕСЂРѕРІ
 enum SensorType
 {
   SensorType_Accelerometer,
@@ -99,37 +99,37 @@ enum SensorType
   SensorType_Num
 };
 
-//Интерфейс сенсора
+//РРЅС‚РµСЂС„РµР№СЃ СЃРµРЅСЃРѕСЂР°
 class ISensor : public xtl::reference_counter
 {
   public:
-    //Получение типа
+    //РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°
     virtual const char* GetType () = 0;
 
-    //Частота обновления
+    //Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
     virtual void  SetUpdateRate (float rate) = 0;
     virtual float GetUpdateRate () = 0;
 
-    //Получение платформо-зависимого дескриптора экрана
+    //РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
     virtual const void* GetNativeHandle () = 0;
 
-    //Чтение событий сенсора
+    //Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
     virtual void StartPolling (ISensorEventListener& listener) = 0;
     virtual void StopPolling  () = 0;
 
-    //Получение имени
+    //РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
     virtual const char* GetName ()
     {
       return GetType ();
     }
 
-    //Получение производителя
+    //РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЏ
     virtual const char* GetVendor ()
     {
       return "Apple";
     }
 
-    //Получение максимального значения
+    //РџРѕР»СѓС‡РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
     virtual float GetMaxRange ()
     {
       return FLT_MAX;
@@ -143,7 +143,7 @@ typedef xtl::intrusive_ptr<ISensor> SensorPtr;
 class AccelerometerSensor : public ISensor
 {
   public:
-    //Конструктор / деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     AccelerometerSensor ()
       : accelerometer_delegate (0)
       {}
@@ -153,13 +153,13 @@ class AccelerometerSensor : public ISensor
       StopPolling ();
     }
 
-    //Получение типа
+    //РџРѕР»СѓС‡РµРЅРёРµ С‚РёРїР°
     const char* GetType ()
     {
       return "Accelerometer";
     }
 
-    //Частота обновления
+    //Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
     void  SetUpdateRate (float rate)
     {
       [UIAccelerometer sharedAccelerometer].updateInterval = 1 / rate;
@@ -170,13 +170,13 @@ class AccelerometerSensor : public ISensor
       return 1.f / [UIAccelerometer sharedAccelerometer].updateInterval;
     }
 
-    //Получение платформо-зависимого дескриптора экрана
+    //РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
     const void* GetNativeHandle ()
     {
       return [UIAccelerometer sharedAccelerometer];
     }
 
-    //Чтение событий сенсора
+    //Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
     void StartPolling (ISensorEventListener& listener)
     {
       StopPolling ();
@@ -191,7 +191,7 @@ class AccelerometerSensor : public ISensor
     }
 
   private:
-    AccelerometerDelegate *accelerometer_delegate; //слушатель событий
+    AccelerometerDelegate *accelerometer_delegate; //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№
 };
 
 }
@@ -199,12 +199,12 @@ class AccelerometerSensor : public ISensor
 namespace syslib
 {
 
-/// Дескриптор сенсора
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ СЃРµРЅСЃРѕСЂР°
 struct sensor_handle
 {
-  SensorType type;      //тип сенсора
-  SensorPtr  sensor;    //сенсор
-  bool       polling;   //ведется ли в данный момент опрос сенсора
+  SensorType type;      //С‚РёРї СЃРµРЅСЃРѕСЂР°
+  SensorPtr  sensor;    //СЃРµРЅСЃРѕСЂ
+  bool       polling;   //РІРµРґРµС‚СЃСЏ Р»Рё РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РѕРїСЂРѕСЃ СЃРµРЅСЃРѕСЂР°
 
   sensor_handle (SensorType in_type)
     : type (in_type), polling (false)
@@ -223,7 +223,7 @@ struct sensor_handle
 }
 
 /*
-    Количество сенсоров
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 size_t IPhoneSensorManager::GetSensorsCount ()
@@ -232,12 +232,12 @@ size_t IPhoneSensorManager::GetSensorsCount ()
 }
 
 /*
-    Создание / удаление сенсора
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
 */
 
 sensor_t IPhoneSensorManager::CreateSensor (size_t sensor_index)
 {
-  //Защита от двойного создания сенсоров одного типа сделана снаружи
+  //Р—Р°С‰РёС‚Р° РѕС‚ РґРІРѕР№РЅРѕРіРѕ СЃРѕР·РґР°РЅРёСЏ СЃРµРЅСЃРѕСЂРѕРІ РѕРґРЅРѕРіРѕ С‚РёРїР° СЃРґРµР»Р°РЅР° СЃРЅР°СЂСѓР¶Рё
   if (sensor_index >= GetSensorsCount ())
     throw xtl::make_range_exception ("syslib::IPhoneSensorManager::CreateSensor", "sensor_index", sensor_index, 0u, GetSensorsCount ());
 
@@ -250,7 +250,7 @@ void IPhoneSensorManager::DestroySensor (sensor_t handle)
 }
 
 /*
-    Имя сенсора
+    РРјСЏ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string IPhoneSensorManager::GetSensorName (sensor_t handle)
@@ -262,7 +262,7 @@ stl::string IPhoneSensorManager::GetSensorName (sensor_t handle)
 }
 
 /*
-    Производитель сенсора
+    РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string IPhoneSensorManager::GetSensorVendor (sensor_t handle)
@@ -274,7 +274,7 @@ stl::string IPhoneSensorManager::GetSensorVendor (sensor_t handle)
 }
 
 /*
-    Тип устройства
+    РўРёРї СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 stl::string IPhoneSensorManager::GetSensorType (sensor_t handle)
@@ -286,7 +286,7 @@ stl::string IPhoneSensorManager::GetSensorType (sensor_t handle)
 }
 
 /*
-    Максимальное значение
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 */
 
 float IPhoneSensorManager::GetSensorMaxRange (sensor_t handle)
@@ -298,7 +298,7 @@ float IPhoneSensorManager::GetSensorMaxRange (sensor_t handle)
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void IPhoneSensorManager::SetSensorUpdateRate (sensor_t handle, float rate)
@@ -318,7 +318,7 @@ float IPhoneSensorManager::GetSensorUpdateRate (sensor_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* IPhoneSensorManager::GetNativeSensorHandle (sensor_t handle)
@@ -330,7 +330,7 @@ const void* IPhoneSensorManager::GetNativeSensorHandle (sensor_t handle)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void IPhoneSensorManager::GetSensorProperties (sensor_t handle, common::PropertyMap& properties)
@@ -340,7 +340,7 @@ void IPhoneSensorManager::GetSensorProperties (sensor_t handle, common::Property
 }
 
 /*
-    Чтение событий сенсора
+    Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
 */
 
 void IPhoneSensorManager::StartSensorPolling (sensor_t handle, ISensorEventListener& listener)

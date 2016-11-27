@@ -4,18 +4,18 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации списка линий
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° Р»РёРЅРёР№
 */
 
 typedef xtl::uninitialized_storage<LineDesc> LineDescArray;
 
 struct LineList::Impl: public xtl::instance_counter<LineList>
 {
-  LineDescArray items;    //массив линий
+  LineDescArray items;    //РјР°СЃСЃРёРІ Р»РёРЅРёР№
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LineList::LineList ()
@@ -28,7 +28,7 @@ LineList::~LineList ()
 }
 
 /*
-    Создание списка линий
+    РЎРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° Р»РёРЅРёР№
 */
 
 LineList::Pointer LineList::Create ()
@@ -37,7 +37,7 @@ LineList::Pointer LineList::Create ()
 }
 
 /*
-    Размер массива линий
+    Р Р°Р·РјРµСЂ РјР°СЃСЃРёРІР° Р»РёРЅРёР№
 */
 
 size_t LineList::LinesCount () const
@@ -56,7 +56,7 @@ size_t LineList::LineDescsCapacityCore ()
 }
 
 /*
-    Изменение размера списка линий / резервирование места для хранения линий
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР° Р»РёРЅРёР№ / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Р»РёРЅРёР№
 */
 
 void LineList::Resize (size_t count)
@@ -72,7 +72,7 @@ void LineList::Reserve (size_t count)
 }
 
 /*
-    Массив линий
+    РњР°СЃСЃРёРІ Р»РёРЅРёР№
 */
 
 const LineDesc* LineList::Lines () const
@@ -91,7 +91,7 @@ LineDesc* LineList::Lines ()
 }
 
 /*
-    Добавление линий в массив
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р»РёРЅРёР№ РІ РјР°СЃСЃРёРІ
 */
 
 void LineList::Insert (const LineDesc& desc)
@@ -117,7 +117,7 @@ void LineList::Insert (size_t items_count, const LineDesc* items)
 }
 
 /*
-    Очистка списка линий
+    РћС‡РёСЃС‚РєР° СЃРїРёСЃРєР° Р»РёРЅРёР№
 */
 
 void LineList::RemoveAll ()
@@ -126,7 +126,7 @@ void LineList::RemoveAll ()
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void LineList::AcceptCore (Visitor& visitor)
@@ -136,7 +136,7 @@ void LineList::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Оповещение об обновлении данных
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РґР°РЅРЅС‹С…
 */
 
 void LineList::Invalidate ()

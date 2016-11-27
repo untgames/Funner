@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки эффектов
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ
 */
 
 void DaeParser::ParseLibraryEffects (Parser::Iterator iter)
@@ -19,20 +19,20 @@ void DaeParser::ParseEffect (Parser::Iterator iter)
 {
   const char* id = get<const char*> (*iter, "id");
 
-    //создание эффекта
+    //СЃРѕР·РґР°РЅРёРµ СЌС„С„РµРєС‚Р°
 
   Effect effect;
 
   effect.SetId (id);
 
-    //разбор профилей эффекта
+    //СЂР°Р·Р±РѕСЂ РїСЂРѕС„РёР»РµР№ СЌС„С„РµРєС‚Р°
 
   common::ParseNode profile_common = iter->First ("profile_COMMON");
 
   if (profile_common)
     ParseEffectProfileCommon (profile_common, effect);
 
-    //добавление эффекта в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ СЌС„С„РµРєС‚Р° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
   model.Effects ().Insert (id, effect);
 }
@@ -42,11 +42,11 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
   if (!profile_iter->First ("technique"))
     raise_parser_exception (*profile_iter, "Incorrect 'profile_COMMON' tag. Node must have 'technique' sub-tag");
 
-    //чтение техники
+    //С‡С‚РµРЅРёРµ С‚РµС…РЅРёРєРё
 
   Parser::Iterator technique_iter = profile_iter->First ("technique");
 
-    //чтение экстра параметров
+    //С‡С‚РµРЅРёРµ СЌРєСЃС‚СЂР° РїР°СЂР°РјРµС‚СЂРѕРІ
 
   if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.bump.texture"))
     ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Bump);
@@ -57,7 +57,7 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
   if (Parser::Iterator bump_texture_iter = technique_iter->First ("extra.technique.gloss.texture"))
     ParseTexture (bump_texture_iter, profile_iter, effect, TextureMap_Specular);
 
-    //чтение типа шейдера
+    //С‡С‚РµРЅРёРµ С‚РёРїР° С€РµР№РґРµСЂР°
 
   static String2Value<ShaderType> shader_types [] = {
     {"constant", ShaderType_Constant},
@@ -81,7 +81,7 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
   if (type_index == shader_types_count)
     raise_parser_exception (*technique_iter, "Uncorrect 'technique' tag, no expected sub-tag (one of 'constant', 'lambert', 'phong' or 'blinn')");
   
-    //чтение базовых параметров техники
+    //С‡С‚РµРЅРёРµ Р±Р°Р·РѕРІС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµС…РЅРёРєРё
     
   static String2Value<EffectParam> shader_params [] = {
     {"shininess.float.#text",           EffectParam_Shininess},
@@ -98,7 +98,7 @@ void DaeParser::ParseEffectProfileCommon (Parser::Iterator profile_iter, Effect&
       effect.SetParam (shader_params [i].value, get<float> (param_node, ""));
   }
 
-    //чтение текстурных карт
+    //С‡С‚РµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
 
   static String2Value<TextureMap> texmaps [] = {
     {"diffuse", TextureMap_Diffuse},
@@ -185,7 +185,7 @@ void DaeParser::ParseTexture (Parser::Iterator iter, Parser::Iterator profile_it
   if (common::ParseNode param_node = iter->First ("extra.technique.amount.#text"))
     texture.SetAmount (get<float> (param_node, ""));
 
-    //добавить чтение экстра-полей
+    //РґРѕР±Р°РІРёС‚СЊ С‡С‚РµРЅРёРµ СЌРєСЃС‚СЂР°-РїРѕР»РµР№
     
   effect.SetTexture (map, texture);
 }

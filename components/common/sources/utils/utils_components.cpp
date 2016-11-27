@@ -17,14 +17,14 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  COMPONENT_MANAGER_DEFAULT_LOG = "common.ComponentManager"; //имя потока протоколирования
-const size_t COMPONENT_NAME_BUFFER_SIZE    = 128;                       //буфер для хранения имени компонента
+const char*  COMPONENT_MANAGER_DEFAULT_LOG = "common.ComponentManager"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const size_t COMPONENT_NAME_BUFFER_SIZE    = 128;                       //Р±СѓС„РµСЂ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРјРµРЅРё РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 /*
-    Реализация менеджера компонентов
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 */
 
 class ComponentManagerImpl
@@ -33,16 +33,16 @@ class ComponentManagerImpl
     typedef ComponentManager::LogHandler LogHandler;
     typedef ComponentManager::Iterator   Iterator;
   
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ComponentManagerImpl () : components (MallocAllocator (&malloc, &free)), load_indent (0) {}
 
-      //деструктор
+      //РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ComponentManagerImpl ()
     {
       Unload ("*");
     }
 
-      //регистрация компонента
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
     void Register (const char* name, IComponent* component)
     {
       if (!component || !name)
@@ -61,7 +61,7 @@ class ComponentManagerImpl
       components.insert (iter, ComponentNode (name, component));
     }
 
-      //отмена регистрации компонента
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РєРѕРјРїРѕРЅРµРЅС‚Р°
     void Unregister (IComponent* component)
     {
       if (!component)
@@ -76,7 +76,7 @@ class ComponentManagerImpl
       }
     }
     
-      //отмена регистрации компонента оп маске имени
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РєРѕРјРїРѕРЅРµРЅС‚Р° РѕРї РјР°СЃРєРµ РёРјРµРЅРё
     void Unregister (const char* wc_component_mask)
     {
       if (!wc_component_mask)
@@ -91,7 +91,7 @@ class ComponentManagerImpl
       }
     }
 
-      //загрузка компонентов
+      //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
     void Load (const char* wc_component_mask, const LogHandler& log_handler)
     {
       if (!wc_component_mask)
@@ -153,7 +153,7 @@ class ComponentManagerImpl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
 
         node.is_locked = false;  
@@ -165,7 +165,7 @@ class ComponentManagerImpl
         log.Printf ("...components loaded successfully");
     }
     
-      //выгрузка компонента
+      //РІС‹РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     void Unload (const char* wc_component_mask)
     {
       if (!wc_component_mask)
@@ -204,7 +204,7 @@ class ComponentManagerImpl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
 
         node.is_loaded = false;
@@ -217,7 +217,7 @@ class ComponentManagerImpl
         log.Printf ("...components unloaded successfully");
     }
     
-      //создание итератора
+      //СЃРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
     Iterator CreateIterator ()
     {
       return Iterator (components.begin (), components.begin (), components.end ());
@@ -239,18 +239,18 @@ class ComponentManagerImpl
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
   private:
     struct ComponentNode: public IComponentState
     {
-      IComponent* component;                         //указатель на компонент
-      char        name [COMPONENT_NAME_BUFFER_SIZE]; //имя компонента
-      size_t      name_hash;                         //хэш имени компонента
-      bool        is_loaded;                         //флаг: загружен ли компонент
-      bool        is_locked;                         //флаг: компонент заблокирован для отмены регистрации
+      IComponent* component;                         //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕРјРїРѕРЅРµРЅС‚
+      char        name [COMPONENT_NAME_BUFFER_SIZE]; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+      size_t      name_hash;                         //С…СЌС€ РёРјРµРЅРё РєРѕРјРїРѕРЅРµРЅС‚Р°
+      bool        is_loaded;                         //С„Р»Р°Рі: Р·Р°РіСЂСѓР¶РµРЅ Р»Рё РєРѕРјРїРѕРЅРµРЅС‚
+      bool        is_locked;                         //С„Р»Р°Рі: РєРѕРјРїРѕРЅРµРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ РґР»СЏ РѕС‚РјРµРЅС‹ СЂРµРіРёСЃС‚СЂР°С†РёРё
 
       ComponentNode (const char* in_name, IComponent* in_component) :
         component (in_component),
@@ -277,7 +277,7 @@ class ComponentManagerImpl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }
 
@@ -303,7 +303,7 @@ typedef Singleton<ComponentManagerImpl, SingletonStatic> ComponentManagerSinglet
 }
 
 /*
-    Регистрация компонента
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 void ComponentManager::Register (const char* name, IComponent* component)
@@ -322,7 +322,7 @@ void ComponentManager::Unregister (const char* wc_component_mask)
 }
 
 /*
-    Загрузка компонентов
+    Р—Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 */
 
 void ComponentManager::Load (const char* wc_component_mask)
@@ -341,7 +341,7 @@ void ComponentManager::Unload (const char* wc_component_mask)
 }
 
 /*
-    Создание итератора
+    РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 ComponentManager::Iterator ComponentManager::CreateIterator ()

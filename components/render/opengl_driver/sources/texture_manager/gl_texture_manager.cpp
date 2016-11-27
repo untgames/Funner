@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Слот сэмплирования
+    РЎР»РѕС‚ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 typedef xtl::trackable_ptr<BindableTexture> TexturePtr;
@@ -16,25 +16,25 @@ typedef xtl::trackable_ptr<SamplerState>    SamplerStatePtr;
 
 struct SamplerSlot
 {
-  TexturePtr      texture;       //текстура
-  SamplerStatePtr sampler_state; //состояние сэмплера
+  TexturePtr      texture;       //С‚РµРєСЃС‚СѓСЂР°
+  SamplerStatePtr sampler_state; //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃСЌРјРїР»РµСЂР°
 };
 
 /*
-    Состояние менеджера текстур
+    РЎРѕСЃС‚РѕСЏРЅРёРµ РјРµРЅРµРґР¶РµСЂР° С‚РµРєСЃС‚СѓСЂ
 */
 
 class TextureManagerState: public IStageState
 {
   public:
-      //конструкторы
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
     TextureManagerState (TextureManagerState* in_main_state) : owner (0), main_state (in_main_state) {}
     TextureManagerState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}
 
-      //получение слотов сэмплирования
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃР»РѕС‚РѕРІ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
     SamplerSlot* GetSlots () { return &samplers [0]; }
 
-      //получение слота сэмплирования
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃР»РѕС‚Р° СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
     SamplerSlot& GetSlot (unsigned int slot)
     {
       if (slot >= DEVICE_SAMPLER_SLOTS_COUNT)
@@ -43,7 +43,7 @@ class TextureManagerState: public IStageState
       return samplers [slot];
     }
 
-      //установка текстуры
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹
     void SetTexture (unsigned int slot, BindableTexture* in_texture)
     {
       TexturePtr& texture = GetSlot (slot).texture;
@@ -56,13 +56,13 @@ class TextureManagerState: public IStageState
       UpdateNotify ();
     }
 
-      //получение текстуры
+      //РїРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
     BindableTexture* GetTexture (unsigned int slot)
     {
       return GetSlot (slot).texture.get ();
     }
 
-      //установка состояния сэмплирования
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
     void SetSampler (unsigned int slot, SamplerState* in_state)
     {
       SamplerStatePtr& state = GetSlot (slot).sampler_state;
@@ -75,20 +75,20 @@ class TextureManagerState: public IStageState
       UpdateNotify ();
     }
 
-      //получение состояния сэмплирования
+      //РїРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
     SamplerState* GetSampler (unsigned int slot)
     {
       return GetSlot (slot).sampler_state.get ();
     }
 
-      //захват состояния
+      //Р·Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
 
-      //восстановление состояния
+      //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -96,7 +96,7 @@ class TextureManagerState: public IStageState
     }
 
   private:
-      //копирование состояния
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Copy (const TextureManagerState& source, const StateBlockMask& mask)
     {
       bool need_rebind = false;
@@ -120,7 +120,7 @@ class TextureManagerState: public IStageState
         UpdateNotify ();
     }
 
-      //оповещение об изменении
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё
     void UpdateNotify ()
     {
       if (!owner)
@@ -134,12 +134,12 @@ class TextureManagerState: public IStageState
     typedef xtl::array<SamplerSlot, DEVICE_SAMPLER_SLOTS_COUNT> SamplerSlotArray;
 
   private:
-    ContextObject*         owner;      //владелец состояния
-    TextureManagerStatePtr main_state; //основное состояние
-    SamplerSlotArray       samplers;   //слоты сэмплирования
+    ContextObject*         owner;      //РІР»Р°РґРµР»РµС† СЃРѕСЃС‚РѕСЏРЅРёСЏ
+    TextureManagerStatePtr main_state; //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+    SamplerSlotArray       samplers;   //СЃР»РѕС‚С‹ СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
 };
 
-//проверка размера на степень двойки
+//РїСЂРѕРІРµСЂРєР° СЂР°Р·РјРµСЂР° РЅР° СЃС‚РµРїРµРЅСЊ РґРІРѕР№РєРё
 bool is_power_of_two (unsigned int size)
 {
   return ((size - 1) & size) == 0;
@@ -148,20 +148,20 @@ bool is_power_of_two (unsigned int size)
 }
 
 /*
-    Описание реализации TextureManager
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё TextureManager
 */
 
 struct TextureManager::Impl: public ContextObject
 {
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const ContextManager& context_manager, TextureManager& in_texture_manager) :
       ContextObject (context_manager),
       texture_manager (in_texture_manager),
       state (this)
     {
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
-      //выбор текущего контекста
+      //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
       MakeContextCurrent ();
 
@@ -170,21 +170,21 @@ struct TextureManager::Impl: public ContextObject
       if (caps.has_arb_seamless_cube_map)
         glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
       CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
 #endif
     }
 
-      //получение основного состояния
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕСЃРЅРѕРІРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     TextureManagerState& GetState () { return state; }
 
-      //биндинг текстур и сэмплеров
+      //Р±РёРЅРґРёРЅРі С‚РµРєСЃС‚СѓСЂ Рё СЃСЌРјРїР»РµСЂРѕРІ
     void Bind ()
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::Bind";
 
-        //получение кэш-переменных
+        //РїРѕР»СѓС‡РµРЅРёРµ РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
       size_t       *current_texture_id       = GetContextCache () + CacheEntry_TextureId0,
                    *current_texture_target   = GetContextCache () + CacheEntry_TextureTarget0,
@@ -192,11 +192,11 @@ struct TextureManager::Impl: public ContextObject
                    &current_active_slot      = GetContextCache () [CacheEntry_ActiveTextureSlot];
       unsigned int enabled_textures          = 0;
 
-        //выбор текущего контекста
+        //РІС‹Р±РѕСЂ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
       MakeContextCurrent ();
 
-        //установка текстур и сэмплеров
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂ Рё СЃСЌРјРїР»РµСЂРѕРІ
 
       BindableTextureDesc texture_desc;
 
@@ -222,7 +222,7 @@ struct TextureManager::Impl: public ContextObject
                need_change_mode    = current_texture_target [i] != texture_target,
                need_set_slot       = need_bind || need_change_mode;
 
-          //установка активного слота
+          //СѓСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ СЃР»РѕС‚Р°
 
         if (need_set_slot && current_active_slot != i && caps.glActiveTexture_fn)
         {
@@ -231,16 +231,16 @@ struct TextureManager::Impl: public ContextObject
           current_active_slot = i;
         }
 
-          //биндинг текстуры
+          //Р±РёРЅРґРёРЅРі С‚РµРєСЃС‚СѓСЂС‹
 
         if (need_bind)
           texture->Bind ();
 
-          //установка сэмплера
+          //СѓСЃС‚Р°РЅРѕРІРєР° СЃСЌРјРїР»РµСЂР°
 
         if (need_change_sampler)
         {
-            //проверка случая установки для одной и той же текстуры различных сэмплеров
+            //РїСЂРѕРІРµСЂРєР° СЃР»СѓС‡Р°СЏ СѓСЃС‚Р°РЅРѕРІРєРё РґР»СЏ РѕРґРЅРѕР№ Рё С‚РѕР№ Р¶Рµ С‚РµРєСЃС‚СѓСЂС‹ СЂР°Р·Р»РёС‡РЅС‹С… СЃСЌРјРїР»РµСЂРѕРІ
 
           for (unsigned int j=0; j<i; j++)
             if (samplers [j].texture == texture && samplers [j].sampler_state && samplers [j].sampler_state != sampler_state)
@@ -254,7 +254,7 @@ struct TextureManager::Impl: public ContextObject
           texture->SetSamplerHash (sampler_state->GetDescHash ());
         }
 
-          //изменение режима текстурирования для текущего слота
+          //РёР·РјРµРЅРµРЅРёРµ СЂРµР¶РёРјР° С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СЃР»РѕС‚Р°
 
         if (need_change_mode)
         {
@@ -289,16 +289,16 @@ struct TextureManager::Impl: public ContextObject
         }
       }
 
-        //проверка ошибок
+        //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
       CheckErrors (METHOD_NAME);
 
-        //обновление кэш-переменных
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€-РїРµСЂРµРјРµРЅРЅС‹С…
 
       current_enabled_textures = enabled_textures;
     }
 
-      //создание текстуры
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
     ITexture* CreateTexture (const TextureDesc& desc, const TextureData* data)
     {
       switch (desc.dimension)
@@ -311,14 +311,14 @@ struct TextureManager::Impl: public ContextObject
       }
     }
 
-      //cоздание сэмплера
+      //cРѕР·РґР°РЅРёРµ СЃСЌРјРїР»РµСЂР°
     ISamplerState* CreateSamplerState (const SamplerDesc& desc)
     {
       return new SamplerState (GetContextManager (), desc);
     }
 
     /*
-        Установка текущей текстуры и сэмплера
+        РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ С‚РµРєСЃС‚СѓСЂС‹ Рё СЃСЌРјРїР»РµСЂР°
     */
 
     void SetTexture (unsigned int sampler_slot, ITexture* texture)
@@ -345,7 +345,7 @@ struct TextureManager::Impl: public ContextObject
       return state.GetSampler (sampler_slot);
     }
 
-    ///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+    ///Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
     void GenerateMips (ITexture* texture)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::GenerateMips";
@@ -368,13 +368,13 @@ struct TextureManager::Impl: public ContextObject
 
       caps.glGenerateMipmap_fn (texture_desc.target);
 
-        //проверка ошибок
+        //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
       CheckErrors (METHOD_NAME);
     }
 
   private:
-      //проверка номера слота сэмплирования
+      //РїСЂРѕРІРµСЂРєР° РЅРѕРјРµСЂР° СЃР»РѕС‚Р° СЃСЌРјРїР»РёСЂРѕРІР°РЅРёСЏ
     unsigned int CheckSamplerSlot (unsigned int sampler_slot)
     {
       const ContextCaps& caps = GetCaps ();
@@ -392,7 +392,7 @@ struct TextureManager::Impl: public ContextObject
 
       if ((desc.width < max_texture_size || desc.height < max_texture_size) &&
           ((is_power_of_two (desc.width) && is_power_of_two (desc.height)) || caps.has_arb_texture_non_power_of_two ||
-          (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //можно масштабировать только по одной оси
+          (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //РјРѕР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РїРѕ РѕРґРЅРѕР№ РѕСЃРё
       {
         if (desc.width > max_texture_size)
           return new ScaledTexture (GetContextManager (), texture_manager, desc, data, max_texture_size, desc.height);
@@ -403,16 +403,16 @@ struct TextureManager::Impl: public ContextObject
         return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
 
-      //создание двумерной текстуры
+      //СЃРѕР·РґР°РЅРёРµ РґРІСѓРјРµСЂРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     ITexture* CreateTexture2D (const TextureDesc& in_desc, const TextureData* data)
     {
-        //игнорирование неиспользуемых параметров
+        //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
       TextureDesc desc = in_desc;
 
       desc.layers = 1;
 
-        //проверка возможности создания текстуры
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
       const ContextCaps& caps = GetCaps ();
 
@@ -426,7 +426,7 @@ struct TextureManager::Impl: public ContextObject
         return CreateScaledTexture2D (desc, data, caps.max_texture_size);
       }
 
-        //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
+        //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
@@ -434,7 +434,7 @@ struct TextureManager::Impl: public ContextObject
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмуляции
+          return new Texture2DNoSubimage (GetContextManager (), desc, data); //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ РІ СЂРµР¶РёРјРµ СЌРјСѓР»СЏС†РёРё
 #endif
 
         return new Texture2D (GetContextManager (), desc, data);
@@ -460,12 +460,12 @@ struct TextureManager::Impl: public ContextObject
       return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
     
-      //создание кубической текстуры
+      //СЃРѕР·РґР°РЅРёРµ РєСѓР±РёС‡РµСЃРєРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     ITexture* CreateTextureCubemap (const TextureDesc& desc, const TextureData* data)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
 
-        //проверка возможности создания текстуры
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
       const ContextCaps& caps = GetCaps ();
 
@@ -485,7 +485,7 @@ struct TextureManager::Impl: public ContextObject
           stl::min (desc.height, caps.max_cube_map_texture_size));
       }
 
-        //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
+        //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
         return new TextureCubemap (GetContextManager (), desc, data);
@@ -495,16 +495,16 @@ struct TextureManager::Impl: public ContextObject
     
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-      //создание одномерной текстуры
+      //СЃРѕР·РґР°РЅРёРµ РѕРґРЅРѕРјРµСЂРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     ITexture* CreateTexture1D (const TextureDesc& in_desc, const TextureData* data)
     {
-        //игнорирование неиспользуемых параметров
+        //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 
       TextureDesc desc = in_desc;
 
       desc.height = desc.layers = 1;
 
-        //проверка возможности создания текстуры
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
       const ContextCaps& caps = GetCaps ();
 
@@ -515,7 +515,7 @@ struct TextureManager::Impl: public ContextObject
         return new ScaledTexture (GetContextManager (), texture_manager, desc, data, caps.max_texture_size, 1);
       }
 
-        //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
+        //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
       bool is_pot = is_power_of_two (desc.width);
 
@@ -524,7 +524,7 @@ struct TextureManager::Impl: public ContextObject
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture1DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмуляции
+          return new Texture1DNoSubimage (GetContextManager (), desc, data); //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ РІ СЂРµР¶РёРјРµ СЌРјСѓР»СЏС†РёРё
 
         return new Texture1D (GetContextManager (), desc, data);
       }
@@ -545,12 +545,12 @@ struct TextureManager::Impl: public ContextObject
       return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
 
-      //создание трёхмерной текстуры
+      //СЃРѕР·РґР°РЅРёРµ С‚СЂС‘С…РјРµСЂРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
     ITexture* CreateTexture3D (const TextureDesc& desc, const TextureData* data)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture3D";
 
-        //проверка возможности создания текстуры
+        //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
       const ContextCaps& caps = GetCaps ();
 
@@ -571,7 +571,7 @@ struct TextureManager::Impl: public ContextObject
           desc.width, desc.height, desc.layers, get_name (desc.format));
       }
 
-        //создание текстуры
+        //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 
       return new Texture3D (GetContextManager (), desc, data);
     }    
@@ -591,12 +591,12 @@ struct TextureManager::Impl: public ContextObject
 #endif
 
   public:
-    TextureManager&     texture_manager; //менеджер текстур
-    TextureManagerState state;           //состояние менеджера текстур
+    TextureManager&     texture_manager; //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+    TextureManagerState state;           //СЃРѕСЃС‚РѕСЏРЅРёРµ РјРµРЅРµРґР¶РµСЂР° С‚РµРєСЃС‚СѓСЂ
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureManager::TextureManager (const ContextManager& context_manager)
@@ -608,7 +608,7 @@ TextureManager::~TextureManager ()
 }
 
 /*
-    Создание объекта состояния уровня
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 */
 
 IStageState* TextureManager::CreateStageState ()
@@ -617,7 +617,7 @@ IStageState* TextureManager::CreateStageState ()
 }
 
 /*
-   Биндинг текстур и сэмплеров
+   Р‘РёРЅРґРёРЅРі С‚РµРєСЃС‚СѓСЂ Рё СЃСЌРјРїР»РµСЂРѕРІ
 */
 
 void TextureManager::Bind ()
@@ -634,7 +634,7 @@ void TextureManager::Bind ()
 }
 
 /*
-   Создание текстуры и сэмплера
+   РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ Рё СЃСЌРјРїР»РµСЂР°
 */
 
 ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc, const TextureData* data)
@@ -664,7 +664,7 @@ ISamplerState* TextureManager::CreateSamplerState (const SamplerDesc& sampler_de
 }
 
 /*
-   Установка текущей текстуры и сэмплера
+   РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ С‚РµРєСЃС‚СѓСЂС‹ Рё СЃСЌРјРїР»РµСЂР°
 */
 
 void TextureManager::SetTexture (unsigned int sampler_slot, ITexture* texture)
@@ -720,7 +720,7 @@ ISamplerState* TextureManager::GetSampler (unsigned int sampler_slot) const
 }
 
 /*
-   Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+   Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
 */
 
 void TextureManager::GenerateMips (ITexture* texture)

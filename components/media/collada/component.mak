@@ -1,41 +1,41 @@
 ###################################################################################################
-#Ξοπεδελενθÿ θ κξνρςΰνςϋ
+#ΠΠΏΡ€ΠµΠ΄ΠµΠ»ΠµΠ½ΠΈΡ ΠΈ ΠΊΠΎΠ½ΡΡ‚Π°Π½Ρ‚Ρ‹
 ###################################################################################################
 TARGETS := MEDIA.COLLADA.SOURCES MEDIA.COLLADA.DAE.SOURCES MEDIA.COLLADA.CONVERT.SOURCES MEDIA.COLLADA.DAE.TESTS MEDIA.COLLADA.CONVERTER \
   MEDIA.COLLADA.CONVERT.TESTS MEDIA.COLLADA.CONVERTER.TESTS
 
-#Φελό - sources
+#Π¦ΠµΠ»Ρ - sources
 MEDIA.COLLADA.SOURCES.TYPE             := static-lib
 MEDIA.COLLADA.SOURCES.NAME             := funner.media.collada
 MEDIA.COLLADA.SOURCES.SOURCE_DIRS      := sources/model
 MEDIA.COLLADA.SOURCES.IMPORTS          := compile.media.collada compile.media.shared
 
-#Φελό - DAE loader sources
+#Π¦ΠµΠ»Ρ - DAE loader sources
 MEDIA.COLLADA.DAE.SOURCES.TYPE             := static-lib
 MEDIA.COLLADA.DAE.SOURCES.NAME             := funner.media.collada.dae
 MEDIA.COLLADA.DAE.SOURCES.SOURCE_DIRS      := sources/dae_loader
 MEDIA.COLLADA.DAE.SOURCES.IMPORTS          := compile.media.collada link.media.collada
 
-#Φελό - collada convert sources
+#Π¦ΠµΠ»Ρ - collada convert sources
 MEDIA.COLLADA.CONVERT.SOURCES.TYPE        := static-lib
 MEDIA.COLLADA.CONVERT.SOURCES.NAME        := funner.media.collada.convert
 MEDIA.COLLADA.CONVERT.SOURCES.SOURCE_DIRS := sources/convert
 MEDIA.COLLADA.CONVERT.SOURCES.IMPORTS     := compile.media.collada compile.media.geometry compile.media.animation \
                                              compile.math.curves compile.media.physics
 
-#Φελό - DAE loader tests
+#Π¦ΠµΠ»Ρ - DAE loader tests
 MEDIA.COLLADA.DAE.TESTS.TYPE             := test-suite
 MEDIA.COLLADA.DAE.TESTS.SOURCE_DIRS      := tests/dae_loader
 MEDIA.COLLADA.DAE.TESTS.IMPORTS          := compile.media.collada link.media.collada.dae
 
-#Φελό - collada convert tests
+#Π¦ΠµΠ»Ρ - collada convert tests
 MEDIA.COLLADA.CONVERT.TESTS.TYPE             := test-suite
 MEDIA.COLLADA.CONVERT.TESTS.SOURCE_DIRS      := tests/convert
 MEDIA.COLLADA.CONVERT.TESTS.IMPORTS          := compile.media.collada compile.media.geometry compile.media.animation \
                                                 link.media.collada.dae link.media.collada.convert link.media.geometry \
                                                 link.media.geometry.xmesh link.media.animation.xanim link.media.animation.binanim
 
-#Φελό - Collada converter
+#Π¦ΠµΠ»Ρ - Collada converter
 MEDIA.COLLADA.CONVERTER.TYPE        := application
 MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
@@ -45,7 +45,7 @@ MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image
                                        link.media.geometry.binmesh link.media.rfx link.media.animation.xanim \
                                        link.media.animation.binanim link.media.physics.xphys link.media.rfx.default_serializers
 
-#Φελό - collada convert tests
+#Π¦ΠµΠ»Ρ - collada convert tests
 MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite
 MEDIA.COLLADA.CONVERTER.TESTS.SOURCE_DIRS        := tests/collada_converter
 MEDIA.COLLADA.CONVERTER.TESTS.EXECUTION_DIR      := tests/collada_converter

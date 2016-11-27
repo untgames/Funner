@@ -3,7 +3,7 @@
 using namespace media::animation;
 
 /*
-    Описание реализации анимационного состояния
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 namespace media
@@ -14,10 +14,10 @@ namespace animation
 
 struct AnimationStateImpl: public xtl::reference_counter, public xtl::trackable
 {
-  float time;   //текущее время
-  float weight; //вес
+  float time;   //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ
+  float weight; //РІРµСЃ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   AnimationStateImpl () : time (0.0f), weight (1.0f) {}  
 };
 
@@ -26,7 +26,7 @@ struct AnimationStateImpl: public xtl::reference_counter, public xtl::trackable
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AnimationState::AnimationState ()
@@ -59,7 +59,7 @@ AnimationState& AnimationState::operator = (const AnimationState& s)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t AnimationState::Id () const
@@ -68,7 +68,7 @@ size_t AnimationState::Id () const
 }
 
 /*
-    Текущее время
+    РўРµРєСѓС‰РµРµ РІСЂРµРјСЏ
 */
 
 void AnimationState::SetTime (float time)
@@ -82,7 +82,7 @@ float AnimationState::Time () const
 }
 
 /*
-    Вес анимации
+    Р’РµСЃ Р°РЅРёРјР°С†РёРё
 */
 
 void AnimationState::SetWeight (float weight)
@@ -99,7 +99,7 @@ float AnimationState::Weight () const
 }
 
 /*
-    Получение реализации
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 AnimationStateImpl& AnimationState::Impl () const
@@ -108,7 +108,7 @@ AnimationStateImpl& AnimationState::Impl () const
 }
 
 /*
-    Получение объекта оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& AnimationState::GetTrackable () const
@@ -132,7 +132,7 @@ xtl::trackable& get_trackable (const AnimationState& s)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void AnimationState::Swap (AnimationState& s)
@@ -152,7 +152,7 @@ void swap (AnimationState& s1, AnimationState& s2)
 }
 
 /*
-    Получение времени и веса
+    РџРѕР»СѓС‡РµРЅРёРµ РІСЂРµРјРµРЅРё Рё РІРµСЃР°
 */
 
 float get_time (AnimationStateImpl& impl)

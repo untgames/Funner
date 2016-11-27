@@ -29,16 +29,16 @@ function LinearAnimation.Create (animation_config)
   
   setmetatable (animation, LinearAnimation)
   
-  animation.object                       = animation_config.object                                              --анимируемый узел
-  animation.start_value                  = animation_config.start_value                                         --начальное значение свойства объекта
-  animation.animation_direction          = animation_config.target_value - animation_config.start_value         --направление изменения значения свойства объекта
-  animation.delay                        = animation_config.delay                                               --задержка перед началом анимации
-  animation.animation_time               = animation_config.animation_time                                      --время анимации
-  animation.ellapsed_time                = 0                                                                    --прошедшее время
-  animation.property_set_function        = animation_config.property_set_function                               --функция установки свойства объекта
-  animation.animation_begin_handlers     = copy_animation_handlers (animation_config.animation_begin_handlers)  --обработчики, вызываемый при первом срабатывании
-  animation.animation_end_handlers       = copy_animation_handlers (animation_config.animation_end_handlers)    --обработчики окончания анимации
-  animation.playing                      = true                                                                 --проигрывается ли анимация
+  animation.object                       = animation_config.object                                              --Р°РЅРёРјРёСЂСѓРµРјС‹Р№ СѓР·РµР»
+  animation.start_value                  = animation_config.start_value                                         --РЅР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р°
+  animation.animation_direction          = animation_config.target_value - animation_config.start_value         --РЅР°РїСЂР°РІР»РµРЅРёРµ РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р°
+  animation.delay                        = animation_config.delay                                               --Р·Р°РґРµСЂР¶РєР° РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј Р°РЅРёРјР°С†РёРё
+  animation.animation_time               = animation_config.animation_time                                      --РІСЂРµРјСЏ Р°РЅРёРјР°С†РёРё
+  animation.ellapsed_time                = 0                                                                    --РїСЂРѕС€РµРґС€РµРµ РІСЂРµРјСЏ
+  animation.property_set_function        = animation_config.property_set_function                               --С„СѓРЅРєС†РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р°
+  animation.animation_begin_handlers     = copy_animation_handlers (animation_config.animation_begin_handlers)  --РѕР±СЂР°Р±РѕС‚С‡РёРєРё, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРµСЂРІРѕРј СЃСЂР°Р±Р°С‚С‹РІР°РЅРёРё
+  animation.animation_end_handlers       = copy_animation_handlers (animation_config.animation_end_handlers)    --РѕР±СЂР°Р±РѕС‚С‡РёРєРё РѕРєРѕРЅС‡Р°РЅРёСЏ Р°РЅРёРјР°С†РёРё
+  animation.playing                      = true                                                                 --РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ Р»Рё Р°РЅРёРјР°С†РёСЏ
 
   if not animation.delay then
     animation.delay = 0

@@ -1,5 +1,5 @@
 /*
-    Разбор базовых типов
+    Р Р°Р·Р±РѕСЂ Р±Р°Р·РѕРІС‹С… С‚РёРїРѕРІ
 */
 
 inline bool read (const char* string, long& value)
@@ -218,7 +218,7 @@ struct wchar_string_converter
 
       size_t string_length = wcslen (string);
       
-      static const size_t MAX_LENGTH = BUFFER_SIZE-1; //данный размер совпадает с количеством символов multibyte строке, поскольку работа производится только с базовыми типами: числа и простые символы
+      static const size_t MAX_LENGTH = BUFFER_SIZE-1; //РґР°РЅРЅС‹Р№ СЂР°Р·РјРµСЂ СЃРѕРІРїР°РґР°РµС‚ СЃ РєРѕР»РёС‡РµСЃС‚РІРѕРј СЃРёРјРІРѕР»РѕРІ multibyte СЃС‚СЂРѕРєРµ, РїРѕСЃРєРѕР»СЊРєСѓ СЂР°Р±РѕС‚Р° РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃ Р±Р°Р·РѕРІС‹РјРё С‚РёРїР°РјРё: С‡РёСЃР»Р° Рё РїСЂРѕСЃС‚С‹Рµ СЃРёРјРІРѕР»С‹
 
       if (string_length > MAX_LENGTH)
         string_length = MAX_LENGTH;
@@ -331,7 +331,7 @@ inline bool read (const wchar_t* string, long double& result_value)
 #endif
 
 /*
-    Чтение токенов с приведением типов
+    Р§С‚РµРЅРёРµ С‚РѕРєРµРЅРѕРІ СЃ РїСЂРёРІРµРґРµРЅРёРµРј С‚РёРїРѕРІ
 */
 
 template <class Base, class Char, class Value>
@@ -348,7 +348,7 @@ inline bool read_and_cast (const Char* string, Value& value)
 }
 
 /*
-    Чтение токенов с возвратом значения
+    Р§С‚РµРЅРёРµ С‚РѕРєРµРЅРѕРІ СЃ РІРѕР·РІСЂР°С‚РѕРј Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Value, class Char>

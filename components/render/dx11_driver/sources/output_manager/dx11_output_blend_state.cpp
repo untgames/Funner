@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -49,7 +49,7 @@ BlendState::BlendState (const DeviceManager& manager, const BlendDesc& in_desc)
 {
   try
   {
-      //преобразование дескриптора
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     D3D11_BLEND_DESC dx_desc;
 
@@ -79,7 +79,7 @@ BlendState::BlendState (const DeviceManager& manager, const BlendDesc& in_desc)
       if (src.color_write_mask & ColorWriteFlag_Alpha) dst.RenderTargetWriteMask |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
     }
 
-      //создание состояния
+      //СЃРѕР·РґР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 
     ID3D11BlendState* dx_state = 0;
 
@@ -102,7 +102,7 @@ BlendState::~BlendState ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void BlendState::GetDesc (BlendDesc& out_desc)

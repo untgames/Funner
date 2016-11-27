@@ -1,4 +1,4 @@
-//Тестирование find (c-string, pos)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find (c-string, pos)
 #include <stdio.h>
 #include <stl/string>
 

@@ -6,37 +6,37 @@ using namespace input::low_level;
 using namespace common;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация источника событий ввода
+///Р РµР°Р»РёР·Р°С†РёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct EventsSource::Impl : public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструксторы / деструктор / присваивание
+///РљРѕРЅСЃС‚СЂСѓРєСЃС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Impl  ();
     ~Impl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Информация о подключении
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool        IsConnected () const;
     const char* DriverName  () const;
     const char* DeviceName  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подключение к устройству ввода
+///РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СѓСЃС‚СЂРѕР№СЃС‚РІСѓ РІРІРѕРґР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Connect    (const char* driver_name_mask, const char* device_name_mask, const xtl::function<void (const char*)>& log_function);
     void Disconnect ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Источник событий ввода
+///РСЃС‚РѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     connection RegisterHandler (const EventHandler&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработчик сообщений от устройства
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РѕС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DeviceEventHandler (const char* event);
 
@@ -44,14 +44,14 @@ struct EventsSource::Impl : public xtl::reference_counter
     typedef xtl::signal<void (const char*)> DeviceSignal;
     typedef com_ptr<IDevice>                DevicePtr;
 
-    DeviceSignal         signals;           //сигналы устройства
-    DevicePtr            connected_device;  //подключённое устройство
-    xtl::auto_connection device_connection; //подключение к устройству
-    stl::string          driver_name;       //имя драйвера
+    DeviceSignal         signals;           //СЃРёРіРЅР°Р»С‹ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+    DevicePtr            connected_device;  //РїРѕРґРєР»СЋС‡С‘РЅРЅРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ
+    xtl::auto_connection device_connection; //РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє СѓСЃС‚СЂРѕР№СЃС‚РІСѓ
+    stl::string          driver_name;       //РёРјСЏ РґСЂР°Р№РІРµСЂР°
 };
 
 /*
-   Конструксторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєСЃС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 EventsSource::Impl::Impl () {}
@@ -61,7 +61,7 @@ EventsSource::Impl::~Impl ()
 }
 
 /*
-   Информация о подключении
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРё
 */
 
 bool EventsSource::Impl::IsConnected () const
@@ -80,7 +80,7 @@ const char* EventsSource::Impl::DeviceName () const
 }
 
 /*
-   Подключение к устройству ввода
+   РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СѓСЃС‚СЂРѕР№СЃС‚РІСѓ РІРІРѕРґР°
 */
 
 void EventsSource::Impl::Connect (const char* driver_name_mask, const char* device_name_mask, const xtl::function<void (const char*)>& log_function)
@@ -126,7 +126,7 @@ void EventsSource::Impl::Disconnect ()
 }
 
 /*
-   Источник событий ввода
+   РСЃС‚РѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
 */
 
 xtl::connection EventsSource::Impl::RegisterHandler (const EventHandler& handler)
@@ -135,7 +135,7 @@ xtl::connection EventsSource::Impl::RegisterHandler (const EventHandler& handler
 }
 
 /*
-   Обработчик сообщений от устройства
+   РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РѕС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void EventsSource::Impl::DeviceEventHandler (const char* event)
@@ -146,12 +146,12 @@ void EventsSource::Impl::DeviceEventHandler (const char* event)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-   Конструксторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєСЃС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 EventsSource::EventsSource ()
@@ -183,7 +183,7 @@ EventsSource& EventsSource::operator = (const EventsSource& source)
 }
 
 /*
-   Информация о подключении
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРё
 */
 
 bool EventsSource::IsConnected () const
@@ -202,7 +202,7 @@ const char* EventsSource::DeviceName () const
 }
 
 /*
-   Подключение к устройству ввода
+   РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СѓСЃС‚СЂРѕР№СЃС‚РІСѓ РІРІРѕРґР°
 */
 
 namespace
@@ -236,7 +236,7 @@ void EventsSource::Disconnect ()
 }
 
 /*
-   Источник событий ввода
+   РСЃС‚РѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
 */
 
 xtl::connection EventsSource::RegisterHandler (const EventHandler& handler) const
@@ -245,7 +245,7 @@ xtl::connection EventsSource::RegisterHandler (const EventHandler& handler) cons
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void EventsSource::Swap (EventsSource& source)
@@ -257,7 +257,7 @@ namespace input
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (EventsSource& source1, EventsSource& source2)

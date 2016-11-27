@@ -12,12 +12,12 @@ namespace
 {
 
 Lockable       instance_lock;
-LogSystemImpl* instance = 0; //экземпляр системы протоколирования
+LogSystemImpl* instance = 0; //СЌРєР·РµРјРїР»СЏСЂ СЃРёСЃС‚РµРјС‹ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LogSystemImpl::LogSystemImpl ()
@@ -38,7 +38,7 @@ LogSystemImpl::~LogSystemImpl ()
 }
 
 /*
-    Регистрация источников протоколирования
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РёСЃС‚РѕС‡РЅРёРєРѕРІ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 void LogSystemImpl::Register (LogImpl* source)
@@ -68,7 +68,7 @@ void LogSystemImpl::Unregister (LogImpl* source)
 }
 
 /*
-    Регистрация фильтров протоколирования
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С„РёР»СЊС‚СЂРѕРІ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 void LogSystemImpl::Register (LogFilterImpl* filter)
@@ -98,7 +98,7 @@ void LogSystemImpl::Unregister (LogFilterImpl* filter)
 }
 
 /*
-    Получение и освобождение экземпляра системы протоколирования
+    РџРѕР»СѓС‡РµРЅРёРµ Рё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° СЃРёСЃС‚РµРјС‹ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 LogSystemPtr LogSystemImpl::Instance ()

@@ -4,12 +4,12 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации Sprite
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Sprite
 */
 
 struct Sprite::Impl: public xtl::instance_counter<Sprite>
 {
-  SpriteDesc sprite_desc; //описание спрайта
+  SpriteDesc sprite_desc; //РѕРїРёСЃР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
   
   Impl ()
   {
@@ -21,7 +21,7 @@ struct Sprite::Impl: public xtl::instance_counter<Sprite>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Sprite::Sprite ()
@@ -35,7 +35,7 @@ Sprite::~Sprite ()
 }
 
 /*
-    Создание спрайта
+    РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
 */
 
 Sprite::Pointer Sprite::Create ()
@@ -44,7 +44,7 @@ Sprite::Pointer Sprite::Create ()
 }
 
 /*
-    Цвет спрайта
+    Р¦РІРµС‚ СЃРїСЂР°Р№С‚Р°
 */
 
 namespace
@@ -100,7 +100,7 @@ float Sprite::Alpha () const
 }
 
 /*
-    Текстурные координаты
+    РўРµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹
 */
 
 void Sprite::SetTexOffset (const math::vec2f& offset)
@@ -128,7 +128,7 @@ const math::vec2f& Sprite::TexSize () const
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Sprite::AcceptCore (Visitor& visitor)
@@ -138,7 +138,7 @@ void Sprite::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Реализация получения количества спрайтов и массива спрайтов
+    Р РµР°Р»РёР·Р°С†РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЃРїСЂР°Р№С‚РѕРІ Рё РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t Sprite::SpriteDescsCountCore ()
@@ -157,7 +157,7 @@ const SpriteDesc* Sprite::SpriteDescsCore ()
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void Sprite::BindProperties (common::PropertyBindingMap& bindings)

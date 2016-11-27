@@ -6,20 +6,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_MESSAGES_COUNT_RESERVE = 128;  //резервируемое количество сообщений об ошибках разбора
-const size_t DEFAULT_MESSAGE_BUFFER_RESERVE = 1024; //резервируемый размер буфера ошибок
+const size_t DEFAULT_MESSAGES_COUNT_RESERVE = 128;  //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕРѕР±С‰РµРЅРёР№ РѕР± РѕС€РёР±РєР°С… СЂР°Р·Р±РѕСЂР°
+const size_t DEFAULT_MESSAGE_BUFFER_RESERVE = 1024; //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РѕС€РёР±РѕРє
 
 /*
-    Информация о сообщении
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕРѕР±С‰РµРЅРёРё
 */
 
 struct ParseLogMessage
 {
-  ParseLogMessageType type;   //тип сообщения  
-  size_t              offset; //смещение до сообщения об ошибке
+  ParseLogMessageType type;   //С‚РёРї СЃРѕРѕР±С‰РµРЅРёСЏ  
+  size_t              offset; //СЃРјРµС‰РµРЅРёРµ РґРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ
 };
 
 typedef stl::vector<ParseLogMessage> MessageArray;
@@ -27,17 +27,17 @@ typedef stl::vector<ParseLogMessage> MessageArray;
 }
 
 /*
-    Описание реализации протокола парсера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРѕС‚РѕРєРѕР»Р° РїР°СЂСЃРµСЂР°
 */
 
 struct ParseLog::Impl: public xtl::reference_counter
 {
-  MessageArray messages;       //сообщения протокола
-  stl::string  message_buffer; //буфер с сообщениями об ошибках
-  bool         has_errors;     //есть ошибки разбора
-  bool         has_warnings;   //есть предупреждения разбора
+  MessageArray messages;       //СЃРѕРѕР±С‰РµРЅРёСЏ РїСЂРѕС‚РѕРєРѕР»Р°
+  stl::string  message_buffer; //Р±СѓС„РµСЂ СЃ СЃРѕРѕР±С‰РµРЅРёСЏРјРё РѕР± РѕС€РёР±РєР°С…
+  bool         has_errors;     //РµСЃС‚СЊ РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°
+  bool         has_warnings;   //РµСЃС‚СЊ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ СЂР°Р·Р±РѕСЂР°
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     has_errors   = false;
@@ -47,12 +47,12 @@ struct ParseLog::Impl: public xtl::reference_counter
     message_buffer.reserve (DEFAULT_MESSAGE_BUFFER_RESERVE);
   }
 
-///Добавление сообщения
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ
   void InsertMessage (const char* file_name, size_t line, const char* node_name, ParseLogMessageType type, const char* format, va_list args, bool need_prefix = true)
   {
     static const char* METHOD_NAME = "common::ParseLog::Impl::InsertMessage";
     
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (need_prefix && !file_name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
@@ -60,7 +60,7 @@ struct ParseLog::Impl: public xtl::reference_counter
     if (!format)
       throw xtl::make_null_argument_exception (METHOD_NAME, "format");
 
-      //преобразование типа сообщения
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РёРїР° СЃРѕРѕР±С‰РµРЅРёСЏ
 
     const char* message_type_string;
 
@@ -73,7 +73,7 @@ struct ParseLog::Impl: public xtl::reference_counter
         throw xtl::make_argument_exception (METHOD_NAME, "message_type", type);
     }
     
-      //добавление сообщения об ошибке
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ
       
     ParseLogMessage message = {type, message_buffer.size ()};
     
@@ -119,7 +119,7 @@ struct ParseLog::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ParseLog::ParseLog ()
@@ -146,7 +146,7 @@ ParseLog& ParseLog::operator = (const ParseLog& log)
 }
 
 /*
-    Количество сообщений / информация о состоянии протоколирования
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕРѕР±С‰РµРЅРёР№ / РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 */
 
 size_t ParseLog::MessagesCount () const
@@ -165,7 +165,7 @@ bool ParseLog::HasWarnings () const
 }
 
 /*
-    Перебор сообщений
+    РџРµСЂРµР±РѕСЂ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 const char* ParseLog::Message (size_t index) const
@@ -185,7 +185,7 @@ ParseLogMessageType ParseLog::MessageType (size_t index) const
 }
 
 /*
-    Добавление сообщений об ошибке
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№ РѕР± РѕС€РёР±РєРµ
 */
 
 void ParseLog::Printf (ParseLogMessageType type, const char* format, ...)
@@ -290,7 +290,7 @@ void ParseLog::Warning (const ParseNode& node, const char* format, ...)
 }
 
 /*
-    Печать сообщений
+    РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void ParseLog::Print (const LogFunction& fn)
@@ -303,13 +303,13 @@ void ParseLog::Print (const LogFunction& fn)
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ParseLog::Swap (ParseLog& log)

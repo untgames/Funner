@@ -3,18 +3,18 @@
 using namespace social;
 
 /*
-   Реализация таблицы рекордов
+   Р РµР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ
 */
 
 struct Leaderboard::Impl : public xtl::reference_counter
 {
-  stl::string           id;                      //идентификатор
-  stl::string           title;                   //название
-  Score                 user_score;              //очки залогиненного пользователя
-  common::PropertyMap   properties;              //свойства
-  ScoreList             scores;                  //очки таблицы
-  const void*           handle;                  //низкоуровневый дескриптор
-  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
+  stl::string           id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  stl::string           title;                   //РЅР°Р·РІР°РЅРёРµ
+  Score                 user_score;              //РѕС‡РєРё Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+  common::PropertyMap   properties;              //СЃРІРѕР№СЃС‚РІР°
+  ScoreList             scores;                  //РѕС‡РєРё С‚Р°Р±Р»РёС†С‹
+  const void*           handle;                  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction handle_release_function; //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl ()
     : handle (0)
@@ -28,7 +28,7 @@ struct Leaderboard::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Leaderboard::Leaderboard ()
@@ -54,7 +54,7 @@ Leaderboard& Leaderboard::operator = (const Leaderboard& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 const char* Leaderboard::Id () const
@@ -71,7 +71,7 @@ void Leaderboard::SetId (const char* id)
 }
 
 /*
-   Название
+   РќР°Р·РІР°РЅРёРµ
 */
 
 const char* Leaderboard::Title () const
@@ -88,7 +88,7 @@ void Leaderboard::SetTitle (const char* title)
 }
 
 /*
-   Очки залогиненного пользователя
+   РћС‡РєРё Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 const Score& Leaderboard::UserScore () const
@@ -102,7 +102,7 @@ void Leaderboard::SetUserScore (const Score& score)
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& Leaderboard::Properties () const
@@ -121,7 +121,7 @@ void Leaderboard::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Рекорды
+   Р РµРєРѕСЂРґС‹
 */
 
 const ScoreList& Leaderboard::Scores () const
@@ -140,7 +140,7 @@ void Leaderboard::SetScores (const ScoreList& scores)
 }
 
 /*
-   Получение/установка низкоуровневого дескриптора
+   РџРѕР»СѓС‡РµРЅРёРµ/СѓСЃС‚Р°РЅРѕРІРєР° РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 const void* Leaderboard::Handle () const
@@ -158,7 +158,7 @@ void Leaderboard::SetHandle (const void* handle, const ReleaseHandleFunction& re
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Leaderboard::Swap (Leaderboard& source)
@@ -170,7 +170,7 @@ namespace social
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Leaderboard& leaderboard1, Leaderboard& leaderboard2)

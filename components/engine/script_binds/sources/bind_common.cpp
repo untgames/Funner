@@ -14,14 +14,14 @@ namespace common_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* COMPONENT_NAME = "script.binds.Common";
 const char* BINDER_NAME    = "Common";
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

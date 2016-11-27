@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := DEMOS.SCENE_INPUT.SHARED DEMOS.SCENE_INPUT.TESTS
 
-#Цель №1 - Общий код 2D рендера
+#Р¦РµР»СЊ в„–1 - РћР±С‰РёР№ РєРѕРґ 2D СЂРµРЅРґРµСЂР°
 DEMOS.SCENE_INPUT.SHARED.TYPE             := static-lib
 DEMOS.SCENE_INPUT.SHARED.NAME             := funner.demos.scene_input.shared
 DEMOS.SCENE_INPUT.SHARED.INCLUDE_DIRS     :=
@@ -11,7 +11,7 @@ DEMOS.SCENE_INPUT.SHARED.SOURCE_DIRS      := shared
 DEMOS.SCENE_INPUT.SHARED.IMPORTS          := compile.system compile.render.scene_render.server compile.render.scene_render.client compile.render.low_level \
                                              compile.scene_graph.core compile.input.window_driver compile.input.scene_input compile.input.manager
 
-#Цель №2 - Тесты 2D рендера
+#Р¦РµР»СЊ в„–2 - РўРµСЃС‚С‹ 2D СЂРµРЅРґРµСЂР°
 DEMOS.SCENE_INPUT.TESTS.TYPE             := test-suite
 DEMOS.SCENE_INPUT.TESTS.INCLUDE_DIRS     := shared
 DEMOS.SCENE_INPUT.TESTS.SOURCE_DIRS      := sources

@@ -1,14 +1,14 @@
 /*
-    Метафункции для однопроходных интервалов
+    РњРµС‚Р°С„СѓРЅРєС†РёРё РґР»СЏ РѕРґРЅРѕРїСЂРѕС…РѕРґРЅС‹С… РёРЅС‚РµСЂРІР°Р»РѕРІ
 */
 
-//тип значения элементов интервала
+//С‚РёРї Р·РЅР°С‡РµРЅРёСЏ СЌР»РµРјРµРЅС‚РѕРІ РёРЅС‚РµСЂРІР°Р»Р°
 template <class T> struct range_value
 {
   typedef typename stl::iterator_traits<typename range_iterator<T>::type>::value_type type;
 };
 
-//тип итератора интервала
+//С‚РёРї РёС‚РµСЂР°С‚РѕСЂР° РёРЅС‚РµСЂРІР°Р»Р°
 template <class C>               struct range_iterator                                       { typedef typename C::iterator type; };
 template <class Iterator>        struct range_iterator<stl::pair<Iterator, Iterator> >       { typedef Iterator type; };
 template <class Iterator>        struct range_iterator<const stl::pair<Iterator, Iterator> > { typedef Iterator type; };
@@ -17,7 +17,7 @@ template <class T, size_t Size>  struct range_iterator<const T [Size]>          
 template <class T, size_t Size>  struct range_iterator<volatile T [Size]>                    { typedef volatile T* type; };
 template <class T, size_t Size>  struct range_iterator<const volatile T [Size]>              { typedef const volatile T* type; };
 
-//тип константного итератора интервала
+//С‚РёРї РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР° РёРЅС‚РµСЂРІР°Р»Р°
 template <class C>               struct range_const_iterator                                       { typedef typename C::const_iterator type; };
 template <class Iterator>        struct range_const_iterator<stl::pair<Iterator, Iterator> >       { typedef Iterator type; };
 template <class Iterator>        struct range_const_iterator<const stl::pair<Iterator, Iterator> > { typedef Iterator type; };
@@ -27,16 +27,16 @@ template <class T, size_t Size>  struct range_const_iterator<volatile T [Size]> 
 template <class T, size_t Size>  struct range_const_iterator<const volatile T [Size]>              { typedef const T* type; };
 
 /*
-    Метафункции для интервалов прямого перебора
+    РњРµС‚Р°С„СѓРЅРєС†РёРё РґР»СЏ РёРЅС‚РµСЂРІР°Р»РѕРІ РїСЂСЏРјРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 */
 
-//тип разности между двумя итераторами интервала
+//С‚РёРї СЂР°Р·РЅРѕСЃС‚Рё РјРµР¶РґСѓ РґРІСѓРјСЏ РёС‚РµСЂР°С‚РѕСЂР°РјРё РёРЅС‚РµСЂРІР°Р»Р°
 template <class T> struct range_difference
 {
   typedef typename stl::iterator_traits<typename range_const_iterator<T>::type>::difference_type type;
 };
 
-//тип размерности интервала
+//С‚РёРї СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё РёРЅС‚РµСЂРІР°Р»Р°
 template <class C>               struct range_size                                      { typedef typename C::size_type type; };
 template <class Iterator>        struct range_size<stl::pair<Iterator, Iterator> >      { typedef size_t type; };
 template <class Iterator>        struct range_size<const stl::pair<Iterator,Iterator> > { typedef size_t type; };
@@ -46,23 +46,23 @@ template <class T, size_t Size>  struct range_size<volatile T [Size]>           
 template <class T, size_t Size>  struct range_size<const volatile T [Size]>             { typedef size_t type; };
 
 /*
-    Метафункции для интервалов двунаправленного перебора
+    РњРµС‚Р°С„СѓРЅРєС†РёРё РґР»СЏ РёРЅС‚РµСЂРІР°Р»РѕРІ РґРІСѓРЅР°РїСЂР°РІР»РµРЅРЅРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 */
 
-//определение типа итератора обратного перебора
+//РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° РёС‚РµСЂР°С‚РѕСЂР° РѕР±СЂР°С‚РЅРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 template <class T> struct range_reverse_iterator
 {
   typedef stl::reverse_iterator<typename range_iterator<T>::type> type;
 };
 
-//определение типа константного итератора обратного перебора
+//РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР° РѕР±СЂР°С‚РЅРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 template <class T> struct range_const_reverse_iterator
 {
   typedef stl::reverse_iterator<typename range_const_iterator<T>::type> type;
 };
 
 /*
-    Дополнительные метафункции
+    Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РјРµС‚Р°С„СѓРЅРєС†РёРё
 */
 
 template <class T> struct range_result_iterator
@@ -96,10 +96,10 @@ template <class T> struct range_reverse_result_iterator
 };
 
 /*
-    Функции для однопроходных интервалов перебора
+    Р¤СѓРЅРєС†РёРё РґР»СЏ РѕРґРЅРѕРїСЂРѕС…РѕРґРЅС‹С… РёРЅС‚РµСЂРІР°Р»РѕРІ РїРµСЂРµР±РѕСЂР°
 */
 
-//получение итератора на начало интервала
+//РїРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР° РЅР° РЅР°С‡Р°Р»Рѕ РёРЅС‚РµСЂРІР°Р»Р°
 template <class T>
 inline typename range_const_iterator<T>::type begin (const T& c)
 {
@@ -142,7 +142,7 @@ inline typename range_const_iterator<T>::type const_begin (const T& c)
   return begin (c);
 }
 
-//получение итератора на конец интервала
+//РїРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР° РЅР° РєРѕРЅРµС† РёРЅС‚РµСЂРІР°Р»Р°
 template <class T>
 inline typename range_const_iterator<T>::type end (const T& c)
 {
@@ -185,7 +185,7 @@ inline typename range_const_iterator<T>::type const_end (const T& c)
   return end (c);
 }
 
-//проверка на пустоту интервала
+//РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ РёРЅС‚РµСЂРІР°Р»Р°
 template <class T>
 inline bool empty (const T& c)
 {
@@ -193,10 +193,10 @@ inline bool empty (const T& c)
 }
 
 /*
-    Функции для интервалов прямого перебора
+    Р¤СѓРЅРєС†РёРё РґР»СЏ РёРЅС‚РµСЂРІР°Р»РѕРІ РїСЂСЏРјРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 */
 
-//определение количества элементов в интервале
+//РѕРїСЂРµРґРµР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ РІ РёРЅС‚РµСЂРІР°Р»Рµ
 template <class T> inline typename range_size<T>::type size (const T& c)
 {
   return c.size ();
@@ -213,10 +213,10 @@ template <class T, size_t Size> inline size_t size (const T (&array)[Size])
 }
 
 /*
-    Функции для интервалов двунаправленного перебора
+    Р¤СѓРЅРєС†РёРё РґР»СЏ РёРЅС‚РµСЂРІР°Р»РѕРІ РґРІСѓРЅР°РїСЂР°РІР»РµРЅРЅРѕРіРѕ РїРµСЂРµР±РѕСЂР°
 */
 
-//получение обратного итератора на начало интервала
+//РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЂР°С‚РЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР° РЅР° РЅР°С‡Р°Р»Рѕ РёРЅС‚РµСЂРІР°Р»Р°
 template <class T>
 inline typename range_reverse_result_iterator<T>::type rbegin (T& c)
 {
@@ -229,7 +229,7 @@ inline typename range_const_reverse_iterator<T>::type const_rbegin (const T& c)
   return rbegin (c);
 }
 
-//получение обратного итератора на конец интервала
+//РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЂР°С‚РЅРѕРіРѕ РёС‚РµСЂР°С‚РѕСЂР° РЅР° РєРѕРЅРµС† РёРЅС‚РµСЂРІР°Р»Р°
 template <class T> typename range_reverse_result_iterator<T>::type rend (T& c)
 {
   return typename range_reverse_result_iterator<T>::type (begin (c));

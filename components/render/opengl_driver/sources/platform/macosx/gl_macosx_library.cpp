@@ -12,12 +12,12 @@ const char* OPENGL_DYLIB_NAME = "/System/Library/Frameworks/OpenGL.framework/Ope
 }
 
 /*
-    Описание реализации библиотеки функций OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё С„СѓРЅРєС†РёР№ OpenGL
 */
 
 struct Library::Impl
 {
-  syslib::DynamicLibrary opengl_dylib; //библиотека OpenGL
+  syslib::DynamicLibrary opengl_dylib; //Р±РёР±Р»РёРѕС‚РµРєР° OpenGL
 
   Impl ()
     : opengl_dylib (OPENGL_DYLIB_NAME)
@@ -25,7 +25,7 @@ struct Library::Impl
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Library::Library ()
@@ -38,7 +38,7 @@ Library::~Library ()
 }
 
 /*
-   Получение адреса точки входа
+   РџРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃР° С‚РѕС‡РєРё РІС…РѕРґР°
 */
 
 void* Library::GetProcAddress (const char* name, unsigned int search_flags)

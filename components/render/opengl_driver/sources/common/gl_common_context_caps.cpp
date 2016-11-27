@@ -8,7 +8,7 @@ namespace
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 /*
-    Версии OpenGL
+    Р’РµСЂСЃРёРё OpenGL
 */
 
 enum GlVersion
@@ -32,7 +32,7 @@ enum GlVersion
 };
 
 /*
-    Таблица множеств расширений, вошедших в версии стандарта OpenGL
+    РўР°Р±Р»РёС†Р° РјРЅРѕР¶РµСЃС‚РІ СЂР°СЃС€РёСЂРµРЅРёР№, РІРѕС€РµРґС€РёС… РІ РІРµСЂСЃРёРё СЃС‚Р°РЅРґР°СЂС‚Р° OpenGL
 */
 
 class StandardExtensionSet
@@ -86,7 +86,7 @@ class StandardExtensionSet
 }
 
 /*
-    Реализация ContextCaps
+    Р РµР°Р»РёР·Р°С†РёСЏ ContextCaps
 */
 
 ContextCaps::ContextCaps ()
@@ -98,7 +98,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 {
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-    //маркеры используемых расширений
+    //РјР°СЂРєРµСЂС‹ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
   static Extension ARB_depth_texture              = "GL_ARB_depth_texture",
                    ARB_fragment_shader            = "GL_ARB_fragment_shader",
@@ -141,7 +141,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   static Extension versions [GlVersion_Num] = {"GL_VERSION_1_2", "GL_VERSION_1_3", "GL_VERSION_1_4", "GL_VERSION_1_5",
                                                "GL_VERSION_2_0", "GL_VERSION_2_1"};
 
-    //получение маски доступных расширений
+    //РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃРєРё РґРѕСЃС‚СѓРїРЅС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
   ExtensionSet ext = available_extension_set;
 
@@ -434,7 +434,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 }
 
 /*
-    Преобразование в формат возможностей устройства
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІ С„РѕСЂРјР°С‚ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const

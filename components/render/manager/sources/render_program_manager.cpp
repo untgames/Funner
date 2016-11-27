@@ -3,16 +3,16 @@
 using namespace render::manager;
 
 /*
-    Описание реализации менеджера шейдинга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРёРЅРіР°
 */
 
 struct ProgramManager::Impl
 {
-  ProgramProxyManager program_proxy_manager; //менеджер прокси программ
+  ProgramProxyManager program_proxy_manager; //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё РїСЂРѕРіСЂР°РјРј
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ProgramManager::ProgramManager ()
@@ -25,7 +25,7 @@ ProgramManager::~ProgramManager ()
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 ProgramProxy ProgramManager::GetProgramProxy (const char* name)
@@ -34,7 +34,7 @@ ProgramProxy ProgramManager::GetProgramProxy (const char* name)
 }
 
 /*
-    Поиск загруженной программы
+    РџРѕРёСЃРє Р·Р°РіСЂСѓР¶РµРЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 ProgramPtr ProgramManager::FindProgram (const char* name)
@@ -43,7 +43,7 @@ ProgramPtr ProgramManager::FindProgram (const char* name)
 }
 
 /*
-    Установка программы по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРѕРіСЂР°РјРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void ProgramManager::SetDefaultProgram (const ProgramPtr& program)

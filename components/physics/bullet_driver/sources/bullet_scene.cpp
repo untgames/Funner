@@ -12,11 +12,11 @@ const float       DEFAULT_SIMULATION_STEP = 1.f / 60.f;
 const math::vec4f DRAW_TEXT_COLOR (0.f, 0.f, 0.f, 1.f);
 const size_t      MAX_SIMULATION_SUBSTEPS = 120;
 
-//Информация о точке касания (необходимо для обработчика удаления касания)
+//РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РѕС‡РєРµ РєР°СЃР°РЅРёСЏ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СѓРґР°Р»РµРЅРёСЏ РєР°СЃР°РЅРёСЏ)
 struct ContactPointInfo
 {
-  Scene*         scene;  //сцена
-  CollisionEvent event;  //событие
+  Scene*         scene;  //СЃС†РµРЅР°
+  CollisionEvent event;  //СЃРѕР±С‹С‚РёРµ
 };
 
 bool contact_added_callback (btManifoldPoint& contact_point,
@@ -56,7 +56,7 @@ bool contact_added_callback (btManifoldPoint& contact_point,
   }
   catch (...)
   {
-    //подавление исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
   contact_point.m_userPersistentData = contact_point_info;
@@ -76,7 +76,7 @@ bool contact_destroyed_callback (void* user_persistent_data)
   }
   catch (...)
   {
-    //подавление исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
   delete contact_point_info;
@@ -98,8 +98,8 @@ void check_create_joint_arguments (const char* source, IRigidBody* body1, IRigid
 
 struct CollisionFilterDesc
 {
-  IScene::BroadphaseCollisionFilter filter;     //фильтр
-  bool                              collides;   //режим фильтрации
+  IScene::BroadphaseCollisionFilter filter;     //С„РёР»СЊС‚СЂ
+  bool                              collides;   //СЂРµР¶РёРј С„РёР»СЊС‚СЂР°С†РёРё
 
   CollisionFilterDesc ()
     : collides (true)
@@ -110,11 +110,11 @@ struct CollisionFilterDesc
     {}
 };
 
-//Класс обрабатывающий результаты трассировки луча
+//РљР»Р°СЃСЃ РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰РёР№ СЂРµР·СѓР»СЊС‚Р°С‚С‹ С‚СЂР°СЃСЃРёСЂРѕРІРєРё Р»СѓС‡Р°
 class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
 {
   public:
-    //Конструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BulletRayTestCallback (const math::vec3f& in_ray_origin, const math::vec3f& in_ray_end, RayTestMode in_mode, const physics::low_level::IScene::RayTestCallback& in_callback)
       : callback (in_callback)
       , ray_origin (in_ray_origin)
@@ -125,7 +125,7 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
       , result_body (0)
       {}
 
-    //Вызов callback если было обнаружено пересечение
+    //Р’С‹Р·РѕРІ callback РµСЃР»Рё Р±С‹Р»Рѕ РѕР±РЅР°СЂСѓР¶РµРЅРѕ РїРµСЂРµСЃРµС‡РµРЅРёРµ
     void NotifyCallback ()
     {
       if (!result_body)
@@ -134,14 +134,14 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
       callback (result_body, result_position, result_normal);
     }
 
-    //Установка групп коллизии для фильтрации
+    //РЈСЃС‚Р°РЅРѕРІРєР° РіСЂСѓРїРї РєРѕР»Р»РёР·РёРё РґР»СЏ С„РёР»СЊС‚СЂР°С†РёРё
     void SetCollisionGroups (size_t count, const size_t* groups)
     {
       collision_groups_count = count;
       collision_groups       = groups;
     }
 
-    //Проверка нужно ли тестировать пересечение
+    //РџСЂРѕРІРµСЂРєР° РЅСѓР¶РЅРѕ Р»Рё С‚РµСЃС‚РёСЂРѕРІР°С‚СЊ РїРµСЂРµСЃРµС‡РµРЅРёРµ
     bool needsCollision (btBroadphaseProxy* proxy) const
     {
       if (!collision_groups_count)
@@ -158,7 +158,7 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
       return false;
     }
 
-    //Обнаружено пересечение
+    //РћР±РЅР°СЂСѓР¶РµРЅРѕ РїРµСЂРµСЃРµС‡РµРЅРёРµ
     btScalar addSingleResult (btCollisionWorld::LocalRayResult& ray_result, bool normal_in_world_space)
     {
       bool update_result = true;
@@ -205,19 +205,19 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
     }
 
   private:
-    const IScene::RayTestCallback& callback;                //колбек
-    math::vec3f                    ray_origin;              //точка начала луча
-    math::vec3f                    ray_end;                 //точка конца луча
-    RayTestMode                    mode;                    //режим тестирования
-    float                          farthest_hit_fraction;   //самое дальнее пересечение
-    size_t                         collision_groups_count;  //количество груп коллизии
-    const size_t*                  collision_groups;        //группы коллизии, с которыми проверяется пересечение луча
-    RigidBody*                     result_body;             //пересеченное тело
-    math::vec3f                    result_position;         //точка пересечения
-    math::vec3f                    result_normal;           //нормаль в точке пересечения
+    const IScene::RayTestCallback& callback;                //РєРѕР»Р±РµРє
+    math::vec3f                    ray_origin;              //С‚РѕС‡РєР° РЅР°С‡Р°Р»Р° Р»СѓС‡Р°
+    math::vec3f                    ray_end;                 //С‚РѕС‡РєР° РєРѕРЅС†Р° Р»СѓС‡Р°
+    RayTestMode                    mode;                    //СЂРµР¶РёРј С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ
+    float                          farthest_hit_fraction;   //СЃР°РјРѕРµ РґР°Р»СЊРЅРµРµ РїРµСЂРµСЃРµС‡РµРЅРёРµ
+    size_t                         collision_groups_count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ РіСЂСѓРї РєРѕР»Р»РёР·РёРё
+    const size_t*                  collision_groups;        //РіСЂСѓРїРїС‹ РєРѕР»Р»РёР·РёРё, СЃ РєРѕС‚РѕСЂС‹РјРё РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РїРµСЂРµСЃРµС‡РµРЅРёРµ Р»СѓС‡Р°
+    RigidBody*                     result_body;             //РїРµСЂРµСЃРµС‡РµРЅРЅРѕРµ С‚РµР»Рѕ
+    math::vec3f                    result_position;         //С‚РѕС‡РєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ
+    math::vec3f                    result_normal;           //РЅРѕСЂРјР°Р»СЊ РІ С‚РѕС‡РєРµ РїРµСЂРµСЃРµС‡РµРЅРёСЏ
 };
 
-//Класс реализующий отладочную отрисовку
+//РљР»Р°СЃСЃ СЂРµР°Р»РёР·СѓСЋС‰РёР№ РѕС‚Р»Р°РґРѕС‡РЅСѓСЋ РѕС‚СЂРёСЃРѕРІРєСѓ
 class DebugDrawer : public btIDebugDraw
 {
   public:
@@ -330,23 +330,23 @@ typedef stl::hash_map<CollisionGroupPair, CollisionFilterDesc> CollisionFiltersM
 typedef xtl::signal<void (const CollisionEvent&)>              CollisionSignal;
 
 /*
-    Описание реализации физической сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С„РёР·РёС‡РµСЃРєРѕР№ СЃС†РµРЅС‹
 */
 
 struct Scene::Impl : public btOverlapFilterCallback
 {
-  BroadphaseCollisionFilter           default_collision_filter;   //фильтр коллизий по умолчанию
-  btDefaultCollisionConfiguration     *collision_configuration;   //конфигурация обработчика коллизий
-  btCollisionDispatcher               *collision_dispatcher;      //обработчик коллизий
-  btBroadphaseInterface               *broadphase_interface;      //обработчик фазы broadphase
-  btSequentialImpulseConstraintSolver *solver;                    //рассчетчик соединений
-  btDiscreteDynamicsWorld             *dynamics_world;            //физический мир
-  math::vec3f                         gravity;                    //гравитация
-  float                               simulation_step;            //шаг симуляции
-  BodyDestroyConnectionsMap           body_destroy_connections;   //соединения удаления тел
-  JointDestroyConnectionsMap          joint_destroy_connections;  //соединения удаления соединений тел
-  CollisionFiltersMap                 collision_filters_map;      //карта фильтров коллизий (ключ - пара номеров групп, первое значение не больше второго)
-  CollisionSignal                     collision_signals [CollisionEventType_Num]; //сигналы обработки коллизий
+  BroadphaseCollisionFilter           default_collision_filter;   //С„РёР»СЊС‚СЂ РєРѕР»Р»РёР·РёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  btDefaultCollisionConfiguration     *collision_configuration;   //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РєРѕР»Р»РёР·РёР№
+  btCollisionDispatcher               *collision_dispatcher;      //РѕР±СЂР°Р±РѕС‚С‡РёРє РєРѕР»Р»РёР·РёР№
+  btBroadphaseInterface               *broadphase_interface;      //РѕР±СЂР°Р±РѕС‚С‡РёРє С„Р°Р·С‹ broadphase
+  btSequentialImpulseConstraintSolver *solver;                    //СЂР°СЃСЃС‡РµС‚С‡РёРє СЃРѕРµРґРёРЅРµРЅРёР№
+  btDiscreteDynamicsWorld             *dynamics_world;            //С„РёР·РёС‡РµСЃРєРёР№ РјРёСЂ
+  math::vec3f                         gravity;                    //РіСЂР°РІРёС‚Р°С†РёСЏ
+  float                               simulation_step;            //С€Р°Рі СЃРёРјСѓР»СЏС†РёРё
+  BodyDestroyConnectionsMap           body_destroy_connections;   //СЃРѕРµРґРёРЅРµРЅРёСЏ СѓРґР°Р»РµРЅРёСЏ С‚РµР»
+  JointDestroyConnectionsMap          joint_destroy_connections;  //СЃРѕРµРґРёРЅРµРЅРёСЏ СѓРґР°Р»РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёР№ С‚РµР»
+  CollisionFiltersMap                 collision_filters_map;      //РєР°СЂС‚Р° С„РёР»СЊС‚СЂРѕРІ РєРѕР»Р»РёР·РёР№ (РєР»СЋС‡ - РїР°СЂР° РЅРѕРјРµСЂРѕРІ РіСЂСѓРїРї, РїРµСЂРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµ Р±РѕР»СЊС€Рµ РІС‚РѕСЂРѕРіРѕ)
+  CollisionSignal                     collision_signals [CollisionEventType_Num]; //СЃРёРіРЅР°Р»С‹ РѕР±СЂР°Р±РѕС‚РєРё РєРѕР»Р»РёР·РёР№
 
   Impl ()
   {
@@ -430,7 +430,7 @@ struct Scene::Impl : public btOverlapFilterCallback
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Scene::Scene ()
@@ -447,7 +447,7 @@ Scene::Scene ()
 }
 
 /*
-   Управление гравитацией
+   РЈРїСЂР°РІР»РµРЅРёРµ РіСЂР°РІРёС‚Р°С†РёРµР№
 */
 
 const math::vec3f& Scene::Gravity ()
@@ -465,7 +465,7 @@ void Scene::SetGravity (const math::vec3f& value)
 }
 
 /*
-   Симуляция
+   РЎРёРјСѓР»СЏС†РёСЏ
 */
 
 float Scene::SimulationStep ()
@@ -484,7 +484,7 @@ void Scene::PerformSimulation (float dt)
 }
 
 /*
-   Создание тел в сцене (тела, обладающие нулевой массой, являются статическими)
+   РЎРѕР·РґР°РЅРёРµ С‚РµР» РІ СЃС†РµРЅРµ (С‚РµР»Р°, РѕР±Р»Р°РґР°СЋС‰РёРµ РЅСѓР»РµРІРѕР№ РјР°СЃСЃРѕР№, СЏРІР»СЏСЋС‚СЃСЏ СЃС‚Р°С‚РёС‡РµСЃРєРёРјРё)
 */
 
 RigidBody* Scene::CreateRigidBody (IShape* shape, float mass)
@@ -513,7 +513,7 @@ RigidBody* Scene::CreateRigidBody (IShape* shape, float mass)
 }
 
 /*
-   Создание соединений между телами
+   РЎРѕР·РґР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёР№ РјРµР¶РґСѓ С‚РµР»Р°РјРё
 */
 
 Joint* Scene::CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const SphericalJointDesc& desc)
@@ -571,13 +571,13 @@ Joint* Scene::CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const 
               body2_transform (btQuaternion (btVector3 (desc.axis [1].x, desc.axis [1].y, desc.axis [1].z), 0), btVector3 (desc.anchor [1].x, desc.anchor [1].y, desc.anchor [1].z));
 
   btSliderConstraint *joint = new btSliderConstraint (*casted_body1->BulletRigidBody (), *casted_body2->BulletRigidBody (),
-                                                      body1_transform, body2_transform, true);   //??????????последний параметр не ясен?????????
+                                                      body1_transform, body2_transform, true);   //??????????РїРѕСЃР»РµРґРЅРёР№ РїР°СЂР°РјРµС‚СЂ РЅРµ СЏСЃРµРЅ?????????
 
   return impl->AddJoint (casted_body1, casted_body2, joint);
 }
 
 /*
-   Фильтрация столкновений объектов
+   Р¤РёР»СЊС‚СЂР°С†РёСЏ СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
 */
 
 void Scene::SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter)
@@ -599,7 +599,7 @@ void Scene::SetDefaultCollisionFilter (const BroadphaseCollisionFilter& filter)
 }
 
 /*
-   Обработка столкновений объектов
+   РћР±СЂР°Р±РѕС‚РєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
 */
 
 xtl::connection Scene::RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler)
@@ -611,7 +611,7 @@ xtl::connection Scene::RegisterCollisionCallback (CollisionEventType event_type,
 }
 
 /*
-   Трассировка луча, если коллбек возвращает true - поиск пересечений продолжается
+   РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РµСЃР»Рё РєРѕР»Р»Р±РµРє РІРѕР·РІСЂР°С‰Р°РµС‚ true - РїРѕРёСЃРє РїРµСЂРµСЃРµС‡РµРЅРёР№ РїСЂРѕРґРѕР»Р¶Р°РµС‚СЃСЏ
 */
 
 void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
@@ -656,7 +656,7 @@ void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, 
 }
 
 /*
-   Отладочная отрисовка
+   РћС‚Р»Р°РґРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°
 */
 
 void Scene::Draw (render::debug::PrimitiveRender& render)
@@ -671,7 +671,7 @@ void Scene::Draw (render::debug::PrimitiveRender& render)
 }
 
 /*
-   Оповещение о коллизии
+   РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РєРѕР»Р»РёР·РёРё
 */
 
 void Scene::ColissionNotify (const CollisionEvent& event)

@@ -844,8 +844,8 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 		switch(compression)
 		{
 			// If the compression code is 0, the image data is just the raw image data,
-			// whose size is calculated as (LayerBottomｨCLayerTop)*
-			// (LayerRightｨCLayerLeft).
+			// whose size is calculated as (LayerBottomﾐ，LayerTop)*
+			// (LayerRightﾐ，LayerLeft).
 			case 0:
 				if(layer->channel_info[i].channel_id == -2)
 					memcpy(image_data, context->temp_channel_data, mask_channel_length);
@@ -854,8 +854,8 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 				break;
 
 			// If the compression code is 1, the image data starts with the byte counts
-			// for all the scan lines in the channel (LayerBottomｨCLayerTop), with
-			// each count stored as a twoｨCbyte value.(**PSB** each count stored as a
+			// for all the scan lines in the channel (LayerBottomﾐ，LayerTop), with
+			// each count stored as a twoﾐ，byte value.(**PSB** each count stored as a
 			// four-byte value.) The RLE compressed data follows, with each scan line
 			// compressed separately. The RLE compression is the same compression
 			// algorithm used by the Macintosh ROM routine PackBits, and the TIFF

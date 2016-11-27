@@ -3,11 +3,11 @@
 namespace
 {
 
-///Тестовое соединение с сервером
+///РўРµСЃС‚РѕРІРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРµСЂРІРµСЂРѕРј
 class MyConnection: public scene::interchange::IConnection, public xtl::reference_counter, public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MyConnection (const char* init_string) 
     {
       common::PropertyMap properties = common::parse_init_string (init_string);
@@ -17,22 +17,22 @@ class MyConnection: public scene::interchange::IConnection, public xtl::referenc
       response_connection = xtl::com_ptr<scene::interchange::IConnection> (scene::interchange::ConnectionManager::CreateConnection (response_connection_name, "initiator=MyConnection"), false);
     }
 
-///Является ли соединение внутрипроцессным
+///РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
     bool IsInprocessed () { return true; }
 
-///Обработка входного потока данных
+///РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
     void ProcessCommands (const scene::interchange::CommandBuffer& commands)
     {
     }
 
-///Получение события оповещения об удалении
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
     xtl::trackable& GetTrackable () { return *this; }
 
-///Подсчет ссылок
+///РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
-///Создание соединения
+///РЎРѕР·РґР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
     static IConnection* CreateConnection (const char* name, const char* init_string)
     {
       return new MyConnection (init_string);

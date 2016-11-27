@@ -9,10 +9,10 @@ namespace win8
 {
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-/// Преобразование строки
+/// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё
 stl::string tostring (String^ input)
 {
   if (input == nullptr)
@@ -29,7 +29,7 @@ stl::string tostring (String^ input)
   return common::tostring (wstr);
 }
 
-/// Выброс исключения с сообщением HRESULT
+/// Р’С‹Р±СЂРѕСЃ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ СЃРѕРѕР±С‰РµРЅРёРµРј HRESULT
 void raise_com_error (const char* method, HRESULT error)
 {
   throw xtl::format_operation_exception (method, _com_error (error).ErrorMessage ());

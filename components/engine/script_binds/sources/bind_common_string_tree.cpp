@@ -18,13 +18,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* LOG_NAME                   = "script.binds.StringTree";
 const char* COMMON_STRING_TREE_LIBRARY = "Common.StringNode";
 
-//получение протокола
+//РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕС‚РѕРєРѕР»Р°
 Log& get_log ()
 {
   static Log log (LOG_NAME);
@@ -34,14 +34,14 @@ Log& get_log ()
 
 }
 
-///Узел дерева строк
+///РЈР·РµР» РґРµСЂРµРІР° СЃС‚СЂРѕРє
 struct StringNode::Impl
 {
   Impl ()
     : ref_count (1)
     {}
 
-  ///Работа с атрибутами
+  ///Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
   size_t AttributesCapacity () const
   {
     return attribute_offsets.capacity ();
@@ -146,7 +146,7 @@ struct StringNode::Impl
     attributes.clear ();
   }
 
-  ///Работа с детьмя
+  ///Р Р°Р±РѕС‚Р° СЃ РґРµС‚СЊРјСЏ
   size_t ChildrenCapacity () const
   {
     return childs.capacity ();
@@ -203,7 +203,7 @@ struct StringNode::Impl
     childs.clear ();
   }
 
-  ///Загрузка/сохранение
+  ///Р—Р°РіСЂСѓР·РєР°/СЃРѕС…СЂР°РЅРµРЅРёРµ
   static Pointer LoadXml (const char* file_name)
   {
     static const char* METHOD_NAME = "script::binds::StringNode::LoadXml";
@@ -313,7 +313,7 @@ struct StringNode::Impl
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
 
       common::FileSystem::Rename (tmp_file_name.c_str (), file_name);
@@ -324,7 +324,7 @@ struct StringNode::Impl
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }            
     }
     catch (xtl::exception& e)
@@ -334,7 +334,7 @@ struct StringNode::Impl
     }
   }  
 
-  ///Поиск узла
+  ///РџРѕРёСЃРє СѓР·Р»Р°
   Pointer FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
   {
     if (!name_to_find)
@@ -519,15 +519,15 @@ struct StringNode::Impl
       const char*   attributes;
   };
 
-  stl::string          name;                 //имя узла
-  stl::string          attributes;           //значения атрибутов
-  AttributeOffsetArray attribute_offsets;    //массив смещений атрибутов
-  ChildArray           childs;               //дети
-  size_t               ref_count;            //количество ссылок
+  stl::string          name;                 //РёРјСЏ СѓР·Р»Р°
+  stl::string          attributes;           //Р·РЅР°С‡РµРЅРёСЏ Р°С‚СЂРёР±СѓС‚РѕРІ
+  AttributeOffsetArray attribute_offsets;    //РјР°СЃСЃРёРІ СЃРјРµС‰РµРЅРёР№ Р°С‚СЂРёР±СѓС‚РѕРІ
+  ChildArray           childs;               //РґРµС‚Рё
+  size_t               ref_count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃСЃС‹Р»РѕРє
 };
 
 /*
-   Конструктор/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StringNode::StringNode ()
@@ -540,7 +540,7 @@ StringNode::~StringNode ()
 }
 
 /*
-   Создание нового узла
+   РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СѓР·Р»Р°
 */
 
 StringNode::Pointer StringNode::Create ()
@@ -549,7 +549,7 @@ StringNode::Pointer StringNode::Create ()
 }
 
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 StringNode::Pointer StringNode::Clone ()
@@ -567,7 +567,7 @@ StringNode::Pointer StringNode::Clone ()
 }
 
 /*
-   Получение имени/переименование
+   РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё/РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ
 */
 
 const char* StringNode::Name () const
@@ -584,7 +584,7 @@ void StringNode::SetName (const char* new_name)
 }
 
 /*
-   Работа с атрибутами
+   Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
 */
 
 size_t StringNode::AttributesCapacity () const
@@ -633,7 +633,7 @@ void StringNode::RemoveAllAttributes ()
 }
 
 /*
-   Работа с детьмя
+   Р Р°Р±РѕС‚Р° СЃ РґРµС‚СЊРјСЏ
 */
 
 size_t StringNode::ChildrenCapacity () const
@@ -677,7 +677,7 @@ void StringNode::RemoveAllChildren ()
 }
 
 /*
-   Загрузка/сохранение
+   Р—Р°РіСЂСѓР·РєР°/СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 StringNode::Pointer StringNode::LoadXml (const char* file_name)
@@ -716,7 +716,7 @@ void StringNode::SafeSaveXml (const char* file_name)
 }
 
 /*
-   Поиск узла
+   РџРѕРёСЃРє СѓР·Р»Р°
 */
 
 StringNode::Pointer StringNode::FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
@@ -725,7 +725,7 @@ StringNode::Pointer StringNode::FindNode (const char* name_to_find, const char* 
 }
 
 /*
-   Подсчёт ссылок
+   РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void StringNode::AddRef () const
@@ -736,7 +736,7 @@ void StringNode::AddRef () const
 
 void StringNode::Release () const
 {
-    //защита от повторного удаления в обработчике
+    //Р·Р°С‰РёС‚Р° РѕС‚ РїРѕРІС‚РѕСЂРЅРѕРіРѕ СѓРґР°Р»РµРЅРёСЏ РІ РѕР±СЂР°Р±РѕС‚С‡РёРєРµ
 
   if (!impl->ref_count)
     return;
@@ -746,7 +746,7 @@ void StringNode::Release () const
 }
 
 /*
-   Получение значения нулевого атрибута дочернего узла с именем name
+   РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РЅСѓР»РµРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р° РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° СЃ РёРјРµРЅРµРј name
 */
 
 const char* StringNode::Get (const char* name)
@@ -779,7 +779,7 @@ namespace
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск дочернего узла по имени
+///РџРѕРёСЃРє РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїРѕ РёРјРµРЅРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 StringNode::Pointer find (StringNode& node, const char* name)
 {
@@ -807,18 +807,18 @@ namespace engine
 {
 
 /*
-    Регистрация библиотеки работы с деревьями строк
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РґРµСЂРµРІСЊСЏРјРё СЃС‚СЂРѕРє
 */
 
 void bind_common_string_tree (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_STRING_TREE_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&StringNode::Create));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Name",               make_invoker (&StringNode::SetName));
   lib.Register ("get_Name",               make_invoker (&StringNode::Name));
@@ -857,7 +857,7 @@ void bind_common_string_tree (Environment& environment)
                                                      make_invoker (implicit_cast<const char* (StringNode::*) (const char*)> (&StringNode::Get))));
   lib.Register ("Set",                 make_invoker (&set));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<StringNode> (COMMON_STRING_TREE_LIBRARY);
 }

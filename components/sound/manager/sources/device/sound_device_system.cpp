@@ -19,7 +19,7 @@ namespace low_level
 {
 
 /*
-    Описание реализации системы управления устройствами воспроизведения звука
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјС‹ СѓРїСЂР°РІР»РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°РјРё РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ Р·РІСѓРєР°
 */
 
 class SoundSystemImpl
@@ -28,14 +28,14 @@ class SoundSystemImpl
     typedef SoundSystem::CreateDeviceHandler CreateDeviceHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация драйверов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     void RegisterDriver       (const char* driver_name, const CreateDeviceHandler& creater);
     void UnregisterDriver     (const char* driver_name);
     void UnregisterAllDrivers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация конфигураций
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* RegisterConfiguration       (const char* driver_name, const char* device_name);
     void        UnregisterConfiguration     (const char* configuration_name);
@@ -44,18 +44,18 @@ class SoundSystemImpl
     void        UnregisterAllConfigurations ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перечисление доступных конфигураций
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… РєРѕРЅС„РёРіСѓСЂР°С†РёР№
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t      GetConfigurationsCount () const;
     const char* GetConfiguration       (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск конфигурации
+///РџРѕРёСЃРє РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* FindConfiguration (const char* driver_mask, const char* device_mask) const; //в случае неудачи - 0
+    const char* FindConfiguration (const char* driver_mask, const char* device_mask) const; //РІ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё - 0
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание устройства воспроизведения звука
+///РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ Р·РІСѓРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ISoundDevice* CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string);
     ISoundDevice* CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string = "");
@@ -87,7 +87,7 @@ class SoundSystemImpl
 }
 
 /*
-    Регистрация драйверов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂРѕРІ
 */
 
 void SoundSystemImpl::RegisterDriver (const char* driver_name, const CreateDeviceHandler& creater)
@@ -124,7 +124,7 @@ void SoundSystemImpl::UnregisterAllDrivers ()
 }
 
 /*
-    Получение имени конфигурации
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 */
 
 string SoundSystemImpl::GetConfigurationName (const char* driver_name, const char* device_name)
@@ -133,7 +133,7 @@ string SoundSystemImpl::GetConfigurationName (const char* driver_name, const cha
 }
 
 /*
-    Регистрация конфигураций
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёР№
 */
 
 const char* SoundSystemImpl::RegisterConfiguration (const char* driver_name, const char* device_name)
@@ -150,18 +150,18 @@ const char* SoundSystemImpl::RegisterConfiguration (const char* driver_name, con
     throw xtl::make_argument_exception ("sound::low_level::SoundSystem::RegisterConfiguration", "driver_name", driver_name,
                           "There is no driver with this name");
 
-    //формирование имени конфигурации
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
   string configuration_name;
 
   GetConfigurationName (driver_name, device_name).swap (configuration_name);
 
-    //проверка наличия конфигурации
+    //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
   ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name.c_str ());
 
   if (cfg_iter != configurations.end ())
-    return cfg_iter->second.name.c_str (); //конфигурация с таким именем уже зарегистрирована
+    return cfg_iter->second.name.c_str (); //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅР°
     
   cfg_iter = configurations.insert_pair (configuration_name.c_str (), Configuration ()).first;
   
@@ -194,7 +194,7 @@ void SoundSystemImpl::UnregisterConfiguration (const char* configuration_name)
   ConfigurationMap::iterator cfg_iter = configurations.find (configuration_name);
 
   if (cfg_iter == configurations.end ())
-    return; //конфигурация с таким именем отсутствует
+    return; //РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
 
   configuration_array.erase (remove (configuration_array.begin (), configuration_array.end (), cfg_iter), configuration_array.end ());
 
@@ -244,7 +244,7 @@ void SoundSystemImpl::UnregisterAllConfigurations ()
 }
 
 /*
-    Перечисление доступных конфигураций
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… РєРѕРЅС„РёРіСѓСЂР°С†РёР№
 */
 
 size_t SoundSystemImpl::GetConfigurationsCount () const
@@ -261,7 +261,7 @@ const char* SoundSystemImpl::GetConfiguration (size_t index) const
 }
 
 /*
-    Создание устройства воспроизведения звука
+    РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ Р·РІСѓРєР°
 */
 
 ISoundDevice* SoundSystemImpl::CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string)
@@ -295,10 +295,10 @@ ISoundDevice* SoundSystemImpl::CreateDevice (const char* driver_name, const char
 }
 
 /*
-    Поиск конфигурации
+    РџРѕРёСЃРє РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 */
 
-//в случае неудачи - 0
+//РІ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё - 0
 const char* SoundSystemImpl::FindConfiguration (const char* driver_mask, const char* device_mask) const
 {
   if (!driver_mask || !device_mask)
@@ -312,7 +312,7 @@ const char* SoundSystemImpl::FindConfiguration (const char* driver_mask, const c
 }
 
 /*
-    Обёртки над обращениями к системе управления устройствами воспроизведения звука
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РѕР±СЂР°С‰РµРЅРёСЏРјРё Рє СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°РјРё РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ Р·РІСѓРєР°
 */
 
 typedef Singleton<sound::low_level::SoundSystemImpl> SoundSystemSingleton;

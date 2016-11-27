@@ -3,7 +3,7 @@
 */
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T, template <class> class Strategy>
@@ -34,7 +34,7 @@ inline intrusive_ptr<T, Strategy>::~intrusive_ptr ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T, template <class> class Strategy>
@@ -65,7 +65,7 @@ inline intrusive_ptr<T, Strategy>& intrusive_ptr<T, Strategy>::operator = (const
 }
 
 /*
-    Получение указателя
+    РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T, template <class> class Strategy>
@@ -87,7 +87,7 @@ inline T& intrusive_ptr<T, Strategy>::operator * () const
 }
 
 /*
-    Проверка указателя
+    РџСЂРѕРІРµСЂРєР° СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T, template <class> class Strategy>
@@ -97,7 +97,7 @@ inline bool intrusive_ptr<T, Strategy>::operator ! () const
 }
 
 /*
-    Сравнение указателей
+    РЎСЂР°РІРЅРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T,  template <class> class Strategy> template <class T1,  template <class> class Strategy1>
@@ -209,7 +209,7 @@ inline bool operator >= (const T1* p1, const intrusive_ptr<T2, Strategy>& p2)
 }
 
 /*
-    Обмен значений указателей
+    РћР±РјРµРЅ Р·РЅР°С‡РµРЅРёР№ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T, template <class> class Strategy>
@@ -227,7 +227,7 @@ inline void swap (intrusive_ptr<T, Strategy>& p1, intrusive_ptr<T, Strategy>& p2
 }
 
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class T1, class T2, template <class> class Strategy>
@@ -249,7 +249,7 @@ inline intrusive_ptr<T1, Strategy> dynamic_pointer_cast (const intrusive_ptr<T2,
 }
 
 /*
-    Получение plain-указателя
+    РџРѕР»СѓС‡РµРЅРёРµ plain-СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T, template <class> class Strategy>
@@ -283,7 +283,7 @@ inline com_ptr<T>::com_ptr (const com_ptr<T1>& p)
   { }
 
 /*
-    Обмен значений указателей
+    РћР±РјРµРЅ Р·РЅР°С‡РµРЅРёР№ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T>
@@ -293,7 +293,7 @@ inline void swap (com_ptr<T>& p1, com_ptr<T>& p2)
 }  
 
 /*
-    Приведение типов
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ
 */
 
 template <class T1, class T2>

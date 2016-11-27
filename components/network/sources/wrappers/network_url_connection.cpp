@@ -6,28 +6,28 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  DEFAULT_URL              = "http://localhost/";  //URL по умолчанию
-const char*  DEFAULT_CONTENT_TYPE     = "text";               //тип контента по умолчанию
-const char*  DEFAULT_CONTENT_ENCODING = "utf-8";              //кодировка контента по умолчанию
-const size_t BLOCK_SIZE               = 16384;                //размер буфера блока по умолчанию
+const char*  DEFAULT_URL              = "http://localhost/";  //URL РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const char*  DEFAULT_CONTENT_TYPE     = "text";               //С‚РёРї РєРѕРЅС‚РµРЅС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const char*  DEFAULT_CONTENT_ENCODING = "utf-8";              //РєРѕРґРёСЂРѕРІРєР° РєРѕРЅС‚РµРЅС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t BLOCK_SIZE               = 16384;                //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° Р±Р»РѕРєР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-///Блок буфера данных
+///Р‘Р»РѕРє Р±СѓС„РµСЂР° РґР°РЅРЅС‹С…
 struct Block: public xtl::reference_counter
 {
-  char buffer [BLOCK_SIZE]; //буфер данных
+  char buffer [BLOCK_SIZE]; //Р±СѓС„РµСЂ РґР°РЅРЅС‹С…
 };
 
 typedef xtl::intrusive_ptr<Block> BlockPtr;
 typedef stl::list<BlockPtr>       BlockList;
 
-///Буфера данных
+///Р‘СѓС„РµСЂР° РґР°РЅРЅС‹С…
 class Buffer
 {
   public:
@@ -38,7 +38,7 @@ class Buffer
     {
     }
     
-///Доступный объём данных
+///Р”РѕСЃС‚СѓРїРЅС‹Р№ РѕР±СЉС‘Рј РґР°РЅРЅС‹С…
     size_t Available ()
     {
       syslib::Lock lock (mutex);
@@ -46,7 +46,7 @@ class Buffer
       return total_size - offset;
     }
     
-///Общий объём данных
+///РћР±С‰РёР№ РѕР±СЉС‘Рј РґР°РЅРЅС‹С…
     size_t TotalSize ()
     {
       syslib::Lock lock (mutex);
@@ -54,7 +54,7 @@ class Buffer
       return total_size;
     }
     
-///Прекращение помещения данных в буфер
+///РџСЂРµРєСЂР°С‰РµРЅРёРµ РїРѕРјРµС‰РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂ
     void FinishPut ()
     {
       syslib::Lock lock (mutex);
@@ -64,7 +64,7 @@ class Buffer
       condition.NotifyAll ();
     }
     
-///Помещение данных в буфер
+///РџРѕРјРµС‰РµРЅРёРµ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂ
     void Put (const void* buffer, size_t size)
     {
       if (!buffer && size)
@@ -98,7 +98,7 @@ class Buffer
       condition.NotifyAll ();
     }
     
-///Получение данных из буфера
+///РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· Р±СѓС„РµСЂР°
     size_t Get (void* buffer, size_t size)
     {
       syslib::Lock lock (mutex);    
@@ -115,7 +115,7 @@ class Buffer
 
       while (size)
       {
-          //ожидание данных
+          //РѕР¶РёРґР°РЅРёРµ РґР°РЅРЅС‹С…
           
         size_t available;
         
@@ -127,14 +127,14 @@ class Buffer
           condition.Wait (mutex);
         }
         
-          //получение блока
+          //РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РѕРєР°
           
         if (blocks.empty ())
           throw xtl::format_operation_exception ("", "Internal error: empty list");
         
         BlockPtr block = blocks.front ();
         
-          //расчёт смещений
+          //СЂР°СЃС‡С‘С‚ СЃРјРµС‰РµРЅРёР№
           
         size_t block_offset         = offset % BLOCK_SIZE,
                block_available_size = BLOCK_SIZE - block_offset,
@@ -143,16 +143,16 @@ class Buffer
         if (read_size > available)
           read_size = available;
         
-          //чтение данных
+          //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
           
         memcpy (dst, block->buffer + block_offset, read_size);
         
-          //обновление списка
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР°
           
         if (read_size == block_available_size)
           blocks.pop_front ();
         
-          //обновление указателей
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№
           
         result += read_size;
         size   -= read_size;
@@ -168,36 +168,36 @@ class Buffer
     Buffer& operator = (const Buffer&); //no impl
   
   private:
-    syslib::Mutex     mutex;        //блокировка
-    syslib::Condition condition;    //событие приёма данных
-    size_t            total_size;   //общий объём данных
-    size_t            offset;       //смещение для первого блока данных
-    BlockList         blocks;       //блоки данных
-    bool              put_finished; //помещение данных в буфера завершено
+    syslib::Mutex     mutex;        //Р±Р»РѕРєРёСЂРѕРІРєР°
+    syslib::Condition condition;    //СЃРѕР±С‹С‚РёРµ РїСЂРёС‘РјР° РґР°РЅРЅС‹С…
+    size_t            total_size;   //РѕР±С‰РёР№ РѕР±СЉС‘Рј РґР°РЅРЅС‹С…
+    size_t            offset;       //СЃРјРµС‰РµРЅРёРµ РґР»СЏ РїРµСЂРІРѕРіРѕ Р±Р»РѕРєР° РґР°РЅРЅС‹С…
+    BlockList         blocks;       //Р±Р»РѕРєРё РґР°РЅРЅС‹С…
+    bool              put_finished; //РїРѕРјРµС‰РµРЅРёРµ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂР° Р·Р°РІРµСЂС€РµРЅРѕ
 };
 
 }
 
 /*
-    Описание реализации URL соединения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё URL СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IListener
 {
-  syslib::Mutex             mutex;            //блокировка соединения
-  network::Url              url;              //URL ресурса
-  stl::auto_ptr<IUrlStream> stream;           //поток URL данных
-  stl::string               status;           //статус
-  stl::string               content_type;     //тип контента
-  stl::string               content_encoding; //кодировка
-  size_t                    content_length;   //длина контента
-  Buffer                    send_buffer;      //буфер приёма
-  Buffer                    recv_buffer;      //буфер передачи
-  volatile bool             send_closed;      //канал отправки данных закрыт
-  volatile bool             recv_closed;      //канал приёма данных закрыт
-  volatile bool             recv_headers;     //заголовки потока получены
+  syslib::Mutex             mutex;            //Р±Р»РѕРєРёСЂРѕРІРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ
+  network::Url              url;              //URL СЂРµСЃСѓСЂСЃР°
+  stl::auto_ptr<IUrlStream> stream;           //РїРѕС‚РѕРє URL РґР°РЅРЅС‹С…
+  stl::string               status;           //СЃС‚Р°С‚СѓСЃ
+  stl::string               content_type;     //С‚РёРї РєРѕРЅС‚РµРЅС‚Р°
+  stl::string               content_encoding; //РєРѕРґРёСЂРѕРІРєР°
+  size_t                    content_length;   //РґР»РёРЅР° РєРѕРЅС‚РµРЅС‚Р°
+  Buffer                    send_buffer;      //Р±СѓС„РµСЂ РїСЂРёС‘РјР°
+  Buffer                    recv_buffer;      //Р±СѓС„РµСЂ РїРµСЂРµРґР°С‡Рё
+  volatile bool             send_closed;      //РєР°РЅР°Р» РѕС‚РїСЂР°РІРєРё РґР°РЅРЅС‹С… Р·Р°РєСЂС‹С‚
+  volatile bool             recv_closed;      //РєР°РЅР°Р» РїСЂРёС‘РјР° РґР°РЅРЅС‹С… Р·Р°РєСЂС‹С‚
+  volatile bool             recv_headers;     //Р·Р°РіРѕР»РѕРІРєРё РїРѕС‚РѕРєР° РїРѕР»СѓС‡РµРЅС‹
 
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   Impl ()
     : url (DEFAULT_URL)
     , content_type (DEFAULT_CONTENT_TYPE)
@@ -222,15 +222,15 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       throw xtl::format_operation_exception ("", "Internal error: Null stream returned by stream manager");
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
-    mutex.Lock (); //без вызова Unlock, поскольку Mutex будет удалён
+    mutex.Lock (); //Р±РµР· РІС‹Р·РѕРІР° Unlock, РїРѕСЃРєРѕР»СЊРєСѓ Mutex Р±СѓРґРµС‚ СѓРґР°Р»С‘РЅ
 
     stream.reset ();
   }
   
-///Получение заголовков
+///РџРѕР»СѓС‡РµРЅРёРµ Р·Р°РіРѕР»РѕРІРєРѕРІ
   void ReceiveHeaders ()
   {
     try
@@ -252,7 +252,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     }
   }
   
-///Обработка события получения данных
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С…
   void WriteReceivedData (const void* buffer, size_t size)
   {
     try
@@ -266,7 +266,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     }
   }
   
-///Конец приёма данных
+///РљРѕРЅРµС† РїСЂРёС‘РјР° РґР°РЅРЅС‹С…
   void FinishReceiveData ()
   {
     try
@@ -282,7 +282,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     }
   }
   
-///Приём данных
+///РџСЂРёС‘Рј РґР°РЅРЅС‹С…
   size_t Receive (void* buffer, size_t size)
   {
     try
@@ -303,7 +303,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     }
   }
   
-///Обработка события отсылки данных
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РѕС‚СЃС‹Р»РєРё РґР°РЅРЅС‹С…
   size_t ReadSendData (void* buffer, size_t size)
   {
     try
@@ -317,7 +317,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     }
   }
   
-///Отсылка данных
+///РћС‚СЃС‹Р»РєР° РґР°РЅРЅС‹С…
   size_t Send (const void* buffer, size_t size)
   {
     try
@@ -342,7 +342,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 UrlConnection::UrlConnection ()
@@ -384,7 +384,7 @@ UrlConnection& UrlConnection::operator = (const UrlConnection& connection)
 }
 
 /*
-    Идентификатор ресурса
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЂРµСЃСѓСЂСЃР°
 */
 
 const network::Url& UrlConnection::Url () const
@@ -395,7 +395,7 @@ const network::Url& UrlConnection::Url () const
 }
 
 /*
-    Закрытие соединения
+    Р—Р°РєСЂС‹С‚РёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 void UrlConnection::Close ()
@@ -413,7 +413,7 @@ bool UrlConnection::IsClosed () const
 }
 
 /*
-    Закрытие каналов передачи данных
+    Р—Р°РєСЂС‹С‚РёРµ РєР°РЅР°Р»РѕРІ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С…
 */
 
 bool UrlConnection::IsReceiveClosed () const
@@ -439,7 +439,7 @@ void UrlConnection::CloseSend ()
 }
 
 /*
-    Параметры содержимого
+    РџР°СЂР°РјРµС‚СЂС‹ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
 */
 
 size_t UrlConnection::ContentLength () const
@@ -508,7 +508,7 @@ const char* UrlConnection::Status () const
 }
 
 /*
-    Чтение / запись данных
+    Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
 */
 
 size_t UrlConnection::Receive (void* buffer, size_t size)
@@ -538,10 +538,10 @@ size_t UrlConnection::Send (const void* buffer, size_t size)
 }
 
 /*
-    Размеры окна приёма / передачи
+    Р Р°Р·РјРµСЂС‹ РѕРєРЅР° РїСЂРёС‘РјР° / РїРµСЂРµРґР°С‡Рё
 */
 
-//количество байт доступных для чтения без блокировки
+//РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚ РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ С‡С‚РµРЅРёСЏ Р±РµР· Р±Р»РѕРєРёСЂРѕРІРєРё
 size_t UrlConnection::ReceiveAvailable () const
 {
   syslib::Lock lock (impl->mutex);
@@ -549,7 +549,7 @@ size_t UrlConnection::ReceiveAvailable () const
   return impl->recv_buffer.Available ();
 }
 
-//общее число полученных байт
+//РѕР±С‰РµРµ С‡РёСЃР»Рѕ РїРѕР»СѓС‡РµРЅРЅС‹С… Р±Р°Р№С‚
 size_t UrlConnection::ReceivedDataSize () const
 {
   syslib::Lock lock (impl->mutex);
@@ -557,7 +557,7 @@ size_t UrlConnection::ReceivedDataSize () const
   return impl->recv_buffer.TotalSize ();
 }
 
-//общее число переданных байт
+//РѕР±С‰РµРµ С‡РёСЃР»Рѕ РїРµСЂРµРґР°РЅРЅС‹С… Р±Р°Р№С‚
 size_t UrlConnection::SendDataSize () const
 {
   syslib::Lock lock (impl->mutex);
@@ -566,7 +566,7 @@ size_t UrlConnection::SendDataSize () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void UrlConnection::Swap (UrlConnection& connection)

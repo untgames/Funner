@@ -1,16 +1,16 @@
--- Инициализация графики
+-- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РіСЂР°С„РёРєРё
 local function InitGraphics ()
-  -- Создание экрана
+  -- РЎРѕР·РґР°РЅРёРµ СЌРєСЂР°РЅР°
   
   local screen = Scene.Screen.Create ()
   
   screen:DisableBackground ()
   
-  -- Привязка экрана к окну в config.xml
+  -- РџСЂРёРІСЏР·РєР° СЌРєСЂР°РЅР° Рє РѕРєРЅСѓ РІ config.xml
 
   Engine.Screens.Register ("Screen1", screen)
   
-  -- Добавление на экран области вывода
+  -- Р”РѕР±Р°РІР»РµРЅРёРµ РЅР° СЌРєСЂР°РЅ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
   local viewport = Scene.Viewport.Create ()
   
@@ -30,14 +30,14 @@ local function InitGraphics ()
   return methods
 end
 
--- Инициализация ввода  
+-- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРІРѕРґР°  
 local function InitInput () 
   local this = {}  
   
   local mouse_x = 0
   local mouse_y = 0
 
-  -- Обработчики
+  -- РћР±СЂР°Р±РѕС‚С‡РёРєРё
   
   this.OnWindowClosed = function ()
     print ("Window closed")
@@ -69,10 +69,10 @@ local function InitInput ()
     print ("cursor out of window")
   end  
 
-  -- Регистрация обработчика событий ввода. CreateEventHandler без параметров перенаправит все события ввода в скрипт
+  -- Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°. CreateEventHandler Р±РµР· РїР°СЂР°РјРµС‚СЂРѕРІ РїРµСЂРµРЅР°РїСЂР°РІРёС‚ РІСЃРµ СЃРѕР±С‹С‚РёСЏ РІРІРѕРґР° РІ СЃРєСЂРёРїС‚
   
   local function EventsDispatch (command)
-    -- Компиляция команды
+    -- РљРѕРјРїРёР»СЏС†РёСЏ РєРѕРјР°РЅРґС‹
     
     local status, value = pcall (loadstring (string.format ("return function (this) %s end", command)))
     local fn
@@ -85,7 +85,7 @@ local function InitInput ()
       return
     end
 
-    -- Запуск команды
+    -- Р—Р°РїСѓСЃРє РєРѕРјР°РЅРґС‹
 
     status, value = pcall (fn, this)
     
@@ -99,7 +99,7 @@ local function InitInput ()
   return {}
 end
 
--- Загрузка ресурсов
+-- Р—Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 local function InitResources ()
   local resource_group = Engine.ResourceManager.Group.Create ()
   
@@ -112,9 +112,9 @@ local function InitResources ()
   return {}
 end
 
--- Создание тестовой сцены
+-- РЎРѕР·РґР°РЅРёРµ С‚РµСЃС‚РѕРІРѕР№ СЃС†РµРЅС‹
 local function InitScene (gfx)
-  -- Создание сцены и камеры
+  -- РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹ Рё РєР°РјРµСЂС‹
 
   local scene  = Scene.Scene.Create ()
   local camera = Scene.OrthoCamera.Create ()
@@ -128,11 +128,11 @@ local function InitScene (gfx)
   
   camera:BindToScene (scene)
   
-  -- Установка активной камеры
+  -- РЈСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕР№ РєР°РјРµСЂС‹
   
   gfx.SetCamera (camera)
   
-  -- Создание спрайта
+  -- РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
   
   local sprite = Scene.Sprite.Create ()
   
@@ -145,13 +145,13 @@ local function InitScene (gfx)
   return {}
 end
 
--- Главная функция
+-- Р“Р»Р°РІРЅР°СЏ С„СѓРЅРєС†РёСЏ
 local function Main ()
-  local gfx_system      = InitGraphics () -- ссылки хранятся, чтобы сборщик мусора не удалил вложенные объекты
+  local gfx_system      = InitGraphics () -- СЃСЃС‹Р»РєРё С…СЂР°РЅСЏС‚СЃСЏ, С‡С‚РѕР±С‹ СЃР±РѕСЂС‰РёРє РјСѓСЃРѕСЂР° РЅРµ СѓРґР°Р»РёР» РІР»РѕР¶РµРЅРЅС‹Рµ РѕР±СЉРµРєС‚С‹
   local input_system    = InitInput ()  
   local scene_system    = InitScene (gfx_system)
   local resource_system = InitResources ()
 end
 
--- Вызов Main
+-- Р’С‹Р·РѕРІ Main
 Main ()

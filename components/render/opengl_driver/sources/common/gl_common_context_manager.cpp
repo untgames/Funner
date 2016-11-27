@@ -8,15 +8,15 @@ namespace
 
 /*
 ===================================================================================================
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 ===================================================================================================
 */
 
-const size_t DEFAULT_TEMP_BUFFER_SIZE = 256; //дефолтный размер буфера для временных данных
+const size_t DEFAULT_TEMP_BUFFER_SIZE = 256; //РґРµС„РѕР»С‚РЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… РґР°РЅРЅС‹С…
 
 /*
 ===================================================================================================
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 ===================================================================================================    
 */
 
@@ -24,41 +24,41 @@ struct OpenGLException: virtual public xtl::exception {};
 
 /*
 ===================================================================================================
-    Описание реализации контекста OpenGL
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° OpenGL
 ===================================================================================================
 */
 
 class ContextImpl: public xtl::reference_counter, private IContextListener
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ContextImpl (ISwapChain* swap_chain, const ContextSettings& context_settings)
       : need_check_errors (context_settings.IsNeedCheckErrors ())
       , need_validate_programs (context_settings.IsNeedValidatePrograms ())
     {
       try
       {
-          //очистка контекстного кеша
+          //РѕС‡РёСЃС‚РєР° РєРѕРЅС‚РµРєСЃС‚РЅРѕРіРѕ РєРµС€Р°
 
         memset (context_cache.data (), 0, context_cache.size () * sizeof (ContextCache::value_type));
 
-          //создание контекста
+          //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
         context = ContextPtr (PlatformManager::CreateContext (swap_chain), false);
 
-          //подписка на события контекста
+          //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
 
         context->AttachListener (this);
 
-          //выбор активного контекста
+          //РІС‹Р±РѕСЂ Р°РєС‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
         context->MakeCurrent (swap_chain);
 
-          //инициализация таблицы точек входа OpenGL 1.1
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ С‚РѕС‡РµРє РІС…РѕРґР° OpenGL 1.1
 
         gl_entries.Init (context->GetLibrary ());
 
-          //отключение буферов отрисовки
+          //РѕС‚РєР»СЋС‡РµРЅРёРµ Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
           
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
@@ -67,14 +67,14 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
 #endif
 
-          //определение поддержки расширений
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№
 
         extensions_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
         version_string    = reinterpret_cast<const char*> (glGetString (GL_VERSION));
         vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
         renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
 
-          //добавление непереносимых расширений
+          //РґРѕР±Р°РІР»РµРЅРёРµ РЅРµРїРµСЂРµРЅРѕСЃРёРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
 
         IPropertyList* swap_chain_properties = swap_chain->GetProperties ();        
 
@@ -95,11 +95,11 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
             }
         }
 
-          //установка флагов поддержки расширений
+          //СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№
 
         extensions.SetGroup (extensions_string.c_str (), true);
 
-          //определение поддержки расширений и версий
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёР№ Рё РІРµСЂСЃРёР№
 
         Version version = version_string.c_str ();
 
@@ -166,7 +166,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
           }        
         }
 
-          //определение багов работы OpenGL
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ Р±Р°РіРѕРІ СЂР°Р±РѕС‚С‹ OpenGL
 
         stl::string bug_string;
 
@@ -176,7 +176,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         
         extensions_string += bug_string;
 
-          //инициализация таблицы возможностей контекста
+          //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РєРѕРЅС‚РµРєСЃС‚Р°
 
         context_caps.Init (extensions, context_settings.EnabledExtensions (), context_settings);
       }
@@ -187,47 +187,47 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
       }
     }
        
-///Получение контекста
+///РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     IContext& GetContext () { return *context; }
 
-///Получение точек входа OpenGL 1.1
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РѕС‡РµРє РІС…РѕРґР° OpenGL 1.1
     const GlEntries& GetGlEntries () { return gl_entries; }
 
-///Получение флагов поддержки исключений
+///РџРѕР»СѓС‡РµРЅРёРµ С„Р»Р°РіРѕРІ РїРѕРґРґРµСЂР¶РєРё РёСЃРєР»СЋС‡РµРЅРёР№
     ExtensionSet& GetExtensions () { return extensions; } 
  
-///Получение аппаратно-поддерживаемых возможностей контекста
+///РџРѕР»СѓС‡РµРЅРёРµ Р°РїРїР°СЂР°С‚РЅРѕ-РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РєРѕРЅС‚РµРєСЃС‚Р°
     const ContextCaps& GetCaps () { return context_caps; }
     
-///Нужно ли проверять ошибки
+///РќСѓР¶РЅРѕ Р»Рё РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєРё
     bool IsNeedCheckErrors () { return need_check_errors; }
 
-///Нужно ли валидировать программы
+///РќСѓР¶РЅРѕ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊ РїСЂРѕРіСЂР°РјРјС‹
     bool IsNeedValidatePrograms () { return need_validate_programs; }
 
-///Получение информации о реализации OpenGL
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЂРµР°Р»РёР·Р°С†РёРё OpenGL
     const char* GetExtensionsString () { return extensions_string.c_str (); }
     const char* GetVersionString    () { return version_string.c_str (); }
     const char* GetVendorString     () { return vendor_string.c_str (); }
     const char* GetRendererString   () { return renderer_string.c_str (); }
 
-///Получение кэша контекста
+///РџРѕР»СѓС‡РµРЅРёРµ РєСЌС€Р° РєРѕРЅС‚РµРєСЃС‚Р°
     size_t* GetContextCache () { return &context_cache [0]; }
 
-///Получение текущего контекста
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     static ContextImpl* GetCurrentContext ()
     {
       return current_context;
     }
 
   private:
-///Контекст стал текущим
+///РљРѕРЅС‚РµРєСЃС‚ СЃС‚Р°Р» С‚РµРєСѓС‰РёРј
     void OnSetCurrent ()
     {
       current_context = this;
     } 
 
-///Контекст перестал быть текущим
+///РљРѕРЅС‚РµРєСЃС‚ РїРµСЂРµСЃС‚Р°Р» Р±С‹С‚СЊ С‚РµРєСѓС‰РёРј
     virtual void OnLostCurrent ()
     {
       current_context = 0;
@@ -239,20 +239,20 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     typedef xtl::array<size_t, CacheEntry_Num> ContextCache;
     
   private:
-    ContextPtr   context;                //контекст OpenGL
-    GlEntries    gl_entries;             //таблица точек входа OpenGL 1.1
-    ExtensionSet extensions;             //флаги поддерживаемых исключений
-    stl::string  extensions_string;      //строка поддерживаемых расширений
-    stl::string  version_string;         //версия OpenGL
-    stl::string  vendor_string;          //производитель реализации OpenGL
-    stl::string  renderer_string;        //имя устройства отрисовки OpenGL
-    ContextCache context_cache;          //кэш состояния контекста
-    ContextCaps  context_caps;           //аппаратно поддерживаемые возможности контекста
-    bool         need_check_errors;      //нужно ли проверять ошибки
-    bool         need_validate_programs; //нужно ли валидировать программу
+    ContextPtr   context;                //РєРѕРЅС‚РµРєСЃС‚ OpenGL
+    GlEntries    gl_entries;             //С‚Р°Р±Р»РёС†Р° С‚РѕС‡РµРє РІС…РѕРґР° OpenGL 1.1
+    ExtensionSet extensions;             //С„Р»Р°РіРё РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РёСЃРєР»СЋС‡РµРЅРёР№
+    stl::string  extensions_string;      //СЃС‚СЂРѕРєР° РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… СЂР°СЃС€РёСЂРµРЅРёР№
+    stl::string  version_string;         //РІРµСЂСЃРёСЏ OpenGL
+    stl::string  vendor_string;          //РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЂРµР°Р»РёР·Р°С†РёРё OpenGL
+    stl::string  renderer_string;        //РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё OpenGL
+    ContextCache context_cache;          //РєСЌС€ СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
+    ContextCaps  context_caps;           //Р°РїРїР°СЂР°С‚РЅРѕ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚Р°
+    bool         need_check_errors;      //РЅСѓР¶РЅРѕ Р»Рё РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєРё
+    bool         need_validate_programs; //РЅСѓР¶РЅРѕ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊ РїСЂРѕРіСЂР°РјРјСѓ
 
   private:
-    static ContextImpl* current_context; //указатель на текущий контекст
+    static ContextImpl* current_context; //СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚
 };
 
 ContextImpl* ContextImpl::current_context = 0;
@@ -261,14 +261,14 @@ ContextImpl* ContextImpl::current_context = 0;
 
 /*
 ===================================================================================================
-    Описание реализации ContextManager
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё ContextManager
 ===================================================================================================
 */
 
 struct ContextManager::Impl: public xtl::reference_counter
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (ISwapChain* swap_chain, const char* init_string)
       : context (swap_chain, init_string),
         temp_buffer (DEFAULT_TEMP_BUFFER_SIZE),
@@ -277,12 +277,12 @@ struct ContextManager::Impl: public xtl::reference_counter
         need_change_context (true),
         on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
     {
-        //инициализация флагов ребиндинга уровней
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С„Р»Р°РіРѕРІ СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅРµР№
 
       for (size_t stage=0; stage<Stage_Num; stage++)
         need_stage_rebind [stage] = true;
 
-        //получение адаптера
+        //РїРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 
       if (!swap_chain)
         throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::Impl::Impl", "swap_chain");
@@ -290,10 +290,10 @@ struct ContextManager::Impl: public xtl::reference_counter
       adapter = swap_chain->GetAdapter ();
     }
 
-///Получение адаптера
+///РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
     IAdapter* GetAdapter () { return adapter.get (); }
 
-///Установка текущей цепочки обмена
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     void SetSwapChain (ISwapChain* swap_chain)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::ContextManager::SetSwapChain";
@@ -301,40 +301,40 @@ struct ContextManager::Impl: public xtl::reference_counter
       if (swap_chain == current_swap_chain)
         return;
      
-      if (!swap_chain) //использование первичной цепочки обмена
+      if (!swap_chain) //РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РїРµСЂРІРёС‡РЅРѕР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
         throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
 
-        //регистрация обработчиков удаления цепочек обмена
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РµРє РѕР±РјРµРЅР°
 
       swap_chain->RegisterDestroyHandler (on_destroy_swap_chain);
 
-        //обновление данных
+        //РѕР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С…
 
       current_swap_chain  = swap_chain;
       need_change_context = true;
 
-        //оповещение о необходимости ребиндинга менеджера целевых буферов отрисовки
+        //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґРёРЅРіР° РјРµРЅРµРґР¶РµСЂР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
       StageRebindNotify (Stage_RenderTargetManager);
     }
     
-///Активация текущего контекста
+///РђРєС‚РёРІР°С†РёСЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     void MakeContextCurrent (bool clear_errors)
     {
-        //проверка необходимости смены контекстов
+        //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃРјРµРЅС‹ РєРѕРЅС‚РµРєСЃС‚РѕРІ
       
       if (ContextImpl::GetCurrentContext () == &context && !need_change_context)
         return;
       
       try
       {
-          //установка контекста
+          //СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС‚РµРєСЃС‚Р°
 
         context.GetContext ().MakeCurrent (current_swap_chain);
         
         need_change_context = false;
 
-          //очистка текущей ошибки
+          //РѕС‡РёСЃС‚РєР° С‚РµРєСѓС‰РµР№ РѕС€РёР±РєРё
 
         if (clear_errors)
           ClearErrors ();          
@@ -347,11 +347,11 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }
 
-///Получение текущего контекста и цепочек обмена
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р° Рё С†РµРїРѕС‡РµРє РѕР±РјРµРЅР°
     ISwapChain*  GetSwapChain () { return current_swap_chain; }
     ContextImpl& GetContext   () { return context; }
 
-///Получение буфера памяти для временного размещения данных
+///РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° РїР°РјСЏС‚Рё РґР»СЏ РІСЂРµРјРµРЅРЅРѕРіРѕ СЂР°Р·РјРµС‰РµРЅРёСЏ РґР°РЅРЅС‹С…
     void* GetTempBuffer (size_t size)
     {
       temp_buffer.resize (size, false);
@@ -359,7 +359,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return temp_buffer.data ();
     }
 
-///Создание совместимой цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ СЃРѕРІРјРµСЃС‚РёРјРѕР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain)
     {
       if (!swap_chain)
@@ -368,7 +368,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       return PlatformManager::CreatePBuffer (swap_chain);
     }
     
-///Создание совместимой цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ СЃРѕРІРјРµСЃС‚РёРјРѕР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain, const SwapChainDesc& desc)
     {
       if (!swap_chain)
@@ -377,13 +377,13 @@ struct ContextManager::Impl: public xtl::reference_counter
       return PlatformManager::CreatePBuffer (swap_chain, &desc);
     }    
 
-///Проверка совместимости контекста и цепочки обмена
+///РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚Р° Рё С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     bool IsCompatible (ISwapChain* swap_chain)
     {
       return context.GetContext ().IsCompatible (swap_chain);
     }
 
-///Протоколирование
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
     void LogPrint (const char* message)
     {
       log.Print (message);
@@ -394,7 +394,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       log.VPrintf (message, args);
     }
 
-///Включение / отключение проверки ошибок
+///Р’РєР»СЋС‡РµРЅРёРµ / РѕС‚РєР»СЋС‡РµРЅРёРµ РїСЂРѕРІРµСЂРєРё РѕС€РёР±РѕРє
     void SetValidationState (bool state)
     {
       check_gl_errors = state;
@@ -402,7 +402,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     
     bool GetValidationState () { return check_gl_errors && context.IsNeedCheckErrors (); }
     
-//Проверка ошибок OpenGL
+//РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє OpenGL
     void CheckErrors (const char* source)
     {
       if (!GetValidationState ())      
@@ -438,7 +438,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       }
     }
 
-///Очистка текущей ошибки OpenGL
+///РћС‡РёСЃС‚РєР° С‚РµРєСѓС‰РµР№ РѕС€РёР±РєРё OpenGL
     void ClearErrors ()
     {
       if (!check_gl_errors)
@@ -447,7 +447,7 @@ struct ContextManager::Impl: public xtl::reference_counter
       while (glGetError () != GL_NO_ERROR);
     }
     
-///Оповещение о необходимости ребинда уровня
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґР° СѓСЂРѕРІРЅСЏ
     void StageRebindNotify (Stage stage)
     {
       if (stage < 0 || stage >= Stage_Num)
@@ -456,14 +456,14 @@ struct ContextManager::Impl: public xtl::reference_counter
       need_stage_rebind [stage] = true;
     }
     
-///Очистка флагов ребиндинга
+///РћС‡РёСЃС‚РєР° С„Р»Р°РіРѕРІ СЂРµР±РёРЅРґРёРЅРіР°
     void ResetRebindNotifications ()
     {
       for (size_t stage=0; stage<Stage_Num; stage++)
         need_stage_rebind [stage] = false;
     }
     
-///Проверка необходимости ребинда уровня
+///РџСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґР° СѓСЂРѕРІРЅСЏ
     bool NeedStageRebind (Stage stage)
     {
       if (stage < 0 || stage >= Stage_Num)
@@ -473,7 +473,7 @@ struct ContextManager::Impl: public xtl::reference_counter
     }  
 
   private:
-///Обработчик удаления цепочки обмена
+///РћР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     void OnDestroySwapChain ()
     {
       current_swap_chain  = 0;
@@ -485,20 +485,20 @@ struct ContextManager::Impl: public xtl::reference_counter
     typedef xtl::uninitialized_storage<char> DataBuffer;
 
   private:
-    Log                       log;                           //протокол
-    ContextImpl               context;                       //контекст
-    DataBuffer                temp_buffer;                   //буфер памяти для временных данных
-    LogHandler                log_handler;                   //обработчик протоколирования
-    AdapterPtr                adapter;                       //адаптер менеджера контекстов
-    ISwapChain*               current_swap_chain;            //текущая цепочка обмена
-    bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
-    bool                      need_change_context;           //необходимо сменить контекст
-    xtl::trackable::slot_type on_destroy_swap_chain;         //обработчик удаления цепочки обмена
-    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
+    Log                       log;                           //РїСЂРѕС‚РѕРєРѕР»
+    ContextImpl               context;                       //РєРѕРЅС‚РµРєСЃС‚
+    DataBuffer                temp_buffer;                   //Р±СѓС„РµСЂ РїР°РјСЏС‚Рё РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… РґР°РЅРЅС‹С…
+    LogHandler                log_handler;                   //РѕР±СЂР°Р±РѕС‚С‡РёРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    AdapterPtr                adapter;                       //Р°РґР°РїС‚РµСЂ РјРµРЅРµРґР¶РµСЂР° РєРѕРЅС‚РµРєСЃС‚РѕРІ
+    ISwapChain*               current_swap_chain;            //С‚РµРєСѓС‰Р°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+    bool                      check_gl_errors;               //РЅСѓР¶РЅРѕ Р»Рё РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєРё OpenGL
+    bool                      need_change_context;           //РЅРµРѕР±С…РѕРґРёРјРѕ СЃРјРµРЅРёС‚СЊ РєРѕРЅС‚РµРєСЃС‚
+    xtl::trackable::slot_type on_destroy_swap_chain;         //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+    bool                      need_stage_rebind [Stage_Num]; //С„Р»Р°РіРё, РѕРїСЂРµРґРµР»СЏСЋС‰РёРµ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ СЂРµР±РёРЅРґРёРЅРіР° СѓСЂРѕРІРЅСЏ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ContextManager::ContextManager (ISwapChain* swap_chain, const char* init_string)
@@ -528,7 +528,7 @@ ContextManager& ContextManager::operator = (const ContextManager& manager)
 }
 
 /*
-    Создание цепочки обмена совместимой с контекстом
+    РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° СЃРѕРІРјРµСЃС‚РёРјРѕР№ СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 ISwapChain* ContextManager::CreateCompatibleSwapChain (ISwapChain* swap_chain)
@@ -542,7 +542,7 @@ ISwapChain* ContextManager::CreateCompatibleSwapChain (ISwapChain* swap_chain, c
 }
 
 /*
-    Выбор текущей цепочки обмена
+    Р’С‹Р±РѕСЂ С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 void ContextManager::SetSwapChain (ISwapChain* swap_chain)
@@ -556,7 +556,7 @@ ISwapChain* ContextManager::GetSwapChain () const
 }
 
 /*
-    Активация текущего контекста
+    РђРєС‚РёРІР°С†РёСЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void ContextManager::MakeContextCurrent () const
@@ -579,7 +579,7 @@ bool ContextManager::TryMakeContextCurrent () const
 }
 
 /*
-    Работа с кэшем текущего контекста
+    Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 const size_t* ContextManager::GetContextCache () const
@@ -609,7 +609,7 @@ size_t ContextManager::GetContextCacheValue (size_t entry_id) const
 }
 
 /*
-   Получение буфера памяти для временного размещения данных
+   РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° РїР°РјСЏС‚Рё РґР»СЏ РІСЂРµРјРµРЅРЅРѕРіРѕ СЂР°Р·РјРµС‰РµРЅРёСЏ РґР°РЅРЅС‹С…
 */
 
 void* ContextManager::GetTempBuffer (size_t size) const
@@ -618,7 +618,7 @@ void* ContextManager::GetTempBuffer (size_t size) const
 }
 
 /*
-    Получение информации о текущей реализации OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РµРєСѓС‰РµР№ СЂРµР°Р»РёР·Р°С†РёРё OpenGL
 */
 
 const char* ContextManager::GetExtensions () const
@@ -642,7 +642,7 @@ const char* ContextManager::GetRenderer () const
 }
 
 /*
-    Адаптер
+    РђРґР°РїС‚РµСЂ
 */
 
 IAdapter* ContextManager::GetAdapter () const
@@ -651,7 +651,7 @@ IAdapter* ContextManager::GetAdapter () const
 }
 
 /*
-    Проверка совместимости контекста и цепочки обмена
+    РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РєРѕРЅС‚РµРєСЃС‚Р° Рё С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 bool ContextManager::IsCompatible (ISwapChain* swap_chain) const
@@ -660,7 +660,7 @@ bool ContextManager::IsCompatible (ISwapChain* swap_chain) const
 }
 
 /*
-    Проверка совместимости менеджеров контекстов
+    РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё РјРµРЅРµРґР¶РµСЂРѕРІ РєРѕРЅС‚РµРєСЃС‚РѕРІ
 */
 
 bool ContextManager::IsCompatible (const ContextManager& manager) const
@@ -669,7 +669,7 @@ bool ContextManager::IsCompatible (const ContextManager& manager) const
 }
 
 /*
-    Определение поддержки расширения контекстом
+    РћРїСЂРµРґРµР»РµРЅРёРµ РїРѕРґРґРµСЂР¶РєРё СЂР°СЃС€РёСЂРµРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 bool ContextManager::IsSupported (const Extension& extension) const
@@ -678,7 +678,7 @@ bool ContextManager::IsSupported (const Extension& extension) const
 }
 
 /*
-   Поулчение аппаратно поддерживаемых возможностей контекста
+   РџРѕСѓР»С‡РµРЅРёРµ Р°РїРїР°СЂР°С‚РЅРѕ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 const ContextCaps& ContextManager::GetCaps () const
@@ -687,7 +687,7 @@ const ContextCaps& ContextManager::GetCaps () const
 }
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void ContextManager::LogPrintf (const char* format, ...) const
@@ -704,7 +704,7 @@ void ContextManager::LogVPrintf (const char* format, va_list args) const
 }
 
 /*
-    Проверка ошибок OpenGL
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє OpenGL
 */
 
 void ContextManager::SetValidationState (bool state)
@@ -738,7 +738,7 @@ void ContextManager::ClearErrors () const
 }
 
 /*
-    Оповещение о необходимости ребинда уровня / очистка флагов ребиндинга / проверка необходимости ребинда уровней
+    РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґР° СѓСЂРѕРІРЅСЏ / РѕС‡РёСЃС‚РєР° С„Р»Р°РіРѕРІ СЂРµР±РёРЅРґРёРЅРіР° / РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂРµР±РёРЅРґР° СѓСЂРѕРІРЅРµР№
 */
 
 void ContextManager::StageRebindNotify (Stage stage)
@@ -757,7 +757,7 @@ bool ContextManager::NeedStageRebind (Stage stage) const
 }
 
 /*
-    Нужно ли валидировать программы
+    РќСѓР¶РЅРѕ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊ РїСЂРѕРіСЂР°РјРјС‹
 */
 
 bool ContextManager::NeedValidatePrograms () const
@@ -775,7 +775,7 @@ namespace opengl
 {
 
 /*
-    Получение таблицы точек входа для текущего контекста
+    РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ С‚РѕС‡РµРє РІС…РѕРґР° РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 const GlEntries* get_gl_entries ()

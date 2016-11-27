@@ -1,4 +1,4 @@
-//Тестирование алгоритма copy_backward (first, last, result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° copy_backward (first, last, result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

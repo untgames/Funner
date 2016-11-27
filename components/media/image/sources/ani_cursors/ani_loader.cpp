@@ -10,13 +10,13 @@ namespace ani_cursor_loader
 {
 
 /*
-    Загрузчик ANI курсоров
+    Р—Р°РіСЂСѓР·С‡РёРє ANI РєСѓСЂСЃРѕСЂРѕРІ
 */
 
 class AniLoader
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AniLoader (const char* file_name, Image& image)
       : file (file_name)
     {
@@ -24,7 +24,7 @@ class AniLoader
       {
         memset (&ani_header, 0, sizeof ani_header);
         
-          //разбор файла
+          //СЂР°Р·Р±РѕСЂ С„Р°Р№Р»Р°
         
         RiffHeader riff_header;
         
@@ -63,7 +63,7 @@ class AniLoader
             throw xtl::format_operation_exception ("", "Can' skip chunk '%s'", tag);
         }
         
-          //заполнение изображения
+          //Р·Р°РїРѕР»РЅРµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
           
         if (!images.size ())
           throw xtl::format_operation_exception ("", "Empty cursor file");
@@ -83,7 +83,7 @@ class AniLoader
     }
     
   private:    
-///Разбор заголовка
+///Р Р°Р·Р±РѕСЂ Р·Р°РіРѕР»РѕРІРєР°
     void ParseAniHeader ()
     {
       Read (ani_header);
@@ -93,7 +93,7 @@ class AniLoader
           ani_header.header_size, sizeof (AniHeader));
     }        
     
-///Разбор списка кадров
+///Р Р°Р·Р±РѕСЂ СЃРїРёСЃРєР° РєР°РґСЂРѕРІ
     void ParseFramesList ()
     {
       try
@@ -128,7 +128,7 @@ class AniLoader
       }
     }
     
-///Разбор кадра
+///Р Р°Р·Р±РѕСЂ РєР°РґСЂР°
     void ParseFrame ()
     {
       try
@@ -166,7 +166,7 @@ class AniLoader
       }
     }
     
-///Разбор последовательности кадров
+///Р Р°Р·Р±РѕСЂ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РєР°РґСЂРѕРІ
     void ParseSequence ()
     {
       try
@@ -198,7 +198,7 @@ class AniLoader
       }
     }
 
-///Чтение данных
+///Р§С‚РµРЅРёРµ РґР°РЅРЅС‹С…
     template <class T>
     void Read (T& data)
     {
@@ -221,15 +221,15 @@ class AniLoader
     typedef stl::vector<Image> FrameList;
 
   private:
-    AniHeader                        ani_header;  //заголовок анимированного курсора
-    common::InputFile                file;        //файл с данными курсора
-    xtl::uninitialized_storage<char> icon_buffer; //буфер для чтения данных изображения
-    ImageList                        images;      //список изображений
-    FrameList                        frames;      //список кадров
+    AniHeader                        ani_header;  //Р·Р°РіРѕР»РѕРІРѕРє Р°РЅРёРјРёСЂРѕРІР°РЅРЅРѕРіРѕ РєСѓСЂСЃРѕСЂР°
+    common::InputFile                file;        //С„Р°Р№Р» СЃ РґР°РЅРЅС‹РјРё РєСѓСЂСЃРѕСЂР°
+    xtl::uninitialized_storage<char> icon_buffer; //Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+    ImageList                        images;      //СЃРїРёСЃРѕРє РёР·РѕР±СЂР°Р¶РµРЅРёР№
+    FrameList                        frames;      //СЃРїРёСЃРѕРє РєР°РґСЂРѕРІ
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

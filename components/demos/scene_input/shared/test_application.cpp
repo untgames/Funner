@@ -24,27 +24,27 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* CONFIGURATION_FILE_NAME   = "media/config.xml"; //имя файла конфигурации
-const char* SERVER_NAME               = "MyServer";         //имя сервера рендеринга
-const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
-const char* RFX_FILE_NAME             = "media/render.rfx";     //имя файла с настройками рендера
-const char* TEXTURE_FILE_NAME         = "media/bottom.jpg";     //имя файла с текстурой
+const char* CONFIGURATION_FILE_NAME   = "media/config.xml"; //РёРјСЏ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
+const char* SERVER_NAME               = "MyServer";         //РёРјСЏ СЃРµСЂРІРµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //РёРјСЏ С„Р°Р№Р»Р° СЃ РјР°С‚РµСЂРёР°Р»Р°РјРё
+const char* RFX_FILE_NAME             = "media/render.rfx";     //РёРјСЏ С„Р°Р№Р»Р° СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё СЂРµРЅРґРµСЂР°
+const char* TEXTURE_FILE_NAME         = "media/bottom.jpg";     //РёРјСЏ С„Р°Р№Р»Р° СЃ С‚РµРєСЃС‚СѓСЂРѕР№
 
-const size_t DEFAULT_WINDOW_WIDTH  = 400;             //начальная ширина окна
-const size_t DEFAULT_WINDOW_HEIGHT = 300;             //начальная высота окна
-const char*  DEFAULT_WINDOW_TITLE  = "Render2d test"; //заголовок окна
+const size_t DEFAULT_WINDOW_WIDTH  = 400;             //РЅР°С‡Р°Р»СЊРЅР°СЏ С€РёСЂРёРЅР° РѕРєРЅР°
+const size_t DEFAULT_WINDOW_HEIGHT = 300;             //РЅР°С‡Р°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РѕРєРЅР°
+const char*  DEFAULT_WINDOW_TITLE  = "Render2d test"; //Р·Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 
-const size_t DEFAULT_FB_COLOR_BITS         = 24; //глубина буфера цвета
-const size_t DEFAULT_FB_ALPHA_BITS         = 8;  //глубина альфа-буфера
-const size_t DEFAULT_FB_DEPTH_BITS         = 24; //глубина z-buffer'а
-const size_t DEFAULT_FB_STENCIL_BITS       = 8;  //глубина буфера трафарета
-const bool   DEFAULT_FB_FULL_SCREEN_STATE  = 0;  //состояние full screen
+const size_t DEFAULT_FB_COLOR_BITS         = 24; //РіР»СѓР±РёРЅР° Р±СѓС„РµСЂР° С†РІРµС‚Р°
+const size_t DEFAULT_FB_ALPHA_BITS         = 8;  //РіР»СѓР±РёРЅР° Р°Р»СЊС„Р°-Р±СѓС„РµСЂР°
+const size_t DEFAULT_FB_DEPTH_BITS         = 24; //РіР»СѓР±РёРЅР° z-buffer'Р°
+const size_t DEFAULT_FB_STENCIL_BITS       = 8;  //РіР»СѓР±РёРЅР° Р±СѓС„РµСЂР° С‚СЂР°С„Р°СЂРµС‚Р°
+const bool   DEFAULT_FB_FULL_SCREEN_STATE  = 0;  //СЃРѕСЃС‚РѕСЏРЅРёРµ full screen
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 template <class T> T get (ParseNode& node, const char* name, const T& default_value)
@@ -60,18 +60,18 @@ void log_print (const char* message)
 }
 
 /*
-    Описание реализации TestApplication
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё TestApplication
 */
 
 struct TestApplication::Impl
 {
-  stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
-  xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
-  scene::server::Server          render_server;       //сервер рендера сцены
-  scene::client::Client          render_client;       //клиент рендера сцены
-  scene::client::RenderTarget    render_target;       //цель рендеринга
-  input::EventsSource            input_source;        //источник событий ввода
-  SceneInputManager              input;               //менеджер ввода
+  stl::auto_ptr<syslib::Window>  window;              //РіР»Р°РІРЅРѕРµ РѕРєРЅРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
+  xtl::auto_connection           app_idle_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРёРіРЅР°Р»Р° РѕР±СЂР°Р±РѕС‚С‡РёРєР° С…РѕР»РѕСЃС‚РѕРіРѕ С…РѕРґР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+  scene::server::Server          render_server;       //СЃРµСЂРІРµСЂ СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
+  scene::client::Client          render_client;       //РєР»РёРµРЅС‚ СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
+  scene::client::RenderTarget    render_target;       //С†РµР»СЊ СЂРµРЅРґРµСЂРёРЅРіР°
+  input::EventsSource            input_source;        //РёСЃС‚РѕС‡РЅРёРє СЃРѕР±С‹С‚РёР№ РІРІРѕРґР°
+  SceneInputManager              input;               //РјРµРЅРµРґР¶РµСЂ РІРІРѕРґР°
 
   Impl ()
     : render_server (SERVER_NAME)
@@ -129,7 +129,7 @@ struct TestApplication::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TestApplication::TestApplication ()
@@ -140,7 +140,7 @@ TestApplication::TestApplication ()
     common::Parser cfg_parser (CONFIGURATION_FILE_NAME);
     common::ParseNode cfg_root = cfg_parser.Root ().First ("Configuration");    
     
-      //создание окна
+      //СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°
 
     impl->window = new syslib::Window (get (cfg_root, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ?
         syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, get (cfg_root, "WindowWidth", DEFAULT_WINDOW_WIDTH),
@@ -152,7 +152,7 @@ TestApplication::TestApplication ()
 
     impl->window->Show ();
     
-      //настройка ввода
+      //РЅР°СЃС‚СЂРѕР№РєР° РІРІРѕРґР°
       
     input::low_level::WindowDriver::RegisterDevice ("window1", *impl->window);
 
@@ -160,13 +160,13 @@ TestApplication::TestApplication ()
     
     impl->input_source.RegisterHandler (xtl::bind (&Impl::ProcessInputEvent, impl.get (), _1));
 
-      //регистрация обработчиков событий окна
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, impl.get ()));
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, impl.get ()));
 //    impl->window->RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&Impl::ChangeWindowStyle, impl.get ()));
 
-      //инициализация системы рендеринга
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРёСЃС‚РµРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 
     common::PropertyMap window_properties;
     
@@ -177,7 +177,7 @@ TestApplication::TestApplication ()
 
     impl->render_server.AttachWindow ("my_window", *impl->window, window_properties);
 
-      //инициализация рендера
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂРµРЅРґРµСЂР°
 
     impl->render_target = impl->render_client.CreateRenderTarget ("my_window");
   }
@@ -193,7 +193,7 @@ TestApplication::~TestApplication ()
 }
 
 /*
-    Получение объектов приложения
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 scene::client::Client& TestApplication::Render ()
@@ -207,7 +207,7 @@ SceneInputManager& TestApplication::InputManager ()
 }
 
 /*
-   Загрузка ресурсов
+   Р—Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void TestApplication::LoadResources ()
@@ -218,7 +218,7 @@ void TestApplication::LoadResources ()
 }
 
 /*
-   Получение окна приложения
+   РџРѕР»СѓС‡РµРЅРёРµ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 syslib::Window& TestApplication::Window ()
@@ -227,7 +227,7 @@ syslib::Window& TestApplication::Window ()
 }
 
 /*
-    Получение цели рендеринга
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 scene::client::RenderTarget& TestApplication::RenderTarget ()
@@ -236,7 +236,7 @@ scene::client::RenderTarget& TestApplication::RenderTarget ()
 }
 
 /*
-    Запуск приложения
+    Р—Р°РїСѓСЃРє РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 int TestApplication::Run ()
@@ -247,7 +247,7 @@ int TestApplication::Run ()
 }
 
 /*
-    Перерисовка
+    РџРµСЂРµСЂРёСЃРѕРІРєР°
 */
 
 void TestApplication::PostRedraw ()
@@ -256,7 +256,7 @@ void TestApplication::PostRedraw ()
 }
 
 /*
-    Установка idle-функции
+    РЈСЃС‚Р°РЅРѕРІРєР° idle-С„СѓРЅРєС†РёРё
 */
 
 void TestApplication::SetIdleHandler (const IdleFunction& idle)

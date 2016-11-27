@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RasterizerState::RasterizerState (const DeviceManager& manager, const RasterizerDesc& in_desc)
@@ -13,7 +13,7 @@ RasterizerState::RasterizerState (const DeviceManager& manager, const Rasterizer
 {
   try
   {
-      //преобразование дескриптора
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     D3D11_RASTERIZER_DESC dx_desc;
 
@@ -55,7 +55,7 @@ RasterizerState::RasterizerState (const DeviceManager& manager, const Rasterizer
         throw xtl::make_argument_exception ("", "desc.cull_mode", desc.cull_mode);
     }
 
-      //создание состояния
+      //СЃРѕР·РґР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 
     ID3D11RasterizerState* dx_state = 0;
 
@@ -78,7 +78,7 @@ RasterizerState::~RasterizerState ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void RasterizerState::GetDesc (RasterizerDesc& out_desc)

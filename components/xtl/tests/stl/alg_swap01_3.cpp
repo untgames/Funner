@@ -1,4 +1,4 @@
-//Тестирование алгоритма swap_ranges (first1, last1, first2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° swap_ranges (first1, last1, first2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

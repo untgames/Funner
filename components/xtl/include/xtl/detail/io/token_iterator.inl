@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Token, class BaseIter>
@@ -13,7 +13,7 @@ inline token_iterator<Token, BaseIter>::token_iterator (base_iterator in_first, 
   {}
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Token, class BaseIter>
@@ -33,7 +33,7 @@ inline token_iterator<Token, BaseIter>& token_iterator<Token, BaseIter>::assign 
 }
 
 /*
-    Получение токена
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РѕРєРµРЅР°
 */
 
 template <class Token, class BaseIter>
@@ -55,7 +55,7 @@ inline typename token_iterator<Token, BaseIter>::pointer token_iterator<Token, B
 }
 
 /*
-    Количество доступных токенов / проверка на пустота
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… С‚РѕРєРµРЅРѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Р°
 */
 
 template <class T>
@@ -77,7 +77,7 @@ inline bool token_iterator<Token, BaseIter>::empty () const
 }
 
 /*
-    Арифметика
+    РђСЂРёС„РјРµС‚РёРєР°
 */
 
 template <class Token, class BaseIter>
@@ -141,7 +141,7 @@ inline token_iterator<Token, BaseIter>& token_iterator<Token, BaseIter>::operato
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class Token, class BaseIter>
@@ -163,7 +163,7 @@ inline void swap (token_iterator<Token, BaseIter>& a, token_iterator<Token, Base
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class Token, class BaseIter>
@@ -179,7 +179,7 @@ inline bool token_iterator<Token, BaseIter>::operator != (const token_iterator& 
 }
 
 /*
-    Создание итератора
+    РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class Token>
@@ -195,7 +195,7 @@ inline token_iterator<typename iterator_traits<BaseIter>::value_type, BaseIter> 
 }
 
 /*
-    Чтение интервальных значений
+    Р§С‚РµРЅРёРµ РёРЅС‚РµСЂРІР°Р»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 */
 
 namespace detail
@@ -279,7 +279,7 @@ inline size_t read_range (token_iterator<Token, BaseIter>& iter, OutIter first, 
 }
 
 /*
-    Разбор токенов
+    Р Р°Р·Р±РѕСЂ С‚РѕРєРµРЅРѕРІ
 */
 
 namespace detail
@@ -499,7 +499,7 @@ inline bool read (token_iterator<const wchar_t*, BaseIter>& iter, long double& v
 }
 
 /*
-    Копирование токена    
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ С‚РѕРєРµРЅР°    
 */
 
 template <class Token, class BaseIter>
@@ -516,7 +516,7 @@ inline bool read (token_iterator<Token, BaseIter>& iter, Token& value)
 }
 
 /*
-    Чтение STL строк
+    Р§С‚РµРЅРёРµ STL СЃС‚СЂРѕРє
 */
 
 template <class T, class BaseIter, class CharT, class Allocator>
@@ -533,7 +533,7 @@ inline bool read (token_iterator<const T*, BaseIter>& iter, stl::basic_string<T,
 }
 
 /*
-    Чтение токенов с приведением типов
+    Р§С‚РµРЅРёРµ С‚РѕРєРµРЅРѕРІ СЃ РїСЂРёРІРµРґРµРЅРёРµРј С‚РёРїРѕРІ
 */
 
 template <class Base, class Token, class BaseIter, class Value>
@@ -550,7 +550,7 @@ inline bool read_and_cast (token_iterator<Token, BaseIter>& iter, Value& value)
 }
 
 /*
-    Чтение токенов с возвратом значения
+    Р§С‚РµРЅРёРµ С‚РѕРєРµРЅРѕРІ СЃ РІРѕР·РІСЂР°С‚РѕРј Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Value, class Token, class BaseIter>
@@ -573,7 +573,7 @@ inline Value get (token_iterator<Token, BaseIter>& iter, const Value& default_va
 }
 
 /*
-    Чтение токенов
+    Р§С‚РµРЅРёРµ С‚РѕРєРµРЅРѕРІ
 */
 
 template <class Token, class BaseIter, class Value>

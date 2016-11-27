@@ -5,7 +5,7 @@ using namespace render::debug;
 class MyPrimitiveRender : public PrimitiveRender
 {
   public:
-    ///Рисование примитивов
+    ///Р РёСЃРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     void DrawLinesCore (size_t lines_count, const RenderablePoint* points)
     {
       printf ("Drawing %u lines:\n", lines_count);

@@ -11,13 +11,13 @@ using namespace render::low_level::dx11;
 
 struct OutputManagerContextState::Impl: public DeviceObject
 {
-  BlendStatePtr        blend_state;         //состояние подуровня смешивания цветов
-  DepthStencilStatePtr depth_stencil_state; //состояние подуровня отсечения
-  size_t               stencil_ref;         //референсное значение стенсила
-  RasterizerStatePtr   rasterizer_state;    //состояние подуровня растеризации
-  bool                 is_dirty;            //флаг "грязности"
+  BlendStatePtr        blend_state;         //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
+  DepthStencilStatePtr depth_stencil_state; //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ
+  size_t               stencil_ref;         //СЂРµС„РµСЂРµРЅСЃРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃС‚РµРЅСЃРёР»Р°
+  RasterizerStatePtr   rasterizer_state;    //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
+  bool                 is_dirty;            //С„Р»Р°Рі "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
     , stencil_ref ()
@@ -25,10 +25,10 @@ struct OutputManagerContextState::Impl: public DeviceObject
   {
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   virtual ~Impl () {}
 
-/// Оповещение об изменении
+/// РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё
   void UpdateNotify ()
   {
     is_dirty = true;
@@ -36,7 +36,7 @@ struct OutputManagerContextState::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputManagerContextState::OutputManagerContextState (const DeviceManager& manager)
@@ -54,7 +54,7 @@ OutputManagerContextState::~OutputManagerContextState ()
 }
 
 /*
-    Получение реализации
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 OutputManagerContextState::Impl& OutputManagerContextState::GetImpl () const
@@ -63,7 +63,7 @@ OutputManagerContextState::Impl& OutputManagerContextState::GetImpl () const
 }
 
 /*
-    Настройка подуровня растеризации
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 */
 
 void OutputManagerContextState::SetRasterizerState (IRasterizerState* in_state)
@@ -92,7 +92,7 @@ IRasterizerState* OutputManagerContextState::GetRasterizerState () const
 }
 
 /*
-    Настройка подуровня смешивания цветов
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
 */
 
 void OutputManagerContextState::SetBlendState (IBlendState* in_state)
@@ -121,7 +121,7 @@ IBlendState* OutputManagerContextState::GetBlendState () const
 }
 
 /*
-    Настройка подуровня попиксельного отсечения
+    РќР°СЃС‚СЂРѕР№РєР° РїРѕРґСѓСЂРѕРІРЅСЏ РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void OutputManagerContextState::SetDepthStencilState (IDepthStencilState* in_state)
@@ -165,7 +165,7 @@ size_t OutputManagerContextState::GetStencilReference () const
 }
 
 /*
-    Копирование состояния
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 */
 
 void OutputManagerContextState::CopyTo (const StateBlockMask& mask, OutputManagerContextState& dst_state) const
@@ -205,17 +205,17 @@ void OutputManagerContextState::CopyTo (const StateBlockMask& mask, OutputManage
 */
 
 /*
-    Описание реализации контекста
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 {
-  DxContextPtr         context;                     //контекст устройства
-  BlendStatePtr        null_blend_state;            //состояние подуровня смешивания с выключенной записью
-  DepthStencilStatePtr null_depth_stencil_state;    //состояние подуровня отсечения с вылюченными операциями
-  RasterizerStatePtr   null_rasterizer_state;       //состояни подуровня растеризации по умолчанию
+  DxContextPtr         context;                     //РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  BlendStatePtr        null_blend_state;            //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ СЃ РІС‹РєР»СЋС‡РµРЅРЅРѕР№ Р·Р°РїРёСЃСЊСЋ
+  DepthStencilStatePtr null_depth_stencil_state;    //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРґСѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ СЃ РІС‹Р»СЋС‡РµРЅРЅС‹РјРё РѕРїРµСЂР°С†РёСЏРјРё
+  RasterizerStatePtr   null_rasterizer_state;       //СЃРѕСЃС‚РѕСЏРЅРё РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : OutputManagerContextState::Impl (manager)
     , context (in_context)
@@ -243,7 +243,7 @@ struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputManagerContext::OutputManagerContext (const DeviceManager& manager, const DxContextPtr& context, const DefaultResources& default_resources)
@@ -256,7 +256,7 @@ OutputManagerContext::~OutputManagerContext ()
 }
 
 /*
-    Получение реализации
+    РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 OutputManagerContext::Impl& OutputManagerContext::GetImpl () const
@@ -265,21 +265,21 @@ OutputManagerContext::Impl& OutputManagerContext::GetImpl () const
 }
 
 /*
-    Установка состояния уровня в контекст
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 void OutputManagerContext::Bind ()
 {
   try
   {
-      //проверка флага "грязности"
+      //РїСЂРѕРІРµСЂРєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     Impl& impl = GetImpl ();
 
     if (!impl.is_dirty)
       return;
 
-      //установка состояния подуровня смешивания цветов
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
 
     BlendState* blend_state = impl.blend_state.get ();
 
@@ -290,7 +290,7 @@ void OutputManagerContext::Bind ()
 
     impl.context->OMSetBlendState (&blend_state->GetHandle (), blend_factors, 0xffffffff);
 
-      //установка состояния подуровня отсечения
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ
 
     DepthStencilState* depth_stencil_state = impl.depth_stencil_state.get ();
 
@@ -299,7 +299,7 @@ void OutputManagerContext::Bind ()
 
     impl.context->OMSetDepthStencilState (&depth_stencil_state->GetHandle (), impl.stencil_ref);
 
-      //установка состояния подуровня растеризации
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕРґСѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 
     RasterizerState* rasterizer_state = impl.rasterizer_state.get ();
 
@@ -308,7 +308,7 @@ void OutputManagerContext::Bind ()
 
     impl.context->RSSetState (&rasterizer_state->GetHandle ());
 
-      //очистка флага "грязности"
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіР° "РіСЂСЏР·РЅРѕСЃС‚Рё"
 
     impl.is_dirty = false;
   }

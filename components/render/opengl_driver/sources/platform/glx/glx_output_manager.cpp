@@ -8,13 +8,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_OUTPUT_ARRAY_RESERVE = 8; //резервируемое количество устройств вывода
+const size_t DEFAULT_OUTPUT_ARRAY_RESERVE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 
 /*
-    Основные определения типов
+    РћСЃРЅРѕРІРЅС‹Рµ РѕРїСЂРµРґРµР»РµРЅРёСЏ С‚РёРїРѕРІ
 */
 
 typedef xtl::com_ptr<Output>   OutputPtr;
@@ -23,17 +23,17 @@ typedef stl::vector<OutputPtr> OutputArray;
 }
 
 /*
-    Описание реализации OutputManager
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё OutputManager
 */
 
 struct OutputManager::Impl: public xtl::reference_counter
 {
-  OutputArray  outputs;  //устройства вывода  
-  static Impl* instance; //глобальный экземпляр реализации менеджера устройств вывода
+  OutputArray  outputs;  //СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°  
+  static Impl* instance; //РіР»РѕР±Р°Р»СЊРЅС‹Р№ СЌРєР·РµРјРїР»СЏСЂ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
   
   Impl ()
   {
-    //соединение с дисплеем
+    //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
     
     Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
     
@@ -47,7 +47,7 @@ struct OutputManager::Impl: public xtl::reference_counter
     
     outputs.reserve (screens_count);
     
-    //построение массива устройств вывода
+    //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
     
     for (size_t screen_number=0; screen_number<screens_count; screen_number++)
       outputs.push_back (Output::Pointer (new Output (display, screen_number), false));
@@ -64,7 +64,7 @@ struct OutputManager::Impl: public xtl::reference_counter
 OutputManager::Impl* OutputManager::Impl::instance = 0;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputManager::OutputManager ()
@@ -80,7 +80,7 @@ OutputManager::~OutputManager ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t OutputManager::GetOutputsCount () const
@@ -97,7 +97,7 @@ Output* OutputManager::GetOutput (size_t index) const
 }
 
 /*
-    Поиск устройства вывода, перекрытие которого с окном максимально
+    РџРѕРёСЃРє СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°, РїРµСЂРµРєСЂС‹С‚РёРµ РєРѕС‚РѕСЂРѕРіРѕ СЃ РѕРєРЅРѕРј РјР°РєСЃРёРјР°Р»СЊРЅРѕ
 */
 
 Output* OutputManager::FindContainingOutput (Window window) const
@@ -105,7 +105,7 @@ Output* OutputManager::FindContainingOutput (Window window) const
   if (window < 0)
     return 0;
 
-  //соединение с дисплеем
+  //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
   
   Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
   

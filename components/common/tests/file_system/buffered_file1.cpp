@@ -19,7 +19,7 @@ static char buffer [1024*16];
 class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
 {
   public:
-///Работа с файлом
+///Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
     file_t FileOpen (const char* name, filemode_t mode_flags, size_t buffer_size)
     {
       try
@@ -243,7 +243,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
       }      
     }
 
-///Управление расположением файлов
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
     void Remove (const char* file_name)
     {
       FileSystem::Remove (file_name + strlen (LOG_PREFIX));
@@ -259,7 +259,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
       throw xtl::format_not_supported_exception ("LogFileSystem::Remove", "Mkdir operation not supported on url links");      
     }
 
-///Получение информации о файле
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
     bool IsFileExist (const char* file_name)
     {
       return false;
@@ -270,7 +270,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
       return false;
     }
 
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
     filesize_t GetFreeSpace (const char* path)
     {
       return (filesize_t)-1;
@@ -281,7 +281,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
       return (filesize_t)-1;
     }
 
-//Файловые атрибуты
+//Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
     void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
     {
       throw xtl::format_not_supported_exception ("LogFileSystem::SetFileAttribute");
@@ -302,13 +302,13 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
       throw xtl::format_not_supported_exception ("LogFileSystem::RemoveFileAttribute");
     }
 
-///Поиск файла
+///РџРѕРёСЃРє С„Р°Р№Р»Р°
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {
-      //поиска по URL ссылке нет
+      //РїРѕРёСЃРєР° РїРѕ URL СЃСЃС‹Р»РєРµ РЅРµС‚
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);

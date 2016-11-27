@@ -3,7 +3,7 @@
 using namespace physics;
 
 /*
-   Твердое тело
+   РўРІРµСЂРґРѕРµ С‚РµР»Рѕ
 */
 
 RigidBodyImpl::RigidBodyImpl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material, const Scene& in_scene)
@@ -19,7 +19,7 @@ RigidBodyImpl::RigidBodyImpl (RigidBodyPtr in_body, const physics::Shape& in_sha
 }
 
 /*
-   Согласование объекта с группой
+   РЎРѕРіР»Р°СЃРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃ РіСЂСѓРїРїРѕР№
 */
 
 const char* RigidBodyImpl::CollisionGroup ()
@@ -38,7 +38,7 @@ void RigidBodyImpl::SetCollisionGroup (const char* new_group)
 }
 
 /*
-   Получение текущей позиции
+   РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё
 */
 
 const Transform& RigidBodyImpl::CurrentTransform ()
@@ -59,7 +59,7 @@ void RigidBodyImpl::SetWorldTransform (const Transform& transform)
 }
 
 /*
-   Обработка изменения позиции
+   РћР±СЂР°Р±РѕС‚РєР° РёР·РјРµРЅРµРЅРёСЏ РїРѕР·РёС†РёРё
 */
 
 void RigidBodyImpl::OnTransformUpdate ()
@@ -73,7 +73,7 @@ void RigidBodyImpl::OnTransformUpdate ()
 }
 
 /*
-   Геометрическое тело
+   Р“РµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ С‚РµР»Рѕ
 */
 
 physics::Shape& RigidBodyImpl::Shape ()
@@ -82,7 +82,7 @@ physics::Shape& RigidBodyImpl::Shape ()
 }
 
 /*
-   Материал
+   РњР°С‚РµСЂРёР°Р»
 */
 
 physics::Material& RigidBodyImpl::Material ()
@@ -98,7 +98,7 @@ void RigidBodyImpl::SetMaterial (const physics::Material& in_material)
 }
 
 /*
-   Получение низкоуровневого тела
+   РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ С‚РµР»Р°
 */
 
 physics::low_level::IRigidBody* RigidBodyImpl::LowLevelBody ()
@@ -107,7 +107,7 @@ physics::low_level::IRigidBody* RigidBodyImpl::LowLevelBody ()
 }
 
 /*
-   Подписка на обновление положения тела
+   РџРѕРґРїРёСЃРєР° РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ С‚РµР»Р°
 */
 
 xtl::connection RigidBodyImpl::RegisterTransformUpdateCallback (const RigidBody::TransformUpdateCallback& callback_handler)
@@ -116,7 +116,7 @@ xtl::connection RigidBodyImpl::RegisterTransformUpdateCallback (const RigidBody:
 }
 
 /*
-   Подписка на столкновения тела
+   РџРѕРґРїРёСЃРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ С‚РµР»Р°
 */
 
 xtl::connection RigidBodyImpl::RegisterCollisionCallback (const char* group_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
@@ -138,7 +138,7 @@ xtl::connection RigidBodyImpl::RegisterCollisionCallback (const char* group_mask
 }
 
 /*
-   Оповещение о столкновения тела
+   РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ С‚РµР»Р°
 */
 
 void RigidBodyImpl::OnCollision (CollisionEventType event_type, RigidBody& second_body, const math::vec3f& collision_point)
@@ -152,7 +152,7 @@ void RigidBodyImpl::OnCollision (CollisionEventType event_type, RigidBody& secon
 }
 
 /*
-   Обработка события о столкновения тела
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ Рѕ СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ С‚РµР»Р°
 */
 
 void RigidBodyImpl::ProcessCollisionWithMask (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
@@ -176,7 +176,7 @@ void RigidBodyImpl::ProcessCollisionWithHash (CollisionEventType event_type, Rig
 }
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 RigidBody::RigidBody (const RigidBody& source)
@@ -202,7 +202,7 @@ RigidBody& RigidBody::operator = (const RigidBody& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t RigidBody::Id () const
@@ -211,7 +211,7 @@ size_t RigidBody::Id () const
 }
 
 /*
-   Масса
+   РњР°СЃСЃР°
 */
 
 float RigidBody::Mass () const
@@ -225,7 +225,7 @@ void RigidBody::SetMass (float mass)
 }
 
 /*
-   Управление тензором
+   РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРЅР·РѕСЂРѕРј
 */
 
 const math::vec3f& RigidBody::MassSpaceInertiaTensor () const
@@ -239,7 +239,7 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& tensor)
 }
 
 /*
-   Мировое положение
+   РњРёСЂРѕРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
 */
 
 const Transform& RigidBody::WorldTransform () const
@@ -253,7 +253,7 @@ void RigidBody::SetWorldTransform (const Transform& transform)
 }
 
 /*
-   Управление сном
+   РЈРїСЂР°РІР»РµРЅРёРµ СЃРЅРѕРј
 */
 
 float RigidBody::SleepLinearVelocity () const
@@ -277,7 +277,7 @@ void RigidBody::SetSleepAngularVelocity (float value)
 }
 
 /*
-   Управление пороговым значением скорости перехода в режим непрерывного движения
+   РЈРїСЂР°РІР»РµРЅРёРµ РїРѕСЂРѕРіРѕРІС‹Рј Р·РЅР°С‡РµРЅРёРµРј СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµС…РѕРґР° РІ СЂРµР¶РёРј РЅРµРїСЂРµСЂС‹РІРЅРѕРіРѕ РґРІРёР¶РµРЅРёСЏ
 */
 
 float RigidBody::CcdMotionThreshold () const
@@ -291,7 +291,7 @@ void RigidBody::SetCcdMotionThreshold (float value)
 }
 
 /*
-   Геометрическое тело
+   Р“РµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРµ С‚РµР»Рѕ
 */
 
 const physics::Shape& RigidBody::Shape () const
@@ -305,7 +305,7 @@ physics::Shape& RigidBody::Shape ()
 }
 
 /*
-   Материал
+   РњР°С‚РµСЂРёР°Р»
 */
 
 const physics::Material& RigidBody::Material () const
@@ -324,7 +324,7 @@ void RigidBody::SetMaterial (const physics::Material& material)
 }
 
 /*
-   Флаги поведения
+   Р¤Р»Р°РіРё РїРѕРІРµРґРµРЅРёСЏ
 */
 
 size_t RigidBody::Flags () const
@@ -377,7 +377,7 @@ void RigidBody::ChangeFlags (size_t flags, bool state)
 }
 
 /*
-   Согласование объекта с группой
+   РЎРѕРіР»Р°СЃРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃ РіСЂСѓРїРїРѕР№
 */
 
 const char* RigidBody::CollisionGroup () const
@@ -391,7 +391,7 @@ void RigidBody::SetCollisionGroup (const char* new_group)
 }
 
 /*
-   Приложение силы/импульса/вращения
+   РџСЂРёР»РѕР¶РµРЅРёРµ СЃРёР»С‹/РёРјРїСѓР»СЊСЃР°/РІСЂР°С‰РµРЅРёСЏ
 */
 
 void RigidBody::AddForce (const math::vec3f& force, const math::vec3f& relative_position)
@@ -415,7 +415,7 @@ void RigidBody::AddTorqueImpulse (const math::vec3f& torque)
 }
 
 /*
-   Управление линейной/угловой скоростями
+   РЈРїСЂР°РІР»РµРЅРёРµ Р»РёРЅРµР№РЅРѕР№/СѓРіР»РѕРІРѕР№ СЃРєРѕСЂРѕСЃС‚СЏРјРё
 */
 
 const math::vec3f& RigidBody::LinearVelocity () const
@@ -439,7 +439,7 @@ void RigidBody::SetAngularVelocity (const math::vec3f& velocity)
 }
 
 /*
-   Оповещение об изменении положения тела
+   РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РїРѕР»РѕР¶РµРЅРёСЏ С‚РµР»Р°
 */
 
 xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdateCallback& callback_handler)
@@ -448,7 +448,7 @@ xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdat
 }
 
 /*
-   Обработка столкновений объектов
+   РћР±СЂР°Р±РѕС‚РєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№ РѕР±СЉРµРєС‚РѕРІ
 */
 
 xtl::connection RigidBody::RegisterCollisionCallback (const char* group_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
@@ -457,7 +457,7 @@ xtl::connection RigidBody::RegisterCollisionCallback (const char* group_mask, Co
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void RigidBody::Swap (RigidBody& source)
@@ -476,7 +476,7 @@ void swap (RigidBody& material1, RigidBody& material2)
 }
 
 /*
-   Создание
+   РЎРѕР·РґР°РЅРёРµ
 */
 
 RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material, const Scene& scene)
@@ -500,7 +500,7 @@ RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyImpl* impl)
 }
 
 /*
-   Получение реализации
+   РџРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 RigidBodyImpl* RigidBodyImplProvider::Impl (const RigidBody& body)
@@ -509,7 +509,7 @@ RigidBodyImpl* RigidBodyImplProvider::Impl (const RigidBody& body)
 }
 
 /*
-   Получение низкоуровневого тела
+   РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ С‚РµР»Р°
 */
 
 physics::low_level::IRigidBody* RigidBodyImplProvider::LowLevelBody (const RigidBody& body)

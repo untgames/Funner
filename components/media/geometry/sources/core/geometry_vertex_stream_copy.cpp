@@ -8,7 +8,7 @@ namespace
 {
 
 /*
-    Генерация исключения несовместимости форматов преобразования
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РЅРµСЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С„РѕСЂРјР°С‚РѕРІ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 void raise_incompatible (VertexAttributeType src_type, VertexAttributeType dst_type)
@@ -18,7 +18,7 @@ void raise_incompatible (VertexAttributeType src_type, VertexAttributeType dst_t
 }
 
 /*
-    Шаблонная функция копирования
+    РЁР°Р±Р»РѕРЅРЅР°СЏ С„СѓРЅРєС†РёСЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 */
 
 inline void copy_attribute (const VertexInfluence& src, VertexInfluence& dst)
@@ -90,7 +90,7 @@ void copy_internal
 }
 
 /*
-    Копирование массивов атрибутов с преобразованием формата
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ Р°С‚СЂРёР±СѓС‚РѕРІ СЃ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµРј С„РѕСЂРјР°С‚Р°
 */
 
 namespace media

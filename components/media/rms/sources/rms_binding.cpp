@@ -3,15 +3,15 @@
 using namespace media::rms;
 
 /*
-    Описание реализации связывания
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРІСЏР·С‹РІР°РЅРёСЏ
 */
 
 typedef stl::auto_ptr<ICustomBinding> BindingPtr;
 
 struct Binding::Impl: public xtl::reference_counter
 {
-  BindingPtr           binding;           //объект связывания
-  xtl::auto_connection on_delete_binding; //соединение с сигналом, оповещающим о досрочном удалении объекта
+  BindingPtr           binding;           //РѕР±СЉРµРєС‚ СЃРІСЏР·С‹РІР°РЅРёСЏ
+  xtl::auto_connection on_delete_binding; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј, РѕРїРѕРІРµС‰Р°СЋС‰РёРј Рѕ РґРѕСЃСЂРѕС‡РЅРѕРј СѓРґР°Р»РµРЅРёРё РѕР±СЉРµРєС‚Р°
 
   Impl () {}
   
@@ -31,7 +31,7 @@ struct Binding::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Binding::Binding ()
@@ -68,7 +68,7 @@ Binding& Binding::operator = (const Binding& binding)
 }
 
 /*
-    Синхронная загрузка и выгрузка ресурсов
+    РЎРёРЅС…СЂРѕРЅРЅР°СЏ Р·Р°РіСЂСѓР·РєР° Рё РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 namespace
@@ -169,7 +169,7 @@ void Binding::Unload ()
 }
 
 /*
-    Асинхронная загрузка и выгрузка ресурсов
+    РђСЃРёРЅС…СЂРѕРЅРЅР°СЏ Р·Р°РіСЂСѓР·РєР° Рё РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void Binding::AsyncLoad (const ProgressHandler& progress_handler)
@@ -263,7 +263,7 @@ void Binding::AsyncUnload ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Binding::Swap (Binding& binding)

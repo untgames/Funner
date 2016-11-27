@@ -19,32 +19,32 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char*  CONSOLE_HANDLERS_MASK   = "common.console.*";
 const size_t DEFAULT_MAX_LINES_COUNT = 256;
 
 /*
-    Реализация консоли
+    Р РµР°Р»РёР·Р°С†РёСЏ РєРѕРЅСЃРѕР»Рё
 */
 
 class ConsoleImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ConsoleImpl () : max_lines_count (DEFAULT_MAX_LINES_COUNT), first_line_index (0)
     {
       lines.reserve (max_lines_count);
     }
 
-///Печать сообщений
+///РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№
     void Print (const char* message)
     {
       if (!message)
         throw xtl::make_null_argument_exception ("common::Console::Print", "message");
         
-        //оповещение о возникновении нового сообщения
+        //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РЅРѕРІРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
 
       LoadConsoleHandlers ();
 
@@ -56,7 +56,7 @@ class ConsoleImpl
       {
       }
         
-        //разбивка на строки и оповещение о появлении строк
+        //СЂР°Р·Р±РёРІРєР° РЅР° СЃС‚СЂРѕРєРё Рё РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕСЏРІР»РµРЅРёРё СЃС‚СЂРѕРє
 
       const char* volatile pos = strchr (message, '\n');
 
@@ -80,14 +80,14 @@ class ConsoleImpl
           pos      = strchr (prev_pos, '\n');
         } while (pos);
 
-          //изменение текущего сообщения
+          //РёР·РјРµРЅРµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ
 
         if (*prev_pos)
           current_line = prev_pos;
       }
     }
 
-///Регистрация обработчиков событий консоли
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РєРѕРЅСЃРѕР»Рё
     xtl::connection RegisterEventHandler (ConsoleEvent event, const Console::EventHandler& handler)
     {
       if (event < 0 || event > ConsoleEvent_Num)
@@ -96,10 +96,10 @@ class ConsoleImpl
       return signals [event].connect (handler);
     }
 
-///Максимальное количество хранимых сообщений
+///РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С…СЂР°РЅРёРјС‹С… СЃРѕРѕР±С‰РµРЅРёР№
     size_t MaxLinesCount () { return max_lines_count; }
 
-///Установка максимального количества хранимых сообщений
+///РЈСЃС‚Р°РЅРѕРІРєР° РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° С…СЂР°РЅРёРјС‹С… СЃРѕРѕР±С‰РµРЅРёР№
     void SetMaxLinesCount (size_t in_max_lines_count)
     {
       lines.reserve (in_max_lines_count);
@@ -112,10 +112,10 @@ class ConsoleImpl
       current_line.clear ();
     }
 
-///Количество сообщений
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕРѕР±С‰РµРЅРёР№
     size_t LinesCount () { return lines.size (); }
 
-///Получение сообщения
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ
     const char* Message (size_t index)
     {
       if (index >= lines.size ())
@@ -132,7 +132,7 @@ class ConsoleImpl
     
     void AddLine ()
     {
-        //оповещение о появлении новой строки
+        //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕСЏРІР»РµРЅРёРё РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
       
       try
       {
@@ -142,7 +142,7 @@ class ConsoleImpl
       {
       }      
       
-        //сохранение истории сообщений
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РёСЃС‚РѕСЂРёРё СЃРѕРѕР±С‰РµРЅРёР№
 
       if (!max_lines_count)
         return;
@@ -163,7 +163,7 @@ class ConsoleImpl
     }
 
   private:
-    //строка консоли
+    //СЃС‚СЂРѕРєР° РєРѕРЅСЃРѕР»Рё
     struct ConsoleLine: public xtl::reference_counter
     {
       ConsoleLine (const stl::string& in_data) : data (in_data) {}
@@ -184,17 +184,17 @@ class ConsoleImpl
 };
 
 /*
-    Синглтон консоли
+    РЎРёРЅРіР»С‚РѕРЅ РєРѕРЅСЃРѕР»Рё
 */
 
 typedef Singleton<ConsoleImpl> ConsoleSingleton;
 
-volatile int print_lock = 0; //консоль заблокирована для печати
+volatile int print_lock = 0; //РєРѕРЅСЃРѕР»СЊ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅР° РґР»СЏ РїРµС‡Р°С‚Рё
 
 }
 
 /*
-   Печать сообщений
+   РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void Console::Print (const char* message)
@@ -254,7 +254,7 @@ void Console::VPrintf (const char* message, va_list list)
 }
 
 /*
-   Регистрация обработчиков событий консоли
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РєРѕРЅСЃРѕР»Рё
 */
 
 xtl::connection Console::RegisterEventHandler (ConsoleEvent event, const Console::EventHandler& handler)
@@ -263,7 +263,7 @@ xtl::connection Console::RegisterEventHandler (ConsoleEvent event, const Console
 }
 
 /*
-    Максимальное количество хранимых сообщений
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С…СЂР°РЅРёРјС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void Console::SetMaxLinesCount (size_t lines_count)
@@ -277,7 +277,7 @@ size_t Console::MaxLinesCount ()
 }
 
 /*
-    Перечисление строк консоли
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЃС‚СЂРѕРє РєРѕРЅСЃРѕР»Рё
 */
 
 size_t Console::LinesCount ()

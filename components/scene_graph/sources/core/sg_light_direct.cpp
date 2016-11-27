@@ -4,19 +4,19 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float LIGHT_INFINITY = 1.0e+9f;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1.0e+9f;  //РµСЃР»Рё СЂР°РґРёСѓСЃ/СЂР°СЃСЃС‚РѕСЏРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р° РїСЂРµРІС‹С€Р°РµС‚ СЌС‚Сѓ РІРµР»РёС‡РёРЅСѓ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‚СЃСЏ Р±РµСЃРєРѕРЅРµС‡РЅС‹Рµ bv
 
 /*
-    Описание реализации DirectLight
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё DirectLight
 */
 
 struct DirectLight::Impl: public xtl::instance_counter<DirectLight>
 {
-  float radius; //радиус действия света
+  float radius; //СЂР°РґРёСѓСЃ РґРµР№СЃС‚РІРёСЏ СЃРІРµС‚Р°
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DirectLight::DirectLight ()
@@ -31,7 +31,7 @@ DirectLight::~DirectLight ()
 }
 
 /*
-    Создание источника света
+    РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 DirectLight::Pointer DirectLight::Create ()
@@ -40,7 +40,7 @@ DirectLight::Pointer DirectLight::Create ()
 }
 
 /*
-    Радиус действия источника света
+    Р Р°РґРёСѓСЃ РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void DirectLight::SetRadius (float radius)
@@ -55,7 +55,7 @@ float DirectLight::Radius () const
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void DirectLight::UpdateBoundsCore ()
@@ -67,7 +67,7 @@ void DirectLight::UpdateBoundsCore ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void DirectLight::AcceptCore (Visitor& visitor)
@@ -77,7 +77,7 @@ void DirectLight::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void DirectLight::BindProperties (common::PropertyBindingMap& bindings)

@@ -11,7 +11,7 @@ struct syslib::thread_handle
 namespace
 {
 
-//функция нити
+//С„СѓРЅРєС†РёСЏ РЅРёС‚Рё
 unsigned CALLBACK thread_run (void* data)
 {
   if (!data)
@@ -25,7 +25,7 @@ unsigned CALLBACK thread_run (void* data)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
   try
@@ -34,7 +34,7 @@ unsigned CALLBACK thread_run (void* data)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
   return 0;
@@ -43,21 +43,21 @@ unsigned CALLBACK thread_run (void* data)
 }
 
 /*
-    Создание / удаление нити
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ РЅРёС‚Рё
 */
 
 thread_t WindowsThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
-      //проверка корректности аргументов, захват объекта обслуживания нити
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ, Р·Р°С…РІР°С‚ РѕР±СЉРµРєС‚Р° РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ РЅРёС‚Рё
 
     if (!in_callback)
       throw xtl::make_null_argument_exception ("", "callback");
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
 
-      //создание нити
+      //СЃРѕР·РґР°РЅРёРµ РЅРёС‚Рё
 
     stl::auto_ptr<thread_handle> handle (new thread_handle);
 
@@ -86,7 +86,7 @@ void WindowsThreadManager::DestroyThread (thread_t thread)
 }
 
 /*
-    Ожидание завершения нити
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РЅРёС‚Рё
 */
 
 void WindowsThreadManager::JoinThread (thread_t thread)
@@ -107,7 +107,7 @@ void WindowsThreadManager::JoinThread (thread_t thread)
 }
 
 /*
-   Получение идентификатора нити
+   РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РЅРёС‚Рё
 */
 
 size_t WindowsThreadManager::GetThreadId (thread_t thread)
@@ -121,7 +121,7 @@ size_t WindowsThreadManager::GetCurrentThreadId ()
 }
 
 /*
-   Установка приоритета нити
+   РЈСЃС‚Р°РЅРѕРІРєР° РїСЂРёРѕСЂРёС‚РµС‚Р° РЅРёС‚Рё
 */
 
 void WindowsThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)

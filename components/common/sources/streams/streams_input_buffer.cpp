@@ -3,15 +3,15 @@
 using namespace common;
 
 /*
-    Описание реализации InputStreamBuffer
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё InputStreamBuffer
 */
 
 struct InputStreamBuffer::Impl
 {
-  StreamBuffer buffer;   //буфер
-  ReadFunction reader;   //функция чтения
-  size_t       position; //позиция в буфере чтения
-  size_t       finish;   //конец буфера чтения
+  StreamBuffer buffer;   //Р±СѓС„РµСЂ
+  ReadFunction reader;   //С„СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ
+  size_t       position; //РїРѕР·РёС†РёСЏ РІ Р±СѓС„РµСЂРµ С‡С‚РµРЅРёСЏ
+  size_t       finish;   //РєРѕРЅРµС† Р±СѓС„РµСЂР° С‡С‚РµРЅРёСЏ
   
   size_t Available () const { return finish - position; }
   
@@ -22,7 +22,7 @@ struct InputStreamBuffer::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputStreamBuffer::InputStreamBuffer (size_t buffer_size)
@@ -40,7 +40,7 @@ InputStreamBuffer::~InputStreamBuffer ()
 }
 
 /*
-    Управление размером буфера
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРј Р±СѓС„РµСЂР°
 */
 
 size_t InputStreamBuffer::Size () const
@@ -57,7 +57,7 @@ void InputStreamBuffer::Resize (size_t buffer_size)
 }
 
 /*
-    Чтение
+    Р§С‚РµРЅРёРµ
 */
 
 size_t InputStreamBuffer::Read (void* buffer, size_t size)
@@ -66,14 +66,14 @@ size_t InputStreamBuffer::Read (void* buffer, size_t size)
   char*         ptr           = static_cast<char*> (buffer);
   StreamBuffer& stream_buffer = impl->buffer;
 
-    //если буферизация отключена - читаем в обход буфера
+    //РµСЃР»Рё Р±СѓС„РµСЂРёР·Р°С†РёСЏ РѕС‚РєР»СЋС‡РµРЅР° - С‡РёС‚Р°РµРј РІ РѕР±С…РѕРґ Р±СѓС„РµСЂР°
 
   if (!stream_buffer.Size ())
     return impl->reader (buffer, size);
 
   while (size)
   {
-      //если буфер опустошен - заполняем его
+      //РµСЃР»Рё Р±СѓС„РµСЂ РѕРїСѓСЃС‚РѕС€РµРЅ - Р·Р°РїРѕР»РЅСЏРµРј РµРіРѕ
 
     if (!impl->Available ())
     {
@@ -102,7 +102,7 @@ size_t InputStreamBuffer::Read (void* buffer, size_t size)
 }
 
 /*
-    Присоединение пользовательского буфера
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 void InputStreamBuffer::SetUserBuffer (void* buffer, size_t size)
@@ -114,7 +114,7 @@ void InputStreamBuffer::SetUserBuffer (void* buffer, size_t size)
 }
 
 /*
-    Функция чтения данных
+    Р¤СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С…
 */
 
 void InputStreamBuffer::SetReader (const ReadFunction& reader)
@@ -128,7 +128,7 @@ const InputStreamBuffer::ReadFunction& InputStreamBuffer::Reader () const
 }
 
 /*
-    Функция чтения данных по умолчанию
+    Р¤СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С… РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 size_t InputStreamBuffer::DefaultReader (void*, size_t)
@@ -137,7 +137,7 @@ size_t InputStreamBuffer::DefaultReader (void*, size_t)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void InputStreamBuffer::Swap (InputStreamBuffer& isb)

@@ -8,13 +8,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256; //резервируемое количество форматов пикселей
+const size_t PIXEL_FORMAT_ARRAY_RESERVE_SIZE = 256; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
 
 /*
-    Реализация менеджера платформы
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РїР»Р°С‚С„РѕСЂРјС‹
 */
 
 class PlatformManagerImpl
@@ -22,12 +22,12 @@ class PlatformManagerImpl
   public:
     typedef render::low_level::opengl::IContext IContext;
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     PlatformManagerImpl ()
     {
       try
       {
-          //получение пути к директории Windows
+          //РїРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё Рє РґРёСЂРµРєС‚РѕСЂРёРё Windows
           
         stl::string win_dir;      
 
@@ -37,7 +37,7 @@ class PlatformManagerImpl
         {      
           win_dir.pop_back ();
           
-            //получение версии Windows
+            //РїРѕР»СѓС‡РµРЅРёРµ РІРµСЂСЃРёРё Windows
             
           OSVERSIONINFO version;
           
@@ -48,7 +48,7 @@ class PlatformManagerImpl
           if (!GetVersionEx (&version))
             raise_error ("::GetVersionInfo");
 
-            //загрузка MSOGL
+            //Р·Р°РіСЂСѓР·РєР° MSOGL
 
           LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage GLBUG_texture_no_mipmap' acceleration=mcd");
           
@@ -57,13 +57,13 @@ class PlatformManagerImpl
 
           if (version.dwMajorVersion < WINDOWS7_VERSION_MAJOR || version.dwMajorVersion == WINDOWS7_VERSION_MAJOR && version.dwMinorVersion < WINDOWS7_VERSION_MINOR)          
           {
-              //загрузка Direct3D эмулятора AcXtrnal
+              //Р·Р°РіСЂСѓР·РєР° Direct3D СЌРјСѓР»СЏС‚РѕСЂР° AcXtrnal
 
             LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str (), "bugs='GLBUG_texture_no_subimage' acceleration=mcd");
           }
         }      
         
-          //загрузка адаптера "по умолчанию"
+          //Р·Р°РіСЂСѓР·РєР° Р°РґР°РїС‚РµСЂР° "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
         LoadDefaultAdapter ("OpenGL32", "opengl32");
       }
@@ -74,7 +74,7 @@ class PlatformManagerImpl
       }
     }
 
-///Создание адаптера
+///РЎРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
     Adapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
       try
@@ -99,19 +99,19 @@ class PlatformManagerImpl
       }
     }
 
-///Перечисление адаптеров "по умолчанию"
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ Р°РґР°РїС‚РµСЂРѕРІ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
       for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
         handler (get_pointer (*iter));
     }
 
-///Создание цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     ISwapChain* CreateSwapChain (size_t adapters_count, IAdapter** adapters, const SwapChainDesc& desc)
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (adapters_count && !adapters)
           throw xtl::make_null_argument_exception ("", "adapters");
@@ -143,7 +143,7 @@ class PlatformManagerImpl
 
         DCHolder dc_holder (desc.window_handle);
         
-          //перечисление достуных форматов пикселей
+          //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРЅС‹С… С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
 
         Adapter::PixelFormatArray         pixel_formats;
         Adapter::WglExtensionEntriesArray wgl_extension_entries;
@@ -184,11 +184,11 @@ class PlatformManagerImpl
           PixelFormatManager::SetDefaultLibrary (0);
         }
 
-          //выбор наиболее подходящего формата          
+          //РІС‹Р±РѕСЂ РЅР°РёР±РѕР»РµРµ РїРѕРґС…РѕРґСЏС‰РµРіРѕ С„РѕСЂРјР°С‚Р°          
 
         const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc);
 
-          //протоколирование выбранного формата
+          //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 
         const char* acceleration_string = "";
         
@@ -235,7 +235,7 @@ class PlatformManagerImpl
           acceleration_string, pixel_format.pixel_format_index, pixel_format.adapter->GetName (), pixel_format.color_bits,
           pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.samples_count, flags.c_str ());
 
-          //создание цепочки обмена
+          //СЃРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
         return new PrimarySwapChain (desc, pixel_format);
       }
@@ -246,7 +246,7 @@ class PlatformManagerImpl
       }
     }
 
-///Создание PBuffer'а
+///РЎРѕР·РґР°РЅРёРµ PBuffer'Р°
     ISwapChain* CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc* pbuffer_desc)
     {
       try
@@ -268,7 +268,7 @@ class PlatformManagerImpl
       }
     }
 
-///Создание контекста
+///РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
     IContext* CreateContext (ISwapChain* swap_chain)
     {
       try
@@ -283,16 +283,16 @@ class PlatformManagerImpl
     }
     
   private:
-///Попытка загрузки адаптера "по умолчанию"
+///РџРѕРїС‹С‚РєР° Р·Р°РіСЂСѓР·РєРё Р°РґР°РїС‚РµСЂР° "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
     void LoadDefaultAdapter (const char* name, const char* path, const char* init_string = "")
     {
       try
       {
-          //создание адаптера
+          //СЃРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
 
         AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
 
-          //регистрация адаптера
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р°РґР°РїС‚РµСЂР°
 
         default_adapters.push_front (adapter);
       }
@@ -306,7 +306,7 @@ class PlatformManagerImpl
       }
     }
     
-///Сравнение двух количественных показателей (0 - первый формат более подходит, 1 - второй формат более подходит)
+///РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… РєРѕР»РёС‡РµСЃС‚РІРµРЅРЅС‹С… РїРѕРєР°Р·Р°С‚РµР»РµР№ (0 - РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚, 1 - РІС‚РѕСЂРѕР№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚)
     static int CompareFormatCounts (size_t source1, size_t source2, size_t require)
     {
       if (source1 == require)
@@ -327,15 +327,15 @@ class PlatformManagerImpl
       }
     }
     
-///Сравнение двух форматов (0 - первый формат более подходит, 1 - второй формат более подходит)
+///РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… С„РѕСЂРјР°С‚РѕРІ (0 - РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚, 1 - РІС‚РѕСЂРѕР№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚)
     static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
     {
-        //упорядочивание по типу ускорения
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ С‚РёРїСѓ СѓСЃРєРѕСЂРµРЅРёСЏ
 
       if (fmt0.acceleration != fmt1.acceleration)
         return fmt0.acceleration < fmt1.acceleration;
 
-        //упорядочивание по отсутствию/наличию двойной буферизации
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РѕС‚СЃСѓС‚СЃС‚РІРёСЋ/РЅР°Р»РёС‡РёСЋ РґРІРѕР№РЅРѕР№ Р±СѓС„РµСЂРёР·Р°С†РёРё
         
       if (fmt0.buffers_count != fmt1.buffers_count)
       {
@@ -357,32 +357,32 @@ class PlatformManagerImpl
         }
       }
 
-        //упорядочивание по количеству битов цвета
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ С†РІРµС‚Р°
         
       if (fmt0.color_bits != fmt1.color_bits)
         return CompareFormatCounts (fmt0.color_bits, fmt1.color_bits, swap_chain_desc.frame_buffer.color_bits);
         
-        //упорядочивание по количеству битов глубины
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ РіР»СѓР±РёРЅС‹
 
       if (fmt0.depth_bits != fmt1.depth_bits)
         return CompareFormatCounts (fmt0.depth_bits, fmt1.depth_bits, swap_chain_desc.frame_buffer.depth_bits);
 
-        //упорядочивание по количеству битов трафарета
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ С‚СЂР°С„Р°СЂРµС‚Р°
 
       if (fmt0.stencil_bits != fmt1.stencil_bits)
         return CompareFormatCounts (fmt0.stencil_bits, fmt1.stencil_bits, swap_chain_desc.frame_buffer.stencil_bits);
 
-        //упорядочивание по количеству сэмплов
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ СЃСЌРјРїР»РѕРІ
 
       if (fmt0.samples_count != fmt1.samples_count)
         return CompareFormatCounts (fmt0.samples_count, fmt1.samples_count, swap_chain_desc.samples_count);
 
-        //упорядочивание по количеству битов альфы
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±РёС‚РѕРІ Р°Р»СЊС„С‹
 
       if (fmt0.alpha_bits != fmt1.alpha_bits)
         return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);        
 
-        //упорядочивание по режиму обмена
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ СЂРµР¶РёРјСѓ РѕР±РјРµРЅР°
         
       if (fmt0.swap_method != fmt1.swap_method)
       {
@@ -393,35 +393,35 @@ class PlatformManagerImpl
           return 1;
       }
 
-        //упорядочивание по количеству буферов обмена
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ Р±СѓС„РµСЂРѕРІ РѕР±РјРµРЅР°
 
       if (fmt0.buffers_count != fmt1.buffers_count)
         return CompareFormatCounts (fmt0.buffers_count, fmt1.buffers_count, swap_chain_desc.buffers_count);
         
-        //упорядочивание по наличию поддержки PBuffer
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РЅР°Р»РёС‡РёСЋ РїРѕРґРґРµСЂР¶РєРё PBuffer
         
       if (fmt0.support_draw_to_pbuffer != fmt1.support_draw_to_pbuffer)
         return fmt1.support_draw_to_pbuffer;
 
-        //упорядочивание по наличию стерео-режима
+        //СѓРїРѕСЂСЏРґРѕС‡РёРІР°РЅРёРµ РїРѕ РЅР°Р»РёС‡РёСЋ СЃС‚РµСЂРµРѕ-СЂРµР¶РёРјР°
         
       if (fmt0.support_stereo != fmt1.support_stereo)
         return fmt1.support_stereo;
 
-        //при прочих равных первый формат более подходит
+        //РїСЂРё РїСЂРѕС‡РёС… СЂР°РІРЅС‹С… РїРµСЂРІС‹Р№ С„РѕСЂРјР°С‚ Р±РѕР»РµРµ РїРѕРґС…РѕРґРёС‚
 
       return 1;
     }
     
-///Выбор формата пикселей
+///Р’С‹Р±РѕСЂ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
     const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc)
     {
-        //если не найдено ни одного подходящего формата - создание цепочки обмена невозможно                  
+        //РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅРѕ РЅРё РѕРґРЅРѕРіРѕ РїРѕРґС…РѕРґСЏС‰РµРіРѕ С„РѕСЂРјР°С‚Р° - СЃРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° РЅРµРІРѕР·РјРѕР¶РЅРѕ                  
 
       if (pixel_formats.empty ())
         throw xtl::format_operation_exception ("render::low_level::opengl::windows::PlatformManagerImpl::ChoosePixelFormat", "No pixel formats found");
 
-        //поиск формата
+        //РїРѕРёСЃРє С„РѕСЂРјР°С‚Р°
 
       const PixelFormatDesc* best = &pixel_formats [0];
       
@@ -437,8 +437,8 @@ class PlatformManagerImpl
     typedef stl::list<AdapterPtr> AdapterList;
 
   private:
-    Log         log;              //протокол
-    AdapterList default_adapters; //адаптеры "по умолчанию"
+    Log         log;              //РїСЂРѕС‚РѕРєРѕР»
+    AdapterList default_adapters; //Р°РґР°РїС‚РµСЂС‹ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
@@ -446,7 +446,7 @@ typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
 }
 
 /*
-    Обёртки над менеджером платформы
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РјРµРЅРµРґР¶РµСЂРѕРј РїР»Р°С‚С„РѕСЂРјС‹
 */
 
 IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path, const char* init_string)

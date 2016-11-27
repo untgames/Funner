@@ -5,12 +5,12 @@ using namespace syslib::android;
 namespace
 {
 
-/// Константы
-const char* COMPONENTS_MASK                               = "common.syslib.android.load_handlers.*";                  //маска имён компонентов обработчиков загрузки
+/// РљРѕРЅСЃС‚Р°РЅС‚С‹
+const char* COMPONENTS_MASK                               = "common.syslib.android.load_handlers.*";                  //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ Р·Р°РіСЂСѓР·РєРё
 const char* ENGINE_ACTIVITY_CLASS_NAME                    = "com/untgames/funner/application/EngineActivity";
 const char* ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
 
-/// Виртуальная машина
+/// Р’РёСЂС‚СѓР°Р»СЊРЅР°СЏ РјР°С€РёРЅР°
 JavaVM* java_vm = 0;
 
 jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name, jstring jwork_dir, jstring jprogram_args, jstring jenv_vars)
@@ -60,11 +60,11 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
   }
 }
 
-///Менеджер приложения
+///РњРµРЅРµРґР¶РµСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class ApplicationManagerImpl
 {
   public:
-    ///Регистрация обработчиков загрузки приложения
+    ///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
     void RegisterLoadHandler (const char* id, const ApplicationManager::LoadHandler& handler)
     {
       static const char* METHOD_NAME = "syslib::android::ApplicationManager::RegisterLoadHandler";
@@ -93,7 +93,7 @@ class ApplicationManagerImpl
       load_handlers.clear ();
     }
 
-    ///Проверка зарегистрирован ли обработчки загрузки
+    ///РџСЂРѕРІРµСЂРєР° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ Р»Рё РѕР±СЂР°Р±РѕС‚С‡РєРё Р·Р°РіСЂСѓР·РєРё
     bool IsLoadHandlerRegistered (const char* id)
     {
       if (!id)
@@ -102,7 +102,7 @@ class ApplicationManagerImpl
       return load_handlers.find (id) != load_handlers.end ();
     }
 
-    ///Оповещение о загрузке приложения
+    ///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ Р·Р°РіСЂСѓР·РєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnLoad (JNIEnv* env)
     {
       for (LoadHandlersMap::iterator iter = load_handlers.begin (), end = load_handlers.end (); iter != end; ++iter)
@@ -121,11 +121,11 @@ typedef common::Singleton<ApplicationManagerImpl> ApplicationManagerSingleton;
 }
 
 /*
-   Менеджер приложения
+   РњРµРЅРµРґР¶РµСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 /*
-   Регистрация обработчиков загрузки приложения
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 void ApplicationManager::RegisterLoadHandler (const char* id, const LoadHandler& handler)
@@ -144,7 +144,7 @@ void ApplicationManager::UnregisterAllLoadHandlers ()
 }
 
 /*
-   Проверка зарегистрирован ли обработчки загрузки
+   РџСЂРѕРІРµСЂРєР° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ Р»Рё РѕР±СЂР°Р±РѕС‚С‡РєРё Р·Р°РіСЂСѓР·РєРё
 */
 
 bool ApplicationManager::IsLoadHandlerRegistered (const char* id)

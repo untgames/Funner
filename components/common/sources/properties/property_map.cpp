@@ -6,14 +6,14 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_RESERVED_BUFFER_SIZE = 64;   //резервируемый объём буфера свойств
-const char*  DEFAULT_VALUES_SEPARATOR     =  " "; //разделитель значений
+const size_t DEFAULT_RESERVED_BUFFER_SIZE = 64;   //СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ РѕР±СЉС‘Рј Р±СѓС„РµСЂР° СЃРІРѕР№СЃС‚РІ
+const char*  DEFAULT_VALUES_SEPARATOR     =  " "; //СЂР°Р·РґРµР»РёС‚РµР»СЊ Р·РЅР°С‡РµРЅРёР№
 
 /*
-    Отображения типов и идентификаторов типов
+    РћС‚РѕР±СЂР°Р¶РµРЅРёСЏ С‚РёРїРѕРІ Рё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ С‚РёРїРѕРІ
 */
 
 template <class T>
@@ -65,7 +65,7 @@ template <> struct PropertyTypeMap<PropertyType_Matrix>
 }
 
 /*
-    Описание реализации карты свойств
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 typedef xtl::uninitialized_storage<char>           Buffer;
@@ -73,14 +73,14 @@ typedef xtl::signal<void (PropertyMapEvent event)> Signal;
 
 struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  PropertyLayout layout;                          //расположение свойств
-  Buffer         buffer;                          //буфер с данными карты свойств
-  StringArray    strings;                         //массив строк карты свойств
-  size_t         hash;                            //хэш карты
-  bool           need_update;                     //необходимо обновление вспомогательных данных
-  Signal         signals [PropertyMapEvent_Num];  //сигналы карты свойств  
+  PropertyLayout layout;                          //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
+  Buffer         buffer;                          //Р±СѓС„РµСЂ СЃ РґР°РЅРЅС‹РјРё РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
+  StringArray    strings;                         //РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
+  size_t         hash;                            //С…СЌС€ РєР°СЂС‚С‹
+  bool           need_update;                     //РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІР»РµРЅРёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… РґР°РЅРЅС‹С…
+  Signal         signals [PropertyMapEvent_Num];  //СЃРёРіРЅР°Р»С‹ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ  
 
-///Конструктор по умолчанию
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   Impl ()
     : hash (0)
     , need_update (true)
@@ -92,7 +92,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     Update ();
   }
   
-///Конструктор для совместно используемого расположения свойств
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ СЃРѕРІРјРµСЃС‚РЅРѕ РёСЃРїРѕР»СЊР·СѓРµРјРѕРіРѕ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
   Impl (const PropertyLayout& in_layout)
     : layout (in_layout)
     , buffer (layout.BufferSize ())
@@ -114,7 +114,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     Update ();
   }
   
-///Конструктор копирования
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
   Impl (const Impl& impl)
     : layout (impl.layout)
     , buffer (impl.buffer)
@@ -125,7 +125,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     Update ();
   }
   
-///Оповещение об изменении данных
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґР°РЅРЅС‹С…
   void UpdateNotify ()
   {
     need_update = true;      
@@ -138,12 +138,12 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }    
   }
 
-///Обновление данных
+///РћР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С…
   void Update ()
   {
     hash = crc32 (buffer.data (), buffer.size (), layout.Hash ());
@@ -154,7 +154,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     need_update = false;
   }
   
-///Захват объекта расположения свойств
+///Р—Р°С…РІР°С‚ РѕР±СЉРµРєС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
   void CaptureLayout ()
   {
     if (layout.UseCount () == 1)
@@ -165,7 +165,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     layout.Capture ();    
   }
   
-///Вставка нового свойства
+///Р’СЃС‚Р°РІРєР° РЅРѕРІРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
   size_t InsertProperty (const char* name, common::PropertyType type, size_t elements_count)
   {
     try
@@ -214,7 +214,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
   
-///Получение либо создание свойства и возвращение его индекса
+///РџРѕР»СѓС‡РµРЅРёРµ Р»РёР±Рѕ СЃРѕР·РґР°РЅРёРµ СЃРІРѕР№СЃС‚РІР° Рё РІРѕР·РІСЂР°С‰РµРЅРёРµ РµРіРѕ РёРЅРґРµРєСЃР°
   size_t GetIndexOrCreate (const char* name, common::PropertyType type, size_t elements_count, bool& new_property_inserted)
   {
     static const char* METHOD_NAME = "common::PropertyMap::Impl::GetIndexOrCreate";
@@ -224,14 +224,14 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     if (!name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-      //поиск уже созданного свойства
+      //РїРѕРёСЃРє СѓР¶Рµ СЃРѕР·РґР°РЅРЅРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 
     int index = layout.IndexOf (name);
 
     if (index != -1)
       return static_cast<size_t> (index);
 
-      //создание нового свойства
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 
     index = static_cast<int> (InsertProperty (name, type, elements_count));
 
@@ -240,7 +240,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     return static_cast<size_t> (index);
   }
   
-///Получение индекса свойства
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃР° СЃРІРѕР№СЃС‚РІР°
   size_t GetIndex (const char* name)
   {
     static const char* METHOD_NAME = "common::PropertyMap::Impl::GetIndex";
@@ -256,7 +256,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Property has not registered");
   }
   
-///Установка свойства по имени
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР° РїРѕ РёРјРµРЅРё
   template <class T>
   void SetProperty (const char* method_name, const char* name, size_t elements_count, const T* values)
   {
@@ -288,11 +288,11 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
   
-///Установка свойства по индексу
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР° РїРѕ РёРЅРґРµРєСЃСѓ
   template <class T>
   void SetProperty (size_t property_index, size_t elements_count, const T* values)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (property_index >= layout.Size ())
       throw xtl::make_range_exception ("", "property_index", property_index, layout.Size ());
@@ -340,7 +340,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }    
   }
   
-///Копирование данных с приведением типа
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… СЃ РїСЂРёРІРµРґРµРЅРёРµРј С‚РёРїР°
   template <class T>
   void ReadScalarValueToProperty (size_t elements_count, const T* values, const PropertyDesc& desc)
   {
@@ -631,7 +631,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }  
   }  
   
-///Чтение свойства по имени
+///Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РїРѕ РёРјРµРЅРё
   template <class T>
   void GetProperty (const char* method_name, const char* name, size_t elements_count, T* values)
   {
@@ -646,7 +646,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
   
-///Чтение свойства по индексу
+///Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РїРѕ РёРЅРґРµРєСЃСѓ
   template <class T>
   void GetProperty (size_t property_index, size_t elements_count, T* values)
   {
@@ -692,7 +692,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }  
   
-///Чтение значения из свойства
+///Р§С‚РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РёР· СЃРІРѕР№СЃС‚РІР°
   template <class T>
   void ReadScalarValueFromProperty (size_t elements_count, T* result, const PropertyDesc& desc)
   {
@@ -893,7 +893,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     *values = strings [string_index];
   }  
   
-///Получение данных
+///РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…
   template <class T>
   const T* GetData (const char* method_name, size_t property_index)
   {
@@ -918,7 +918,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }  
   
-///Удаление свойства
+///РЈРґР°Р»РµРЅРёРµ СЃРІРѕР№СЃС‚РІР°
   void RemoveProperty (size_t index)
   {
     try
@@ -934,7 +934,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       {
         unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
         
-          //поиск дубликатов
+          //РїРѕРёСЃРє РґСѓР±Р»РёРєР°С‚РѕРІ
         
         const PropertyDesc* update_desc = layout.Properties ();        
         
@@ -949,7 +949,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
               string_entries_count++;
           }
           
-        if (string_entries_count == 1) //при отсутствии дубликатов удаление строки
+        if (string_entries_count == 1) //РїСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё РґСѓР±Р»РёРєР°С‚РѕРІ СѓРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРєРё
         {
           strings.Remove (string_index);
           
@@ -985,10 +985,10 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
   
-///Изменение параметров свойства
+///РР·РјРµРЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРІРѕР№СЃС‚РІР°
   void ChangeProperty (size_t index, common::PropertyType type, size_t elements_count)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (index >= layout.Size ())
       throw xtl::make_range_exception ("", "index", index, layout.Size ());
@@ -1013,20 +1013,20 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     if (desc.type == type && desc.elements_count == elements_count)
       return;
       
-      //получение изменения размера буфера
+      //РїРѕР»СѓС‡РµРЅРёРµ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР°
 
     size_t new_property_size = get_size (type) * elements_count,
            old_property_size = get_size (desc.type) * desc.elements_count;
           
     ptrdiff_t size_diff = new_property_size - old_property_size;
     
-      //предварительные операции    
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рµ РѕРїРµСЂР°С†РёРё    
 
     CaptureLayout ();
 
     need_update = true;
     
-      //сохранение параметров
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
     
     common::PropertyType old_type = desc.type;
 
@@ -1036,30 +1036,30 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 
     Buffer old_buffer (buffer.size () + size_diff);    
     
-      //замена буфера
+      //Р·Р°РјРµРЅР° Р±СѓС„РµСЂР°
       
     old_buffer.swap (buffer);    
 
     try
     {
-        //копирование данных
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
       memcpy (buffer.data (), old_buffer.data (), desc.offset);
       memset (buffer.data () + desc.offset, 0, new_property_size);
       memcpy (buffer.data () + desc.offset + new_property_size, old_buffer.data () + desc.offset + old_property_size, old_buffer.size () - 
         desc.offset - old_property_size);
         
-        //добавление строки в случае необходимости
+        //РґРѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё РІ СЃР»СѓС‡Р°Рµ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
 
       if (type == PropertyType_String)
         *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset) = (unsigned int)strings.Add ("");
 
-        //изменение типа в лэйауте
+        //РёР·РјРµРЅРµРЅРёРµ С‚РёРїР° РІ Р»СЌР№Р°СѓС‚Рµ
         
       layout.SetPropertyType (index, type);
       layout.SetPropertyElementsCount (index, elements_count);
 
-        //установка свойства
+        //СѓСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР°
         
       switch (old_type)
       {
@@ -1157,7 +1157,7 @@ const char* PropertyMap::Impl::GetData (const char* method_name, size_t property
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyMap::PropertyMap ()
@@ -1193,7 +1193,7 @@ PropertyMap& PropertyMap::operator = (const PropertyMap& map)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t PropertyMap::Id () const
@@ -1202,7 +1202,7 @@ size_t PropertyMap::Id () const
 }
 
 /*
-    Получение объекта оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& PropertyMap::Trackable () const
@@ -1221,7 +1221,7 @@ xtl::trackable& get_trackable (const PropertyMap& map)
 }
 
 /*
-    Подписка на события карты свойств
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєР°СЂС‚С‹ СЃРІРѕР№СЃС‚РІ
 */
 
 xtl::connection PropertyMap::RegisterEventHandler (PropertyMapEvent event, const EventHandler& handler) const
@@ -1236,7 +1236,7 @@ xtl::connection PropertyMap::RegisterEventHandler (PropertyMapEvent event, const
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 PropertyMap PropertyMap::Clone () const
@@ -1245,7 +1245,7 @@ PropertyMap PropertyMap::Clone () const
 }
 
 /*
-    Количество свойств
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t PropertyMap::Size () const
@@ -1254,10 +1254,10 @@ size_t PropertyMap::Size () const
 }
 
 /*
-    Хэш параметров
+    РҐСЌС€ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
-//хэш данных
+//С…СЌС€ РґР°РЅРЅС‹С…
 size_t PropertyMap::Hash () const
 {
   if (impl->need_update)
@@ -1266,14 +1266,14 @@ size_t PropertyMap::Hash () const
   return impl->hash;
 }
 
-//хэш структуры параметров
+//С…СЌС€ СЃС‚СЂСѓРєС‚СѓСЂС‹ РїР°СЂР°РјРµС‚СЂРѕРІ
 size_t PropertyMap::LayoutHash () const
 {
   return impl->layout.Hash ();
 }
 
 /*
-    Имя свойства
+    РРјСЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 const char* PropertyMap::PropertyName (size_t index) const
@@ -1324,7 +1324,7 @@ void PropertyMap::SetPropertyName (const char* old_name, const char* new_name)
 }
 
 /*
-    Тип свойства / количество элементов
+    РўРёРї СЃРІРѕР№СЃС‚РІР° / РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 PropertyType PropertyMap::PropertyType (size_t index) const
@@ -1380,7 +1380,7 @@ size_t PropertyMap::PropertyElementsCount (const char* name) const
 }
 
 /*
-    Смена типа / количества элементов
+    РЎРјРµРЅР° С‚РёРїР° / РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 void PropertyMap::SetPropertyType (const char* name, common::PropertyType type)
@@ -1420,7 +1420,7 @@ void PropertyMap::SetPropertyElementsCount (size_t index, size_t count)
 }
 
 /*
-    Поиск индекса свойства
+    РџРѕРёСЃРє РёРЅРґРµРєСЃР° СЃРІРѕР№СЃС‚РІР°
 */
 
 int PropertyMap::IndexOf (const char* name) const
@@ -1434,7 +1434,7 @@ bool PropertyMap::IsPresent (const char* name) const
 }
 
 /*
-    Добавление свойства
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 size_t PropertyMap::AddProperty (const char* name, common::PropertyType type, size_t elements_count)
@@ -1455,7 +1455,7 @@ size_t PropertyMap::AddProperty (const char* name, common::PropertyType type, si
 }
 
 /*
-    Установка свойства по имени
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР° РїРѕ РёРјРµРЅРё
 */
 
 void PropertyMap::SetProperty (const char* name, int value)
@@ -1509,7 +1509,7 @@ void PropertyMap::SetProperty (const char* name, size_t count, const math::mat4f
 }
 
 /*
-    Установка свойства по индексу
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІР° РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 void PropertyMap::SetProperty (size_t property_index, const stl::string& value)
@@ -1563,7 +1563,7 @@ void PropertyMap::SetProperty (size_t property_index, size_t count, const math::
 }
 
 /*
-    Чтение свойства по имени
+    Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РїРѕ РёРјРµРЅРё
 */
 
 void PropertyMap::GetProperty (const char* name, int& result) const
@@ -1705,7 +1705,7 @@ const math::mat4f* PropertyMap::GetMatrixArray (const char* name) const
 }
 
 /*
-    Чтение свойства по индексу
+    Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІР° РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 void PropertyMap::GetProperty (size_t property_index, int& result) const
@@ -1807,7 +1807,7 @@ const math::mat4f* PropertyMap::GetMatrixArray (size_t property_index) const
 }
 
 /*
-    Удаление свойств
+    РЈРґР°Р»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyMap::RemoveProperty (const char* name)
@@ -1844,7 +1844,7 @@ void PropertyMap::Clear ()
 }
 
 /*
-    Получение расположения параметров
+    РџРѕР»СѓС‡РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 PropertyLayout PropertyMap::Layout () const
@@ -1853,7 +1853,7 @@ PropertyLayout PropertyMap::Layout () const
 }
 
 /*
-    Сброс лэйаута
+    РЎР±СЂРѕСЃ Р»СЌР№Р°СѓС‚Р°
 */
 
 void PropertyMap::Reset (const PropertyLayout& in_layout)
@@ -1894,7 +1894,7 @@ void PropertyMap::Reset (const PropertyLayout& in_layout)
 }
 
 /*
-    Работа с буфером
+    Р Р°Р±РѕС‚Р° СЃ Р±СѓС„РµСЂРѕРј
 */
 
 const void* PropertyMap::BufferData () const
@@ -1908,7 +1908,7 @@ size_t PropertyMap::BufferSize () const
 }
 
 /*
-    Обновление буфера
+    РћР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂР°
 */
 
 void PropertyMap::SetBufferData (const void* source_data)
@@ -1946,7 +1946,7 @@ void PropertyMap::SetBufferData (const void* source_data)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyMap::Swap (PropertyMap& map)

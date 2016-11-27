@@ -6,7 +6,7 @@ using namespace render::scene::server;
 using interchange::uint32;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t DEFAULT_BUFFER_SIZE = 128;
@@ -27,7 +27,7 @@ inline void* read (interchange::InputStream& s, xtl::type<void*>)
 }
 
 /*
-    Описание реализации соединения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 
@@ -35,11 +35,11 @@ typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
 struct ServerLoopbackConnection::Impl
 {
-  ConnectionPtr                  connection; //внутреннее соединение от сервера к серверу
-  interchange::CommandBufferPool pool;       //пул буферов
-  interchange::OutputStream      stream;     //выходной поток
+  ConnectionPtr                  connection; //РІРЅСѓС‚СЂРµРЅРЅРµРµ СЃРѕРµРґРёРЅРµРЅРёРµ РѕС‚ СЃРµСЂРІРµСЂР° Рє СЃРµСЂРІРµСЂСѓ
+  interchange::CommandBufferPool pool;       //РїСѓР» Р±СѓС„РµСЂРѕРІ
+  interchange::OutputStream      stream;     //РІС‹С…РѕРґРЅРѕР№ РїРѕС‚РѕРє
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     pool.SetDefaultBufferSize (DEFAULT_BUFFER_SIZE);
@@ -47,7 +47,7 @@ struct ServerLoopbackConnection::Impl
     SendCommands ();
   }
 
-/// Отсылка команд
+/// РћС‚СЃС‹Р»РєР° РєРѕРјР°РЅРґ
   void SendCommands ()
   {
     interchange::CommandBuffer buffer = pool.CreateBuffer ();
@@ -60,7 +60,7 @@ struct ServerLoopbackConnection::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ServerLoopbackConnection::ServerLoopbackConnection (const char* name)
@@ -85,7 +85,7 @@ ServerLoopbackConnection::~ServerLoopbackConnection ()
 }
 
 /*
-    Сообщения серверу
+    РЎРѕРѕР±С‰РµРЅРёСЏ СЃРµСЂРІРµСЂСѓ
 */
 
 void ServerLoopbackConnection::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
@@ -231,7 +231,7 @@ void ServerLoopbackConnection::OnWindowPaint (size_t id)
 }
 
 /*
-    Обработка входящей команды
+    РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґСЏС‰РµР№ РєРѕРјР°РЅРґС‹
 */
 
 bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, interchange::InputStream& stream, ConnectionState& state)

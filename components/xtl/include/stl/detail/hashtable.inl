@@ -1,5 +1,5 @@
 /*
-    Таблица размеров хэш-таблицы (from SGI STL)
+    РўР°Р±Р»РёС†Р° СЂР°Р·РјРµСЂРѕРІ С…СЌС€-С‚Р°Р±Р»РёС†С‹ (from SGI STL)
 */
 
 template <bool dummy> struct hashtable_prime_list
@@ -18,7 +18,7 @@ template <bool dummy> const size_t hashtable_prime_list<dummy>::table [28] =
 };
 
 /*
-    Управление ростом хэш-таблицы
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРѕСЃС‚РѕРј С…СЌС€-С‚Р°Р±Р»РёС†С‹
 */
 
 inline size_t stl_next_prime (size_t size)
@@ -42,7 +42,7 @@ inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::Bucket::Bucket (itera
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -70,7 +70,7 @@ inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable (const hash
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -81,7 +81,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::get_allocator () const
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -119,7 +119,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::key_eq () const
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -179,7 +179,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::rend () const
 }
 
 /*
-    Информация о пакетах
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїР°РєРµС‚Р°С…
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -264,7 +264,7 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::_copy (const hashtable&
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -285,7 +285,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::operator = (const hashtable&
 }
 
 /*
-    Вставка
+    Р’СЃС‚Р°РІРєР°
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -318,9 +318,9 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::insert_unique_noresize (cons
   
     for (size_type count=bucket.count;count--;++i)
       if (equals (keyof (*i),keyof (obj)))
-        return pair<iterator,bool> (i,false); //объект уже присутствует
+        return pair<iterator,bool> (i,false); //РѕР±СЉРµРєС‚ СѓР¶Рµ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚
 
-    i = list.insert (i,obj); //вставка нового значения
+    i = list.insert (i,obj); //РІСЃС‚Р°РІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
   }
   else bucket.first = i = list.insert (end (),obj);
 
@@ -349,7 +349,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::insert_equal_noresize (const
     if (count)
       for (++i;--count && equals (keyof (*i),keyof (obj));++i);
 
-    i = list.insert (i,obj); //вставка нового значения
+    i = list.insert (i,obj); //РІСЃС‚Р°РІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
   }
   else bucket.first = i = list.insert (end (),obj);
 
@@ -380,7 +380,7 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::insert_equal (Iter firs
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -450,7 +450,7 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::clear ()
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -485,8 +485,8 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::resize (size_type new_s
       bucket.count++;
     }
 
-      //list.end () возвращает итератор на узел жёстко связанный со списком
-      //при выходе из функции данный итератор будет не действителен
+      //list.end () РІРѕР·РІСЂР°С‰Р°РµС‚ РёС‚РµСЂР°С‚РѕСЂ РЅР° СѓР·РµР» Р¶С‘СЃС‚РєРѕ СЃРІСЏР·Р°РЅРЅС‹Р№ СЃРѕ СЃРїРёСЃРєРѕРј
+      //РїСЂРё РІС‹С…РѕРґРµ РёР· С„СѓРЅРєС†РёРё РґР°РЅРЅС‹Р№ РёС‚РµСЂР°С‚РѕСЂ Р±СѓРґРµС‚ РЅРµ РґРµР№СЃС‚РІРёС‚РµР»РµРЅ
     for (typename vector_type::iterator i=new_table.begin ();i!=new_table.end ();++i)
       if (i->first == new_list.end ())
         i->first = end ();
@@ -502,7 +502,7 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::resize (size_type new_s
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -617,10 +617,10 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find_or_insert (const value_
 
   resize (num_elements+1);
 
-  if (old_table_size != table.size ()) //если хэш-таблица была перестроена
+  if (old_table_size != table.size ()) //РµСЃР»Рё С…СЌС€-С‚Р°Р±Р»РёС†Р° Р±С‹Р»Р° РїРµСЂРµСЃС‚СЂРѕРµРЅР°
     return *insert_unique_noresize (obj).first;
 
-  pos = list.insert (pos,obj); //вставка нового значения
+  pos = list.insert (pos,obj); //РІСЃС‚Р°РІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 
   if (!bucket->count)
     bucket->first = pos;
@@ -632,7 +632,7 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find_or_insert (const value_
 }
 
 /*
-    Обмен содержимого двух таблиц
+    РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… С‚Р°Р±Р»РёС†
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -654,7 +654,7 @@ inline void swap
 }
 
 /*
-    Сравнение (в лексикографическом порядке)
+    РЎСЂР°РІРЅРµРЅРёРµ (РІ Р»РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРј РїРѕСЂСЏРґРєРµ)
 */
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>

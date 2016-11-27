@@ -14,7 +14,7 @@ const char* FILE_NAME   = "data/test.xfl";
 template <class Item>
 void dump (const char* collection_name, const ICollection<Item>& collection, int level);
 
-//печать строки пробелов (отступ)
+//РїРµС‡Р°С‚СЊ СЃС‚СЂРѕРєРё РїСЂРѕР±РµР»РѕРІ (РѕС‚СЃС‚СѓРї)
 void print_space (int count)
 {
   count *= 2;
@@ -22,7 +22,7 @@ void print_space (int count)
   for (int i = 0; i < count; i++) printf(" ");
 }
 
-//печать числа с плавающей точкой
+//РїРµС‡Р°С‚СЊ С‡РёСЃР»Р° СЃ РїР»Р°РІР°СЋС‰РµР№ С‚РѕС‡РєРѕР№
 void print (float value)
 {
   static float EPS = 0.001f;
@@ -33,7 +33,7 @@ void print (float value)
   printf ("%+.3f", value);
 }
 
-//печать вектора
+//РїРµС‡Р°С‚СЊ РІРµРєС‚РѕСЂР°
 template <class T, unsigned int N>
 void print (const math::vector<T, N>& v)
 {
@@ -48,7 +48,7 @@ void print (const math::vector<T, N>& v)
   printf (" ]");
 }
 
-//печать кейфремов
+//РїРµС‡Р°С‚СЊ РєРµР№С„СЂРµРјРѕРІ
 void dump (const PropertyAnimationKeyframe& keyframe, int level)
 {
   print_space (level++);
@@ -59,7 +59,7 @@ void dump (const PropertyAnimationKeyframe& keyframe, int level)
   printf      ("Time:  %.3f\n", keyframe.time);
 }
 
-//печать анимируемого параметра
+//РїРµС‡Р°С‚СЊ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 void dump (const PropertyAnimation& property, int level)
 {
   print_space (level++);
@@ -70,7 +70,7 @@ void dump (const PropertyAnimation& property, int level)
   dump ("keyframes", property.Keyframes (), level);
 }
 
-//печать анимации кадра анимации
+//РїРµС‡Р°С‚СЊ Р°РЅРёРјР°С†РёРё РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 void dump (const AnimationCore& animation, int level)
 {
   print_space (++level);
@@ -91,7 +91,7 @@ const char* get_frame_element_type (FrameElementType type)
   }
 }
 
-//печать элемента кадра анимации
+//РїРµС‡Р°С‚СЊ СЌР»РµРјРµРЅС‚Р° РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 void dump (const FrameElement& element, int level)
 {
   print_space (level++);
@@ -110,7 +110,7 @@ void dump (const FrameElement& element, int level)
   printf      ("\n");
 }
 
-//печать кадра анимации
+//РїРµС‡Р°С‚СЊ РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 void dump (const Frame& frame, int level)
 {
   print_space (level++);
@@ -126,7 +126,7 @@ void dump (const Frame& frame, int level)
   dump ("frame elements", frame.Elements (), level);
 }
 
-//печать слоя анимации
+//РїРµС‡Р°С‚СЊ СЃР»РѕСЏ Р°РЅРёРјР°С†РёРё
 void dump (const Layer& layer, int level)
 {
   print_space (level++);
@@ -135,7 +135,7 @@ void dump (const Layer& layer, int level)
   dump ("frames", layer.Frames (), level);
 }
 
-//печать анимации
+//РїРµС‡Р°С‚СЊ Р°РЅРёРјР°С†РёРё
 void dump (const Timeline& timeline, int level)
 {
   print_space (level++);
@@ -144,7 +144,7 @@ void dump (const Timeline& timeline, int level)
   dump ("layers", timeline.Layers (), level);
 }
 
-//печать ресурса
+//РїРµС‡Р°С‚СЊ СЂРµСЃСѓСЂСЃР°
 void dump (const Resource& resource, int level)
 {
   print_space (level++);
@@ -153,7 +153,7 @@ void dump (const Resource& resource, int level)
   printf      ("Path: '%s'\n", resource.Path ());
 }
 
-//печать элемента анимации
+//РїРµС‡Р°С‚СЊ СЌР»РµРјРµРЅС‚Р° Р°РЅРёРјР°С†РёРё
 void dump (const Symbol& symbol, int level)
 {
   print_space (level++);
@@ -162,7 +162,7 @@ void dump (const Symbol& symbol, int level)
   dump (symbol.Timeline (), level);
 }
 
-//печать библиотеки
+//РїРµС‡Р°С‚СЊ Р±РёР±Р»РёРѕС‚РµРєРё
 template <class Item>
 void dump (const char* collection_name, const ICollection<Item>& collection, int level)
 {

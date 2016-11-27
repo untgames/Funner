@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Описание реализации нативного окна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РЅР°С‚РёРІРЅРѕРіРѕ РѕРєРЅР°
 */
 
 namespace
@@ -23,10 +23,10 @@ struct NativeWindow::Impl: public xtl::trackable
   syslib::Window* window;
   ListenerArray   listeners;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (syslib::Window& in_window) : window (&in_window) {}
 
-/// Получение окна
+/// РџРѕР»СѓС‡РµРЅРёРµ РѕРєРЅР°
   syslib::Window& Window ()
   {
     if (!window)
@@ -35,7 +35,7 @@ struct NativeWindow::Impl: public xtl::trackable
     return *window;
   }
 
-/// События
+/// РЎРѕР±С‹С‚РёСЏ
   void OnDestroy ()
   {
     window = 0;
@@ -73,7 +73,7 @@ struct NativeWindow::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 NativeWindow::NativeWindow (syslib::Window& window)
@@ -99,7 +99,7 @@ NativeWindow::~NativeWindow ()
 }
 
 /*
-    Подсчет ссылок
+    РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
 */
 
 void NativeWindow::AddRef ()
@@ -113,7 +113,7 @@ void NativeWindow::Release ()
 }
 
 /*
-    Размеры окна
+    Р Р°Р·РјРµСЂС‹ РѕРєРЅР°
 */
 
 unsigned int NativeWindow::GetWidth ()
@@ -143,7 +143,7 @@ unsigned int NativeWindow::GetHeight ()
 }
 
 /*
-    Область вывода
+    РћР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
 */
 
 Rect NativeWindow::GetViewport ()
@@ -160,7 +160,7 @@ Rect NativeWindow::GetViewport ()
 }
 
 /*
-    Низкоуровневый дескриптор
+    РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
 */
 
 void* NativeWindow::GetHandle ()
@@ -177,7 +177,7 @@ void* NativeWindow::GetHandle ()
 }
 
 /*
-    Установка слушателя событий
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
 */
 
 void NativeWindow::AttachListener (INativeWindowListener* listener)
@@ -199,7 +199,7 @@ void NativeWindow::DetachListener (INativeWindowListener* listener)
 }
 
 /*
-    Создание обертки
+    РЎРѕР·РґР°РЅРёРµ РѕР±РµСЂС‚РєРё
 */
 
 namespace render

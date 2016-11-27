@@ -11,19 +11,19 @@ const float EPS = 0.0001f;
 }
 
 /*
-    Описание реализации контроллера выравнивания одного узла с другим узлом
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ РѕРґРЅРѕРіРѕ СѓР·Р»Р° СЃ РґСЂСѓРіРёРј СѓР·Р»РѕРј
 */
 
 struct AlignWithNode::Impl: public xtl::instance_counter<AlignWithNode>
 {
-  Node*                node;                    //выравниваемый узел
-  AccelerationFunction acceleration_function;   //функция рассчета ускорения узла
-  Node::ConstPointer   target_node;             //узел, на который идет выравнивание
-  NodeOrt              target_node_axis;        //ось узла, с которым идет выравнивание
-  NodeOrt              node_axis;               //ось узла, которая должна быть выравнена
-  NodeOrt              node_rotation_axis;      //ось узла, вокруг которой производится вращение
-  math::vec3f          current_speed;           //текущая скорость узла
-  xtl::auto_connection scene_attach_connection; //соединения события присоединения узла к сцене
+  Node*                node;                    //РІС‹СЂР°РІРЅРёРІР°РµРјС‹Р№ СѓР·РµР»
+  AccelerationFunction acceleration_function;   //С„СѓРЅРєС†РёСЏ СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
+  Node::ConstPointer   target_node;             //СѓР·РµР», РЅР° РєРѕС‚РѕСЂС‹Р№ РёРґРµС‚ РІС‹СЂР°РІРЅРёРІР°РЅРёРµ
+  NodeOrt              target_node_axis;        //РѕСЃСЊ СѓР·Р»Р°, СЃ РєРѕС‚РѕСЂС‹Рј РёРґРµС‚ РІС‹СЂР°РІРЅРёРІР°РЅРёРµ
+  NodeOrt              node_axis;               //РѕСЃСЊ СѓР·Р»Р°, РєРѕС‚РѕСЂР°СЏ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІС‹СЂР°РІРЅРµРЅР°
+  NodeOrt              node_rotation_axis;      //РѕСЃСЊ СѓР·Р»Р°, РІРѕРєСЂСѓРі РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІСЂР°С‰РµРЅРёРµ
+  math::vec3f          current_speed;           //С‚РµРєСѓС‰Р°СЏ СЃРєРѕСЂРѕСЃС‚СЊ СѓР·Р»Р°
+  xtl::auto_connection scene_attach_connection; //СЃРѕРµРґРёРЅРµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ СѓР·Р»Р° Рє СЃС†РµРЅРµ
 
   Impl (Node& in_node)
     : node (&in_node)
@@ -39,7 +39,7 @@ struct AlignWithNode::Impl: public xtl::instance_counter<AlignWithNode>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AlignWithNode::AlignWithNode (Node& node)
@@ -53,7 +53,7 @@ AlignWithNode::~AlignWithNode ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 AlignWithNode::Pointer AlignWithNode::Create (Node& node)
@@ -62,7 +62,7 @@ AlignWithNode::Pointer AlignWithNode::Create (Node& node)
 }
 
 /*
-   Установка/получение функции рассчета ускорения узла
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С„СѓРЅРєС†РёРё СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
 */
 
 void AlignWithNode::SetAccelerationHandler (const AccelerationFunction& acceleration_function)
@@ -76,7 +76,7 @@ const AlignWithNode::AccelerationFunction& AlignWithNode::AccelerationHandler ()
 }
 
 /*
-   Запуск движения
+   Р—Р°РїСѓСЃРє РґРІРёР¶РµРЅРёСЏ
 */
 
 void AlignWithNode::Start (const Node& target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis)
@@ -88,7 +88,7 @@ void AlignWithNode::Start (const Node& target_node, NodeOrt target_node_axis, No
 }
 
 /*
-   Остановка движения
+   РћСЃС‚Р°РЅРѕРІРєР° РґРІРёР¶РµРЅРёСЏ
 */
 
 void AlignWithNode::Stop ()
@@ -97,7 +97,7 @@ void AlignWithNode::Stop ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void AlignWithNode::Update (const TimeValue& time_value)

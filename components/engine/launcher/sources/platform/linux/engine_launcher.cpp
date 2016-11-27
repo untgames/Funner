@@ -12,7 +12,7 @@ const char* ENGINE_LIBRARY_NAME = "libfunner.so";
 
 }
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [], const char* env [])
 {
   void* library = dlopen (ENGINE_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
@@ -48,5 +48,5 @@ int main (int argc, const char* argv [], const char* env [])
 
   delete funner;
 
-  //dlclose (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в libfunner.so
+  //dlclose (library); //Р±РёР±Р»РёРѕС‚РµРєР° РЅРµ РІС‹РіСЂСѓР¶Р°РµС‚СЃСЏ, РёР·-Р·Р° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЃСЂР°Р±Р°С‚С‹РІР°РЅРёР№ atexit, РІС‹Р·РІР°РЅРЅС‹С… РІ libfunner.so
 }

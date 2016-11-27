@@ -7,13 +7,13 @@ using namespace math;
 namespace
 {
 
-//Константы (имена библиотек)
+//РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 
 const char* BINDER_NAME                   = "MathSplineLoader";
 const char* COMPONENT_NAME                = "script.binds.MathSplineLoader";
 const char* MATHLIB_SPLINE_LOADER_LIBRARY = "Math.SplineLoader";
 
-//Функции загрузки сплайнов
+//Р¤СѓРЅРєС†РёРё Р·Р°РіСЂСѓР·РєРё СЃРїР»Р°Р№РЅРѕРІ
 linear_splinef load_linear_float_spline (const StringNode& node, const char* key_node, const char* time_attribute, const char* value_attribute)
 {
   static const char* METHOD_NAME = "script::binds::load_linear_float_spline";
@@ -120,14 +120,14 @@ basic_spline<spline_linear_key<vector<T, Size> > > load_linear_spline_vector_key
   return return_value;
 }
 
-//Регистрация библиотеки загрузки сплайнов
+//Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё Р·Р°РіСЂСѓР·РєРё СЃРїР»Р°Р№РЅРѕРІ
 void bind_math_spline_loader_library (script::Environment& environment)
 {
-  //создание библиотек
+  //СЃРѕР·РґР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
   
   InvokerRegistry lib  = environment.CreateLibrary (MATHLIB_SPLINE_LOADER_LIBRARY);
 
-  //регистрация функций
+  //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№
 
   lib.Register ("LoadLinearFloatSpline", make_invoker (&load_linear_float_spline));
   lib.Register ("LoadLinearVec2fSpline", make_invoker (
@@ -152,7 +152,7 @@ namespace components
 namespace math_spline_loader_script_bind
 {
 
-//Компонент
+//РљРѕРјРїРѕРЅРµРЅС‚
 class Component
 {
   public:

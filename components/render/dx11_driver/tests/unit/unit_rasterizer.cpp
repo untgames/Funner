@@ -2,7 +2,7 @@
 
 using namespace common;
 
-//печать дескриптора rasterizer-state
+//РїРµС‡Р°С‚СЊ РґРµСЃРєСЂРёРїС‚РѕСЂР° rasterizer-state
 inline void dump_desc (IRasterizerState& state)
 {
   if (!&state)

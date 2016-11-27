@@ -4,7 +4,7 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, PrimitiveBuffersImpl& buffers, const DeviceManagerPtr& device_manager, MeshBufferUsage usage)
@@ -18,7 +18,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
     InputLayoutManager& layout_manager = device_manager->InputLayoutManager ();
 
-      //резервирование вершинных атрибутов
+      //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
     
     unsigned int attributes_count = 0;
     
@@ -30,7 +30,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
     streams.reserve (source.StreamsCount ());
     vertex_formats.reserve (source.StreamsCount ());
     
-      //конвертация
+      //РєРѕРЅРІРµСЂС‚Р°С†РёСЏ
 
     for (unsigned int i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
     {
@@ -133,7 +133,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 }
 
 /*
-    Клонирование вершинного формата
+    РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 */
 
 media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, const media::geometry::VertexFormat& format)
@@ -154,7 +154,7 @@ media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, 
 }
 
 /*
-    Вершинные потоки
+    Р’РµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
 */
 
 unsigned int VertexBuffer::StreamsCount ()
@@ -171,7 +171,7 @@ const LowLevelBufferPtr* VertexBuffer::Streams ()
 }
 
 /*
-    Получение лэйаута
+    РџРѕР»СѓС‡РµРЅРёРµ Р»СЌР№Р°СѓС‚Р°
 */
 
 LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layout_manager, InputDataType type)
@@ -181,14 +181,14 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layo
     if (type < 0 || type >= InputDataType_Num)
       throw xtl::make_argument_exception ("", "type", type);
       
-      //проверка наличия лэйаута в кэше
+      //РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р»СЌР№Р°СѓС‚Р° РІ РєСЌС€Рµ
       
     LowLevelInputLayoutPtr& layout = layouts [type];
       
     if (layout)
       return layout;
       
-      //создание нового лэйаута
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
       
     InputLayoutDesc layout_desc;
 

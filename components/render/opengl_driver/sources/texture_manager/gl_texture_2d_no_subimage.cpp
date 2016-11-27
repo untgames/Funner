@@ -6,7 +6,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
@@ -16,7 +16,7 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture2DNoSubimage::SetUncompressedData

@@ -8,7 +8,7 @@ using namespace stl;
 */
 
 /*
-    Êîíñòðóêòîðû, äåñòðóêòîð è ïðèñâàèâàíèå
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€Ñ‹, Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ Ð¸ Ð¿Ñ€Ð¸ÑÐ²Ð°Ð¸Ð²Ð°Ð½Ð¸Ðµ
 */
 
 File::File ()
@@ -38,7 +38,7 @@ File& File::operator = (const File& file)
 }
 
 /*
-    Ïîëó÷åíèå ïîëíîãî ïóòè ê ôàéëó
+    ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»Ð½Ð¾Ð³Ð¾ Ð¿ÑƒÑ‚Ð¸ Ðº Ñ„Ð°Ð¹Ð»Ñƒ
 */
 
 const char* File::Path () const
@@ -47,7 +47,7 @@ const char* File::Path () const
 }
 
 /*
-    Ðåæèì ðàáîòû ôàéëà
+    Ð ÐµÐ¶Ð¸Ð¼ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ„Ð°Ð¹Ð»Ð°
 */
 
 filemode_t File::Mode () const
@@ -105,7 +105,7 @@ bool File::IsBuffered () const
 }
 
 /*
-    ×òåíèå / çàïèñü
+    Ð§Ñ‚ÐµÐ½Ð¸Ðµ / Ð·Ð°Ð¿Ð¸ÑÑŒ
 */
 
 size_t File::Read (void* buf,size_t size)
@@ -137,7 +137,7 @@ size_t File::Write (const void* buf,size_t size)
 }
 
 /*
-    Ðàáîòà ñ ôàéëîâûì óêàçàòåëåì
+    Ð Ð°Ð±Ð¾Ñ‚Ð° Ñ Ñ„Ð°Ð¹Ð»Ð¾Ð²Ñ‹Ð¼ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÐµÐ¼
 */
 
 void File::Rewind ()
@@ -178,7 +178,7 @@ filepos_t File::Tell () const
 }
 
 /*
-    Ðàçìåð ôàéëà / ïðîâåðêà íà êîíåö ôàéëà
+    Ð Ð°Ð·Ð¼ÐµÑ€ Ñ„Ð°Ð¹Ð»Ð° / Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° ÐºÐ¾Ð½ÐµÑ† Ñ„Ð°Ð¹Ð»Ð°
 */
 
 filesize_t File::Size () const
@@ -200,7 +200,7 @@ bool File::Eof () const
 }
 
 /*
-    Ðàáîòà ñ ôàéëîâûìè áóôåðàìè
+    Ð Ð°Ð±Ð¾Ñ‚Ð° Ñ Ñ„Ð°Ð¹Ð»Ð¾Ð²Ñ‹Ð¼Ð¸ Ð±ÑƒÑ„ÐµÑ€Ð°Ð¼Ð¸
 */
 
 void File::Flush ()
@@ -214,7 +214,7 @@ size_t File::BufferSize () const
 }
 
 /*
-    Çàêðûòèå ôàéëà
+    Ð—Ð°ÐºÑ€Ñ‹Ñ‚Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð°
 */
 
 void File::Close ()
@@ -228,7 +228,7 @@ void File::Close ()
 }
 
 /*
-    Ñðàâíåíèå äâóõ ôàéëîâ íà ýêâèâàëåíòíîñòü
+    Ð¡Ñ€Ð°Ð²Ð½ÐµÐ½Ð¸Ðµ Ð´Ð²ÑƒÑ… Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð½Ð° ÑÐºÐ²Ð¸Ð²Ð°Ð»ÐµÐ½Ñ‚Ð½Ð¾ÑÑ‚ÑŒ
 */
 
 bool File::operator == (const File& file) const
@@ -242,7 +242,7 @@ bool File::operator != (const File& file) const
 }
 
 /*
-    Ïîëó÷åíèå äåñêðèïòîðà ôàéëà (äëÿ âíóòðåííåãî èñïîëüçîâàíèÿ)
+    ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´ÐµÑÐºÑ€Ð¸Ð¿Ñ‚Ð¾Ñ€Ð° Ñ„Ð°Ð¹Ð»Ð° (Ð´Ð»Ñ Ð²Ð½ÑƒÑ‚Ñ€ÐµÐ½Ð½ÐµÐ³Ð¾ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ñ)
 */
 
 FileImplPtr File::GetImpl () const
@@ -261,7 +261,7 @@ FileImpl::FileImpl (filemode_t _mode)
 
 FileImpl::~FileImpl ()
 {
-  if (anonymous_file_path && FileSystemSingleton::IsInitialized ()) //åñëè ìåíåäæåðà ôàéëîâîé ñèñòåìû óæå óíè÷òîæåí ðåãèñòðàöèÿ íå íóæíà
+  if (anonymous_file_path && FileSystemSingleton::IsInitialized ()) //ÐµÑÐ»Ð¸ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð° Ñ„Ð°Ð¹Ð»Ð¾Ð²Ð¾Ð¹ ÑÐ¸ÑÑ‚ÐµÐ¼Ñ‹ ÑƒÐ¶Ðµ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°Ñ†Ð¸Ñ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ð°
   {
     FileSystemSingleton::Instance ()->RemoveAnonymousFilePath (this);
   }

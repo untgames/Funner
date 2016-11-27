@@ -7,20 +7,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int LISTENER_ARRAY_RESERVE_SIZE = 4; //резервируемое количество слушателей
+const unsigned int LISTENER_ARRAY_RESERVE_SIZE = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»СѓС€Р°С‚РµР»РµР№
 
 /*
-    Вспомогательные классы
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹
 */
 
-/// Обертка над нативным окном
+/// РћР±РµСЂС‚РєР° РЅР°Рґ РЅР°С‚РёРІРЅС‹Рј РѕРєРЅРѕРј
 class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     NativeWindow (void* in_handle, unsigned int in_width, unsigned int in_height, const manager::Rect& in_viewport)
       : handle (in_handle)
       , width (in_width)
@@ -35,7 +35,7 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
       listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
     }
 
-///Установка размеров экрана
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂРѕРІ СЌРєСЂР°РЅР°
     void SetSize (unsigned int in_width, unsigned int in_height)
     {
       try
@@ -53,11 +53,11 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
       }
     }
 
-///Размеры окна
+///Р Р°Р·РјРµСЂС‹ РѕРєРЅР°
     unsigned int GetWidth  () { return width; }
     unsigned int GetHeight () { return height; }
 
-///Установка области вывода
+///РЈСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     void SetViewport (const manager::Rect& rect)
     {
       try
@@ -74,10 +74,10 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
       }
     }
 
-///Область вывода
+///РћР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
     manager::Rect GetViewport () { return viewport; }
 
-///Установка низкроуровневого дескриптора
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРёР·РєСЂРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
     void SetHandle (void* in_handle)
     {
       try
@@ -94,10 +94,10 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
       }
     }
 
-///Низкоуровневый дескриптор
+///РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
     void* GetHandle () { return handle; }
 
-///Отрисовка
+///РћС‚СЂРёСЃРѕРІРєР°
     void Repaint ()
     {
       try
@@ -112,11 +112,11 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
       }
     }
 
-///Установка слушателя событий
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№
     void AttachListener (manager::INativeWindowListener* listener) { if (listener) listeners.push_back (listener); }
     void DetachListener (manager::INativeWindowListener* listener) { if (listener) listeners.erase (stl::remove (listeners.begin (), listeners.end (), listener), listeners.end ()); }
 
-///Подсчет ссылок
+///РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
@@ -133,11 +133,11 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<NativeWindow> NativeWindowPtr;
 
-/// Окно
+/// РћРєРЅРѕ
 class Window: public xtl::reference_counter
 {
   public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Window (RenderManager& render_manager, const char* in_name, const char* init_string, void* handle, unsigned int width, unsigned int height, const manager::Rect& viewport)
       : log (render_manager.Log ())
     {
@@ -166,7 +166,7 @@ class Window: public xtl::reference_counter
       }
     }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Window ()
     {
       render_window.reset ();
@@ -174,13 +174,13 @@ class Window: public xtl::reference_counter
       log.Printf ("Render window '%s' has been destroyed", name.c_str ());
     }
 
-/// Имя
+/// РРјСЏ
     const char* Name () { return name.c_str (); }
 
-/// Окно рендеринга
+/// РћРєРЅРѕ СЂРµРЅРґРµСЂРёРЅРіР°
     manager::Window& RenderWindow () { return *render_window; }
 
-/// Нативное окно
+/// РќР°С‚РёРІРЅРѕРµ РѕРєРЅРѕ
     ::NativeWindow& NativeWindow () { return *native_window; }
 
   private:
@@ -197,22 +197,22 @@ typedef stl::hash_map<stl::hash_key<const char*>, WindowPtr> WindowNamedMap;
 }
 
 /*
-    Описание реализации менеджера окон
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РѕРєРѕРЅ
 */
 
 struct WindowManager::Impl
 {
-  RenderManager  render_manager; //менеджер рендеринга
-  WindowMap      windows;        //окна
-  WindowNamedMap named_windows;  //именованные окна
+  RenderManager  render_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  WindowMap      windows;        //РѕРєРЅР°
+  WindowNamedMap named_windows;  //РёРјРµРЅРѕРІР°РЅРЅС‹Рµ РѕРєРЅР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const RenderManager& in_render_manager)
     : render_manager (in_render_manager)
   {
   }
 
-/// Получение окна
+/// РџРѕР»СѓС‡РµРЅРёРµ РѕРєРЅР°
   Window& GetWindow (size_t id)
   {
     try
@@ -233,7 +233,7 @@ struct WindowManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 WindowManager::WindowManager (const RenderManager& manager)
@@ -247,7 +247,7 @@ WindowManager::~WindowManager ()
 }
 
 /*
-    Добавление и удаление окон  
+    Р”РѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РѕРєРѕРЅ  
 */
 
 void WindowManager::AttachWindow (size_t id, const char* name, const char* init_string, void* handle, unsigned int width, unsigned int height, const manager::Rect& rect)
@@ -301,7 +301,7 @@ void WindowManager::DetachWindow (size_t id)
 }
 
 /*
-    Поиск окна по имени
+    РџРѕРёСЃРє РѕРєРЅР° РїРѕ РёРјРµРЅРё
 */
 
 manager::Window& WindowManager::GetWindow (const char* name) const
@@ -326,7 +326,7 @@ manager::Window& WindowManager::GetWindow (const char* name) const
 }
 
 /*
-    Обновление окон
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРѕРЅ
 */
 
 void WindowManager::SetWindowSize (size_t id, unsigned int width, unsigned int height)
@@ -369,7 +369,7 @@ void WindowManager::SetWindowHandle (size_t id, void* handle)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void WindowManager::RepaintWindow (size_t id)

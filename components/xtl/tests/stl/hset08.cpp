@@ -1,4 +1,4 @@
-// Тестирование insert ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ insert ()
 #include <stdio.h>
 #include <stl/hash_set>
 #include "test.h"

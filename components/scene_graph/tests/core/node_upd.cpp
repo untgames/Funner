@@ -56,7 +56,7 @@ int main ()
   
   printf ("yet one update\n");
   
-  parent_parent->Update (TimeValue (1, 2)); //для проверки отсоединения от списка обновлений
+  parent_parent->Update (TimeValue (1, 2)); //РґР»СЏ РїСЂРѕРІРµСЂРєРё РѕС‚СЃРѕРµРґРёРЅРµРЅРёСЏ РѕС‚ СЃРїРёСЃРєР° РѕР±РЅРѕРІР»РµРЅРёР№
 
   return 0;
 }

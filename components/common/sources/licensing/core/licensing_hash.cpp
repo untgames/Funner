@@ -30,7 +30,7 @@ void calculate_license_hash (const stl::vector<CheckFile>& check_files_list, con
 {
   try
   {
-    //проверка корректности содержимого лицензии
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ Р»РёС†РµРЅР·РёРё
     stl::string check_string;
 
     for (stl::vector<CheckFile>::const_iterator iter=check_files_list.begin (), end=check_files_list.end (); iter!=end; ++iter)

@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚СЊ РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -17,40 +17,40 @@ void raise (const char* method_name)
 
 }
 
-//создание семафора
+//СЃРѕР·РґР°РЅРёРµ СЃРµРјР°С„РѕСЂР°
 semaphore_t DefaultThreadManager::CreateSemaphore (size_t initial_value)
 {
   raise ("syslib::DefaultThreadManager::CreateSemaphore");
   return 0;
 }
 
-//уничтожение семафора
+//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРµРјР°С„РѕСЂР°
 void DefaultThreadManager::DestroySemaphore (semaphore_t handle)
 {
   raise ("syslib::DefaultThreadManager::DestroySemaphore");
 }
 
-//ожидание следующей задачи
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void DefaultThreadManager::WaitSemaphore (semaphore_t handle)
 {
   raise ("syslib::DefaultThreadManager::WaitSemaphore");
 }
 
-//ожидание следующей задачи с таймаутом
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 bool DefaultThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   raise ("syslib::DefaultThreadManager::WaitSemaphore");
   return false;
 }
 
-//попытка ожидани¤ следующей задачи
+//РїРѕРїС‹С‚РєР° РѕР¶РёРґР°РЅРёВ¤ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 bool DefaultThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   raise ("syslib::DefaultThreadManager::TryWaitSemaphore");
   return false;
 }
 
-//посылка следующей задачи
+//РїРѕСЃС‹Р»РєР° СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void DefaultThreadManager::PostSemaphore (semaphore_t handle)
 {
   raise ("syslib::DefaultThreadManager::PostSemaphore");

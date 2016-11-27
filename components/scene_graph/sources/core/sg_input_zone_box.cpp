@@ -4,12 +4,12 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации InputZoneBox
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё InputZoneBox
 */
 
 struct InputZoneBox::Impl: public xtl::instance_counter<InputZoneBox>
 {
-  ZoneDesc zone_desc [6]; //описания зон ввода
+  ZoneDesc zone_desc [6]; //РѕРїРёСЃР°РЅРёСЏ Р·РѕРЅ РІРІРѕРґР°
   
   Impl ()
   {
@@ -40,7 +40,7 @@ struct InputZoneBox::Impl: public xtl::instance_counter<InputZoneBox>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputZoneBox::InputZoneBox ()
@@ -56,7 +56,7 @@ InputZoneBox::~InputZoneBox ()
 }
 
 /*
-    Создание спрайта
+    РЎРѕР·РґР°РЅРёРµ СЃРїСЂР°Р№С‚Р°
 */
 
 InputZoneBox::Pointer InputZoneBox::Create ()
@@ -65,7 +65,7 @@ InputZoneBox::Pointer InputZoneBox::Create ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void InputZoneBox::AcceptCore (Visitor& visitor)
@@ -75,7 +75,7 @@ void InputZoneBox::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Реализация получения количества спрайтов и массива спрайтов
+    Р РµР°Р»РёР·Р°С†РёСЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЃРїСЂР°Р№С‚РѕРІ Рё РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t InputZoneBox::ZoneDescsCountCore ()

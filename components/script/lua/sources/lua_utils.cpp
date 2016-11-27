@@ -7,16 +7,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t STACK_DUMP_BUFFER_RESERVE = 128; //размер строки, резервируемый для дампа стека луа
+const size_t STACK_DUMP_BUFFER_RESERVE = 128; //СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё, СЂРµР·РµСЂРІРёСЂСѓРµРјС‹Р№ РґР»СЏ РґР°РјРїР° СЃС‚РµРєР° Р»СѓР°
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
-//функция, вызываемая сборщиком мусора при удалении объектов пользовательского типа данных
+//С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ СЃР±РѕСЂС‰РёРєРѕРј РјСѓСЃРѕСЂР° РїСЂРё СѓРґР°Р»РµРЅРёРё РѕР±СЉРµРєС‚РѕРІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ С‚РёРїР° РґР°РЅРЅС‹С…
 struct VariantDestroy 
 {
   static int Invoke (lua_State* state)
@@ -25,7 +25,7 @@ struct VariantDestroy
 
     if (variant && lua_getmetatable (state, -1))
     {
-        //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
+        //РІСЃРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ С‚РёРїС‹ РґР°РЅРЅС‹С…, С…СЂР°РЅРёРјС‹Рµ РІ СЃС‚РµРєРµ, РїСЂРёРІРѕРґСЏС‚СЃСЏ Рє xtl::any*. РїСЂРѕРІРµСЂРєР° СЃРѕРІРїР°РґРµРЅРёСЏ РјРµС‚Р°С‚Р°Р±Р»РёС† РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ
       
       lua_pop (state, 1);
       
@@ -36,7 +36,7 @@ struct VariantDestroy
   }
 };
 
-//печать в строку состояния объекта пользовательского типа данных
+//РїРµС‡Р°С‚СЊ РІ СЃС‚СЂРѕРєСѓ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЉРµРєС‚Р° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ С‚РёРїР° РґР°РЅРЅС‹С…
 struct VariantToString
 {
   static int Invoke (lua_State* state)
@@ -67,7 +67,7 @@ namespace script
 namespace lua
 {
 
-//получение строки с местом вызова
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ РјРµСЃС‚РѕРј РІС‹Р·РѕРІР°
 stl::string get_lua_position (lua_State* state)
 {
   stl::string buffer;  
@@ -90,38 +90,38 @@ stl::string get_lua_position (lua_State* state)
   return buffer;
 }
 
-//удаление объекта
+//СѓРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р°
 int variant_destroy (lua_State* state)
 {
   return safe_call<VariantDestroy> (state);
 }
 
-//печать в строку состояния объекта пользовательского типа данных
+//РїРµС‡Р°С‚СЊ РІ СЃС‚СЂРѕРєСѓ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЉРµРєС‚Р° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ С‚РёРїР° РґР°РЅРЅС‹С…
 int variant_tostring (lua_State* state)
 {
   return safe_call<VariantToString> (state);
 }
 
-//печать состояния стека
+//РїРµС‡Р°С‚СЊ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃС‚РµРєР°
 void dump_stack (lua_State* state, stl::string& buffer)
 {
-    //резервирование памяти для буфера дампа стека
+    //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ Р±СѓС„РµСЂР° РґР°РјРїР° СЃС‚РµРєР°
     
   buffer.clear   ();
   buffer.reserve (STACK_DUMP_BUFFER_RESERVE);
   
-    //перебор элементов стека
+    //РїРµСЂРµР±РѕСЂ СЌР»РµРјРµРЅС‚РѕРІ СЃС‚РµРєР°
 
   int count = lua_gettop (state) + 1;    
 
   for (int i=1; i<count; i++)
   {
-      //добавление разделителя
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЂР°Р·РґРµР»РёС‚РµР»СЏ
     
     if (!buffer.empty ())
       buffer += ", ";
       
-      //печать элемента
+      //РїРµС‡Р°С‚СЊ СЌР»РµРјРµРЅС‚Р°
       
     int type = lua_type (state, i);
       
@@ -183,7 +183,7 @@ void dump_stack (lua_State* state, stl::string& buffer)
   }
 }
 
-//проверка возможности поместить в стек count аргументов 
+//РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїРѕРјРµСЃС‚РёС‚СЊ РІ СЃС‚РµРє count Р°СЂРіСѓРјРµРЅС‚РѕРІ 
 void check_stack (lua_State* state, unsigned int count)
 {
   if (!lua_checkstack (state, count))
@@ -194,7 +194,7 @@ void check_stack (lua_State* state, unsigned int count)
 namespace
 {
 
-//проверка наличия элемента в стеке
+//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЌР»РµРјРµРЅС‚Р° РІ СЃС‚РµРєРµ
 void check_item_index (lua_State* state, unsigned int index, const char* function_name)
 {
   unsigned int stack_size = lua_gettop (state) + 1;
@@ -205,18 +205,18 @@ void check_item_index (lua_State* state, unsigned int index, const char* functio
 
 }
 
-//проверка корректности типа элемента, извлекаемого из стека
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С‚РёРїР° СЌР»РµРјРµРЅС‚Р°, РёР·РІР»РµРєР°РµРјРѕРіРѕ РёР· СЃС‚РµРєР°
 void check_item (lua_State* state, unsigned int index, int expected_type, const char* function_name)
 {
-    //проверка корректности индекса элемента
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РёРЅРґРµРєСЃР° СЌР»РµРјРµРЅС‚Р°
 
   check_item_index (state, index, function_name);
 
-    //определение типа элемента, находящегося в стеке
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїР° СЌР»РµРјРµРЅС‚Р°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РІ СЃС‚РµРєРµ
 
   int item_type = lua_type (state, index);
 
-    //проверка совместимости типов
+    //РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С‚РёРїРѕРІ
 
   switch (item_type)
   {
@@ -275,7 +275,7 @@ void check_item (lua_State* state, unsigned int index, int expected_type, const 
   }  
 }
 
-//получение сообщения об ошибке
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ
 void raise_error (lua_State* state, const char* source)
 {
   try

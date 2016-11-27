@@ -3,16 +3,16 @@
 using namespace media::adobe::xfl;
 
 /*
-    Описание реализации элемента кадра анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌР»РµРјРµРЅС‚Р° РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 */
 
 struct FrameElement::Impl : public xtl::reference_counter
 {
-  stl::string      name;                 //имя элемента
-  FrameElementType type;                 //тип элемента
-  size_t           first_frame;          //номер кадра (в глобальном времени), с которого начинается отображение данного кадра
-  math::vec2f      translation;          //смещение
-  math::vec2f      transformation_point; //пивот
+  stl::string      name;                 //РёРјСЏ СЌР»РµРјРµРЅС‚Р°
+  FrameElementType type;                 //С‚РёРї СЌР»РµРјРµРЅС‚Р°
+  size_t           first_frame;          //РЅРѕРјРµСЂ РєР°РґСЂР° (РІ РіР»РѕР±Р°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё), СЃ РєРѕС‚РѕСЂРѕРіРѕ РЅР°С‡РёРЅР°РµС‚СЃСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РґР°РЅРЅРѕРіРѕ РєР°РґСЂР°
+  math::vec2f      translation;          //СЃРјРµС‰РµРЅРёРµ
+  math::vec2f      transformation_point; //РїРёРІРѕС‚
   
   Impl (FrameElementType in_type)
     : type (in_type)
@@ -21,7 +21,7 @@ struct FrameElement::Impl : public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 FrameElement::FrameElement (FrameElementType type)
@@ -59,7 +59,7 @@ FrameElement& FrameElement::operator = (const FrameElement& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* FrameElement::Name () const
@@ -76,7 +76,7 @@ void FrameElement::SetName (const char* name)
 }
 
 /*
-   Тип
+   РўРёРї
 */
 
 FrameElementType FrameElement::Type () const
@@ -85,7 +85,7 @@ FrameElementType FrameElement::Type () const
 }
 
 /*
-   Тайминги
+   РўР°Р№РјРёРЅРіРё
 */
 
 size_t FrameElement::FirstFrame () const
@@ -99,7 +99,7 @@ void FrameElement::SetFirstFrame (size_t first_frame)
 }
 
 /*
-   Положение
+   РџРѕР»РѕР¶РµРЅРёРµ
 */
 
 const math::vec2f& FrameElement::Translation () const
@@ -123,7 +123,7 @@ void FrameElement::SetTransformationPoint (const math::vec2f& transformation_poi
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FrameElement::Swap (FrameElement& element)
@@ -141,7 +141,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (FrameElement& element1, FrameElement& element2)

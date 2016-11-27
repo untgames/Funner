@@ -8,14 +8,14 @@ namespace
 {
 
 /*
-    Цель рендеринга
+    Р¦РµР»СЊ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct RenderTargetViewDesc
 {
-  unsigned int    layer;         //номер слоя
-  unsigned int    mip_level;     //номер мип-уровня
-  RenderTargetPtr render_target; //цель рендеринга
+  unsigned int    layer;         //РЅРѕРјРµСЂ СЃР»РѕСЏ
+  unsigned int    mip_level;     //РЅРѕРјРµСЂ РјРёРї-СѓСЂРѕРІРЅСЏ
+  RenderTargetPtr render_target; //С†РµР»СЊ СЂРµРЅРґРµСЂРёРЅРіР°
   
   RenderTargetViewDesc (unsigned int in_layer, unsigned int in_mip_level, const RenderTargetPtr& in_render_target)
     : layer (in_layer)
@@ -47,23 +47,23 @@ render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
 }
 
 /*
-    Описание реализации текстуры
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµРєСЃС‚СѓСЂС‹
 */
 
 struct TextureImpl::Impl: public DebugIdHolder
 {
-  DeviceManagerPtr               device_manager; //менеджер устройства
-  LowLevelTexturePtr             texture;        //текстура
-  TextureDimension               dimension;      //размерность текстуры
-  render::manager::PixelFormat   format;         //формат текстуры
-  render::low_level::PixelFormat target_format;  //целевой формат текстуры
-  unsigned int                   width;          //ширина текстуры
-  unsigned int                   height;         //высота текстуры
-  unsigned int                   depth;          //глубина текстуры либо количество слоёв
-  RenderTargetArray              render_targets; //цели рендеринга
-  stl::string                    name;           //имя текстуры
+  DeviceManagerPtr               device_manager; //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  LowLevelTexturePtr             texture;        //С‚РµРєСЃС‚СѓСЂР°
+  TextureDimension               dimension;      //СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ С‚РµРєСЃС‚СѓСЂС‹
+  render::manager::PixelFormat   format;         //С„РѕСЂРјР°С‚ С‚РµРєСЃС‚СѓСЂС‹
+  render::low_level::PixelFormat target_format;  //С†РµР»РµРІРѕР№ С„РѕСЂРјР°С‚ С‚РµРєСЃС‚СѓСЂС‹
+  unsigned int                   width;          //С€РёСЂРёРЅР° С‚РµРєСЃС‚СѓСЂС‹
+  unsigned int                   height;         //РІС‹СЃРѕС‚Р° С‚РµРєСЃС‚СѓСЂС‹
+  unsigned int                   depth;          //РіР»СѓР±РёРЅР° С‚РµРєСЃС‚СѓСЂС‹ Р»РёР±Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‘РІ
+  RenderTargetArray              render_targets; //С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  stl::string                    name;           //РёРјСЏ С‚РµРєСЃС‚СѓСЂС‹
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, TextureDimension in_dimension, PixelFormat in_format, render::low_level::PixelFormat in_target_format, const char* in_name)
     : device_manager (in_device_manager)
     , dimension (in_dimension)
@@ -82,23 +82,23 @@ struct TextureImpl::Impl: public DebugIdHolder
       Log ().Printf  ("Texture '%s' created (id=%u)", name.c_str (), Id ());
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     if (device_manager->Settings ().HasDebugLog ())
       Log ().Printf  ("Texture '%s' destroyed (id=%u)", name.c_str (), Id ());
   }
   
-///Получение цели рендеринга
+///РџРѕР»СѓС‡РµРЅРёРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
   RenderTargetPtr GetRenderTarget (unsigned int layer, unsigned int mip_level)
   {
-      //поиск цели рендеринга среди списка уже созданных
+      //РїРѕРёСЃРє С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР° СЃСЂРµРґРё СЃРїРёСЃРєР° СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С…
     
     for (RenderTargetArray::iterator iter=render_targets.begin (), end=render_targets.end (); iter!=end; ++iter)
       if (iter->layer == layer && iter->mip_level == mip_level)
         return iter->render_target;
         
-     //создание новой цели рендеринга
+     //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
      
    RenderTargetPtr render_target (new RenderTargetImpl (device_manager, texture.get (), layer, mip_level), false);
    
@@ -109,7 +109,7 @@ struct TextureImpl::Impl: public DebugIdHolder
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 TextureImpl::TextureImpl 
@@ -124,7 +124,7 @@ TextureImpl::TextureImpl
 {
   try
   {
-      //преобразование аргументов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");
@@ -177,7 +177,7 @@ TextureImpl::TextureImpl
         throw xtl::make_argument_exception ("", "dimension", dimension);
     }
 
-      //создание текстуры
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
       
     low_level::TextureDesc desc;
     
@@ -214,7 +214,7 @@ TextureImpl::TextureImpl
 {
   try
   {
-      //преобразование аргументов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");
@@ -270,7 +270,7 @@ TextureImpl::TextureImpl
         throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
     }
 
-      //создание текстуры
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
       
     impl = new Impl (device_manager, dimension, format, desc.format, name);
 
@@ -290,7 +290,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::manage
 {
   try
   {
-      //преобразование аргументов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");
@@ -313,7 +313,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::manage
         throw xtl::make_argument_exception ("", "dimension", dimension);
     }
 
-      //создание текстуры
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
       
     low_level::TextureDesc desc;
     
@@ -380,7 +380,7 @@ TextureImpl::~TextureImpl ()
 }
 
 /*
-    Имя текстуры
+    РРјСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 const char* TextureImpl::Name ()
@@ -400,7 +400,7 @@ void TextureImpl::SetName (const char* name)
 }
 
 /*
-    Низкоуровневый объект текстуры
+    РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РѕР±СЉРµРєС‚ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 LowLevelTexturePtr TextureImpl::DeviceTexture ()
@@ -409,7 +409,7 @@ LowLevelTexturePtr TextureImpl::DeviceTexture ()
 }
 
 /*
-    Размерность
+    Р Р°Р·РјРµСЂРЅРѕСЃС‚СЊ
 */
 
 render::manager::TextureDimension TextureImpl::Dimension ()
@@ -418,7 +418,7 @@ render::manager::TextureDimension TextureImpl::Dimension ()
 }
 
 /*
-    Формат и размеры
+    Р¤РѕСЂРјР°С‚ Рё СЂР°Р·РјРµСЂС‹
 */
 
 render::manager::PixelFormat TextureImpl::Format ()
@@ -442,7 +442,7 @@ unsigned int TextureImpl::Depth ()
 }
 
 /*
-    Получение цели рендеринга
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 RenderTargetPtr TextureImpl::RenderTarget (unsigned int layer, unsigned int mip_level)
@@ -459,14 +459,14 @@ RenderTargetPtr TextureImpl::RenderTarget (unsigned int layer, unsigned int mip_
 }
 
 /*
-    Обновление образа
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕР±СЂР°Р·Р°
 */
 
 void TextureImpl::Update (const media::Image& image)
 {
   try
   {
-      //проверка возможности обновления
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ
       
     if (image.Width () != impl->width)
       throw xtl::format_operation_exception ("", "Image width %u mismatch texture width %u", image.Width (), impl->width);
@@ -531,7 +531,7 @@ void TextureImpl::Update (const media::Image& image)
         throw xtl::format_not_supported_exception ("", "Unsupported image format '%s'", media::get_format_name (image.Format ()));
     }
     
-      //обновление данных
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РґР°РЅРЅС‹С…
 
     for (unsigned int i=0; i<impl->depth; i++)
       impl->texture->SetData (i, 0, 0, 0, impl->width, impl->height, source_format, image.Bitmap (i));
@@ -544,13 +544,13 @@ void TextureImpl::Update (const media::Image& image)
 }
 
 /*
-    Захват образа
+    Р—Р°С…РІР°С‚ РѕР±СЂР°Р·Р°
 */
 
 namespace
 {
 
-//получение формата пикселей для изображения
+//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ РґР»СЏ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 media::PixelFormat get_format (render::manager::PixelFormat format)
 {
   switch (format)

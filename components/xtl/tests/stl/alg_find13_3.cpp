@@ -1,4 +1,4 @@
-//Тестирование алгоритма count (first, last, value, n)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° count (first, last, value, n)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

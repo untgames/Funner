@@ -3,18 +3,18 @@
 namespace syslib
 {
 
-const size_t KEY_NAME_MAP_STRING_SIZE = ScanCode_Num * 8; //длина строки имён клавиш
+const size_t KEY_NAME_MAP_STRING_SIZE = ScanCode_Num * 8; //РґР»РёРЅР° СЃС‚СЂРѕРєРё РёРјС‘РЅ РєР»Р°РІРёС€
 
 /*
-    Получение имени клавиши
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°РІРёС€Рё
 */
 
 const char* get_key_scan_name (ScanCode scan_code)
 {
   struct NameMap
   {
-    char* names [ScanCode_Num];                   //имена клавиш
-    char  name_string [KEY_NAME_MAP_STRING_SIZE]; //строка с именами
+    char* names [ScanCode_Num];                   //РёРјРµРЅР° РєР»Р°РІРёС€
+    char  name_string [KEY_NAME_MAP_STRING_SIZE]; //СЃС‚СЂРѕРєР° СЃ РёРјРµРЅР°РјРё
 
     NameMap ()
     {

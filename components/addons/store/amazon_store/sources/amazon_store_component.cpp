@@ -6,16 +6,16 @@ using namespace store::amazon_store;
 namespace
 {
 
-const char* COMPONENT_NAME              = "store.stores.amazon_store";                        //имя компонента
-const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.amazon_store"; //имя компонента обработчика загрузки приложения
-const char* LOAD_HANDLER_ID             = "AmazonStore";                                      //идентификатор обработчика загрузки приложения
-const char* STORE_ID                    = "AmazonStore";                                      //идентификатор магазина
-const char* STORE_NAME_MASK             = "AmazonStore";                                      //маска имен магазинов
+const char* COMPONENT_NAME              = "store.stores.amazon_store";                        //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* LOAD_HANDLER_COMPONENT_NAME = "common.syslib.android.load_handlers.amazon_store"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р° РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* LOAD_HANDLER_ID             = "AmazonStore";                                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РіСЂСѓР·РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ
+const char* STORE_ID                    = "AmazonStore";                                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјР°РіР°Р·РёРЅР°
+const char* STORE_NAME_MASK             = "AmazonStore";                                      //РјР°СЃРєР° РёРјРµРЅ РјР°РіР°Р·РёРЅРѕРІ
 
 }
 
 /*
-   Компонент магазина
+   РљРѕРјРїРѕРЅРµРЅС‚ РјР°РіР°Р·РёРЅР°
 */
 
 namespace components

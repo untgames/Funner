@@ -27,13 +27,13 @@ namespace zip_file_system
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "common.file_systems.zip_file_system"; //имя потока протоколирования
+const char* LOG_NAME = "common.file_systems.zip_file_system"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 /*
-    Протоколирование исключения
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 struct LogHolder
@@ -263,7 +263,7 @@ zzip_ssize_t zip_write_func (int fd, _zzip_const void* buf, zzip_size_t len)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Файловая система zip-файла
+///Р¤Р°Р№Р»РѕРІР°СЏ СЃРёСЃС‚РµРјР° zip-С„Р°Р№Р»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ZipFileSystem: public ICustomFileSystem, public Lockable
 {
@@ -272,7 +272,7 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     virtual ~ZipFileSystem ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с файлом
+///Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     file_t     FileOpen   (const char* name,filemode_t mode_flags,size_t);
     void       FileClose  (file_t);
@@ -287,26 +287,26 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     void       FileFlush  (file_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление расположением файлов
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Remove (const char* file_name);
     void Rename (const char* file_name,const char* new_name);
     void Mkdir  (const char* dir_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение информации о файле
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsFileExist (const char* file_name);
     bool GetFileInfo (const char* file_name,FileInfo& info);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     filesize_t GetFreeSpace (const char* path);   //returns (filesize_t)-1 if free space can't be determined
     filesize_t GetTotalSpace (const char* path);  //returns (filesize_t)-1 if free space can't be determined
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Файловые атрибуты
+///Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
     void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
@@ -314,24 +314,24 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     void RemoveFileAttribute (const char* file_name, const char* attribute);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск файла (Search возвращает количество найденных файлов)
+///РџРѕРёСЃРє С„Р°Р№Р»Р° (Search РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР°Р№РґРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Search (const char* wc_mask,const FileSearchHandler& handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  ();
     void Release ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация файла
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ С„Р°Р№Р»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterFile (const char* name, FileListItem item);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка ошибки
+///РџСЂРѕРІРµСЂРєР° РѕС€РёР±РєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CheckError ();
     void CheckError (zzip_error_t);
@@ -358,11 +358,11 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация
+///Р РµР°Р»РёР·Р°С†РёСЏ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-    Получение сообщения об ошибке
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ
 */
 
 const char* GetZZipErrorMessage (zzip_error_t error)
@@ -382,7 +382,7 @@ const char* GetZZipErrorMessage (zzip_error_t error)
 }
 
 /*
-    Инициализация / завершение
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ / Р·Р°РІРµСЂС€РµРЅРёРµ
 */
 
 ZipFileSystem::ZipFileSystem (const char* path)
@@ -464,7 +464,7 @@ ZipFileSystem::~ZipFileSystem ()
 }
 
 /*
-    Регистрация файла
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С„Р°Р№Р»Р°
 */
 
 void ZipFileSystem::RegisterFile (const char* file_name, FileListItem item)
@@ -501,7 +501,7 @@ void ZipFileSystem::RegisterFile (const char* file_name, FileListItem item)
 }
 
 /*
-    Работа с файлом
+    Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
 */
 
 ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t mode_flags,size_t)
@@ -635,7 +635,7 @@ void ZipFileSystem::FileFlush (file_t)
 }
 
 /*
-    Управление расположением файлов
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
 */
 
 void ZipFileSystem::Remove (const char* file_name)
@@ -657,7 +657,7 @@ void ZipFileSystem::Mkdir (const char* dir_name)
 }
 
 /*
-    Получение информации о файле
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 */
 
 bool ZipFileSystem::IsFileExist (const char* file_name)
@@ -684,7 +684,7 @@ bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 }
 
 /*
-   Информация о файловой системе
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 */
 
 filesize_t ZipFileSystem::GetFreeSpace (const char* path)
@@ -698,7 +698,7 @@ filesize_t ZipFileSystem::GetTotalSpace (const char* path)
 }
 
 /*
-    Файловые атрибуты
+    Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
 */
 
 void ZipFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
@@ -722,7 +722,7 @@ void ZipFileSystem::RemoveFileAttribute (const char* file_name, const char* attr
 }
 
 /*
-    Поиск файла
+    РџРѕРёСЃРє С„Р°Р№Р»Р°
 */
 
 void ZipFileSystem::Search (const char* wc_mask,const FileSearchHandler& find_handler)
@@ -735,7 +735,7 @@ void ZipFileSystem::Search (const char* wc_mask,const FileSearchHandler& find_ha
 }
 
 /*
-    Проверка ошибки
+    РџСЂРѕРІРµСЂРєР° РѕС€РёР±РєРё
 */
 
 void ZipFileSystem::CheckError ()
@@ -753,7 +753,7 @@ void ZipFileSystem::CheckError (zzip_error_t error)
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void ZipFileSystem::AddRef ()
@@ -768,7 +768,7 @@ void ZipFileSystem::Release ()
 }
 
 /*
-    Компонент, регистрирующий ZipFileSystem
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ ZipFileSystem
 */
 
 class ZipFileSystemComponent

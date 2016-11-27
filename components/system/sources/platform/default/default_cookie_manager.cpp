@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с окнами невозможна для платформы по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ РѕРєРЅР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР° РґР»СЏ РїР»Р°С‚С„РѕСЂРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -18,7 +18,7 @@ void raise (const char* method_name)
 }
 
 /*
-   Политика приема cookie
+   РџРѕР»РёС‚РёРєР° РїСЂРёРµРјР° cookie
 */
 
 void DefaultCookieManager::SetAcceptCookie (bool policy)
@@ -33,7 +33,7 @@ bool DefaultCookieManager::AcceptCookie ()
 }
 
 /*
-   Удаление cookie
+   РЈРґР°Р»РµРЅРёРµ cookie
 */
 
 void DefaultCookieManager::DeleteCookies (const char* uri)

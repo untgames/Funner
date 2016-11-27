@@ -1,5 +1,5 @@
 /*
-    Базовый класс именованого исключения
+    Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РёРјРµРЅРѕРІР°РЅРѕРіРѕ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */
 
 inline named_exception::named_exception (const char* s)
@@ -14,7 +14,7 @@ inline const char* named_exception::what () const throw ()
 }
 
 /*
-    Логические ошибки
+    Р›РѕРіРёС‡РµСЃРєРёРµ РѕС€РёР±РєРё
 */
 
 inline logic_error::logic_error (const char* s) 
@@ -38,7 +38,7 @@ inline out_of_range::out_of_range (const char* s)
   { }    
  
 /*
-    Ошибки времени выполнения
+    РћС€РёР±РєРё РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ
 */
 
 inline runtime_error::runtime_error (const char* s)
@@ -58,7 +58,7 @@ inline underflow_error::underflow_error (const char* s)
   { }  
 
 /*
-    Возбуждение исключения
+    Р’РѕР·Р±СѓР¶РґРµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
 */  
 
 template <class Exception>

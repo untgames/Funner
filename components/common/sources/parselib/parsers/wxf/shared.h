@@ -17,71 +17,71 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексемы
+///Р›РµРєСЃРµРјС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum WxfLexem
 {
-  WxfLexem_Undefined,    //не определена
-  WxfLexem_EndOfFile,    //конец файла
-  WxfLexem_NewLine,      //новая строка
-  WxfLexem_Value,        //значение (число)
-  WxfLexem_Identifier,   //идентификатор
-  WxfLexem_String,       //строка
-  WxfLexem_BeginBracket, //открывающая скобка '('
-  WxfLexem_EndBracket,   //закрывающая скобка ')'
-  WxfLexem_BeginFrame,   //начало фрейма '{'
-  WxfLexem_EndFrame,     //конец фрейма '}'
-  WxfLexem_Directive,    //директива '#...'
+  WxfLexem_Undefined,    //РЅРµ РѕРїСЂРµРґРµР»РµРЅР°
+  WxfLexem_EndOfFile,    //РєРѕРЅРµС† С„Р°Р№Р»Р°
+  WxfLexem_NewLine,      //РЅРѕРІР°СЏ СЃС‚СЂРѕРєР°
+  WxfLexem_Value,        //Р·РЅР°С‡РµРЅРёРµ (С‡РёСЃР»Рѕ)
+  WxfLexem_Identifier,   //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  WxfLexem_String,       //СЃС‚СЂРѕРєР°
+  WxfLexem_BeginBracket, //РѕС‚РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° '('
+  WxfLexem_EndBracket,   //Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР° ')'
+  WxfLexem_BeginFrame,   //РЅР°С‡Р°Р»Рѕ С„СЂРµР№РјР° '{'
+  WxfLexem_EndFrame,     //РєРѕРЅРµС† С„СЂРµР№РјР° '}'
+  WxfLexem_Directive,    //РґРёСЂРµРєС‚РёРІР° '#...'
 
   WxfLexem_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Статус лексического анализатора wxf-файлов
+///РЎС‚Р°С‚СѓСЃ Р»РµРєСЃРёС‡РµСЃРєРѕРіРѕ Р°РЅР°Р»РёР·Р°С‚РѕСЂР° wxf-С„Р°Р№Р»РѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum WxfLexerStatus
 {
-  WxfLexerStatus_NoError,          //нет ошибки
-  WxfLexerStatus_UnclosedComment,  //незакрытый коментарий
-  WxfLexerStatus_UnclosedString,   //незакрытая строка
-  WxfLexerStatus_WrongChar,        //неверный символ
-  WxfLexerStatus_WrongIdentifier,  //неверный идентификатор
-  WxfLexerStatus_WrongValue,       //неверное значение
-  WxfLexerStatus_WrongDirective,   //неверная директива
+  WxfLexerStatus_NoError,          //РЅРµС‚ РѕС€РёР±РєРё
+  WxfLexerStatus_UnclosedComment,  //РЅРµР·Р°РєСЂС‹С‚С‹Р№ РєРѕРјРµРЅС‚Р°СЂРёР№
+  WxfLexerStatus_UnclosedString,   //РЅРµР·Р°РєСЂС‹С‚Р°СЏ СЃС‚СЂРѕРєР°
+  WxfLexerStatus_WrongChar,        //РЅРµРІРµСЂРЅС‹Р№ СЃРёРјРІРѕР»
+  WxfLexerStatus_WrongIdentifier,  //РЅРµРІРµСЂРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  WxfLexerStatus_WrongValue,       //РЅРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  WxfLexerStatus_WrongDirective,   //РЅРµРІРµСЂРЅР°СЏ РґРёСЂРµРєС‚РёРІР°
 
   WxfLexerStatus_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексический анализатор
+///Р›РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class WxfLexer
 {
   public:      
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     WxfLexer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка буфера разбора
+///РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Reset (char* buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сканирование следующей лексемы
+///РЎРєР°РЅРёСЂРѕРІР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р»РµРєСЃРµРјС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     WxfLexem NextLexem  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Состояние разбора
+///РЎРѕСЃС‚РѕСЏРЅРёРµ СЂР°Р·Р±РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    WxfLexem       Lexem        () const { return current_lexem; }               //текущая лексема
-    WxfLexerStatus Status       () const { return current_status; }              //текущая ошибка
-    size_t         LineNumber   () const { return line_number; }                 //текущая строка
-    size_t         LinePosition () const { return cursor - line_start + 1; }     //смещение от начала строки
-    const char*    Token        () const { return current_token; }               //текущий токен
-    char           CurrentChar  () const { return cursor == erased_char_position ? erased_char : *cursor; } //текущий символ
+    WxfLexem       Lexem        () const { return current_lexem; }               //С‚РµРєСѓС‰Р°СЏ Р»РµРєСЃРµРјР°
+    WxfLexerStatus Status       () const { return current_status; }              //С‚РµРєСѓС‰Р°СЏ РѕС€РёР±РєР°
+    size_t         LineNumber   () const { return line_number; }                 //С‚РµРєСѓС‰Р°СЏ СЃС‚СЂРѕРєР°
+    size_t         LinePosition () const { return cursor - line_start + 1; }     //СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё
+    const char*    Token        () const { return current_token; }               //С‚РµРєСѓС‰РёР№ С‚РѕРєРµРЅ
+    char           CurrentChar  () const { return cursor == erased_char_position ? erased_char : *cursor; } //С‚РµРєСѓС‰РёР№ СЃРёРјРІРѕР»
 
   private:
     WxfLexer (const WxfLexer&); //no impl

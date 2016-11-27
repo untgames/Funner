@@ -149,7 +149,7 @@ void on_achievement_reported (const char* source, NSError *error, common::Log lo
 }
 
 /*
-   Достижения
+   Р”РѕСЃС‚РёР¶РµРЅРёСЏ
 */
 
 void GameKitSessionImpl::LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties)
@@ -173,7 +173,7 @@ void GameKitSessionImpl::LoadAchievements (const LoadAchievementsCallback& callb
 }
 
 /*
-   Иконка
+   РРєРѕРЅРєР°
 */
 
 void GameKitSessionImpl::LoadAchievementPicture (const Achievement& achievement, const LoadAchievementPictureCallback& callback, const common::PropertyMap& properties)
@@ -204,7 +204,7 @@ void GameKitSessionImpl::LoadAchievementPicture (const Achievement& achievement,
 }
 
 /*
-   Публикация
+   РџСѓР±Р»РёРєР°С†РёСЏ
 */
 
 void GameKitSessionImpl::SendAchievement (const Achievement& achievement, const SendAchievementCallback& callback, const common::PropertyMap& properties)

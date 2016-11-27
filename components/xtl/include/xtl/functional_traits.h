@@ -1,5 +1,5 @@
 /*
-    Этот код был сгенерирован автоматически. Не исправляйте его вручную
+    Р­С‚РѕС‚ РєРѕРґ Р±С‹Р» СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. РќРµ РёСЃРїСЂР°РІР»СЏР№С‚Рµ РµРіРѕ РІСЂСѓС‡РЅСѓСЋ
 */
 
 #ifndef XTL_FUNCTIONAL_TRAITS_HEADER
@@ -24,7 +24,7 @@ namespace detail
 {
 
 /*
-    Таблица конфигурации функционального объекта
+    РўР°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 */
 
 template <class Fn> struct functional_traits
@@ -38,7 +38,7 @@ template <class Fn> struct functional_traits
 };
 
 /*
-    Специализации для различных видов квалификаторов
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СЂР°Р·Р»РёС‡РЅС‹С… РІРёРґРѕРІ РєРІР°Р»РёС„РёРєР°С‚РѕСЂРѕРІ
 */
 
 template <class Fn> struct functional_traits<const Fn>:          public functional_traits<Fn> {};
@@ -46,20 +46,20 @@ template <class Fn> struct functional_traits<volatile Fn>:       public function
 template <class Fn> struct functional_traits<const volatile Fn>: public functional_traits<Fn> {};
 
 /*
-    Таблицы конфигурации аргументов функции и типа возвращаемого значения
+    РўР°Р±Р»РёС†С‹ РєРѕРЅС„РёРіСѓСЂР°С†РёРё Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё Рё С‚РёРїР° РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
-//тип используемый в качестве индикатора отсутствия аргумента, аналогичен void
+//С‚РёРї РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РІ РєР°С‡РµСЃС‚РІРµ РёРЅРґРёРєР°С‚РѕСЂР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ Р°СЂРіСѓРјРµРЅС‚Р°, Р°РЅР°Р»РѕРіРёС‡РµРЅ void
 struct void_argument {};
 
-//обёртка указывающая на наличие многоточия в списке аргументов функции
+//РѕР±С‘СЂС‚РєР° СѓРєР°Р·С‹РІР°СЋС‰Р°СЏ РЅР° РЅР°Р»РёС‡РёРµ РјРЅРѕРіРѕС‚РѕС‡РёСЏ РІ СЃРїРёСЃРєРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё
 template <class Traits>
 struct ellipses_functional_traits: public Traits
 {
   enum { has_ellipses = true };
 };
 
-//таблица конфигурации для сигнатур на функции
+//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СЃРёРіРЅР°С‚СѓСЂ РЅР° С„СѓРЅРєС†РёРё
 template <size_t ArgumentsCount, class Ret, class Arg1=void_argument, class Arg2=void_argument, class Arg3=void_argument, class Arg4=void_argument, class Arg5=void_argument, class Arg6=void_argument, class Arg7=void_argument, class Arg8=void_argument, class Arg9=void_argument>
 class signature_arguments_traits
 {
@@ -82,14 +82,14 @@ class signature_arguments_traits
     };
 };
 
-//таблица конфигурации для указателей на функции
+//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёРё
 template <size_t ArgumentsCount, class Ret, class Arg1=void_argument, class Arg2=void_argument, class Arg3=void_argument, class Arg4=void_argument, class Arg5=void_argument, class Arg6=void_argument, class Arg7=void_argument, class Arg8=void_argument, class Arg9=void_argument>
 struct ptrfun_arguments_traits: public signature_arguments_traits<ArgumentsCount, Ret,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8,Arg9>
 {
   enum { is_ptrfun = true, is_function = false };
 };
 
-//таблица конфигурации для указателей на функции-члены
+//С‚Р°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёРё-С‡Р»РµРЅС‹
 template <size_t ArgumentsCount, class T, class Ret, class Arg1=void_argument, class Arg2=void_argument, class Arg3=void_argument, class Arg4=void_argument, class Arg5=void_argument, class Arg6=void_argument, class Arg7=void_argument, class Arg8=void_argument, class Arg9=void_argument>
 struct memfun_arguments_traits: public signature_arguments_traits<ArgumentsCount, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>
 {
@@ -99,1136 +99,1136 @@ struct memfun_arguments_traits: public signature_arguments_traits<ArgumentsCount
 };
 
 /*
-    Специализации для сигнатур функций
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СЃРёРіРЅР°С‚СѓСЂ С„СѓРЅРєС†РёР№
 */
 
-//специализация для сигнатуры без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret>
 struct functional_traits<Ret ()>: public signature_arguments_traits<0, Ret> { };
 
-//специализация для сигнатуры без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Ret>
 struct functional_traits<Ret (...)>: public ellipses_functional_traits<signature_arguments_traits<0, Ret> > { };
 
-//специализация для сигнатуры с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (Arg1)>: public signature_arguments_traits<1, Ret, Arg1> { };
 
-//специализация для сигнатуры с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (Arg1, ...)>: public ellipses_functional_traits<signature_arguments_traits<1, Ret, Arg1> > { };
 
-//специализация для сигнатуры с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (Arg1, Arg2)>: public signature_arguments_traits<2, Ret, Arg1, Arg2> { };
 
-//специализация для сигнатуры с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, ...)>: public ellipses_functional_traits<signature_arguments_traits<2, Ret, Arg1, Arg2> > { };
 
-//специализация для сигнатуры с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3)>: public signature_arguments_traits<3, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для сигнатуры с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, ...)>: public ellipses_functional_traits<signature_arguments_traits<3, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для сигнатуры с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4)>: public signature_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для сигнатуры с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, ...)>: public ellipses_functional_traits<signature_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для сигнатуры с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5)>: public signature_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для сигнатуры с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, ...)>: public ellipses_functional_traits<signature_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для сигнатуры с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public signature_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для сигнатуры с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...)>: public ellipses_functional_traits<signature_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для сигнатуры с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public signature_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для сигнатуры с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...)>: public ellipses_functional_traits<signature_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для сигнатуры с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public signature_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для сигнатуры с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...)>: public ellipses_functional_traits<signature_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для сигнатуры с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public signature_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для сигнатуры с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРіРЅР°С‚СѓСЂС‹ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public ellipses_functional_traits<signature_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
 /*
-    Специализации для указателей на функцию-член класса
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР°
 */
 
-//специализация для указателя на функцию-член класса T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)()>: public memfun_arguments_traits<0, T, Ret> { };
 
-//специализация для указателя на функцию-член класса T без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)(...)>: public ellipses_functional_traits<memfun_arguments_traits<0, T, Ret> > { };
 
-//специализация для указателя на функцию-член класса const T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)() const>: public memfun_arguments_traits<0, const T, Ret> { };
 
-//специализация для указателя на функцию-член класса const T без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)(...) const>: public ellipses_functional_traits<memfun_arguments_traits<0, const T, Ret> > { };
 
-//специализация для указателя на функцию-член класса volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)() volatile>: public memfun_arguments_traits<0, volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса volatile T без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)(...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<0, volatile T, Ret> > { };
 
-//специализация для указателя на функцию-член класса const volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)() const volatile>: public memfun_arguments_traits<0, const volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса const volatile T без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Ret>
 struct functional_traits<Ret (T::*)(...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<0, const volatile T, Ret> > { };
 
-//специализация для указателя на функцию-член класса T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1)>: public memfun_arguments_traits<1, T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса T с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, ...)>: public ellipses_functional_traits<memfun_arguments_traits<1, T, Ret, Arg1> > { };
 
-//специализация для указателя на функцию-член класса const T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1) const>: public memfun_arguments_traits<1, const T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const T с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<1, const T, Ret, Arg1> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1) volatile>: public memfun_arguments_traits<1, volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса volatile T с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<1, volatile T, Ret, Arg1> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1) const volatile>: public memfun_arguments_traits<1, const volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<1, const volatile T, Ret, Arg1> > { };
 
-//специализация для указателя на функцию-член класса T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2)>: public memfun_arguments_traits<2, T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса T с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, ...)>: public ellipses_functional_traits<memfun_arguments_traits<2, T, Ret, Arg1, Arg2> > { };
 
-//специализация для указателя на функцию-член класса const T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2) const>: public memfun_arguments_traits<2, const T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const T с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<2, const T, Ret, Arg1, Arg2> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2) volatile>: public memfun_arguments_traits<2, volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<2, volatile T, Ret, Arg1, Arg2> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2) const volatile>: public memfun_arguments_traits<2, const volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<2, const volatile T, Ret, Arg1, Arg2> > { };
 
-//специализация для указателя на функцию-член класса T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3)>: public memfun_arguments_traits<3, T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса T с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, ...)>: public ellipses_functional_traits<memfun_arguments_traits<3, T, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для указателя на функцию-член класса const T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3) const>: public memfun_arguments_traits<3, const T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const T с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<3, const T, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3) volatile>: public memfun_arguments_traits<3, volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<3, volatile T, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3) const volatile>: public memfun_arguments_traits<3, const volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<3, const volatile T, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для указателя на функцию-член класса T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4)>: public memfun_arguments_traits<4, T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса T с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, ...)>: public ellipses_functional_traits<memfun_arguments_traits<4, T, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для указателя на функцию-член класса const T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4) const>: public memfun_arguments_traits<4, const T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const T с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<4, const T, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4) volatile>: public memfun_arguments_traits<4, volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<4, volatile T, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4) const volatile>: public memfun_arguments_traits<4, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<4, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для указателя на функцию-член класса T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public memfun_arguments_traits<5, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса T с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...)>: public ellipses_functional_traits<memfun_arguments_traits<5, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для указателя на функцию-член класса const T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const>: public memfun_arguments_traits<5, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const T с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<5, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) volatile>: public memfun_arguments_traits<5, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<5, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const volatile>: public memfun_arguments_traits<5, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<5, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для указателя на функцию-член класса T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public memfun_arguments_traits<6, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса T с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...)>: public ellipses_functional_traits<memfun_arguments_traits<6, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для указателя на функцию-член класса const T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const>: public memfun_arguments_traits<6, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const T с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<6, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) volatile>: public memfun_arguments_traits<6, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<6, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const volatile>: public memfun_arguments_traits<6, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<6, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для указателя на функцию-член класса T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public memfun_arguments_traits<7, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса T с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...)>: public ellipses_functional_traits<memfun_arguments_traits<7, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для указателя на функцию-член класса const T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const>: public memfun_arguments_traits<7, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const T с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<7, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) volatile>: public memfun_arguments_traits<7, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<7, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const volatile>: public memfun_arguments_traits<7, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<7, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для указателя на функцию-член класса T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public memfun_arguments_traits<8, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса T с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...)>: public ellipses_functional_traits<memfun_arguments_traits<8, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для указателя на функцию-член класса const T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const>: public memfun_arguments_traits<8, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const T с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<8, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) volatile>: public memfun_arguments_traits<8, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<8, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const volatile>: public memfun_arguments_traits<8, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<8, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для указателя на функцию-член класса T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public memfun_arguments_traits<9, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса T с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public ellipses_functional_traits<memfun_arguments_traits<9, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
-//специализация для указателя на функцию-член класса const T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const>: public memfun_arguments_traits<9, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const T с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) const>: public ellipses_functional_traits<memfun_arguments_traits<9, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
-//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) volatile>: public memfun_arguments_traits<9, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) volatile>: public ellipses_functional_traits<memfun_arguments_traits<9, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
-//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) const volatile>: public ellipses_functional_traits<memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
 #if !defined(_MSC_VER) || defined(_WIN32_WCE) || defined (WP8)
 
 /*
-    Специализации для указателей на функцию
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ
 */
 
-//специализация для указателя на функцию без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret>
 struct functional_traits<Ret (*)()>: public ptrfun_arguments_traits<0, Ret>  { };
 
-//специализация для указателя на функцию без аргументов и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Ret>
 struct functional_traits<Ret (*)(...)>: public ellipses_functional_traits<ptrfun_arguments_traits<0, Ret> > { };
 
-//специализация для указателя на функцию с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (*)(Arg1)>: public ptrfun_arguments_traits<1, Ret, Arg1>  { };
 
-//специализация для указателя на функцию с 1-м аргументом и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (*)(Arg1, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<1, Ret, Arg1> > { };
 
-//специализация для указателя на функцию с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2)>: public ptrfun_arguments_traits<2, Ret, Arg1, Arg2>  { };
 
-//специализация для указателя на функцию с 2-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<2, Ret, Arg1, Arg2> > { };
 
-//специализация для указателя на функцию с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<3, Ret, Arg1, Arg2, Arg3>  { };
 
-//специализация для указателя на функцию с 3-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<3, Ret, Arg1, Arg2, Arg3> > { };
 
-//специализация для указателя на функцию с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4>  { };
 
-//специализация для указателя на функцию с 4-мя аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4> > { };
 
-//специализация для указателя на функцию с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
 
-//специализация для указателя на функцию с 5-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> > { };
 
-//специализация для указателя на функцию с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
 
-//специализация для указателя на функцию с 6-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> > { };
 
-//специализация для указателя на функцию с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
 
-//специализация для указателя на функцию с 7-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> > { };
 
-//специализация для указателя на функцию с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
 
-//специализация для указателя на функцию с 8-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> > { };
 
-//специализация для указателя на функцию с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
 
-//специализация для указателя на функцию с 9-ю аргументами и многоточием
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё Рё РјРЅРѕРіРѕС‚РѕС‡РёРµРј
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...)>: public ellipses_functional_traits<ptrfun_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
 #else //_MSC_VER
 
 /*
-    Специализации для компилятора MSVC
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ РєРѕРјРїРёР»СЏС‚РѕСЂР° MSVC
 */
 
 /*
-    Специализации для указателей на функцию с модификатором __fastcall
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __fastcall
 */
 
 #if !defined (__cplusplus_cli) && !defined (WP8) && !defined (_M_X64)
 
-//специализация для указателя на функцию без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret>
 struct functional_traits<Ret (__fastcall*)()>: public ptrfun_arguments_traits<0, Ret>  { };
 
-//специализация для указателя на функцию с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1)>: public ptrfun_arguments_traits<1, Ret, Arg1>  { };
 
-//специализация для указателя на функцию с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2)>: public ptrfun_arguments_traits<2, Ret, Arg1, Arg2>  { };
 
-//специализация для указателя на функцию с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<3, Ret, Arg1, Arg2, Arg3>  { };
 
-//специализация для указателя на функцию с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4>  { };
 
-//специализация для указателя на функцию с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
 
-//специализация для указателя на функцию с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
 
-//специализация для указателя на функцию с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
 
-//специализация для указателя на функцию с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
 
-//специализация для указателя на функцию с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__fastcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
 
 /*
-    Специализации для указателей на функцию-член класса с модификатором __fastcall
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __fastcall
 */
 
-//специализация для указателя на функцию-член класса T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__fastcall T::*)()>: public memfun_arguments_traits<0, T, Ret> { };
 
-//специализация для указателя на функцию-член класса const T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__fastcall T::*)() const>: public memfun_arguments_traits<0, const T, Ret> { };
 
-//специализация для указателя на функцию-член класса volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__fastcall T::*)() volatile>: public memfun_arguments_traits<0, volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса const volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__fastcall T::*)() const volatile>: public memfun_arguments_traits<0, const volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1)>: public memfun_arguments_traits<1, T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1) const>: public memfun_arguments_traits<1, const T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1) volatile>: public memfun_arguments_traits<1, volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1) const volatile>: public memfun_arguments_traits<1, const volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2)>: public memfun_arguments_traits<2, T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2) const>: public memfun_arguments_traits<2, const T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2) volatile>: public memfun_arguments_traits<2, volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2) const volatile>: public memfun_arguments_traits<2, const volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3)>: public memfun_arguments_traits<3, T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3) const>: public memfun_arguments_traits<3, const T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3) volatile>: public memfun_arguments_traits<3, volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3) const volatile>: public memfun_arguments_traits<3, const volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4)>: public memfun_arguments_traits<4, T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4) const>: public memfun_arguments_traits<4, const T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4) volatile>: public memfun_arguments_traits<4, volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4) const volatile>: public memfun_arguments_traits<4, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public memfun_arguments_traits<5, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const>: public memfun_arguments_traits<5, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) volatile>: public memfun_arguments_traits<5, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const volatile>: public memfun_arguments_traits<5, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public memfun_arguments_traits<6, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const>: public memfun_arguments_traits<6, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) volatile>: public memfun_arguments_traits<6, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const volatile>: public memfun_arguments_traits<6, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public memfun_arguments_traits<7, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const>: public memfun_arguments_traits<7, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) volatile>: public memfun_arguments_traits<7, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const volatile>: public memfun_arguments_traits<7, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public memfun_arguments_traits<8, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const>: public memfun_arguments_traits<8, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) volatile>: public memfun_arguments_traits<8, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const volatile>: public memfun_arguments_traits<8, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public memfun_arguments_traits<9, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const>: public memfun_arguments_traits<9, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) volatile>: public memfun_arguments_traits<9, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__fastcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
 #endif
 
 /*
-    Специализации для указателей на функцию с модификатором __stdcall
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __stdcall
 */
 
 #ifndef _M_X64
 
-//специализация для указателя на функцию без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret>
 struct functional_traits<Ret (__stdcall*)()>: public ptrfun_arguments_traits<0, Ret>  { };
 
-//специализация для указателя на функцию с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1)>: public ptrfun_arguments_traits<1, Ret, Arg1>  { };
 
-//специализация для указателя на функцию с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2)>: public ptrfun_arguments_traits<2, Ret, Arg1, Arg2>  { };
 
-//специализация для указателя на функцию с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<3, Ret, Arg1, Arg2, Arg3>  { };
 
-//специализация для указателя на функцию с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4>  { };
 
-//специализация для указателя на функцию с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
 
-//специализация для указателя на функцию с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
 
-//специализация для указателя на функцию с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
 
-//специализация для указателя на функцию с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
 
-//специализация для указателя на функцию с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
 
 /*
-    Специализации для указателей на функцию-член класса с модификатором __stdcall
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __stdcall
 */
 
-//специализация для указателя на функцию-член класса T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__stdcall T::*)()>: public memfun_arguments_traits<0, T, Ret> { };
 
-//специализация для указателя на функцию-член класса const T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__stdcall T::*)() const>: public memfun_arguments_traits<0, const T, Ret> { };
 
-//специализация для указателя на функцию-член класса volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__stdcall T::*)() volatile>: public memfun_arguments_traits<0, volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса const volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__stdcall T::*)() const volatile>: public memfun_arguments_traits<0, const volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1)>: public memfun_arguments_traits<1, T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1) const>: public memfun_arguments_traits<1, const T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1) volatile>: public memfun_arguments_traits<1, volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1) const volatile>: public memfun_arguments_traits<1, const volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2)>: public memfun_arguments_traits<2, T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2) const>: public memfun_arguments_traits<2, const T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2) volatile>: public memfun_arguments_traits<2, volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2) const volatile>: public memfun_arguments_traits<2, const volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3)>: public memfun_arguments_traits<3, T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3) const>: public memfun_arguments_traits<3, const T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3) volatile>: public memfun_arguments_traits<3, volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3) const volatile>: public memfun_arguments_traits<3, const volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4)>: public memfun_arguments_traits<4, T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4) const>: public memfun_arguments_traits<4, const T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4) volatile>: public memfun_arguments_traits<4, volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4) const volatile>: public memfun_arguments_traits<4, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public memfun_arguments_traits<5, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const>: public memfun_arguments_traits<5, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) volatile>: public memfun_arguments_traits<5, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const volatile>: public memfun_arguments_traits<5, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public memfun_arguments_traits<6, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const>: public memfun_arguments_traits<6, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) volatile>: public memfun_arguments_traits<6, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const volatile>: public memfun_arguments_traits<6, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public memfun_arguments_traits<7, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const>: public memfun_arguments_traits<7, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) volatile>: public memfun_arguments_traits<7, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const volatile>: public memfun_arguments_traits<7, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public memfun_arguments_traits<8, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const>: public memfun_arguments_traits<8, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) volatile>: public memfun_arguments_traits<8, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const volatile>: public memfun_arguments_traits<8, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public memfun_arguments_traits<9, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const>: public memfun_arguments_traits<9, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) volatile>: public memfun_arguments_traits<9, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__stdcall T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
 #endif
 
 /*
-    Специализации для указателей на функцию с модификатором __cdecl
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __cdecl
 */
 
-//специализация для указателя на функцию без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret>
 struct functional_traits<Ret (__cdecl*)()>: public ptrfun_arguments_traits<0, Ret>  { };
 
-//специализация для указателя на функцию с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class Arg1, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1)>: public ptrfun_arguments_traits<1, Ret, Arg1>  { };
 
-//специализация для указателя на функцию с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2)>: public ptrfun_arguments_traits<2, Ret, Arg1, Arg2>  { };
 
-//специализация для указателя на функцию с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3)>: public ptrfun_arguments_traits<3, Ret, Arg1, Arg2, Arg3>  { };
 
-//специализация для указателя на функцию с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4)>: public ptrfun_arguments_traits<4, Ret, Arg1, Arg2, Arg3, Arg4>  { };
 
-//специализация для указателя на функцию с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public ptrfun_arguments_traits<5, Ret, Arg1, Arg2, Arg3, Arg4, Arg5>  { };
 
-//специализация для указателя на функцию с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public ptrfun_arguments_traits<6, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>  { };
 
-//специализация для указателя на функцию с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public ptrfun_arguments_traits<7, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>  { };
 
-//специализация для указателя на функцию с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public ptrfun_arguments_traits<8, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>  { };
 
-//специализация для указателя на функцию с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public ptrfun_arguments_traits<9, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9>  { };
 
 /*
-    Специализации для указателей на функцию-член класса с модификатором __cdecl
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РґР»СЏ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° СЃ РјРѕРґРёС„РёРєР°С‚РѕСЂРѕРј __cdecl
 */
 
 #ifndef _M_X64
 
-//специализация для указателя на функцию-член класса T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__cdecl T::*)()>: public memfun_arguments_traits<0, T, Ret> { };
 
-//специализация для указателя на функцию-член класса const T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__cdecl T::*)() const>: public memfun_arguments_traits<0, const T, Ret> { };
 
-//специализация для указателя на функцию-член класса volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__cdecl T::*)() volatile>: public memfun_arguments_traits<0, volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса const volatile T без аргументов
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class T,class Ret>
 struct functional_traits<Ret (__cdecl T::*)() const volatile>: public memfun_arguments_traits<0, const volatile T, Ret> { };
 
-//специализация для указателя на функцию-член класса T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1)>: public memfun_arguments_traits<1, T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1) const>: public memfun_arguments_traits<1, const T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1) volatile>: public memfun_arguments_traits<1, volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 1-м аргументом
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T,class Arg1, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1) const volatile>: public memfun_arguments_traits<1, const volatile T, Ret, Arg1> { };
 
-//специализация для указателя на функцию-член класса T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2)>: public memfun_arguments_traits<2, T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) const>: public memfun_arguments_traits<2, const T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) volatile>: public memfun_arguments_traits<2, volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 2-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2) const volatile>: public memfun_arguments_traits<2, const volatile T, Ret, Arg1, Arg2> { };
 
-//специализация для указателя на функцию-член класса T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3)>: public memfun_arguments_traits<3, T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) const>: public memfun_arguments_traits<3, const T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) volatile>: public memfun_arguments_traits<3, volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 3-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3) const volatile>: public memfun_arguments_traits<3, const volatile T, Ret, Arg1, Arg2, Arg3> { };
 
-//специализация для указателя на функцию-член класса T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4)>: public memfun_arguments_traits<4, T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) const>: public memfun_arguments_traits<4, const T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) volatile>: public memfun_arguments_traits<4, volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 4-мя аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4) const volatile>: public memfun_arguments_traits<4, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4> { };
 
-//специализация для указателя на функцию-член класса T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5)>: public memfun_arguments_traits<5, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const>: public memfun_arguments_traits<5, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) volatile>: public memfun_arguments_traits<5, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 5-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5) const volatile>: public memfun_arguments_traits<5, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5> { };
 
-//специализация для указателя на функцию-член класса T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6)>: public memfun_arguments_traits<6, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const>: public memfun_arguments_traits<6, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) volatile>: public memfun_arguments_traits<6, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 6-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) const volatile>: public memfun_arguments_traits<6, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> { };
 
-//специализация для указателя на функцию-член класса T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7)>: public memfun_arguments_traits<7, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const>: public memfun_arguments_traits<7, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) volatile>: public memfun_arguments_traits<7, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 7-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) const volatile>: public memfun_arguments_traits<7, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> { };
 
-//специализация для указателя на функцию-член класса T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8)>: public memfun_arguments_traits<8, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const>: public memfun_arguments_traits<8, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) volatile>: public memfun_arguments_traits<8, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 8-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) const volatile>: public memfun_arguments_traits<8, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> { };
 
-//специализация для указателя на функцию-член класса T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9)>: public memfun_arguments_traits<9, T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const>: public memfun_arguments_traits<9, const T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) volatile>: public memfun_arguments_traits<9, volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 
-//специализация для указателя на функцию-член класса const volatile T с 9-ю аргументами
+//СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С„СѓРЅРєС†РёСЋ-С‡Р»РµРЅ РєР»Р°СЃСЃР° const volatile T СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (__cdecl T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9) const volatile>: public memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> { };
 

@@ -11,7 +11,7 @@
 using namespace render::low_level;
 
 /*
-    Конструктор
+    ╨Ъ╨╛╨╜╤Б╤В╤А╤Г╨║╤В╨╛╤А
 */
 
 StateBlockMask::StateBlockMask ()
@@ -20,7 +20,7 @@ StateBlockMask::StateBlockMask ()
 }
 
 /*
-   Групповая установка
+   ╨У╤А╤Г╨┐╨┐╨╛╨▓╨░╤П ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨░
 */
 
 void StateBlockMask::Set (StateBlockGroup group, bool value)
@@ -88,7 +88,7 @@ void StateBlockMask::Clear ()
 }
 
 /*
-    Хэш
+    ╨е╤Н╤И
 */
 
 size_t StateBlockMask::Hash () const
@@ -97,7 +97,7 @@ size_t StateBlockMask::Hash () const
 }
 
 /*
-   Покомопонентные логические операции
+   ╨Я╨╛╨║╨╛╨╝╨╛╨┐╨╛╨╜╨╡╨╜╤В╨╜╤Л╨╡ ╨╗╨╛╨│╨╕╤З╨╡╤Б╨║╨╕╨╡ ╨╛╨┐╨╡╤А╨░╤Ж╨╕╨╕
 */
 
 namespace
@@ -173,7 +173,7 @@ StateBlockMask StateBlockMask::operator ^ (const StateBlockMask& mask) const
 }
 
 /*
-   Сравнение
+   ╨б╤А╨░╨▓╨╜╨╡╨╜╨╕╨╡
 */
 
 bool StateBlockMask::operator == (const StateBlockMask& mask) const

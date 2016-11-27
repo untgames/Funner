@@ -4,17 +4,17 @@ using namespace physics;
 using namespace physics::low_level;
 
 /*
-   Реализация менеджера физики
+   Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° С„РёР·РёРєРё
 */
 
 typedef xtl::com_ptr<IDriver> DriverPtr;
 
 struct PhysicsManager::Impl: public xtl::trackable
 {
-  DriverPtr                      driver;   //драйвер
-  media::physics::PhysicsLibrary library;  //библиотека описаний объектов
+  DriverPtr                      driver;   //РґСЂР°Р№РІРµСЂ
+  media::physics::PhysicsLibrary library;  //Р±РёР±Р»РёРѕС‚РµРєР° РѕРїРёСЃР°РЅРёР№ РѕР±СЉРµРєС‚РѕРІ
 
-    //слияние коллекций
+    //СЃР»РёСЏРЅРёРµ РєРѕР»Р»РµРєС†РёР№
   template <class T>
   void MergeCollections (const media::physics::PhysicsLibraryCollection<T>& source, media::physics::PhysicsLibraryCollection<T>& destination)
   {
@@ -22,7 +22,7 @@ struct PhysicsManager::Impl: public xtl::trackable
       destination.Attach (source.ItemId (iter), *iter);
   }
 
-    //вычитание коллекций
+    //РІС‹С‡РёС‚Р°РЅРёРµ РєРѕР»Р»РµРєС†РёР№
   template <class T>
   void SubtractCollections (const media::physics::PhysicsLibraryCollection<T>& subtrahend, media::physics::PhysicsLibraryCollection<T>& minuend)
   {
@@ -30,7 +30,7 @@ struct PhysicsManager::Impl: public xtl::trackable
       minuend.Detach (subtrahend.ItemId (iter));
   }
 
-  ///Загрузка / выгрузка ресурсов
+  ///Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
   void LoadLibrary (const char* name)
   {
     media::physics::PhysicsLibrary new_library (name);
@@ -55,7 +55,7 @@ struct PhysicsManager::Impl: public xtl::trackable
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PhysicsManager::PhysicsManager (const char* driver_name)
@@ -83,7 +83,7 @@ PhysicsManager::~PhysicsManager ()
 }
 
 /*
-   Описание
+   РћРїРёСЃР°РЅРёРµ
 */
 
 const char* PhysicsManager::Description () const
@@ -92,7 +92,7 @@ const char* PhysicsManager::Description () const
 }
     
 /*
-   Создание объектов
+   РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ
 */
 
 Scene PhysicsManager::CreateScene ()
@@ -214,7 +214,7 @@ Shape PhysicsManager::CreateShape (const char* name, const math::vec3f& scale)
 }
 
 /*
-   Загрузка / выгрузка ресурсов
+   Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void PhysicsManager::LoadLibrary (const char* name)
@@ -244,7 +244,7 @@ void PhysicsManager::UnloadLibrary (const char* name)
 }
 
 /*
-    Получение объекта оповещения об удалении менеджера
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё РјРµРЅРµРґР¶РµСЂР°
 */
 
 xtl::trackable& PhysicsManager::Trackable () const

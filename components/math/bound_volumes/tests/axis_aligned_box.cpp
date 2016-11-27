@@ -126,7 +126,7 @@ int main ()
 
   printf ("contains point: %d\n", contains (box, vec3f (10.0f)));
   printf ("contains box1: %d\n", contains (box, box1));
-//  printf ("contains intersection (box, box1): %d\n", contains (box, intersection (box, box1)));  //� ���������� ����������� ���������� ������ box, ��-�� �������� ��������� �������� ������� �� �����������
+//  printf ("contains intersection (box, box1): %d\n", contains (box, intersection (box, box1)));  //Р’ СЂРµР·СѓР»СЊС‚Р°С‚Рµ РїРµСЂРµСЃРµС‡РµРЅРёСЏ РїРѕР»СѓС‡Р°РµС‚СЃСЏ РїСѓСЃС‚РѕР№ box, РёР·-Р·Р° РґСЂРѕР¶Р°РЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚ РїСЂРѕРІРµСЂРєРё Р·Р°РІРёСЃРёС‚ РѕС‚ РєРѕРјРїРёР»СЏС‚РѕСЂР°
 
   printf ("box == box: %d\n", box == box);
   printf ("box != box: %d\n", box != box);

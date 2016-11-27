@@ -16,7 +16,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание слушателя
+    РЎРѕР·РґР°РЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 Listener::Pointer create_listener ()
@@ -25,33 +25,33 @@ Listener::Pointer create_listener ()
 }
 
 /*
-   Регистрация библиотеки работы с слушателями
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃР»СѓС€Р°С‚РµР»СЏРјРё
 */
 
 void bind_listener_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_LISTENER_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_listener));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Gain", make_invoker (&Listener::SetGain));
   lib.Register ("get_Gain", make_invoker (&Listener::Gain));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Listener> (SCENE_LISTENER_LIBRARY);
 }
 
 /*
-    Создание источника звука
+    РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° Р·РІСѓРєР°
 */
 
 SoundEmitter::Pointer create_sound_emitter (const char* sound_declaration_name)
@@ -60,22 +60,22 @@ SoundEmitter::Pointer create_sound_emitter (const char* sound_declaration_name)
 }
 
 /*
-   Регистрация библиотеки работы с источниками звука
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РёСЃС‚РѕС‡РЅРёРєР°РјРё Р·РІСѓРєР°
 */
 
 void bind_sound_emitter_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SOUND_EMITTER_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_sound_emitter));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Gain",            make_invoker (&SoundEmitter::SetGain));
   lib.Register ("get_Gain",            make_invoker (&SoundEmitter::Gain));
@@ -88,7 +88,7 @@ void bind_sound_emitter_library (Environment& environment)
       make_invoker<void (SoundEmitter&)> (xtl::bind (&SoundEmitter::Play, _1, 0.f))));
   lib.Register ("Stop", make_invoker (&SoundEmitter::Stop));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<SoundEmitter> (SCENE_SOUND_EMITTER_LIBRARY);
 }

@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -12,7 +12,7 @@ inline hash_map_base<Key,T,HashFn,EqualKey,Allocator>::hash_map_base
 { }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -23,7 +23,7 @@ hash_map_base<Key,T,HashFn,EqualKey,Allocator>::get_allocator () const
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -62,7 +62,7 @@ hash_map_base<Key,T,HashFn,EqualKey,Allocator>::key_eq () const
 
 
 /*
-    Итераторы
+    РС‚РµСЂР°С‚РѕСЂС‹
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -122,7 +122,7 @@ hash_map_base<Key,T,HashFn,EqualKey,Allocator>::rend () const
 }
 
 /*
-    Информация о пакетах
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїР°РєРµС‚Р°С…
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -147,7 +147,7 @@ hash_map_base<Key,T,HashFn,EqualKey,Allocator>::elems_in_bucket (size_type bucke
 }
 
 /*
-    Изменение размера таблицы
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С‚Р°Р±Р»РёС†С‹
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -157,7 +157,7 @@ inline void hash_map_base<Key,T,HashFn,EqualKey,Allocator>::resize (size_type si
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -186,7 +186,7 @@ inline void hash_map_base<Key,T,HashFn,EqualKey,Allocator>::clear ()
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -227,7 +227,7 @@ hash_map_base<Key,T,HashFn,EqualKey,Allocator>::equal_range (const key_type& x) 
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -267,7 +267,7 @@ inline bool hash_map_base<Key,T,HashFn,EqualKey,Allocator>::operator >= (const h
 }
 
 /*
-    Множество с уникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ СѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -297,14 +297,14 @@ inline hash_map<Key,T,HashFn,EqualKey,Allocator>::hash_map
   insert (first,last);
 }
 
-//Операции доступа
+//РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline T& hash_map<Key,T,HashFn,EqualKey,Allocator>::operator [] (const key_type& key)
 {
   return ht.find_or_insert (value_type (key,T ())).second;
 }
 
-//Вставка
+//Р’СЃС‚Р°РІРєР°
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline pair<typename hash_map<Key,T,HashFn,EqualKey,Allocator>::iterator,bool> 
 hash_map<Key,T,HashFn,EqualKey,Allocator>::insert (const value_type& x)
@@ -327,7 +327,7 @@ inline void hash_map<Key,T,HashFn,EqualKey,Allocator>::insert (Iter first,Iter l
   ht.insert_unique (first,last);
 }
 
-//Обмен
+//РћР±РјРµРЅ
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline void hash_map<Key,T,HashFn,EqualKey,Allocator>::swap (hash_map& s)
 {
@@ -341,7 +341,7 @@ inline void swap (hash_map<Key,T,HashFn,EqualKey,Allocator>& a,hash_map<Key,T,Ha
 }
 
 /*
-    Множество с неуникальными ключами
+    РњРЅРѕР¶РµСЃС‚РІРѕ СЃ РЅРµСѓРЅРёРєР°Р»СЊРЅС‹РјРё РєР»СЋС‡Р°РјРё
 */
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
@@ -371,7 +371,7 @@ inline hash_multimap<Key,T,HashFn,EqualKey,Allocator>::hash_multimap
   insert (first,last);
 }
 
-//Вставка
+//Р’СЃС‚Р°РІРєР°
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline typename hash_multimap<Key,T,HashFn,EqualKey,Allocator>::iterator 
 hash_multimap<Key,T,HashFn,EqualKey,Allocator>::insert (const value_type& x)
@@ -392,7 +392,7 @@ inline void hash_multimap<Key,T,HashFn,EqualKey,Allocator>::insert (Iter first,I
   ht.insert_equal (first,last);
 }
 
-//Обмен
+//РћР±РјРµРЅ
 template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline void hash_multimap<Key,T,HashFn,EqualKey,Allocator>::swap (hash_multimap& s)
 {

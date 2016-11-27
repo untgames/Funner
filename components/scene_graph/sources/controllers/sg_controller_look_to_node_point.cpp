@@ -11,19 +11,19 @@ const float EPS = 0.0001f;
 }
 
 /*
-    Описание реализации контроллера выравнивания ориентации на точку узла
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ РѕСЂРёРµРЅС‚Р°С†РёРё РЅР° С‚РѕС‡РєСѓ СѓР·Р»Р°
 */
 
 struct LookToNodePoint::Impl: public xtl::instance_counter<LookToNodePoint>
 {
-  Node*                node;                    //передвигаемый узел
-  AccelerationFunction acceleration_function;   //функция рассчета ускорения узла
-  Node::ConstPointer   target_node;             //преследуемый узел
-  math::vec3f          target_point;            //целевая точка в системе координат преследуемого узла
-  NodeOrt              look_axis;               //ось узла, которая должна быть направлена на точку
-  NodeOrt              rotation_axis;           //ось узла, вокруг которой производится вращение
-  math::vec3f          current_speed;           //текущая скорость узла
-  xtl::auto_connection scene_attach_connection; //соединения события присоединения узла к сцене
+  Node*                node;                    //РїРµСЂРµРґРІРёРіР°РµРјС‹Р№ СѓР·РµР»
+  AccelerationFunction acceleration_function;   //С„СѓРЅРєС†РёСЏ СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
+  Node::ConstPointer   target_node;             //РїСЂРµСЃР»РµРґСѓРµРјС‹Р№ СѓР·РµР»
+  math::vec3f          target_point;            //С†РµР»РµРІР°СЏ С‚РѕС‡РєР° РІ СЃРёСЃС‚РµРјРµ РєРѕРѕСЂРґРёРЅР°С‚ РїСЂРµСЃР»РµРґСѓРµРјРѕРіРѕ СѓР·Р»Р°
+  NodeOrt              look_axis;               //РѕСЃСЊ СѓР·Р»Р°, РєРѕС‚РѕСЂР°СЏ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РЅР°РїСЂР°РІР»РµРЅР° РЅР° С‚РѕС‡РєСѓ
+  NodeOrt              rotation_axis;           //РѕСЃСЊ СѓР·Р»Р°, РІРѕРєСЂСѓРі РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІСЂР°С‰РµРЅРёРµ
+  math::vec3f          current_speed;           //С‚РµРєСѓС‰Р°СЏ СЃРєРѕСЂРѕСЃС‚СЊ СѓР·Р»Р°
+  xtl::auto_connection scene_attach_connection; //СЃРѕРµРґРёРЅРµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ СѓР·Р»Р° Рє СЃС†РµРЅРµ
 
   Impl (Node& in_node)
     : node (&in_node)
@@ -41,7 +41,7 @@ struct LookToNodePoint::Impl: public xtl::instance_counter<LookToNodePoint>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LookToNodePoint::LookToNodePoint (Node& node)
@@ -54,7 +54,7 @@ LookToNodePoint::~LookToNodePoint ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 LookToNodePoint::Pointer LookToNodePoint::Create (Node& node)
@@ -63,7 +63,7 @@ LookToNodePoint::Pointer LookToNodePoint::Create (Node& node)
 }
 
 /*
-   Установка/получение функции рассчета ускорения узла
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ С„СѓРЅРєС†РёРё СЂР°СЃСЃС‡РµС‚Р° СѓСЃРєРѕСЂРµРЅРёСЏ СѓР·Р»Р°
 */
 
 void LookToNodePoint::SetAccelerationHandler (const AccelerationFunction& acceleration_function)
@@ -77,7 +77,7 @@ const LookToNodePoint::AccelerationFunction& LookToNodePoint::AccelerationHandle
 }
 
 /*
-   Запуск движения
+   Р—Р°РїСѓСЃРє РґРІРёР¶РµРЅРёСЏ
 */
 
 void LookToNodePoint::Start (const Node& node, const math::vec3f& node_space_position, NodeOrt look_axis, NodeOrt rotation_axis)
@@ -89,7 +89,7 @@ void LookToNodePoint::Start (const Node& node, const math::vec3f& node_space_pos
 }
 
 /*
-   Остановка движения
+   РћСЃС‚Р°РЅРѕРІРєР° РґРІРёР¶РµРЅРёСЏ
 */
 
 void LookToNodePoint::Stop ()
@@ -98,7 +98,7 @@ void LookToNodePoint::Stop ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void LookToNodePoint::Update (const TimeValue& time_value)

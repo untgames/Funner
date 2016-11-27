@@ -1,4 +1,4 @@
-//Тестирование алгоритма includes (range1,range2)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° includes (range1,range2)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

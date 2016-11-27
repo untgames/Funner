@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Получение размера пикселя
+    РџРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° РїРёРєСЃРµР»СЏ
 */
 
 unsigned int get_pixel_size (PixelFormat format)
@@ -32,7 +32,7 @@ unsigned int get_pixel_used_size (PixelFormat format)
 }
 
 /*
-    Печать, заполнение, сравнение строк пикселей
+    РџРµС‡Р°С‚СЊ, Р·Р°РїРѕР»РЅРµРЅРёРµ, СЃСЂР°РІРЅРµРЅРёРµ СЃС‚СЂРѕРє РїРёРєСЃРµР»РµР№
 */
 
 int myrand ()
@@ -119,7 +119,7 @@ void print_buffer_diff (unsigned int width, unsigned int height, unsigned int pi
 }
 
 /*
-    Тестирование операции установки / чтения данных для буфера указанного формата
+    РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ РѕРїРµСЂР°С†РёРё СѓСЃС‚Р°РЅРѕРІРєРё / С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С… РґР»СЏ Р±СѓС„РµСЂР° СѓРєР°Р·Р°РЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 */
 
 void test_buffer (ITexture& render_buffer, unsigned int x, unsigned int y, unsigned int width, unsigned int height, PixelFormat format)

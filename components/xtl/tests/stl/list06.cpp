@@ -1,4 +1,4 @@
-// Тестирование push_back и pop_back
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ push_back Рё pop_back
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

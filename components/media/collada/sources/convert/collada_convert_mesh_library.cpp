@@ -4,12 +4,12 @@ namespace
 {
 
 const float        EPS                   = 0.001f;
-const unsigned int SURFACES_RESERVE_SIZE = 8;     //резервируемое количество поверхностей
+const unsigned int SURFACES_RESERVE_SIZE = 8;     //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 
 const char* MAIN_VERTEX_STREAM_NAME = "main";
 
 /*
-    Текстурные касательные и бинормали
+    РўРµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЃР°С‚РµР»СЊРЅС‹Рµ Рё Р±РёРЅРѕСЂРјР°Р»Рё
 */
 
 struct Tangent: public media::geometry::CustomAttribute<math::vec3f>
@@ -148,7 +148,7 @@ template <unsigned int Channel> struct TexChannel: public media::geometry::TexCh
 };
 
 /*
-    Преобразователь данных коллады
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ РґР°РЅРЅС‹С… РєРѕР»Р»Р°РґС‹
 */
 
 class Converter
@@ -168,43 +168,43 @@ class Converter
 
     typedef stl::hash_map<stl::hash_key<const char*>, media::geometry::VertexStream> VertexStreamMap;
     
-    //преобразованная поверхность
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅР°СЏ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ
     struct Surface
     {
-      VertexStreamMap                vertex_streams; //вершинный потоки
-      media::geometry::PrimitiveType primitive_type; //тип примитивов
-      unsigned int                   first_index;    //номер первого индекса
-      unsigned int                   indices_count;  //количество индексов
-      stl::string                    material;       //имя материала
+      VertexStreamMap                vertex_streams; //РІРµСЂС€РёРЅРЅС‹Р№ РїРѕС‚РѕРєРё
+      media::geometry::PrimitiveType primitive_type; //С‚РёРї РїСЂРёРјРёС‚РёРІРѕРІ
+      unsigned int                   first_index;    //РЅРѕРјРµСЂ РїРµСЂРІРѕРіРѕ РёРЅРґРµРєСЃР°
+      unsigned int                   indices_count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ
+      stl::string                    material;       //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
     };    
 
-    //преобразованный меш
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹Р№ РјРµС€
     struct Mesh
     {
-      SurfaceList                  surfaces;      //преобразованные поверхности
-      media::geometry::IndexBuffer index_buffer;  //индексный буфер
+      SurfaceList                  surfaces;      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹Рµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
+      media::geometry::IndexBuffer index_buffer;  //РёРЅРґРµРєСЃРЅС‹Р№ Р±СѓС„РµСЂ
 
       Mesh () { surfaces.reserve (SURFACES_RESERVE_SIZE); }
     };
 
-    //преобразованный скин
+    //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹Р№ СЃРєРёРЅ
     struct Skin
     {
-      MeshPtr                             base_mesh; //базовый меш
-      media::geometry::VertexWeightStream weights;   //вершинные веса
-      stl::string                         id;        //идентификатор (для поиска каналов vertex-influence)
+      MeshPtr                             base_mesh; //Р±Р°Р·РѕРІС‹Р№ РјРµС€
+      media::geometry::VertexWeightStream weights;   //РІРµСЂС€РёРЅРЅС‹Рµ РІРµСЃР°
+      stl::string                         id;        //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ (РґР»СЏ РїРѕРёСЃРєР° РєР°РЅР°Р»РѕРІ vertex-influence)
     };
 
   private:
-    const media::collada::Model&   model;             //исходная коллада-модель
-    media::geometry::MeshLibrary&  mesh_library;      //результирующая библиотека мешей
-    MeshMap                        mesh_map;          //карта преобразованных мешей
-    SkinMap                        skin_map;          //карта преобразованных скинов
-    bool                           fix_zero_tangents; //необходимо ли исправлять нулевые касательные
+    const media::collada::Model&   model;             //РёСЃС…РѕРґРЅР°СЏ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»СЊ
+    media::geometry::MeshLibrary&  mesh_library;      //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР° РјРµС€РµР№
+    MeshMap                        mesh_map;          //РєР°СЂС‚Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹С… РјРµС€РµР№
+    SkinMap                        skin_map;          //РєР°СЂС‚Р° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅС‹С… СЃРєРёРЅРѕРІ
+    bool                           fix_zero_tangents; //РЅРµРѕР±С…РѕРґРёРјРѕ Р»Рё РёСЃРїСЂР°РІР»СЏС‚СЊ РЅСѓР»РµРІС‹Рµ РєР°СЃР°С‚РµР»СЊРЅС‹Рµ
 
   public:
     /*
-        Конструктор
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     */
 
     Converter (const media::collada::Model& in_model, media::geometry::MeshLibrary& in_library, bool in_fix_zero_tangents)
@@ -218,7 +218,7 @@ class Converter
     }
 
     /*
-        Преобразование библиотеки
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     */
     
     template <class T>
@@ -229,10 +229,10 @@ class Converter
     }
 
     /*
-        Преобразование поверхности
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     */    
 
-      //преобразование положений и нормалей
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕР»РѕР¶РµРЅРёР№ Рё РЅРѕСЂРјР°Р»РµР№
     void ConvertSurfaceVertices (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
       typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf> ColladaVertex;
@@ -253,12 +253,12 @@ class Converter
         dst_vertex->normal   = src_vertex->normal;
       }
 
-        //добавление потока в карту вершинных потоков поверхности
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїРѕС‚РѕРєР° РІ РєР°СЂС‚Сѓ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
       dst_surface.vertex_streams.insert_pair (MAIN_VERTEX_STREAM_NAME, vs);
     }
 
-      //преобразование текстурных вершин
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РІРµСЂС€РёРЅ
     void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<0>::Coord3f, TexChannel<0>::Tangentf, TexChannel<0>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord0    = src_vertex.coord;
@@ -324,11 +324,11 @@ class Converter
 
       unsigned int vertices_count = src_surface.VerticesCount ();
 
-        //создание вершинного потока
+        //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
 
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaTexVertex> ());
 
-        //преобразование данных
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
       const media::collada::TexVertex* src_vertex = src_surface.TexVertexChannels ().Data (channel_index);
       ColladaTexVertex*                dst_vertex = vs.Data<ColladaTexVertex> ();
@@ -342,17 +342,17 @@ class Converter
       return vs;
     }
     
-      //преобразование текстурных вершин с цветами
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РІРµСЂС€РёРЅ СЃ С†РІРµС‚Р°РјРё
     media::geometry::VertexStream CreateTexColoredVertices (const media::collada::Surface& src_surface, unsigned int tex_channel_index, unsigned int color_channel_index)
     {
       typedef media::geometry::Vertex<media::geometry::Color3f, TexChannel<0>::Coord3f, Tangent, Binormal> ColladaTexVertex;
 
       unsigned int vertices_count = src_surface.VerticesCount ();
 
-        //создание вершинного потока
+        //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaTexVertex> ());
 
-        //преобразование данных
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
       const media::collada::TexVertex* src_vertex = src_surface.TexVertexChannels ().Data (tex_channel_index);
       const math::vec3f*               src_color  = src_surface.ColorChannels ().Data (color_channel_index);
@@ -372,7 +372,7 @@ class Converter
       return vs;
     }    
     
-      //преобразование каналов текстурных вершин
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР°РЅР°Р»РѕРІ С‚РµРєСЃС‚СѓСЂРЅС‹С… РІРµСЂС€РёРЅ
     void ConvertSurfaceTexVertexChannels (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
       typedef media::collada::Surface::TexVertexChannelList TexVertexChannelList;
@@ -383,11 +383,11 @@ class Converter
 
       for (unsigned int i=0; i<tex_channels.Size (); i++)
       {
-          //определение вида потока: текстурные координаты либо текстурные координат + цвет
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ РІРёРґР° РїРѕС‚РѕРєР°: С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РёР±Рѕ С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚ + С†РІРµС‚
 
         int color_channel_index = color_channels.Find (tex_channels.Name (i));
         
-          //преобразование вершинного потока
+          //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
 
         media::geometry::VertexStream vs (0, media::geometry::VertexDeclaration (media::geometry::VertexFormat ()));
 
@@ -426,13 +426,13 @@ class Converter
           }
         }
 
-          //регистрация вершинного потока в поверхности
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР° РІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
         dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%u", tex_channels.Name (i)).c_str (), vs);
       }
     }
     
-      //преобразование каналов vertex influence
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР°РЅР°Р»РѕРІ vertex influence
     void ConvertSurfaceInfluenceChannels (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
       typedef media::collada::Surface::InfluenceChannelList InfluenceChannelList;
@@ -442,13 +442,13 @@ class Converter
       
       for (unsigned int i=0; i<channels.Size (); i++)
       {
-          //создание вершинного потока
+          //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
         
         typedef media::geometry::Vertex<media::geometry::VertexInfluence> ColladaInfluence;
 
         media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaInfluence> ());
 
-          //преобразование данных
+          //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РґР°РЅРЅС‹С…
 
         const media::collada::VertexInfluence* src_influence = src_surface.InfluenceChannels ().Data (i);
         ColladaInfluence*                      dst_influence = vs.Data<ColladaInfluence> ();
@@ -462,13 +462,13 @@ class Converter
           dst_influence->weights_count = src_influence->weights_count;
         }    
 
-          //регистрация вершинного потока в поверхности
+          //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР° РІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
           
         dst_surface.vertex_streams.insert_pair (common::format ("influences.%s", channels.Name (i)).c_str (), vs);
       }
     }
     
-      //преобразование индексов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ
     void ConvertSurfaceIndices (const media::collada::Surface& src_surface, media::geometry::IndexBuffer& dst_index_buffer)
     { 
       unsigned int indices_count             = src_surface.IndicesCount (),
@@ -482,7 +482,7 @@ class Converter
       stl::copy (src_surface.Indices (), src_surface.Indices () + indices_count, dst_index_buffer.Data<unsigned int> () + current_index_buffer_size);
     }
 
-      //коррекция нулевых касательных
+      //РєРѕСЂСЂРµРєС†РёСЏ РЅСѓР»РµРІС‹С… РєР°СЃР°С‚РµР»СЊРЅС‹С…
     void FixZeroTangents (Surface& dst_surface)
     {
       VertexStreamMap::iterator main_vs_iter = dst_surface.vertex_streams.find (MAIN_VERTEX_STREAM_NAME);
@@ -562,19 +562,19 @@ class Converter
       }
     }
 
-      //преобразование поверхности
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     void ConvertSurface (const media::collada::Surface& src_surface, Mesh& dst_mesh)
     {
-        //создание поверхности
+        //СЃРѕР·РґР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
       SurfacePtr dst_surface (new Surface);
 
-        //задание диапазона индексов
+        //Р·Р°РґР°РЅРёРµ РґРёР°РїР°Р·РѕРЅР° РёРЅРґРµРєСЃРѕРІ
 
       dst_surface->first_index   = dst_mesh.index_buffer.Size ();
       dst_surface->indices_count = src_surface.IndicesCount ();
 
-        //преобразование массивов поверхности
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
       ConvertSurfaceVertices          (src_surface, *dst_surface);
       ConvertSurfaceTexVertexChannels (src_surface, *dst_surface);
@@ -584,7 +584,7 @@ class Converter
       if (fix_zero_tangents)
         FixZeroTangents (*dst_surface);
 
-        //преобразование типа примитива поверхности
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РёРїР° РїСЂРёРјРёС‚РёРІР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
       
       switch (src_surface.PrimitiveType ())
       {
@@ -596,26 +596,26 @@ class Converter
         default:                                          return;
       }
       
-        //задание имени материала
+        //Р·Р°РґР°РЅРёРµ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
         
       dst_surface->material = src_surface.Material ();
 
-        //регистрация поверхности
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
       dst_mesh.surfaces.push_back (dst_surface);
     }    
     
     /*
-        Преобразование меша
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РјРµС€Р°
     */
 
     void ConvertMesh (const char* id, const media::collada::Mesh& src_mesh)
     {
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       MeshPtr dst_mesh (new Mesh);
       
-        //резервирование памяти для хранения индексов
+        //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРЅРґРµРєСЃРѕРІ
         
       unsigned int indices_count = 0;
       
@@ -624,12 +624,12 @@ class Converter
         
       dst_mesh->index_buffer.Reserve (indices_count);
 
-        //преобразование поверхностей
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 
       for (unsigned int i=0; i<src_mesh.Surfaces ().Size (); i++)
         ConvertSurface (src_mesh.Surfaces () [i], *dst_mesh);
 
-        //Преобразование индексов в минимально возможный тип данных
+        //РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ РІ РјРёРЅРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ С‚РёРї РґР°РЅРЅС‹С…
       unsigned int max_index_value = 0;
       unsigned int *current_index  = dst_mesh->index_buffer.Data<unsigned int> ();
 
@@ -643,18 +643,18 @@ class Converter
       else if (max_index_value <= 0xffff)
         dst_mesh->index_buffer.SetDataType (media::geometry::IndexType_UInt16);
 
-        //регистрация меша
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС€Р°
 
       mesh_map.insert_pair (id, dst_mesh);
     }    
     
     /*
-        Преобразование скина
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃРєРёРЅР°
     */
 
     void ConvertSkin (const char* id, const media::collada::Skin& src_skin)
     {
-        //определение имени базового меша
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ РёРјРµРЅРё Р±Р°Р·РѕРІРѕРіРѕ РјРµС€Р°
 
       const char*                  base_mesh_name = src_skin.BaseMesh ();
       const media::collada::Morph* morph          = model.Morphs ().Find (base_mesh_name);
@@ -662,21 +662,21 @@ class Converter
       if (morph)
         base_mesh_name = morph->BaseMesh ();
 
-        //поиск преобразованного меша
+        //РїРѕРёСЃРє РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРЅРѕРіРѕ РјРµС€Р°
 
       MeshMap::iterator iter = mesh_map.find (base_mesh_name);
 
       if (iter == mesh_map.end ())
-        return; //базовый меш не найден
+        return; //Р±Р°Р·РѕРІС‹Р№ РјРµС€ РЅРµ РЅР°Р№РґРµРЅ
         
-        //создание скина
+        //СЃРѕР·РґР°РЅРёРµ СЃРєРёРЅР°
         
       SkinPtr skin (new Skin);
       
       skin->base_mesh = iter->second;
       skin->id        = id;
 
-        //преобразование весов
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРµСЃРѕРІ
         
       media::geometry::VertexWeightStream& vws           = skin->weights;
       unsigned int                         weights_count = src_skin.WeightsCount ();
@@ -692,19 +692,19 @@ class Converter
         dst_weight->joint_weight = src_weight->weight;
       }
 
-        //регистрация скина
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРєРёРЅР°
 
       skin_map.insert_pair (id, skin);
     }
     
     /*
-        Преобразование инстанцированного меша
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РјРµС€Р°
     */
     
     void ConvertInstanceSurface (Surface& surface, const media::collada::MaterialBinds& binds, const char* influence_channel_name,
                                  media::geometry::VertexWeightStream* vws, media::geometry::Mesh& dst_mesh)
     {
-        //получение эффекта
+        //РїРѕР»СѓС‡РµРЅРёРµ СЌС„С„РµРєС‚Р°
       
       const char*                     material_name = binds.FindMaterial (surface.material.c_str ());
       const media::collada::Material* material      = material_name ? model.Materials ().Find (material_name) : 0;
@@ -717,11 +717,11 @@ class Converter
       if (!effect)
         return;
 
-        //компоновка вершинного буфера
+        //РєРѕРјРїРѕРЅРѕРІРєР° РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
       
       media::geometry::VertexBuffer vertex_buffer;
       
-        //присоединение основного вершинного потока
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РѕСЃРЅРѕРІРЅРѕРіРѕ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
         
       VertexStreamMap::iterator iter = surface.vertex_streams.find ("main");
       
@@ -730,16 +730,16 @@ class Converter
 
       vertex_buffer.Attach (iter->second);
       
-        //присоединение текстурных каналов
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°РЅР°Р»РѕРІ
         
       for (int i=0; i<media::collada::TextureMap_Num; i++)
       {
-          //получение имени канала текстурных координат
+          //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР°РЅР°Р»Р° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
         
         const media::collada::Texture& texture      = effect->Texture ((media::collada::TextureMap)i);
         const char*                    channel_name = texture.TexcoordChannel ();
         
-          //поиск канала текстурных координат
+          //РїРѕРёСЃРє РєР°РЅР°Р»Р° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 
         if (strstr (channel_name, "CHANNEL") == channel_name)
           channel_name += strlen ("CHANNEL");
@@ -749,14 +749,14 @@ class Converter
         VertexStreamMap::iterator iter = surface.vertex_streams.find (common::format ("texchannels.%s", channel_name).c_str ());
 
         if (iter == surface.vertex_streams.end ())
-          continue; //вершинный канал не найден
+          continue; //РІРµСЂС€РёРЅРЅС‹Р№ РєР°РЅР°Р» РЅРµ РЅР°Р№РґРµРЅ
 
-          //добавление канала
+          //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РЅР°Р»Р°
           
         vertex_buffer.Attach (iter->second);
       }
       
-        //присоединение канала vertex influences
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РєР°РЅР°Р»Р° vertex influences
       
       if (influence_channel_name && vws)
       {
@@ -769,11 +769,11 @@ class Converter
         }
       }
       
-        //регистрация вершинного буфера
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       unsigned int vertex_buffer_index = dst_mesh.Attach (vertex_buffer);
 
-        //добавление примитива
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІР°
         
       dst_mesh.AddPrimitive (surface.primitive_type, vertex_buffer_index, surface.first_index,
                              media::geometry::get_primitives_count (surface.primitive_type, surface.indices_count), material_name);
@@ -781,7 +781,7 @@ class Converter
     
     void ConvertInstanceMesh (const char* id, const media::collada::InstanceMesh& imesh)
     {
-        //поиск инстанцируемого меша
+        //РїРѕРёСЃРє РёРЅСЃС‚Р°РЅС†РёСЂСѓРµРјРѕРіРѕ РјРµС€Р°
       
       MeshMap::iterator iter = mesh_map.find (imesh.Mesh ());
       
@@ -791,33 +791,33 @@ class Converter
       Mesh*                                mesh  = get_pointer (iter->second);
       const media::collada::MaterialBinds& binds = imesh.MaterialBinds ();
       
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       media::geometry::Mesh dst_mesh;
       
       dst_mesh.Rename (id);
       
-        //присоединение индексного буфера
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
         
       dst_mesh.Attach (mesh->index_buffer);
       
-        //преобразование поверхностей
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
 
       for (SurfaceList::iterator i=mesh->surfaces.begin (), end=mesh->surfaces.end (); i!=end; ++i)
         ConvertInstanceSurface (**i, binds, "", 0, dst_mesh);
         
-        //регистрация меша в библиотеке
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС€Р° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 
       mesh_library.Attach (id, dst_mesh);
     }
     
     /*
-        Преобразование инстанцированного контроллера (пока только скины)
+        РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° (РїРѕРєР° С‚РѕР»СЊРєРѕ СЃРєРёРЅС‹)
     */
     
     void ConvertInstanceController (const char* id, const media::collada::InstanceController& icontroller)
     {
-        //поиск инстанцируемого меша
+        //РїРѕРёСЃРє РёРЅСЃС‚Р°РЅС†РёСЂСѓРµРјРѕРіРѕ РјРµС€Р°
 
       SkinMap::iterator iter = skin_map.find (icontroller.Controller ());
 
@@ -828,17 +828,17 @@ class Converter
       Mesh*                                base_mesh = get_pointer (skin->base_mesh);
       const media::collada::MaterialBinds& binds     = icontroller.MaterialBinds ();
 
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       media::geometry::Mesh dst_mesh;
 
       dst_mesh.Rename (id);
 
-        //присоединение индексного буфера
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       dst_mesh.Attach (base_mesh->index_buffer);
 
-        //преобразование поверхностей
+        //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
         
       const char*                          skin_id = skin->id.c_str ();
       media::geometry::VertexWeightStream* vws     = &skin->weights;
@@ -846,13 +846,13 @@ class Converter
       for (SurfaceList::iterator i=base_mesh->surfaces.begin (), end=base_mesh->surfaces.end (); i!=end; ++i)
         ConvertInstanceSurface (**i, binds, skin_id, vws, dst_mesh);
 
-        //регистрация меша в библиотеке
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС€Р° РІ Р±РёР±Р»РёРѕС‚РµРєРµ
         
       mesh_library.Attach (id, dst_mesh);
     }    
     
     /*
-        Обход узлов коллада-сцены: инстанцирование геометрии
+        РћР±С…РѕРґ СѓР·Р»РѕРІ РєРѕР»Р»Р°РґР°-СЃС†РµРЅС‹: РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРёРµ РіРµРѕРјРµС‚СЂРёРё
     */
 
     void ConvertNode (const char* id, const media::collada::Node& src_node)
@@ -877,7 +877,7 @@ namespace media
 namespace collada
 {
 
-//преобразование коллада-модели в библиотеку мешей
+//РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕР»Р»Р°РґР°-РјРѕРґРµР»Рё РІ Р±РёР±Р»РёРѕС‚РµРєСѓ РјРµС€РµР№
 void convert (const media::collada::Model& src_model, geometry::MeshLibrary& dst_library, bool fix_zero_tangents)
 {
   Converter (src_model, dst_library, fix_zero_tangents);

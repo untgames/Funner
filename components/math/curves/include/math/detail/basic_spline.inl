@@ -4,7 +4,7 @@ namespace detail
 namespace adl
 {
 
-///Проверка равенства двух значений
+///РџСЂРѕРІРµСЂРєР° СЂР°РІРµРЅСЃС‚РІР° РґРІСѓС… Р·РЅР°С‡РµРЅРёР№
 template <class T1, class T2>
 bool equal (const T1& a, const T1& b, const T2& eps)
 {
@@ -21,7 +21,7 @@ bool check_equal (const T1& a, const T1& b, const T2& eps)
 
 }
 
-///Обёртка для инициализации результата сплайна
+///РћР±С‘СЂС‚РєР° РґР»СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё СЂРµР·СѓР»СЊС‚Р°С‚Р° СЃРїР»Р°Р№РЅР°
 template <class T> struct spline_result_wrapper
 {
   T value;
@@ -29,7 +29,7 @@ template <class T> struct spline_result_wrapper
   spline_result_wrapper () : value () {}
 };
 
-///Фрейм
+///Р¤СЂРµР№Рј
 template <class Key> struct spline_key_frame
 {
   typedef Key                            key_type;
@@ -80,7 +80,7 @@ template <class T> struct spline_key_frame<spline_linear_key<T> >
   }
 };
 
-///Компаратор для фреймов
+///РљРѕРјРїР°СЂР°С‚РѕСЂ РґР»СЏ С„СЂРµР№РјРѕРІ
 template <class Frame> struct spline_key_frame_less
 {
   bool operator () (const Frame& frame1, const Frame& frame2) const
@@ -94,14 +94,14 @@ template <class Frame> struct spline_key_frame_less
   }
 };
 
-///Нормирование времени
+///РќРѕСЂРјРёСЂРѕРІР°РЅРёРµ РІСЂРµРјРµРЅРё
 template <class Time, class Frame>
 Time normalize_time (const Time& time, const Frame& frame)
 {
   return (time - frame.key.time) * frame.time_factor;
 }
 
-///Интерполяция
+///РРЅС‚РµСЂРїРѕР»СЏС†РёСЏ
 template <class Time, class Frame, class Value>
 void spline_eval (const Time& unclamped_time, const Frame& frame, Value& result)
 {    
@@ -122,7 +122,7 @@ void spline_eval (const Time& time, const spline_key_frame<spline_linear_key<Val
   result = frame.key.value + frame.value_diff * (time - frame.key.time) / frame.time_diff;
 }
 
-///Раcчёт коэффициентов TCB-сплайна
+///Р Р°cС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ TCB-СЃРїР»Р°Р№РЅР°
 template <class Frame>
 void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame& next1, const Frame& next2, Frame& result)
 {
@@ -210,12 +210,12 @@ void recompute (spline_key_frame<spline_tcb_key<T> >* first, spline_key_frame<sp
 
   typedef spline_key_frame<spline_tcb_key<T> > frame_type;
   
-    //расчёт коэффициентов для средних точек
+    //СЂР°СЃС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ РґР»СЏ СЃСЂРµРґРЅРёС… С‚РѕС‡РµРє
   
   for (frame_type* frame=first+1; frame<last-2; ++frame)
     spline_recompute_hermite (frame [-1], frame [0], frame [1], frame [2], *frame);
   
-    //расчёт коэффициентов для крайних точек
+    //СЂР°СЃС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ РґР»СЏ РєСЂР°Р№РЅРёС… С‚РѕС‡РµРє
     
   spline_frame_selector<frame_type> frame_selector (first, last, closed);
 
@@ -228,7 +228,7 @@ void recompute (spline_key_frame<spline_tcb_key<T> >* first, spline_key_frame<sp
     spline_recompute_hermite (last - 1, frame_selector);
 }
 
-///Расчёт коэффициентов Безье сплайна
+///Р Р°СЃС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ Р‘РµР·СЊРµ СЃРїР»Р°Р№РЅР°
 template <class T>
 void recompute (spline_key_frame<spline_bezier_key<T> >* first, spline_key_frame<spline_bezier_key<T> >* last, bool closed)
 {
@@ -269,13 +269,13 @@ void recompute (spline_key_frame<spline_bezier_key<T> >* first, spline_key_frame
   } 
 }
 
-///Расчёт сплайна без интерполяции
+///Р Р°СЃС‡С‘С‚ СЃРїР»Р°Р№РЅР° Р±РµР· РёРЅС‚РµСЂРїРѕР»СЏС†РёРё
 template <class T>
 void recompute (spline_key_frame<spline_step_key<T> >* first, spline_key_frame<spline_step_key<T> >* last, bool closed)
 {
 }
 
-///Расчёт сплайна без интерполяции
+///Р Р°СЃС‡С‘С‚ СЃРїР»Р°Р№РЅР° Р±РµР· РёРЅС‚РµСЂРїРѕР»СЏС†РёРё
 template <class T>
 void recompute (spline_key_frame<spline_linear_key<T> >* first, spline_key_frame<spline_linear_key<T> >* last, bool closed)
 {
@@ -305,7 +305,7 @@ void recompute (spline_key_frame<spline_linear_key<T> >* first, spline_key_frame
 }
 
 /*
-    TCB сплайн
+    TCB СЃРїР»Р°Р№РЅ
 */
 
 template <class T>
@@ -349,7 +349,7 @@ spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& i
 }
 
 /*
-    Сплайн без интерполяции
+    РЎРїР»Р°Р№РЅ Р±РµР· РёРЅС‚РµСЂРїРѕР»СЏС†РёРё
 */
 
 template <class T>
@@ -364,7 +364,7 @@ spline_step_key<T>::spline_step_key (const time_type& time, const value_type& va
 }
 
 /*
-    Сплайн с линейной интерполяцией
+    РЎРїР»Р°Р№РЅ СЃ Р»РёРЅРµР№РЅРѕР№ РёРЅС‚РµСЂРїРѕР»СЏС†РёРµР№
 */
 
 template <class T>
@@ -379,7 +379,7 @@ spline_linear_key<T>::spline_linear_key (const time_type& time, const value_type
 }
 
 /*
-    Безье сплайн
+    Р‘РµР·СЊРµ СЃРїР»Р°Р№РЅ
 */
 
 template <class T>
@@ -406,7 +406,7 @@ spline_bezier_key<T>::spline_bezier_key (const time_type& in_time, const value_t
 }
 
 /*
-    Описание реализации сплайна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїР»Р°Р№РЅР°
 */
 
 template <class Key> struct basic_spline<Key>::implementation: public xtl::reference_counter
@@ -416,17 +416,17 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
   typedef typename basic_spline<Key>::scalar_type scalar_type;  
   typedef stl::vector<frame_type>                 frame_list;
 
-  spline_wrap begin_wrap;       //отсечение на левой границе сплайна
-  spline_wrap end_wrap;         //отсечение на правой границе сплайна
-  time_type   min_time;         //минимальное время
-  time_type   max_time;         //максимальное время
-  frame_list  frames;           //фреймы
-  scalar_type closed_eps;       //погрешность для определения закрытости сплайна
-  bool        closed;           //закрытый ли сплайн
-  bool        need_recompute;   //ключи требуют перерасчёта
-  bool        need_sort;        //ключи требуют сортировки
+  spline_wrap begin_wrap;       //РѕС‚СЃРµС‡РµРЅРёРµ РЅР° Р»РµРІРѕР№ РіСЂР°РЅРёС†Рµ СЃРїР»Р°Р№РЅР°
+  spline_wrap end_wrap;         //РѕС‚СЃРµС‡РµРЅРёРµ РЅР° РїСЂР°РІРѕР№ РіСЂР°РЅРёС†Рµ СЃРїР»Р°Р№РЅР°
+  time_type   min_time;         //РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+  time_type   max_time;         //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+  frame_list  frames;           //С„СЂРµР№РјС‹
+  scalar_type closed_eps;       //РїРѕРіСЂРµС€РЅРѕСЃС‚СЊ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ Р·Р°РєСЂС‹С‚РѕСЃС‚Рё СЃРїР»Р°Р№РЅР°
+  bool        closed;           //Р·Р°РєСЂС‹С‚С‹Р№ Р»Рё СЃРїР»Р°Р№РЅ
+  bool        need_recompute;   //РєР»СЋС‡Рё С‚СЂРµР±СѓСЋС‚ РїРµСЂРµСЂР°СЃС‡С‘С‚Р°
+  bool        need_sort;        //РєР»СЋС‡Рё С‚СЂРµР±СѓСЋС‚ СЃРѕСЂС‚РёСЂРѕРІРєРё
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   implementation ()
     : begin_wrap (spline_wrap_default)
     , end_wrap (spline_wrap_default)
@@ -439,7 +439,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
   {
   }
   
-///Сортировка
+///РЎРѕСЂС‚РёСЂРѕРІРєР°
   void sort ()
   {
     if (!need_sort)
@@ -461,7 +461,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
     need_sort = false;
   }
   
-///Перерасчёт коэффициентов
+///РџРµСЂРµСЂР°СЃС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ
   void recompute ()
   {
     if (!need_recompute)
@@ -476,16 +476,16 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
     need_recompute = false;
   }
   
-///Отсечение времени
+///РћС‚СЃРµС‡РµРЅРёРµ РІСЂРµРјРµРЅРё
   time_type clamp (const time_type& time, float coef)
   {
     return static_cast<time_type> (fmod (static_cast<float> (time - min_time), coef * static_cast<float> (max_time - min_time))) + min_time;
   }
 
-///Получение отсеченного согласно настройкам сплайна времени
+///РџРѕР»СѓС‡РµРЅРёРµ РѕС‚СЃРµС‡РµРЅРЅРѕРіРѕ СЃРѕРіР»Р°СЃРЅРѕ РЅР°СЃС‚СЂРѕР№РєР°Рј СЃРїР»Р°Р№РЅР° РІСЂРµРјРµРЅРё
   time_type get_wrapped_time (time_type time)
   {
-      //перерасчёт
+      //РїРµСЂРµСЂР°СЃС‡С‘С‚
     
     if (need_recompute)    
       recompute ();
@@ -521,15 +521,15 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
     return time;
   }
 
-///Поиск ключевого кадра
+///РџРѕРёСЃРє РєР»СЋС‡РµРІРѕРіРѕ РєР°РґСЂР°
   frame_type& get_frame (time_type time)
   {
-      //перерасчёт
+      //РїРµСЂРµСЂР°СЃС‡С‘С‚
 
     if (need_recompute)
       recompute ();
 
-      //поиск кадра
+      //РїРѕРёСЃРє РєР°РґСЂР°
 
     typename frame_list::iterator iter = stl::lower_bound (frames.begin (), frames.end (), time, detail::spline_key_frame_less<frame_type> ());
     
@@ -544,7 +544,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class Key>
@@ -563,7 +563,7 @@ template <class Key>
 basic_spline<Key>::basic_spline (const basic_spline& s)
   : impl (s.impl)
 {
-  xtl::reference_counter* ref_count = impl;  //Обход бага компиляции gcc 4.0 на мак
+  xtl::reference_counter* ref_count = impl;  //РћР±С…РѕРґ Р±Р°РіР° РєРѕРјРїРёР»СЏС†РёРё gcc 4.0 РЅР° РјР°Рє
 
   addref (ref_count);
 }
@@ -582,7 +582,7 @@ basic_spline<Key>& basic_spline<Key>::operator = (const basic_spline& s)
 }
 
 /*
-    Копирование
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 template <class Key>
@@ -592,7 +592,7 @@ basic_spline<Key> basic_spline<Key>::clone () const
 }
 
 /*
-    Поведение на границе
+    РџРѕРІРµРґРµРЅРёРµ РЅР° РіСЂР°РЅРёС†Рµ
 */
 
 template <class Key>
@@ -635,7 +635,7 @@ spline_wrap basic_spline<Key>::end_wrap () const
 }
 
 /*
-    Количество ключей / проверка на пустоту
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РєР»СЋС‡РµР№ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class Key>
@@ -651,7 +651,7 @@ bool basic_spline<Key>::empty () const
 }
 
 /*
-    Закрытый ли сплайн
+    Р—Р°РєСЂС‹С‚С‹Р№ Р»Рё СЃРїР»Р°Р№РЅ
 */
 
 template <class Key>
@@ -676,7 +676,7 @@ const typename basic_spline<Key>::scalar_type& basic_spline<Key>::closed_eps () 
 }
 
 /*
-    Резервирование ключей
+    Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РєР»СЋС‡РµР№
 */
 
 template <class Key>
@@ -692,7 +692,7 @@ size_t basic_spline<Key>::capacity () const
 }
 
 /*
-    Получение / обновление ключа
+    РџРѕР»СѓС‡РµРЅРёРµ / РѕР±РЅРѕРІР»РµРЅРёРµ РєР»СЋС‡Р°
 */
 
 template <class Key>
@@ -717,7 +717,7 @@ void basic_spline<Key>::set_key (size_t index, const key_type& key)
 }
 
 /*
-    Добавление ключа
+    Р”РѕР±Р°РІР»РµРЅРёРµ РєР»СЋС‡Р°
 */
 
 template <class Key>
@@ -749,7 +749,7 @@ size_t basic_spline<Key>::add_key (const time_type& time, const value_type& valu
 }
 
 /*
-    Удаление ключей
+    РЈРґР°Р»РµРЅРёРµ РєР»СЋС‡РµР№
 */
 
 template <class Key>
@@ -776,7 +776,7 @@ void basic_spline<Key>::clear ()
 }
 
 /*
-    Сортировка ключей для ускорения поиска
+    РЎРѕСЂС‚РёСЂРѕРІРєР° РєР»СЋС‡РµР№ РґР»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ РїРѕРёСЃРєР°
 */
 
 template <class Key>
@@ -786,7 +786,7 @@ void basic_spline<Key>::sort ()
 }
 
 /*
-    Расчёт значения в промежуточной точке
+    Р Р°СЃС‡С‘С‚ Р·РЅР°С‡РµРЅРёСЏ РІ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕР№ С‚РѕС‡РєРµ
 */
 
 template <class Key>
@@ -832,7 +832,7 @@ void basic_spline<Key>::operator () (const time_type& time, typename basic_splin
 }
 
 /*
-    Минимальное и максимальное время
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
 */
 
 template <class Key>
@@ -852,7 +852,7 @@ const typename basic_spline<Key>::time_type& basic_spline<Key>::max_time () cons
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class Key>

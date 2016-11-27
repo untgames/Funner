@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Device::Device (ISwapChain* swap_chain, const char* init_string)
@@ -20,11 +20,11 @@ Device::Device (ISwapChain* swap_chain, const char* init_string)
     cached_base_index (~0),
     need_validate_programs (context_manager.NeedValidatePrograms ())
 {  
-    //инициализация кэша
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєСЌС€Р°
     
   memset (&cached_indices_layout, 0, sizeof cached_indices_layout);
 
-    //получение информации об устройстве отрисовки
+    //РїРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё РѕР± СѓСЃС‚СЂРѕР№СЃС‚РІРµ РѕС‚СЂРёСЃРѕРІРєРё
 
   properties.AddProperty ("init_string",   init_string);
   properties.AddProperty ("gl_vendor",     context_manager.GetVendor ());
@@ -57,7 +57,7 @@ Device::~Device ()
 }
 
 /*
-    Имя устройства
+    РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Device::GetName ()
@@ -66,7 +66,7 @@ const char* Device::GetName ()
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* Device::GetAdapter ()
@@ -75,7 +75,7 @@ IAdapter* Device::GetAdapter ()
 }
 
 /*
-    Получение возможностей устройства
+    РџРѕР»СѓС‡РµРЅРёРµ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 void Device::GetCaps (DeviceCaps& caps)
@@ -124,7 +124,7 @@ const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic sema
 }
 
 /*
-    Управление запросами
+    РЈРїСЂР°РІР»РµРЅРёРµ Р·Р°РїСЂРѕСЃР°РјРё
 */
 
 IQuery* Device::CreateQuery (QueryType type)
@@ -133,7 +133,7 @@ IQuery* Device::CreateQuery (QueryType type)
 }
 
 /*
-    Работа с блоками состояний
+    Р Р°Р±РѕС‚Р° СЃ Р±Р»РѕРєР°РјРё СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
@@ -150,7 +150,7 @@ IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 }
 
 /*
-    Управление входным уровнем (input-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (input-stage)
 */
 
 IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
@@ -239,7 +239,7 @@ IBuffer* Device::ISGetIndexBuffer ()
 }
 
 /*
-    Управление уровнем вывода вершин
+    РЈРїСЂР°РІР»РµРЅРёРµ СѓСЂРѕРІРЅРµРј РІС‹РІРѕРґР° РІРµСЂС€РёРЅ
 */
 
 void Device::SOSetTargets (unsigned int buffers_count, IBuffer** buffers, const unsigned int* offsets)
@@ -263,7 +263,7 @@ unsigned int Device::SOGetTargetOffset (unsigned int stream_output_slot)
 }
 
 /*
-    Управление шейдерными уровнями (shader-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ С€РµР№РґРµСЂРЅС‹РјРё СѓСЂРѕРІРЅСЏРјРё (shader-stage)
 */
 
 IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
@@ -323,7 +323,7 @@ IBuffer* Device::SSGetConstantBuffer (unsigned int buffer_slot)
 }
 
 /*
-    Управление текстурами
+    РЈРїСЂР°РІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂР°РјРё
 */
 
 ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
@@ -407,7 +407,7 @@ ITexture* Device::SSGetTexture (unsigned int sampler_slot)
 }
 
 /*
-    Управление растеризатором (rasterizer-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂРѕРј (rasterizer-stage)
 */
 
 IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
@@ -454,7 +454,7 @@ const Rect& Device::RSGetScissor (unsigned int render_target_slot)
 }
 
 /*
-    Управление выходным уровнем (output-stage)
+    РЈРїСЂР°РІР»РµРЅРёРµ РІС‹С…РѕРґРЅС‹Рј СѓСЂРѕРІРЅРµРј (output-stage)
 */
 
 IBlendState* Device::CreateBlendState (const BlendDesc& desc)
@@ -514,7 +514,7 @@ unsigned int Device::OSGetStencilReference ()
 }
 
 /*
-    Управление менеджером целевых буферов отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РјРµРЅРµРґР¶РµСЂРѕРј С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, unsigned int buffer_index)
@@ -614,7 +614,7 @@ void Device::ClearViews (unsigned int clear_flags, unsigned int views_count, con
 }
 
 /*
-   Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+   Р“РµРЅРµСЂР°С†РёСЏ РјРёРї-СѓСЂРѕРІРЅРµР№ С‚РµРєСЃС‚СѓСЂС‹ (РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ С‚РµРєСЃС‚СѓСЂ РІ РєРѕС‚РѕСЂС‹Рµ РІРµРґРµС‚СЃСЏ СЂРµРЅРґРµСЂРёРЅРі)
 */
 
 void Device::GenerateMips (ITexture* texture)
@@ -631,7 +631,7 @@ void Device::GenerateMips (ITexture* texture)
 }
 
 /*
-    Управление предикатами отрисовки
+    РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРµРґРёРєР°С‚Р°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 IPredicate* Device::CreatePredicate ()
@@ -663,7 +663,7 @@ bool Device::GetPredicateValue ()
 }
 
 /*
-    Создание контекста
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 IDeviceContext* Device::CreateDeferredContext ()
@@ -686,7 +686,7 @@ void Device::ExecuteCommandList (ICommandList* list, bool restore_state)
 }
 
 /*
-    Установка состояния устройства в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLayout* out_indices_layout)
@@ -695,18 +695,18 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
   {
     bool is_program_validate_needed = false;
     
-      //установка состояния менеджера целевых буферов отрисовки
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
       
     if (context_manager.NeedStageRebind (Stage_RenderTargetManager))
     {
       render_target_manager.Bind ();
 
-      context_manager.StageRebindNotify (Stage_Output); //сделать внутреннее кэширование состояния has_render_target/has_depth_stencil!!!
+      context_manager.StageRebindNotify (Stage_Output); //СЃРґРµР»Р°С‚СЊ РІРЅСѓС‚СЂРµРЅРЅРµРµ РєСЌС€РёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ has_render_target/has_depth_stencil!!!
       
       is_program_validate_needed = true;
     }   
 
-      //установка состояния менеджера текстур
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂР° С‚РµРєСЃС‚СѓСЂ
 
     if (context_manager.NeedStageRebind (Stage_TextureManager))
     {
@@ -715,7 +715,7 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
       is_program_validate_needed = true;      
     }
 
-      //установка состояния шейдерного уровня
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ С€РµР№РґРµСЂРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 
     if (context_manager.NeedStageRebind (Stage_Shading))
     {
@@ -724,7 +724,7 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
       is_program_validate_needed = true;      
     }
 
-      //установка состояния входного уровня
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІС…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 
     if (context_manager.NeedStageRebind (Stage_Input) || base_vertex != cached_base_vertex || (base_index != cached_base_index && out_indices_layout))
     {
@@ -752,7 +752,7 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
         *out_indices_layout = cached_indices_layout;
     }
 
-      //установка состояния выходного уровня
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РІС‹С…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 
     if (context_manager.NeedStageRebind (Stage_Output))
     {
@@ -765,11 +765,11 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
       is_program_validate_needed = true;      
     }
 
-      //очистка флагов ребиндинга
+      //РѕС‡РёСЃС‚РєР° С„Р»Р°РіРѕРІ СЂРµР±РёРЅРґРёРЅРіР°
 
     context_manager.ResetRebindNotifications ();
     
-      //валидация текущей программы
+      //РІР°Р»РёРґР°С†РёСЏ С‚РµРєСѓС‰РµР№ РїСЂРѕРіСЂР°РјРјС‹
       
     if (need_validate_programs && is_program_validate_needed)
       shader_stage.ValidateBindedProgram ();
@@ -782,13 +782,13 @@ void Device::Bind (unsigned int base_vertex, unsigned int base_index, IndicesLay
 }
 
 /*
-    Рисование примитивов
+    Р РёСЃРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 namespace
 {
 
-//получение режима рисования примитивов OpenGL
+//РїРѕР»СѓС‡РµРЅРёРµ СЂРµР¶РёРјР° СЂРёСЃРѕРІР°РЅРёСЏ РїСЂРёРјРёС‚РёРІРѕРІ OpenGL
 GLenum get_mode (PrimitiveType type, const char* source)
 {
   switch (type)
@@ -810,24 +810,24 @@ void Device::Draw (PrimitiveType primitive_type, unsigned int first_vertex, unsi
 {
   try
   {
-      //проверка предиката отрисовки
+      //РїСЂРѕРІРµСЂРєР° РїСЂРµРґРёРєР°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
 
     if (!query_manager.GetPredicateAsyncResult ())
       return;
 
-      //преобразование типа примитивов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РёРїР° РїСЂРёРјРёС‚РёРІРѕРІ
 
     GLenum mode = get_mode (primitive_type, "");
 
-      //установка состояния устройства в контекст OpenGL
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
     Bind (0, 0); 
 
-      //рисование
+      //СЂРёСЃРѕРІР°РЅРёРµ
 
     glDrawArrays (mode, first_vertex, vertices_count);
 
-      //проверка ошибок      
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє      
 
     context_manager.CheckErrors ("glDrawArrays");    
   }
@@ -842,26 +842,26 @@ void Device::DrawIndexed (PrimitiveType primitive_type, unsigned int first_index
 {
   try
   {
-      //проверка предиката отрисовки
+      //РїСЂРѕРІРµСЂРєР° РїСЂРµРґРёРєР°С‚Р° РѕС‚СЂРёСЃРѕРІРєРё
 
     if (!query_manager.GetPredicateAsyncResult ())
       return;
 
-      //преобразование типа примитивов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С‚РёРїР° РїСЂРёРјРёС‚РёРІРѕРІ
 
     GLenum mode = get_mode (primitive_type, "");
     
-      //установка состояния устройства в контекст OpenGL
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
     IndicesLayout indices_layout;
 
     Bind (base_vertex, first_index, &indices_layout);
 
-      //рисование      
+      //СЂРёСЃРѕРІР°РЅРёРµ      
 
     glDrawElements (mode, indices_count, indices_layout.type, indices_layout.data);    
 
-      //проверка ошибок
+      //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
     context_manager.CheckErrors ("glDrawElements");
   }
@@ -888,22 +888,22 @@ void Device::DrawAuto (PrimitiveType primitive_type)
 }
 
 /*
-    Ожидание завершения выполнения буфера команд
+    РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р±СѓС„РµСЂР° РєРѕРјР°РЅРґ
 */
 
 void Device::Flush ()
 {
   try
   {
-      //установка текущего контекста
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     context_manager.MakeContextCurrent ();
     
-      //сброс очереди команд
+      //СЃР±СЂРѕСЃ РѕС‡РµСЂРµРґРё РєРѕРјР°РЅРґ
 
     glFlush ();  
 
-      //обновление целевых буферов отрисовки
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
     render_target_manager.UpdateRenderTargets ();
   }
@@ -915,7 +915,7 @@ void Device::Flush ()
 }
 
 /*
-    Список свойств устройства отрисовки
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 IPropertyList* Device::GetProperties ()

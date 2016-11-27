@@ -8,16 +8,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* GLOBAL_LIBRARY_NAME = "global";
 
 /*
-    Функции передаваемые lua
+    Р¤СѓРЅРєС†РёРё РїРµСЂРµРґР°РІР°РµРјС‹Рµ lua
 */
 
-//диспетчер вызовов
+//РґРёСЃРїРµС‚С‡РµСЂ РІС‹Р·РѕРІРѕРІ
 struct InvokeDispatch
 {
   static const char* GetInvokerName (lua_State* state)
@@ -29,12 +29,12 @@ struct InvokeDispatch
 
   static int Invoke (lua_State* state)
   {
-      //получение указателя на шлюз
+      //РїРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° С€Р»СЋР·
 
     const Invoker& invoker     = *reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
     Interpreter&   interpreter = *reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
 
-      //вызов шлюза
+      //РІС‹Р·РѕРІ С€Р»СЋР·Р°
 
     try
     {
@@ -80,7 +80,7 @@ int invoke_dispatch (lua_State* state)
   return safe_call<InvokeDispatch> (state);
 }
 
-//получение поля по имени
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕР»СЏ РїРѕ РёРјРµРЅРё
 struct VariantGetField
 {
   static int Invoke (lua_State* state)
@@ -93,24 +93,24 @@ struct VariantGetField
     lua_pushvalue (state, 2);
     lua_rawget    (state, -2);
 
-    if (!lua_isnil (state, -1)) //поле с заданным именем найдено
+    if (!lua_isnil (state, -1)) //РїРѕР»Рµ СЃ Р·Р°РґР°РЅРЅС‹Рј РёРјРµРЅРµРј РЅР°Р№РґРµРЅРѕ
     {
-      lua_remove (state, -2); //удаление метатаблицы
+      lua_remove (state, -2); //СѓРґР°Р»РµРЅРёРµ РјРµС‚Р°С‚Р°Р±Р»РёС†С‹
       return 1;
     }
 
-      //пытаемся найти поле с префиксом get_
+      //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё РїРѕР»Рµ СЃ РїСЂРµС„РёРєСЃРѕРј get_
 
-    lua_pop         (state, 1); //удаляем результат предыдущего поиска
+    lua_pop         (state, 1); //СѓРґР°Р»СЏРµРј СЂРµР·СѓР»СЊС‚Р°С‚ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РїРѕРёСЃРєР°
     lua_pushfstring (state, "get_%s", lua_tostring (state, 2));
     lua_rawget      (state, -2);
-    lua_remove      (state, -2); //удаление метатаблицы
+    lua_remove      (state, -2); //СѓРґР°Р»РµРЅРёРµ РјРµС‚Р°С‚Р°Р±Р»РёС†С‹
 
-    if (lua_isnil (state, -1)) //свойство с указанным именем не найдено  
+    if (lua_isnil (state, -1)) //СЃРІРѕР№СЃС‚РІРѕ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј РЅРµ РЅР°Р№РґРµРЅРѕ  
     {
-      lua_pop (state, 1); //удаление результата поиска
+      lua_pop (state, 1); //СѓРґР°Р»РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РїРѕРёСЃРєР°
       
-        //получение имени библиотеки
+        //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё
         
       stl::string library_name = "unknown";
 
@@ -123,14 +123,14 @@ struct VariantGetField
         
       lua_pop (state, 2);
       
-        //генерация исключения
+        //РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ
       
       throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (library='%s')", lua_tostring (state, 2), library_name.c_str ());
     }
 
     bool is_static_call = lua_isuserdata (state, 1) == 0;
 
-      //помещение аргумента вызова шлюза в стек
+      //РїРѕРјРµС‰РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р° РІС‹Р·РѕРІР° С€Р»СЋР·Р° РІ СЃС‚РµРє
 
     if (is_static_call)
     {
@@ -151,7 +151,7 @@ int variant_get_field (lua_State* state)
   return safe_call<VariantGetField> (state);
 }
 
-//установка значения поля
+//СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ РїРѕР»СЏ
 struct VariantSetField
 {
   static int Invoke (lua_State* state)
@@ -161,18 +161,18 @@ struct VariantSetField
     if (!lua_getmetatable (state, 1))
       throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");            
 
-      //пытаемся найти поле с префиксом set_
+      //РїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё РїРѕР»Рµ СЃ РїСЂРµС„РёРєСЃРѕРј set_
 
     lua_pushfstring (state, "set_%s", lua_tostring (state, 2));
     lua_rawget      (state, -2);
 
-    if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
+    if (lua_isnil (state, -1)) //СЃРІРѕР№СЃС‚РІРѕ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј РЅРµ РЅР°Р№РґРµРЅРѕ
     {
-      lua_pop (state, 2); //удаление результата и метатаблицы
+      lua_pop (state, 2); //СѓРґР°Р»РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° Рё РјРµС‚Р°С‚Р°Р±Р»РёС†С‹
       
       if (!lua_istable (state, 3))
       {
-          //получение имени библиотеки
+          //РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё
           
         stl::string library_name = "unknown";
 
@@ -185,26 +185,26 @@ struct VariantSetField
           
         lua_pop (state, 2);
         
-          //генерация исключения      
+          //РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ      
         
         throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found or read-only (library='%s')", lua_tostring (state, 2), library_name.c_str ());
       }
         
-        //добавление вложенной таблицы
+        //РґРѕР±Р°РІР»РµРЅРёРµ РІР»РѕР¶РµРЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹
 
       lua_rawset (state, 1);
 
       return 0;
     }
     
-      //удаление метатаблицы
+      //СѓРґР°Р»РµРЅРёРµ РјРµС‚Р°С‚Р°Р±Р»РёС†С‹
       
     lua_remove (state, -2);
       
-    bool is_static_call = lua_isuserdata (state, 1) == 0; //является ли вызов статическим    
+    bool is_static_call = lua_isuserdata (state, 1) == 0; //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РІС‹Р·РѕРІ СЃС‚Р°С‚РёС‡РµСЃРєРёРј    
     int  args_count     = is_static_call ? 1 : 2;
 
-      //помещение аргументов вызова шлюза в стек
+      //РїРѕРјРµС‰РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РІС‹Р·РѕРІР° С€Р»СЋР·Р° РІ СЃС‚РµРє
 
     if (!is_static_call)
       lua_pushvalue (state, 1);
@@ -227,7 +227,7 @@ int variant_set_field (lua_State* state)
 }
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Library::Library (Interpreter& in_interpreter, const char* name, const InvokerRegistry& in_registry)
@@ -237,7 +237,7 @@ Library::Library (Interpreter& in_interpreter, const char* name, const InvokerRe
     table_name (name),
     is_global (table_name == GLOBAL_LIBRARY_NAME)
 {
-    //регистрация обработчиков удаления пользовательских типов данных    
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СѓРґР°Р»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… С‚РёРїРѕРІ РґР°РЅРЅС‹С…    
 
   static const luaL_reg common_meta_table [] = {
     {"__gc",       &variant_destroy},
@@ -250,25 +250,25 @@ Library::Library (Interpreter& in_interpreter, const char* name, const InvokerRe
   luaL_register    (state, name, common_meta_table);
   lua_pushstring   (state, name);
   lua_pushvalue    (state, -2);
-  lua_rawset       (state, LUA_REGISTRYINDEX); //регистрация метатаблицы
+  lua_rawset       (state, LUA_REGISTRYINDEX); //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚Р°С‚Р°Р±Р»РёС†С‹
   lua_pushvalue    (state, -1);
   lua_setmetatable (state, -1);
 
-    //помещение имени библиотеки в таблицу (отладочная информация)
+    //РїРѕРјРµС‰РµРЅРёРµ РёРјРµРЅРё Р±РёР±Р»РёРѕС‚РµРєРё РІ С‚Р°Р±Р»РёС†Сѓ (РѕС‚Р»Р°РґРѕС‡РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ)
 
   lua_pushstring (state, "__library_name");
   lua_pushstring (state, name);
   lua_rawset     (state, -3);
-  lua_pop        (state, 1); //удаление таблицы из стека  
+  lua_pop        (state, 1); //СѓРґР°Р»РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РёР· СЃС‚РµРєР°  
   
   try
   {    
-      //регистрация шлюзов
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С€Р»СЋР·РѕРІ
 
     for (InvokerRegistry::Iterator i=registry.CreateIterator (); i; ++i)
       RegisterInvoker (registry.InvokerId (i), *i);
 
-      //регистрация обработчиков событий
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
 
     on_register_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnRegisterInvoker,
       xtl::bind (&Library::RegisterInvoker, this, _2, _3));
@@ -308,13 +308,13 @@ void Library::Destroy ()
 }
 
 /*
-    Регистрация/удаление шлюзов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ/СѓРґР°Р»РµРЅРёРµ С€Р»СЋР·РѕРІ
 */
 
 void Library::RegisterInvoker (const char* invoker_name, Invoker& invoker)
 {
   if (!strcmp (invoker_name, "__index") || !strcmp (invoker_name, "__newindex") || !strcmp (invoker_name, "__gc"))
-    return; //регистрация шлюзов с указанными имена запрещена
+    return; //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С€Р»СЋР·РѕРІ СЃ СѓРєР°Р·Р°РЅРЅС‹РјРё РёРјРµРЅР° Р·Р°РїСЂРµС‰РµРЅР°
 
   luaL_getmetatable     (state, table_name.c_str ());  
   lua_pushstring        (state, invoker_name);

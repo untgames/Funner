@@ -6,19 +6,19 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENT_MASK = "network.url_stream.*"; //маска имени компонентов URL потоков
+const char* COMPONENT_MASK = "network.url_stream.*"; //РјР°СЃРєР° РёРјРµРЅРё РєРѕРјРїРѕРЅРµРЅС‚РѕРІ URL РїРѕС‚РѕРєРѕРІ
 
 /*
-    Обработчик URL запроса
+    РћР±СЂР°Р±РѕС‚С‡РёРє URL Р·Р°РїСЂРѕСЃР°
 */
 
 struct UrlQueryHandler: public xtl::reference_counter
 {
-  stl::string                         query_wcmask;   //регулярное выражение, соответствующее запросу
-  UrlStreamManagerImpl::StreamCreator stream_creator; //создатель потока
+  stl::string                         query_wcmask;   //СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ Р·Р°РїСЂРѕСЃСѓ
+  UrlStreamManagerImpl::StreamCreator stream_creator; //СЃРѕР·РґР°С‚РµР»СЊ РїРѕС‚РѕРєР°
   
   UrlQueryHandler (const char* wcmask, const UrlStreamManager::StreamCreator& creator)
     : query_wcmask (wcmask)
@@ -33,16 +33,16 @@ typedef stl::list<UrlQueryHandlerPtr>       UrlQueryHandlerList;
 }
 
 /*
-    Описание реализации менеджера URL потоков
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° URL РїРѕС‚РѕРєРѕРІ
 */
 
 struct UrlStreamManagerImpl::Impl
 {
-  UrlQueryHandlerList query_handlers; //обработчики запросов
+  UrlQueryHandlerList query_handlers; //РѕР±СЂР°Р±РѕС‚С‡РёРєРё Р·Р°РїСЂРѕСЃРѕРІ
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 UrlStreamManagerImpl::UrlStreamManagerImpl ()
@@ -55,7 +55,7 @@ UrlStreamManagerImpl::~UrlStreamManagerImpl ()
 }
 
 /*
-    Регистрация обработчиков URL запросов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ URL Р·Р°РїСЂРѕСЃРѕРІ
 */
 
 void UrlStreamManagerImpl::RegisterStreamCreator (const char* url_wcmask, const StreamCreator& creator)
@@ -91,7 +91,7 @@ void UrlStreamManagerImpl::UnregisterAllStreamCreators ()
 }
 
 /*
-    Создание потока
+    РЎРѕР·РґР°РЅРёРµ РїРѕС‚РѕРєР°
 */
 
 IUrlStream* UrlStreamManagerImpl::CreateStream (const char* url, const char* params, IUrlStream::IListener& stream)
@@ -122,7 +122,7 @@ IUrlStream* UrlStreamManagerImpl::CreateStream (const char* url, const char* par
 }
 
 /*
-    Обёртки
+    РћР±С‘СЂС‚РєРё
 */
 
 void UrlStreamManager::RegisterStreamCreator (const char* url_wcmask, const StreamCreator& creator)

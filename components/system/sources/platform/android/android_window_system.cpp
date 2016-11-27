@@ -11,7 +11,7 @@ const char* LOG_NAME = "android.syslib.window";
 }
 
 /*
-    Окно
+    РћРєРЅРѕ
 */
 
 enum { ScreenKeyboardType_Num = ScreenKeyboardType_PlatformSpecific };
@@ -20,36 +20,36 @@ typedef xtl::trackable_ptr<screen_keyboard_handle> screen_keyboard_ptr;
 
 struct syslib::window_handle: public MessageQueue::Handler
 {
-  global_ref<jobject>  controller;                                //контроллер android окна
-  global_ref<jobject>  view;                                      //android окно
-  screen_keyboard_ptr  screen_keyboards [ScreenKeyboardType_Num]; //экранные клавиатуры
-  WindowMessageHandler message_handler;                           //обработчик сообщений
-  void*                user_data;                                 //пользовательские данные окна
-  unsigned int         background_color;                          //цвет заднего плана
-  unsigned int         background_state;                          //наличие заднего фона
-  jmethodID            get_view_method;                           //метод получения окна
-  jmethodID            get_top_method;                            //метод получения верхнего угла окна
-  jmethodID            get_left_method;                           //метод получения левого угла окна
-  jmethodID            get_width_method;                          //метод получения ширины окна
-  jmethodID            get_height_method;                         //метод получения высоты окна
-  jmethodID            layout_method;                             //метод установки размеров и положения окна
-  jmethodID            set_visibility_method;                     //метод установки видимости окна
-  jmethodID            get_visibility_method;                     //метод получения видимости окна
-  jmethodID            clear_focus_method;                        //метод отмены фокуса ввода
-  jmethodID            request_focus_method;                      //метод запроса фокуса ввода
-  jmethodID            set_background_color_method;               //метод установки цвета заднего плана окна
-  jmethodID            maximize_method;                           //метод максимизации окна
-  jmethodID            get_surface_method;                        //метод получения поверхности
-  jmethodID            post_invalidate_method;                    //метод оповещения о необходимости перерисовки окна
-  jmethodID            bring_to_front_method;                     //метод перемещения окна на передний план
-  jmethodID            remove_from_parent_window_method;          //метод удаления окна
-  bool                 is_multitouch_enabled;                     //включен ли multitouch
-  int                  current_touch_id;                          //текущий идентификатор касания
-  bool                 is_surface_created;                        //состояние поверхности
-  volatile bool        is_native_handle_received;                 //получен ли android window handle
-  common::Log          log;                                       //поток протоколирования
+  global_ref<jobject>  controller;                                //РєРѕРЅС‚СЂРѕР»Р»РµСЂ android РѕРєРЅР°
+  global_ref<jobject>  view;                                      //android РѕРєРЅРѕ
+  screen_keyboard_ptr  screen_keyboards [ScreenKeyboardType_Num]; //СЌРєСЂР°РЅРЅС‹Рµ РєР»Р°РІРёР°С‚СѓСЂС‹
+  WindowMessageHandler message_handler;                           //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№
+  void*                user_data;                                 //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РѕРєРЅР°
+  unsigned int         background_color;                          //С†РІРµС‚ Р·Р°РґРЅРµРіРѕ РїР»Р°РЅР°
+  unsigned int         background_state;                          //РЅР°Р»РёС‡РёРµ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  jmethodID            get_view_method;                           //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РѕРєРЅР°
+  jmethodID            get_top_method;                            //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РІРµСЂС…РЅРµРіРѕ СѓРіР»Р° РѕРєРЅР°
+  jmethodID            get_left_method;                           //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ Р»РµРІРѕРіРѕ СѓРіР»Р° РѕРєРЅР°
+  jmethodID            get_width_method;                          //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ С€РёСЂРёРЅС‹ РѕРєРЅР°
+  jmethodID            get_height_method;                         //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РІС‹СЃРѕС‚С‹ РѕРєРЅР°
+  jmethodID            layout_method;                             //РјРµС‚РѕРґ СѓСЃС‚Р°РЅРѕРІРєРё СЂР°Р·РјРµСЂРѕРІ Рё РїРѕР»РѕР¶РµРЅРёСЏ РѕРєРЅР°
+  jmethodID            set_visibility_method;                     //РјРµС‚РѕРґ СѓСЃС‚Р°РЅРѕРІРєРё РІРёРґРёРјРѕСЃС‚Рё РѕРєРЅР°
+  jmethodID            get_visibility_method;                     //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё РѕРєРЅР°
+  jmethodID            clear_focus_method;                        //РјРµС‚РѕРґ РѕС‚РјРµРЅС‹ С„РѕРєСѓСЃР° РІРІРѕРґР°
+  jmethodID            request_focus_method;                      //РјРµС‚РѕРґ Р·Р°РїСЂРѕСЃР° С„РѕРєСѓСЃР° РІРІРѕРґР°
+  jmethodID            set_background_color_method;               //РјРµС‚РѕРґ СѓСЃС‚Р°РЅРѕРІРєРё С†РІРµС‚Р° Р·Р°РґРЅРµРіРѕ РїР»Р°РЅР° РѕРєРЅР°
+  jmethodID            maximize_method;                           //РјРµС‚РѕРґ РјР°РєСЃРёРјРёР·Р°С†РёРё РѕРєРЅР°
+  jmethodID            get_surface_method;                        //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
+  jmethodID            post_invalidate_method;                    //РјРµС‚РѕРґ РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЂРёСЃРѕРІРєРё РѕРєРЅР°
+  jmethodID            bring_to_front_method;                     //РјРµС‚РѕРґ РїРµСЂРµРјРµС‰РµРЅРёСЏ РѕРєРЅР° РЅР° РїРµСЂРµРґРЅРёР№ РїР»Р°РЅ
+  jmethodID            remove_from_parent_window_method;          //РјРµС‚РѕРґ СѓРґР°Р»РµРЅРёСЏ РѕРєРЅР°
+  bool                 is_multitouch_enabled;                     //РІРєР»СЋС‡РµРЅ Р»Рё multitouch
+  int                  current_touch_id;                          //С‚РµРєСѓС‰РёР№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°СЃР°РЅРёСЏ
+  bool                 is_surface_created;                        //СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
+  volatile bool        is_native_handle_received;                 //РїРѕР»СѓС‡РµРЅ Р»Рё android window handle
+  common::Log          log;                                       //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   window_handle ()
     : message_handler (0)
     , user_data (0)
@@ -64,7 +64,7 @@ struct syslib::window_handle: public MessageQueue::Handler
     MessageQueueSingleton::Instance ()->RegisterHandler (*this);
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~window_handle ()
   {
     try
@@ -95,7 +95,7 @@ struct syslib::window_handle: public MessageQueue::Handler
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
   
@@ -315,7 +315,7 @@ struct syslib::window_handle: public MessageQueue::Handler
       
     log.Printf ("Surface created for window %p", view.get ());
 
-      //получение поверхности
+      //РїРѕР»СѓС‡РµРЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     local_ref<jobject> surface (check_errors (get_env ().CallObjectMethod (controller.get (), get_surface_method)), false);
 
     if (!surface)
@@ -323,7 +323,7 @@ struct syslib::window_handle: public MessageQueue::Handler
 
     is_surface_created = true;
 
-      //оповещение об изменении дескриптора
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
     
     WindowEventContext context;
 
@@ -343,7 +343,7 @@ struct syslib::window_handle: public MessageQueue::Handler
 
     is_surface_created = false;
     
-      //оповещение об изменении дескриптора
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     WindowEventContext context;
 
@@ -356,21 +356,21 @@ struct syslib::window_handle: public MessageQueue::Handler
 namespace
 {
 
-///Константы
-const int VIEW_VISIBLE   = 0; //окно видимо
-const int VIEW_INVISIBLE = 4; //окно невидимо
-const int VIEW_GONE      = 8; //окно невидимо и исключено из расчёта лэйаута
+///РљРѕРЅСЃС‚Р°РЅС‚С‹
+const int VIEW_VISIBLE   = 0; //РѕРєРЅРѕ РІРёРґРёРјРѕ
+const int VIEW_INVISIBLE = 4; //РѕРєРЅРѕ РЅРµРІРёРґРёРјРѕ
+const int VIEW_GONE      = 8; //РѕРєРЅРѕ РЅРµРІРёРґРёРјРѕ Рё РёСЃРєР»СЋС‡РµРЅРѕ РёР· СЂР°СЃС‡С‘С‚Р° Р»СЌР№Р°СѓС‚Р°
 
-///Поддержка класса окна
+///РџРѕРґРґРµСЂР¶РєР° РєР»Р°СЃСЃР° РѕРєРЅР°
 class JniWindowManager
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     JniWindowManager ()
     {
       try
       {          
-          //получение класса Activity
+          //РїРѕР»СѓС‡РµРЅРёРµ РєР»Р°СЃСЃР° Activity
 
         activity_class = local_ref<jclass> (get_env ().GetObjectClass (get_activity ()), false);
         
@@ -387,7 +387,7 @@ class JniWindowManager
       }
     }
     
-///Создание окна
+///РЎРѕР·РґР°РЅРёРµ РѕРєРЅР°
     local_ref<jobject> CreateSurfaceViewController (const char* init_string, void* window_ref)
     {
       local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_surface_view_controller_method, tojstring (init_string).get (), window_ref));
@@ -408,7 +408,7 @@ class JniWindowManager
       return controller;
     }    
     
-///Поиск дескриптора окна
+///РџРѕРёСЃРє РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
     static window_t FindWindow (jobject controller)
     {
       try
@@ -446,7 +446,7 @@ class JniWindowManager
 typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
 
 /*
-    Функции обратного вызова
+    Р¤СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР°
 */
 
 template <class Fn> class WindowMessage: public MessageQueue::Message
@@ -479,7 +479,7 @@ template <class Fn> void push_message (jobject controller, const Fn& fn)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
@@ -560,7 +560,7 @@ void on_surface_destroyed_callback (JNIEnv& env, jobject controller)
 }
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data, WindowType type, void** out_view_controller)
@@ -587,7 +587,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->message_handler = handler;
     window->user_data       = user_data;
 
-      //получение методов
+      //РїРѕР»СѓС‡РµРЅРёРµ РјРµС‚РѕРґРѕРІ
     
     JNIEnv& env = get_env ();
 
@@ -613,14 +613,14 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->post_invalidate_method           = find_method (&env, controller_class.get (), "postInvalidate", "()V");
     window->remove_from_parent_window_method = find_method (&env, controller_class.get (), "removeFromParentWindowThreadSafe", "()V");
     
-      //получение объекта окна
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРєРЅР°
 
     window->view = local_ref<jobject> (check_errors (env.CallObjectMethod (window->controller.get (), window->get_view_method)), false);
 
     if (!window->view)
       throw xtl::format_operation_exception ("", "EngineViewController::getView failed");
 
-      //ожидание создания поверхности
+      //РѕР¶РёРґР°РЅРёРµ СЃРѕР·РґР°РЅРёСЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
     
     if (type == WindowType_Surface)
     {
@@ -641,7 +641,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
           throw xtl::format_operation_exception ("", "Can't create window because Surface has not been created for %u milliseconds", MAX_TIMEOUT_IN_MILLISECONDS);
       }
 
-        //получение дескриптора поверхности
+        //РїРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 
       local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->controller.get (), window->get_surface_method));
 
@@ -706,7 +706,7 @@ void AndroidWindowManager::DestroyWindow (window_t window)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* AndroidWindowManager::GetNativeWindowHandle (window_t window)
@@ -734,7 +734,7 @@ const void* AndroidWindowManager::GetNativeDisplayHandle (window_t)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void AndroidWindowManager::SetWindowTitle (window_t, const wchar_t*)
@@ -753,7 +753,7 @@ void AndroidWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffe
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void AndroidWindowManager::SetWindowRect (window_t window, const Rect& rect)
@@ -828,7 +828,7 @@ void AndroidWindowManager::GetClientRect (window_t window, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void AndroidWindowManager::SetWindowFlag (window_t window, WindowFlag flag, bool state)
@@ -918,7 +918,7 @@ bool AndroidWindowManager::GetWindowFlag (window_t window, WindowFlag flag)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void AndroidWindowManager::InvalidateWindow (window_t window)
@@ -940,7 +940,7 @@ void AndroidWindowManager::InvalidateWindow (window_t window)
 }
 
 /*
-   Установка multitouch режима для окна
+   РЈСЃС‚Р°РЅРѕРІРєР° multitouch СЂРµР¶РёРјР° РґР»СЏ РѕРєРЅР°
 */
 
 void AndroidWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
@@ -976,7 +976,7 @@ bool AndroidWindowManager::IsMultitouchEnabled (window_t window)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void AndroidWindowManager::SetBackgroundColor (window_t window, const Color& color)
@@ -1063,20 +1063,20 @@ bool AndroidWindowManager::GetBackgroundState (window_t window)
 }
 
 /*
-    Создание и уничтожение экранной клавиатуры
+    РЎРѕР·РґР°РЅРёРµ Рё СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЌРєСЂР°РЅРЅРѕР№ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl::trackable
 {
-  global_ref<jobject> view;                       //android окно
-  global_ref<jobject> controller;                 //контроллер
-  global_ref<jclass>  input_method_manager_class; //класс менеджера ввода
-  global_ref<jobject> input_method_manager;       //менеджер ввода
-  jmethodID           request_focus_method;       //метод запроса фокуса
-  jmethodID           show_keyboard_method;       //метод показа клавиатуры
-  jmethodID           hide_keyboard_method;       //метод скрытия клавиатуры
+  global_ref<jobject> view;                       //android РѕРєРЅРѕ
+  global_ref<jobject> controller;                 //РєРѕРЅС‚СЂРѕР»Р»РµСЂ
+  global_ref<jclass>  input_method_manager_class; //РєР»Р°СЃСЃ РјРµРЅРµРґР¶РµСЂР° РІРІРѕРґР°
+  global_ref<jobject> input_method_manager;       //РјРµРЅРµРґР¶РµСЂ РІРІРѕРґР°
+  jmethodID           request_focus_method;       //РјРµС‚РѕРґ Р·Р°РїСЂРѕСЃР° С„РѕРєСѓСЃР°
+  jmethodID           show_keyboard_method;       //РјРµС‚РѕРґ РїРѕРєР°Р·Р° РєР»Р°РІРёР°С‚СѓСЂС‹
+  jmethodID           hide_keyboard_method;       //РјРµС‚РѕРґ СЃРєСЂС‹С‚РёСЏ РєР»Р°РІРёР°С‚СѓСЂС‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   screen_keyboard_handle (window_t window)
     : view (window->view)
     , controller (window->controller)
@@ -1144,7 +1144,7 @@ void AndroidScreenKeyboardManager::DestroyScreenKeyboard (screen_keyboard_t keyb
 }
 
 /*
-    Показ и скрытие клавиатуры
+    РџРѕРєР°Р· Рё СЃРєСЂС‹С‚РёРµ РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 void AndroidScreenKeyboardManager::ShowScreenKeyboard (screen_keyboard_t keyboard)
@@ -1199,7 +1199,7 @@ void AndroidScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t keyboar
 }
 
 /*
-    Проверка поддержки клавиатуры
+    РџСЂРѕРІРµСЂРєР° РїРѕРґРґРµСЂР¶РєРё РєР»Р°РІРёР°С‚СѓСЂС‹
 */
 
 bool AndroidScreenKeyboardManager::IsScreenKeyboardSupported (ScreenKeyboardType type)
@@ -1224,7 +1224,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация методов обратного вызова окна
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РѕРєРЅР°
 void register_window_callbacks (JNIEnv* env)
 {
   try

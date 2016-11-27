@@ -6,7 +6,7 @@
 #include <shared/profile/gl/entries.h>
 
 /*
-    Переопределения для упрощения портируемости
+    РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёСЏ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РїРѕСЂС‚РёСЂСѓРµРјРѕСЃС‚Рё
 */
 
 typedef PFNGLISRENDERBUFFEREXTPROC                      PFNGLISRENDERBUFFERPROC;

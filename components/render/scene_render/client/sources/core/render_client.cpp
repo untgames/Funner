@@ -3,21 +3,21 @@
 using namespace render::scene::client;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_MAX_DRAW_DEPTH = 3; //разрешенная глубина вложенного рендеринга по умолчанию
+const size_t DEFAULT_MAX_DRAW_DEPTH = 3; //СЂР°Р·СЂРµС€РµРЅРЅР°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРЅРѕРіРѕ СЂРµРЅРґРµСЂРёРЅРіР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 /*
-    Описание реализации рендера сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
 */
 
 struct Client::Impl: public xtl::reference_counter
 {
-  ConnectionPtr connection;     //ссылка на соединение
-  size_t        max_draw_depth; //разрешенная глубина вложенного рендеринга
+  ConnectionPtr connection;     //СЃСЃС‹Р»РєР° РЅР° СЃРѕРµРґРёРЅРµРЅРёРµ
+  size_t        max_draw_depth; //СЂР°Р·СЂРµС€РµРЅРЅР°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРЅРѕРіРѕ СЂРµРЅРґРµСЂРёРЅРіР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : max_draw_depth (DEFAULT_MAX_DRAW_DEPTH)
   {
@@ -25,7 +25,7 @@ struct Client::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Client::Client (const char* connection_name, const char* init_string, size_t logon_timeout_ms)
@@ -70,7 +70,7 @@ Client& Client::operator = (const Client& render)
 }
 
 /*
-    Описание системы рендеринга
+    РћРїРёСЃР°РЅРёРµ СЃРёСЃС‚РµРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 const char* Client::Description () const
@@ -79,7 +79,7 @@ const char* Client::Description () const
 }
 
 /*
-    Создание цели рендеринга
+    РЎРѕР·РґР°РЅРёРµ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 namespace
@@ -108,7 +108,7 @@ RenderTarget Client::CreateRenderTarget (const char* target_name, const char* in
 }
 
 /*
-    Максимальный уровень вложенности рендеринга
+    РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РІР»РѕР¶РµРЅРЅРѕСЃС‚Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Client::SetMaxDrawDepth (size_t level)
@@ -135,7 +135,7 @@ size_t Client::MaxDrawDepth () const
 }
 
 /*
-    Работа с ресурсами
+    Р Р°Р±РѕС‚Р° СЃ СЂРµСЃСѓСЂСЃР°РјРё
 */
 
 void Client::LoadResource (const char* file_name)
@@ -183,7 +183,7 @@ void Client::UnloadResource (const char* file_name)
 }
 
 /*
-    Присоединение библиотеки шрифтов
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё С€СЂРёС„С‚РѕРІ
 */
 
 void Client::AttachFontLibrary (const media::FontLibrary& library)
@@ -226,7 +226,7 @@ void Client::DetachAllFontLibraries ()
 }
 
 /*
-   Ожидание незавершенных операций
+   РћР¶РёРґР°РЅРёРµ РЅРµР·Р°РІРµСЂС€РµРЅРЅС‹С… РѕРїРµСЂР°С†РёР№
 */
 
 void Client::Finish ()
@@ -305,7 +305,7 @@ bool Client::TryFinish (size_t timeout_ms)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Client::Swap (Client& render)

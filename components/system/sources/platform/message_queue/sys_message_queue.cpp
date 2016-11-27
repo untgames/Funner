@@ -21,7 +21,7 @@ MessageQueue::Handler::Handler (const Handler&)
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MessageQueue::MessageQueue ()
@@ -35,7 +35,7 @@ MessageQueue::~MessageQueue ()
   {
     mutex.Lock ();
     
-    if (!messages.empty ()) //проверка верна, в случае empty сигнал был уже вызван
+    if (!messages.empty ()) //РїСЂРѕРІРµСЂРєР° РІРµСЂРЅР°, РІ СЃР»СѓС‡Р°Рµ empty СЃРёРіРЅР°Р» Р±С‹Р» СѓР¶Рµ РІС‹Р·РІР°РЅ
       signals [MessageQueueEvent_OnEmpty]();
   }
   catch (...)
@@ -44,7 +44,7 @@ MessageQueue::~MessageQueue ()
 }
 
 /*
-    Регистрация доступных дескрипторов обработчиков
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РґРѕСЃС‚СѓРїРЅС‹С… РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
 */
 
 void MessageQueue::RegisterHandler (const Handler& handler)
@@ -78,7 +78,7 @@ void MessageQueue::UnregisterHandler (const Handler& handler)
 }
 
 /*
-    Помещение сообщения в очередь
+    РџРѕРјРµС‰РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕС‡РµСЂРµРґСЊ
 */
 
 void MessageQueue::PushMessage (const Handler& handler, const MessagePtr& message)
@@ -113,7 +113,7 @@ void MessageQueue::PushMessage (const Handler& handler, const MessagePtr& messag
   }
 }
 
-//используется для пробуждения нити обработки сообщений
+//РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїСЂРѕР±СѓР¶РґРµРЅРёСЏ РЅРёС‚Рё РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
 void MessageQueue::PushEmptyMessage ()
 {
   try
@@ -143,7 +143,7 @@ void MessageQueue::PushEmptyMessage ()
 }
 
 /*
-    Диспетчеризация первого доступного сообщения его обработчику
+    Р”РёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ РїРµСЂРІРѕРіРѕ РґРѕСЃС‚СѓРїРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РµРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєСѓ
 */
 
 void MessageQueue::DispatchFirstMessage ()
@@ -174,7 +174,7 @@ void MessageQueue::DispatchFirstMessage ()
       }
       
       if (!handlers.count (message->id))
-        return; //обработчик сообщения не зарегистрирован
+        return; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёСЏ РЅРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ
     }
     
     if (message)
@@ -188,7 +188,7 @@ void MessageQueue::DispatchFirstMessage ()
 }
 
 /*
-    Проверка количества сообщений в очереди / ожидание сообщений
+    РџСЂРѕРІРµСЂРєР° РєРѕР»РёС‡РµСЃС‚РІР° СЃРѕРѕР±С‰РµРЅРёР№ РІ РѕС‡РµСЂРµРґРё / РѕР¶РёРґР°РЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 bool MessageQueue::IsEmpty () const
@@ -225,7 +225,7 @@ void MessageQueue::WaitMessage ()
 }
 
 /*
-    Регистрация обрабочика события очереди сообщений
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‡РёРєР° СЃРѕР±С‹С‚РёСЏ РѕС‡РµСЂРµРґРё СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 xtl::connection MessageQueue::RegisterEventHandler (MessageQueueEvent event, const EventHandler& handler)

@@ -3,14 +3,14 @@
 using namespace common;
 
 /*
-    Описание реализации OutputStreamBuffer
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё OutputStreamBuffer
 */
 
 struct OutputStreamBuffer::Impl
 {
-  StreamBuffer  buffer;   //буфер
-  WriteFunction writer;   //функция записи
-  size_t        position; //позиция в буфере (количество записанных байт)
+  StreamBuffer  buffer;   //Р±СѓС„РµСЂ
+  WriteFunction writer;   //С„СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё
+  size_t        position; //РїРѕР·РёС†РёСЏ РІ Р±СѓС„РµСЂРµ (РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃР°РЅРЅС‹С… Р±Р°Р№С‚)
   
   size_t Available () const { return buffer.Size () - position; }
   
@@ -21,7 +21,7 @@ struct OutputStreamBuffer::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputStreamBuffer::OutputStreamBuffer (size_t buffer_size)  
@@ -42,12 +42,12 @@ OutputStreamBuffer::~OutputStreamBuffer ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Управление размером буфера
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРј Р±СѓС„РµСЂР°
 */
 
 size_t OutputStreamBuffer::Size () const
@@ -62,7 +62,7 @@ void OutputStreamBuffer::Resize (size_t buffer_size)
 }
 
 /*
-    Присоединение пользовательского буфера
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 void OutputStreamBuffer::SetUserBuffer (void* buffer, size_t size)
@@ -75,7 +75,7 @@ void OutputStreamBuffer::SetUserBuffer (void* buffer, size_t size)
 }
 
 /*
-    Функция записи данных
+    Р¤СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё РґР°РЅРЅС‹С…
 */
 
 void OutputStreamBuffer::SetWriter (const WriteFunction& in_writer)
@@ -92,7 +92,7 @@ const OutputStreamBuffer::WriteFunction& OutputStreamBuffer::Writer () const
 }
 
 /*
-    Функция записи данных по умолчанию
+    Р¤СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё РґР°РЅРЅС‹С… РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 size_t OutputStreamBuffer::DefaultWriter (const void*, size_t)
@@ -101,7 +101,7 @@ size_t OutputStreamBuffer::DefaultWriter (const void*, size_t)
 }
 
 /*
-    Запись
+    Р—Р°РїРёСЃСЊ
 */
 
 size_t OutputStreamBuffer::Write (const void* buffer, size_t size)
@@ -110,14 +110,14 @@ size_t OutputStreamBuffer::Write (const void* buffer, size_t size)
   const char*   ptr           = static_cast<const char*> (buffer);
   StreamBuffer& stream_buffer = impl->buffer;
 
-    //если буферизация отключена - пишем в обход буфера
+    //РµСЃР»Рё Р±СѓС„РµСЂРёР·Р°С†РёСЏ РѕС‚РєР»СЋС‡РµРЅР° - РїРёС€РµРј РІ РѕР±С…РѕРґ Р±СѓС„РµСЂР°
 
   if (!stream_buffer.Size ())
     return impl->writer (buffer, size);
 
   while (size)
   {   
-      //если буфер заполнен - сбрасываем его
+      //РµСЃР»Рё Р±СѓС„РµСЂ Р·Р°РїРѕР»РЅРµРЅ - СЃР±СЂР°СЃС‹РІР°РµРј РµРіРѕ
 
     if (!impl->Available ())
     {
@@ -144,7 +144,7 @@ size_t OutputStreamBuffer::Write (const void* buffer, size_t size)
 }
 
 /*
-    Сброс буфера
+    РЎР±СЂРѕСЃ Р±СѓС„РµСЂР°
 */
 
 void OutputStreamBuffer::Flush ()
@@ -161,7 +161,7 @@ void OutputStreamBuffer::Flush ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void OutputStreamBuffer::Swap (OutputStreamBuffer& osb)

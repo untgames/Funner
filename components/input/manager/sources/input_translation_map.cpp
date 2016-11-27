@@ -5,15 +5,15 @@ using namespace input;
 using namespace stl;
 
 /*
-    Реализация таблицы трансляции команд низкоуровневых устройств ввода в клиентские события
+    Р РµР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ С‚СЂР°РЅСЃР»СЏС†РёРё РєРѕРјР°РЅРґ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІРІРѕРґР° РІ РєР»РёРµРЅС‚СЃРєРёРµ СЃРѕР±С‹С‚РёСЏ
 */
 
 struct TranslationMap::Impl : public xtl::reference_counter
 {
   public:
     /*
-        Регистрация трансляторов    
-          (замены аргументов в клиентской подстановке через {1}, {2}, ...)        
+        Р РµРіРёСЃС‚СЂР°С†РёСЏ С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ    
+          (Р·Р°РјРµРЅС‹ Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ РєР»РёРµРЅС‚СЃРєРѕР№ РїРѕРґСЃС‚Р°РЅРѕРІРєРµ С‡РµСЂРµР· {1}, {2}, ...)        
     */
 
     void Add (const char* input_event, const char* client_event_replacement, const char* tag)
@@ -31,18 +31,18 @@ struct TranslationMap::Impl : public xtl::reference_counter
 
       if (!*tag)
       {
-          //добавление трансляции без тэга
+          //РґРѕР±Р°РІР»РµРЅРёРµ С‚СЂР°РЅСЃР»СЏС†РёРё Р±РµР· С‚СЌРіР°
 
         replacer_map.insert_pair (input_event_hash, replacer);
 
         return;
       }
 
-        //создание новой трансляции
+        //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ С‚СЂР°РЅСЃР»СЏС†РёРё
 
       ReplacerMap::iterator iter = replacer_map.insert_pair (input_event_hash, replacer);
 
-        //регистрация трансляции по тэгу
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚СЂР°РЅСЃР»СЏС†РёРё РїРѕ С‚СЌРіСѓ
 
       try
       {
@@ -56,7 +56,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
     
     /*
-        Удаление транслятора
+        РЈРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃР»СЏС‚РѕСЂР°
     */
 
     void Remove (const char* tag)
@@ -84,7 +84,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
     
     /*
-        Очистка    
+        РћС‡РёСЃС‚РєР°    
     */
 
     void Clear ()
@@ -94,7 +94,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
     
     /*
-        Поиск транслятора
+        РџРѕРёСЃРє С‚СЂР°РЅСЃР»СЏС‚РѕСЂР°
     */
     
     Iterator Find (const char* tag)
@@ -111,7 +111,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
     
     /*
-        Создание итератора
+        РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
     */    
     
     Iterator CreateIterator ()
@@ -120,7 +120,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
     }
 
     /*
-        Обработка события
+        РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ
     */
 
     void ProcessEvent (const char* event, const EventHandler& handler) const
@@ -165,7 +165,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
       TranslationMap::ITranslator& operator () (ReplacerMap::value_type& value) const { return *value.second; }
     };
 
-      //создание итератора    
+      //СЃРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°    
     Iterator CreateIterator (ReplacerMap::iterator iter)
     {
       return Iterator (iter, replacer_map.begin (), replacer_map.end (), translator_selector ());
@@ -177,7 +177,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструксторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєСЃС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 TranslationMap::TranslationMap ()
@@ -214,7 +214,7 @@ TranslationMap& TranslationMap::operator = (const TranslationMap& source)
 }
 
 /*
-   Регистрация трансляторов
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
 */
 
 void TranslationMap::Add (const char* input_event, const char* client_event_replacement, const char* tag)
@@ -233,7 +233,7 @@ void TranslationMap::Remove (const Iterator& iter)
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void TranslationMap::Clear ()
@@ -242,7 +242,7 @@ void TranslationMap::Clear ()
 }
     
 /*
-    Создание итератора
+    РЎРѕР·РґР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 TranslationMap::Iterator TranslationMap::CreateIterator () const
@@ -251,7 +251,7 @@ TranslationMap::Iterator TranslationMap::CreateIterator () const
 }
 
 /*
-    Поиск по тэгу
+    РџРѕРёСЃРє РїРѕ С‚СЌРіСѓ
 */
 
 TranslationMap::Iterator TranslationMap::Find (const char* tag) const
@@ -260,7 +260,7 @@ TranslationMap::Iterator TranslationMap::Find (const char* tag) const
 }
 
 /*
-   Обработка события
+   РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ
 */
 
 void TranslationMap::ProcessEvent (const char* event, const TranslationMap::EventHandler& handler) const
@@ -272,7 +272,7 @@ void TranslationMap::ProcessEvent (const char* event, const TranslationMap::Even
 }
 
 /*
-   Загрузка / сохранение таблицы
+   Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ С‚Р°Р±Р»РёС†С‹
 */
 
 void TranslationMap::Load (const char* file_name)
@@ -291,7 +291,7 @@ void TranslationMap::Save (const char* file_name)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void TranslationMap::Swap (TranslationMap& source)
@@ -303,7 +303,7 @@ namespace input
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (TranslationMap& source1, TranslationMap& source2)

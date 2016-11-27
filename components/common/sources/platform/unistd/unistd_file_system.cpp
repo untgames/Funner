@@ -27,7 +27,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Работа с unistd файловой системой
+    Р Р°Р±РѕС‚Р° СЃ unistd С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРѕР№
 */
 
 namespace
@@ -100,7 +100,7 @@ class UnistdFileSystem: public StdioFileSystem
     }
 #endif
 
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
     filesize_t GetFreeSpace (const char* path)
     {
       struct statvfs result;
@@ -125,7 +125,7 @@ class UnistdFileSystem: public StdioFileSystem
 }
 
 /*
-    Получение файловой системы
+    РџРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјС‹
 */
 
 ICustomFileSystem* UnistdPlatform::GetFileSystem ()

@@ -3,35 +3,35 @@
 using namespace render::scene::client;
 
 /*
-    Îïèñàíèå ðåàëèçàöèè îáëàñòè âûâîäà
+    ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
 */
 
 struct RenderableView::Impl: public scene_graph::IViewportListener
 {
-  ConnectionPtr           connection;                   //ñîåäèíåíèå
-  scene_graph::Viewport   viewport;                     //ññûëêà íà îáëàñòü âûâîäà
-  PropertyMapSynchronizer properties_sync;              //ñèíõðîíèçàòîð ñâîéñòâ
-  object_id_t             render_target_id;             //èäåíòèôèêàòîð öåëè ðåíäåðèíãà
-  object_id_t             id;                           //èäåíòèôèêàòîð îáëàñòè âûâîäà
-  bool                    is_active;                    //àêòèâíà ëè îáëàñòè îòðèñîâêè
-  scene_graph::Camera*    camera;                       //òåêóùàÿ êàìåðà
-  ScenePtr                scene;                        //òåêóùàÿ ñöåíà
-  xtl::auto_connection    on_scene_changed_connection;  //ñîåäèíåíèå ñ ñèãíàëîì îïîâåùåíèÿ îá èçìåíåíèè ñöåíû
-  xtl::auto_connection    on_camera_updated_connection; //ñîåäèíåíèå ñ ñèãíàëîì îïîâåùåíèÿ îá îáíîâëåíèè òðàíñôîðìàöèé
-  size_t                  camera_name_hash;             //õýø èìåíè êàìåðû
-  bool                    need_reconfiguration;         //êîíôèãóðàöèÿ èçìåíåíà
-  bool                    need_update_renderer;         //òðåáóåòñÿ îáíîâèòü ðåíäåð
-  bool                    need_update_background;       //òðåáóåòñÿ îáíîâèòü ïàðàìåòðû î÷èñòêè
-  bool                    need_update_camera;           //òðåáóåòñÿ îáíîâèòü êàìåðó
-  bool                    need_update_transformations;  //òðåáóåòñÿ îáíîâèòü òðàíñôîðìàöèè
-  bool                    need_update_scene;            //òðåáóåòñÿ îáíîâèòü ñöåíó
-  bool                    need_update_properties;       //òðåáóåòñÿ îáíîâëåíèå ñâîéñòâ
-  bool                    need_update_activity;         //òðåáóåòñÿ îáíîâëåíèå àêòèâíîñòè îáëàñòè âûâîäà
-  bool                    need_update_name;             //òðåáóåòñÿ îáíîâëåíèå èìåíè
-  bool                    need_update_area;             //òðåáóåòñÿ îáíîâëåíèå îáëàñòè âûâîäà
-  bool                    need_update_zorder;           //òðåáóåòñÿ îáíîâëåíèå ïîðÿäêà âûâîäà
+  ConnectionPtr           connection;                   //ÑÐ¾ÐµÐ´Ð¸Ð½ÐµÐ½Ð¸Ðµ
+  scene_graph::Viewport   viewport;                     //ÑÑÑ‹Ð»ÐºÐ° Ð½Ð° Ð¾Ð±Ð»Ð°ÑÑ‚ÑŒ Ð²Ñ‹Ð²Ð¾Ð´Ð°
+  PropertyMapSynchronizer properties_sync;              //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ‚Ð¾Ñ€ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²
+  object_id_t             render_target_id;             //Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ñ†ÐµÐ»Ð¸ Ñ€ÐµÐ½Ð´ÐµÑ€Ð¸Ð½Ð³Ð°
+  object_id_t             id;                           //Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
+  bool                    is_active;                    //Ð°ÐºÑ‚Ð¸Ð²Ð½Ð° Ð»Ð¸ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸
+  scene_graph::Camera*    camera;                       //Ñ‚ÐµÐºÑƒÑ‰Ð°Ñ ÐºÐ°Ð¼ÐµÑ€Ð°
+  ScenePtr                scene;                        //Ñ‚ÐµÐºÑƒÑ‰Ð°Ñ ÑÑ†ÐµÐ½Ð°
+  xtl::auto_connection    on_scene_changed_connection;  //ÑÐ¾ÐµÐ´Ð¸Ð½ÐµÐ½Ð¸Ðµ Ñ ÑÐ¸Ð³Ð½Ð°Ð»Ð¾Ð¼ Ð¾Ð¿Ð¾Ð²ÐµÑ‰ÐµÐ½Ð¸Ñ Ð¾Ð± Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¸ ÑÑ†ÐµÐ½Ñ‹
+  xtl::auto_connection    on_camera_updated_connection; //ÑÐ¾ÐµÐ´Ð¸Ð½ÐµÐ½Ð¸Ðµ Ñ ÑÐ¸Ð³Ð½Ð°Ð»Ð¾Ð¼ Ð¾Ð¿Ð¾Ð²ÐµÑ‰ÐµÐ½Ð¸Ñ Ð¾Ð± Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ð¸ Ñ‚Ñ€Ð°Ð½ÑÑ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¹
+  size_t                  camera_name_hash;             //Ñ…ÑÑˆ Ð¸Ð¼ÐµÐ½Ð¸ ÐºÐ°Ð¼ÐµÑ€Ñ‹
+  bool                    need_reconfiguration;         //ÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð°
+  bool                    need_update_renderer;         //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ñ€ÐµÐ½Ð´ÐµÑ€
+  bool                    need_update_background;       //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ¸
+  bool                    need_update_camera;           //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ ÐºÐ°Ð¼ÐµÑ€Ñƒ
+  bool                    need_update_transformations;  //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ñ‚Ñ€Ð°Ð½ÑÑ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸
+  bool                    need_update_scene;            //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ ÑÑ†ÐµÐ½Ñƒ
+  bool                    need_update_properties;       //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²
+  bool                    need_update_activity;         //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚Ð¸ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
+  bool                    need_update_name;             //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð¼ÐµÐ½Ð¸
+  bool                    need_update_area;             //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
+  bool                    need_update_zorder;           //Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ñ€ÑÐ´ÐºÐ° Ð²Ñ‹Ð²Ð¾Ð´Ð°
 
-/// Êîíñòðóêòîð
+/// ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
   Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport, object_id_t in_render_target_id)
     : connection (in_connection)
     , viewport (in_viewport)
@@ -78,7 +78,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     }
   }
 
-/// Äåñòðóêòîð
+/// Ð”ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
   ~Impl ()
   {
     try
@@ -94,28 +94,28 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     }
   }
 
-///Îáëàñòü âûâîäà îáíîâëåíà
+///ÐžÐ±Ð»Ð°ÑÑ‚ÑŒ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð°
   void OnViewportChangeArea (const scene_graph::Rect&, float, float)
   {
     need_reconfiguration = true;
     need_update_area     = true;
   }
 
-///Ïîðÿäîê âûâîäà îáíîâëåí
+///ÐŸÐ¾Ñ€ÑÐ´Ð¾Ðº Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½
   void OnViewportChangeZOrder (int)
   {
     need_reconfiguration = true;
     need_update_zorder   = true;
   }
 
-///Èìÿ îáíîâëåíî
+///Ð˜Ð¼Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¾
   void OnViewportChangeName (const char*)
   {
     need_reconfiguration = true;
     need_update_name     = true;
   }
 
-///Èçìåíåíà êàìåðà
+///Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð° ÐºÐ°Ð¼ÐµÑ€Ð°
   void OnViewportChangeCamera (scene_graph::Camera* new_camera)
   {
     need_reconfiguration = true;
@@ -128,28 +128,28 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     ResetSceneIfChanged ();
   }  
 
-///Èçìåíåíà àêòèâíîñòü îáëàñòè âûâîäà
+///Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð° Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
   void OnViewportChangeActive (bool)
   {
     need_reconfiguration = true;
     need_update_activity = true;
   }
   
-///Èçìåíåíû ïàðàìåòðû î÷èñòêè îáëàñòè âûâîäà
+///Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ¸ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
   void OnViewportChangeBackground (bool, const math::vec4f&)
   {
     need_reconfiguration   = true;
     need_update_background = true;
   }
 
-///Èçìåíåí ïóòü ðåíäåðèíãà
+///Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½ Ð¿ÑƒÑ‚ÑŒ Ñ€ÐµÐ½Ð´ÐµÑ€Ð¸Ð½Ð³Ð°
   void OnViewportChangeTechnique (const char*)
   {
     need_reconfiguration = true;
     need_update_renderer = true;
   }
 
-///Èçìåíåíû ñâîéñòâà ðåíäåðèíãà
+///Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð° Ñ€ÐµÐ½Ð´ÐµÑ€Ð¸Ð½Ð³Ð°
   void OnViewportChangeProperties (const common::PropertyMap& properties)
   {
     need_update_properties = true;
@@ -162,15 +162,15 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     need_reconfiguration   = true;
   }
 
-///Îáíîâëåíû ïàðàìåòðû êàìåðû
+///ÐžÐ±Ð½Ð¾Ð²Ð»ÐµÐ½Ñ‹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ ÐºÐ°Ð¼ÐµÑ€Ñ‹
   void OnCameraUpdated ()
   {
     need_update_transformations = true;
 
-    //óñòàíîâêà ôëàãà ïåðåêîíôèãóðàöèè íå íóæíà
+    //ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ñ„Ð»Ð°Ð³Ð° Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ð¸ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ð°
   }
 
-///Óñòàíîâêà ñöåíû
+///Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° ÑÑ†ÐµÐ½Ñ‹
   void SetScene (scene_graph::Scene* new_scene)
   {
     try
@@ -203,7 +203,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     }
   }
 
-/// Îïîâåùåíèå îá èçìåíåíèè ñöåíû
+/// ÐžÐ¿Ð¾Ð²ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¾Ð± Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¸ ÑÑ†ÐµÐ½Ñ‹
   void OnSceneChanged ()
   {
     need_update_scene    = true;
@@ -212,7 +212,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     ResetSceneIfChanged ();
   }
 
-///Ñáðîñ ñöåíû â ñëó÷àå íåîáõîäèìîñòè
+///Ð¡Ð±Ñ€Ð¾Ñ ÑÑ†ÐµÐ½Ñ‹ Ð² ÑÐ»ÑƒÑ‡Ð°Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸
   void ResetSceneIfChanged ()
   {
     if (!scene)
@@ -233,7 +233,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     }
   }
   
-///Ñèíõðîíèçàöèÿ
+///Ð¡Ð¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ
   void Synchronize ()
   {
     try
@@ -243,7 +243,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
       Context& context = connection->Context ();
 
-        //ïåðåêîíôèãóðàöèÿ èìåíè
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð¸Ð¼ÐµÐ½Ð¸
 
       if (need_update_name)
       {
@@ -252,7 +252,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_name = false;
       }
         
-        //ïåðåêîíôèãóðàöèÿ îáëàñòè âûâîäà
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
 
       if (need_update_area)
       {
@@ -263,7 +263,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_area = false;
       }
 
-        //ïåðåêîíôèãóðàöèÿ ïîðÿäêà âûâîäà
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð¿Ð¾Ñ€ÑÐ´ÐºÐ° Ð²Ñ‹Ð²Ð¾Ð´Ð°
 
       if (need_update_zorder)
       {
@@ -272,7 +272,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_zorder = false;
       }
 
-        //ïåðåêîíôèãóðàöèÿ ðåíäåðà
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ñ€ÐµÐ½Ð´ÐµÑ€Ð°
         
       if (need_update_renderer)
       {        
@@ -281,7 +281,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_renderer = false;
       }
 
-        //ïåðåêîíôèãóðàöèÿ àêòèâíîñòè
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚Ð¸
 
       if (need_update_activity)
       {
@@ -290,7 +290,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_activity = false;
       }
             
-        //ïåðåêîíôèãóðàöèÿ ïàðàìåòðîâ î÷èñòêè
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ¸
         
       if (need_update_background)
       {
@@ -299,7 +299,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_background = false;
       }
 
-        //ïåðåêîíôèãóðàöèÿ êàìåðû
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ ÐºÐ°Ð¼ÐµÑ€Ñ‹
 
       if (need_update_camera)
       {
@@ -307,7 +307,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
         if (camera)
         {
-            //ïîäïèñêà íà èçìåíåíèå ñöåíû â êàìåðå
+            //Ð¿Ð¾Ð´Ð¿Ð¸ÑÐºÐ° Ð½Ð° Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ ÑÑ†ÐµÐ½Ñ‹ Ð² ÐºÐ°Ð¼ÐµÑ€Ðµ
 
           on_scene_changed_connection  = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&Impl::OnSceneChanged, this));
           on_camera_updated_connection = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterUpdate, xtl::bind (&Impl::OnCameraUpdated, this));
@@ -328,7 +328,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_transformations = true;
       }
       
-        //ïåðåêîíôèãóðàöèÿ ñöåíû
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ ÑÑ†ÐµÐ½Ñ‹
 
       if (need_update_scene)
       {
@@ -338,7 +338,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_scene = false;
       }
 
-        //ïåðåêîíôèãóðàöèÿ ñâîéñòâ
+        //Ð¿ÐµÑ€ÐµÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ ÑÐ²Ð¾Ð¹ÑÑ‚Ð²
 
       if (need_update_properties)
       {        
@@ -351,7 +351,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         need_update_properties = false;
       }
 
-        //ñèíõðîíèçàöèÿ ñöåíû
+        //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÑ†ÐµÐ½Ñ‹
 
       connection->Client ().SceneManager ().Update ();
       
@@ -366,7 +366,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 };
 
 /*
-    Êîíñòðóêòîð / äåñòðóêòîð
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ / Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
 */
 
 RenderableView::RenderableView (const ConnectionPtr& connection, scene_graph::Viewport& viewport, object_id_t render_target_id)
@@ -387,7 +387,7 @@ RenderableView::~RenderableView ()
 }
 
 /*
-    Îáëàñòü âûâîäà
+    ÐžÐ±Ð»Ð°ÑÑ‚ÑŒ Ð²Ñ‹Ð²Ð¾Ð´Ð°
 */
 
 const scene_graph::Viewport& RenderableView::Viewport ()
@@ -396,7 +396,7 @@ const scene_graph::Viewport& RenderableView::Viewport ()
 }
 
 /*
-    Èäåíòèôèêàòîð
+    Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€
 */
 
 object_id_t RenderableView::Id ()
@@ -405,22 +405,22 @@ object_id_t RenderableView::Id ()
 }
 
 /*
-    Ñèíõðîíèçàöèÿ ñ ñåðâåðîì
+    Ð¡Ð¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ Ñ ÑÐµÑ€Ð²ÐµÑ€Ð¾Ð¼
 */
 
 void RenderableView::Synchronize ()
 {
   try
   {
-      //ñèíõðîíèçàöèÿ ïàðàìåòðîâ êëèåíòà
+      //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°
 
     impl->connection->Client ().Synchronize ();
 
-      //ñèíõðîíèçàöèÿ îáëàñòè âûâîäà
+      //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð°
 
     impl->Synchronize ();
 
-      //ñèíõðîíèçàöèÿ òðàíñôîðìàöèé
+      //ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ Ñ‚Ñ€Ð°Ð½ÑÑ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¹
 
     if (impl->need_update_transformations)
     {

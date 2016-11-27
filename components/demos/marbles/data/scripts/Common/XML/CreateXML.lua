@@ -1,26 +1,26 @@
 
 
 function CreateXML(filename)
-  --имя файла указывается если нужно загрузить xml из файла
+  --РёРјСЏ С„Р°Р№Р»Р° СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РµСЃР»Рё РЅСѓР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ xml РёР· С„Р°Р№Р»Р°
   local xml={}
   
   xml.Node=Common.StringNode.Create()
   
   --------------------------------------------------------------------------------------------------
-  -- сохранение и загрузка
+  -- СЃРѕС…СЂР°РЅРµРЅРёРµ Рё Р·Р°РіСЂСѓР·РєР°
   
   xml.Save=CreateMethodForObject(XML_Save, xml)
   
   xml.Load=CreateMethodForObject(XML_Load, xml)
     
   --------------------------------------------------------------------------------------------------
-  --Установка имени
+  --РЈСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё
   xml.SetName=CreateMethodForObject(XML_SetName, xml)
    
   xml.GetName=CreateMethodForObject(XML_GetName, xml)
   
   --------------------------------------------------------------------------------------------------
-  -- Запись данных
+  -- Р—Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
   xml.WriteStringWithName=CreateMethodForObject(XML_WriteStringWithName, xml)
   
   xml.TryWriteStringWithName=CreateMethodForObject(XML_WriteStringWithName, xml)
@@ -36,7 +36,7 @@ function CreateXML(filename)
   xml.WriteVec3WithName=CreateMethodForObject(XML_WriteVec3WithName, xml)
   
   --------------------------------------------------------------------------------------------------
-  -- Чтение данных
+  -- Р§С‚РµРЅРёРµ РґР°РЅРЅС‹С…
   xml.ReadStringByName=CreateMethodForObject(XML_ReadStringByName, xml)
     
   xml.ReadStringsByNames=CreateMethodForObject(XML_ReadStringsByNames, xml)
@@ -54,7 +54,7 @@ function CreateXML(filename)
   xml.TryReadVec3ByName=CreateMethodForObject(XML_ReadVec3ByName, xml)
   
   --------------------------------------------------------------------------------------------------
-  -- работа с потомками
+  -- СЂР°Р±РѕС‚Р° СЃ РїРѕС‚РѕРјРєР°РјРё
   
   xml.AddChild=CreateMethodForObject(XML_AddChild, xml)
   
@@ -65,11 +65,11 @@ function CreateXML(filename)
   xml.ForEachChildByName=CreateMethodForObject(XML_ForEachChildByName, xml)
 
   --------------------------------------------------------------------------------------------------
-  -- Инициализация
+  -- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   --------------------------------------------------------------------------------------------------
   xml.SetName("noname")
   
-  --если было указано имя файла - загрузить xml
+  --РµСЃР»Рё Р±С‹Р»Рѕ СѓРєР°Р·Р°РЅРѕ РёРјСЏ С„Р°Р№Р»Р° - Р·Р°РіСЂСѓР·РёС‚СЊ xml
   if filename then
     xml.Load(filename)
   end

@@ -10,27 +10,27 @@
 #include <common/strlib.h>
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  WGLEXT_FILE_NAME     = "../sources/shared/profile/gl/wglext.h";    //имя заголовочного файла WGL-расширений
-const char*  GLEXT_FILE_NAME      = "../sources/shared/profile/gl/glext.h";     //имя заголовочного файла расширений OpenGL
-const char*  GLXEXT_FILE_NAME     = "../sources/shared/profile/gl/glxext.h";    //имя заголовочного файла расширений OpenGL
-const char*  GLESEXT_FILE_NAME    = "../sources/shared/profile/gles/glext.h";   //имя заголовочного файла расширений OpenGL
-const char*  GLES2EXT_FILE_NAME   = "../sources/shared/profile/gles2/gl2ext.h"; //имя заголовочного файла расширений OpenGL
-const char*  TEMPLATES_MASK       = "templates/*";                              //маска имён файлов-шаблонов
-const char*  RESULT_DIR           = "results";                                  //каталог с результирующими файлами
-const size_t ENTRIES_RESERVE_SIZE = 8192;                                       //резервируемое количество точек входа
+const char*  WGLEXT_FILE_NAME     = "../sources/shared/profile/gl/wglext.h";    //РёРјСЏ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРіРѕ С„Р°Р№Р»Р° WGL-СЂР°СЃС€РёСЂРµРЅРёР№
+const char*  GLEXT_FILE_NAME      = "../sources/shared/profile/gl/glext.h";     //РёРјСЏ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРіРѕ С„Р°Р№Р»Р° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
+const char*  GLXEXT_FILE_NAME     = "../sources/shared/profile/gl/glxext.h";    //РёРјСЏ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРіРѕ С„Р°Р№Р»Р° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
+const char*  GLESEXT_FILE_NAME    = "../sources/shared/profile/gles/glext.h";   //РёРјСЏ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРіРѕ С„Р°Р№Р»Р° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
+const char*  GLES2EXT_FILE_NAME   = "../sources/shared/profile/gles2/gl2ext.h"; //РёРјСЏ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРіРѕ С„Р°Р№Р»Р° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
+const char*  TEMPLATES_MASK       = "templates/*";                              //РјР°СЃРєР° РёРјС‘РЅ С„Р°Р№Р»РѕРІ-С€Р°Р±Р»РѕРЅРѕРІ
+const char*  RESULT_DIR           = "results";                                  //РєР°С‚Р°Р»РѕРі СЃ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРјРё С„Р°Р№Р»Р°РјРё
+const size_t ENTRIES_RESERVE_SIZE = 8192;                                       //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РѕС‡РµРє РІС…РѕРґР°
 
 /*
-    Типы
+    РўРёРїС‹
 */
 
 struct Entry
 {
-  stl::string name;   //имя точки входа
-  stl::string prefix; //префикса имени точки входа
-  stl::string type;   //тип точки входа
+  stl::string name;   //РёРјСЏ С‚РѕС‡РєРё РІС…РѕРґР°
+  stl::string prefix; //РїСЂРµС„РёРєСЃР° РёРјРµРЅРё С‚РѕС‡РєРё РІС…РѕРґР°
+  stl::string type;   //С‚РёРї С‚РѕС‡РєРё РІС…РѕРґР°
 
   Entry (const char* in_prefix, const stl::string& source, size_t pos, size_t len) : name (source, pos, len), prefix (in_prefix)
   {
@@ -48,19 +48,19 @@ typedef xtl::shared_ptr<Entry> EntryPtr;
 typedef stl::vector<EntryPtr>  EntryArray;
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
-//чтение таблицы точек входа
+//С‡С‚РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ С‚РѕС‡РµРє РІС…РѕРґР°
 void load_entries (const char* file_name, const char* modifier, const char* prefix, EntryArray& entries)
 {
-    //загрузка исходного текста glext.h
+    //Р·Р°РіСЂСѓР·РєР° РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° glext.h
 
   stl::string source;
   
   common::FileSystem::LoadTextFile (file_name, source);
   
-    //формирование префикса поиска
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїСЂРµС„РёРєСЃР° РїРѕРёСЃРєР°
 
   stl::string full_prefix = modifier;
 
@@ -69,7 +69,7 @@ void load_entries (const char* file_name, const char* modifier, const char* pref
 
   size_t prefix_size = full_prefix.size ();    
   
-    //поиск точек входа
+    //РїРѕРёСЃРє С‚РѕС‡РµРє РІС…РѕРґР°
     
   for (stl::string::size_type pos=0, end;; pos=end)
   {
@@ -85,7 +85,7 @@ void load_entries (const char* file_name, const char* modifier, const char* pref
   }
 }
 
-//печать точек входа
+//РїРµС‡Р°С‚СЊ С‚РѕС‡РµРє РІС…РѕРґР°
 void dump_entries (const EntryArray& entries, stl::string& result)
 {
   for (EntryArray::const_iterator iter=entries.begin (), end=entries.end (); iter!=end; ++iter)
@@ -100,7 +100,7 @@ void dump_entries (const EntryArray& entries, stl::string& result)
   }
 }
 
-//печать макроопределений
+//РїРµС‡Р°С‚СЊ РјР°РєСЂРѕРѕРїСЂРµРґРµР»РµРЅРёР№
 void dump_defines (const EntryArray& entries, stl::string& result)
 {
   for (EntryArray::const_iterator iter=entries.begin (), end=entries.end (); iter!=end; ++iter)
@@ -115,7 +115,7 @@ void dump_defines (const EntryArray& entries, stl::string& result)
   }
 }
 
-//печать кода инициализации
+//РїРµС‡Р°С‚СЊ РєРѕРґР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 void dump_initialization (const EntryArray& entries, stl::string& result)
 {
   for (EntryArray::const_iterator iter=entries.begin (), end=entries.end (); iter!=end; ++iter)
@@ -131,7 +131,7 @@ void dump_initialization (const EntryArray& entries, stl::string& result)
   }
 }
 
-//генерация исходного текста
+//РіРµРЅРµСЂР°С†РёСЏ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р°
 void generate_source
  (const char*       template_file_name,
   const char*       source_name,
@@ -141,13 +141,13 @@ void generate_source
   const EntryArray& wgl_entries,
   const EntryArray& glx_entries)
 {
-    //загрузка шаблона
+    //Р·Р°РіСЂСѓР·РєР° С€Р°Р±Р»РѕРЅР°
 
   stl::string tmpl;
 
   common::FileSystem::LoadTextFile (template_file_name, tmpl);
   
-    //формирование текста на выходе
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚РµРєСЃС‚Р° РЅР° РІС‹С…РѕРґРµ
     
   stl::string result;
   
@@ -181,7 +181,7 @@ void generate_source
 
     stl::string tag = tmpl.substr (pos, end - pos);
 
-      //замены
+      //Р·Р°РјРµРЅС‹
 
     if      (tag == "GLENTRIES")    dump_entries        (gl_entries, result);
     else if (tag == "GLDEFINES")    dump_defines        (gl_entries, result);
@@ -206,7 +206,7 @@ void generate_source
     end += END_REPLACEMENT_TAG_SIZE;
   }
   
-    //сохранение сформированного файла
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃС„РѕСЂРјРёСЂРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
     
   common::OutputFile file (source_name);
   
@@ -219,7 +219,7 @@ int main ()
 
   try
   {
-      //загрузка точек входа OpenGL
+      //Р·Р°РіСЂСѓР·РєР° С‚РѕС‡РµРє РІС…РѕРґР° OpenGL
 
     EntryArray gl_entries, gles_entries, gles2_entries, wgl_entries, glx_entries;
 
@@ -229,12 +229,12 @@ int main ()
     load_entries (WGLEXT_FILE_NAME,  "WINAPI", "wgl",      wgl_entries);    
     load_entries (GLXEXT_FILE_NAME,  "", "glX",            glx_entries);
 
-      //создание нового каталога с результирующими файлами
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР° СЃ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРјРё С„Р°Р№Р»Р°РјРё
 
     if (!common::FileSystem::IsFileExist (RESULT_DIR))
       common::FileSystem::Mkdir (RESULT_DIR);
 
-      //генерация файлов
+      //РіРµРЅРµСЂР°С†РёСЏ С„Р°Р№Р»РѕРІ
 
     for (common::FileListIterator iter = common::FileSystem::Search (TEMPLATES_MASK); iter; ++iter)
     {

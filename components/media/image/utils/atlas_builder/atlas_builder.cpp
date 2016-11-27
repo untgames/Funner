@@ -22,7 +22,7 @@
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
@@ -30,7 +30,7 @@ const char*  DEFAULT_ATLAS_FILE_NAME    = "images.png";
 const char*  DEFAULT_LAYOUT_FILE_NAME   = "layout.xatlas";
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -48,46 +48,46 @@ void error (const char* format, ...)
 }
 
 /*
-    Обработка командной строки
+    РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                name;          //имя команды
-  char                       short_name;    //короткое имя
-  const char*                argument_name; //имя аргумента
-  const char*                tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                       short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                  //массив опций
-  size_t        options_count;            //количество опций
-  StringArray   sources;                  //имя исходных изображений
-  stl::string   atlas_file_format;        //имя результирующего изображения
-  stl::string   layout_atlas_file_format; //имя результирующего изображения в атласе
-  stl::string   layout_file_name;         //имя файла разметки
-  stl::string   isolated_images_wildcard; //маска имён изолированных изображений не входящих в общий атлас
-  unsigned int  max_image_size;           //максимальный размер одного изображения
-  unsigned int  margin;                   //отступ между картинками в атласе
-  bool          silent;                   //минимальное число сообщений
-  bool          print_help;               //нужно ли печатать сообщение помощи
-  bool          need_layout;              //нужно генерировать файл разметки
-  bool          need_pot_rescale;         //нужно ли масштабировать изображение к размерам кратным степени двойки
-  bool          invert_x;                 //инвертирование координаты X тайлов
-  bool          invert_y;                 //инвертирование координаты Y тайлов
-  bool          swap_axises;              //обмен осей местами
-  bool          square_axises;            //квадратные текстуры
-  bool          top_right_edge_margin;    //использовать ли отступ от правого и верхнего краев картинки
-  bool          dont_store_images;        //не хранить все картинки в памяти
+  const Option* options;                  //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  StringArray   sources;                  //РёРјСЏ РёСЃС…РѕРґРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
+  stl::string   atlas_file_format;        //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  stl::string   layout_atlas_file_format; //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ Р°С‚Р»Р°СЃРµ
+  stl::string   layout_file_name;         //РёРјСЏ С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
+  stl::string   isolated_images_wildcard; //РјР°СЃРєР° РёРјС‘РЅ РёР·РѕР»РёСЂРѕРІР°РЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№ РЅРµ РІС…РѕРґСЏС‰РёС… РІ РѕР±С‰РёР№ Р°С‚Р»Р°СЃ
+  unsigned int  max_image_size;           //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РѕРґРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  unsigned int  margin;                   //РѕС‚СЃС‚СѓРї РјРµР¶РґСѓ РєР°СЂС‚РёРЅРєР°РјРё РІ Р°С‚Р»Р°СЃРµ
+  bool          silent;                   //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool          print_help;               //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
+  bool          need_layout;              //РЅСѓР¶РЅРѕ РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» СЂР°Р·РјРµС‚РєРё
+  bool          need_pot_rescale;         //РЅСѓР¶РЅРѕ Р»Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Рє СЂР°Р·РјРµСЂР°Рј РєСЂР°С‚РЅС‹Рј СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
+  bool          invert_x;                 //РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ X С‚Р°Р№Р»РѕРІ
+  bool          invert_y;                 //РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ Y С‚Р°Р№Р»РѕРІ
+  bool          swap_axises;              //РѕР±РјРµРЅ РѕСЃРµР№ РјРµСЃС‚Р°РјРё
+  bool          square_axises;            //РєРІР°РґСЂР°С‚РЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹
+  bool          top_right_edge_margin;    //РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р»Рё РѕС‚СЃС‚СѓРї РѕС‚ РїСЂР°РІРѕРіРѕ Рё РІРµСЂС…РЅРµРіРѕ РєСЂР°РµРІ РєР°СЂС‚РёРЅРєРё
+  bool          dont_store_images;        //РЅРµ С…СЂР°РЅРёС‚СЊ РІСЃРµ РєР°СЂС‚РёРЅРєРё РІ РїР°РјСЏС‚Рё
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("atlas-builder [<OPTIONS>] <SOURCE> ...\n");
@@ -114,97 +114,97 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка формата имени результирующего файла атласа
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° Р°С‚Р»Р°СЃР°
 void command_line_result_atlas (const char* file_name, Params& params)
 {
   params.atlas_file_format = file_name;
 }
 
-//установка формата имени результирующего файла атласа при генерации файла разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° Р°С‚Р»Р°СЃР° РїСЂРё РіРµРЅРµСЂР°С†РёРё С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
 void command_line_result_layout_atlas (const char* file_name, Params& params)
 {
   params.layout_atlas_file_format = file_name;
 }
 
-//установка имени результирующего файла разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
 void command_line_result_layout (const char* file_name, Params& params)
 {
   params.layout_file_name = file_name;
 }
 
-//установка максимального размера одной картинки
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РѕРґРЅРѕР№ РєР°СЂС‚РёРЅРєРё
 void command_line_max_image_size (const char* size, Params& params)
 {
   params.max_image_size = atoi (size);
 }
 
-//установка отступа между картинками
+//СѓСЃС‚Р°РЅРѕРІРєР° РѕС‚СЃС‚СѓРїР° РјРµР¶РґСѓ РєР°СЂС‚РёРЅРєР°РјРё
 void command_line_margin (const char* size, Params& params)
 {
   params.margin = atoi (size);
 }
 
-//установка флага генерации файла разметки
+//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РіРµРЅРµСЂР°С†РёРё С„Р°Р№Р»Р° СЂР°Р·РјРµС‚РєРё
 void command_line_no_layout (const char* file_name, Params& params)
 {
   params.need_layout = false;
 }
 
-//установка параметра масштабирования к степени двойки
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ Рє СЃС‚РµРїРµРЅРё РґРІРѕР№РєРё
 void command_line_pot (const char*, Params& params)
 {
   params.need_pot_rescale = true;  
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра инвертирования тайлов по оси X
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ С‚Р°Р№Р»РѕРІ РїРѕ РѕСЃРё X
 void command_line_invert_x (const char*, Params& params)
 {
   params.invert_x = true;
 }
 
-//установка параметра инвертирования тайлов по оси Y
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ С‚Р°Р№Р»РѕРІ РїРѕ РѕСЃРё Y
 void command_line_invert_y (const char*, Params& params)
 {
   params.invert_y = true;
 }
 
-//установка параметра обмена осей местами
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РѕР±РјРµРЅР° РѕСЃРµР№ РјРµСЃС‚Р°РјРё
 void command_line_swap_axises (const char*, Params& params)
 {
   params.swap_axises = true;
 }
 
-//установка параметра квадратных текстур
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РєРІР°РґСЂР°С‚РЅС‹С… С‚РµРєСЃС‚СѓСЂ
 void command_line_square_axises (const char*, Params& params)
 {
   params.square_axises = true;
 }
 
-//установка использования отступа от верхнего и правого краев
+//СѓСЃС‚Р°РЅРѕРІРєР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РѕС‚СЃС‚СѓРїР° РѕС‚ РІРµСЂС…РЅРµРіРѕ Рё РїСЂР°РІРѕРіРѕ РєСЂР°РµРІ
 void command_line_top_right_edge_margin (const char*, Params& params)
 {
   params.top_right_edge_margin = true;
 }
 
-//установка параметра хранения картинок в памяти
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° С…СЂР°РЅРµРЅРёСЏ РєР°СЂС‚РёРЅРѕРє РІ РїР°РјСЏС‚Рё
 void command_line_dont_store_images (const char*, Params& params)
 {
   params.dont_store_images = true;
 }
 
-//установка маски изолированных изображений
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°СЃРєРё РёР·РѕР»РёСЂРѕРІР°РЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
 void command_line_isolated_images (const char* string, Params& params)
 {
   params.isolated_images_wildcard = string;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.atlas_file_format.empty ())
@@ -229,7 +229,7 @@ void validate (Params& params)
   }
 }
 
-//построение атласа
+//РїРѕСЃС‚СЂРѕРµРЅРёРµ Р°С‚Р»Р°СЃР°
 void format_atlas_names (Params& params, size_t atlas_index, bool is_single_atlas, stl::string& atlas_file_name, stl::string& layout_atlas_file_name)
 {
   if (is_single_atlas)
@@ -300,7 +300,7 @@ void build (Params& params)
 {
   try
   {
-      //обработка изолированных изображений
+      //РѕР±СЂР°Р±РѕС‚РєР° РёР·РѕР»РёСЂРѕРІР°РЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
       
     common::StringArray isolated_images_wildcard_list = common::split (params.isolated_images_wildcard.c_str ());
 
@@ -330,7 +330,7 @@ void build (Params& params)
       isolated_images.insert_pair (source, source);
     }
     
-      //построение атласов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ Р°С‚Р»Р°СЃРѕРІ
 
     unsigned int pack_flags = 0;
 
@@ -352,13 +352,13 @@ void build (Params& params)
       const char* source      = params.sources [i];
       bool        is_isolated = isolated_images.find (source) != isolated_images.end ();
 
-      if (is_isolated) //изолированное изображение всегда кладётся в атлас одно
+      if (is_isolated) //РёР·РѕР»РёСЂРѕРІР°РЅРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РІСЃРµРіРґР° РєР»Р°РґС‘С‚СЃСЏ РІ Р°С‚Р»Р°СЃ РѕРґРЅРѕ
         continue;
 
       builder.Insert (source, !params.dont_store_images);
     }
 
-      //сохранение атласа
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ Р°С‚Р»Р°СЃР°
     media::Atlas result_atlas;
 
     size_t atlas_index = 0;
@@ -432,7 +432,7 @@ int main (int argc, const char* argv [])
 
     static const size_t options_count = sizeof (options) / sizeof (*options);
 
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 
     params.options               = options;
     params.options_count         = options_count;
@@ -455,10 +455,10 @@ int main (int argc, const char* argv [])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
     
     if (params.print_help)
       return 0;
@@ -466,11 +466,11 @@ int main (int argc, const char* argv [])
     for (size_t i = 0, count = command_line.ParamsCount (); i < count; i++)
       params.sources.Add (command_line.Param (i));
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
     validate (params);
 
-      //построение атласа
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ Р°С‚Р»Р°СЃР°
 
     build (params);
   }

@@ -10,20 +10,20 @@ namespace xfont_saver
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* FLOAT_FORMAT = ".000"; //количество знаков после запятой при выводе вещественных чисел
+const char* FLOAT_FORMAT = ".000"; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№ РїСЂРё РІС‹РІРѕРґРµ РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… С‡РёСЃРµР»
 
 /*
-    Вспомогательный класс сохранения шрифтов
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ СЃРѕС…СЂР°РЅРµРЅРёСЏ С€СЂРёС„С‚РѕРІ
 */
 
 class XmlFontSaver
 {
   public:
     /*
-        Конструктор
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     */
 
     XmlFontSaver (const char* file_name, const Font& font, const char* image_name_format, const RasterizedFontCreationParams& params)
@@ -34,7 +34,7 @@ class XmlFontSaver
 
   private:
     /*
-        Сохранение шрифта
+        РЎРѕС…СЂР°РЅРµРЅРёРµ С€СЂРёС„С‚Р°
     */
 
     void SaveFont (const Font& font, const char* image_name_format, const RasterizedFontCreationParams& params)
@@ -65,7 +65,7 @@ class XmlFontSaver
     }
 
     /*
-        Сохранение глифов
+        РЎРѕС…СЂР°РЅРµРЅРёРµ РіР»РёС„РѕРІ
     */
 
     void SaveGlyphs (const Font& font, const RasterizedFont& rasterized_font)
@@ -95,7 +95,7 @@ class XmlFontSaver
     }
 
     /*
-        Сохранение кернингов
+        РЎРѕС…СЂР°РЅРµРЅРёРµ РєРµСЂРЅРёРЅРіРѕРІ
     */
 
     void SaveKernings (const Font& font)
@@ -120,11 +120,11 @@ class XmlFontSaver
     }
     
   private:
-    XmlWriter writer; //сериализатор XML
+    XmlWriter writer; //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ XML
 };
 
 /*
-    Сохранение шрифта
+    РЎРѕС…СЂР°РЅРµРЅРёРµ С€СЂРёС„С‚Р°
 */
 
 void xfont_save (const char* file_name, const Font& font, const char* image_name_format, const RasterizedFontCreationParams& params)
@@ -141,13 +141,13 @@ void xfont_save (const char* file_name, const Font& font, const char* image_name
 }
 
 /*
-   Компонент сохранение шрифтов
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёРµ С€СЂРёС„С‚РѕРІ
 */
 
 class XFontSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     XFontSaverComponent () 
     {
       FontManager::RegisterSaver ("xfont", &xfont_save);

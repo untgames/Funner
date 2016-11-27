@@ -1,4 +1,4 @@
-// SerjTest: Тестирование copy
+// SerjTest: РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ copy
 
 #include <stdio.h>
 #include <stl/string>

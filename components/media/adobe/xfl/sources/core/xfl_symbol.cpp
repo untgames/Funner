@@ -3,17 +3,17 @@
 using namespace media::adobe::xfl;
 
 /*
-    Описание реализации элемента анимации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌР»РµРјРµРЅС‚Р° Р°РЅРёРјР°С†РёРё
 */
 
 struct Symbol::Impl : public xtl::reference_counter
 {
-  stl::string   name;     //имя элемента
-  xfl::Timeline timeline; //базовая анимация
+  stl::string   name;     //РёРјСЏ СЌР»РµРјРµРЅС‚Р°
+  xfl::Timeline timeline; //Р±Р°Р·РѕРІР°СЏ Р°РЅРёРјР°С†РёСЏ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Symbol::Symbol ()
@@ -39,7 +39,7 @@ Symbol& Symbol::operator = (const Symbol& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* Symbol::Name () const
@@ -56,7 +56,7 @@ void Symbol::SetName (const char* name)
 }
 
 /*
-   Базовая анимация
+   Р‘Р°Р·РѕРІР°СЏ Р°РЅРёРјР°С†РёСЏ
 */
 
 const media::adobe::xfl::Timeline& Symbol::Timeline () const
@@ -75,7 +75,7 @@ void Symbol::SetTimeline (const media::adobe::xfl::Timeline& timeline)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Symbol::Swap (Symbol& symbol)
@@ -93,7 +93,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Symbol& symbol1, Symbol& symbol2)

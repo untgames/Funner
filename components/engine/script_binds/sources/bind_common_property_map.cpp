@@ -10,7 +10,7 @@ namespace
 const char* COMMON_PROPERTY_MAP_LIBRARY = "Common.PropertyMap";
 
 /*
-   Регистрация библиотеки работы со свойствами узла
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃРІРѕР№СЃС‚РІР°РјРё СѓР·Р»Р°
 */
 
 template <class Ret> struct result_value
@@ -43,11 +43,11 @@ void bind_common_property_map (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_PROPERTY_MAP_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_property_map));
   
-    //регистрация методов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ
     
   lib.Register ("get_Id",          make_invoker (&PropertyMap::Id));
   lib.Register ("get_Size",        make_invoker (&PropertyMap::Size));
@@ -85,7 +85,7 @@ void bind_common_property_map (Environment& environment)
   lib.Register ("SetVector",       make_invoker (implicit_cast<void (PropertyMap::*)(const char*, const math::vec4f&)> (&PropertyMap::SetProperty)));
   lib.Register ("SetMatrix",       make_invoker (implicit_cast<void (PropertyMap::*)(const char*, const math::mat4f&)> (&PropertyMap::SetProperty)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<PropertyMap> (COMMON_PROPERTY_MAP_LIBRARY);
 }

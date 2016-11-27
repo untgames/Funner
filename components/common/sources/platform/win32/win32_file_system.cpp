@@ -6,7 +6,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Операции работы с файлом
+    РћРїРµСЂР°С†РёРё СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»РѕРј
 */
 
 Win32FileSystem::Win32FileSystem ()
@@ -252,7 +252,7 @@ void Win32FileSystem::FileFlush (file_t file)
 }
 
 /*
-    Управление расположением файла
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»Р°
 */
 
 void Win32FileSystem::Remove (const char* file_name)
@@ -313,7 +313,7 @@ void Win32FileSystem::Mkdir (const char* dir_name)
 }
 
 /*
-    Получение информации о файле
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 */
 
 bool Win32FileSystem::IsFileExist (const char* file_name)
@@ -362,7 +362,7 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
 }
 
 /*
-   Информация о файловой системе
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 */
 
 filesize_t Win32FileSystem::GetFreeSpace (const char* path)
@@ -386,7 +386,7 @@ filesize_t Win32FileSystem::GetTotalSpace (const char* path)
 }
 
 /*
-    Поиск файлов
+    РџРѕРёСЃРє С„Р°Р№Р»РѕРІ
 */
 
 void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler)

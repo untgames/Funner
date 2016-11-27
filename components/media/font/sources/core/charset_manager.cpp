@@ -5,11 +5,11 @@ using namespace media;
 namespace
 {
 
-//Реализация менеджера наборов символов
+//Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° РЅР°Р±РѕСЂРѕРІ СЃРёРјРІРѕР»РѕРІ
 class CharsetManagerImpl
 {
   public:
-    //Регистрация наборов символов
+    //Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅР°Р±РѕСЂРѕРІ СЃРёРјРІРѕР»РѕРІ
     void RegisterCharset (const char* name, const char* chars)
     {
       CharsetsMap::iterator iter = charsets.find (name);
@@ -32,7 +32,7 @@ class CharsetManagerImpl
       charsets.clear ();
     }
 
-    ///Поиск набора символов
+    ///РџРѕРёСЃРє РЅР°Р±РѕСЂР° СЃРёРјРІРѕР»РѕРІ
     const char* FindCharset (const char* name)
     {
       CharsetsMap::iterator iter = charsets.find (name);
@@ -43,7 +43,7 @@ class CharsetManagerImpl
       return iter->second->utf8_charset.c_str ();
     }
 
-    ///Поиск отсортированного набора символов без дубликатов в utf32 кодировке
+    ///РџРѕРёСЃРє РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РЅР°Р±РѕСЂР° СЃРёРјРІРѕР»РѕРІ Р±РµР· РґСѓР±Р»РёРєР°С‚РѕРІ РІ utf32 РєРѕРґРёСЂРѕРІРєРµ
     const unsigned int* FindSortedUtf32Charset (const char* name)
     {
       CharsetsMap::iterator iter = charsets.find (name);
@@ -55,11 +55,11 @@ class CharsetManagerImpl
     }
 
   private:
-    //Данные набора символов
+    //Р”Р°РЅРЅС‹Рµ РЅР°Р±РѕСЂР° СЃРёРјРІРѕР»РѕРІ
     struct Charset : public  xtl::reference_counter
     {
-      stl::string               utf8_charset;  //исходный набор символов
-      stl::vector<unsigned int> utf32_charset; //отсортированный набор символов без дубликатов в utf32 кодировке
+      stl::string               utf8_charset;  //РёСЃС…РѕРґРЅС‹Р№ РЅР°Р±РѕСЂ СЃРёРјРІРѕР»РѕРІ
+      stl::vector<unsigned int> utf32_charset; //РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅС‹Р№ РЅР°Р±РѕСЂ СЃРёРјРІРѕР»РѕРІ Р±РµР· РґСѓР±Р»РёРєР°С‚РѕРІ РІ utf32 РєРѕРґРёСЂРѕРІРєРµ
 
       Charset (const char* in_utf8_charset)
         : utf8_charset (in_utf8_charset)
@@ -102,11 +102,11 @@ typedef common::Singleton<CharsetManagerImpl> CharsetManagerSingleton;
 }
 
 /*
-   Менеджер наборов символов
+   РњРµРЅРµРґР¶РµСЂ РЅР°Р±РѕСЂРѕРІ СЃРёРјРІРѕР»РѕРІ
 */
 
 /*
-   Регистрация наборов символов
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅР°Р±РѕСЂРѕРІ СЃРёРјРІРѕР»РѕРІ
 */
 
 void CharsetManager::RegisterCharset (const char* name, const char* chars)
@@ -136,7 +136,7 @@ void CharsetManager::UnregisterAllCharsets ()
 }
 
 /*
-   Поиск набора символов
+   РџРѕРёСЃРє РЅР°Р±РѕСЂР° СЃРёРјРІРѕР»РѕРІ
 */
 
 const char* CharsetManager::FindCharset (const char* name)
@@ -148,7 +148,7 @@ const char* CharsetManager::FindCharset (const char* name)
 }
 
 /*
-   Поиск отсортированного набора символов без дубликатов в utf32 кодировке
+   РџРѕРёСЃРє РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РЅР°Р±РѕСЂР° СЃРёРјРІРѕР»РѕРІ Р±РµР· РґСѓР±Р»РёРєР°С‚РѕРІ РІ utf32 РєРѕРґРёСЂРѕРІРєРµ
 */
 
 const unsigned int* CharsetManager::FindSortedUtf32Charset (const char* name)

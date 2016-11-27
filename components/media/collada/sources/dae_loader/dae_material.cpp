@@ -1,7 +1,7 @@
 #include "shared.h"
 
 /*
-    Разбор библиотеки материалов
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void DaeParser::ParseLibraryMaterials (Parser::Iterator iter)
@@ -26,7 +26,7 @@ void DaeParser::ParseMaterial (Parser::Iterator iter)
 
   const char* effect_id = get<const char*> (*effect_iter, "url");
 
-  effect_id++; //убираем префиксный '#'
+  effect_id++; //СѓР±РёСЂР°РµРј РїСЂРµС„РёРєСЃРЅС‹Р№ '#'
 
   Effect* effect = model.Effects ().Find (effect_id);
 
@@ -36,14 +36,14 @@ void DaeParser::ParseMaterial (Parser::Iterator iter)
   if (effect_iter->Next ())
     raise_parser_exception (*iter, "Only one 'instance_effect' tag allowed");
 
-    //создание нового материала
+    //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 
   Material material;
 
   material.SetId    (id);
   material.SetEffect (effect_id);
 
-    //добавление материала в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
     
   model.Materials ().Insert (id, material);
 }

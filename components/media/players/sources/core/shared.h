@@ -26,7 +26,7 @@ namespace media
 namespace players
 {
 
-///Создание проигрывателя
+///РЎРѕР·РґР°РЅРёРµ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ
 IStreamPlayer* create_stream_player (const char* target, const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler);
 
 }

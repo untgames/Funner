@@ -1,4 +1,4 @@
-//тестирование resize
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ resize
 #include <stdio.h>
 #include <stl/deque>
 #include "test.h"

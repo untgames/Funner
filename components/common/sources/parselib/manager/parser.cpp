@@ -3,19 +3,19 @@
 using namespace common;
 
 /*
-    Описание реализации парсера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїР°СЂСЃРµСЂР°
 */
 
 struct Parser::Impl
 {
-  ParseLog  log;  //протокол разбора
-  ParseNode root; //корень дерева разбора
+  ParseLog  log;  //РїСЂРѕС‚РѕРєРѕР» СЂР°Р·Р±РѕСЂР°
+  ParseNode root; //РєРѕСЂРµРЅСЊ РґРµСЂРµРІР° СЂР°Р·Р±РѕСЂР°
   
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
   Impl (ParseLog in_log, const char* file_name, const char* format)
     : log (in_log)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
@@ -23,7 +23,7 @@ struct Parser::Impl
     if (!format)
       throw xtl::make_null_argument_exception ("", "format");
       
-      //загрузка буфера
+      //Р·Р°РіСЂСѓР·РєР° Р±СѓС„РµСЂР°
 
     stl::string parse_buffer;
 
@@ -31,7 +31,7 @@ struct Parser::Impl
 
     try
     {
-        //разбор    
+        //СЂР°Р·Р±РѕСЂ    
 
       root = parse (log, format, file_name, parse_buffer.size () + 1, &parse_buffer [0]);
     }
@@ -48,7 +48,7 @@ struct Parser::Impl
   Impl (ParseLog in_log, const char* name, size_t buffer_size, const char* buffer, const char* format)
     : log (in_log)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -59,13 +59,13 @@ struct Parser::Impl
     if (!format)
       throw xtl::make_null_argument_exception ("", "format");
 
-        //копирование буфера
+        //РєРѕРїРёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂР°
 
     stl::string parse_buffer (buffer, buffer_size);    
       
     try
     {    
-        //разбор
+        //СЂР°Р·Р±РѕСЂ
 
       root = parse (log, format, name, parse_buffer.size () + 1, &parse_buffer [0]);
     }
@@ -81,7 +81,7 @@ struct Parser::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Parser::Parser (const char* file_name, const char* format)
@@ -145,7 +145,7 @@ Parser::~Parser ()
 }
 
 /*
-    Протокол разбора
+    РџСЂРѕС‚РѕРєРѕР» СЂР°Р·Р±РѕСЂР°
 */
 
 ParseLog& Parser::Log ()
@@ -159,7 +159,7 @@ const ParseLog& Parser::Log () const
 }
 
 /*
-    Корень дерева разбора
+    РљРѕСЂРµРЅСЊ РґРµСЂРµРІР° СЂР°Р·Р±РѕСЂР°
 */
 
 ParseNode Parser::Root () const
@@ -168,7 +168,7 @@ ParseNode Parser::Root () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Parser::Swap (Parser& parser)

@@ -14,7 +14,7 @@ namespace common
 class PropertyMap;
 
 /*
-    Функции работы с именами путей
+    Р¤СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РёРјРµРЅР°РјРё РїСѓС‚РµР№
 */
 
 stl::string basename (const char*);
@@ -27,7 +27,7 @@ stl::string dir      (const stl::string&);
 stl::string notdir   (const stl::string&);
 
 /*
-    Форматирование режима файла и флагов поиска файлов
+    Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ СЂРµР¶РёРјР° С„Р°Р№Р»Р° Рё С„Р»Р°РіРѕРІ РїРѕРёСЃРєР° С„Р°Р№Р»РѕРІ
 */
 
 typedef size_t filemode_t;
@@ -36,28 +36,28 @@ stl::string strfilemode    (filemode_t mode);
 stl::string strsearchflags (size_t search_flags);
 
 /*
-    Форматированный вывод в строку
+    Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅС‹Р№ РІС‹РІРѕРґ РІ СЃС‚СЂРѕРєСѓ
 */
 
 stl::string format  (const char*,...);
 stl::string vformat (const char*,va_list);
 
 /*
-    Замена управляющих символов их обозначениями (\n, \r, etc.)
+    Р—Р°РјРµРЅР° СѓРїСЂР°РІР»СЏСЋС‰РёС… СЃРёРјРІРѕР»РѕРІ РёС… РѕР±РѕР·РЅР°С‡РµРЅРёСЏРјРё (\n, \r, etc.)
 */
 
 stl::string compress   (const char*);
 stl::string decompress (const char* str,const char* exception = NULL);
 
 /*
-    Отсечение пробелов
+    РћС‚СЃРµС‡РµРЅРёРµ РїСЂРѕР±РµР»РѕРІ
 */
 
 stl::string strip (const char* str, const char* spaces=" \t");
 stl::string trim  (const char* str, const char* spaces=" \t");
 
 /*
-    Разбиение строки
+    Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё
 */
 
 stl::string word (const char* str, size_t word_index, const char* delimiters=" ", const char* spaces=" \t", const char* brackets="");
@@ -67,7 +67,7 @@ StringArray split (const char* str,const char* delimiters=" ",const char* spaces
 StringArray split (const stl::string& str,const char* delimiters=" ",const char* spaces=" \t", const char* brackets="");
 
 /*
-    Разбор строк инициализации (property1=value property2='string value')
+    Р Р°Р·Р±РѕСЂ СЃС‚СЂРѕРє РёРЅРёС†РёР°Р»РёР·Р°С†РёРё (property1=value property2='string value')
 */
 
 void        parse_init_string (const char* init_string, const xtl::function<void (const char* property, const char* value)>& fn);
@@ -75,7 +75,7 @@ PropertyMap parse_init_string (const char* init_string);
 void        parse_format_string (const char* format_string, const xtl::function<void (const char* prefix, const char* replacement_tag)>& fn);
 
 /*
-    Работа с регулярными выражениями
+    Р Р°Р±РѕС‚Р° СЃ СЂРµРіСѓР»СЏСЂРЅС‹РјРё РІС‹СЂР°Р¶РµРЅРёСЏРјРё
 */
 
 StringArray parse   (const char* string,const char* re_pattern, const char* flags="");
@@ -88,20 +88,20 @@ bool wcimatch (const char* string,const char* wildcard);
 bool is_wildcard (const char* string);
 
 /*
-    Получение строки с информацией об ошибке (портируемый аналог strerror)
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ РѕР± РѕС€РёР±РєРµ (РїРѕСЂС‚РёСЂСѓРµРјС‹Р№ Р°РЅР°Р»РѕРі strerror)
 */
 
 const char* strerror (int code);
 
 /*
-    Компрессия / декомпрессия последовательности байт в символы
+    РљРѕРјРїСЂРµСЃСЃРёСЏ / РґРµРєРѕРјРїСЂРµСЃСЃРёСЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё Р±Р°Р№С‚ РІ СЃРёРјРІРѕР»С‹
 */
 
 void decompress_buffer (size_t src_buffer_size, const void* src_buffer, char* dst_buffer); //dst_buffer_size = buffer_size * 2 + 1
 void compress_buffer   (size_t src_buffer_size, const char* src_buffer, void* dst_buffer); //dst_buffer_size = src_buffer_size / 2
 
 /*
-    Компрессия / декомпрессия в Base64
+    РљРѕРјРїСЂРµСЃСЃРёСЏ / РґРµРєРѕРјРїСЂРµСЃСЃРёСЏ РІ Base64
 */
 
 void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string& result);

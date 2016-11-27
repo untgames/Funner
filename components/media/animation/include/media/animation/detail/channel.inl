@@ -1,21 +1,21 @@
 namespace detail
 {
 
-///базовый класс контейнера функции анимационного канала
+///Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РєРѕРЅС‚РµР№РЅРµСЂР° С„СѓРЅРєС†РёРё Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ РєР°РЅР°Р»Р°
 class IEvaluatorBase : public xtl::reference_counter
 {
   public:
-    virtual const std::type_info& TrackType () = 0; //тип трека
-    virtual const std::type_info& ValueType () = 0; //тип значения результата
-    virtual float                 MinUnwrappedTime () = 0; //минимальное неотсеченное время
-    virtual float                 MaxUnwrappedTime () = 0; //максимальное неотсеченное время
-    virtual float                 MinTime () = 0; //минимальное время
-    virtual float                 MaxTime () = 0; //максимальное время
+    virtual const std::type_info& TrackType () = 0; //С‚РёРї С‚СЂРµРєР°
+    virtual const std::type_info& ValueType () = 0; //С‚РёРї Р·РЅР°С‡РµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р°
+    virtual float                 MinUnwrappedTime () = 0; //РјРёРЅРёРјР°Р»СЊРЅРѕРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ
+    virtual float                 MaxUnwrappedTime () = 0; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ
+    virtual float                 MinTime () = 0; //РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+    virtual float                 MaxTime () = 0; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
     
     virtual ~IEvaluatorBase () {}
 };
 
-///шаблонный интерфейс функции анимационного канала
+///С€Р°Р±Р»РѕРЅРЅС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ С„СѓРЅРєС†РёРё Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ РєР°РЅР°Р»Р°
 template <class T> class IEvaluator : public IEvaluatorBase
 {
   public:
@@ -82,7 +82,7 @@ inline float get_max_time (xtl::default_cast_type)
 
 }
 
-///реализация функции анимационного канала
+///СЂРµР°Р»РёР·Р°С†РёСЏ С„СѓРЅРєС†РёРё Р°РЅРёРјР°С†РёРѕРЅРЅРѕРіРѕ РєР°РЅР°Р»Р°
 template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType<Fn>::Type> 
 {
   public:
@@ -147,7 +147,7 @@ template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType
 */
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -179,7 +179,7 @@ Evaluator<T>& Evaluator<T>::operator = (const Evaluator<T>& source)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>
@@ -195,7 +195,7 @@ void swap (Evaluator<T>& evaluator1, Evaluator<T>& evaluator2)
 }
 
 /*
-   Вычисление значений
+   Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№
 */
 
 namespace detail
@@ -231,7 +231,7 @@ void Evaluator<T>::operator () (float time, ValueType& value)
 */
 
 /*
-    Вычисление значений по времени
+    Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїРѕ РІСЂРµРјРµРЅРё
 */
 
 template <class Ret> Ret Channel::Eval (float time) const
@@ -245,7 +245,7 @@ template <class Ret> void Channel::Eval (float time, Ret& result) const
 }
 
 /*
-    Сплайн
+    РЎРїР»Р°Р№РЅ
 */
 
 template <class Fn> void Channel::SetTrack (const Fn& fn)
@@ -267,7 +267,7 @@ template <class Fn> Fn* Channel::Track ()
 }
 
 /*
-    Получение функции вычисления значений
+    РџРѕР»СѓС‡РµРЅРёРµ С„СѓРЅРєС†РёРё РІС‹С‡РёСЃР»РµРЅРёСЏ Р·РЅР°С‡РµРЅРёР№
 */
 
 template <class T> animation::Evaluator<T> Channel::Evaluator () const

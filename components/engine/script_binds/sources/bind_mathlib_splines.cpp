@@ -7,7 +7,7 @@ namespace
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* MATHLIB_LINEAR_SPLINE_FLOAT_LIBRARY = "Math.LinearSplineFloat";
@@ -17,7 +17,7 @@ const char* MATHLIB_LINEAR_SPLINE_VEC4_LIBRARY  = "Math.LinearSplineVec4";
 const char* MATHLIB_SPLINE_WRAP_LIBRARY         = "Math.SplineWrap";
 
 /*
-    Создание сплайна
+    РЎРѕР·РґР°РЅРёРµ СЃРїР»Р°Р№РЅР°
 */
 
 linear_splinef create_linear_splinef ()
@@ -41,7 +41,7 @@ linear_spline4f create_linear_spline4f ()
 }
 
 /*
-   Получение ключей
+   РџРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡РµР№
 */
 
 template <class T>
@@ -75,13 +75,13 @@ typename T::value_type eval (T& spline, typename T::time_type time)
 }
 
 /*
-    Регистрация библиотеки работы с сплайнами
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ СЃРїР»Р°Р№РЅР°РјРё
 */
 
 template <class T>
 void bind_spline_library (InvokerRegistry& lib)
 {
-    //регистрация функций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№
 
   lib.Register ("get_BeginWrap",  make_invoker (&T::begin_wrap));
   lib.Register ("get_EndWrap",    make_invoker (&T::end_wrap));
@@ -112,12 +112,12 @@ namespace engine
 {
 
 /*
-    Регистрация библиотек работы со сплайнами
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїР»Р°Р№РЅР°РјРё
 */
 
 void bind_math_splines_library (script::Environment& environment)
 {
-    //создание библиотек
+    //СЃРѕР·РґР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
     
   InvokerRegistry linear_splinef_lib  = environment.CreateLibrary (MATHLIB_LINEAR_SPLINE_FLOAT_LIBRARY);
   InvokerRegistry linear_spline2f_lib = environment.CreateLibrary (MATHLIB_LINEAR_SPLINE_VEC2_LIBRARY);
@@ -129,21 +129,21 @@ void bind_math_splines_library (script::Environment& environment)
   spline_wrap_lib.Register ("get_Repeat", make_const (spline_wrap_repeat));
   spline_wrap_lib.Register ("get_Mirror", make_const (spline_wrap_mirror));
   
-    //регистрация библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
   
   bind_spline_library<linear_splinef>  (linear_splinef_lib);
   bind_spline_library<linear_spline2f> (linear_spline2f_lib);
   bind_spline_library<linear_spline3f> (linear_spline3f_lib);
   bind_spline_library<linear_spline4f> (linear_spline4f_lib);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
   
   linear_splinef_lib.Register  ("Create", make_invoker (&create_linear_splinef));
   linear_spline2f_lib.Register ("Create", make_invoker (&create_linear_spline2f));
   linear_spline3f_lib.Register ("Create", make_invoker (&create_linear_spline3f));
   linear_spline4f_lib.Register ("Create", make_invoker (&create_linear_spline4f));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<linear_splinef>  (MATHLIB_LINEAR_SPLINE_FLOAT_LIBRARY);
   environment.RegisterType<linear_spline2f> (MATHLIB_LINEAR_SPLINE_VEC2_LIBRARY);

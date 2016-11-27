@@ -4,22 +4,22 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Вспомогательные структуры
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 */
 
 typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDescPtr> RenderTargetDescMap;
 
 /*
-    Описание реализации кадра
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєР°РґСЂР°
 */
 
 struct RenderTargetMapImpl::Impl
 {
-  RenderTargetDescMap render_targets; //целевые буферы отрисовки
+  RenderTargetDescMap render_targets; //С†РµР»РµРІС‹Рµ Р±СѓС„РµСЂС‹ РѕС‚СЂРёСЃРѕРІРєРё
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetMapImpl::RenderTargetMapImpl ()
@@ -32,7 +32,7 @@ RenderTargetMapImpl::~RenderTargetMapImpl ()
 }
 
 /*
-    Регистрация целевых буферов отрисовки
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void RenderTargetMapImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
@@ -83,7 +83,7 @@ void RenderTargetMapImpl::RemoveAllRenderTargets ()
 }
 
 /*
-    Получение целевых буферов отрисовки
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 RenderTargetPtr RenderTargetMapImpl::FindRenderTarget (const char* name)

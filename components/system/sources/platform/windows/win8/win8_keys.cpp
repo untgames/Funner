@@ -12,7 +12,7 @@ namespace syslib
 namespace win8
 {
 
-/// Отображение кнопки 
+/// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РєРЅРѕРїРєРё 
 Key get_key_code (VirtualKey key)
 {
   switch (key)

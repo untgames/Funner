@@ -9,7 +9,7 @@ namespace
 const char* LOG_NAME = "syslib.CarbonTimer";
 
 /*
-    Описание реализации таймера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚Р°Р№РјРµСЂР°
 */
 
 class CarbonTimer
@@ -25,11 +25,11 @@ class CarbonTimer
     static void TimerProc (EventLoopTimerRef in_timer, void* user_data);
 
   private:
-    EventLoopTimerRef timer;       //таймер
-    TimerHandler      handler;     //обработчик
-    void*             user_data;   //пользовательские данные
-    EventRef          dummy_event; //событие, посылаемое при каждом вызове TimerProc
-    common::Log       log;         //дебаг-лог
+    EventLoopTimerRef timer;       //С‚Р°Р№РјРµСЂ
+    TimerHandler      handler;     //РѕР±СЂР°Р±РѕС‚С‡РёРє
+    void*             user_data;   //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
+    EventRef          dummy_event; //СЃРѕР±С‹С‚РёРµ, РїРѕСЃС‹Р»Р°РµРјРѕРµ РїСЂРё РєР°Р¶РґРѕРј РІС‹Р·РѕРІРµ TimerProc
+    common::Log       log;         //РґРµР±Р°Рі-Р»РѕРі
 };
 
 }
@@ -95,7 +95,7 @@ void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
 }
 
 /*
-    Создание / уничтожение таймера
+    РЎРѕР·РґР°РЅРёРµ / СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ С‚Р°Р№РјРµСЂР°
 */
 
 timer_t CarbonTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)

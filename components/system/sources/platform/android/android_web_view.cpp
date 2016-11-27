@@ -6,11 +6,11 @@ using namespace syslib::android;
 namespace
 {
 
-//Класс, устанавливающий значение async result в случае удаления, если он не был установлен
+//РљР»Р°СЃСЃ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‰РёР№ Р·РЅР°С‡РµРЅРёРµ async result РІ СЃР»СѓС‡Р°Рµ СѓРґР°Р»РµРЅРёСЏ, РµСЃР»Рё РѕРЅ РЅРµ Р±С‹Р» СѓСЃС‚Р°РЅРѕРІР»РµРЅ
 class AsyncResultHolder : public xtl::reference_counter
 {
   public:
-    //Конструктор/деструктор
+    //РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     AsyncResultHolder (global_ref<jobject> in_result)
       : result (in_result)
       , result_setted (false)
@@ -25,11 +25,11 @@ class AsyncResultHolder : public xtl::reference_counter
       }
       catch (...)
       {
-        //Подавление исключений
+        //РџРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-    //Установка значения результата
+    //РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р°
     void SetResultValue (bool value)
     {
       JNIEnv& env = get_env ();
@@ -53,8 +53,8 @@ class AsyncResultHolder : public xtl::reference_counter
     AsyncResultHolder& operator = (const AsyncResultHolder&); //no impl
 
   private:
-    global_ref<jobject> result;        //результат
-    bool                result_setted; //было ли задано значение результата
+    global_ref<jobject> result;        //СЂРµР·СѓР»СЊС‚Р°С‚
+    bool                result_setted; //Р±С‹Р»Рѕ Р»Рё Р·Р°РґР°РЅРѕ Р·РЅР°С‡РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р°
 };
 
 typedef xtl::intrusive_ptr<AsyncResultHolder> AsyncResultHolderPtr;
@@ -63,20 +63,20 @@ typedef xtl::intrusive_ptr<AsyncResultHolder> AsyncResultHolderPtr;
 
 struct syslib::web_view_handle: public MessageQueue::Handler
 {
-  IWebViewListener*   listener;               //слушатель событий web-view
-  global_ref<jobject> controller;             //контроллер формы
-  window_t            window;                 //дескриптор окна
-  jmethodID           is_loading_method;      //метод проверки состояния офрмы
-  jmethodID           load_url_method;        //метод загрузки URL ресурса
-  jmethodID           load_data_method;       //метод загрузки данных
-  jmethodID           reload_method;          //метод перезагрузки страницы
-  jmethodID           stop_loading_method;    //метод перезагрузки страницы
-  jmethodID           can_go_back_method;     //метод проверки возможности возвращения назад
-  jmethodID           can_go_forward_method;  //метод проверки возможности перемещения вперед
-  jmethodID           go_back_method;         //метод возвращения назад
-  jmethodID           go_forward_method;      //метод перемещения вперед
+  IWebViewListener*   listener;               //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ web-view
+  global_ref<jobject> controller;             //РєРѕРЅС‚СЂРѕР»Р»РµСЂ С„РѕСЂРјС‹
+  window_t            window;                 //РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°
+  jmethodID           is_loading_method;      //РјРµС‚РѕРґ РїСЂРѕРІРµСЂРєРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕС„СЂРјС‹
+  jmethodID           load_url_method;        //РјРµС‚РѕРґ Р·Р°РіСЂСѓР·РєРё URL СЂРµСЃСѓСЂСЃР°
+  jmethodID           load_data_method;       //РјРµС‚РѕРґ Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…
+  jmethodID           reload_method;          //РјРµС‚РѕРґ РїРµСЂРµР·Р°РіСЂСѓР·РєРё СЃС‚СЂР°РЅРёС†С‹
+  jmethodID           stop_loading_method;    //РјРµС‚РѕРґ РїРµСЂРµР·Р°РіСЂСѓР·РєРё СЃС‚СЂР°РЅРёС†С‹
+  jmethodID           can_go_back_method;     //РјРµС‚РѕРґ РїСЂРѕРІРµСЂРєРё РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІРѕР·РІСЂР°С‰РµРЅРёСЏ РЅР°Р·Р°Рґ
+  jmethodID           can_go_forward_method;  //РјРµС‚РѕРґ РїСЂРѕРІРµСЂРєРё РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РїРµСЂРµРјРµС‰РµРЅРёСЏ РІРїРµСЂРµРґ
+  jmethodID           go_back_method;         //РјРµС‚РѕРґ РІРѕР·РІСЂР°С‰РµРЅРёСЏ РЅР°Р·Р°Рґ
+  jmethodID           go_forward_method;      //РјРµС‚РѕРґ РїРµСЂРµРјРµС‰РµРЅРёСЏ РІРїРµСЂРµРґ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   web_view_handle (IWebViewListener* in_listener)
     : listener (in_listener)
     , window ()
@@ -84,7 +84,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
     MessageQueueSingleton::Instance ()->RegisterHandler (*this);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~web_view_handle ()
   {
     try
@@ -106,11 +106,11 @@ struct syslib::web_view_handle: public MessageQueue::Handler
     }
     catch (...)
     {
-      //Подавление исключений
+      //РџРѕРґР°РІР»РµРЅРёРµ РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Обработчик событий окна
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
   static void WindowMessageHandler (window_t, WindowEvent event, const WindowEventContext& context, void* user_data)
   {
     if (!user_data)
@@ -133,7 +133,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
     }
   }  
   
-///События загрузки
+///РЎРѕР±С‹С‚РёСЏ Р·Р°РіСЂСѓР·РєРё
   void OnLoadStartedCallback (const stl::string& request)
   {
     if (listener)
@@ -152,7 +152,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
       listener->OnLoadFailed (error_message.c_str ());    
   }
 
-///Проверка необходимости открытия ссылки
+///РџСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕС‚РєСЂС‹С‚РёСЏ СЃСЃС‹Р»РєРё
   void ShouldStartLoadingCallback (const stl::string& request, AsyncResultHolderPtr result)
   {
     bool bool_result = true;
@@ -167,7 +167,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
 namespace
 {
 
-///Получение дескриптора WebView
+///РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° WebView
 web_view_t find_web_view (jobject controller)
 {
    try
@@ -228,7 +228,7 @@ template <class Fn> void push_message (jobject controller, const Fn& fn)
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }    
 
@@ -255,14 +255,14 @@ void should_start_loading (JNIEnv& env, jobject controller, jstring request, job
 }
 
 /*
-    Создание/уничтожение web-view
+    РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
 {
   try
   {
-      //создание формы
+      //СЃРѕР·РґР°РЅРёРµ С„РѕСЂРјС‹
     stl::auto_ptr<web_view_handle> view (new web_view_handle (listener));    
 
     void* view_controller = 0;
@@ -327,7 +327,7 @@ void AndroidWindowManager::DestroyWebView (web_view_t handle)
 }
 
 /*
-    Присоединенное окно
+    РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t AndroidWindowManager::GetWindow (web_view_t handle)
@@ -349,7 +349,7 @@ window_t AndroidWindowManager::GetWindow (web_view_t handle)
 }
 
 /*
-    Загрузка данных
+    Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void AndroidWindowManager::LoadRequest (web_view_t handle, const char* request)
@@ -411,7 +411,7 @@ void AndroidWindowManager::LoadData (web_view_t handle, const char* data, size_t
 }
 
 /*
-    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void AndroidWindowManager::Reload (web_view_t handle)
@@ -473,7 +473,7 @@ bool AndroidWindowManager::IsLoading (web_view_t handle)
 }
 
 /*
-    Средства навигации
+    РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool AndroidWindowManager::CanGoBack (web_view_t handle)
@@ -558,7 +558,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация методов обратного вызова web-view
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° web-view
 void register_web_view_callbacks (JNIEnv* env)
 {
   try

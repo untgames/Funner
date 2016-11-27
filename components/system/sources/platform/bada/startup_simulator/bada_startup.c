@@ -6,16 +6,16 @@
 #include <FBaseSys.h>
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t PRINTF_STACK_BUFFER_SIZE  = 32;                      //размер стекового буфера для печати текста
-const size_t STDOUT_FILE_NAME_MAX_SIZE = 2048;                    //максимальный размер имени файла перенаправления stdout
-const char*  STDOUT_ENVIRONMENT_VAR    = "BADA_STDOUT_FILE_NAME"; //имя переменной окружения, содержащей имя файла перенаправления stdout
-const char*  STDOUT_EXIT_MARKER        = "BADA APPLICATION EXITED. RETURN CODE IS:\n"; //маркер выхода из приложения
+const size_t PRINTF_STACK_BUFFER_SIZE  = 32;                      //СЂР°Р·РјРµСЂ СЃС‚РµРєРѕРІРѕРіРѕ Р±СѓС„РµСЂР° РґР»СЏ РїРµС‡Р°С‚Рё С‚РµРєСЃС‚Р°
+const size_t STDOUT_FILE_NAME_MAX_SIZE = 2048;                    //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РёРјРµРЅРё С„Р°Р№Р»Р° РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ stdout
+const char*  STDOUT_ENVIRONMENT_VAR    = "BADA_STDOUT_FILE_NAME"; //РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ РѕРєСЂСѓР¶РµРЅРёСЏ, СЃРѕРґРµСЂР¶Р°С‰РµР№ РёРјСЏ С„Р°Р№Р»Р° РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏ stdout
+const char*  STDOUT_EXIT_MARKER        = "BADA APPLICATION EXITED. RETURN CODE IS:\n"; //РјР°СЂРєРµСЂ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
 
 /*
-    Статические переменные
+    РЎС‚Р°С‚РёС‡РµСЃРєРёРµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 */
 
 static HANDLE       stdout_file_handle = 0;
@@ -24,10 +24,10 @@ static const char*  osp_main_args []   = {""};
 static const char** osp_main_argv      = osp_main_args;
 
 /*
-    Переопределение функций
+    РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ С„СѓРЅРєС†РёР№
 */
 
-///закрытие файла вывода stdout
+///Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РІС‹РІРѕРґР° stdout
 static void close_stdout ()
 {
   if (stdout_file_handle)
@@ -37,7 +37,7 @@ static void close_stdout ()
   }
 }
 
-///вывод текста
+///РІС‹РІРѕРґ С‚РµРєСЃС‚Р°
 static void write_stdout (const char* text, size_t text_size)
 {
   DWORD text_written = 0;
@@ -100,7 +100,7 @@ int puts (const char* s)
   return 0;
 }
 
-///печать в строку
+///РїРµС‡Р°С‚СЊ РІ СЃС‚СЂРѕРєСѓ
 static int xvsnprintf (char* buffer, size_t count, const char* format, va_list list)
 {
   if (!buffer || !count)
@@ -113,7 +113,7 @@ static int xvsnprintf (char* buffer, size_t count, const char* format, va_list l
   return ret < 0 || (size_t)ret >= count ? -1 : ret;
 }
 
-///переопределение функции vprintf
+///РїРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ С„СѓРЅРєС†РёРё vprintf
 int vprintf (const char* format, va_list args)
 {
   char buffer [PRINTF_STACK_BUFFER_SIZE];
@@ -146,7 +146,7 @@ int vprintf (const char* format, va_list args)
   return 0;
 }
 
-///переопределение функции printf
+///РїРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ С„СѓРЅРєС†РёРё printf
 int printf (const char* format, ...)
 {
   va_list args;
@@ -156,7 +156,7 @@ int printf (const char* format, ...)
   return vprintf (format, args);
 }
 
-///точка входа в приложение
+///С‚РѕС‡РєР° РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ
 _EXPORT_ int OspMain (int argc, char *argv [])
 {
   osp_main_argc = argc;
@@ -176,13 +176,13 @@ _EXPORT_ int OspMain (int argc, char *argv [])
   return result;
 }
 
-//получение числа аргументов при вызове OspMain
+//РїРѕР»СѓС‡РµРЅРёРµ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ РїСЂРё РІС‹Р·РѕРІРµ OspMain
 int get_osp_main_argc ()
 {
   return osp_main_argc;
 }
 
-//получение указателя на список аргументов OspMain
+//РїРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° СЃРїРёСЃРѕРє Р°СЂРіСѓРјРµРЅС‚РѕРІ OspMain
 const char** get_osp_main_argv ()
 {
   return osp_main_argv;

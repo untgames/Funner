@@ -4,12 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджер текстур
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
 */
 
 struct TextureManager::Impl: public DeviceObject
 {
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
   {
@@ -17,7 +17,7 @@ struct TextureManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureManager::TextureManager (const DeviceManager& manager)
@@ -30,7 +30,7 @@ TextureManager::~TextureManager ()
 }
     
 /*
-    Создание текстуры и сэмплера
+    РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂС‹ Рё СЃСЌРјРїР»РµСЂР°
 */
 
 ITexture* TextureManager::CreateTexture (const TextureDesc& desc, const TextureData* data)

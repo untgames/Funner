@@ -1,11 +1,11 @@
 /*
-    Вспомогательные функции
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 */
 
 namespace detail
 {
 
-//получение начала и конца интервала
+//РїРѕР»СѓС‡РµРЅРёРµ РЅР°С‡Р°Р»Р° Рё РєРѕРЅС†Р° РёРЅС‚РµСЂРІР°Р»Р°
 template <class Iter, class ForwardRange>
 inline Iter adl_range_begin (ForwardRange& r)
 {
@@ -20,7 +20,7 @@ inline Iter adl_range_end (ForwardRange& r)
   return end (r);
 }
 
-//сравнение двух интервалов на эквивалентность
+//СЃСЂР°РІРЅРµРЅРёРµ РґРІСѓС… РёРЅС‚РµСЂРІР°Р»РѕРІ РЅР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚СЊ
 template <class FwdRange1, class FwdRange2>
 inline bool range_equal (const FwdRange1& r1, const FwdRange2& r2)
 {
@@ -32,7 +32,7 @@ inline bool range_equal (const FwdRange1& r1, const FwdRange2& r2)
   return size1 == size2 && stl::equal (begin (r1), end (r1), begin (r2));
 }
 
-//отношение порядка "меньше" для двух интервалов
+//РѕС‚РЅРѕС€РµРЅРёРµ РїРѕСЂСЏРґРєР° "РјРµРЅСЊС€Рµ" РґР»СЏ РґРІСѓС… РёРЅС‚РµСЂРІР°Р»РѕРІ
 template <class FwdRange1, class FwdRange2>
 inline bool range_less (const FwdRange1& r1, const FwdRange2& r2)
 {
@@ -42,7 +42,7 @@ inline bool range_less (const FwdRange1& r1, const FwdRange2& r2)
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class FwdIter>
@@ -66,7 +66,7 @@ inline iterator_range<FwdIter>::iterator_range (const FwdRange& r)
   {}
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class FwdIter>
@@ -110,24 +110,24 @@ inline iterator_range<FwdIter>& iterator_range<FwdIter>::operator = (const FwdRa
 }
 
 /*
-    Параметры интервала
+    РџР°СЂР°РјРµС‚СЂС‹ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
-//начало интервала
+//РЅР°С‡Р°Р»Рѕ РёРЅС‚РµСЂРІР°Р»Р°
 template <class FwdIter>
 inline typename iterator_range<FwdIter>::iterator iterator_range<FwdIter>::begin () const
 {
   return first;
 }
 
-//конец интервала
+//РєРѕРЅРµС† РёРЅС‚РµСЂРІР°Р»Р°
 template <class FwdIter>
 inline typename iterator_range<FwdIter>::iterator iterator_range<FwdIter>::end () const
 {
   return last;
 }
 
-//размер интервала
+//СЂР°Р·РјРµСЂ РёРЅС‚РµСЂРІР°Р»Р°
 template <class FwdIter>
 inline typename iterator_range<FwdIter>::size_type iterator_range<FwdIter>::size () const
 {
@@ -137,7 +137,7 @@ inline typename iterator_range<FwdIter>::size_type iterator_range<FwdIter>::size
   return stl::distance (first, last);
 }
 
-//проверка на пустоту
+//РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 template <class FwdIter>
 inline bool iterator_range<FwdIter>::empty () const
 {
@@ -154,7 +154,7 @@ inline bool empty (const iterator_range<FwdIter>& r)
 }
 
 /*
-    Получение первого и последнего элементов интервала
+    РџРѕР»СѓС‡РµРЅРёРµ РїРµСЂРІРѕРіРѕ Рё РїРѕСЃР»РµРґРЅРµРіРѕ СЌР»РµРјРµРЅС‚РѕРІ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class FwdIter>
@@ -172,7 +172,7 @@ inline typename iterator_range<FwdIter>::value_type& iterator_range<FwdIter>::ba
 }
 
 /*
-    Индексный доступ (только для итераторов произвольного доступа)
+    РРЅРґРµРєСЃРЅС‹Р№ РґРѕСЃС‚СѓРї (С‚РѕР»СЊРєРѕ РґР»СЏ РёС‚РµСЂР°С‚РѕСЂРѕРІ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ РґРѕСЃС‚СѓРїР°)
 */
 
 template <class FwdIter>
@@ -182,7 +182,7 @@ inline typename iterator_range<FwdIter>::value_type& iterator_range<FwdIter>::op
 }
 
 /*
-    Проверка эквивалентности двух интервалов
+    РџСЂРѕРІРµСЂРєР° СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё РґРІСѓС… РёРЅС‚РµСЂРІР°Р»РѕРІ
 */
 
 template <class FwdIter>
@@ -192,7 +192,7 @@ inline bool iterator_range<FwdIter>::equal (const iterator_range& r) const
 }
 
 /*
-    Сравнение двух интервалов
+    РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… РёРЅС‚РµСЂРІР°Р»РѕРІ
 */
 
 template <class FwdIter1, class FwdIter2>
@@ -304,7 +304,7 @@ inline bool operator >= (const FwdRange& r1, const iterator_range<FwdIter>& r2)
 }
 
 /*
-    Создание интервала
+    РЎРѕР·РґР°РЅРёРµ РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class FwdIter>
@@ -372,7 +372,7 @@ inline iterator_range<T*> make_iterator_range (size_t count, T* array)
 }
 
 /*
-    Создание последовательности из интервала
+    РЎРѕР·РґР°РЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё РёР· РёРЅС‚РµСЂРІР°Р»Р°
 */
 
 template <class Sequence, class FwdRange>

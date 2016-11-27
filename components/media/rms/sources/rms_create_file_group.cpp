@@ -7,19 +7,19 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-static const char* RESOURCE_LIST_FILE_MASK = "*.xreslist"; //шаблон имени файла со списокм ресурсов
+static const char* RESOURCE_LIST_FILE_MASK = "*.xreslist"; //С€Р°Р±Р»РѕРЅ РёРјРµРЅРё С„Р°Р№Р»Р° СЃРѕ СЃРїРёСЃРѕРєРј СЂРµСЃСѓСЂСЃРѕРІ
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-//обработка списка ресурсов
+//РѕР±СЂР°Р±РѕС‚РєР° СЃРїРёСЃРєР° СЂРµСЃСѓСЂСЃРѕРІ
 void process_resource_list (size_t count, const char** list, Group& result);
 
-//обработка файла со списком ресурсов
+//РѕР±СЂР°Р±РѕС‚РєР° С„Р°Р№Р»Р° СЃРѕ СЃРїРёСЃРєРѕРј СЂРµСЃСѓСЂСЃРѕРІ
 void process_resource_list_file (const char* file_name, Group& result)
 {
   try
@@ -54,7 +54,7 @@ void process_resource_list_file (const char* file_name, Group& result)
   }
 }
 
-//обработка отдельного файла
+//РѕР±СЂР°Р±РѕС‚РєР° РѕС‚РґРµР»СЊРЅРѕРіРѕ С„Р°Р№Р»Р°
 void process_file (const char* file_name, Group& result)
 {
   if (!*file_name)
@@ -70,14 +70,14 @@ void process_file (const char* file_name, Group& result)
   }
 }
 
-//обработка wildcard
+//РѕР±СЂР°Р±РѕС‚РєР° wildcard
 void process_wildcard (const char* file_mask, Group& result)
 {
   for (FileListIterator i=FileSystem::Search (file_mask, FileSearch_Files | FileSearch_Sort); i; ++i)
     process_file (i->name, result);
 }
 
-//обработка списка ресурсов
+//РѕР±СЂР°Р±РѕС‚РєР° СЃРїРёСЃРєР° СЂРµСЃСѓСЂСЃРѕРІ
 void process_resource_list (size_t count, const char** list, Group& result)
 {
   for (size_t i=0; i<count; i++)
@@ -101,7 +101,7 @@ void process_resource_list (size_t count, const char** list, Group& result)
 }
 
 /*
-    Создание группы из списка файлов / файла ресурсов
+    РЎРѕР·РґР°РЅРёРµ РіСЂСѓРїРїС‹ РёР· СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ / С„Р°Р№Р»Р° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 namespace media

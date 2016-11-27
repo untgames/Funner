@@ -1,7 +1,7 @@
 #ifndef BOUND_VOLUMES_TESTS_SHARED
 #define BOUND_VOLUMES_TESTS_SHARED
 
-//тестирование компиляции кода с макросами min/max
+//С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ РєРѕРјРїРёР»СЏС†РёРё РєРѕРґР° СЃ РјР°РєСЂРѕСЃР°РјРё min/max
 #define min
 #define max
 
@@ -17,7 +17,7 @@ using namespace bound_volumes;
 using namespace math;
 
 /*
-    Вывод приимтивов
+    Р’С‹РІРѕРґ РїСЂРёРёРјС‚РёРІРѕРІ
 */
 
 void dump (const vec3f& v)

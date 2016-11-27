@@ -24,7 +24,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   size_t        sources_count = SourcesCount ();
   const Source* sources       = Sources ();
   
-    //расчёт коэффициента нормализации весов
+    //СЂР°СЃС‡С‘С‚ РєРѕСЌС„С„РёС†РёРµРЅС‚Р° РЅРѕСЂРјР°Р»РёР·Р°С†РёРё РІРµСЃРѕРІ
 
   float total_weight = 0.0f;
   
@@ -40,7 +40,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   
   weight_multiplier = 1.0f / total_weight;
   
-    //смешивание
+    //СЃРјРµС€РёРІР°РЅРёРµ
   
   for (size_t i=0; i<sources_count; i++)
   {
@@ -53,7 +53,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
 }
 
 /*
-    Смешивание
+    РЎРјРµС€РёРІР°РЅРёРµ
 */
 
 template <class T>

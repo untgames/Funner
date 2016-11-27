@@ -6,19 +6,19 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const unsigned int RESERVE_OPERATIONS_COUNT = 16;
 
 /*
-    Операция эффекта
+    РћРїРµСЂР°С†РёСЏ СЌС„С„РµРєС‚Р°
 */
 
 struct EffectOperation: public xtl::reference_counter
 {
-  EffectPassPtr         pass;   //проход, осуществляемый при выполнении операции
-  InstantiatedEffectPtr effect; //эффект, осуществляемый при выполнении операции
+  EffectPassPtr         pass;   //РїСЂРѕС…РѕРґ, РѕСЃСѓС‰РµСЃС‚РІР»СЏРµРјС‹Р№ РїСЂРё РІС‹РїРѕР»РЅРµРЅРёРё РѕРїРµСЂР°С†РёРё
+  InstantiatedEffectPtr effect; //СЌС„С„РµРєС‚, РѕСЃСѓС‰РµСЃС‚РІР»СЏРµРјС‹Р№ РїСЂРё РІС‹РїРѕР»РЅРµРЅРёРё РѕРїРµСЂР°С†РёРё
 
   EffectOperation (const EffectPassPtr& in_pass) : pass (in_pass) {}
 
@@ -31,16 +31,16 @@ typedef stl::vector<EffectOperationPtr>     EffectOperationArray;
 }
 
 /*
-    Описание реализации эффекта
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЌС„С„РµРєС‚Р°
 */
 
 typedef stl::vector<size_t> TagHashArray;
 
 struct Effect::Impl
 {
-  common::StringArray  tags;       //тэги прохода
-  TagHashArray         tag_hashes; //хэши тэгов
-  EffectOperationArray operations; //операции рендеринга
+  common::StringArray  tags;       //С‚СЌРіРё РїСЂРѕС…РѕРґР°
+  TagHashArray         tag_hashes; //С…СЌС€Рё С‚СЌРіРѕРІ
+  EffectOperationArray operations; //РѕРїРµСЂР°С†РёРё СЂРµРЅРґРµСЂРёРЅРіР°
   
   Impl ()
   {
@@ -49,7 +49,7 @@ struct Effect::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Effect::Effect ()
@@ -62,7 +62,7 @@ Effect::~Effect ()
 }
 
 /*
-    Тэги фрейма: используются для рекурсивного рендеринга
+    РўСЌРіРё С„СЂРµР№РјР°: РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РґР»СЏ СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Effect::SetTags (const char* tags)
@@ -124,7 +124,7 @@ const size_t* Effect::TagHashes ()
   return &impl->tag_hashes [0];
 }
 /*
-    Проходы рендеринга / вложенные эффекты
+    РџСЂРѕС…РѕРґС‹ СЂРµРЅРґРµСЂРёРЅРіР° / РІР»РѕР¶РµРЅРЅС‹Рµ СЌС„С„РµРєС‚С‹
 */
 
 unsigned int Effect::OperationsCount ()

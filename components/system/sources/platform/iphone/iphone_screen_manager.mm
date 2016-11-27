@@ -22,7 +22,7 @@ void fill_screen_mode_desc (UIScreen* screen, UIScreenMode* mode, ScreenModeDesc
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t IPhoneScreenManager::CreateScreen  (size_t screen_index)
@@ -41,7 +41,7 @@ void IPhoneScreenManager::DestroyScreen (screen_t screen)
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t IPhoneScreenManager::GetScreensCount ()
@@ -50,7 +50,7 @@ size_t IPhoneScreenManager::GetScreensCount ()
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* IPhoneScreenManager::GetScreenName (screen_t screen)
@@ -62,7 +62,7 @@ const char* IPhoneScreenManager::GetScreenName (screen_t screen)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t IPhoneScreenManager::GetScreenModesCount (screen_t screen)
@@ -90,7 +90,7 @@ void IPhoneScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Scr
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void IPhoneScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenModeDesc& mode_desc)
@@ -136,7 +136,7 @@ void IPhoneScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc&
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void IPhoneScreenManager::SetScreenGammaRamp (screen_t screen, const Color3f table [256])
@@ -157,7 +157,7 @@ void IPhoneScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [25
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t IPhoneScreenManager::FindContainingScreen (const void* window)
@@ -169,7 +169,7 @@ screen_t IPhoneScreenManager::FindContainingScreen (const void* window)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* IPhoneScreenManager::GetNativeScreenHandle (screen_t screen)
@@ -181,7 +181,7 @@ const void* IPhoneScreenManager::GetNativeScreenHandle (screen_t screen)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void IPhoneScreenManager::GetScreenProperties (screen_t screen, common::PropertyMap& properties)

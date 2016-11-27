@@ -4,20 +4,20 @@ using namespace render::scene::client;
 using namespace render::scene;
 
 /*
-    Максимальное ожидание ответа от сервера
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РѕР¶РёРґР°РЅРёРµ РѕС‚РІРµС‚Р° РѕС‚ СЃРµСЂРІРµСЂР°
 */
 
-const size_t DEFAULT_WAIT_FEEDBACK_TIMEOUT = 1000; //время ожидания ответа от сервера в миллисекундах
-const size_t RESPONSE_QUEUE_SIZE           = 128;  //размер очереди ответов от сервера
+const size_t DEFAULT_WAIT_FEEDBACK_TIMEOUT = 1000; //РІСЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ РѕС‚РІРµС‚Р° РѕС‚ СЃРµСЂРІРµСЂР° РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С…
+const size_t RESPONSE_QUEUE_SIZE           = 128;  //СЂР°Р·РјРµСЂ РѕС‡РµСЂРµРґРё РѕС‚РІРµС‚РѕРІ РѕС‚ СЃРµСЂРІРµСЂР°
 
 /*
-    Описание реализации соединения с сервером
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ СЃРµСЂРІРµСЂРѕРј
 */
 
 namespace
 {
 
-/// Состояния соединения
+/// РЎРѕСЃС‚РѕСЏРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
 enum State
 {
   State_Disconnected,
@@ -25,7 +25,7 @@ enum State
   State_Connected,
 };
 
-/// Контекст обработки
+/// РљРѕРЅС‚РµРєСЃС‚ РѕР±СЂР°Р±РѕС‚РєРё
 class ContextImpl: public Context
 {
   public:
@@ -41,17 +41,17 @@ typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
 struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  stl::string                            response_connection_name;    //имя соединения для ответов
-  syslib::Condition                      logon_ack_waiter;            //семафор ожидания ответа на логин
-  syslib::Mutex                          mutex;                       //мьютекс данных
-  volatile State                         state;                       //состояние соединения
-  stl::string                            description;                 //описание соединения
-  xtl::com_ptr<interchange::IConnection> client_to_server_connection; //соединение от клиента к серверу
-  stl::auto_ptr<ClientImpl>              client;                      //реализация рендера сцены
-  stl::auto_ptr<ContextImpl>             context;                     //контекст
-  interchange::CommandQueue              response_queue;              //очередь команд
+  stl::string                            response_connection_name;    //РёРјСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ РґР»СЏ РѕС‚РІРµС‚РѕРІ
+  syslib::Condition                      logon_ack_waiter;            //СЃРµРјР°С„РѕСЂ РѕР¶РёРґР°РЅРёСЏ РѕС‚РІРµС‚Р° РЅР° Р»РѕРіРёРЅ
+  syslib::Mutex                          mutex;                       //РјСЊСЋС‚РµРєСЃ РґР°РЅРЅС‹С…
+  volatile State                         state;                       //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
+  stl::string                            description;                 //РѕРїРёСЃР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
+  xtl::com_ptr<interchange::IConnection> client_to_server_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ РѕС‚ РєР»РёРµРЅС‚Р° Рє СЃРµСЂРІРµСЂСѓ
+  stl::auto_ptr<ClientImpl>              client;                      //СЂРµР°Р»РёР·Р°С†РёСЏ СЂРµРЅРґРµСЂР° СЃС†РµРЅС‹
+  stl::auto_ptr<ContextImpl>             context;                     //РєРѕРЅС‚РµРєСЃС‚
+  interchange::CommandQueue              response_queue;              //РѕС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : state (State_Disconnected)
     , response_queue (RESPONSE_QUEUE_SIZE)
@@ -61,7 +61,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
     interchange::ConnectionManager::RegisterConnection (response_connection_name.c_str (), response_connection_name.c_str (), xtl::bind (&Impl::CreateResponseConnection, this, _1, _2));
   }
 
-/// Деструктор
+/// Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -78,16 +78,16 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
 
-/// Соединение получения ответов от сервера
+/// РЎРѕРµРґРёРЅРµРЅРёРµ РїРѕР»СѓС‡РµРЅРёСЏ РѕС‚РІРµС‚РѕРІ РѕС‚ СЃРµСЂРІРµСЂР°
   class ServerToClientConnection: public interchange::IConnection, public xtl::reference_counter, public xtl::trackable
   {
     public:
       ServerToClientConnection (const interchange::CommandQueue& in_queue) : queue (in_queue)  {}
 
-      ///Является ли соединение внутрипроцессным
+      ///РЇРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІРЅСѓС‚СЂРёРїСЂРѕС†РµСЃСЃРЅС‹Рј
       bool IsInprocessed () { return true; }
 
-      ///Обработка входного потока данных
+      ///РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° РґР°РЅРЅС‹С…
       void ProcessCommands (const interchange::CommandBuffer& commands)
       {
         try
@@ -101,10 +101,10 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
         }
       }
 
-      ///Получение события оповещения об удалении
+      ///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
       xtl::trackable& GetTrackable () { return *this; }
 
-      ///Подсчет ссылок
+      ///РџРѕРґСЃС‡РµС‚ СЃСЃС‹Р»РѕРє
       void AddRef ()  { addref (this); }
       void Release () { release (this); }
 
@@ -112,7 +112,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
       interchange::CommandQueue queue;
   };
 
-/// Функция создания соединения для получения ответов от сервера
+/// Р¤СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РѕС‚РІРµС‚РѕРІ РѕС‚ СЃРµСЂРІРµСЂР°
   interchange::IConnection* CreateResponseConnection (const char* name, const char* init_string)
   {
     try
@@ -143,7 +143,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
 
-/// Обработка ответа от сервера
+/// РћР±СЂР°Р±РѕС‚РєР° РѕС‚РІРµС‚Р° РѕС‚ СЃРµСЂРІРµСЂР°
   void ProcessResponseFromServer (const interchange::CommandBuffer& commands)
   {
     try
@@ -162,7 +162,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Connection::Connection (const char* connection_name, const char* init_string, size_t logon_timeout)
@@ -171,7 +171,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
   {
     impl = new Impl;
 
-      //создание соединения
+      //СЃРѕР·РґР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 
     size_t start_time = common::milliseconds ();
 
@@ -180,7 +180,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
 
     syslib::Lock lock (impl->mutex);
 
-      //ожидание ответа от сервера
+      //РѕР¶РёРґР°РЅРёРµ РѕС‚РІРµС‚Р° РѕС‚ СЃРµСЂРІРµСЂР°
 
     while (impl->state == State_LogonAckWaiting)
     {
@@ -194,7 +194,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
       impl->logon_ack_waiter.Wait (impl->mutex, wait_timeout);
     }
 
-      //создание контекста
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->client.reset (new ClientImpl);
     impl->context.reset (new ContextImpl (*impl->client));    
@@ -216,7 +216,7 @@ Connection::~Connection ()
 }
 
 /*
-    Описание соединения
+    РћРїРёСЃР°РЅРёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 const char* Connection::Description ()
@@ -225,7 +225,7 @@ const char* Connection::Description ()
 }
 
 /*
-    Рендер сцены
+    Р РµРЅРґРµСЂ СЃС†РµРЅС‹
 */
 
 ClientImpl& Connection::Client ()
@@ -234,7 +234,7 @@ ClientImpl& Connection::Client ()
 }
 
 /*
-    Контекст
+    РљРѕРЅС‚РµРєСЃС‚
 */
 
 Context& Connection::Context ()
@@ -243,7 +243,7 @@ Context& Connection::Context ()
 }
 
 /*
-    Ожидание ответа от сервера
+    РћР¶РёРґР°РЅРёРµ РѕС‚РІРµС‚Р° РѕС‚ СЃРµСЂРІРµСЂР°
 */
 
 void Connection::WaitServerFeedback ()

@@ -4,13 +4,13 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t RESERVE_OUTPUTS_SIZE = 16;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Adapter::Adapter (const DxFactoryPtr& factory, const char* name, const char* dll_path, const char*)
@@ -82,7 +82,7 @@ Adapter::Adapter (const DxAdapterPtr& in_adapter)
 
 void Adapter::Init ()
 {
-    //получение параметров адаптера
+    //РїРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р°РґР°РїС‚РµСЂР°
 
   DXGI_ADAPTER_DESC desc;
 
@@ -101,7 +101,7 @@ void Adapter::Init ()
   properties.AddProperty ("SharedSystemMemory", common::format ("%u", desc.SharedSystemMemory).c_str ());
   properties.AddProperty ("AdapterLuid", common::format ("%08x", desc.AdapterLuid).c_str ()); 
 
-    //перечисление устройств вывода
+    //РїРµСЂРµС‡РёСЃР»РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 
   outputs.reserve (RESERVE_OUTPUTS_SIZE);
 
@@ -122,7 +122,7 @@ Adapter::~Adapter ()
 }
 
 /*
-    Имя адаптера / путь к модулю / описание
+    РРјСЏ Р°РґР°РїС‚РµСЂР° / РїСѓС‚СЊ Рє РјРѕРґСѓР»СЋ / РѕРїРёСЃР°РЅРёРµ
 */
 
 const char* Adapter::GetName ()
@@ -146,7 +146,7 @@ HMODULE Adapter::GetModule ()
 }
 
 /*
-    Ссылка на адаптер DX11
+    РЎСЃС‹Р»РєР° РЅР° Р°РґР°РїС‚РµСЂ DX11
 */
 
 IDXGIAdapter& Adapter::GetHandle ()
@@ -155,7 +155,7 @@ IDXGIAdapter& Adapter::GetHandle ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t Adapter::GetOutputsCount ()
@@ -181,7 +181,7 @@ Output* Adapter::FindOutput (IDXGIOutput* output)
 }
 
 /*
-    Список свойств адаптера
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ Р°РґР°РїС‚РµСЂР°
 */
 
 IPropertyList* Adapter::GetProperties ()

@@ -1,8 +1,8 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := MEDIALIB_ADOBE_COMPONENTS
 
-#Цель №1 - MediaLib components
+#Р¦РµР»СЊ в„–1 - MediaLib components
 MEDIALIB_ADOBE_COMPONENTS.TYPE        := package
 MEDIALIB_ADOBE_COMPONENTS.COMPONENTS  := xfl

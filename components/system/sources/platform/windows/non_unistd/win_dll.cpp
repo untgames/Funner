@@ -4,7 +4,7 @@ using namespace syslib;
 using namespace common;
 
 /*
-    Загрузка динамических библиотек
+    Р—Р°РіСЂСѓР·РєР° РґРёРЅР°РјРёС‡РµСЃРєРёС… Р±РёР±Р»РёРѕС‚РµРє
 */
 
 dll_t WindowsLibraryManager::LoadLibrary (const wchar_t* name)
@@ -68,7 +68,7 @@ void* WindowsLibraryManager::GetSymbol (dll_t handle, const char* symbol_name)
   void* address = (void*)GetProcAddress (library, symbol_name);
 #endif
 
-    //сбрасываем все ошибки
+    //СЃР±СЂР°СЃС‹РІР°РµРј РІСЃРµ РѕС€РёР±РєРё
 
   SetLastError (0);
 

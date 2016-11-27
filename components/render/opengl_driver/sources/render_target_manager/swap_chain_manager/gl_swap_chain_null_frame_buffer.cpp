@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SwapChainNullFrameBuffer::SwapChainNullFrameBuffer (const FrameBufferManagerPtr& in_frame_buffer_manager)
@@ -14,7 +14,7 @@ SwapChainNullFrameBuffer::SwapChainNullFrameBuffer (const FrameBufferManagerPtr&
   {}
 
 /*
-    Установка буфера в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° Р±СѓС„РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void SwapChainNullFrameBuffer::Bind ()

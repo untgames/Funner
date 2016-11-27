@@ -11,11 +11,11 @@ namespace
 #define FT_ERROR_START_LIST    {
 #define FT_ERROR_END_LIST      };
 
-//ошибки freetype
+//РѕС€РёР±РєРё freetype
 const struct
 {
-  int         error_code;    //код ошибки
-  const char* error_message; //описание ошибки
+  int         error_code;    //РєРѕРґ РѕС€РёР±РєРё
+  const char* error_message; //РѕРїРёСЃР°РЅРёРµ РѕС€РёР±РєРё
 } FREETYPE_ERRORS [] =
 
 #include FT_ERRORS_H
@@ -28,7 +28,7 @@ namespace media
 namespace freetype
 {
 
-//Получение имени ошибки free type
+//РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РѕС€РёР±РєРё free type
 const char* get_free_type_error_name (FT_Error error)
 {
   for (size_t i = 0, count = sizeof (FREETYPE_ERRORS) / sizeof (*FREETYPE_ERRORS); i < count; i++)
@@ -38,7 +38,7 @@ const char* get_free_type_error_name (FT_Error error)
   return "unknown error";
 }
 
-//Проверка ошибки free type
+//РџСЂРѕРІРµСЂРєР° РѕС€РёР±РєРё free type
 void check_free_type_error (FT_Error error, const char* source)
 {
   if (!error)

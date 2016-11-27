@@ -6,7 +6,7 @@ namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация построителя шрифта
+///Р РµР°Р»РёР·Р°С†РёСЏ РїРѕСЃС‚СЂРѕРёС‚РµР»СЏ С€СЂРёС„С‚Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct FontBuilder::Impl : public xtl::reference_counter
 {
@@ -19,13 +19,13 @@ struct FontBuilder::Impl : public xtl::reference_counter
     release (font_impl);
   }
 
-  FontImpl* font_impl;  //шрифт
+  FontImpl* font_impl;  //С€СЂРёС„С‚
 };
 
 }
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 FontBuilder::FontBuilder ()
@@ -52,7 +52,7 @@ FontBuilder& FontBuilder::operator = (const FontBuilder& source)
 }
 
 /*
-   Получение / изменение имени исходного файла
+   РџРѕР»СѓС‡РµРЅРёРµ / РёР·РјРµРЅРµРЅРёРµ РёРјРµРЅРё РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 */
 
 const char* FontBuilder::Source () const
@@ -69,7 +69,7 @@ void FontBuilder::SetSource (const char* new_source)
 }
 
 /*
-   Получение/изменение имени / семейства / стиля шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ РёРјРµРЅРё / СЃРµРјРµР№СЃС‚РІР° / СЃС‚РёР»СЏ С€СЂРёС„С‚Р°
 */
 
 const char* FontBuilder::Name () const
@@ -112,7 +112,7 @@ void FontBuilder::SetStyleName (const char* new_style_name)
 }
 
 /*
-   Получение/изменение размера таблицы глифов
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С‚Р°Р±Р»РёС†С‹ РіР»РёС„РѕРІ
 */
 
 void FontBuilder::SetGlyphsCount (unsigned int new_glyphs_count)
@@ -126,7 +126,7 @@ unsigned int FontBuilder::GlyphsCount () const
 }
 
 /*
-   Получение/изменение кода первого глифа
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ РєРѕРґР° РїРµСЂРІРѕРіРѕ РіР»РёС„Р°
 */
 
 void FontBuilder::SetFirstGlyphCode (unsigned int new_first_glyph_code)
@@ -140,7 +140,7 @@ unsigned int FontBuilder::FirstGlyphCode () const
 }
 
 /*
-   Получение/изменение размера шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ/РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°
 */
 
 void FontBuilder::SetFontSize (unsigned int new_font_size)
@@ -154,7 +154,7 @@ unsigned int FontBuilder::FontSize () const
 }
 
 /*
-   Доступ к данным о глифах
+   Р”РѕСЃС‚СѓРї Рє РґР°РЅРЅС‹Рј Рѕ РіР»РёС„Р°С…
 */
 
 const GlyphInfo* FontBuilder::Glyphs () const
@@ -168,7 +168,7 @@ GlyphInfo* FontBuilder::Glyphs ()
 }
 
 /*
-   Добавление/получение/удаление информации о кёрнингах
+   Р”РѕР±Р°РІР»РµРЅРёРµ/РїРѕР»СѓС‡РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєС‘СЂРЅРёРЅРіР°С…
 */
 
 void FontBuilder::InsertKerning (unsigned int left_glyph_index, unsigned int right_glyph_index, const KerningInfo& kerning_info)
@@ -198,7 +198,7 @@ bool FontBuilder::HasKerning (unsigned int left_glyph_index, unsigned int right_
 
 
 /*
-   Установка растеризатора
+   РЈСЃС‚Р°РЅРѕРІРєР° СЂР°СЃС‚РµСЂРёР·Р°С‚РѕСЂР°
 */
 
 void FontBuilder::SetRasterizer (const FontBuilder::RasterizerHandler& new_rasterizer)
@@ -212,7 +212,7 @@ const FontBuilder::RasterizerHandler& FontBuilder::Rasterizer () const
 }
 
 /*
-   Получение шрифта
+   РџРѕР»СѓС‡РµРЅРёРµ С€СЂРёС„С‚Р°
 */
 
 media::Font FontBuilder::Font ()
@@ -221,7 +221,7 @@ media::Font FontBuilder::Font ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void FontBuilder::Swap (FontBuilder& source)
@@ -234,7 +234,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (FontBuilder& builder1, FontBuilder& builder2)

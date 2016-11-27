@@ -4,23 +4,23 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации входного лэйаута
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 */
 
 typedef stl::vector<D3D11_INPUT_ELEMENT_DESC> InputElementArray;
 
 struct InputLayout::Impl
 {  
-  InputElementArray vertex_elements;                            //вершинные элементы
-  DXGI_FORMAT       index_format;                               //формат индексов
-  size_t            index_buffer_offset;                        //смещение в индексном буфере
-  size_t            vertex_elements_hash;                       //хэш вершинных элементов
-  UINT              strides [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //шаги между вершинами
-  size_t            hash;                                       //хэш
+  InputElementArray vertex_elements;                            //РІРµСЂС€РёРЅРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹
+  DXGI_FORMAT       index_format;                               //С„РѕСЂРјР°С‚ РёРЅРґРµРєСЃРѕРІ
+  size_t            index_buffer_offset;                        //СЃРјРµС‰РµРЅРёРµ РІ РёРЅРґРµРєСЃРЅРѕРј Р±СѓС„РµСЂРµ
+  size_t            vertex_elements_hash;                       //С…СЌС€ РІРµСЂС€РёРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
+  UINT              strides [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //С€Р°РіРё РјРµР¶РґСѓ РІРµСЂС€РёРЅР°РјРё
+  size_t            hash;                                       //С…СЌС€
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputLayout::InputLayout (const InputLayoutDesc& desc)
@@ -28,11 +28,11 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 {
   try
   {
-      //создание вершинных элементов
+      //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 
     impl->vertex_elements.reserve (desc.vertex_attributes_count);
 
-      //преобразование вершинных атрибутов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
     memset (impl->strides, 0, sizeof (impl->strides));
 
@@ -49,7 +49,7 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
         memset (&dst_va, 0, sizeof (dst_va));
 
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!src_va.semantic)
           throw xtl::format_exception<xtl::null_argument_exception> ("", "Null desc.vertex_attributes[%u].semantic", i);
@@ -179,7 +179,7 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
             throw xtl::format_exception<xtl::argument_exception> ("", "desc.vertex_attributes[%u].format", i, src_va.format);
         }
 
-          //добавление элемента
+          //РґРѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
 
         impl->vertex_elements.push_back (dst_va);        
       }
@@ -199,7 +199,7 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
       }
     }
 
-      //преобразование индексных атрибутов
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РёРЅРґРµРєСЃРЅС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
     impl->index_buffer_offset = desc.index_buffer_offset;
 
@@ -221,7 +221,7 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
       default:                        throw xtl::make_argument_exception ("", "desc.index_type", desc.index_type);
     }
 
-      //расчёт хэша
+      //СЂР°СЃС‡С‘С‚ С…СЌС€Р°
 
     impl->vertex_elements_hash = common::crc32 (&impl->vertex_elements [0], sizeof (D3D11_INPUT_ELEMENT_DESC) * impl->vertex_elements.size ());
 
@@ -239,7 +239,7 @@ InputLayout::~InputLayout ()
 }
 
 /*
-    Параметры вершинного доступа
+    РџР°СЂР°РјРµС‚СЂС‹ РІРµСЂС€РёРЅРЅРѕРіРѕ РґРѕСЃС‚СѓРїР°
 */
 
 const D3D11_INPUT_ELEMENT_DESC* InputLayout::GetVertexElements () const
@@ -253,7 +253,7 @@ size_t InputLayout::GetVertexElementsCount () const
 }
 
 /*
-    Параметры индексного доступа
+    РџР°СЂР°РјРµС‚СЂС‹ РёРЅРґРµРєСЃРЅРѕРіРѕ РґРѕСЃС‚СѓРїР°
 */
 
 DXGI_FORMAT InputLayout::GetIndexFormat () const
@@ -267,7 +267,7 @@ size_t InputLayout::GetIndexBufferOffset () const
 }
 
 /*
-    Получение хэша
+    РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р°
 */
 
 size_t InputLayout::GetHash () const
@@ -281,7 +281,7 @@ size_t InputLayout::GetVertexElementsHash () const
 }
 
 /*
-    Шаги между вершинами
+    РЁР°РіРё РјРµР¶РґСѓ РІРµСЂС€РёРЅР°РјРё
 */
 
 const UINT* InputLayout::GetStrides () const

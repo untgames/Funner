@@ -3,43 +3,43 @@
 using namespace render::low_level::opengl;
 
 /*
-    Описание реализации контекстных настроек
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚РЅС‹С… РЅР°СЃС‚СЂРѕРµРє
 */
 
 struct ContextSettings::Impl
 {
-  ExtensionSet required_extensions;                       //расширения, затребованные в строке иициализации
-  ExtensionSet enabled_extensions;                        //расширения, разрешенные к использованию в строке инициализации
-  Version      min_version;                               //минимальная требуемая версии OpenGL
-  Version      max_version;                               //максимальная необходимая версия OpenGL
-  bool         need_check_errors;                         //нужно ли проверять ошибки
-  bool         need_validate_programs;                    //нужно ли валидировать программы
-  unsigned int int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
-  bool         is_ffp_allowed;                            //поддерживается ли ffp
+  ExtensionSet required_extensions;                       //СЂР°СЃС€РёСЂРµРЅРёСЏ, Р·Р°С‚СЂРµР±РѕРІР°РЅРЅС‹Рµ РІ СЃС‚СЂРѕРєРµ РёРёС†РёР°Р»РёР·Р°С†РёРё
+  ExtensionSet enabled_extensions;                        //СЂР°СЃС€РёСЂРµРЅРёСЏ, СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РІ СЃС‚СЂРѕРєРµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
+  Version      min_version;                               //РјРёРЅРёРјР°Р»СЊРЅР°СЏ С‚СЂРµР±СѓРµРјР°СЏ РІРµСЂСЃРёРё OpenGL
+  Version      max_version;                               //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РЅРµРѕР±С…РѕРґРёРјР°СЏ РІРµСЂСЃРёСЏ OpenGL
+  bool         need_check_errors;                         //РЅСѓР¶РЅРѕ Р»Рё РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєРё
+  bool         need_validate_programs;                    //РЅСѓР¶РЅРѕ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊ РїСЂРѕРіСЂР°РјРјС‹
+  unsigned int int_settings [ContextSettingsInteger_Num]; //С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё РєРѕРЅС‚РµРєСЃС‚Р°
+  bool         is_ffp_allowed;                            //РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ Р»Рё ffp
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const char* init_string)
     : need_check_errors (true)
     , need_validate_programs (false)
     , is_ffp_allowed (true)
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
     
     if (!init_string)
       throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextSettings::ContextSettings::Impl", "init_string");
       
-      //инициализация параметров
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
       
     enabled_extensions.Set (true);
 
     memset (int_settings, 0, sizeof (int_settings));
 
-      //разбор строки инициализации
+      //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
     
     common::parse_init_string (init_string, xtl::bind (&Impl::SetProperty, this, _1, _2));    
   }
   
-///Установка значения
+///РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ
   void SetProperty (const char* name, const char* value)
   {
     if (!xtl::xstricmp (name, "require"))
@@ -142,7 +142,7 @@ struct ContextSettings::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ContextSettings::ContextSettings (const char* init_string)
@@ -155,23 +155,23 @@ ContextSettings::~ContextSettings ()
 }
 
 /*
-    Множества расширений
+    РњРЅРѕР¶РµСЃС‚РІР° СЂР°СЃС€РёСЂРµРЅРёР№
 */
 
-//обязательные расширения
+//РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ СЂР°СЃС€РёСЂРµРЅРёСЏ
 const ExtensionSet& ContextSettings::RequiredExtensions () const
 {
   return impl->required_extensions;
 }
 
-//разрешенные расширения
+//СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ СЂР°СЃС€РёСЂРµРЅРёСЏ
 const ExtensionSet& ContextSettings::EnabledExtensions () const
 {
   return impl->enabled_extensions;
 }
 
 /*
-    Нужно ли проверять ошибки
+    РќСѓР¶РЅРѕ Р»Рё РїСЂРѕРІРµСЂСЏС‚СЊ РѕС€РёР±РєРё
 */
 
 bool ContextSettings::IsNeedCheckErrors () const
@@ -185,23 +185,23 @@ bool ContextSettings::IsNeedValidatePrograms () const
 }
 
 /*
-    Версии OpenGL
+    Р’РµСЂСЃРёРё OpenGL
 */
 
-//минимальная требуемая версия OpenGL
+//РјРёРЅРёРјР°Р»СЊРЅР°СЏ С‚СЂРµР±СѓРµРјР°СЏ РІРµСЂСЃРёСЏ OpenGL
 const Version& ContextSettings::MinVersion () const
 {
   return impl->min_version;
 }
 
-//максимальная версия (для ручного ограничения функциональности)
+//РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІРµСЂСЃРёСЏ (РґР»СЏ СЂСѓС‡РЅРѕРіРѕ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕСЃС‚Рё)
 const Version& ContextSettings::MaxVersion () const
 {
   return impl->max_version;
 }
 
 /*
-    Получение целочисленных настроек контекста
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… РЅР°СЃС‚СЂРѕРµРє РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 unsigned int ContextSettings::GetInteger (ContextSettingsInteger tag) const
@@ -213,7 +213,7 @@ unsigned int ContextSettings::GetInteger (ContextSettingsInteger tag) const
 }
 
 /*
-   Поддерживается ли ffp
+   РџРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ Р»Рё ffp
 */
 
 bool ContextSettings::IsFfpAllowed () const

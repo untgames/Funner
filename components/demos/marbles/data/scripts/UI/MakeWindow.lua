@@ -1,12 +1,12 @@
 
 --[[
-Методы:
+РњРµС‚РѕРґС‹:
 
 window.Update ()
-  нужно вызывать после любых изменений стиля, размера или надписи на окне
+  РЅСѓР¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊ РїРѕСЃР»Рµ Р»СЋР±С‹С… РёР·РјРµРЅРµРЅРёР№ СЃС‚РёР»СЏ, СЂР°Р·РјРµСЂР° РёР»Рё РЅР°РґРїРёСЃРё РЅР° РѕРєРЅРµ
   
 window.UpdateState (MouseX, MouseY, click)
-  обновляет состояние кнопок и других элементов окна, а также отрабатывает нажатие на них
+  РѕР±РЅРѕРІР»СЏРµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРѕРє Рё РґСЂСѓРіРёС… СЌР»РµРјРµРЅС‚РѕРІ РѕРєРЅР°, Р° С‚Р°РєР¶Рµ РѕС‚СЂР°Р±Р°С‚С‹РІР°РµС‚ РЅР°Р¶Р°С‚РёРµ РЅР° РЅРёС…
 
 ]]
 
@@ -19,32 +19,32 @@ function UI.MakeWindow(control)
   
   window.ControlType="Window"
 
-  window.Controls={}       --массив кнопок окна
+  window.Controls={}       --РјР°СЃСЃРёРІ РєРЅРѕРїРѕРє РѕРєРЅР°
   
   
-  window.ActiveControl=nil --активная кнопка окна(та, над которой в данный момент мышка)
+  window.ActiveControl=nil --Р°РєС‚РёРІРЅР°СЏ РєРЅРѕРїРєР° РѕРєРЅР°(С‚Р°, РЅР°Рґ РєРѕС‚РѕСЂРѕР№ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РјС‹С€РєР°)
   
   if not(window.CaptionAlignment) then 
     window.CaptionAlignment=vec3( 0, 0, 0)
   end
   
-  window.Moving=false -- включается, когда окно перетаскивают
-  window.Movable=true -- если установить в false то окно будет невозможно перетащить
+  window.Moving=false -- РІРєР»СЋС‡Р°РµС‚СЃСЏ, РєРѕРіРґР° РѕРєРЅРѕ РїРµСЂРµС‚Р°СЃРєРёРІР°СЋС‚
+  window.Movable=true -- РµСЃР»Рё СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РІ false С‚Рѕ РѕРєРЅРѕ Р±СѓРґРµС‚ РЅРµРІРѕР·РјРѕР¶РЅРѕ РїРµСЂРµС‚Р°С‰РёС‚СЊ
   
   --------------------------------------------------------------------------------------------------
-  -- основные функции
+  -- РѕСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё
   --------------------------------------------------------------------------------------------------
   
-  local MouseX, MouseY = 0, 0 --хранят координаты мыши над окном
+  local MouseX, MouseY = 0, 0 --С…СЂР°РЅСЏС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РјС‹С€Рё РЅР°Рґ РѕРєРЅРѕРј
   
-  local IdCounter=0 --счетчик id для добавляемых элементов
+  local IdCounter=0 --СЃС‡РµС‚С‡РёРє id РґР»СЏ РґРѕР±Р°РІР»СЏРµРјС‹С… СЌР»РµРјРµРЅС‚РѕРІ
   
   --------------------------------------------------------------------------------------------------
-  -- добавление и удаление контролов
+  -- РґРѕР±Р°РІР»РµРЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РєРѕРЅС‚СЂРѕР»РѕРІ
   --------------------------------------------------------------------------------------------------
   
   window.AddControl=function (control)
-    --используется для добавления кнопок, полей ввода, слайдеров и т.д.
+    --РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РєРЅРѕРїРѕРє, РїРѕР»РµР№ РІРІРѕРґР°, СЃР»Р°Р№РґРµСЂРѕРІ Рё С‚.Рґ.
     assert(control~=nil,"ERROR: window.AddControl(control) - control is nil")
     window.Controls[control]=control
     control.id=IdCounter
@@ -119,7 +119,7 @@ function UI.MakeWindow(control)
   end
   
   --------------------------------------------------------------------------------------------------
-  -- выделение контролов
+  -- РІС‹РґРµР»РµРЅРёРµ РєРѕРЅС‚СЂРѕР»РѕРІ
   --------------------------------------------------------------------------------------------------
 
   local GetMousePositionForControl=WindowManager.GetMouseXY
@@ -137,7 +137,7 @@ function UI.MakeWindow(control)
   end
   
   window.SelectActiveControlByMouse=function ()
-    -- проверка, возможно уже выбрана активная кнопка
+    -- РїСЂРѕРІРµСЂРєР°, РІРѕР·РјРѕР¶РЅРѕ СѓР¶Рµ РІС‹Р±СЂР°РЅР° Р°РєС‚РёРІРЅР°СЏ РєРЅРѕРїРєР°
     if window.ActiveControl~=nil then
       if window.ActiveControl.HasXY(MouseX, MouseY) then 
         return 
@@ -146,7 +146,7 @@ function UI.MakeWindow(control)
         window.ActiveControl=nil
       end
     end
-    -- обновляет состояние всех кнопок, ищет новую активную
+    -- РѕР±РЅРѕРІР»СЏРµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РІСЃРµС… РєРЅРѕРїРѕРє, РёС‰РµС‚ РЅРѕРІСѓСЋ Р°РєС‚РёРІРЅСѓСЋ
     local controls=window.Controls
     local control_index, control = next(controls)
     while control_index do
@@ -180,20 +180,20 @@ function UI.MakeWindow(control)
   end
   
   window.GetRelativeControl=function(X, Y, DirectionPriority, start_control)
-    --[[выбирает ближайший контрол относительно заданного контрола start_control или относительно (0,0)
-    X и Y задают направдение поиска соседнего контрола, например:
-    (-1,0) - поиск контрола слева, (1,1) -поиск контрола справа внизу
+    --[[РІС‹Р±РёСЂР°РµС‚ Р±Р»РёР¶Р°Р№С€РёР№ РєРѕРЅС‚СЂРѕР» РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ Р·Р°РґР°РЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р° start_control РёР»Рё РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ (0,0)
+    X Рё Y Р·Р°РґР°СЋС‚ РЅР°РїСЂР°РІРґРµРЅРёРµ РїРѕРёСЃРєР° СЃРѕСЃРµРґРЅРµРіРѕ РєРѕРЅС‚СЂРѕР»Р°, РЅР°РїСЂРёРјРµСЂ:
+    (-1,0) - РїРѕРёСЃРє РєРѕРЅС‚СЂРѕР»Р° СЃР»РµРІР°, (1,1) -РїРѕРёСЃРє РєРѕРЅС‚СЂРѕР»Р° СЃРїСЂР°РІР° РІРЅРёР·Сѓ
     ]]
       
-    local found=false --найденный контрол
+    local found=false --РЅР°Р№РґРµРЅРЅС‹Р№ РєРѕРЅС‚СЂРѕР»
       
     local function GetRelative()
-      local start=vec3(0,0,0) -- стартовая позиция
+      local start=vec3(0,0,0) -- СЃС‚Р°СЂС‚РѕРІР°СЏ РїРѕР·РёС†РёСЏ
         if start_control then start=start_control.GetCenterPosition() end
       local controls=window.Controls
       local control_index, control = next(controls)
       local dpos=vec3(0,0,0)
-      local MinF=false --при нахождени контрола будет происходить минимизация функции отклонения от стартового
+      local MinF=false --РїСЂРё РЅР°С…РѕР¶РґРµРЅРё РєРѕРЅС‚СЂРѕР»Р° Р±СѓРґРµС‚ РїСЂРѕРёСЃС…РѕРґРёС‚СЊ РјРёРЅРёРјРёР·Р°С†РёСЏ С„СѓРЅРєС†РёРё РѕС‚РєР»РѕРЅРµРЅРёСЏ РѕС‚ СЃС‚Р°СЂС‚РѕРІРѕРіРѕ
       local F=0
       while control_index do
         if (control~=start_control) and (control.ArrowSelectable) then
@@ -222,8 +222,8 @@ function UI.MakeWindow(control)
     
     GetRelative()
     if not(found) then
-      --если далее в этом направлении нет контролов, 
-      --ищется крайний контрол в противоположном направлении
+      --РµСЃР»Рё РґР°Р»РµРµ РІ СЌС‚РѕРј РЅР°РїСЂР°РІР»РµРЅРёРё РЅРµС‚ РєРѕРЅС‚СЂРѕР»РѕРІ, 
+      --РёС‰РµС‚СЃСЏ РєСЂР°Р№РЅРёР№ РєРѕРЅС‚СЂРѕР» РІ РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё
       X, Y, DirectionPriority = -X, -Y, 1
       GetRelative()
     end
@@ -240,7 +240,7 @@ function UI.MakeWindow(control)
   end
   
   --------------------------------------------------------------------------------------------------
-  -- обработка событий
+  -- РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№
   --------------------------------------------------------------------------------------------------
   local OnOpened=function ()
     window.RedrawAllControls()
@@ -250,21 +250,21 @@ function UI.MakeWindow(control)
   
   local OnGotFocus=function (Mouse_X, Mouse_Y)
     MouseX, MouseY = Mouse_X, Mouse_Y
-    --сообщение всем контролам, что получен фокус
+    --СЃРѕРѕР±С‰РµРЅРёРµ РІСЃРµРј РєРѕРЅС‚СЂРѕР»Р°Рј, С‡С‚Рѕ РїРѕР»СѓС‡РµРЅ С„РѕРєСѓСЃ
     local controls=window.Controls
     local control_index, control = next(controls)
     while control_index do
       control.HandleEvent("ParentGotFocus", GetMousePositionForControl (control))
       control_index, control = next(controls, control_index)
     end
-    --поиск новой активной кнопки
+    --РїРѕРёСЃРє РЅРѕРІРѕР№ Р°РєС‚РёРІРЅРѕР№ РєРЅРѕРїРєРё
     window.SelectActiveControlByMouse (MouseX, MouseY)
   end
   window.RegisterEventHandler ("GotFocus", OnGotFocus)
   
   
   local OnLostFocus=function ()
-    -- все кнопки сновятся пассивными
+    -- РІСЃРµ РєРЅРѕРїРєРё СЃРЅРѕРІСЏС‚СЃСЏ РїР°СЃСЃРёРІРЅС‹РјРё
     if window.ActiveControl then
       window.ActiveControl.HandleEvent("LostFocus", GetMousePositionForControl (control))
       window.ActiveControl=nil
@@ -275,25 +275,25 @@ function UI.MakeWindow(control)
       control.HandleEvent("ParentLostFocus", GetMousePositionForControl (control))
       control_index, control = next(controls, control_index)
     end
-    -- режим перетаскивания отключается
+    -- СЂРµР¶РёРј РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёСЏ РѕС‚РєР»СЋС‡Р°РµС‚СЃСЏ
     window.Moving=false
   end
   window.RegisterEventHandler ("LostFocus", OnLostFocus)
   
   --------------------------------------------------------------------------------------------------
-  -- обработка событий мышки
+  -- РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РјС‹С€РєРё
   --------------------------------------------------------------------------------------------------
   
-  -- левая кнопка мыши -----------------------------------------------------------------------------
+  -- Р»РµРІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё -----------------------------------------------------------------------------
   local OnPressed=function ()
     if window.ActiveControl==nil then
       window.SelectActiveControlByMouse (MouseX, MouseY)
     end
     if window.ActiveControl then
-      --если нажата активная кнопка окна
+      --РµСЃР»Рё РЅР°Р¶Р°С‚Р° Р°РєС‚РёРІРЅР°СЏ РєРЅРѕРїРєР° РѕРєРЅР°
       window.ActiveControl.HandleEvent("Pressed", GetMousePositionForControl (window.ActiveControl))
     else
-      --если ни одна кнопка не была нажата, пытаемся перетащить окно
+      --РµСЃР»Рё РЅРё РѕРґРЅР° РєРЅРѕРїРєР° РЅРµ Р±С‹Р»Р° РЅР°Р¶Р°С‚Р°, РїС‹С‚Р°РµРјСЃСЏ РїРµСЂРµС‚Р°С‰РёС‚СЊ РѕРєРЅРѕ
       if window.Movable then
         local pos=window.Rect.Position()
         window.Moving={}
@@ -314,13 +314,13 @@ function UI.MakeWindow(control)
   window.RegisterEventHandler ("Released", OnReleased)
   
   
-  -- правая кнопка мыши -----------------------------------------------------------------------------
+  -- РїСЂР°РІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё -----------------------------------------------------------------------------
   local OnPressed_2=function ()
     if window.ActiveControl==nil then
       window.SelectActiveControlByMouse (MouseX, MouseY)
     end
     if window.ActiveControl then
-      --если нажата активная кнопка окна
+      --РµСЃР»Рё РЅР°Р¶Р°С‚Р° Р°РєС‚РёРІРЅР°СЏ РєРЅРѕРїРєР° РѕРєРЅР°
       window.ActiveControl.HandleEvent("Pressed_2", GetMousePositionForControl (window.ActiveControl))
     end
   end
@@ -334,7 +334,7 @@ function UI.MakeWindow(control)
   end
   window.RegisterEventHandler ("Released_2", OnReleased_2)
   
-  -- колесо мыши ----------------------------------------------------------------------------------
+  -- РєРѕР»РµСЃРѕ РјС‹С€Рё ----------------------------------------------------------------------------------
   local OnMouseWheelUp=function ()
     window.Moving=nil
     if window.ActiveControl then
@@ -353,12 +353,12 @@ function UI.MakeWindow(control)
   
   local OnMouseMoved=function (Mouse_X, Mouse_Y)
     MouseX, MouseY = Mouse_X, Mouse_Y
-    -- если идет перетаскивание окна
+    -- РµСЃР»Рё РёРґРµС‚ РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ РѕРєРЅР°
     if window.Moving then
       local pos=window.Position()
       window.Node:SetPosition (pos.x+(MouseX-window.Moving.MouseX), pos.y+(MouseY-window.Moving.MouseY), 0)
     else
-      --определение активной кнопки окна
+      --РѕРїСЂРµРґРµР»РµРЅРёРµ Р°РєС‚РёРІРЅРѕР№ РєРЅРѕРїРєРё РѕРєРЅР°
       window.SelectActiveControlByMouse (MouseX, MouseY)
       if window.ActiveControl then
         window.ActiveControl.HandleEvent("MouseMoved", GetMousePositionForControl (window.ActiveControl))
@@ -368,11 +368,11 @@ function UI.MakeWindow(control)
   window.RegisterEventHandler ("MouseMoved", OnMouseMoved)
   
   --------------------------------------------------------------------------------------------------
-  -- обработка событий клавиатуры
+  -- РѕР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёР№ РєР»Р°РІРёР°С‚СѓСЂС‹
   --------------------------------------------------------------------------------------------------
   
   local OnKeyDown=function(key)
-    -- если нажата одна из стрелок на клавиатуре
+    -- РµСЃР»Рё РЅР°Р¶Р°С‚Р° РѕРґРЅР° РёР· СЃС‚СЂРµР»РѕРє РЅР° РєР»Р°РІРёР°С‚СѓСЂРµ
     if window.SelectControlsByKeys then
       local FoundControl=false
       if key=="ArrowUp"    then FoundControl=window.GetRelativeControl( 0, 1, 0.4, window.ActiveControl)  end
@@ -384,7 +384,7 @@ function UI.MakeWindow(control)
         return
       end
     end
-    -- для всех остальных кнопок клавиатуры
+    -- РґР»СЏ РІСЃРµС… РѕСЃС‚Р°Р»СЊРЅС‹С… РєРЅРѕРїРѕРє РєР»Р°РІРёР°С‚СѓСЂС‹
     if window.ActiveControl then
       window.ActiveControl.HandleEvent("KeyDown", key)
     end

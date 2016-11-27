@@ -8,7 +8,7 @@ using namespace render::scene;
 using namespace render::scene::client;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t INVALID_INDEX = ~0u;
@@ -18,15 +18,15 @@ namespace scene {
 namespace client {
 
 /*
-    Кэш рендеринга шрифтов
+    РљСЌС€ СЂРµРЅРґРµСЂРёРЅРіР° С€СЂРёС„С‚РѕРІ
 */
 
-/// Дескриптор ссылки на символ
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ СЃСЃС‹Р»РєРё РЅР° СЃРёРјРІРѕР»
 struct CharDescRef
 {
-  const scene_graph::CharDesc* desc;             //дескриптор символа
-  const RasterizedGlyphInfo*   rasterized_glyph; //растеризованный глиф
-  size_t                       image_index; //индекс текстового блока
+  const scene_graph::CharDesc* desc;             //РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРёРјРІРѕР»Р°
+  const RasterizedGlyphInfo*   rasterized_glyph; //СЂР°СЃС‚РµСЂРёР·РѕРІР°РЅРЅС‹Р№ РіР»РёС„
+  size_t                       image_index; //РёРЅРґРµРєСЃ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±Р»РѕРєР°
 
   CharDescRef (const scene_graph::CharDesc& in_desc) : desc (&in_desc), rasterized_glyph (), image_index (INVALID_INDEX) {}
 
@@ -55,21 +55,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  DEFAULT_BATCH_NAME                = "";     //имя пакета для рендеринга текста по умолчанию
-const size_t DEFAULT_RESERVED_SPRITES_COUNT    = 32;     //резервируемое количество спрайтов по умолчанию
-const size_t DEFAULT_RESERVED_FONT_TEXT_BLOCKS = 4;      //резервируемое количество текстовых блоков
+const char*  DEFAULT_BATCH_NAME                = "";     //РёРјСЏ РїР°РєРµС‚Р° РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР° С‚РµРєСЃС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t DEFAULT_RESERVED_SPRITES_COUNT    = 32;     //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t DEFAULT_RESERVED_FONT_TEXT_BLOCKS = 4;      //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµРєСЃС‚РѕРІС‹С… Р±Р»РѕРєРѕРІ
 
 /*
-    Текстовая модель
+    РўРµРєСЃС‚РѕРІР°СЏ РјРѕРґРµР»СЊ
 */
 
 class TextModel: public VisualModel
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     TextModel (scene_graph::TextModel& model, SceneManager& manager)
       : VisualModel (model, manager, interchange::NodeType_SpriteList)
       , font_manager (manager.Client ().FontManager ())
@@ -86,11 +86,11 @@ class TextModel: public VisualModel
       font_text_blocks.reserve (DEFAULT_RESERVED_FONT_TEXT_BLOCKS);
     }
 
-///Исходный узел
+///РСЃС…РѕРґРЅС‹Р№ СѓР·РµР»
     scene_graph::TextModel& SourceNode () const { return static_cast<scene_graph::TextModel&> (Node::SourceNode ()); }
 
   protected:
-///Реализация синхронизации
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
     void UpdateCore (client::Context& context)
     {
       try
@@ -99,7 +99,7 @@ class TextModel: public VisualModel
 
         scene_graph::TextModel& model = SourceNode ();
 
-          //проверка обновления материала и текстурной семантики
+          //РїСЂРѕРІРµСЂРєР° РѕР±РЅРѕРІР»РµРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р° Рё С‚РµРєСЃС‚СѓСЂРЅРѕР№ СЃРµРјР°РЅС‚РёРєРё
 
         size_t current_material_name_hash    = model.MaterialHash (),
                current_texture_semantic_hash = model.TextureSemanticHash ();
@@ -111,12 +111,12 @@ class TextModel: public VisualModel
           need_update_fonts = true;
         }
 
-          //проверка обновления шрифтов и символов
+          //РїСЂРѕРІРµСЂРєР° РѕР±РЅРѕРІР»РµРЅРёСЏ С€СЂРёС„С‚РѕРІ Рё СЃРёРјРІРѕР»РѕРІ
 
         if (!need_update_fonts && !need_update_descs)
           return;
 
-          //копирование и сортировка символов
+          //РєРѕРїРёСЂРѕРІР°РЅРёРµ Рё СЃРѕСЂС‚РёСЂРѕРІРєР° СЃРёРјРІРѕР»РѕРІ
 
         const size_t chars_count = model.CharsCount ();
 
@@ -124,7 +124,7 @@ class TextModel: public VisualModel
 
         stl::sort (chars.begin (), chars.end (), CharSorterByFont ());
 
-          //обновление шрифтов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ С€СЂРёС„С‚РѕРІ
 
         if (chars_count && need_update_fonts)
         {
@@ -136,7 +136,7 @@ class TextModel: public VisualModel
           texture_semantic_hash = current_texture_semantic_hash;
         }
 
-          //обновление символов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
 
         if (need_update_descs)
         {
@@ -153,13 +153,13 @@ class TextModel: public VisualModel
     }
 
   private:
-/// Дескриптор текстового блока с одинаковым шрифтом
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±Р»РѕРєР° СЃ РѕРґРёРЅР°РєРѕРІС‹Рј С€СЂРёС„С‚РѕРј
     struct FontTextBlock: public xtl::reference_counter
     {
-      size_t          font_id;                //идентификатор шрифта
-      bool            used;                   //флаг используемости блока (обновляется во время изменения шрифтов)
-      FontMaterialPtr font_material;          //материал шрифта
-      size_t          reserved_sprites_count; //резервируемое количество спрайтов в блоке
+      size_t          font_id;                //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С€СЂРёС„С‚Р°
+      bool            used;                   //С„Р»Р°Рі РёСЃРїРѕР»СЊР·СѓРµРјРѕСЃС‚Рё Р±Р»РѕРєР° (РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РІРѕ РІСЂРµРјСЏ РёР·РјРµРЅРµРЅРёСЏ С€СЂРёС„С‚РѕРІ)
+      FontMaterialPtr font_material;          //РјР°С‚РµСЂРёР°Р» С€СЂРёС„С‚Р°
+      size_t          reserved_sprites_count; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ РІ Р±Р»РѕРєРµ
     };
 
     typedef xtl::intrusive_ptr<FontTextBlock> FontTextBlockPtr;
@@ -169,11 +169,11 @@ class TextModel: public VisualModel
     struct CharSorterByFont       { bool operator () (const CharDescRef& char1, const CharDescRef& char2) const { return char1.desc->font < char2.desc->font; } };
     struct CharSorterByImageIndex { bool operator () (const CharDescRef& char1, const CharDescRef& char2) const { return char1.image_index < char2.image_index; } };
 
-/// Обработчики событий текстовой модели
+/// РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ С‚РµРєСЃС‚РѕРІРѕР№ РјРѕРґРµР»Рё
     void UpdateDescsNotify () { need_update_descs = true; }
     void UpdateFontsNotify () { need_update_fonts = true; }
 
-/// Инициализация кэша
+/// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєСЌС€Р°
     static FontRenderingTempCachePtr GetRenderingCache (SceneManager& manager)
     {
       try
@@ -198,7 +198,7 @@ class TextModel: public VisualModel
       }
     }
 
-/// Поиск текстового блока
+/// РџРѕРёСЃРє С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±Р»РѕРєР°
     size_t FindFontTextBlock (const media::Font& font)
     {
       size_t id = font.Id ();
@@ -210,16 +210,16 @@ class TextModel: public VisualModel
       return INVALID_INDEX;
     }
 
-/// Добавление текстового блока
+/// Р”РѕР±Р°РІР»РµРЅРёРµ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±Р»РѕРєР°
     size_t AddFontTextBlock (client::Context& context, const media::Font& font, scene_graph::TextModel& model)
     {
       try
       {
-          //получение материала шрифта
+          //РїРѕР»СѓС‡РµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚Р°
 
         FontMaterialPtr font_material = font_manager.CreateFontMaterial (font, model.Material (), model.TextureSemantic ());
 
-          //определение базового индекса блока
+          //РѕРїСЂРµРґРµР»РµРЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ РёРЅРґРµРєСЃР° Р±Р»РѕРєР°
 
         uint32 base_index = 0, free_slots_count = 0;
 
@@ -248,14 +248,14 @@ class TextModel: public VisualModel
 
         if (derived_materials_count > free_slots_count)
         {
-            //если свободного места не достаточно - выделяем дополнительную область в конце
+            //РµСЃР»Рё СЃРІРѕР±РѕРґРЅРѕРіРѕ РјРµСЃС‚Р° РЅРµ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ - РІС‹РґРµР»СЏРµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ РѕР±Р»Р°СЃС‚СЊ РІ РєРѕРЅС†Рµ
  
           base_index = (uint32)font_text_blocks.size ();
 
           font_text_blocks.resize (font_text_blocks.size () + derived_materials_count);
         }
 
-          //создание текстовых блоков
+          //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚РѕРІС‹С… Р±Р»РѕРєРѕРІ
 
         try
         {
@@ -271,7 +271,7 @@ class TextModel: public VisualModel
             *iter = font_text_block;
           }
 
-            //синхронизация с сервером
+            //СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃ СЃРµСЂРІРµСЂРѕРј
 
           object_id_t id = Id ();
 
@@ -298,7 +298,7 @@ class TextModel: public VisualModel
       }
     }
 
-/// Удаление всеъ текстовых блоков
+/// РЈРґР°Р»РµРЅРёРµ РІСЃРµСЉ С‚РµРєСЃС‚РѕРІС‹С… Р±Р»РѕРєРѕРІ
     void RemoveAllTextBlocks (client::Context& context)
     {
       interchange::object_id_t id = Id ();
@@ -310,18 +310,18 @@ class TextModel: public VisualModel
       font_text_blocks.clear ();
     }
 
-/// Обновление шрифтов
+/// РћР±РЅРѕРІР»РµРЅРёРµ С€СЂРёС„С‚РѕРІ
     void UpdateFonts (client::Context& context, scene_graph::TextModel& model)
     {
       try
       {
-          //очистка флагов
+          //РѕС‡РёСЃС‚РєР° С„Р»Р°РіРѕРІ
 
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (), end=font_text_blocks.end (); iter!=end; ++iter)
           if (*iter)
             (*iter)->used = false;
 
-          //обновление шрифтов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ С€СЂРёС„С‚РѕРІ
 
         if (!chars.empty ())
         {         
@@ -338,7 +338,7 @@ class TextModel: public VisualModel
 
             if (font_text_block_index != INVALID_INDEX)
             {
-                //обновление флагов существующего шрифта
+                //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р»Р°РіРѕРІ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С€СЂРёС„С‚Р°
 
               size_t font_id = font->Id ();
 
@@ -347,14 +347,14 @@ class TextModel: public VisualModel
             }
             else
             {
-                //создание нового текстового блока
+                //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±Р»РѕРєР°
 
               font_text_block_index = AddFontTextBlock (context, *font, model);
             }
           }
         }
 
-          //сброс кэша
+          //СЃР±СЂРѕСЃ РєСЌС€Р°
 
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end ();)
           if (*iter && !(*iter)->used)
@@ -372,12 +372,12 @@ class TextModel: public VisualModel
       }
     }
 
-/// Обновление символов
+/// РћР±РЅРѕРІР»РµРЅРёРµ СЃРёРјРІРѕР»РѕРІ
     void UpdateDescs (client::Context& context, scene_graph::TextModel& model)
     {
       try
       {
-          //сброс флагов
+          //СЃР±СЂРѕСЃ С„Р»Р°РіРѕРІ
 
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++iter)
           if (*iter)
@@ -385,7 +385,7 @@ class TextModel: public VisualModel
 
         if (!chars.empty ())
         {         
-            //обновление глифов
+            //РѕР±РЅРѕРІР»РµРЅРёРµ РіР»РёС„РѕРІ
 
           for (CharDescRef *char_desc = &chars [0], *char_desc_end = char_desc + chars.size (); char_desc!=char_desc_end;)
           {
@@ -425,7 +425,7 @@ class TextModel: public VisualModel
               i->image_index = image_index;
             }
 
-              //обновление списков спрайтов
+              //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєРѕРІ СЃРїСЂР°Р№С‚РѕРІ
 
             if (font.TexturesCount () > 1)
             {
@@ -438,7 +438,7 @@ class TextModel: public VisualModel
           }
         }
 
-          //чистка неиспользуемых текстовых блоков
+          //С‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… С‚РµРєСЃС‚РѕРІС‹С… Р±Р»РѕРєРѕРІ
 
         for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++iter)
         {
@@ -455,14 +455,14 @@ class TextModel: public VisualModel
       }
     }
 
-/// Обновление списков спрайтов
+/// РћР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєРѕРІ СЃРїСЂР°Р№С‚РѕРІ
     void UpdateSpriteList (client::Context& context, CharDescRef* first, CharDescRef* last, size_t text_block_index)
     {
-        //сортировка по индексу изображения
+        //СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РёРЅРґРµРєСЃСѓ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 
       stl::sort (first, last, CharSorterByImageIndex ());
 
-        //группировка и обновление списков спрайтов
+        //РіСЂСѓРїРїРёСЂРѕРІРєР° Рё РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєРѕРІ СЃРїСЂР°Р№С‚РѕРІ
 
       while (first != last)
       {
@@ -486,7 +486,7 @@ class TextModel: public VisualModel
 
     void UpdateSpriteList (client::Context& context, const CharDescRef* first, const CharDescRef* last, size_t subid, FontTextBlock& text_block)
     {
-        //генерация спрайтов
+        //РіРµРЅРµСЂР°С†РёСЏ СЃРїСЂР°Р№С‚РѕРІ
 
       sprites.resize (last - first, false);
       
@@ -513,7 +513,7 @@ class TextModel: public VisualModel
         sprite++;
       }
 
-        //обновление размеров списка
+        //РѕР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ СЃРїРёСЃРєР°
 
       size_t count = sprite - sprites.data ();
 
@@ -527,7 +527,7 @@ class TextModel: public VisualModel
 
       context.SetSpriteListBuffer (id, uint32 (subid), (uint32)count, (uint32)text_block.reserved_sprites_count);
 
-        //обновление списка спрайтов
+        //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР° СЃРїСЂР°Р№С‚РѕРІ
 
       if (count)
         context.SetSpriteListDescs (id, uint32 (subid), 0, interchange::RawArray<interchange::SpriteDesc> (sprites.data (), (uint32)count));

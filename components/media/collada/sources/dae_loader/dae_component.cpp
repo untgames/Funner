@@ -8,7 +8,7 @@ namespace components
 namespace dae_loader
 {
 
-//загрузчик Dae-файлов
+//Р·Р°РіСЂСѓР·С‡РёРє Dae-С„Р°Р№Р»РѕРІ
 class DaeLoaderComponent
 {
   public:

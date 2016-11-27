@@ -1,4 +1,4 @@
-//Тестирование алгоритма binary_search (first, last, value, pred)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° binary_search (first, last, value, pred)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

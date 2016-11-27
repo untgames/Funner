@@ -1,6 +1,6 @@
 #include <cstdio>
 
-//тест проверяет работу компилятора c non-POD на присвоение вида B seasons = { { "spring", "summer", "autumn", "winter" } };
+//С‚РµСЃС‚ РїСЂРѕРІРµСЂСЏРµС‚ СЂР°Р±РѕС‚Сѓ РєРѕРјРїРёР»СЏС‚РѕСЂР° c non-POD РЅР° РїСЂРёСЃРІРѕРµРЅРёРµ РІРёРґР° B seasons = { { "spring", "summer", "autumn", "winter" } };
 
 const size_t MAX_NUM = 16;
 

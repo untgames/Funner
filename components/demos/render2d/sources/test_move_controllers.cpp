@@ -83,7 +83,7 @@ struct Test
     aligner1->Start (*sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
     aligner2->Start (*sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
 
-      //создание сцены
+      //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
     camera = OrthoCamera::Create ();
 
     camera->BindToScene (scene);
@@ -96,7 +96,7 @@ struct Test
     camera->SetZNear    (-20);
     camera->SetZFar     (20);
 
-      //создание областей вывода
+      //СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     Viewport vp;
 
@@ -113,17 +113,17 @@ struct Test
 
     screen.Attach (vp);
 
-      //настройка целевых буферов вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІС‹РІРѕРґР°
 
     RenderTarget& render_target = application.RenderTarget ();
 
     render_target.SetScreen (&screen);
 
-      //загрузка ресурсов
+      //Р·Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 
     application.LoadResources ();
 
-      //установка idle-функции
+      //СѓСЃС‚Р°РЅРѕРІРєР° idle-С„СѓРЅРєС†РёРё
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
   }
@@ -140,7 +140,7 @@ struct Test
     return sprite;
   }
 
-    //обработчик главного цикла приложения
+    //РѕР±СЂР°Р±РѕС‚С‡РёРє РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
   void Idle ()
   {
     try
@@ -187,11 +187,11 @@ int main ()
 
   try
   {
-      //настройка протоколированиЯ
+      //РЅР°СЃС‚СЂРѕР№РєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРЇ
 
     common::LogFilter filter ("*", &log_print);
 
-      //запуск теста
+      //Р·Р°РїСѓСЃРє С‚РµСЃС‚Р°
 
     Test test;
 

@@ -9,17 +9,17 @@ using namespace render::manager;
 namespace
 {
 
-///Элемент кэша опций шейдера
+///Р­Р»РµРјРµРЅС‚ РєСЌС€Р° РѕРїС†РёР№ С€РµР№РґРµСЂР°
 struct ShaderOptionsCacheEntry: public ShaderOptions, public xtl::reference_counter
 {
-  size_t layout_hash;    //закэшированный хэш расположения свойств
-  size_t options_count;  //закэшированное количество опций
-  bool   is_valid;       //является ли данный элемент корректным
+  size_t layout_hash;    //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ С…СЌС€ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  size_t options_count;  //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  bool   is_valid;       //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚ РєРѕСЂСЂРµРєС‚РЅС‹Рј
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ShaderOptionsCacheEntry () : layout_hash (0xffffffff), options_count (0), is_valid (false) {}
   
-///Обновление кэша
+///РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
   void UpdateCache (const common::PropertyMap& properties, ShaderOptionsLayout& layout)
   {
     if (is_valid && layout.Hash () == layout_hash && options_count == layout.Size ())
@@ -39,19 +39,19 @@ typedef CacheMap<ShaderOptionsLayout*, ShaderOptionsCacheEntryPtr> ShaderOptions
 }
 
 /*
-    Описание реализации кэша опций шейдера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСЌС€Р° РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 struct ShaderOptionsCache::Impl: public xtl::trackable
 {
   ShaderOptionsCache&               owner;
-  common::PropertyMap               properties;                //полный список опций
-  common::PropertyMap::EventHandler properties_update_handler; //обработчик события обновления свойств
-  xtl::auto_connection              on_properties_update;      //соединение с обработчиком обновления свойств
-  ShaderOptionsCacheEntryMap        cache;                     //кэш опций шейдера
-  bool                              need_invalidate_cache;     //кэш требуется обновить
+  common::PropertyMap               properties;                //РїРѕР»РЅС‹Р№ СЃРїРёСЃРѕРє РѕРїС†РёР№
+  common::PropertyMap::EventHandler properties_update_handler; //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  xtl::auto_connection              on_properties_update;      //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРј РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  ShaderOptionsCacheEntryMap        cache;                     //РєСЌС€ РѕРїС†РёР№ С€РµР№РґРµСЂР°
+  bool                              need_invalidate_cache;     //РєСЌС€ С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІРёС‚СЊ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ShaderOptionsCache& in_owner, const CacheManagerPtr& cache_manager)
     : owner (in_owner)
     , properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
@@ -61,7 +61,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
     on_properties_update  = properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, properties_update_handler); 
   }
   
-///Обработчик события обновления свойств
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
   void OnPropertiesUpdate ()
   {
     need_invalidate_cache = true;
@@ -69,7 +69,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
     owner.InvalidateCache ();
   }
   
-///Обработчик события удаления расположения опций шейдера
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РѕРїС†РёР№ С€РµР№РґРµСЂР°
   void OnLayoutDeleted (ShaderOptionsLayout* layout)
   {
     cache.Remove (layout);
@@ -77,7 +77,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderOptionsCache::ShaderOptionsCache (const CacheManagerPtr& cache_manager)
@@ -90,7 +90,7 @@ ShaderOptionsCache::~ShaderOptionsCache ()
 }
 
 /*
-    Количество закэшированных расположений опций шейдера
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹С… СЂР°СЃРїРѕР»РѕР¶РµРЅРёР№ РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 size_t ShaderOptionsCache::CachedLayoutsCount ()
@@ -99,7 +99,7 @@ size_t ShaderOptionsCache::CachedLayoutsCount ()
 }
 
 /*
-    Полный список опций
+    РџРѕР»РЅС‹Р№ СЃРїРёСЃРѕРє РѕРїС†РёР№
 */
 
 void ShaderOptionsCache::SetProperties (const common::PropertyMap& properties)
@@ -115,7 +115,7 @@ const common::PropertyMap& ShaderOptionsCache::Properties ()
 }
 
 /*
-    Получение опций шейдера
+    РџРѕР»СѓС‡РµРЅРёРµ РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 namespace
@@ -135,12 +135,12 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
 {
   try
   {
-      //обработка частного случая - отсутствия свойств
+      //РѕР±СЂР°Р±РѕС‚РєР° С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ - РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЃРІРѕР№СЃС‚РІ
       
     if (impl->properties.Size () == 0 || layout.Size () == 0)
       return xtl::singleton_default<ShaderOptions>::instance ();
     
-      //обновление флагов кэширования
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С„Р»Р°РіРѕРІ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
     
     if (impl->need_invalidate_cache)
     {
@@ -149,7 +149,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
       impl->need_invalidate_cache = false;
     }
      
-      //поиск в кэше
+      //РїРѕРёСЃРє РІ РєСЌС€Рµ
       
     if (ShaderOptionsCacheEntryPtr* entry = impl->cache.Find (&layout))
     {
@@ -157,7 +157,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
       return **entry;
     }
     
-      //добавление элемента кэша
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РєСЌС€Р°
       
     ShaderOptionsCacheEntryPtr entry (new ShaderOptionsCacheEntry, false);
     

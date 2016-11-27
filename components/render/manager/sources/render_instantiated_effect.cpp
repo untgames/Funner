@@ -3,19 +3,19 @@
 using namespace render::manager;
 
 /*
-    Описание реализации инстанцированной эффекта
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕР№ СЌС„С„РµРєС‚Р°
 */
 
 typedef stl::vector<size_t> TagHashArray;
 
 struct InstantiatedEffect::Impl
 {
-  common::StringArray tags;       //тэги прохода
-  TagHashArray        tag_hashes; //хэши тэгов  
+  common::StringArray tags;       //С‚СЌРіРё РїСЂРѕС…РѕРґР°
+  TagHashArray        tag_hashes; //С…СЌС€Рё С‚СЌРіРѕРІ  
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InstantiatedEffect::InstantiatedEffect ()
@@ -28,7 +28,7 @@ InstantiatedEffect::~InstantiatedEffect ()
 }
 
 /*
-    Тэги фрейма: используются для рекурсивного рендеринга
+    РўСЌРіРё С„СЂРµР№РјР°: РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РґР»СЏ СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void InstantiatedEffect::SetTags (const char* tags)

@@ -7,38 +7,38 @@ namespace
 {
 
 /*
-    Константы (вынести в конфигурацию)!!!
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РІС‹РЅРµСЃС‚Рё РІ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ)!!!
 */
 
-const char* CONFIG_FILE_NAME = "media/configuration.xml"; //имя файла конфигурации
+const char* CONFIG_FILE_NAME = "media/configuration.xml"; //РёРјСЏ С„Р°Р№Р»Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 
-const char* DEFAULT_LOG_FILE_NAME = "water-slides.log"; //имя файла протокола
+const char* DEFAULT_LOG_FILE_NAME = "water-slides.log"; //РёРјСЏ С„Р°Р№Р»Р° РїСЂРѕС‚РѕРєРѕР»Р°
 
-const size_t DEFAULT_WINDOW_WIDTH  = 400;                         //начальная ширина окна
-const size_t DEFAULT_WINDOW_HEIGHT = 300;                         //начальная высота окна
-const char*  DEFAULT_WINDOW_TITLE  = "Water slides demo ($Id$)"; //заголовок окна
+const size_t DEFAULT_WINDOW_WIDTH  = 400;                         //РЅР°С‡Р°Р»СЊРЅР°СЏ С€РёСЂРёРЅР° РѕРєРЅР°
+const size_t DEFAULT_WINDOW_HEIGHT = 300;                         //РЅР°С‡Р°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РѕРєРЅР°
+const char*  DEFAULT_WINDOW_TITLE  = "Water slides demo ($Id$)"; //Р·Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 
-const char*  WATER_DROP_SOUND_NAME   = "media/drop.snddecl";      //имя файла декларации с звуком капли
+const char*  WATER_DROP_SOUND_NAME   = "media/drop.snddecl";      //РёРјСЏ С„Р°Р№Р»Р° РґРµРєР»Р°СЂР°С†РёРё СЃ Р·РІСѓРєРѕРј РєР°РїР»Рё
 
-const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
-const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
-const size_t DEFAULT_FB_DEPTH_BITS    = 24; //глубина z-buffer'а
-const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
-const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
-const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen по умолчанию
+const size_t DEFAULT_FB_COLOR_BITS    = 24; //РіР»СѓР±РёРЅР° Р±СѓС„РµСЂР° С†РІРµС‚Р°
+const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //РіР»СѓР±РёРЅР° Р°Р»СЊС„Р°-Р±СѓС„РµСЂР°
+const size_t DEFAULT_FB_DEPTH_BITS    = 24; //РіР»СѓР±РёРЅР° z-buffer'Р°
+const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //РіР»СѓР±РёРЅР° Р±СѓС„РµСЂР° С‚СЂР°С„Р°СЂРµС‚Р°
+const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //РєРѕР»РёС‡РµСЃС‚РІРѕ Р±СѓС„РµСЂРѕРІ РІ С†РµРїРѕС‡РєРµ РѕР±РјРµРЅР°
+const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства рендеринга
+const char* DEFAULT_DEVICE_INIT_STRING = ""; //СЃС‚СЂРѕРєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё СѓСЃС‚СЂРѕР№СЃС‚РІР° СЂРµРЅРґРµСЂРёРЅРіР°
 
 }
 
 /*
-    Описание реализации приложения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 struct MyApplication::Impl
 {
   public:
-      //конструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl () :
       configuration (CONFIG_FILE_NAME),
       log_file (configuration.GetString ("LogFileName", DEFAULT_LOG_FILE_NAME)),
@@ -82,21 +82,21 @@ struct MyApplication::Impl
 
       LogMessage ("Create window...");
       
-        //установка пользовательской функции отладочного протоколирования
+        //СѓСЃС‚Р°РЅРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
       window.SetDebugLog (xtl::bind (&Impl::LogMessage, this, _1));
       
-        //установка заголовка окна
+        //СѓСЃС‚Р°РЅРѕРІРєР° Р·Р°РіРѕР»РѕРІРєР° РѕРєРЅР°
       
       window.SetTitle (configuration.GetString ("WindowTitle", DEFAULT_WINDOW_TITLE));
       
-        //показ окна
+        //РїРѕРєР°Р· РѕРєРЅР°
 
       window.Show ();
       
       LogMessage ("Initializing rendering device...");
 
-        //создание цепочки обмена и устройства рендеринга
+        //СЃРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° СЂРµРЅРґРµСЂРёРЅРіР°
 
       SwapChainDesc desc;
 
@@ -114,11 +114,11 @@ struct MyApplication::Impl
       render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "*", desc, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
         swap_chain, device);
       
-        //оповещение об изменении размеров
+        //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё СЂР°Р·РјРµСЂРѕРІ
       
       OnResize ();
 
-        //регистрация обработчиков событий окна
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
 
       window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, this));
@@ -129,12 +129,12 @@ struct MyApplication::Impl
         
       window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Impl::OnMouse, this, _2, _3));
 
-        //регистрация обработчиков событий приложения
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
         
       app_idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&Impl::OnIdle, this));      
     }
     
-      //деструктор
+      //РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Impl ()
     {
       try
@@ -157,17 +157,17 @@ struct MyApplication::Impl
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-      //протолирование
+      //РїСЂРѕС‚РѕР»РёСЂРѕРІР°РЅРёРµ
     void LogMessage (const char* message)
     {
       if (!message)
         return;
 
-          //формирование префикса протоколирования
+          //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїСЂРµС„РёРєСЃР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
       time_t ltime;
 
@@ -179,7 +179,7 @@ struct MyApplication::Impl
 
       prefix += common::format (" : %03u] ", MyApplication::Milliseconds () % 1000);
 
-        //формирование набора строк для вывода в протокол        
+        //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РЅР°Р±РѕСЂР° СЃС‚СЂРѕРє РґР»СЏ РІС‹РІРѕРґР° РІ РїСЂРѕС‚РѕРєРѕР»        
         
 
       common::StringArray lines = split (message, "\n");
@@ -196,12 +196,12 @@ struct MyApplication::Impl
         write (log_stream, "\r\n");
       }      
 
-        //сброс протокола на диск
+        //СЃР±СЂРѕСЃ РїСЂРѕС‚РѕРєРѕР»Р° РЅР° РґРёСЃРє
 
       log_stream.Buffer ().Flush ();
     }
     
-      //работа с игровым отображением
+      //СЂР°Р±РѕС‚Р° СЃ РёРіСЂРѕРІС‹Рј РѕС‚РѕР±СЂР°Р¶РµРЅРёРµРј
     void SetView (const GameView& view)
     {
       if (current_view)
@@ -212,7 +212,7 @@ struct MyApplication::Impl
         }
         catch (...)
         {
-          //подавление всех исключений
+          //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
         }
       }
       
@@ -251,7 +251,7 @@ struct MyApplication::Impl
     const GameView& View () const { return current_view; }
 
   private:
-      //сброс буфера в файл-протолирования
+      //СЃР±СЂРѕСЃ Р±СѓС„РµСЂР° РІ С„Р°Р№Р»-РїСЂРѕС‚РѕР»РёСЂРѕРІР°РЅРёСЏ
     size_t LogWriteBuffer (const void* buffer, size_t size)
     {
       size_t result = log_file.Write (buffer, size);
@@ -261,7 +261,7 @@ struct MyApplication::Impl
       return result;
     }
   
-      //обработчик закрытия окна
+      //РѕР±СЂР°Р±РѕС‚С‡РёРє Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
     void OnClose ()
     {
       syslib::Application::Exit (0);
@@ -271,7 +271,7 @@ struct MyApplication::Impl
       swap_chain = 0;
     }
   
-      //обработчик изменения размеров окна
+      //РѕР±СЂР°Р±РѕС‚С‡РёРє РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
     void OnResize ()
     {
       try
@@ -300,7 +300,7 @@ struct MyApplication::Impl
       }
     }        
 
-      //обработчик перерисовки окна
+      //РѕР±СЂР°Р±РѕС‚С‡РёРє РїРµСЂРµСЂРёСЃРѕРІРєРё РѕРєРЅР°
     void OnRedraw ()
     {
       try
@@ -331,7 +331,7 @@ struct MyApplication::Impl
       }
     }
     
-      //обработчик нажатия / отпускания клавиш мыши
+      //РѕР±СЂР°Р±РѕС‚С‡РёРє РЅР°Р¶Р°С‚РёСЏ / РѕС‚РїСѓСЃРєР°РЅРёСЏ РєР»Р°РІРёС€ РјС‹С€Рё
     void OnMouse (syslib::WindowEvent event, const syslib::WindowEventContext& context)
     {
       if (!current_view)
@@ -358,7 +358,7 @@ struct MyApplication::Impl
       }
     }
     
-      //обработчик "холостого хода" приложения
+      //РѕР±СЂР°Р±РѕС‚С‡РёРє "С…РѕР»РѕСЃС‚РѕРіРѕ С…РѕРґР°" РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnIdle ()
     {
       if (!current_view)
@@ -381,20 +381,20 @@ struct MyApplication::Impl
     }
 
   private:
-    ::Configuration     configuration;       //настрройки
-    OutputFile          log_file;            //файл протолирования
-    OutputTextStream    log_stream;          //поток протоколирования работы приложения
-    syslib::Window      window;              //главное окно приложения
-    SwapChainPtr        swap_chain;          //цепочка обмена главного окна приложения
-    DevicePtr           device;              //устройство рендеринга главного окна приложения
-    xtl::connection     app_idle_connection; //соединение сигнала обработчика холостого хода приложения
-    GameView            current_view;        //текущее игровое отображение
-    sound::SoundManager *sound_manager;      //менеджер звуков
-    sound::ScenePlayer  *scene_player;       //проигрыватель звуков
+    ::Configuration     configuration;       //РЅР°СЃС‚СЂСЂРѕР№РєРё
+    OutputFile          log_file;            //С„Р°Р№Р» РїСЂРѕС‚РѕР»РёСЂРѕРІР°РЅРёСЏ
+    OutputTextStream    log_stream;          //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ СЂР°Р±РѕС‚С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    syslib::Window      window;              //РіР»Р°РІРЅРѕРµ РѕРєРЅРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    SwapChainPtr        swap_chain;          //С†РµРїРѕС‡РєР° РѕР±РјРµРЅР° РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    DevicePtr           device;              //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ СЂРµРЅРґРµСЂРёРЅРіР° РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    xtl::connection     app_idle_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРёРіРЅР°Р»Р° РѕР±СЂР°Р±РѕС‚С‡РёРєР° С…РѕР»РѕСЃС‚РѕРіРѕ С…РѕРґР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    GameView            current_view;        //С‚РµРєСѓС‰РµРµ РёРіСЂРѕРІРѕРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ
+    sound::SoundManager *sound_manager;      //РјРµРЅРµРґР¶РµСЂ Р·РІСѓРєРѕРІ
+    sound::ScenePlayer  *scene_player;       //РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЊ Р·РІСѓРєРѕРІ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MyApplication::MyApplication ()
@@ -407,7 +407,7 @@ MyApplication::~MyApplication ()
 }
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void MyApplication::LogMessage (const char* message)
@@ -433,7 +433,7 @@ void MyApplication::VLogFormatMessage (const char* format, va_list list)
 }
 
 /*
-    Получение количества милисекунд, прошедших от момента запуска приложения
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РјРёР»РёСЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РёС… РѕС‚ РјРѕРјРµРЅС‚Р° Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 size_t MyApplication::Milliseconds ()
@@ -442,7 +442,7 @@ size_t MyApplication::Milliseconds ()
 }
 
 /*
-    Установка текущего отображения
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 */
 
 void MyApplication::SetView (const GameView& view)

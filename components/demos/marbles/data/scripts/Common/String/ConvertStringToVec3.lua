@@ -3,7 +3,7 @@ function ConvertStringToVec3(str)
   assert(type(str)=="string","ERROR: ConvertStringToVec3(str) - str is not a string")
   local x,y,z=ToNumbers( UnpackString( str, " "))
   assert((x and y),"ERROR: ConvertToVec3("..str..") - 'x' or 'y' is nil")
-  --возможно что были заданы только координаты x и y - тогда z=0
+  --РІРѕР·РјРѕР¶РЅРѕ С‡С‚Рѕ Р±С‹Р»Рё Р·Р°РґР°РЅС‹ С‚РѕР»СЊРєРѕ РєРѕРѕСЂРґРёРЅР°С‚С‹ x Рё y - С‚РѕРіРґР° z=0
   local v=0
   if z then
     v=vec3(x,y,z)

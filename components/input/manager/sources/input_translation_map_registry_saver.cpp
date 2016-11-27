@@ -33,13 +33,13 @@ class TranslationMapRegistrySaver : public TranslationMapRegistry::IEnumerator
 };
 
 /*
-   Компонент сохранения карт трансляции
+   РљРѕРјРїРѕРЅРµРЅС‚ СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР°СЂС‚ С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 
 class KeyregSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     KeyregSaverComponent () 
     {
       TranslationMapRegistryManager::RegisterSaver ("xkeyreg", &SaveRegistry);

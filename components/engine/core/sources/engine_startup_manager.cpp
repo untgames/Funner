@@ -6,28 +6,28 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME                 = "engine.startup_manager"; //имя потока протоколирования
-const char* LOG_PREFIX               = "engine";                 //префикс имени потока протоколирования
-const char* REGISTRY_COMPONENTS_MASK = "engine.subsystems.*";    //маска имени автоматически загружаемых компонентов
+const char* LOG_NAME                 = "engine.startup_manager"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const char* LOG_PREFIX               = "engine";                 //РїСЂРµС„РёРєСЃ РёРјРµРЅРё РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const char* REGISTRY_COMPONENTS_MASK = "engine.subsystems.*";    //РјР°СЃРєР° РёРјРµРЅРё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р·Р°РіСЂСѓР¶Р°РµРјС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 
 }
 
 /*
-    Описание реализации менеджера запуска подсистем
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р·Р°РїСѓСЃРєР° РїРѕРґСЃРёСЃС‚РµРј
 */
 
 struct StartupManagerImpl::Impl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl ()
     {
     }
   
-///Регистрация обработчика запуска подсистемы
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РїСѓСЃРєР° РїРѕРґСЃРёСЃС‚РµРјС‹
     void RegisterStartupHandler (const char* configuration_node_name, const StartupHandler& startup_handler)
     {
       static const char* METHOD_NAME = "client::StartupManager::RegisterStartupHandler";
@@ -43,7 +43,7 @@ struct StartupManagerImpl::Impl
       startup_handlers.insert_pair (configuration_node_name, StartupHandlerEntryPtr (new StartupHandlerEntry (configuration_node_name, startup_handler), false));
     }
 
-///Удаление обработчика запуска подсистемы
+///РЈРґР°Р»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РїСѓСЃРєР° РїРѕРґСЃРёСЃС‚РµРјС‹
     void UnregisterStartupHandler (const char* configuration_node_name)
     {
       if (!configuration_node_name)
@@ -52,13 +52,13 @@ struct StartupManagerImpl::Impl
       startup_handlers.erase (configuration_node_name);
     }
 
-///Удаление всех обработчиков запуска подсистем
+///РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ Р·Р°РїСѓСЃРєР° РїРѕРґСЃРёСЃС‚РµРј
     void UnregisterAllStartupHandlers ()
     {
       startup_handlers.clear ();
     }
     
-///Запуск подсистем
+///Р—Р°РїСѓСЃРє РїРѕРґСЃРёСЃС‚РµРј
     void Start (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
@@ -75,7 +75,7 @@ struct StartupManagerImpl::Impl
     }
 
   private:
-///Запуск подсистем
+///Р—Р°РїСѓСЃРє РїРѕРґСЃРёСЃС‚РµРј
     void StartCore (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager, common::PropertyMap& properties)
     {      
       common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
@@ -124,7 +124,7 @@ struct StartupManagerImpl::Impl
         if (!match)
           continue;
 
-          //поиск обработчика запуска
+          //РїРѕРёСЃРє РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РїСѓСЃРєР°
 
         StartupHandlers::iterator startup_iter = startup_handlers.find (node_name);
         
@@ -134,7 +134,7 @@ struct StartupManagerImpl::Impl
           continue;
         }
 
-          //старт подсистем
+          //СЃС‚Р°СЂС‚ РїРѕРґСЃРёСЃС‚РµРј
 
         StartupHandlerEntry& entry = *startup_iter->second;
 
@@ -155,7 +155,7 @@ struct StartupManagerImpl::Impl
       }
     }  
   
-///Подключение подсистем, описанных в другом файле
+///РџРѕРґРєР»СЋС‡РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРј, РѕРїРёСЃР°РЅРЅС‹С… РІ РґСЂСѓРіРѕРј С„Р°Р№Р»Рµ
     void IncludeSubsystems (common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager, common::PropertyMap& properties)
     {
       try
@@ -183,7 +183,7 @@ struct StartupManagerImpl::Impl
       }
     }
     
-///Чтение свойств
+///Р§С‚РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
     void ReadProperties (common::ParseNode& node, common::PropertyMap& properties, common::Log& log)
     {
       for (common::Parser::Iterator iter=node.First ("Property"); iter; ++iter)
@@ -225,7 +225,7 @@ struct StartupManagerImpl::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StartupManagerImpl::StartupManagerImpl ()
@@ -237,7 +237,7 @@ StartupManagerImpl::~StartupManagerImpl ()
 }
 
 /*
-    Добавление / удаление обработчиков
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
 */
 
 void StartupManagerImpl::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler)
@@ -256,7 +256,7 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
 }
 
 /*
-    Запуск обработчиков
+    Р—Р°РїСѓСЃРє РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
 */
 
 void StartupManagerImpl::Start (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager)
@@ -265,7 +265,7 @@ void StartupManagerImpl::Start (const common::ParseNode& node, const char* subsy
 }
 
 /*
-    Обёртки над вызовами методов StartupManagerImpl
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РІС‹Р·РѕРІР°РјРё РјРµС‚РѕРґРѕРІ StartupManagerImpl
 */
 
 void StartupManager::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler)

@@ -8,7 +8,7 @@ namespace
 class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Win32ApplicationDelegate ()
     {
       idle_enabled    = false;
@@ -21,7 +21,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
         raise_error ("::RegisterWindowMessage");
     }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       try
@@ -36,7 +36,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
           while (!IsMessageQueueEmpty ())
             DoNextEvent ();
 
-           //если нет обработчиков OnIdle - приостанавливаем приложение
+           //РµСЃР»Рё РЅРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ OnIdle - РїСЂРёРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 
           if (!idle_enabled)
           {
@@ -57,14 +57,14 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       if (!PostThreadMessage (main_thread_id, WM_QUIT, code, 0))
         raise_error ("::PostThreadMessage");
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
@@ -76,13 +76,13 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
       }
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -94,7 +94,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
     }
     
   private:
-///Проверка очереди событий на пустоту
+///РџСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРё СЃРѕР±С‹С‚РёР№ РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsMessageQueueEmpty ()
     {
       if (is_exited)
@@ -104,14 +104,14 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
 
       bool result = PeekMessage (&msg, 0, 0, 0, PM_NOREMOVE) == 0;
 
-        //сбрасываем все ошибки
+        //СЃР±СЂР°СЃС‹РІР°РµРј РІСЃРµ РѕС€РёР±РєРё
 
       SetLastError (0);
 
       return result;
     }
     
-///Ожидание события
+///РћР¶РёРґР°РЅРёРµ СЃРѕР±С‹С‚РёСЏ
     void WaitMessage ()
     {
 #ifndef WINCE
@@ -128,7 +128,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
 #endif
     }
     
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvent ()
     {
       try
@@ -159,17 +159,17 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
     DWORD                 main_thread_id;
 };
 
-///Данные приложения
+///Р”Р°РЅРЅС‹Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class ApplicationImpl
 {
   public:  
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationImpl ()
       : screen_saver_state (true)
     {
     }
 
-///Установка состояния скрин-сейвера
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
     void SetScreenSaverState (bool state)
     {
       screen_saver_state = state;
@@ -178,7 +178,7 @@ class ApplicationImpl
     bool GetScreenSaverState () { return screen_saver_state; }
 
   private:
-    bool screen_saver_state; //состояние скрин-сейвера
+    bool screen_saver_state; //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
 };
 
 typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
@@ -186,7 +186,7 @@ typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* WindowsApplicationManager::CreateDefaultApplicationDelegate ()
@@ -195,7 +195,7 @@ IApplicationDelegate* WindowsApplicationManager::CreateDefaultApplicationDelegat
 }
 
 /*
-   Открытие URL во внешнем браузере
+   РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void WindowsApplicationManager::OpenUrl (const char* url)
@@ -280,7 +280,7 @@ void WindowsApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-    Получение значения переменной среды
+    РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃСЂРµРґС‹
 */
 
 #undef GetEnvironmentVariable
@@ -329,7 +329,7 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
 }
 
 /*
-    Управление энергосбережением
+    РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void WindowsApplicationManager::SetScreenSaverState (bool state)
@@ -351,7 +351,7 @@ bool WindowsApplicationManager::GetScreenSaverState ()
 }
 
 /*
-    Обработка системных сообщений нити
+    РћР±СЂР°Р±РѕС‚РєР° СЃРёСЃС‚РµРјРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РЅРёС‚Рё
 */
 
 void WindowsApplicationManager::ProcessThreadMessages ()

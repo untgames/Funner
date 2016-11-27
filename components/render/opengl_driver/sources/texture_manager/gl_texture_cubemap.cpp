@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
@@ -13,11 +13,11 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
 
-    //установка текстуры в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   Bind ();
   
-    //проверка корректности дескриптора текстуры
+    //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РґРµСЃРєСЂРёРїС‚РѕСЂР° С‚РµРєСЃС‚СѓСЂС‹
 
   if (is_depth_stencil (tex_desc.format))
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create depth cubemap texture. Reason: depth texture may be only 1D or 2D");
@@ -28,7 +28,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   if (tex_desc.width != tex_desc.height)
     throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Cubemap texture sizes must be equal (desc.width=%u, desc.height=%u)", tex_desc.width, tex_desc.height);
 
-     //преобразование формата пикселей
+     //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
   GLenum gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
          gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format),
@@ -70,7 +70,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-    //проверка возможности создания текстуры
+    //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹
 
   glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, 0);
   
@@ -86,18 +86,18 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     
 #endif
 
-    //настройка расположения данных в буфере    
+    //РЅР°СЃС‚СЂРѕР№РєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂРµ    
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
+  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРє
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
-  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
+  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃС‚СЂРѕРє
+  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… РїРёРєСЃРµР»РµР№
 
 #endif
 
-    //создание mip-уровней
+    //СЃРѕР·РґР°РЅРёРµ mip-СѓСЂРѕРІРЅРµР№
     
   TextureDataSelector data_selector (tex_desc, data);
   bool                is_compressed_data = is_compressed (tex_desc.format);
@@ -131,7 +131,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
       {
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-        glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для нулевого mip-уровня)
+        glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС… (РґР»СЏ РЅСѓР»РµРІРѕРіРѕ mip-СѓСЂРѕРІРЅСЏ)
         
 #endif
 
@@ -151,7 +151,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     }
   }
 
-   //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
+   //СѓСЃС‚Р°РЅРѕРІРєР° СЂРµР°Р»СЊРЅРѕРіРѕ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ (СЃРІСЏР·Р°РЅРѕ СЃ СѓСЃС‚Р°РЅРѕРІРєРѕР№ СЃР¶Р°С‚РѕРіРѕ С„РѕСЂРјР°С‚Р°)
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
@@ -170,13 +170,13 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     throw;
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Получение дескриптора слоя текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃР»РѕСЏ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void TextureCubemap::GetLayerDesc (unsigned int layer, LayerDesc& desc)
@@ -189,7 +189,7 @@ void TextureCubemap::GetLayerDesc (unsigned int layer, LayerDesc& desc)
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void TextureCubemap::SetUncompressedData

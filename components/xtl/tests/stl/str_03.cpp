@@ -1,4 +1,4 @@
-//Тестирование copy
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ copy
 #include <stdio.h>
 #include <stl/string>
 #include "test.h"

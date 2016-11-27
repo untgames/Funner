@@ -9,7 +9,7 @@
 
 using namespace engine;
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 extern "C" __attribute__ ((visibility("default"))) int main (int argc, const char* argv [], const char* env [])
 {
   stl::auto_ptr<IEngine> funner (FunnerInit ());

@@ -10,13 +10,13 @@ namespace default_shader_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENT_NAME = "media.rfx.shader.loaders.default"; //имя компонента
+const char* COMPONENT_NAME = "media.rfx.shader.loaders.default"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 /*
-    Загрузчик
+    Р—Р°РіСЂСѓР·С‡РёРє
 */
 
 class DefaultShaderLoader
@@ -42,7 +42,7 @@ class DefaultShaderLoader
 };
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

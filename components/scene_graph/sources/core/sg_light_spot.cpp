@@ -4,20 +4,20 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1e9;  //РµСЃР»Рё СЂР°РґРёСѓСЃ/СЂР°СЃСЃС‚РѕСЏРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р° РїСЂРµРІС‹С€Р°РµС‚ СЌС‚Сѓ РІРµР»РёС‡РёРЅСѓ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‚СЃСЏ Р±РµСЃРєРѕРЅРµС‡РЅС‹Рµ bv
 
 /*
-    Описание реализации SpotLight
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё SpotLight
 */
 
 struct SpotLight::Impl: public xtl::instance_counter<SpotLight>
 {
-  anglef angle;         //угол света
-  float  exponent;      //экспонента рассеивания по углу
+  anglef angle;         //СѓРіРѕР» СЃРІРµС‚Р°
+  float  exponent;      //СЌРєСЃРїРѕРЅРµРЅС‚Р° СЂР°СЃСЃРµРёРІР°РЅРёСЏ РїРѕ СѓРіР»Сѓ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SpotLight::SpotLight ()
@@ -33,7 +33,7 @@ SpotLight::~SpotLight ()
 }
 
 /*
-    Создание источника света
+    РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 SpotLight::Pointer SpotLight::Create ()
@@ -42,7 +42,7 @@ SpotLight::Pointer SpotLight::Create ()
 }
 
 /*
-    Параметры действия источника света
+    РџР°СЂР°РјРµС‚СЂС‹ РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void SpotLight::SetAngle (const math::anglef& angle)
@@ -67,7 +67,7 @@ float SpotLight::Exponent () const
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void SpotLight::UpdateBoundsCore ()
@@ -83,7 +83,7 @@ void SpotLight::UpdateBoundsCore ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void SpotLight::AcceptCore (Visitor& visitor)
@@ -93,7 +93,7 @@ void SpotLight::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void SpotLight::BindProperties (common::PropertyBindingMap& bindings)

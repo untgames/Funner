@@ -6,20 +6,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int RESERVED_LAYOUTS_COUNT = 4; //резервируемое количество связанных лэйаутов
+const unsigned int RESERVED_LAYOUTS_COUNT = 4; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІСЏР·Р°РЅРЅС‹С… Р»СЌР№Р°СѓС‚РѕРІ
 
 /*
-     Слот параметров
+     РЎР»РѕС‚ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 struct Slot
 {
-  common::PropertyLayout layout;            //расположение параметров
-  xtl::auto_connection   update_connection; //соединение с сигналом, вызываемым при изменении параметров
-  size_t                 layout_hash;       //хэш свойств
+  common::PropertyLayout layout;            //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
+  xtl::auto_connection   update_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј, РІС‹Р·С‹РІР°РµРјС‹Рј РїСЂРё РёР·РјРµРЅРµРЅРёРё РїР°СЂР°РјРµС‚СЂРѕРІ
+  size_t                 layout_hash;       //С…СЌС€ СЃРІРѕР№СЃС‚РІ
 
   Slot () : layout_hash (0) {}
 };
@@ -27,7 +27,7 @@ struct Slot
 }
 
 /*
-    Описание реализации расположения параметра
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°
 */
 
 typedef stl::vector<render::low_level::ProgramParameter> ParameterArray;
@@ -35,18 +35,18 @@ typedef stl::vector<ProgramParametersLayoutPtr>          LayoutArray;
 
 struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 {
-  render::low_level::ProgramParametersLayoutDesc  desc;                              //описание параметров
-  ParameterArray                                  parameters;                        //параметры
-  Slot                                            slots [ProgramParametersSlot_Num]; //слоты параметров
-  LayoutArray                                     layouts;                           //связанные расположения свойств
-  size_t                                          hash;                              //хэш блока параметров
-  bool                                            need_rebuild;                      //необходимо ли обновление возвращаемых структур
-  LowLevelDevicePtr                               device;                            //устройство отрисовки
-  LowLevelProgramParametersLayoutPtr              device_layout;                     //объект расположения параметров устройства отрисовки
-  SettingsPtr                                     settings;                          //настройки менеджера рендеринга
-  Log                                             log;                               //протокол отладочных сообщений
+  render::low_level::ProgramParametersLayoutDesc  desc;                              //РѕРїРёСЃР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
+  ParameterArray                                  parameters;                        //РїР°СЂР°РјРµС‚СЂС‹
+  Slot                                            slots [ProgramParametersSlot_Num]; //СЃР»РѕС‚С‹ РїР°СЂР°РјРµС‚СЂРѕРІ
+  LayoutArray                                     layouts;                           //СЃРІСЏР·Р°РЅРЅС‹Рµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  size_t                                          hash;                              //С…СЌС€ Р±Р»РѕРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
+  bool                                            need_rebuild;                      //РЅРµРѕР±С…РѕРґРёРјРѕ Р»Рё РѕР±РЅРѕРІР»РµРЅРёРµ РІРѕР·РІСЂР°С‰Р°РµРјС‹С… СЃС‚СЂСѓРєС‚СѓСЂ
+  LowLevelDevicePtr                               device;                            //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РѕС‚СЂРёСЃРѕРІРєРё
+  LowLevelProgramParametersLayoutPtr              device_layout;                     //РѕР±СЉРµРєС‚ СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  SettingsPtr                                     settings;                          //РЅР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+  Log                                             log;                               //РїСЂРѕС‚РѕРєРѕР» РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
     : need_rebuild (true)
     , device (in_device)
@@ -66,14 +66,14 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     layouts.reserve (RESERVED_LAYOUTS_COUNT);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     if (settings->HasDebugLog ())
       log.Printf ("Program parameters layout destroyed (id=%u)", Id ());
   }
 
-///Построение списка параметров
+///РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
   void Rebuild ()
   {
     static render::low_level::ProgramParameter default_parameter;
@@ -81,11 +81,11 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     if (!need_rebuild)
       return;                 
       
-      //обновление кэша
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
       
     UpdateCache ();
       
-      //резервирование памяти для хранения параметров
+      //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
     
     size_t parameters_count = 0;
     
@@ -104,7 +104,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 
     new_parameters.reserve (parameters_count);
     
-      //построение списка
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР°
       
     if (parameters_count)
     {
@@ -160,7 +160,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
           switch (property->type)
           {            
             case common::PropertyType_String:
-              continue; //строки не поддерживаются рендером
+              continue; //СЃС‚СЂРѕРєРё РЅРµ РїРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ СЂРµРЅРґРµСЂРѕРј
             case common::PropertyType_Integer:
               parameter.type = render::low_level::ProgramParameterType_Int;
               break;
@@ -192,13 +192,13 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
       desc.parameters_count = (unsigned int)new_parameters.size ();
       desc.parameters       = new_parameters.empty () ? &default_parameter : &new_parameters [0];
 
-        //расчёт хэша
+        //СЂР°СЃС‡С‘С‚ С…СЌС€Р°
 
       hash = new_hash;
     }
     else
     {
-        //обработка частного случая отсутствия параметров
+        //РѕР±СЂР°Р±РѕС‚РєР° С‡Р°СЃС‚РЅРѕРіРѕ СЃР»СѓС‡Р°СЏ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 
       desc.parameters_count = 0;
       desc.parameters       = &default_parameter;
@@ -214,7 +214,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     device_layout = LowLevelProgramParametersLayoutPtr ();
   }
   
-///Работа с кэшем
+///Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     need_rebuild  = true;
@@ -225,7 +225,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
   {
   }  
 
-///Оповещение об обновлении свойств
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё СЃРІРѕР№СЃС‚РІ
   void OnPropertiesUpdated (ProgramParametersSlot slot, const common::PropertyMap& properties)
   {
     if (slots [slot].layout_hash == properties.Layout ().Hash ())
@@ -241,7 +241,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ProgramParametersLayout::ProgramParametersLayout (const LowLevelDevicePtr& device, const SettingsPtr& settings)
@@ -254,7 +254,7 @@ ProgramParametersLayout::~ProgramParametersLayout ()
 }
 
 /*
-    Порождающая функция
+    РџРѕСЂРѕР¶РґР°СЋС‰Р°СЏ С„СѓРЅРєС†РёСЏ
 */
 
 ProgramParametersLayoutPtr ProgramParametersLayout::Create (const LowLevelDevicePtr& device, const SettingsPtr& settings)
@@ -263,7 +263,7 @@ ProgramParametersLayoutPtr ProgramParametersLayout::Create (const LowLevelDevice
 }
 
 /*
-    Перечисление параметров
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 const render::low_level::ProgramParametersLayoutDesc& ProgramParametersLayout::Parameters ()
@@ -275,7 +275,7 @@ const render::low_level::ProgramParametersLayoutDesc& ProgramParametersLayout::P
 }
 
 /*
-    Хэш / отладочный идентификатор
+    РҐСЌС€ / РѕС‚Р»Р°РґРѕС‡РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t ProgramParametersLayout::Hash () const
@@ -292,7 +292,7 @@ size_t ProgramParametersLayout::Id () const
 }
 
 /*
-    Установка параметров в соответствующие слоты
+    РЈСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ СЃР»РѕС‚С‹
 */
 
 void ProgramParametersLayout::SetSlot (ProgramParametersSlot slot, const common::PropertyLayout& layout)
@@ -352,7 +352,7 @@ void ProgramParametersLayout::ResetAllSlots ()
 }
 
 /*
-    Связывание параметров
+    РЎРІСЏР·С‹РІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 void ProgramParametersLayout::Attach (const ProgramParametersLayout& layout)
@@ -403,7 +403,7 @@ void ProgramParametersLayout::DetachAll ()
 }
 
 /*
-    Получение объекта расположения параметров низкоуровневого устройства отрисовки
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()

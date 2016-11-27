@@ -15,7 +15,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание сцены
+    РЎРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 */
 
 shared_ptr<Scene> create_scene ()
@@ -29,18 +29,18 @@ Node::Pointer get_scene_root (Scene& scene)
 }
 
 /*
-   Регистрация библиотеки работы со сценой
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃРѕ СЃС†РµРЅРѕР№
 */
 
 void bind_scene_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SCENE_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_scene));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Name", make_invoker (&Scene::SetName));
   lib.Register ("get_Name", make_invoker (&Scene::Name));
@@ -53,18 +53,18 @@ void bind_scene_library (Environment& environment)
 }
 
 /*
-    Регистрация библиотеки работы с объектами сцены
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚Р°РјРё СЃС†РµРЅС‹
 */
 
 void bind_entity_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_ENTITY_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_NODE_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_WireColor",  make_invoker (implicit_cast<void (Entity::*) (const vec3f&)> (&Entity::SetWireColor)));
   lib.Register ("get_WireColor",  make_invoker (&Entity::WireColor));
@@ -85,7 +85,7 @@ void bind_entity_library (Environment& environment)
   lib.Register ("GetIntersections",          make_invoker (make_invoker ((void (Entity::*)(NodeArray&) const)&Entity::GetIntersections),
                                                            make_invoker ((NodeArray (Entity::*)() const)&Entity::GetIntersections)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Entity> (SCENE_ENTITY_LIBRARY);
 }
@@ -99,16 +99,16 @@ void bind_visual_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Scissor", make_invoker (&set_entity_scissor));
   lib.Register ("get_Scissor", make_invoker (implicit_cast<Scissor* (VisualModel::*)()> (&VisualModel::Scissor)));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
 }
@@ -122,15 +122,15 @@ void bind_scissor_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SCISSOR_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_scissor));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Scissor> (SCENE_SCISSOR_LIBRARY);
 }

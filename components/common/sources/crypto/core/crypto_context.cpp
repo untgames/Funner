@@ -3,18 +3,18 @@
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const char* CRYPTO_COMPONENTS_MASK = "common.crypto.*"; //маска имён компонентов шифрования
+const char* CRYPTO_COMPONENTS_MASK = "common.crypto.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ
 
 }
 
 /*
-    Описание реализации контекста шифрования
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р° С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 struct CryptoContext::Impl
@@ -23,7 +23,7 @@ struct CryptoContext::Impl
 };
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CryptoContext::CryptoContext (const char* method, const void* key, unsigned short key_bits, const char* init_string)
@@ -53,7 +53,7 @@ CryptoContext::~CryptoContext ()
 }
 
 /*
-    Размер блока шифрования
+    Р Р°Р·РјРµСЂ Р±Р»РѕРєР° С€РёС„СЂРѕРІР°РЅРёСЏ
 */
 
 size_t CryptoContext::BlockSize () const
@@ -62,7 +62,7 @@ size_t CryptoContext::BlockSize () const
 }
 
 /*
-    Шифрование / дешифровка данных
+    РЁРёС„СЂРѕРІР°РЅРёРµ / РґРµС€РёС„СЂРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 size_t CryptoContext::Update (size_t data_size, const void* src_buffer, void* dst_buffer)
@@ -85,7 +85,7 @@ size_t CryptoContext::Update (size_t data_size, const void* src_buffer, void* ds
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void CryptoContext::Swap (CryptoContext& context)

@@ -9,7 +9,7 @@ using namespace common;
 */
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 LogImpl::LogImpl (const char* log_name)
@@ -53,7 +53,7 @@ LogImpl::~LogImpl ()
 }
 
 /*
-    Имя протокола
+    РРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
 */
 
 const char* LogImpl::Name ()
@@ -64,7 +64,7 @@ const char* LogImpl::Name ()
 }
 
 /*
-    Добавление / удаление фильтров
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ С„РёР»СЊС‚СЂРѕРІ
 */
 
 void LogImpl::AddFilter (LogFilterImpl* filter)
@@ -93,7 +93,7 @@ void LogImpl::RemoveFilter (LogFilterImpl* filter)
 }
 
 /*
-    Протоколирование
+    РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void LogImpl::Print (const char* message)
@@ -117,7 +117,7 @@ void LogImpl::Print (const char* message)
 */
 
 /*
-    Конструктор/деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Log::Log (const char* name)
@@ -137,7 +137,7 @@ Log::~Log ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Log& Log::operator = (const Log& log)
@@ -148,7 +148,7 @@ Log& Log::operator = (const Log& log)
 }
 
 /*
-    Получение имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
 */
 
 const char* Log::Name () const
@@ -157,7 +157,7 @@ const char* Log::Name () const
 }
 
 /*
-    Печать сообщений
+    РџРµС‡Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 void Log::Print (const char* message) const
@@ -179,7 +179,7 @@ void Log::VPrintf (const char* message, va_list list) const
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
@@ -195,7 +195,7 @@ void Log::Printf (const char* message, ...) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Log::Swap (Log& log)

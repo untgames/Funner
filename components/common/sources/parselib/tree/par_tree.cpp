@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ParseTree::ParseTree (ParseTreeBuffer& in_buffer, const ParseLog* in_log)
@@ -19,7 +19,7 @@ ParseTree::~ParseTree ()
 }
 
 /*
-    Протокол разбора
+    РџСЂРѕС‚РѕРєРѕР» СЂР°Р·Р±РѕСЂР°
 */
 
 ParseLog& ParseTree::Log ()

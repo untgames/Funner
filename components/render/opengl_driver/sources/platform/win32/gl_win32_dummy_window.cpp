@@ -7,22 +7,22 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* WINDOW_CLASS_NAME = "OpenGL driver listener window class";
 
 /*
-    Обработчик сообщений дочернего следящего окна
+    РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ РґРѕС‡РµСЂРЅРµРіРѕ СЃР»РµРґСЏС‰РµРіРѕ РѕРєРЅР°
 */
 
 LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-    //получение указателя на первичную цепочку обмена
+    //РїРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РїРµСЂРІРёС‡РЅСѓСЋ С†РµРїРѕС‡РєСѓ РѕР±РјРµРЅР°
 
   IWindowListener* listener = reinterpret_cast<IWindowListener*> (GetWindowLongPtr (wnd, GWLP_USERDATA));
   
-    //если указатель на пользовательские данные не установлен - делаем попытку его установить
+    //РµСЃР»Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ - РґРµР»Р°РµРј РїРѕРїС‹С‚РєСѓ РµРіРѕ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ
     
   if (!listener)
   {
@@ -35,7 +35,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       listener = reinterpret_cast<IWindowListener*> (cs->lpCreateParams);
 
-        //устанавливаем указатель на пользовательские данные
+        //СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ
 
       SetWindowLongPtr (wnd, GWLP_USERDATA, (LONG_PTR)listener);
 
@@ -45,7 +45,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     return DefWindowProc (wnd, message, wparam, lparam);
   }
 
-    //перехват сообщений  
+    //РїРµСЂРµС…РІР°С‚ СЃРѕРѕР±С‰РµРЅРёР№  
 
   try
   {  
@@ -64,16 +64,16 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 
-    //передача управления обработчику "по умолчанию"
+    //РїРµСЂРµРґР°С‡Р° СѓРїСЂР°РІР»РµРЅРёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєСѓ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
   return DefWindowProc (wnd, message, wparam, lparam);    
 }
 
 /*
-    Регистрация оконного класса
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРѕРЅРЅРѕРіРѕ РєР»Р°СЃСЃР°
 */
 
 void RegisterWindowClass ()
@@ -98,7 +98,7 @@ void UnregisterWindowClass ()
 }
 
 /*
-    Количество экземпляров следящего окна
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЌРєР·РµРјРїР»СЏСЂРѕРІ СЃР»РµРґСЏС‰РµРіРѕ РѕРєРЅР°
 */
 
 size_t listener_window_instances = 0;
@@ -106,21 +106,21 @@ size_t listener_window_instances = 0;
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DummyWindow::DummyWindow (HWND parent, IWindowListener* listener)
 {
   try
   {
-      //регистрация класса окна
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєР»Р°СЃСЃР° РѕРєРЅР°
     
     if (!listener_window_instances++)
       RegisterWindowClass ();
       
     try
     {
-        //создание окна        
+        //СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°        
       
       window = CreateWindowA (WINDOW_CLASS_NAME, "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                               parent, 0, GetModuleHandle (0), listener);
@@ -143,18 +143,18 @@ DummyWindow::DummyWindow (HWND parent, IWindowListener* listener)
 
 DummyWindow::~DummyWindow ()
 {
-    //уничтожение окна
+    //СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 
   DestroyWindow (window);
   
-    //отмена регистрации класса окна
+    //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РєР»Р°СЃСЃР° РѕРєРЅР°
   
   if (!--listener_window_instances)
     UnregisterWindowClass ();
 }
 
 /*
-    Получение дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 HWND DummyWindow::GetHandle () const

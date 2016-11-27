@@ -1,4 +1,4 @@
-//Тестирование алгоритма is_heap (first, last, less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° is_heap (first, last, less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

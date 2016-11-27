@@ -6,13 +6,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* COMPONENTS_MASK = "script.binds.*"; //маска имён компонентов скриптовых библиотек
+const char* COMPONENTS_MASK = "script.binds.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ СЃРєСЂРёРїС‚РѕРІС‹С… Р±РёР±Р»РёРѕС‚РµРє
 
 /*
-    Реализация менеджера библиотек
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° Р±РёР±Р»РёРѕС‚РµРє
 */
 
 class LibraryManagerImpl
@@ -20,12 +20,12 @@ class LibraryManagerImpl
   public:
     typedef LibraryManager::BindHandler BindHandler;
   
-///Регистрация библиотеки
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
     void RegisterLibrary (const char* name, const BindHandler& binder)
     {
       static const char* METHOD_NAME = "script::LibraryManager::RegisterLibrary";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -34,12 +34,12 @@ class LibraryManagerImpl
         if (iter->name == name)
           throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Library has already registered");
 
-        //добавление библиотеки
+        //РґРѕР±Р°РІР»РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
 
       libraries.push_back (Library (name, binder));  
     }
 
-///Отмена регистрации библиотеки
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё
     void UnregisterLibrary (const char* name)
     {
       if (!name)
@@ -53,13 +53,13 @@ class LibraryManagerImpl
         }
     }
 
-///Отмена регистрации всех библиотек
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… Р±РёР±Р»РёРѕС‚РµРє
     void UnregisterAllLibraries ()
     {
       libraries.clear ();
     }
     
-///Биндинг библиотек
+///Р‘РёРЅРґРёРЅРі Р±РёР±Р»РёРѕС‚РµРє
     void BindLibraries (Environment& environment, const char* library_mask)
     {
       try
@@ -81,11 +81,11 @@ class LibraryManagerImpl
     }
 
   private:
-///Описание библиотеки
+///РћРїРёСЃР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     struct Library
     {
-      stl::string name;   //имя библиотеки
-      BindHandler binder; //функтор биндинга библиотеки
+      stl::string name;   //РёРјСЏ Р±РёР±Р»РёРѕС‚РµРєРё
+      BindHandler binder; //С„СѓРЅРєС‚РѕСЂ Р±РёРЅРґРёРЅРіР° Р±РёР±Р»РёРѕС‚РµРєРё
 
       Library (const char* in_name, const BindHandler& in_binder) : name (in_name), binder (in_binder) {}
     };
@@ -93,7 +93,7 @@ class LibraryManagerImpl
     typedef stl::list<Library> LibraryList;
 
   private:
-    LibraryList libraries; //библиотеки
+    LibraryList libraries; //Р±РёР±Р»РёРѕС‚РµРєРё
 };
 
 typedef common::Singleton<LibraryManagerImpl> LibraryManagerSingleton;
@@ -101,7 +101,7 @@ typedef common::Singleton<LibraryManagerImpl> LibraryManagerSingleton;
 }
 
 /*
-    Врапперы над вызовами к LibraryManager
+    Р’СЂР°РїРїРµСЂС‹ РЅР°Рґ РІС‹Р·РѕРІР°РјРё Рє LibraryManager
 */
 
 void LibraryManager::RegisterLibrary (const char* name, const BindHandler& binder)

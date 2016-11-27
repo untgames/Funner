@@ -3,7 +3,7 @@
 using namespace media::collada;
 
 /*
-    Описание реализации скина
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРєРёРЅР°
 */
 
 namespace
@@ -11,8 +11,8 @@ namespace
 
 struct Joint
 {
-  stl::string name;       //имя соединения
-  math::mat4f inv_matrix; //обратная матрица соединения
+  stl::string name;       //РёРјСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ
+  math::mat4f inv_matrix; //РѕР±СЂР°С‚РЅР°СЏ РјР°С‚СЂРёС†Р° СЃРѕРµРґРёРЅРµРЅРёСЏ
   
   Joint (const char* in_name) : name (in_name) {}
 };
@@ -23,11 +23,11 @@ typedef stl::vector<Joint*> JointArray;
 
 struct Skin::Impl: public xtl::reference_counter
 {
-  math::mat4f                    bind_shape_matrix; //матрица фигуры
-  JointArray                     joints;            //соединения
-  stl::vector<VertexJointWeight> weights;           //веса соединений
-  stl::string                    base_mesh;         //базовый меш / морф
-  stl::string                    id;                //идентификатор скина
+  math::mat4f                    bind_shape_matrix; //РјР°С‚СЂРёС†Р° С„РёРіСѓСЂС‹
+  JointArray                     joints;            //СЃРѕРµРґРёРЅРµРЅРёСЏ
+  stl::vector<VertexJointWeight> weights;           //РІРµСЃР° СЃРѕРµРґРёРЅРµРЅРёР№
+  stl::string                    base_mesh;         //Р±Р°Р·РѕРІС‹Р№ РјРµС€ / РјРѕСЂС„
+  stl::string                    id;                //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРєРёРЅР°
 
   enum { DEFAULT_JOINTS_RESERVE = 32 };
   
@@ -51,7 +51,7 @@ struct Skin::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Skin::Skin ()
@@ -78,7 +78,7 @@ Skin& Skin::operator = (const Skin& skin)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Skin Skin::Clone () const
@@ -87,7 +87,7 @@ Skin Skin::Clone () const
 }
 
 /*
-    Идентификатор скина
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃРєРёРЅР°
 */
 
 const char* Skin::Id () const
@@ -104,7 +104,7 @@ void Skin::SetId (const char* id)
 }
 
 /*
-    Матрица фигуры 
+    РњР°С‚СЂРёС†Р° С„РёРіСѓСЂС‹ 
 */
 
 const math::mat4f& Skin::BindShapeMatrix () const
@@ -118,7 +118,7 @@ void Skin::SetBindShapeMatrix (const math::mat4f& tm)
 }
 
 /*
-    Работа с соединениями
+    Р Р°Р±РѕС‚Р° СЃ СЃРѕРµРґРёРЅРµРЅРёСЏРјРё
 */
 
 unsigned int Skin::JointsCount () const
@@ -203,7 +203,7 @@ const char* Skin::JointName (unsigned int joint) const
 }
 
 /*
-    Базовый меш / морф
+    Р‘Р°Р·РѕРІС‹Р№ РјРµС€ / РјРѕСЂС„
 */
 
 void Skin::SetBaseMesh (const char* mesh)
@@ -220,7 +220,7 @@ const char* Skin::BaseMesh () const
 }
 
 /*
-    Веса соединений
+    Р’РµСЃР° СЃРѕРµРґРёРЅРµРЅРёР№
 */
 
 unsigned int Skin::WeightsCount () const

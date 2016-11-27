@@ -3,17 +3,17 @@
 using namespace media::collada;
 
 /*
-    Описание реализации InstanceMesh
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё InstanceMesh
 */
 
 struct InstanceMesh::Impl: public xtl::reference_counter
 {
-  stl::string            mesh;  //меш
-  collada::MaterialBinds binds; //присоединённые материалы  
+  stl::string            mesh;  //РјРµС€
+  collada::MaterialBinds binds; //РїСЂРёСЃРѕРµРґРёРЅС‘РЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹  
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InstanceMesh::InstanceMesh ()
@@ -40,7 +40,7 @@ InstanceMesh& InstanceMesh::operator = (const InstanceMesh& imesh)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 InstanceMesh InstanceMesh::Clone () const
@@ -49,7 +49,7 @@ InstanceMesh InstanceMesh::Clone () const
 }
 
 /*
-    Меш
+    РњРµС€
 */
 
 const char* InstanceMesh::Mesh () const
@@ -66,7 +66,7 @@ void InstanceMesh::SetMesh (const char* mesh_id)
 }
 
 /*
-    Присоединённые материалы
+    РџСЂРёСЃРѕРµРґРёРЅС‘РЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹
 */
 
 media::collada::MaterialBinds& InstanceMesh::MaterialBinds ()

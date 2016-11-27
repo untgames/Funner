@@ -6,14 +6,14 @@ using namespace store::ios_store;
 namespace
 {
 
-const char* COMPONENT_NAME  = "store.stores.ios_store"; //имя компонента
-const char* STORE_ID        = "IOSStore";               //идентификатор магазина
-const char* STORE_NAME_MASK = "IOSStore";               //маска имен магазинов
+const char* COMPONENT_NAME  = "store.stores.ios_store"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* STORE_ID        = "IOSStore";               //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РјР°РіР°Р·РёРЅР°
+const char* STORE_NAME_MASK = "IOSStore";               //РјР°СЃРєР° РёРјРµРЅ РјР°РіР°Р·РёРЅРѕРІ
 
 }
 
 /*
-   Компонент магазина
+   РљРѕРјРїРѕРЅРµРЅС‚ РјР°РіР°Р·РёРЅР°
 */
 
 namespace components

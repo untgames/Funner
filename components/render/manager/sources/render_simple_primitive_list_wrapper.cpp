@@ -116,7 +116,7 @@ void swap (SimplePrimitiveList<T>& list1, SimplePrimitiveList<T>& list2)
 }
 
 /*
-    Инстанцирование
+    РРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРёРµ
 */
 
 template class SimplePrimitiveList<Sprite>;

@@ -3,19 +3,19 @@
 using namespace render::scene::client;
 
 /*
-    Описание реализации материала шрифта
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјР°С‚РµСЂРёР°Р»Р° С€СЂРёС„С‚Р°
 */
 
 typedef stl::vector<MaterialPtr> MaterialArray;
 
 struct FontMaterial::Impl
 {
-  FontPtr       font;      //ссылка на шрифт
-  MaterialArray materials; //материалы
+  FontPtr       font;      //СЃСЃС‹Р»РєР° РЅР° С€СЂРёС„С‚
+  MaterialArray materials; //РјР°С‚РµСЂРёР°Р»С‹
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FontMaterial::FontMaterial (MaterialManager& material_manager, const FontPtr& font, const char* material_name, const char* semantic)
@@ -60,7 +60,7 @@ FontMaterial::~FontMaterial ()
 }
 
 /*
-    Шрифт
+    РЁСЂРёС„С‚
 */
 
 Font& FontMaterial::Font ()
@@ -69,7 +69,7 @@ Font& FontMaterial::Font ()
 }
 
 /*
-    Количество материалов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 size_t FontMaterial::MaterialsCount ()
@@ -78,7 +78,7 @@ size_t FontMaterial::MaterialsCount ()
 }
 
 /*
-    Получение имени материала
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
 */
 
 const char* FontMaterial::MaterialName (size_t material_index)

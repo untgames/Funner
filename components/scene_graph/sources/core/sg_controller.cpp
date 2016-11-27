@@ -3,22 +3,22 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации контроллера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 struct Controller::Impl: public xtl::instance_counter<Controller>
 {
-  ControllerEntry      entry;            //вхождение контроллера в список узла
-  size_t               ref_count;        //счётчик ссылок
-  ControllerOwnerMode  owner_mode;       //режим владения
-  scene_graph::Node*   node;             //узел, с которым связан контроллер
-  stl::string          name;             //имя контроллера
-  ControllerTimeMode   time_mode;        //режим управления временем
-  TimeValue            min_delta;        //минимальное значение дельты при обновлении
-  TimeValue            last_update_time; //время последнего обновления
-  bool                 never_update;     //контрлллер не обновлялся
+  ControllerEntry      entry;            //РІС…РѕР¶РґРµРЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІ СЃРїРёСЃРѕРє СѓР·Р»Р°
+  size_t               ref_count;        //СЃС‡С‘С‚С‡РёРє СЃСЃС‹Р»РѕРє
+  ControllerOwnerMode  owner_mode;       //СЂРµР¶РёРј РІР»Р°РґРµРЅРёСЏ
+  scene_graph::Node*   node;             //СѓР·РµР», СЃ РєРѕС‚РѕСЂС‹Рј СЃРІСЏР·Р°РЅ РєРѕРЅС‚СЂРѕР»Р»РµСЂ
+  stl::string          name;             //РёРјСЏ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
+  ControllerTimeMode   time_mode;        //СЂРµР¶РёРј СѓРїСЂР°РІР»РµРЅРёСЏ РІСЂРµРјРµРЅРµРј
+  TimeValue            min_delta;        //РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРµР»СЊС‚С‹ РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё
+  TimeValue            last_update_time; //РІСЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РѕР±РЅРѕРІР»РµРЅРёСЏ
+  bool                 never_update;     //РєРѕРЅС‚СЂР»Р»Р»РµСЂ РЅРµ РѕР±РЅРѕРІР»СЏР»СЃСЏ
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (ControllerTimeMode in_time_mode)
     : ref_count (1)
     , owner_mode (ControllerOwnerMode_None)
@@ -30,7 +30,7 @@ struct Controller::Impl: public xtl::instance_counter<Controller>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Controller::Controller (scene_graph::Node& node, bool updatable)
@@ -88,7 +88,7 @@ Controller::~Controller ()
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Controller::AddRef () const
@@ -115,7 +115,7 @@ size_t Controller::UseCount () const
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 void Controller::SetName (const char* name)
@@ -132,7 +132,7 @@ const char* Controller::Name () const
 }
 
 /*
-    Режим управления временем
+    Р РµР¶РёРј СѓРїСЂР°РІР»РµРЅРёСЏ РІСЂРµРјРµРЅРµРј
 */
 
 void Controller::SetTimeMode (ControllerTimeMode mode)
@@ -155,7 +155,7 @@ ControllerTimeMode Controller::TimeMode () const
 }
 
 /*
-    Минимальная дельта (работает в обоих режимах управления временем)
+    РњРёРЅРёРјР°Р»СЊРЅР°СЏ РґРµР»СЊС‚Р° (СЂР°Р±РѕС‚Р°РµС‚ РІ РѕР±РѕРёС… СЂРµР¶РёРјР°С… СѓРїСЂР°РІР»РµРЅРёСЏ РІСЂРµРјРµРЅРµРј)
 */
 
 void Controller::SetMinDelta (const TimeValue& value)
@@ -169,7 +169,7 @@ const TimeValue& Controller::MinDelta () const
 }
 
 /*
-    Узел, с которым связан контроллер
+    РЈР·РµР», СЃ РєРѕС‚РѕСЂС‹Рј СЃРІСЏР·Р°РЅ РєРѕРЅС‚СЂРѕР»Р»РµСЂ
 */
 
 scene_graph::Node* Controller::AttachedNode ()
@@ -183,7 +183,7 @@ const scene_graph::Node* Controller::AttachedNode () const
 }
 
 /*
-    Состояние обновления контроллера
+    РЎРѕСЃС‚РѕСЏРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 void Controller::SetUpdatable (bool state)
 {
@@ -202,7 +202,7 @@ bool Controller::IsUpdatable () const
 }
 
 /*
-    Обработчик события отсоединения от узла
+    РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РѕС‚СЃРѕРµРґРёРЅРµРЅРёСЏ РѕС‚ СѓР·Р»Р°
 */
 
 void Controller::OnNodeDetached ()
@@ -210,7 +210,7 @@ void Controller::OnNodeDetached ()
 }
 
 /*
-    Режим владения
+    Р РµР¶РёРј РІР»Р°РґРµРЅРёСЏ
 */
 
 void Controller::SetOwnerMode (ControllerOwnerMode mode)
@@ -275,7 +275,7 @@ ControllerOwnerMode Controller::OwnerMode () const
 }
 
 /*
-    Отсоединение контроллера от узла
+    РћС‚СЃРѕРµРґРёРЅРµРЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РѕС‚ СѓР·Р»Р°
 */
 
 void Controller::Detach ()
@@ -309,7 +309,7 @@ void Controller::Detach ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void Controller::UpdateState (const TimeValue& time)
@@ -342,7 +342,7 @@ void Controller::Update (const TimeValue&)
 }
 
 /*
-   Перебор контроллеров
+   РџРµСЂРµР±РѕСЂ РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
 */
 
 Controller::Pointer Controller::NextController ()

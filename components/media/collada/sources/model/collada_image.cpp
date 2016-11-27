@@ -5,17 +5,17 @@ using namespace media;
 using namespace common;
 
 /*
-    Реализация картинки
+    Р РµР°Р»РёР·Р°С†РёСЏ РєР°СЂС‚РёРЅРєРё
 */
 
 struct Image::Impl: public xtl::reference_counter
 {
-  stl::string id;   //идентификатор картинки
-  stl::string path; //путь к файлу картинки
+  stl::string id;   //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°СЂС‚РёРЅРєРё
+  stl::string path; //РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ РєР°СЂС‚РёРЅРєРё
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Image::Image ()
@@ -46,7 +46,7 @@ Image& Image::operator = (const Image& source)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Image Image::Clone () const
@@ -60,7 +60,7 @@ Image Image::Clone () const
 }
 
 /*
-    Идентификатор картинки
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°СЂС‚РёРЅРєРё
 */
 
 const char* Image::Id () const
@@ -77,7 +77,7 @@ void Image::SetId (const char* id)
 }
 
 /*
-    Путь к картинке
+    РџСѓС‚СЊ Рє РєР°СЂС‚РёРЅРєРµ
 */
 
 const char* Image::Path () const

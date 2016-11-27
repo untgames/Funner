@@ -3,17 +3,17 @@
 using namespace social;
 
 /*
-   Реализация пользователя
+   Р РµР°Р»РёР·Р°С†РёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 struct User::Impl : public xtl::reference_counter
 {
-  stl::string           id;                      //идентификатор
-  stl::string           nickname;                //ник
-  bool                  is_friend;               //является ли другом текущего пользователя
-  common::PropertyMap   properties;              //другие свойства
-  const void*           handle;                  //низкоуровневый дескриптор
-  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
+  stl::string           id;                      //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+  stl::string           nickname;                //РЅРёРє
+  bool                  is_friend;               //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РґСЂСѓРіРѕРј С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+  common::PropertyMap   properties;              //РґСЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
+  const void*           handle;                  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction handle_release_function; //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl ()
     : is_friend (false)
@@ -28,7 +28,7 @@ struct User::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 User::User ()
@@ -54,7 +54,7 @@ User& User::operator = (const User& source)
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 const char* User::Id () const
@@ -71,7 +71,7 @@ void User::SetId (const char* id)
 }
 
 /*
-   Ник
+   РќРёРє
 */
 
 const char* User::Nickname () const
@@ -88,7 +88,7 @@ void User::SetNickname (const char* nickname)
 }
 
 /*
-   Является ли другом текущего пользователя
+   РЇРІР»СЏРµС‚СЃСЏ Р»Рё РґСЂСѓРіРѕРј С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 bool User::IsFriend () const
@@ -102,7 +102,7 @@ void User::SetFriend (bool is_friend)
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& User::Properties () const
@@ -121,7 +121,7 @@ void User::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Низкоуровневый дескриптора
+   РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 const void* User::Handle () const
@@ -139,7 +139,7 @@ void User::SetHandle (const void* handle, const ReleaseHandleFunction& release_f
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void User::Swap (User& user)
@@ -151,7 +151,7 @@ namespace social
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (User& user1, User& user2)

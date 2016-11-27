@@ -1,5 +1,5 @@
 /*
-    Теоретико-множественные операции
+    РўРµРѕСЂРµС‚РёРєРѕ-РјРЅРѕР¶РµСЃС‚РІРµРЅРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class Iter1,class Iter2,class OutIter,class Compare1,class Compare2>

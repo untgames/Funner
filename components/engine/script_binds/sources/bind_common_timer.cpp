@@ -35,13 +35,13 @@ void bind_common_timer (script::Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_TIMER_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (make_invoker (xtl::implicit_cast<Timer (*)(const Timer&)> (&create_timer)),
                                         make_invoker (xtl::implicit_cast<Timer (*)()> (&create_timer))
                ));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_Time",       make_invoker (&Timer::SetTime));
   lib.Register ("get_Time",       make_invoker (&Timer::Time));
@@ -54,7 +54,7 @@ void bind_common_timer (script::Environment& environment)
   lib.Register ("Stop",           make_invoker (&Timer::Stop));
   lib.Register ("Reset",          make_invoker (&Timer::Reset));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<Timer> (COMMON_TIMER_LIBRARY);
 }

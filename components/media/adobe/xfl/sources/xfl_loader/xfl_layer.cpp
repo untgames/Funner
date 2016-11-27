@@ -11,7 +11,7 @@ const size_t DEFAULT_FRAMES_COUNT = 2;
 }
 
 /*
-    Разбор слоя анимации
+    Р Р°Р·Р±РѕСЂ СЃР»РѕСЏ Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseLayer (Parser::Iterator iter, Layer& layer)

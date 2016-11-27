@@ -6,11 +6,11 @@ using namespace render::scene::client;
 namespace
 {
 
-///Список спрайтов
+///РЎРїРёСЃРѕРє СЃРїСЂР°Р№С‚РѕРІ
 class LineList: public VisualModel
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     LineList (scene_graph::LineModel& model, SceneManager& manager)
       : VisualModel (model, manager, interchange::NodeType_LineList)
       , on_update_descs_connection (model.RegisterEventHandler (scene_graph::LineModelEvent_AfterLineDescsUpdate, xtl::bind (&LineList::UpdateDescsNotify, this)))
@@ -23,11 +23,11 @@ class LineList: public VisualModel
     {
     }
 
-///Исходный узел
+///РСЃС…РѕРґРЅС‹Р№ СѓР·РµР»
     scene_graph::LineModel& SourceNode () const { return static_cast<scene_graph::LineModel&> (Node::SourceNode ()); }
 
   protected:
-///Реализация синхронизации
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
     void UpdateCore (client::Context& context)
     {
       try

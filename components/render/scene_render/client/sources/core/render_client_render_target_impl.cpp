@@ -3,29 +3,29 @@
 using namespace render::scene::client;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t RESERVE_VIEWS_COUNT = 8; //резервируемое количество областей вывода
+const size_t RESERVE_VIEWS_COUNT = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
 /*
-    Описание реализации цели рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 typedef stl::vector<RenderableViewPtr> ViewList;
 
 struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
 {
-  stl::string          name;                   //имя цели
-  ConnectionPtr        connection;             //соединение
-  object_id_t          id;                     //идентификатор цели
-  scene_graph::Screen* screen;                 //экран
-  ViewList             views;                  //области вывода
-  bool                 need_update;            //требуется обновление
-  bool                 need_update_area;       //требуется обновление области вывода
-  bool                 need_update_background; //требуется обновление бэкграунда
+  stl::string          name;                   //РёРјСЏ С†РµР»Рё
+  ConnectionPtr        connection;             //СЃРѕРµРґРёРЅРµРЅРёРµ
+  object_id_t          id;                     //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С†РµР»Рё
+  scene_graph::Screen* screen;                 //СЌРєСЂР°РЅ
+  ViewList             views;                  //РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  bool                 need_update;            //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ
+  bool                 need_update_area;       //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+  bool                 need_update_background; //С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ Р±СЌРєРіСЂР°СѓРЅРґР°
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const ConnectionPtr& in_connection, const char* render_target_name, const char* init_string)
     : connection (in_connection)
     , id ()
@@ -53,7 +53,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     connection->Context ().CreateRenderTarget (id, name.c_str (), init_string);
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -69,14 +69,14 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     }
   }
   
-///Параметры заднего фона экрана изменены
+///РџР°СЂР°РјРµС‚СЂС‹ Р·Р°РґРЅРµРіРѕ С„РѕРЅР° СЌРєСЂР°РЅР° РёР·РјРµРЅРµРЅС‹
   void OnScreenChangeBackground (bool, const math::vec4f&)
   {
     need_update_background = true;
     need_update            = true;
   }
 
-///Присоединена область вывода
+///РџСЂРёСЃРѕРµРґРёРЅРµРЅР° РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
   void OnScreenAttachViewport (scene_graph::Viewport& viewport)
   {
     try
@@ -95,7 +95,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     }
   }
 
-///Отсоединена область вывода
+///РћС‚СЃРѕРµРґРёРЅРµРЅР° РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
   void OnScreenDetachViewport (scene_graph::Viewport& viewport)
   {
     try
@@ -117,14 +117,14 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     }    
   }
 
-///Обновлена область вывода
+///РћР±РЅРѕРІР»РµРЅР° РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
   void OnScreenChangeArea (const scene_graph::Rect& rect) 
   {    
     need_update_area = true;
     need_update      = true;
   }
   
-///Инициализация
+///РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   void Initialize ()
   {
     try
@@ -142,7 +142,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     }
   }
   
-///Завершение
+///Р—Р°РІРµСЂС€РµРЅРёРµ
   void Destroy ()
   {
     try
@@ -157,7 +157,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
     }
   }
 
-///Экран удален
+///Р­РєСЂР°РЅ СѓРґР°Р»РµРЅ
   void OnScreenDestroy ()
   {
     try
@@ -175,7 +175,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
 };
 
 /*
-  Конструктор / деструктор
+  РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetImpl::RenderTargetImpl (const ConnectionPtr& connection, const char* render_target_name, const char* init_string)
@@ -195,7 +195,7 @@ RenderTargetImpl::~RenderTargetImpl ()
 }
 
 /*
-    Экран (политика владения - weak-ref)
+    Р­РєСЂР°РЅ (РїРѕР»РёС‚РёРєР° РІР»Р°РґРµРЅРёСЏ - weak-ref)
 */
 
 void RenderTargetImpl::SetScreen (scene_graph::Screen* screen)
@@ -246,7 +246,7 @@ scene_graph::Screen* RenderTargetImpl::Screen ()
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void RenderTargetImpl::Update ()
@@ -258,7 +258,7 @@ void RenderTargetImpl::Update ()
 
     Context& context = impl->connection->Context ();
 
-      //обновление
+      //РѕР±РЅРѕРІР»РµРЅРёРµ
 
     if (impl->need_update)
     {
@@ -284,11 +284,11 @@ void RenderTargetImpl::Update ()
     for (ViewList::iterator iter=impl->views.begin (), end=impl->views.end (); iter!=end; ++iter)
       (*iter)->Synchronize ();
 
-      //отсылка команды отрисовки цели
+      //РѕС‚СЃС‹Р»РєР° РєРѕРјР°РЅРґС‹ РѕС‚СЂРёСЃРѕРІРєРё С†РµР»Рё
 
     context.UpdateRenderTarget (impl->id);
 
-      //отсылка команд на выполнение
+      //РѕС‚СЃС‹Р»РєР° РєРѕРјР°РЅРґ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ
 
     impl->connection->Context ().Flush ();
   }
@@ -300,7 +300,7 @@ void RenderTargetImpl::Update ()
 }
 
 /*
-    Захват изображения (screen-shot)
+    Р—Р°С…РІР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ (screen-shot)
 */
 
 void RenderTargetImpl::CaptureImage (media::Image&)

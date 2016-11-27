@@ -43,44 +43,44 @@ namespace android
 {
 
 /*
-    Управление запуском
+    РЈРїСЂР°РІР»РµРЅРёРµ Р·Р°РїСѓСЃРєРѕРј
 */
 
-///Контекст запуска приложения
+///РљРѕРЅС‚РµРєСЃС‚ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 struct ApplicationContext
 {
-  JavaVM*             vm;                          //виртуальная машина
+  JavaVM*             vm;                          //РІРёСЂС‚СѓР°Р»СЊРЅР°СЏ РјР°С€РёРЅР°
   global_ref<jclass>  utils_class;                 //EngineUtils class
   global_ref<jclass>  sensor_event_listener_class; //EngineSensorEventListener class
   
   ApplicationContext () : vm (0) {}
 };
 
-/// точка входа в приложение
+/// С‚РѕС‡РєР° РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ
 void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args, const char* env_vars);
 
-/// регистрация методов обратного вызова окна
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РѕРєРЅР°
 void register_window_callbacks (JNIEnv* env);
 
-/// регистрация методов обратного вызова web-view
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° web-view
 void register_web_view_callbacks (JNIEnv* env);
 
-/// регистрация методов обратного вызова менеджера сенсоров
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РјРµРЅРµРґР¶РµСЂР° СЃРµРЅСЃРѕСЂРѕРІ
 void register_sensor_manager_callbacks (JNIEnv* env);
 
-/// регистрация методов обратного вызова activity
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° activity
 void register_activity_callbacks (JNIEnv* env, jclass activity_class);
 
-/// регистрация обратчиков аварийного завершения
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°С‚С‡РёРєРѕРІ Р°РІР°СЂРёР№РЅРѕРіРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ
 void register_crash_handlers ();
 
-/// регистрация методов обратного вызова screen manager
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° screen manager
 void register_screen_callbacks (JNIEnv* env, jclass activity_class);
 
-/// получение контекста запуска приложения
+/// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 const ApplicationContext& get_context ();
 
-/// изменение activity
+/// РёР·РјРµРЅРµРЅРёРµ activity
 void set_activity (jobject activity);
 
 void startStdioRedirection    (JavaVM*);

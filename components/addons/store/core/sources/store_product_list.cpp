@@ -9,7 +9,7 @@ const size_t DEFAULT_ITEMS_RESERVE = 8;
 
 }
 
-///Реализация списка продуктов
+///Р РµР°Р»РёР·Р°С†РёСЏ СЃРїРёСЃРєР° РїСЂРѕРґСѓРєС‚РѕРІ
 struct ProductList::Impl : public xtl::reference_counter
 {
   stl::vector<Product> items;
@@ -21,7 +21,7 @@ struct ProductList::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 ProductList::ProductList ()
@@ -47,7 +47,7 @@ ProductList& ProductList::operator = (const ProductList& source)
 }
 
 /*
-   Количество элементов / проверка на пустоту
+   РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 size_t ProductList::Size () const
@@ -61,7 +61,7 @@ bool ProductList::IsEmpty () const
 }
 
 /*
-   Доступ к элементу по индексу
+   Р”РѕСЃС‚СѓРї Рє СЌР»РµРјРµРЅС‚Сѓ РїРѕ РёРЅРґРµРєСЃСѓ
 */
 
 const Product& ProductList::operator [] (size_t index) const
@@ -78,7 +78,7 @@ Product& ProductList::operator [] (size_t index)
 }
 
 /*
-   Резервирование элементов
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */
 
 size_t ProductList::Capacity () const
@@ -92,7 +92,7 @@ void ProductList::Reserve (size_t count)
 }
 
 /*
-   Добавление элементов в коллекцию
+   Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РІ РєРѕР»Р»РµРєС†РёСЋ
 */
 
 size_t ProductList::Add (const Product& item)
@@ -103,7 +103,7 @@ size_t ProductList::Add (const Product& item)
 }
 
 /*
-   Удаление элементов из коллекции
+   РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РёР· РєРѕР»Р»РµРєС†РёРё
 */
 
 void ProductList::Remove (size_t index)
@@ -115,7 +115,7 @@ void ProductList::Remove (size_t index)
 }
 
 /*
-   Очистка коллекции
+   РћС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёРё
 */
 
 void ProductList::Clear ()
@@ -124,7 +124,7 @@ void ProductList::Clear ()
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void ProductList::Swap (ProductList& source)
@@ -136,7 +136,7 @@ namespace store
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (ProductList& product1, ProductList& product2)

@@ -3,7 +3,7 @@
 using namespace media::collada;
 
 /*
-    Разбор библиотеки камер
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РєР°РјРµСЂ
 */
 
 void DaeParser::ParseLibraryCameras (Parser::Iterator iter)
@@ -18,7 +18,7 @@ void DaeParser::ParseLibraryCameras (Parser::Iterator iter)
 }
 
 /*
-    Разбор камеры
+    Р Р°Р·Р±РѕСЂ РєР°РјРµСЂС‹
 */
 
 void DaeParser::ParseCamera (Parser::Iterator iter)
@@ -27,7 +27,7 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
 
   iter = get_first_child (*iter, "optics.technique_common");
 
-    //чтение типа камеры
+    //С‡С‚РµРЅРёРµ С‚РёРїР° РєР°РјРµСЂС‹
 
   static String2Value<CameraType> types [] = {
     {"perspective",  CameraType_Perspective},
@@ -50,17 +50,17 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
   if (i == types_count)
     raise_parser_exception (*iter, "Incorrect 'technique_common' tag. No camera type sub-tag (one of 'perspective', 'orthographic')");
 
-    //создание камеры
+    //СЃРѕР·РґР°РЅРёРµ РєР°РјРµСЂС‹
     
   Camera camera;
   
   camera.SetId (id);
   
-    //установка типа камеры
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РёРїР° РєР°РјРµСЂС‹
     
   camera.SetType (type);
   
-    //чтение параметров камеры
+    //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РєР°РјРµСЂС‹
 
   static String2Value<CameraParam> params [] = {
     {"xfov.#text",         CameraParam_XFov},
@@ -78,7 +78,7 @@ void DaeParser::ParseCamera (Parser::Iterator iter)
     if (common::ParseNode param_node = iter->First (params [i].string))
       camera.SetParam (params [i].value, get<float> (param_node, ""));
 
-    //добавление камеры в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РјРµСЂС‹ РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
 
   model.Cameras ().Insert (id, camera);
 }

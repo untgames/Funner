@@ -1,4 +1,4 @@
-//Тестирование replace
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ replace
 #include <stdio.h>
 #include <stl/string>
 

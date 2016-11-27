@@ -4,7 +4,7 @@ using namespace syslib;
 using namespace syslib::android;
 
 /*
-   Политика приема cookie
+   РџРѕР»РёС‚РёРєР° РїСЂРёРµРјР° cookie
 */
 
 void AndroidCookieManager::SetAcceptCookie (bool policy)
@@ -34,7 +34,7 @@ bool AndroidCookieManager::AcceptCookie ()
 }
 
 /*
-   Удаление cookie
+   РЈРґР°Р»РµРЅРёРµ cookie
 */
 
 void AndroidCookieManager::DeleteCookies (const char* uri)

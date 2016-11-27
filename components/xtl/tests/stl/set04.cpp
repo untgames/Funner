@@ -1,4 +1,4 @@
-// Тестирование find ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ find ()
 #include <stdio.h>
 #include <stl/set>
 #include "test.h"

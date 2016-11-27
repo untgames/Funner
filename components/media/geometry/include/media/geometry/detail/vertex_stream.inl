@@ -1,5 +1,5 @@
 /*
-    Объявление вершины
+    РћР±СЉСЏРІР»РµРЅРёРµ РІРµСЂС€РёРЅС‹
 */
 
 inline VertexDeclaration::VertexDeclaration (const VertexFormat& in_format)
@@ -30,7 +30,7 @@ inline VertexDeclaration make_vertex_declaration ()
 }
 
 /*
-    Получение данных вершинного массива
+    РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РІРµСЂС€РёРЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°
 */
 
 template <class Vertex>

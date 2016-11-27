@@ -10,24 +10,24 @@ namespace file_system
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* SUBSYSTEM_NAME = "FileSystem";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.FileSystem"; //имя компонента
+const char* SUBSYSTEM_NAME = "FileSystem";                   //РёРјСЏ РїРѕРґСЃРёСЃС‚РµРјС‹
+const char* COMPONENT_NAME = "engine.subsystems.FileSystem"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 const char* LOG_NAME       = COMPONENT_NAME;
 
 /*
-   Подсистема файловой системы
+   РџРѕРґСЃРёСЃС‚РµРјР° С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјС‹
 */
 
 class FileSystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-/// Конструктор/деструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     FileSystem (common::ParseNode& node)
     {
-        //чтение параметров шифрования
+        //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ
 
       ParseNode crypto_node = node.First ("Crypto");
 
@@ -50,7 +50,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         }
       }
       
-        //чтение параметров кэширования
+        //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
         
       if (ParseNode cache_node = node.First ("Cache"))
       {
@@ -63,7 +63,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         }
       }
         
-        //монтирование путей
+        //РјРѕРЅС‚РёСЂРѕРІР°РЅРёРµ РїСѓС‚РµР№
         
       ParseNode mount_node = node.First ("Mount");
       
@@ -82,7 +82,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         }
       }
 
-        //добавление путей поиска
+        //РґРѕР±Р°РІР»РµРЅРёРµ РїСѓС‚РµР№ РїРѕРёСЃРєР°
 
       const char* paths_string = get<const char*> (node, "Paths", "");
 
@@ -112,7 +112,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         common::FileSystem::RemoveSearchPath (paths [i]);
     }
 
-/// Подсчёт ссылок
+/// РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -125,13 +125,13 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
 };
 
 /*
-   Компонент
+   РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class FileSystemComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     FileSystemComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);

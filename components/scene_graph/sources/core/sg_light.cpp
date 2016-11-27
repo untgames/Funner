@@ -4,19 +4,19 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации Light
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Light
 */
 
 struct Light::Impl: public xtl::instance_counter<Light>
 {
-  vec3f color;         //цвет света
-  vec3f attenuation;   //коэффициенты затухания (x - constant, y - linear, z - quadratic)
-  float intensity;     //интенсивность источника света
-  float range;         //расстояние действия света
+  vec3f color;         //С†РІРµС‚ СЃРІРµС‚Р°
+  vec3f attenuation;   //РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ Р·Р°С‚СѓС…Р°РЅРёСЏ (x - constant, y - linear, z - quadratic)
+  float intensity;     //РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
+  float range;         //СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРµР№СЃС‚РІРёСЏ СЃРІРµС‚Р°
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Light::Light ()
@@ -34,7 +34,7 @@ Light::~Light ()
 }
 
 /*
-    Цвет источника света
+    Р¦РІРµС‚ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void Light::SetLightColor (const math::vec3f& color)
@@ -48,7 +48,7 @@ const math::vec3f& Light::LightColor () const
 }
 
 /*
-    Интенсивность источника света
+    РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void Light::SetIntensity (float value)
@@ -62,7 +62,7 @@ float Light::Intensity () const
 }
 
 /*
-    Затухание (constant, linear, quadratic)
+    Р—Р°С‚СѓС…Р°РЅРёРµ (constant, linear, quadratic)
 */
 
 void Light::SetAttenuation (const math::vec3f& multiplier)
@@ -76,7 +76,7 @@ const math::vec3f& Light::Attenuation () const
 }
 
 /*
-    Расстояние действия источника света
+    Р Р°СЃСЃС‚РѕСЏРЅРёРµ РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void Light::SetRange (float range)
@@ -91,7 +91,7 @@ float Light::Range () const
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Light::AcceptCore (Visitor& visitor)
@@ -101,7 +101,7 @@ void Light::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void Light::BindProperties (common::PropertyBindingMap& bindings)

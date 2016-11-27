@@ -3,7 +3,7 @@
 using namespace scene_graph;
 
 /*
-    Регистрация сериализаторов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ
 */
 
 void SceneSerializationManager::RegisterLoader (const char* file_type, const SceneLoader& loader)

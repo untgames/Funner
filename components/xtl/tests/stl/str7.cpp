@@ -1,4 +1,4 @@
-//Тестирование erase
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ erase
 
 #include <stdio.h>
 #include <stl/string>

@@ -8,15 +8,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char INLINE_FUNCTION_MARKER = '@'; //маркер встраиваемых команд
+const char INLINE_FUNCTION_MARKER = '@'; //РјР°СЂРєРµСЂ РІСЃС‚СЂР°РёРІР°РµРјС‹С… РєРѕРјР°РЅРґ
 
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 Stack::Stack (lua_State* in_state, lua::Interpreter& in_interpreter)
@@ -25,7 +25,7 @@ Stack::Stack (lua_State* in_state, lua::Interpreter& in_interpreter)
   {}
   
 /*
-    Интерпретатор, которому принадлежит стек
+    РРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ СЃС‚РµРє
 */
 
 IInterpreter& Stack::Interpreter ()
@@ -34,7 +34,7 @@ IInterpreter& Stack::Interpreter ()
 }
 
 /*
-    Количество аргументов в стеке
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
 */
 
 unsigned int Stack::Size ()
@@ -43,7 +43,7 @@ unsigned int Stack::Size ()
 }
 
 /*
-    Получение аргументов из стека
+    РџРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РёР· СЃС‚РµРєР°
 */
 
 float Stack::GetFloat (unsigned int index)
@@ -83,7 +83,7 @@ ISymbol* Stack::GetSymbol (unsigned int index)
 {
   try
   {
-      //проверка индекса
+      //РїСЂРѕРІРµСЂРєР° РёРЅРґРµРєСЃР°
 
     check_item (state, index, LUA_TFUNCTION, "");
     
@@ -93,7 +93,7 @@ ISymbol* Stack::GetSymbol (unsigned int index)
     {
       case LUA_TFUNCTION:
       {
-          //получение символа      
+          //РїРѕР»СѓС‡РµРЅРёРµ СЃРёРјРІРѕР»Р°      
 
         return interpreter.SymbolRegistry ().GetSymbol (-(int)index);
       }
@@ -108,7 +108,7 @@ ISymbol* Stack::GetSymbol (unsigned int index)
 
         if (*symbol_string == INLINE_FUNCTION_MARKER)
         {
-          ++symbol_string; //удаление маркера
+          ++symbol_string; //СѓРґР°Р»РµРЅРёРµ РјР°СЂРєРµСЂР°
           
           if (luaL_loadbuffer (state, symbol_string, strlen (symbol_string), symbol_string))
             raise_error (state, "");
@@ -147,27 +147,27 @@ ISymbol* Stack::GetSymbol (unsigned int index)
 
 xtl::any& Stack::GetVariant (unsigned int index)
 {
-    //проверка индекса
+    //РїСЂРѕРІРµСЂРєР° РёРЅРґРµРєСЃР°
     
   check_item (state, index, LUA_TUSERDATA, "script::lua::Stack::GetVariant");
 
-    //получение аргумента
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 
   xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, index));
   
   if (variant && lua_getmetatable (state, index))
   {
-      //все пользовательские типы данных, хранимые в стеке, приводятся к xtl::any*. проверка совпадения метатаблиц не требуется
+      //РІСЃРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ С‚РёРїС‹ РґР°РЅРЅС‹С…, С…СЂР°РЅРёРјС‹Рµ РІ СЃС‚РµРєРµ, РїСЂРёРІРѕРґСЏС‚СЃСЏ Рє xtl::any*. РїСЂРѕРІРµСЂРєР° СЃРѕРІРїР°РґРµРЅРёСЏ РјРµС‚Р°С‚Р°Р±Р»РёС† РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ
     
     lua_pop (state, 1);
     return *variant;
   }
 
-    //если типы не совпали
+    //РµСЃР»Рё С‚РёРїС‹ РЅРµ СЃРѕРІРїР°Р»Рё
 
   luaL_typerror (state, index, "xtl::any");
 
-    //генерация исключения
+    //РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ
 
   throw xtl::format_exception<script::ArgumentException> ("script::Stack::GetVariant", "Item %u has wrong type (non xtl::any)", index);
   
@@ -175,7 +175,7 @@ xtl::any& Stack::GetVariant (unsigned int index)
 }
 
 /*
-    Помещение аргументов в стек
+    РџРѕРјРµС‰РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРє
 */
 
 void Stack::Push (float value)
@@ -237,7 +237,7 @@ void Stack::Push (const xtl::any& value)
   
   if (value.null ())
   {
-      //обработка специального случая: помещение в стек нулевого указателя
+      //РѕР±СЂР°Р±РѕС‚РєР° СЃРїРµС†РёР°Р»СЊРЅРѕРіРѕ СЃР»СѓС‡Р°СЏ: РїРѕРјРµС‰РµРЅРёРµ РІ СЃС‚РµРє РЅСѓР»РµРІРѕРіРѕ СѓРєР°Р·Р°С‚РµР»СЏ
 
     lua_pushnil (state);
 
@@ -271,7 +271,7 @@ void Stack::Push (const xtl::any& value)
 }
 
 /*
-    Удаление аргументов из стека
+    РЈРґР°Р»РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РёР· СЃС‚РµРєР°
 */
 
 void Stack::Pop (unsigned int arguments_count)

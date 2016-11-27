@@ -4,7 +4,7 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Реализация Animation
+    Р РµР°Р»РёР·Р°С†РёСЏ Animation
 */
 
 typedef media::CollectionImpl<Animation, ICollection<Animation> >               AnimationCollection;
@@ -12,13 +12,13 @@ typedef media::CollectionImpl<AnimationChannel, ICollection<AnimationChannel> > 
 
 struct Animation::Impl: public xtl::reference_counter
 {
-  AnimationCollection        animations; //дочерние анимации
-  AnimationChannelCollection channels;   //каналы анимации
-  stl::string                id;         //идентификатор анимации
+  AnimationCollection        animations; //РґРѕС‡РµСЂРЅРёРµ Р°РЅРёРјР°С†РёРё
+  AnimationChannelCollection channels;   //РєР°РЅР°Р»С‹ Р°РЅРёРјР°С†РёРё
+  stl::string                id;         //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°РЅРёРјР°С†РёРё
 };
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Animation::Animation ()
@@ -45,7 +45,7 @@ Animation& Animation::operator = (const Animation& animation)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Animation Animation::Clone () const
@@ -54,7 +54,7 @@ Animation Animation::Clone () const
 }
 
 /*
-    Идентификатор анимации
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°РЅРёРјР°С†РёРё
 */
 
 const char* Animation::Id () const
@@ -71,7 +71,7 @@ void Animation::SetId (const char* id)
 }
 
 /*
-    Список дочерних анимаций
+    РЎРїРёСЃРѕРє РґРѕС‡РµСЂРЅРёС… Р°РЅРёРјР°С†РёР№
 */
 
 AnimationList& Animation::Animations ()
@@ -85,7 +85,7 @@ const AnimationList& Animation::Animations () const
 }
 
 /*
-   Список каналов анимаций
+   РЎРїРёСЃРѕРє РєР°РЅР°Р»РѕРІ Р°РЅРёРјР°С†РёР№
 */
 
 Animation::AnimationChannelList& Animation::Channels ()

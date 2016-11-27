@@ -10,7 +10,7 @@ using namespace render::scene;
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CollectionVisitor::CollectionVisitor (TraverseResult& in_result, size_t in_filter)
@@ -20,7 +20,7 @@ CollectionVisitor::CollectionVisitor (TraverseResult& in_result, size_t in_filte
 }
 
 /*
-    Диспетчеризация по типам
+    Р”РёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ РїРѕ С‚РёРїР°Рј
 */
 
 void CollectionVisitor::Visit (VisualModel& entity)

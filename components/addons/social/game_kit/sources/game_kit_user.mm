@@ -172,7 +172,7 @@ void load_users (const char* source, NSArray* friends, NSError* error, common::L
 }
 
 /*
-   Получение залогиненного пользователя
+   РџРѕР»СѓС‡РµРЅРёРµ Р·Р°Р»РѕРіРёРЅРµРЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 */
 
 User& GameKitSessionImpl::CurrentUser ()
@@ -184,7 +184,7 @@ User& GameKitSessionImpl::CurrentUser ()
 }
 
 /*
-   Загрузка пользователя по идентификатору
+   Р—Р°РіСЂСѓР·РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ
 */
 
 void GameKitSessionImpl::LoadUser (const char* user_id, const LoadUserCallback& callback, const common::PropertyMap& properties)
@@ -212,7 +212,7 @@ void GameKitSessionImpl::LoadUser (const char* user_id, const LoadUserCallback& 
 }
 
 /*
-   Аватар
+   РђРІР°С‚Р°СЂ
 */
 
 void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictureCallback& callback, const common::PropertyMap& properties)
@@ -243,7 +243,7 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
 }
 
 /*
-   Друзья
+   Р”СЂСѓР·СЊСЏ
 */
 
 void GameKitSessionImpl::LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties)

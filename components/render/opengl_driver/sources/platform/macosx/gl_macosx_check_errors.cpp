@@ -94,7 +94,7 @@ namespace opengl
 namespace macosx
 {
 
-//проверка ошибок EventManager
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє EventManager
 void check_event_manager_error (OSStatus error_code, const char* source, const char* message)
 {
   if (error_code != noErr)
@@ -102,7 +102,7 @@ void check_event_manager_error (OSStatus error_code, const char* source, const c
                                            get_event_manager_error_name (error_code), error_code);
 }
 
-//проверка ошибок Quartz Framework
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє Quartz Framework
 void check_quartz_error (CGError error_code, const char* source, const char* message)
 {
   if (error_code != kCGErrorSuccess)
@@ -110,7 +110,7 @@ void check_quartz_error (CGError error_code, const char* source, const char* mes
                                            get_quartz_error_name (error_code), error_code);
 }
 
-//проверка ошибок WindowManager
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє WindowManager
 void check_window_manager_error (OSStatus error_code, const char* source)
 {
   if (error_code != noErr)
@@ -118,7 +118,7 @@ void check_window_manager_error (OSStatus error_code, const char* source)
                                            get_window_manager_error_name (error_code), error_code);
 }
 
-//проверка ошибок Agl Framework
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє Agl Framework
 void check_agl_error (const char* source)
 {
   GLenum err = aglGetError();
@@ -129,7 +129,7 @@ void check_agl_error (const char* source)
   throw xtl::format_operation_exception (source, "Agl error. %s", aglErrorString (err));
 }
 
-//генерация исключений с информацией об ошибке
+//РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёР№ СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ РѕР± РѕС€РёР±РєРµ
 void raise_agl_error (const char* source)
 {
   check_agl_error (source);

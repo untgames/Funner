@@ -145,7 +145,7 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
           case PixelFormat_DXT1:
           case PixelFormat_DXT3:
           case PixelFormat_DXT5:
-               //выравнивание размеров уровня по ближайшему снизу числу, делящемуся на 4
+               //╤Ю╨╗╨░┬а╤Ю┬н╨Б╤Ю┬а┬н╨Б╥Р ╨░┬а┬з┬м╥Р╨░┬о╤Ю ╨│╨░┬о╤Ю┬н╨┐ ╨З┬о ╨О┬л╨Б┬ж┬а┬й╨╕╥Р┬м╨│ ╨▒┬н╨Б┬з╨│ ╨╖╨Б╨▒┬л╨│, ┬д╥Р┬л╨┐╨╣╥Р┬м╨│╨▒╨┐ ┬н┬а 4
 
             level_width  &= ~3;
             level_height &= ~3;

@@ -8,42 +8,42 @@
 #include <common/strlib.h>
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  INPUT_FILE_NAME                   = "input/signatures.h";        //файл с сигнатурами
-const char*  TEMPLATES_MASK                    = "input/templates/*";         //маска имён файлов-шаблонов
-const char*  RESULT_DIR                        = "results";                   //каталог с результирующими файлами
-const char*  SERIALIZE_PARAM_PREFIX            = "write";                     //префикс сериализации параметра
-const char*  SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //префикс сериализации заголовка
-const char*  SERIALIZE_TAIL                    = "EndCommand();";             //хвостовая сериализация
-const char*  COMMAND_ID_ENUM_NAME              = "CommandId";                 //идентификатор команды
-const char*  DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //имя метода десериализации
-const char*  DESERIALIZE_METHOD_NAME           = "read";                      //имя метода десериализации
+const char*  INPUT_FILE_NAME                   = "input/signatures.h";        //С„Р°Р№Р» СЃ СЃРёРіРЅР°С‚СѓСЂР°РјРё
+const char*  TEMPLATES_MASK                    = "input/templates/*";         //РјР°СЃРєР° РёРјС‘РЅ С„Р°Р№Р»РѕРІ-С€Р°Р±Р»РѕРЅРѕРІ
+const char*  RESULT_DIR                        = "results";                   //РєР°С‚Р°Р»РѕРі СЃ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРјРё С„Р°Р№Р»Р°РјРё
+const char*  SERIALIZE_PARAM_PREFIX            = "write";                     //РїСЂРµС„РёРєСЃ СЃРµСЂРёР°Р»РёР·Р°С†РёРё РїР°СЂР°РјРµС‚СЂР°
+const char*  SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //РїСЂРµС„РёРєСЃ СЃРµСЂРёР°Р»РёР·Р°С†РёРё Р·Р°РіРѕР»РѕРІРєР°
+const char*  SERIALIZE_TAIL                    = "EndCommand();";             //С…РІРѕСЃС‚РѕРІР°СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ
+const char*  COMMAND_ID_ENUM_NAME              = "CommandId";                 //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєРѕРјР°РЅРґС‹
+const char*  DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //РёРјСЏ РјРµС‚РѕРґР° РґРµСЃРµСЂРёР°Р»РёР·Р°С†РёРё
+const char*  DESERIALIZE_METHOD_NAME           = "read";                      //РёРјСЏ РјРµС‚РѕРґР° РґРµСЃРµСЂРёР°Р»РёР·Р°С†РёРё
 
 /*
-    Структуры
+    РЎС‚СЂСѓРєС‚СѓСЂС‹
 */
 
-//параметр метода
+//РїР°СЂР°РјРµС‚СЂ РјРµС‚РѕРґР°
 struct Param
 {
-  stl::string name; //имя параметра
-  stl::string type; //тип параметра
+  stl::string name; //РёРјСЏ РїР°СЂР°РјРµС‚СЂР°
+  stl::string type; //С‚РёРї РїР°СЂР°РјРµС‚СЂР°
 
   Param (const char* in_name, const char* in_type) : name (in_name), type (in_type) {}
 };
 
 typedef stl::vector<Param> ParamArray;
 
-//метод
+//РјРµС‚РѕРґ
 struct Method
 {
-  stl::string section;     //имя секции
-  stl::string name;        //имя метода
-  stl::string result_type; //имя возвращаемого типа
-  ParamArray  params;      //список параметров
-  bool        is_manual;   //является ли метод сериализуемым вручную
+  stl::string section;     //РёРјСЏ СЃРµРєС†РёРё
+  stl::string name;        //РёРјСЏ РјРµС‚РѕРґР°
+  stl::string result_type; //РёРјСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ С‚РёРїР°
+  ParamArray  params;      //СЃРїРёСЃРѕРє РїР°СЂР°РјРµС‚СЂРѕРІ
+  bool        is_manual;   //СЏРІР»СЏРµС‚СЃСЏ Р»Рё РјРµС‚РѕРґ СЃРµСЂРёР°Р»РёР·СѓРµРјС‹Рј РІСЂСѓС‡РЅСѓСЋ
 
   Method () : is_manual () {}
 };
@@ -51,7 +51,7 @@ struct Method
 typedef stl::vector<Method> MethodArray;
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
 void skip_space (const char*& iter)
@@ -501,16 +501,16 @@ stl::string get_section_name_from_tag (const char* tag)
   return colon;
 }
 
-//генерация исходного текста
+//РіРµРЅРµСЂР°С†РёСЏ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р°
 void generate_source (const char* template_file_name, const char* source_name, const MethodArray& methods)
 {
-    //загрузка шаблона
+    //Р·Р°РіСЂСѓР·РєР° С€Р°Р±Р»РѕРЅР°
 
   stl::string tmpl;
 
   common::FileSystem::LoadTextFile (template_file_name, tmpl);
   
-    //формирование текста на выходе
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚РµРєСЃС‚Р° РЅР° РІС‹С…РѕРґРµ
     
   stl::string result;
   
@@ -547,7 +547,7 @@ void generate_source (const char* template_file_name, const char* source_name, c
     if (const char* pos = strchr (tag.c_str (), ':'))
       tag.erase (pos - tag.c_str ());
 
-      //замены
+      //Р·Р°РјРµРЅС‹
 
     if      (tag == "ENUMS")            dump_enums           (methods, result);
     else if (tag == "DECLARATIONS")     dump_signatures      (methods, result, section.c_str ());
@@ -562,7 +562,7 @@ void generate_source (const char* template_file_name, const char* source_name, c
     end += END_REPLACEMENT_TAG_SIZE;
   }
   
-    //сохранение сформированного файла
+    //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃС„РѕСЂРјРёСЂРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
     
   common::OutputFile file (source_name);
   
@@ -577,12 +577,12 @@ int main ()
 
     parse_signatures (INPUT_FILE_NAME, methods);
 
-      //создание нового каталога с результирующими файлами
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєР°С‚Р°Р»РѕРіР° СЃ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёРјРё С„Р°Р№Р»Р°РјРё
 
     if (!common::FileSystem::IsFileExist (RESULT_DIR))
       common::FileSystem::Mkdir (RESULT_DIR);
 
-      //генерация файлов
+      //РіРµРЅРµСЂР°С†РёСЏ С„Р°Р№Р»РѕРІ
 
     for (common::FileListIterator iter = common::FileSystem::Search (TEMPLATES_MASK); iter; ++iter)
     {

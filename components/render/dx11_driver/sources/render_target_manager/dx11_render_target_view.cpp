@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 View::View (const DeviceManager& device_manager, ITexture* in_texture, const ViewDesc& in_desc)
@@ -15,14 +15,14 @@ View::View (const DeviceManager& device_manager, ITexture* in_texture, const Vie
 {
   try
   {
-      //проверка корректности текстуры и совместимости с текущим контекстом
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С‚РµРєСЃС‚СѓСЂС‹ Рё СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ С‚РµРєСѓС‰РёРј РєРѕРЅС‚РµРєСЃС‚РѕРј
 
     if (!texture)
       throw xtl::make_null_argument_exception ("", "texture");
 
     Texture* texture_impl = cast_object<Texture> (*this, in_texture, "", "texture");
 
-       //проверка корректности дескриптора
+       //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     TextureDesc texture_desc;
 
@@ -31,11 +31,11 @@ View::View (const DeviceManager& device_manager, ITexture* in_texture, const Vie
     if (in_desc.layer >= texture_desc.layers)
       throw xtl::make_range_exception ("", "desc.layer", in_desc.layer, texture_desc.layers);
 
-      //установка дескриптора
+      //СѓСЃС‚Р°РЅРѕРІРєР° РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
     desc = in_desc;
 
-      //создание отображения
+      //СЃРѕР·РґР°РЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 
     if (is_depth_stencil (texture_desc.format))
     {
@@ -190,7 +190,7 @@ View::~View ()
 }
 
 /*
-    Получение целевой текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ С†РµР»РµРІРѕР№ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 ITexture* View::GetTexture ()
@@ -199,7 +199,7 @@ ITexture* View::GetTexture ()
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void View::GetDesc (ViewDesc& out_desc)

@@ -15,14 +15,14 @@ using namespace render::low_level;
 using namespace common;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 namespace
 {
 
-const char*  DRIVER_COMPONENTS_MASK = "render.low_level.*"; //маска имён компонентов низкоуровневых драйверов отрисовки
-const size_t DRIVER_RESERVED_SIZE   = 8;                    //резервируемое количество драйверов
+const char*  DRIVER_COMPONENTS_MASK = "render.low_level.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹С… РґСЂР°Р№РІРµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
+const size_t DRIVER_RESERVED_SIZE   = 8;                    //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РґСЂР°Р№РІРµСЂРѕРІ
 
 }
 
@@ -33,19 +33,19 @@ namespace low_level
 {
 
 /*
-    Описание реализации системы управления низкоуровневыми драйверами отрисовки
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёСЃС‚РµРјС‹ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 class DriverManagerImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DriverManagerImpl ()
     {
       drivers.reserve (DRIVER_RESERVED_SIZE);
     }
 
-///Регистрация драйвера
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РґСЂР°Р№РІРµСЂР°
     void RegisterDriver (const char* name, IDriver* driver)
     {
       static const char* METHOD_NAME = "render::low_level::DriverManager::RegisterDriver";
@@ -64,7 +64,7 @@ class DriverManagerImpl
       drivers.push_back (DriverDesc (name, driver));
     }
 
-///Отмена регистрации драйвера
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РґСЂР°Р№РІРµСЂР°
     void UnregisterDriver (const char* name)
     {
       if (!name)
@@ -78,19 +78,19 @@ class DriverManagerImpl
       drivers.erase (drivers.begin () + index);
     }
 
-///Отмена регистрации всех драйверов
+///РћС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… РґСЂР°Р№РІРµСЂРѕРІ
     void UnregisterAllDrivers ()
     {
       drivers.clear ();
     }
     
-///Количество драйверов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РґСЂР°Р№РІРµСЂРѕРІ
     size_t DriversCount ()
     {
       return drivers.size ();
     }
 
-///Имя драйвера
+///РРјСЏ РґСЂР°Р№РІРµСЂР°
     const char* DriverName (size_t index)
     {
       if (index >= drivers.size ())
@@ -99,7 +99,7 @@ class DriverManagerImpl
       return drivers [index].name.c_str ();
     }
 
-///Драйвер
+///Р”СЂР°Р№РІРµСЂ
     IDriver* Driver (size_t index)
     {
       if (index >= drivers.size ())
@@ -108,7 +108,7 @@ class DriverManagerImpl
       return drivers [index].driver.get ();
     }
 
-///Поиск драйвера по имени
+///РџРѕРёСЃРє РґСЂР°Р№РІРµСЂР° РїРѕ РёРјРµРЅРё
     IDriver* FindDriver (const char* name)
     {
       if (!name)
@@ -124,90 +124,90 @@ class DriverManagerImpl
       return get_pointer (drivers [index].driver);
     }
 
-///Создание адаптера
+///РЎРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
     IAdapter* CreateAdapter (const char* driver_name, const char* adapter_name, const char* path, const char* init_string)
     {
       static const char* METHOD_NAME = "render::low_level::DriverManagerImpl::CreateAdapter";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!driver_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "driver_name");
 
-        //загрузка драйверов "по умолчанию"
+        //Р·Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
         
       LoadDefaultDrivers ();
       
-        //поиск драйвера
+        //РїРѕРёСЃРє РґСЂР°Р№РІРµСЂР°
         
       int index = FindDriverIndex (driver_name);
       
       if (index == -1)
         throw xtl::make_argument_exception (METHOD_NAME, "driver_name", driver_name, "Driver not registered");
         
-        //создание адаптера
+        //СЃРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
 
       return drivers [index].driver->CreateAdapter (adapter_name, path, init_string);
     }
 
-///Создание цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     ISwapChain* CreateSwapChain
-     (const char*          driver_mask,     //маска имени драйвера
-      const char*          adapter_mask,    //маска имени адаптера
-      const SwapChainDesc& swap_chain_desc) //дескриптор цепочки обмена
+     (const char*          driver_mask,     //РјР°СЃРєР° РёРјРµРЅРё РґСЂР°Р№РІРµСЂР°
+      const char*          adapter_mask,    //РјР°СЃРєР° РёРјРµРЅРё Р°РґР°РїС‚РµСЂР°
+      const SwapChainDesc& swap_chain_desc) //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     {
-        //поиск драйвера
+        //РїРѕРёСЃРє РґСЂР°Р№РІРµСЂР°
         
       AdapterArray adapters;        
 
       DriverPtr driver = GetDriver (driver_mask, adapter_mask, adapters);
 
-        //создание SwapChain и устройства отрисовки
+        //СЃРѕР·РґР°РЅРёРµ SwapChain Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
       return driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc);
     }
 
     ISwapChain* CreateSwapChain
-     (IDriver*             driver,          //драйвер
-      const char*          adapter_mask,    //маска имени адаптера
-      const SwapChainDesc& swap_chain_desc) //дескриптор цепочки обмена
+     (IDriver*             driver,          //РґСЂР°Р№РІРµСЂ
+      const char*          adapter_mask,    //РјР°СЃРєР° РёРјРµРЅРё Р°РґР°РїС‚РµСЂР°
+      const SwapChainDesc& swap_chain_desc) //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     {
       if (!driver)
         throw xtl::make_null_argument_exception ("render::low_level::DriverManager::CreateSwapChain(IDriver*,const char*, const SwapChainDesc&)", "driver");
 
-        //поиск адаптеров
+        //РїРѕРёСЃРє Р°РґР°РїС‚РµСЂРѕРІ
         
       AdapterArray adapters;        
 
       FillAdapters (*driver, adapter_mask, adapters);
 
-        //создание SwapChain и устройства отрисовки
+        //СЃРѕР·РґР°РЅРёРµ SwapChain Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
       return driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc);
     }
 
-///Создание устройства отрисовки
+///РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
     void CreateSwapChainAndDevice
-     (const char*               driver_mask,     //маска имени драйвера
-      const char*               adapter_mask,    //маска имени адаптера
-      const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
-      const char*               init_string,     //строка инициализации
-      xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
-      xtl::com_ptr<IDevice>&    out_device,      //результирующее устройство отрисовки
-      xtl::com_ptr<IDriver>&    out_driver)      //результирующий драйвер
+     (const char*               driver_mask,     //РјР°СЃРєР° РёРјРµРЅРё РґСЂР°Р№РІРµСЂР°
+      const char*               adapter_mask,    //РјР°СЃРєР° РёРјРµРЅРё Р°РґР°РїС‚РµСЂР°
+      const SwapChainDesc&      swap_chain_desc, //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+      const char*               init_string,     //СЃС‚СЂРѕРєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
+      xtl::com_ptr<ISwapChain>& out_swap_chain,  //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰Р°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+      xtl::com_ptr<IDevice>&    out_device,      //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РѕС‚СЂРёСЃРѕРІРєРё
+      xtl::com_ptr<IDriver>&    out_driver)      //СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёР№ РґСЂР°Р№РІРµСЂ
     {
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!init_string)
         init_string = "";
 
-        //поиск драйвера
+        //РїРѕРёСЃРє РґСЂР°Р№РІРµСЂР°
         
       AdapterArray adapters;
 
       DriverPtr driver = GetDriver (driver_mask, adapter_mask, adapters);
 
-        //получение возможностей драйвера
+        //РїРѕР»СѓС‡РµРЅРёРµ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РґСЂР°Р№РІРµСЂР°
 
       DriverCaps caps;
 
@@ -217,7 +217,7 @@ class DriverManagerImpl
 
       if (caps.can_create_swap_chain_without_device)
       {
-          //создание SwapChain и устройства отрисовки
+          //СЃРѕР·РґР°РЅРёРµ SwapChain Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
         xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
         xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
@@ -227,7 +227,7 @@ class DriverManagerImpl
       }
       else
       {
-          //создание SwapChain и устройства отрисовки
+          //СЃРѕР·РґР°РЅРёРµ SwapChain Рё СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
         xtl::com_ptr<IDevice>    device (driver->CreateDevice (adapters.size (), &adapters [0], init_string), false);
         xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (device.get (), swap_chain_desc), false);
@@ -242,7 +242,7 @@ class DriverManagerImpl
   private:
     typedef stl::vector<IAdapter*> AdapterArray;
     
-///Поиск драйвера по имени
+///РџРѕРёСЃРє РґСЂР°Р№РІРµСЂР° РїРѕ РёРјРµРЅРё
     int FindDriverIndex (const char* name)
     {
       if (!name)
@@ -257,10 +257,10 @@ class DriverManagerImpl
       return -1;
     }
 
-///Заполенение таблицы адаптеров
+///Р—Р°РїРѕР»РµРЅРµРЅРёРµ С‚Р°Р±Р»РёС†С‹ Р°РґР°РїС‚РµСЂРѕРІ
     void FillAdapters (IDriver& driver, const char* adapter_mask, AdapterArray& adapters)
     {
-        //поиск предпочтительных адаптеров
+        //РїРѕРёСЃРє РїСЂРµРґРїРѕС‡С‚РёС‚РµР»СЊРЅС‹С… Р°РґР°РїС‚РµСЂРѕРІ
 
       adapters.clear   ();
       adapters.reserve (driver.GetAdaptersCount ());
@@ -271,7 +271,7 @@ class DriverManagerImpl
         const char* adapter_name = "";
 
         if (!adapter || !(adapter_name = adapter->GetName ()))
-          continue; //проверка корректности параметров адаптера
+          continue; //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РїР°СЂР°РјРµС‚СЂРѕРІ Р°РґР°РїС‚РµСЂР°
           
         if (!wcimatch (adapter_name, adapter_mask))
           continue;
@@ -280,10 +280,10 @@ class DriverManagerImpl
       }
     }
 
-///Получение драйвера
+///РџРѕР»СѓС‡РµРЅРёРµ РґСЂР°Р№РІРµСЂР°
     IDriver* GetDriver (const char* driver_mask, const char* adapter_mask, AdapterArray& adapters)
     {
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!driver_mask)
         driver_mask = "*";
@@ -291,11 +291,11 @@ class DriverManagerImpl
       if (!adapter_mask)
         adapter_mask = "*";
 
-        //загрузка драйверов "по умолчанию"
+        //Р·Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
         
       LoadDefaultDrivers ();
         
-        //поиск драйвера
+        //РїРѕРёСЃРє РґСЂР°Р№РІРµСЂР°
         
       for (DriverList::iterator iter=drivers.begin (), end=drivers.end (); iter != end; ++iter)
         if (wcimatch (iter->name.c_str (), driver_mask))
@@ -312,7 +312,7 @@ class DriverManagerImpl
         "No match driver found (driver_mask='%s', adapter_mask='%s')", driver_mask, adapter_mask);      
     }
 
-///Загрузка драйверов по умолчанию
+///Р—Р°РіСЂСѓР·РєР° РґСЂР°Р№РІРµСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     void LoadDefaultDrivers ()
     {
       static ComponentLoader loader (DRIVER_COMPONENTS_MASK);
@@ -336,7 +336,7 @@ class DriverManagerImpl
     typedef stl::vector<DriverDesc> DriverList;
 
   private:
-    DriverList drivers; //карта драйверов
+    DriverList drivers; //РєР°СЂС‚Р° РґСЂР°Р№РІРµСЂРѕРІ
 };
 
 }
@@ -344,7 +344,7 @@ class DriverManagerImpl
 }
 
 /*
-    Обёртки над обращениями к системе управления низкоуровневыми драйверами отрисовки
+    РћР±С‘СЂС‚РєРё РЅР°Рґ РѕР±СЂР°С‰РµРЅРёСЏРјРё Рє СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё РґСЂР°Р№РІРµСЂР°РјРё РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 typedef Singleton<DriverManagerImpl> DriverManagerSingleton;

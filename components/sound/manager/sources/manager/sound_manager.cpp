@@ -38,7 +38,7 @@ namespace
 
 const float EPS = 0.001f;
 
-const char* LOG_NAME = "sound::SoundManager";  //имя потока протоколирования
+const char* LOG_NAME = "sound::SoundManager";  //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 SeekMode get_seek_mode (bool looping)
 {
@@ -52,25 +52,25 @@ typedef xtl::com_ptr<ISample>              SamplePtr;
 }
 
 /*
-    Описание реализации SoundManager
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё SoundManager
 */
 
 struct SoundManagerEmitter
 {
-  int              channel_number;               //номер канала проигрывания (-1 - отсечён или не проигрывается)
-  float            cur_position;                 //текущая позиция проигрывания в секундах
-  size_t           play_start_time;              //время начала проигрывания
-  bool             is_playing;                   //статус проигрывания
-  SoundDeclaration sound_declaration;            //описание звука
-  SamplePtr        sound_sample;                 //сэмпл звука
-  double           duration;                     //длительность звука
-  float            sound_declaration_gain;       //громкость, заданная в описании звука (установка громкости производится относительно этого значения)
-  bool             sample_chosen;                //эммитер ещё не проигрывался
-  Source           source;                       //излучатель звука
-  string           source_name;                  //имя источника
-  size_t           sample_index;                 //индекс сэмпла
-  auto_connection  update_volume_connection;     //соединение события изменения громкости
-  auto_connection  update_properties_connection; //соединение события изменения свойств
+  int              channel_number;               //РЅРѕРјРµСЂ РєР°РЅР°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ (-1 - РѕС‚СЃРµС‡С‘РЅ РёР»Рё РЅРµ РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ)
+  float            cur_position;                 //С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РІ СЃРµРєСѓРЅРґР°С…
+  size_t           play_start_time;              //РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+  bool             is_playing;                   //СЃС‚Р°С‚СѓСЃ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+  SoundDeclaration sound_declaration;            //РѕРїРёСЃР°РЅРёРµ Р·РІСѓРєР°
+  SamplePtr        sound_sample;                 //СЃСЌРјРїР» Р·РІСѓРєР°
+  double           duration;                     //РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р·РІСѓРєР°
+  float            sound_declaration_gain;       //РіСЂРѕРјРєРѕСЃС‚СЊ, Р·Р°РґР°РЅРЅР°СЏ РІ РѕРїРёСЃР°РЅРёРё Р·РІСѓРєР° (СѓСЃС‚Р°РЅРѕРІРєР° РіСЂРѕРјРєРѕСЃС‚Рё РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЌС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ)
+  bool             sample_chosen;                //СЌРјРјРёС‚РµСЂ РµС‰С‘ РЅРµ РїСЂРѕРёРіСЂС‹РІР°Р»СЃСЏ
+  Source           source;                       //РёР·Р»СѓС‡Р°С‚РµР»СЊ Р·РІСѓРєР°
+  string           source_name;                  //РёРјСЏ РёСЃС‚РѕС‡РЅРёРєР°
+  size_t           sample_index;                 //РёРЅРґРµРєСЃ СЃСЌРјРїР»Р°
+  auto_connection  update_volume_connection;     //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ РіСЂРѕРјРєРѕСЃС‚Рё
+  auto_connection  update_properties_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
 
   SoundManagerEmitter  (connection in_update_volume_connection, connection in_update_properties_connection)
     : channel_number (-1), is_playing (false), sample_chosen (false), sample_index (0),
@@ -86,15 +86,15 @@ typedef stl::stack<unsigned short>                      ChannelsSet;
 
 struct SoundManager::Impl : public xtl::trackable
 {
-  DevicePtr                   device;                      //устройство воспроизведения
-  float                       volume;                      //добавочная громкость
-  bool                        is_muted;                    //флаг блокировки проигрывания звука
-  sound::Listener             listener;                    //параметры слушателя
-  EmitterSet                  emitters;                    //излучатели звука
-  ChannelsSet                 free_channels;               //номера свободных каналов
-  Capabilities                capabilities;                //возможности устройства
-  SoundDeclarationLibraryList sound_declaration_libraries; //библиотека описаний звуков
-  common::Log                 log;                         //протокол
+  DevicePtr                   device;                      //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ
+  float                       volume;                      //РґРѕР±Р°РІРѕС‡РЅР°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ
+  bool                        is_muted;                    //С„Р»Р°Рі Р±Р»РѕРєРёСЂРѕРІРєРё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР°
+  sound::Listener             listener;                    //РїР°СЂР°РјРµС‚СЂС‹ СЃР»СѓС€Р°С‚РµР»СЏ
+  EmitterSet                  emitters;                    //РёР·Р»СѓС‡Р°С‚РµР»Рё Р·РІСѓРєР°
+  ChannelsSet                 free_channels;               //РЅРѕРјРµСЂР° СЃРІРѕР±РѕРґРЅС‹С… РєР°РЅР°Р»РѕРІ
+  Capabilities                capabilities;                //РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  SoundDeclarationLibraryList sound_declaration_libraries; //Р±РёР±Р»РёРѕС‚РµРєР° РѕРїРёСЃР°РЅРёР№ Р·РІСѓРєРѕРІ
+  common::Log                 log;                         //РїСЂРѕС‚РѕРєРѕР»
   xtl::trackable              trackable;
 
   Impl (const char* driver_mask, const char* device_mask, const char* init_string)
@@ -117,7 +117,7 @@ struct SoundManager::Impl : public xtl::trackable
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Блокировка проигрывания звука
+///Р‘Р»РѕРєРёСЂРѕРІРєР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void SetMute (bool state)
   {
@@ -126,7 +126,7 @@ struct SoundManager::Impl : public xtl::trackable
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление свойств эмиттеров
+///РћР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ СЌРјРёС‚С‚РµСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void UpdateEmitterVolume (Emitter& emitter, EmitterEvent event)
   {
@@ -157,7 +157,7 @@ struct SoundManager::Impl : public xtl::trackable
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проигрывание звуков
+///РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р·РІСѓРєРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void PlaySound (Emitter& emitter, float offset)
   {
@@ -171,7 +171,7 @@ struct SoundManager::Impl : public xtl::trackable
 
       if (emitter_iter == emitters.end ())
         manager_emitter = SoundManagerEmitterPtr (new SoundManagerEmitter (emitter.RegisterEventHandler (EmitterEvent_OnUpdateVolume, xtl::bind (&SoundManager::Impl::UpdateEmitterVolume, this, _1, _2)),
-            emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, this, _1, _2)))); //создаем эмиттер, в карту добавляем позже, если найдем описание звука
+            emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, this, _1, _2)))); //СЃРѕР·РґР°РµРј СЌРјРёС‚С‚РµСЂ, РІ РєР°СЂС‚Сѓ РґРѕР±Р°РІР»СЏРµРј РїРѕР·Р¶Рµ, РµСЃР»Рё РЅР°Р№РґРµРј РѕРїРёСЃР°РЅРёРµ Р·РІСѓРєР°
       else
         manager_emitter = emitter_iter->second;
 
@@ -381,7 +381,7 @@ struct SoundManager::Impl : public xtl::trackable
 
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SoundManager::SoundManager (const char* driver_mask, const char* device_mask, const char* init_string)
@@ -394,7 +394,7 @@ SoundManager::~SoundManager ()
 }
 
 /*
-   Уровень громкости
+   РЈСЂРѕРІРµРЅСЊ РіСЂРѕРјРєРѕСЃС‚Рё
 */
 
 void SoundManager::SetVolume (float volume)
@@ -412,7 +412,7 @@ float SoundManager::Volume () const
 }
 
 /*
-   Блокировка проигрывания звука
+   Р‘Р»РѕРєРёСЂРѕРІРєР° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР°
 */
 
 void SoundManager::SetMute (bool state)
@@ -426,7 +426,7 @@ bool SoundManager::IsMuted () const
 }
 
 /*
-   Проигрывание звуков
+   РџСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р·РІСѓРєРѕРІ
 */
 
 void SoundManager::PlaySound (Emitter& emitter, float offset)
@@ -460,7 +460,7 @@ bool SoundManager::IsPlaying (Emitter& emitter) const
 }
 
 /*
-   Применение операции ко всем слушателям
+   РџСЂРёРјРµРЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё РєРѕ РІСЃРµРј СЃР»СѓС€Р°С‚РµР»СЏРј
 */
 
 void SoundManager::ForEachEmitter (const EmitterHandler& emitter_handler)
@@ -476,7 +476,7 @@ void SoundManager::ForEachEmitter (const ConstEmitterHandler& emitter_handler) c
 }
 
 /*
-   Применение операции ко всем слушателям c заданным типом
+   РџСЂРёРјРµРЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё РєРѕ РІСЃРµРј СЃР»СѓС€Р°С‚РµР»СЏРј c Р·Р°РґР°РЅРЅС‹Рј С‚РёРїРѕРј
 */
 
 void SoundManager::ForEachEmitter (const char* type, const EmitterHandler& emitter_handler)
@@ -500,7 +500,7 @@ void SoundManager::ForEachEmitter (const char* type, const ConstEmitterHandler& 
 }
 
 /*
-   Регистрация обработчиков события удаления объекта
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 xtl::connection SoundManager::RegisterDestroyHandler (xtl::trackable::slot_type& handler)
@@ -519,7 +519,7 @@ xtl::connection SoundManager::RegisterDestroyHandler (const xtl::trackable::func
 }
 
 /*
-   Установка слушателя
+   РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 void SoundManager::SetListener (const sound::Listener& listener)
@@ -534,7 +534,7 @@ const sound::Listener& SoundManager::Listener () const
 }
 
 /*
-   Загрузка/выгрузка библиотек звуков
+   Р—Р°РіСЂСѓР·РєР°/РІС‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє Р·РІСѓРєРѕРІ
 */
 
 void SoundManager::LoadSoundLibrary (const char* file_name)

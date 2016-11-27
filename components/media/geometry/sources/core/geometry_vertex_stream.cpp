@@ -5,15 +5,15 @@ using namespace media;
 using namespace common;
 
 /*
-    Îïèñàíèå ðåàëèçàöèè âåðøèííîãî ìàññèâà
+    ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð²ÐµÑ€ÑˆÐ¸Ð½Ð½Ð¾Ð³Ð¾ Ð¼Ð°ÑÑÐ¸Ð²Ð°
 */
 
 struct VertexStream::Impl: public xtl::reference_counter
 {
-  VertexFormat format;         //ôîðìàò âåðøèí
-  uint32_t     vertex_size;    //ðàçìåð âåðøèíû
-  Buffer       data_buffer;    //áóôåð ñ äàííûìè
-  uint32_t     vertices_count; //êîëè÷åñòâî âåðøèí
+  VertexFormat format;         //Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ð²ÐµÑ€ÑˆÐ¸Ð½
+  uint32_t     vertex_size;    //Ñ€Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½Ñ‹
+  Buffer       data_buffer;    //Ð±ÑƒÑ„ÐµÑ€ Ñ Ð´Ð°Ð½Ð½Ñ‹Ð¼Ð¸
+  uint32_t     vertices_count; //ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð²ÐµÑ€ÑˆÐ¸Ð½
   
   Impl ();
   Impl (const VertexDeclaration&);
@@ -36,7 +36,7 @@ VertexStream::Impl::Impl (const VertexDeclaration& declaration)
 */
 
 /*
-    Êîíñòðóêòîðû / äåñòðóêòîð
+    ÐšÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€Ñ‹ / Ð´ÐµÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€
 */
 
 VertexStream::VertexStream (Impl* in_impl)
@@ -102,7 +102,7 @@ VertexStream::~VertexStream ()
 }
 
 /*
-    Ïðèñâàèâàíèå
+    ÐŸÑ€Ð¸ÑÐ²Ð°Ð¸Ð²Ð°Ð½Ð¸Ðµ
 */
 
 VertexStream& VertexStream::operator = (const VertexStream& vs)
@@ -112,7 +112,7 @@ VertexStream& VertexStream::operator = (const VertexStream& vs)
 }
 
 /*
-    Ñîçäàíèå êîïèè
+    Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¿Ð¸Ð¸
 */
 
 VertexStream VertexStream::Clone () const
@@ -121,7 +121,7 @@ VertexStream VertexStream::Clone () const
 }
 
 /*
-    Èäåíòèôèêàòîð ïîòîêà
+    Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ñ‚Ð¾ÐºÐ°
 */
 
 size_t VertexStream::Id () const
@@ -130,7 +130,7 @@ size_t VertexStream::Id () const
 }
 
 /*
-    Ôîðìàò
+    Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚
 */
 
 const VertexFormat& VertexStream::Format () const
@@ -139,7 +139,7 @@ const VertexFormat& VertexStream::Format () const
 }
 
 /*
-    Ðàçìåð âåðøèíû
+    Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½Ñ‹
 */
 
 uint32_t VertexStream::VertexSize () const
@@ -148,7 +148,7 @@ uint32_t VertexStream::VertexSize () const
 }
 
 /*
-    Ïîëó÷åíèå äàííûõ
+    ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ…
 */
 
 const void* VertexStream::Data () const
@@ -162,7 +162,7 @@ void* VertexStream::Data ()
 }
 
 /*
-    Êîëè÷åñòâî âåðøèí
+    ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð²ÐµÑ€ÑˆÐ¸Ð½
 */
 
 uint32_t VertexStream::Size () const
@@ -178,7 +178,7 @@ void VertexStream::Resize (uint32_t vertices_count)
 }
 
 /*
-    Î÷èñòêà ìàññèâà
+    ÐžÑ‡Ð¸ÑÑ‚ÐºÐ° Ð¼Ð°ÑÑÐ¸Ð²Ð°
 */
 
 void VertexStream::Clear ()
@@ -187,7 +187,7 @@ void VertexStream::Clear ()
 }
 
 /*
-    Ðåçåðâèðîâàíèå ïàìÿòè
+    Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð°Ð¼ÑÑ‚Ð¸
 */
 
 uint32_t VertexStream::Capacity () const
@@ -201,7 +201,7 @@ void VertexStream::Reserve (uint32_t vertices_count)
 }
 
 /*
-    Îáìåí
+    ÐžÐ±Ð¼ÐµÐ½
 */
 
 void VertexStream::Swap (VertexStream& vs)
@@ -225,7 +225,7 @@ void swap (VertexStream& vs1, VertexStream& vs2)
 }
 
 /*
-    Ïðåîáðàçîâàíèå âåðøèííûõ ìàññèâîâ
+    ÐŸÑ€ÐµÐ¾Ð±Ñ€Ð°Ð·Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð²ÐµÑ€ÑˆÐ¸Ð½Ð½Ñ‹Ñ… Ð¼Ð°ÑÑÐ¸Ð²Ð¾Ð²
 */
 
 void VertexStream::Convert (const VertexStream& src_stream)
@@ -236,19 +236,19 @@ void VertexStream::Convert (const VertexStream& src_stream)
     return;
   }
   
-    //îïðåäåëåíèå êîëè÷åñòâà âåðøèí
+    //Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½
     
   uint32_t vertices_count = src_stream.Size ();
   
-    //èìåçåíåíèå ðàçìåðà ìàññèâà âåðøèí
+    //Ð¸Ð¼ÐµÐ·ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð° Ð¼Ð°ÑÑÐ¸Ð²Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½
   
   Resize (vertices_count);
   
-    //î÷èñòêà ìàññèâà
+    //Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ° Ð¼Ð°ÑÑÐ¸Ð²Ð°
     
   memset (impl->data_buffer.Data (), 0, impl->data_buffer.Size ());
   
-    //êîïèðîâàíèå äàííûõ èç âåðøèííîãî áóôåðà
+    //ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¸Ð· Ð²ÐµÑ€ÑˆÐ¸Ð½Ð½Ð¾Ð³Ð¾ Ð±ÑƒÑ„ÐµÑ€Ð°
   
   for (uint32_t i=0, count=impl->format.AttributesCount (); i<count; i++)
   {
@@ -277,19 +277,19 @@ void VertexStream::Convert (const VertexBuffer& vb)
     return;
   }
   
-    //îïðåäåëåíèå êîëè÷åñòâà âåðøèí
+    //Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½
     
   uint32_t vertices_count = vb.VerticesCount ();
   
-    //èìåçåíåíèå ðàçìåðà ìàññèâà âåðøèí
+    //Ð¸Ð¼ÐµÐ·ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð° Ð¼Ð°ÑÑÐ¸Ð²Ð° Ð²ÐµÑ€ÑˆÐ¸Ð½
   
   Resize (vertices_count);
   
-    //î÷èñòêà ìàññèâà
+    //Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ° Ð¼Ð°ÑÑÐ¸Ð²Ð°
     
   memset (impl->data_buffer.Data (), 0, impl->data_buffer.Size ());
   
-    //êîïèðîâàíèå äàííûõ èç âåðøèííîãî áóôåðà
+    //ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¸Ð· Ð²ÐµÑ€ÑˆÐ¸Ð½Ð½Ð¾Ð³Ð¾ Ð±ÑƒÑ„ÐµÑ€Ð°
   
   for (uint32_t i=0, count=impl->format.AttributesCount (); i<count; i++)
   {

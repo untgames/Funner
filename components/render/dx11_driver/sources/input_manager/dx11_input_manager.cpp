@@ -4,12 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджера входного уровня
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РІС…РѕРґРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 */
 
 struct InputManager::Impl: public DeviceObject
 {
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
   {
@@ -17,7 +17,7 @@ struct InputManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputManager::InputManager (const DeviceManager& device_manager)
@@ -30,7 +30,7 @@ InputManager::~InputManager ()
 }
 
 /*
-    Создание ресурсов уровня
+    РЎРѕР·РґР°РЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ СѓСЂРѕРІРЅСЏ
 */
 
 InputLayout* InputManager::CreateInputLayout (const InputLayoutDesc& desc)
@@ -60,7 +60,7 @@ IBuffer* InputManager::CreateBuffer (const BufferDesc& desc, const void* data)
 }
 
 /*
-    Получение имени семантики
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРµРјР°РЅС‚РёРєРё
 */
 
 const char* InputManager::GetVertexAttributeSemanticName (VertexAttributeSemantic semantic)

@@ -9,7 +9,7 @@ namespace low_level
 namespace opengl
 {
 
-//инициализация единичной матрицы
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РµРґРёРЅРёС‡РЅРѕР№ РјР°С‚СЂРёС†С‹
 void identity_matrix (Matrix4f m)
 {
   for (size_t i=0; i<4; i++)
@@ -17,7 +17,7 @@ void identity_matrix (Matrix4f m)
       m [i][j] = i == j ? 1.0f : 0.0f;
 }
 
-//умножение матриц (result = a * b)
+//СѓРјРЅРѕР¶РµРЅРёРµ РјР°С‚СЂРёС† (result = a * b)
 void mult_matrix (const Matrix4f a, const Matrix4f b, Matrix4f result)
 {
   for (int i=0; i<4; i++)
@@ -34,7 +34,7 @@ void mult_matrix (const Matrix4f a, const Matrix4f b, Matrix4f result)
   }
 }
 
-//транспонирование матрицы
+//С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРёРµ РјР°С‚СЂРёС†С‹
 void transpose_matrix (const Matrix4f source, Matrix4f destination)
 {
   for (size_t i=0; i<4; i++)

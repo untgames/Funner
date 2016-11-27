@@ -19,14 +19,14 @@ using namespace common;
 using namespace debug;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const size_t MAX_LINE_SIZE             = 2048;
 const size_t HELP_STRING_PREFIX_LENGTH = 30;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -43,50 +43,50 @@ void error (const char* format, ...)
   exit (1);
 }
 
-//дескриптор map-file
+//РґРµСЃРєСЂРёРїС‚РѕСЂ map-file
 struct MapFileDesc
 {  
-  MapFile     map_file;           //map-файл
-  stl::string map_file_base_name; //базовое имя map-файла
-  filetime_t  modification_time;  //время модицикации файла
+  MapFile     map_file;           //map-С„Р°Р№Р»
+  stl::string map_file_base_name; //Р±Р°Р·РѕРІРѕРµ РёРјСЏ map-С„Р°Р№Р»Р°
+  filetime_t  modification_time;  //РІСЂРµРјСЏ РјРѕРґРёС†РёРєР°С†РёРё С„Р°Р№Р»Р°
   
   MapFileDesc (const char* file_name) : map_file (file_name, "gcc"), map_file_base_name (basename (notdir (file_name))), modification_time (FileSystem::GetFileTime (file_name)) {}
 };
 
 typedef stl::list<MapFileDesc> MapFileList;
 
-//дескриптор сегмента
+//РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРµРіРјРµРЅС‚Р°
 struct SegmentDesc
 {
-  size_t        start_address;  //начальный адрес сегмента
-  size_t        finish_address; //конечный адрес сегмента
-  MapFileDesc*  map_file;       //map-файл
+  size_t        start_address;  //РЅР°С‡Р°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ СЃРµРіРјРµРЅС‚Р°
+  size_t        finish_address; //РєРѕРЅРµС‡РЅС‹Р№ Р°РґСЂРµСЃ СЃРµРіРјРµРЅС‚Р°
+  MapFileDesc*  map_file;       //map-С„Р°Р№Р»
 };
 
 typedef stl::list<SegmentDesc> SegmentList;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  common::CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                        name;          //имя команды
-  char                               short_name;    //короткое имя
-  const char*                        argument_name; //имя аргумента
-  const char*                        tip;           //подсказка
+  common::CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                        name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                               short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                        argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                        tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;             //массив опций
-  size_t        options_count;       //количество опций
-  MapFileList   map_files;           //список map-файлов
-  SegmentList   segments;            //список сегментов
-  bool          silent;              //включен ли режим без вывода сообщений
-  bool          print_help;          //нужно ли печатать сообщение помощи
+  const Option* options;             //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;       //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  MapFileList   map_files;           //СЃРїРёСЃРѕРє map-С„Р°Р№Р»РѕРІ
+  SegmentList   segments;            //СЃРїРёСЃРѕРє СЃРµРіРјРµРЅС‚РѕРІ
+  bool          silent;              //РІРєР»СЋС‡РµРЅ Р»Рё СЂРµР¶РёРј Р±РµР· РІС‹РІРѕРґР° СЃРѕРѕР±С‰РµРЅРёР№
+  bool          print_help;          //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("android-crash-resolver [<OPTIONS>] <SOURCE> ...\n");
@@ -113,13 +113,13 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//чтение шестнадцатиричного числа
+//С‡С‚РµРЅРёРµ С€РµСЃС‚РЅР°РґС†Р°С‚РёСЂРёС‡РЅРѕРіРѕ С‡РёСЃР»Р°
 bool read_hex (const char* string, size_t& value)
 {
   if (!string || !*string)
@@ -136,7 +136,7 @@ bool read_hex (const char* string, size_t& value)
   return false;
 }
 
-//чтение данных в буфер
+//С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂ
 bool read_line (FILE* file, stl::string& buffer)
 {
   if (!fgets (&buffer [0], (int)buffer.capacity (), file))
@@ -153,7 +153,7 @@ bool read_line (FILE* file, stl::string& buffer)
   return true;
 }
 
-//проверка состояния карт
+//РїСЂРѕРІРµСЂРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РєР°СЂС‚
 void reload_map_files (Params& params)
 {
   for (MapFileList::iterator i=params.map_files.begin (); i!=params.map_files.end (); ++i)
@@ -196,12 +196,12 @@ void reload_map_files (Params& params)
   }
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 { 
 }
 
-//разбор сегментов
+//СЂР°Р·Р±РѕСЂ СЃРµРіРјРµРЅС‚РѕРІ
 void parse_segment (Params& params, const char* line)
 {
   StringArray tokens = split (line, " -");
@@ -235,7 +235,7 @@ void parse_segment (Params& params, const char* line)
   }
 }
 
-//разрешение адреса
+//СЂР°Р·СЂРµС€РµРЅРёРµ Р°РґСЂРµСЃР°
 void resolve_address (Params& params, size_t address, const char* module_name)
 {
   stl::string module_base_name = basename (notdir (module_name));  
@@ -272,7 +272,7 @@ void resolve_address (Params& params, size_t address, const char* module_name)
   }
 }
 
-//обработка строки лога
+//РѕР±СЂР°Р±РѕС‚РєР° СЃС‚СЂРѕРєРё Р»РѕРіР°
 void process_log_line (Params& params, const char* line_start)
 {
   const char* s = line_start;
@@ -328,7 +328,7 @@ void process_log_line (Params& params, const char* line_start)
   }
 }
 
-//обработка лога Android
+//РѕР±СЂР°Р±РѕС‚РєР° Р»РѕРіР° Android
 void process_android_log (Params& params)
 {    
   stl::string line;
@@ -397,12 +397,12 @@ void process_android_log (Params& params)
   }
 }
 
-//точка входа
+//С‚РѕС‡РєР° РІС…РѕРґР°
 int main (int argc, const char* argv [])
 {
   try
   {
-      //инициализация
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
       
     Params params;
 
@@ -422,11 +422,11 @@ int main (int argc, const char* argv [])
     for (size_t i = 0; i < params.options_count; i++)
       command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 
     if (params.print_help)
       return 0;
@@ -438,7 +438,7 @@ int main (int argc, const char* argv [])
       return 1;
     }
 
-      //загрузка карт
+      //Р·Р°РіСЂСѓР·РєР° РєР°СЂС‚
       
     for (size_t i=0; i<command_line.ParamsCount (); i++)
     {
@@ -449,11 +449,11 @@ int main (int argc, const char* argv [])
       params.map_files.push_back (desc);
     }
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
     validate (params);
       
-      //запуск утилиты
+      //Р·Р°РїСѓСЃРє СѓС‚РёР»РёС‚С‹
 
     process_android_log (params);
 

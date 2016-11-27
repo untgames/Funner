@@ -13,7 +13,7 @@ namespace
 {
 
 /*
-    Ключ в таблице поиска сериализатора
+    РљР»СЋС‡ РІ С‚Р°Р±Р»РёС†Рµ РїРѕРёСЃРєР° СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 */
 
 struct SerializerKey
@@ -31,20 +31,20 @@ struct SerializerKey
   size_t                hash;
 };
 
-//функция хэширования для ключа поиска сериализатора
+//С„СѓРЅРєС†РёСЏ С…СЌС€РёСЂРѕРІР°РЅРёСЏ РґР»СЏ РєР»СЋС‡Р° РїРѕРёСЃРєР° СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 size_t hash (const SerializerKey& key)
 {
   return key.hash;
 }
 
 /*
-    Реализация менеджера сериализаторов
+    Р РµР°Р»РёР·Р°С†РёСЏ РјРµРЅРµРґР¶РµСЂР° СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ
 */
 
 class SerializerManagerImpl
 {
   public:
-      //регистрация сериализатора
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
     void Register (const char* extension, const std::type_info& signature, detail::ISerializerHolder* holder)        
     {
       static const char* METHOD_NAME = "common::SerializerManagerImpl::Register";
@@ -58,7 +58,7 @@ class SerializerManagerImpl
       serializers [SerializerKey (extension, signature)] = SerializerHolderPtr (holder);
     }
 
-      //отмена регистрации сериализатора
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
     void Unregister (const char* extension, const std::type_info& signature)
     {
       if (!extension)
@@ -67,7 +67,7 @@ class SerializerManagerImpl
       serializers.erase (SerializerKey (extension, signature));
     }
 
-      //отмена регистрации сериализаторов с указанной сигнатуров
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ СЃ СѓРєР°Р·Р°РЅРЅРѕР№ СЃРёРіРЅР°С‚СѓСЂРѕРІ
     void UnregisterAll (const std::type_info& signature)
     {
       for (SerializerMap::iterator iter=serializers.begin (), end=serializers.end (); iter!=end;)
@@ -87,13 +87,13 @@ class SerializerManagerImpl
         else                                              ++iter;
     }    
     
-      //отмена регистрации всех сериализаторов
+      //РѕС‚РјРµРЅР° СЂРµРіРёСЃС‚СЂР°С†РёРё РІСЃРµС… СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ
     void UnregisterAll ()
     {
       serializers.clear ();
     }
     
-      //поиск сериализатора
+      //РїРѕРёСЃРє СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
     detail::ISerializerHolder* Find (const char* name, const std::type_info& signature, SerializerFindMode mode, bool raise_exception)
     {
       static const char* METHOD_NAME = "common::SerializerManagerImpl::Find";
@@ -160,7 +160,7 @@ typedef Singleton<SerializerManagerImpl> SerializerManagerSingleton;
 */
 
 /*
-    Регистрация сериализаторов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ
 */
 
 void SerializerManager::Register (const char* extension, const std::type_info& signature, detail::ISerializerHolder* holder)
@@ -189,7 +189,7 @@ void SerializerManager::UnregisterAll ()
 }
 
 /*
-    Поиск сериализатора
+    РџРѕРёСЃРє СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°
 */
  
 detail::ISerializerHolder* SerializerManager::Find (const char* extension, const std::type_info& signature, SerializerFindMode mode, bool raise_exception)

@@ -7,7 +7,7 @@ using namespace render::manager;
 */
 
 /*
-    Описание реализации хранилища динамических примитивов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С…СЂР°РЅРёР»РёС‰Р° РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 namespace
@@ -34,12 +34,12 @@ typedef stl::vector<RendererDynamicPrimitiveGroup> GroupArray;
 
 struct DynamicPrimitiveEntityStorage::Impl
 {
-  EntityImpl&           entity;     //ссылка на объект
-  DynamicPrimitiveArray primitives; //список динамических примитивов
-  GroupArray            groups;     //группы примитивов рендеринга
-  size_t                update_id;  //идентификатор транзакции обновления
+  EntityImpl&           entity;     //СЃСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚
+  DynamicPrimitiveArray primitives; //СЃРїРёСЃРѕРє РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
+  GroupArray            groups;     //РіСЂСѓРїРїС‹ РїСЂРёРјРёС‚РёРІРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
+  size_t                update_id;  //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚СЂР°РЅР·Р°РєС†РёРё РѕР±РЅРѕРІР»РµРЅРёСЏ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (EntityImpl& in_entity)
     : entity (in_entity)
     , update_id ()
@@ -48,7 +48,7 @@ struct DynamicPrimitiveEntityStorage::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DynamicPrimitiveEntityStorage::DynamicPrimitiveEntityStorage (EntityImpl& entity)
@@ -62,7 +62,7 @@ DynamicPrimitiveEntityStorage::~DynamicPrimitiveEntityStorage ()
 }
 
 /*
-    Добавление динамических примитивов
+    Р”РѕР±Р°РІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void DynamicPrimitiveEntityStorage::AddPrimitive (const DynamicPrimitivePtr& primitive, void* source_tag)
@@ -121,7 +121,7 @@ void DynamicPrimitiveEntityStorage::RemoveAllPrimitives ()
 }
 
 /*
-    Поиск примитива по тэгу
+    РџРѕРёСЃРє РїСЂРёРјРёС‚РёРІР° РїРѕ С‚СЌРіСѓ
 */
 
 DynamicPrimitivePtr DynamicPrimitiveEntityStorage::FindPrimitive (void* source_tag, bool touch)
@@ -139,7 +139,7 @@ DynamicPrimitivePtr DynamicPrimitiveEntityStorage::FindPrimitive (void* source_t
 }
 
 /*
-    Управление автоматической сборкой неиспользуемых динамических примитивов
+    РЈРїСЂР°РІР»РµРЅРёРµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ СЃР±РѕСЂРєРѕР№ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹С… РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void DynamicPrimitiveEntityStorage::BeginUpdate ()
@@ -167,7 +167,7 @@ void DynamicPrimitiveEntityStorage::EndUpdate ()
 }
 
 /*
-    Группы примитивов рендеринга
+    Р“СЂСѓРїРїС‹ РїСЂРёРјРёС‚РёРІРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 size_t DynamicPrimitiveEntityStorage::RendererPrimitiveGroupsCount ()
@@ -188,25 +188,25 @@ RendererDynamicPrimitiveGroup* DynamicPrimitiveEntityStorage::RendererPrimitiveG
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
       
 void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
 {
   try
   {
-      //очистка групп
+      //РѕС‡РёСЃС‚РєР° РіСЂСѓРїРї
 
     impl->groups.clear ();
 
-      //обновление групп
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РіСЂСѓРїРї
 
     impl->groups.reserve (impl->primitives.size ());
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
       impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), iter->primitive.get ()));
 
-      //обновление зависимостей
+      //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№
 
     InvalidateCacheDependencies ();
   }

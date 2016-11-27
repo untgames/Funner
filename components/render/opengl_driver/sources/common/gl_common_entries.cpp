@@ -21,18 +21,18 @@ inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
 }
 
 /*
-    Инициализация точек входа OpenGL
+    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РµРє РІС…РѕРґР° OpenGL
 */
 
 void GlEntries::Init (ILibrary& library)
 {
-    //обнуление адресов точек входа
+    //РѕР±РЅСѓР»РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР°
 
   memset (this, 0, sizeof (GlEntries));
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-    //получение адресов точек входа OpenGL 1.1
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° OpenGL 1.1
 
   init_entry (library, "glAccum", Accum);
   init_entry (library, "glAlphaFunc", AlphaFunc);
@@ -371,7 +371,7 @@ void GlEntries::Init (ILibrary& library)
   init_entry (library, "glVertexPointer", VertexPointer);
   init_entry (library, "glViewport", Viewport);
   
-    //получение адресов точек входа расширений OpenGL
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
 
   init_extension_entry (library, "glBlendColor", BlendColor);
   init_extension_entry (library, "glBlendEquation", BlendEquation);
@@ -2457,7 +2457,7 @@ void GlEntries::Init (ILibrary& library)
 
 #elif defined (OPENGL_ES_SUPPORT)
 
-    //получение адресов точек входа OpenGL ES 1.1
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° OpenGL ES 1.1
 
   init_entry (library, "glAlphaFunc", AlphaFunc);
   init_entry (library, "glClearColor", ClearColor);
@@ -2605,7 +2605,7 @@ void GlEntries::Init (ILibrary& library)
   init_entry (library, "glViewport", Viewport);
 //  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
   
-    //получение адресов точек входа расширений OpenGL
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
 
   init_extension_entry (library, "glBlendEquationSeparateOES", BlendEquationSeparateOES);
   init_extension_entry (library, "glBlendFuncSeparateOES", BlendFuncSeparateOES);
@@ -2856,7 +2856,7 @@ void GlEntries::Init (ILibrary& library)
   init_entry (library, "glVertexAttribPointer", VertexAttribPointer);
   init_entry (library, "glViewport", Viewport);
 
-    //получение адресов точек входа расширений OpenGL
+    //РїРѕР»СѓС‡РµРЅРёРµ Р°РґСЂРµСЃРѕРІ С‚РѕС‡РµРє РІС…РѕРґР° СЂР°СЃС€РёСЂРµРЅРёР№ OpenGL
 
   init_extension_entry (library, "glDebugMessageControlKHR", DebugMessageControlKHR);
   init_extension_entry (library, "glDebugMessageInsertKHR", DebugMessageInsertKHR);

@@ -1,4 +1,4 @@
-// Тестирование erase и clear
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ erase Рё clear
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

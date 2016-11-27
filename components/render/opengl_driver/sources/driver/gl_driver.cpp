@@ -8,28 +8,28 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  DRIVER_NAME                = "OpenGL";                  //имя драйвера
-const char*  COMPONENT_NAME             = "render.low_level.opengl"; //имя компонента
-const size_t ADAPTER_ARRAY_RESERVE_SIZE = 4;                         //резервируемое количество адаптеров отрисовки
+const char*  DRIVER_NAME                = "OpenGL";                  //РёРјСЏ РґСЂР°Р№РІРµСЂР°
+const char*  COMPONENT_NAME             = "render.low_level.opengl"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const size_t ADAPTER_ARRAY_RESERVE_SIZE = 4;                         //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р°РґР°РїС‚РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Driver::Driver ()
 {
   try
   {
-      //резервирование места для адаптера
+      //СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РјРµСЃС‚Р° РґР»СЏ Р°РґР°РїС‚РµСЂР°
 
     adapters.reserve (ADAPTER_ARRAY_RESERVE_SIZE);
 
-      //регистрация адаптеров "по умолчанию"
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р°РґР°РїС‚РµСЂРѕРІ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
     PlatformManager::EnumDefaultAdapters (xtl::bind (&Driver::RegisterAdapter, this, _1));
   }
@@ -45,7 +45,7 @@ Driver::~Driver ()
 }
 
 /*
-    Описание драйвера
+    РћРїРёСЃР°РЅРёРµ РґСЂР°Р№РІРµСЂР°
 */
 
 const char* Driver::GetDescription ()
@@ -54,7 +54,7 @@ const char* Driver::GetDescription ()
 }
 
 /*
-    Получение возможностей драйвера
+    РџРѕР»СѓС‡РµРЅРёРµ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ РґСЂР°Р№РІРµСЂР°
 */
 
 void Driver::GetCaps (DriverCaps& caps)
@@ -65,7 +65,7 @@ void Driver::GetCaps (DriverCaps& caps)
 }
 
 /*
-    Перечисление доступных адаптеров
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… Р°РґР°РїС‚РµСЂРѕРІ
 */
 
 size_t Driver::GetAdaptersCount ()
@@ -82,7 +82,7 @@ IAdapter* Driver::GetAdapter (size_t index)
 }
 
 /*
-    Регистрация адаптеров
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р°РґР°РїС‚РµСЂРѕРІ
 */
 
 void Driver::RegisterAdapter (IAdapter* adapter)
@@ -106,14 +106,14 @@ void Driver::UnregisterAdapter (IAdapter* adapter)
 }
 
 /*
-    Создание адаптера
+    РЎРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char* init_string)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -121,17 +121,17 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
     if (!path)
       throw xtl::make_null_argument_exception ("", "path");
 
-      //создание адаптера
+      //СЃРѕР·РґР°РЅРёРµ Р°РґР°РїС‚РµСЂР°
 
     typedef xtl::com_ptr<IAdapter> AdapterPtr;
     
     AdapterPtr adapter (PlatformManager::CreateAdapter (name, path, init_string), false);
     
-      //регистрация адаптера в драйвере
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р°РґР°РїС‚РµСЂР° РІ РґСЂР°Р№РІРµСЂРµ
 
     RegisterAdapter (adapter.get ());
 
-      //возвращение адаптера
+      //РІРѕР·РІСЂР°С‰РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
       
     adapter->AddRef ();
 
@@ -145,7 +145,7 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
 }
 
 /*
-    Создание цепочки обмена
+    РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 ISwapChain* Driver::CreateSwapChain (size_t prefered_adapters_count, IAdapter** prefered_adapters, const SwapChainDesc& swap_chain_desc)
@@ -182,7 +182,7 @@ ISwapChain* Driver::CreateSwapChain (IDevice* in_device, const SwapChainDesc& de
 }
 
 /*
-    Создание устройства отрисовки
+    РЎРѕР·РґР°РЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
@@ -210,7 +210,7 @@ IDevice* Driver::CreateDevice (size_t prefered_adapters_count, IAdapter** prefer
 }
 
 /*
-    Установка функции отладочного протоколирования драйвера
+    РЈСЃС‚Р°РЅРѕРІРєР° С„СѓРЅРєС†РёРё РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ РґСЂР°Р№РІРµСЂР°
 */
 
 void Driver::SetDebugLog (const LogFunction& in_log_fn)
@@ -224,7 +224,7 @@ const LogFunction& Driver::GetDebugLog ()
 }
 
 /*
-    Компонент драйвера
+    РљРѕРјРїРѕРЅРµРЅС‚ РґСЂР°Р№РІРµСЂР°
 */
 
 namespace components

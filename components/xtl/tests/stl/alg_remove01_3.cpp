@@ -1,4 +1,4 @@
-//Тестирование алгоритма remove (first, last, value)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° remove (first, last, value)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

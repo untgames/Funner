@@ -11,13 +11,13 @@ namespace openal_media_player
 const char* TARGET_NAME = "low_level_openal";
 
 /*
-   Компонент проигрывания медиа
+   РљРѕРјРїРѕРЅРµРЅС‚ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РјРµРґРёР°
 */
 
 class PlayerComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     PlayerComponent ()
     {
       StreamPlayerManager::RegisterPlayer (TARGET_NAME, &PlayerComponent::CreatePlayer);

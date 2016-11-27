@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Получение файловых систем
+    РџРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј
 */
 
 ICustomFileSystem* Win32Platform::GetFileSystem ()

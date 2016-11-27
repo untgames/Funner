@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS.msvc   := ENGINE.DOT_NET_WRAPPER ENGINE.DOT_NET_WRAPPERS_GENERATOR
 
-#Цель - обёртка для взаимодействия с .Net
+#Р¦РµР»СЊ - РѕР±С‘СЂС‚РєР° РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ .Net
 ENGINE.DOT_NET_WRAPPER.TYPE            := dynamic-lib
 ENGINE.DOT_NET_WRAPPER.NAME            := funner.net
 ENGINE.DOT_NET_WRAPPER.SOURCE_DIRS     := sources
@@ -12,7 +12,7 @@ ENGINE.DOT_NET_WRAPPER.IMPORTS         := compile.xtl compile.engine.launcher
 
 GENERATOR_BUILD_INTERNALS_DIR := ../../../../$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/ENGINE.DOT_NET_WRAPPERS_GENERATOR/build-internals
 
-#Цель - обёртка для взаимодействия с .Net
+#Р¦РµР»СЊ - РѕР±С‘СЂС‚РєР° РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ .Net
 ENGINE.DOT_NET_WRAPPERS_GENERATOR.TYPE            := application
 ENGINE.DOT_NET_WRAPPERS_GENERATOR.OUT_DIR         := $(GENERATOR_BUILD_INTERNALS_DIR)
 ENGINE.DOT_NET_WRAPPERS_GENERATOR.NAME            := dot-net-wrappers-generator

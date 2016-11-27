@@ -6,7 +6,7 @@ namespace syslib
 namespace macosx
 {
 
-//Преобразование процесса к приложению
+//РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїСЂРѕС†РµСЃСЃР° Рє РїСЂРёР»РѕР¶РµРЅРёСЋ
 void transform_process_type ()
 {
   static bool transformed;

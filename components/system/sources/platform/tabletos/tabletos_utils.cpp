@@ -37,7 +37,7 @@ namespace syslib
 namespace tabletos
 {
 
-//инициализация платформы
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР»Р°С‚С„РѕСЂРјС‹
 void platform_initialize ()
 {
   typedef common::Singleton<TabletOsInitializer> TabletOsInitializerSingleton;
@@ -45,7 +45,7 @@ void platform_initialize ()
   TabletOsInitializerSingleton::Instance ();
 }
 
-//проверка ошибок использования BPS и генерация исключения в случае их наличия
+//РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ BPS Рё РіРµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ СЃР»СѓС‡Р°Рµ РёС… РЅР°Р»РёС‡РёСЏ
 void check_errors (const char* source)
 {
   try

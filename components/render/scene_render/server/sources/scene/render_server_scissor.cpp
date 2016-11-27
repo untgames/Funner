@@ -5,16 +5,16 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации области отсечения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 struct Scissor::Impl
 {
-  manager::BoxArea area; //область отсечения
+  manager::BoxArea area; //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Scissor::Scissor ()
@@ -27,7 +27,7 @@ Scissor::~Scissor ()
 }
 
 /*
-    Область
+    РћР±Р»Р°СЃС‚СЊ
 */
 
 const manager::BoxArea& Scissor::Area ()
@@ -36,7 +36,7 @@ const manager::BoxArea& Scissor::Area ()
 }
 
 /*
-    Обход
+    РћР±С…РѕРґ
 */
 
 void Scissor::VisitCore (ISceneVisitor& visitor)
@@ -45,7 +45,7 @@ void Scissor::VisitCore (ISceneVisitor& visitor)
 }
 
 /*
-    Оповещение об обновлении ограничивающего тела
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ С‚РµР»Р°
 */
 
 void Scissor::OnUpdateBounds ()

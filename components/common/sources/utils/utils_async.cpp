@@ -20,10 +20,10 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "common.async_result"; //поток отладочного протоколирования
+const char* LOG_NAME = "common.async_result"; //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 }
 
@@ -34,16 +34,16 @@ const char* LOG_NAME = "common.async_result"; //поток отладочного протоколирован
 */
 
 /*
-    Описание реализации асинхронного результата
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°СЃРёРЅС…СЂРѕРЅРЅРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°
 */
 
 struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
 {
-  Action                              action;       //операция
-  stl::auto_ptr<detail::IAsyncAction> async_action; //реализация операции
-  detail::IAsyncResult*               result;       //результат
-  CallbackHandler                     callback;     //оповещение об окончании выполнения операции
-  bool                                completed;    //выполнена ли операция
+  Action                              action;       //РѕРїРµСЂР°С†РёСЏ
+  stl::auto_ptr<detail::IAsyncAction> async_action; //СЂРµР°Р»РёР·Р°С†РёСЏ РѕРїРµСЂР°С†РёРё
+  detail::IAsyncResult*               result;       //СЂРµР·СѓР»СЊС‚Р°С‚
+  CallbackHandler                     callback;     //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕРєРѕРЅС‡Р°РЅРёРё РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёРё
+  bool                                completed;    //РІС‹РїРѕР»РЅРµРЅР° Р»Рё РѕРїРµСЂР°С†РёСЏ
   
   Impl ()
     : result (0)
@@ -194,7 +194,7 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AsyncResult::AsyncResult ()
@@ -241,7 +241,7 @@ AsyncResult& AsyncResult::operator = (const AsyncResult& result)
 }
 
 /*
-    Проверка выполненности операции / ожидание завершения операции / результат
+    РџСЂРѕРІРµСЂРєР° РІС‹РїРѕР»РЅРµРЅРЅРѕСЃС‚Рё РѕРїРµСЂР°С†РёРё / РѕР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РѕРїРµСЂР°С†РёРё / СЂРµР·СѓР»СЊС‚Р°С‚
 */
 
 bool AsyncResult::IsCompleted () const
@@ -302,7 +302,7 @@ AsyncResultType<void>::Type AsyncResult::Result<void> ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void AsyncResult::Swap (AsyncResult& result)
@@ -327,12 +327,12 @@ void swap (AsyncResult& result1, AsyncResult& result2)
 */
 
 /*
-    Описание реализации исключения асинхронной операции
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РёСЃРєР»СЋС‡РµРЅРёСЏ Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 */
 
 struct AsyncException::Impl: public xtl::reference_counter
 {
-  xtl::string_buffer message; //сообщение, возвращаемое исключением
+  xtl::string_buffer message; //СЃРѕРѕР±С‰РµРЅРёРµ, РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµРј
   
   Impl ()
   {
@@ -346,7 +346,7 @@ struct AsyncException::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AsyncException::AsyncException ()
@@ -377,7 +377,7 @@ AsyncException& AsyncException::operator = (const AsyncException& e)
 }
 
 /*
-    Переопределение операций xtl::exception
+    РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ РѕРїРµСЂР°С†РёР№ xtl::exception
 */
 
 const char* AsyncException::what () const throw ()
@@ -395,7 +395,7 @@ void AsyncException::vtouch (const char* format, va_list args) throw ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void AsyncException::Swap (AsyncException& e)

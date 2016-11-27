@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T,class Traits,class Alloc>
@@ -157,7 +157,7 @@ inline void basic_string<T,Traits,Alloc>::_init (Iter first,Iter last)
 }
 
 /*
-    Выделение памяти
+    Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё
 */
 
 template <class T,class Traits,class Alloc>
@@ -208,10 +208,10 @@ inline void basic_string<T,Traits,Alloc>::deallocate (pointer p,size_type count)
 }
 
 /*
-    Методы реализации
+    РњРµС‚РѕРґС‹ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
-//инициализация завершающим нулём
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р·Р°РІРµСЂС€Р°СЋС‰РёРј РЅСѓР»С‘Рј
 template <class T,class Traits,class Alloc>
 inline void basic_string<T,Traits,Alloc>::construct_null (value_type* p)
 {
@@ -232,7 +232,7 @@ void basic_string<T,Traits,Alloc>::terminate_string ()
   }
 }
 
-//внутреннее копирование
+//РІРЅСѓС‚СЂРµРЅРЅРµРµ РєРѕРїРёСЂРѕРІР°РЅРёРµ
 template <class T,class Traits,class Alloc> template <class Iter> 
 inline void basic_string<T,Traits,Alloc>::_copy (Iter first,Iter last,iterator result)
 {
@@ -246,7 +246,7 @@ inline void basic_string<T,Traits,Alloc>::_copy (const value_type* first,const v
   traits_type::copy (result,first,last-first);
 }
 
-//сравнение
+//СЃСЂР°РІРЅРµРЅРёРµ
 template <class T,class Traits,class Alloc>
 inline int basic_string<T,Traits,Alloc>::_compare 
  (const value_type* f1,
@@ -260,42 +260,42 @@ inline int basic_string<T,Traits,Alloc>::_compare
   return cmp ? cmp : (n1 < n2 ? -1 : (n1 > n2 ? 1 : 0));
 }
 
-//следующий размер буфера для строки (не считая завершающий 0)
+//СЃР»РµРґСѓСЋС‰РёР№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РґР»СЏ СЃС‚СЂРѕРєРё (РЅРµ СЃС‡РёС‚Р°СЏ Р·Р°РІРµСЂС€Р°СЋС‰РёР№ 0)
 template <class T,class Traits,class Alloc>
 inline typename basic_string<T,Traits,Alloc>::size_type basic_string<T,Traits,Alloc>::next_size (size_type inc_size) const
 {
   return size () + (inc_size < size () && max_size () - size () >= size () ? size () : inc_size);
 }
 
-//предикат возможности роста строки
+//РїСЂРµРґРёРєР°С‚ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂРѕСЃС‚Р° СЃС‚СЂРѕРєРё
 template <class T,class Traits,class Alloc>
 inline bool basic_string<T,Traits,Alloc>::is_grow_possible (size_type inc_size) const
 {
   return max_size () - size () >= inc_size;
 }
 
-//корректность итератора
+//РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РёС‚РµСЂР°С‚РѕСЂР°
 template <class T,class Traits,class Alloc>
 inline bool basic_string<T,Traits,Alloc>::is_valid (iterator pos) const
 {
   return pos >= start && pos <= finish;
 }
 
-//корректность диапозона
+//РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РґРёР°РїРѕР·РѕРЅР°
 template <class T,class Traits,class Alloc>
 inline bool basic_string<T,Traits,Alloc>::is_valid (iterator first,iterator last) const
 {
   return first <= last && first >= start && last <= finish;
 }
 
-//корректность позиции
+//РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РїРѕР·РёС†РёРё
 template <class T,class Traits,class Alloc>
 inline bool basic_string<T,Traits,Alloc>::is_valid (size_type pos) const
 {
   return pos <= size ();
 }
 
-//корректность диапозона
+//РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РґРёР°РїРѕР·РѕРЅР°
 template <class T,class Traits,class Alloc>
 inline bool basic_string<T,Traits,Alloc>::is_valid (size_type pos,size_type count) const
 {
@@ -303,7 +303,7 @@ inline bool basic_string<T,Traits,Alloc>::is_valid (size_type pos,size_type coun
 }
 
 /*
-    Размер строки / макс. возможный размер / объём / проверка на пустоту
+    Р Р°Р·РјРµСЂ СЃС‚СЂРѕРєРё / РјР°РєСЃ. РІРѕР·РјРѕР¶РЅС‹Р№ СЂР°Р·РјРµСЂ / РѕР±СЉС‘Рј / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T,class Traits,class Alloc>
@@ -332,7 +332,7 @@ inline bool basic_string<T,Traits,Alloc>::empty () const
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
    
 template <class T,class Traits,class Alloc>
@@ -372,7 +372,7 @@ inline typename basic_string<T,Traits,Alloc>::const_reference basic_string<T,Tra
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class T,class Traits,class Alloc> 
@@ -424,7 +424,7 @@ inline typename basic_string<T,Traits,Alloc>::const_reverse_iterator basic_strin
 }
 
 /*
-    Изменение размера
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР°
 */
 
 template <class T,class Traits,class Alloc>
@@ -501,7 +501,7 @@ void basic_string<T,Traits,Alloc>::reserve (size_type new_size)
 }
 
 /*
-    Получение подстроки
+    РџРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃС‚СЂРѕРєРё
 */
 
 template <class T,class Traits,class Alloc>
@@ -514,7 +514,7 @@ inline basic_string<T,Traits,Alloc> basic_string<T,Traits,Alloc>::substr (size_t
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T,class Traits,class Alloc>
@@ -662,7 +662,7 @@ inline basic_string<T,Traits,Alloc>& basic_string<T,Traits,Alloc>::operator = (T
 }
 
 /*
-    Конкатенация
+    РљРѕРЅРєР°С‚РµРЅР°С†РёСЏ
 */
 
 template <class T,class Traits,class Alloc> 
@@ -894,7 +894,7 @@ inline basic_string<T,Traits,Alloc> operator + (const T a, const basic_string<T,
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class T,class Traits,class Alloc>
@@ -956,7 +956,7 @@ inline void basic_string<T,Traits,Alloc>::clear ()
 }
 
 /*
-    Вставка
+    Р’СЃС‚Р°РІРєР°
 */
 
 template <class T,class Traits,class Alloc> template <class Iter>
@@ -1218,7 +1218,7 @@ typename basic_string<T,Traits,Alloc>::iterator basic_string<T,Traits,Alloc>::in
 }
 
 /*
-    Замена
+    Р—Р°РјРµРЅР°
 */    
 
 template <class T,class Traits,class Alloc>
@@ -1380,7 +1380,7 @@ inline basic_string<T,Traits,Alloc>& basic_string<T,Traits,Alloc>::replace
 }
 
 /*
-    Обмен и копирование строки в буфер
+    РћР±РјРµРЅ Рё РєРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РІ Р±СѓС„РµСЂ
 */    
 
 template <class T,class Traits,class Alloc>
@@ -1423,7 +1423,7 @@ inline typename basic_string<T,Traits,Alloc>::size_type basic_string<T,Traits,Al
 }  
 
 /*
-    Лексикографическое сравнение
+    Р›РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРµ СЃСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T,class Traits,class Alloc>
@@ -1592,7 +1592,7 @@ inline bool operator >= (const T* x, const basic_string<T,Traits,Alloc>& y)
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <class T,class Traits,class Alloc>

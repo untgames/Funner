@@ -3,30 +3,30 @@
 using namespace render::manager;
 
 /*
-    Описание реализации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 typedef stl::vector<size_t> TagHashArray;
 
 struct EffectPass::Impl
 {
-  DeviceManagerPtr             device_manager;           //менеджер устройства отрисовки
-  common::StringArray          color_targets;            //целевые буферы цвета
-  stl::string                  depth_stencil_target;     //целевой буфер глубины
-  render::manager::SortMode    sort_mode;                //режим сортировки
-  LowLevelDepthStencilStatePtr depth_stencil_state;      //состояние уровня отсечения
-  LowLevelBlendStatePtr        blend_state;              //состояние уровня смешивания цветов
-  LowLevelRasterizerStatePtr   rasterizer_state;         //состояние уровня растеризации
-  LowLevelRasterizerStatePtr   rasterizer_scissor_state; //состояние уровня растеризации с включенным тестом отсечения
-  LowLevelStateBlockPtr        scissor_off_state_block;  //блок состояний
-  LowLevelStateBlockPtr        scissor_on_state_block;   //блок состояний с включенным тестом отсечения
-  ProgramPtr                   program;                  //программа
-  bool                         state_block_need_update;  //блок состояний требует обновления
-  unsigned int                 clear_flags;              //флаги очистки
-  common::StringArray          tags;                     //тэги прохода
-  TagHashArray                 tag_hashes;               //хэши тэгов
+  DeviceManagerPtr             device_manager;           //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  common::StringArray          color_targets;            //С†РµР»РµРІС‹Рµ Р±СѓС„РµСЂС‹ С†РІРµС‚Р°
+  stl::string                  depth_stencil_target;     //С†РµР»РµРІРѕР№ Р±СѓС„РµСЂ РіР»СѓР±РёРЅС‹
+  render::manager::SortMode    sort_mode;                //СЂРµР¶РёРј СЃРѕСЂС‚РёСЂРѕРІРєРё
+  LowLevelDepthStencilStatePtr depth_stencil_state;      //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ РѕС‚СЃРµС‡РµРЅРёСЏ
+  LowLevelBlendStatePtr        blend_state;              //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ СЃРјРµС€РёРІР°РЅРёСЏ С†РІРµС‚РѕРІ
+  LowLevelRasterizerStatePtr   rasterizer_state;         //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
+  LowLevelRasterizerStatePtr   rasterizer_scissor_state; //СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё СЃ РІРєР»СЋС‡РµРЅРЅС‹Рј С‚РµСЃС‚РѕРј РѕС‚СЃРµС‡РµРЅРёСЏ
+  LowLevelStateBlockPtr        scissor_off_state_block;  //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№
+  LowLevelStateBlockPtr        scissor_on_state_block;   //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ СЃ РІРєР»СЋС‡РµРЅРЅС‹Рј С‚РµСЃС‚РѕРј РѕС‚СЃРµС‡РµРЅРёСЏ
+  ProgramPtr                   program;                  //РїСЂРѕРіСЂР°РјРјР°
+  bool                         state_block_need_update;  //Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ С‚СЂРµР±СѓРµС‚ РѕР±РЅРѕРІР»РµРЅРёСЏ
+  unsigned int                 clear_flags;              //С„Р»Р°РіРё РѕС‡РёСЃС‚РєРё
+  common::StringArray          tags;                     //С‚СЌРіРё РїСЂРѕС…РѕРґР°
+  TagHashArray                 tag_hashes;               //С…СЌС€Рё С‚СЌРіРѕРІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
     , sort_mode (SortMode_Default)
@@ -56,7 +56,7 @@ struct EffectPass::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 EffectPass::EffectPass (const DeviceManagerPtr& device_manager)
@@ -69,7 +69,7 @@ EffectPass::~EffectPass ()
 }
 
 /*
-    Целевые буферы отрисовки
+    Р¦РµР»РµРІС‹Рµ Р±СѓС„РµСЂС‹ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void EffectPass::SetColorTargets (const common::StringArray& targets)
@@ -96,7 +96,7 @@ const char* EffectPass::DepthStencilTarget ()
 }
 
 /*
-    Состояния уровней устройства отрисовки
+    РЎРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅРµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void EffectPass::SetBlendState (const LowLevelBlendStatePtr& state)
@@ -154,7 +154,7 @@ const ProgramPtr& EffectPass::Program ()
 }
 
 /*
-    Блок состояний эффекта
+    Р‘Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ СЌС„С„РµРєС‚Р°
 */
 
 LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
@@ -186,7 +186,7 @@ LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
 }
 
 /*
-    Тэги примитивов, которые войдут в проход
+    РўСЌРіРё РїСЂРёРјРёС‚РёРІРѕРІ, РєРѕС‚РѕСЂС‹Рµ РІРѕР№РґСѓС‚ РІ РїСЂРѕС…РѕРґ
 */
 
 void EffectPass::SetTags (const char* tags)
@@ -249,7 +249,7 @@ const size_t* EffectPass::TagHashes ()
 }
 
 /*
-    Тип сортировки примитивов
+    РўРёРї СЃРѕСЂС‚РёСЂРѕРІРєРё РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 void EffectPass::SetSortMode (render::manager::SortMode mode)
@@ -273,7 +273,7 @@ SortMode EffectPass::SortMode ()
 }
 
 /*
-    Флаги очистки
+    Р¤Р»Р°РіРё РѕС‡РёСЃС‚РєРё
 */
 
 void EffectPass::SetClearFlags (unsigned int clear_flags)

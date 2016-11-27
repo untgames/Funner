@@ -25,26 +25,26 @@ namespace syslib
 namespace win8
 {
 
-/// Контекст приложения
+/// РљРѕРЅС‚РµРєСЃС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
 interface class IApplicationContext
 {
-  /// Получение главного окна
+  /// РџРѕР»СѓС‡РµРЅРёРµ РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
   Windows::UI::Core::CoreWindow^ MainWindow ();
 };
 
-/// Старт приложения
+/// РЎС‚Р°СЂС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ
 void start_application ();
 
-/// Получение контекста приложения
+/// РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 IApplicationContext^ get_context ();
 
-/// Преобразования строк
+/// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃС‚СЂРѕРє
 stl::string tostring (Platform::String^ input);
 
-/// Выброс исключения с сообщением HRESULT
+/// Р’С‹Р±СЂРѕСЃ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ СЃРѕРѕР±С‰РµРЅРёРµРј HRESULT
 void raise_com_error (const char* method, HRESULT error);
 
-/// Преобразование кодов клавиш
+/// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРґРѕРІ РєР»Р°РІРёС€
 Key get_key_code (Windows::System::VirtualKey key);
 
 }

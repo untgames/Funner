@@ -3,20 +3,20 @@
 using namespace social;
 
 /*
-   Реализация достижения в таблице рекордов
+   Р РµР°Р»РёР·Р°С†РёСЏ РґРѕСЃС‚РёР¶РµРЅРёСЏ РІ С‚Р°Р±Р»РёС†Рµ СЂРµРєРѕСЂРґРѕРІ
 */
 
 struct Score::Impl : public xtl::reference_counter
 {
-  stl::string           user_id;                 //идентификатор пользователя, которому принадлежит достижение
-  stl::string           leaderboard_id;          //идентификатор таблицы рекордов, которой принадлежит достижение
-  stl::string           user_data;               //данные, ассоциированные с достижением
-  stl::string           formatted_value;         //текстовое представление значения
-  double                value;                   //значение
-  size_t                rank;                    //ранг в таблице
-  common::PropertyMap   properties;              //другие свойства
-  const void*           handle;                  //низкоуровневый дескриптор
-  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
+  stl::string           user_id;                 //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РґРѕСЃС‚РёР¶РµРЅРёРµ
+  stl::string           leaderboard_id;          //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚Р°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ, РєРѕС‚РѕСЂРѕР№ РїСЂРёРЅР°РґР»РµР¶РёС‚ РґРѕСЃС‚РёР¶РµРЅРёРµ
+  stl::string           user_data;               //РґР°РЅРЅС‹Рµ, Р°СЃСЃРѕС†РёРёСЂРѕРІР°РЅРЅС‹Рµ СЃ РґРѕСЃС‚РёР¶РµРЅРёРµРј
+  stl::string           formatted_value;         //С‚РµРєСЃС‚РѕРІРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ
+  double                value;                   //Р·РЅР°С‡РµРЅРёРµ
+  size_t                rank;                    //СЂР°РЅРі РІ С‚Р°Р±Р»РёС†Рµ
+  common::PropertyMap   properties;              //РґСЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
+  const void*           handle;                  //РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
+  ReleaseHandleFunction handle_release_function; //С„СѓРЅРєС†РёСЏ, РІС‹Р·С‹РІР°РµРјР°СЏ РїСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё РґРµСЃРєСЂРёРїС‚РѕСЂР°
 
   Impl ()
     : value (0)
@@ -32,7 +32,7 @@ struct Score::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор / деструктор / копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Score::Score ()
@@ -58,7 +58,7 @@ Score& Score::operator = (const Score& source)
 }
 
 /*
-   Идентификатор игрока, которому принадлежит достижение
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РёРіСЂРѕРєР°, РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ РґРѕСЃС‚РёР¶РµРЅРёРµ
 */
 
 const char* Score::UserId () const
@@ -75,7 +75,7 @@ void Score::SetUserId (const char* user_id)
 }
 
 /*
-   Идентификатор таблицы рекордов, которой принадлежит достижение
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚Р°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ, РєРѕС‚РѕСЂРѕР№ РїСЂРёРЅР°РґР»РµР¶РёС‚ РґРѕСЃС‚РёР¶РµРЅРёРµ
 */
 
 const char* Score::LeaderboardId () const
@@ -92,7 +92,7 @@ void Score::SetLeaderboardId (const char* leaderboard_id)
 }
 
 /*
-   Данные, ассоциированные с достижением
+   Р”Р°РЅРЅС‹Рµ, Р°СЃСЃРѕС†РёРёСЂРѕРІР°РЅРЅС‹Рµ СЃ РґРѕСЃС‚РёР¶РµРЅРёРµРј
 */
 
 const char* Score::UserData () const
@@ -109,7 +109,7 @@ void Score::SetUserData (const char* user_data)
 }
 
 /*
-   Значение
+   Р—РЅР°С‡РµРЅРёРµ
 */
 
 double Score::Value () const
@@ -123,7 +123,7 @@ void Score::SetValue (double value)
 }
 
 /*
-   Текстовое представление значения
+   РўРµРєСЃС‚РѕРІРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 const char* Score::FormattedValue () const
@@ -140,7 +140,7 @@ void Score::SetFormattedValue (const char* formatted_value)
 }
 
 /*
-   Ранг в таблице
+   Р Р°РЅРі РІ С‚Р°Р±Р»РёС†Рµ
 */
 
 size_t Score::Rank () const
@@ -154,7 +154,7 @@ void Score::SetRank (size_t rank)
 }
 
 /*
-   Другие свойства
+   Р”СЂСѓРіРёРµ СЃРІРѕР№СЃС‚РІР°
 */
 
 const common::PropertyMap& Score::Properties () const
@@ -173,7 +173,7 @@ void Score::SetProperties (const common::PropertyMap& properties)
 }
 
 /*
-   Низкоуровневый дескриптор
+   РќРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ
 */
 
 const void* Score::Handle () const
@@ -191,7 +191,7 @@ void Score::SetHandle (const void* handle, const ReleaseHandleFunction& release_
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Score::Swap (Score& source)
@@ -203,7 +203,7 @@ namespace social
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Score& score1, Score& score2)

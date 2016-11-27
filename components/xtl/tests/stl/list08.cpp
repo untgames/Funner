@@ -1,4 +1,4 @@
-// Тестирование pop_front
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ pop_front
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

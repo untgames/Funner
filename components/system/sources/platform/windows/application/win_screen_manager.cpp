@@ -6,15 +6,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_SCREEN_ARRAY_RESERVE = 8;                //резервируемое количество экранов
-const size_t MODE_ARRAY_RESERVE           = 32;               //резервируемое количество видео-режимов
-const char*  LOG_NAME                     = "system.windows"; //имя протокола вывода сообщений
+const size_t DEFAULT_SCREEN_ARRAY_RESERVE = 8;                //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЌРєСЂР°РЅРѕРІ
+const size_t MODE_ARRAY_RESERVE           = 32;               //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
+const char*  LOG_NAME                     = "system.windows"; //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р° РІС‹РІРѕРґР° СЃРѕРѕР±С‰РµРЅРёР№
 
 /*
-    Получение информации о видео-режиме
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РІРёРґРµРѕ-СЂРµР¶РёРјРµ
 */
 
 bool get_mode_desc (const char* device_name, int mode_index, unsigned short xdpi, unsigned short ydpi, ScreenModeDesc& mode_desc, Rect* screen_rect=0)
@@ -62,21 +62,21 @@ bool get_mode_desc (const char* device_name, int mode_index, unsigned short xdpi
 }
 
 /*
-    Описатель экрана
+    РћРїРёСЃР°С‚РµР»СЊ СЌРєСЂР°РЅР°
 */
 
 typedef stl::vector<ScreenModeDesc> ScreenModeArray;
 
 struct ScreenDesc: public xtl::reference_counter
 {
-  HDC             device_context; //контекст устройства
-  stl::string     name;           //имя устройства
-  stl::string     win_name;       //имя устройства в Windows
-  unsigned short  xdpi;           //плотность пикселей по горизонтали
-  unsigned short  ydpi;           //плотность пикселей по вертикали
-  ScreenModeArray modes;          //режимы экрана
+  HDC             device_context; //РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  stl::string     name;           //РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  stl::string     win_name;       //РёРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ Windows
+  unsigned short  xdpi;           //РїР»РѕС‚РЅРѕСЃС‚СЊ РїРёРєСЃРµР»РµР№ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+  unsigned short  ydpi;           //РїР»РѕС‚РЅРѕСЃС‚СЊ РїРёРєСЃРµР»РµР№ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
+  ScreenModeArray modes;          //СЂРµР¶РёРјС‹ СЌРєСЂР°РЅР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ScreenDesc (const char* in_name, const char* in_win_name, unsigned short in_xdpi, unsigned short in_ydpi)
     : device_context ()
     , name (in_name)
@@ -84,7 +84,7 @@ struct ScreenDesc: public xtl::reference_counter
     , xdpi (in_xdpi)
     , ydpi (in_ydpi)
   {
-      //отсечение завершающих пробелов в имени устройства
+      //РѕС‚СЃРµС‡РµРЅРёРµ Р·Р°РІРµСЂС€Р°СЋС‰РёС… РїСЂРѕР±РµР»РѕРІ РІ РёРјРµРЅРё СѓСЃС‚СЂРѕР№СЃС‚РІР°
 
     stl::string::reverse_iterator iter;
 
@@ -92,7 +92,7 @@ struct ScreenDesc: public xtl::reference_counter
 
     name.erase (iter.base (), name.end ());    
     
-      //построение списка видео-режимов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
       
     modes.reserve (MODE_ARRAY_RESERVE);
 
@@ -102,14 +102,14 @@ struct ScreenDesc: public xtl::reference_counter
       modes.push_back (mode_desc);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~ScreenDesc ()
   {
     if (device_context)
       DeleteDC (device_context);
   }
 
-///Получение дескприптора контекста устройства
+///РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєРїСЂРёРїС‚РѕСЂР° РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР°
   HDC GetDC ()
   {
     if (device_context)
@@ -128,13 +128,13 @@ typedef xtl::intrusive_ptr<ScreenDesc> ScreenDescPtr;
 typedef stl::vector<ScreenDescPtr>     ScreenDescArray;
 
 /*
-    Построитель списка экранов
+    РџРѕСЃС‚СЂРѕРёС‚РµР»СЊ СЃРїРёСЃРєР° СЌРєСЂР°РЅРѕРІ
 */
 
 struct ScreenArrayBuilder
 {
-  common::Log      log;     //протокол
-  ScreenDescArray& screens; //массив экранов
+  common::Log      log;     //РїСЂРѕС‚РѕРєРѕР»
+  ScreenDescArray& screens; //РјР°СЃСЃРёРІ СЌРєСЂР°РЅРѕРІ
 
   ScreenArrayBuilder (ScreenDescArray& in_screens)
     : log (LOG_NAME)
@@ -195,24 +195,24 @@ struct ScreenArrayBuilder
 };
 
 /*
-    Менеджер экранов
+    РњРµРЅРµРґР¶РµСЂ СЌРєСЂР°РЅРѕРІ
 */
 
 struct ScreenManagerImpl
 {
-  ScreenDescArray screens; //экраны
+  ScreenDescArray screens; //СЌРєСЂР°РЅС‹
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ScreenManagerImpl ()
   {
     screens.reserve (DEFAULT_SCREEN_ARRAY_RESERVE);  
 
-      //построение массива экранов
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ РјР°СЃСЃРёРІР° СЌРєСЂР°РЅРѕРІ
 
     ScreenArrayBuilder builder (screens);
   }
   
-///Получение экрана
+///РџРѕР»СѓС‡РµРЅРёРµ СЌРєСЂР°РЅР°
   static ScreenDescPtr GetScreen (screen_t handle)
   {
     if (!handle)
@@ -227,7 +227,7 @@ typedef common::Singleton<ScreenManagerImpl> ScreenManagerSingleton;
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t WindowsScreenManager::GetScreensCount ()
@@ -236,7 +236,7 @@ size_t WindowsScreenManager::GetScreensCount ()
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t WindowsScreenManager::CreateScreen (size_t screen_index)
@@ -266,7 +266,7 @@ void WindowsScreenManager::DestroyScreen (screen_t handle)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* WindowsScreenManager::GetScreenName (screen_t handle)
@@ -285,7 +285,7 @@ const char* WindowsScreenManager::GetScreenName (screen_t handle)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t WindowsScreenManager::GetScreenModesCount (screen_t handle)
@@ -322,7 +322,7 @@ void WindowsScreenManager::GetScreenMode (screen_t handle, size_t mode_index, Sc
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 namespace
@@ -423,7 +423,7 @@ void WindowsScreenManager::GetScreenDefaultMode (screen_t handle, ScreenModeDesc
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void WindowsScreenManager::SetScreenGammaRamp (screen_t handle, const Color3f table [256])
@@ -485,7 +485,7 @@ void WindowsScreenManager::GetScreenGammaRamp (screen_t handle, Color3f table [2
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 namespace
@@ -493,8 +493,8 @@ namespace
 
 struct ScreenSearcher
 {
-  ScreenDescPtr    containing_screen;        //устройств вывода с максимальной областью перекрытия
-  size_t           intersection_region_size; //размер области перекрытия
+  ScreenDescPtr    containing_screen;        //СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РѕР±Р»Р°СЃС‚СЊСЋ РїРµСЂРµРєСЂС‹С‚РёСЏ
+  size_t           intersection_region_size; //СЂР°Р·РјРµСЂ РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
   ScreenDescArray& screens;
   
   ScreenSearcher (HDC dc, ScreenDescArray& in_screens) : intersection_region_size (0), screens (in_screens)
@@ -576,7 +576,7 @@ screen_t WindowsScreenManager::FindContainingScreen (const void* native_window_h
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* WindowsScreenManager::GetNativeScreenHandle (screen_t handle)
@@ -595,7 +595,7 @@ const void* WindowsScreenManager::GetNativeScreenHandle (screen_t handle)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void WindowsScreenManager::GetScreenProperties (screen_t handle, common::PropertyMap& properties)

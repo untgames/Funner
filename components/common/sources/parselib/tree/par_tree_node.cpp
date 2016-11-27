@@ -6,40 +6,40 @@ namespace
 {
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
-//получение реализации узла
+//РїРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓР·Р»Р°
 ParseNodeImpl* get_node_impl (ParseTree* tree, size_t offset)
 {
   return reinterpret_cast<ParseNodeImpl*> (reinterpret_cast<char*> (tree->Buffer ()) + offset);
 }
 
-//получение смещения узла в дереве
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ СѓР·Р»Р° РІ РґРµСЂРµРІРµ
 size_t get_node_offset (ParseTree* tree, ParseNodeImpl* node)
 {
   return reinterpret_cast<char*> (node) - reinterpret_cast<char*> (tree->Buffer ());
 }
 
-//имя узла
+//РёРјСЏ СѓР·Р»Р°
 const char* get_node_name (ParseNodeImpl* node)
 {
   return reinterpret_cast<const char*> (node) + sizeof (ParseNodeImpl);
 }
 
-//первый потомок
+//РїРµСЂРІС‹Р№ РїРѕС‚РѕРјРѕРє
 ParseNodeImpl* get_first_child (ParseNodeImpl* node)
 {
   return node->first_offset ? reinterpret_cast<ParseNodeImpl*> (reinterpret_cast<char*> (node) + node->first_offset) : 0;
 }
 
-//следующий узел в дереве
+//СЃР»РµРґСѓСЋС‰РёР№ СѓР·РµР» РІ РґРµСЂРµРІРµ
 ParseNodeImpl* get_next_node (ParseNodeImpl* node)
 {
   return node->next_offset ? reinterpret_cast<ParseNodeImpl*> (reinterpret_cast<char*> (node) + node->next_offset) : 0;
 }
 
-//следующий узел с указанным именем в дереве
+//СЃР»РµРґСѓСЋС‰РёР№ СѓР·РµР» СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј РІ РґРµСЂРµРІРµ
 ParseNodeImpl* get_next_node (ParseNodeImpl* iter, const char* name)
 {
   if (!iter)
@@ -68,7 +68,7 @@ ParseNodeImpl* get_next_node (ParseNodeImpl* iter, const char* name)
   return 0;
 }
 
-//получение таблицы указателей на атрибуты с компиляцией при необходимости
+//РїРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° Р°С‚СЂРёР±СѓС‚С‹ СЃ РєРѕРјРїРёР»СЏС†РёРµР№ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
 const char** get_attributes (ParseNodeImpl* node, ParseTree* tree)
 {
   const char** attributes = reinterpret_cast<const char**> (reinterpret_cast<char*> (node) + node->attributes_offset);
@@ -87,7 +87,7 @@ const char** get_attributes (ParseNodeImpl* node, ParseTree* tree)
   return attributes;
 }
 
-//Дерево для работы ParseNode::ParseNode ()
+//Р”РµСЂРµРІРѕ РґР»СЏ СЂР°Р±РѕС‚С‹ ParseNode::ParseNode ()
 struct NullTreeHolder
 {
   xtl::intrusive_ptr<ParseTree> tree;
@@ -121,7 +121,7 @@ struct NullTreeHolder
 }
 
 /*
-    Конструктор / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 ParseNode::ParseNode ()
@@ -163,7 +163,7 @@ ParseNode& ParseNode::operator = (const ParseNode& node)
 }
 
 /*
-    Идентификатор
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t ParseNode::Id () const
@@ -172,7 +172,7 @@ size_t ParseNode::Id () const
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 bool ParseNode::IsEmpty () const
@@ -191,7 +191,7 @@ ParseNode::operator UnspecifiedBoolType () const
 }
 
 /*
-    Имя узла
+    РРјСЏ СѓР·Р»Р°
 */
 
 const char* ParseNode::Name () const
@@ -202,7 +202,7 @@ const char* ParseNode::Name () const
 }
 
 /*
-    Работа с атрибутами
+    Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
 */
 
 size_t ParseNode::AttributesCount () const
@@ -228,10 +228,10 @@ const char** ParseNode::Attributes () const
 }
 
 /*
-    Перебор вложенных узлов
+    РџРµСЂРµР±РѕСЂ РІР»РѕР¶РµРЅРЅС‹С… СѓР·Р»РѕРІ
 */
 
-//первый потомок
+//РїРµСЂРІС‹Р№ РїРѕС‚РѕРјРѕРє
 ParseNode ParseNode::First () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
@@ -239,7 +239,7 @@ ParseNode ParseNode::First () const
   return ParseNode (tree, node->first_offset ? offset + node->first_offset : 0);
 }
 
-//следующий узел на данном уровне иерархии
+//СЃР»РµРґСѓСЋС‰РёР№ СѓР·РµР» РЅР° РґР°РЅРЅРѕРј СѓСЂРѕРІРЅРµ РёРµСЂР°СЂС…РёРё
 ParseNode ParseNode::Next () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
@@ -248,10 +248,10 @@ ParseNode ParseNode::Next () const
 }
 
 /*
-    Перебор узлов по имени
+    РџРµСЂРµР±РѕСЂ СѓР·Р»РѕРІ РїРѕ РёРјРµРЅРё
 */
 
-//первый потомок с указанным именем
+//РїРµСЂРІС‹Р№ РїРѕС‚РѕРјРѕРє СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
 ParseNode ParseNode::First (const char* name) const
 {
   if (!name)
@@ -268,7 +268,7 @@ ParseNode ParseNode::First (const char* name) const
   return ParseNode (tree, 0);
 }
 
-//следующий узел на данном уровне иерархии с указанным именем
+//СЃР»РµРґСѓСЋС‰РёР№ СѓР·РµР» РЅР° РґР°РЅРЅРѕРј СѓСЂРѕРІРЅРµ РёРµСЂР°СЂС…РёРё СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј
 ParseNode ParseNode::Next (const char* name) const
 {
   if (!name)
@@ -285,7 +285,7 @@ ParseNode ParseNode::Next (const char* name) const
   return ParseNode (tree, 0);
 }
 
-//следующий "тёзка" на данном уровне иерархии
+//СЃР»РµРґСѓСЋС‰РёР№ "С‚С‘Р·РєР°" РЅР° РґР°РЅРЅРѕРј СѓСЂРѕРІРЅРµ РёРµСЂР°СЂС…РёРё
 ParseNode ParseNode::NextNamesake () const
 {
   ParseNodeImpl* node      = get_node_impl (tree, offset);
@@ -300,10 +300,10 @@ ParseNode ParseNode::NextNamesake () const
 }
 
 /*
-    Информация о расположении узла
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРё СѓР·Р»Р°
 */
 
-//имя исходного текста,  в котором расположен узел
+//РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р°,  РІ РєРѕС‚РѕСЂРѕРј СЂР°СЃРїРѕР»РѕР¶РµРЅ СѓР·РµР»
 const char* ParseNode::Source () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
@@ -311,7 +311,7 @@ const char* ParseNode::Source () const
   return node->source_back_offset ? reinterpret_cast<const char*> (node) - node->source_back_offset : "";
 }
 
-//номер строки
+//РЅРѕРјРµСЂ СЃС‚СЂРѕРєРё
 size_t ParseNode::LineNumber () const
 {
   ParseNodeImpl* node = get_node_impl (tree, offset);
@@ -320,7 +320,7 @@ size_t ParseNode::LineNumber () const
 }
 
 /*
-    Протокол разбора
+    РџСЂРѕС‚РѕРєРѕР» СЂР°Р·Р±РѕСЂР°
 */
 
 ParseLog ParseNode::Log () const
@@ -329,7 +329,7 @@ ParseLog ParseNode::Log () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void ParseNode::Swap (ParseNode& node)

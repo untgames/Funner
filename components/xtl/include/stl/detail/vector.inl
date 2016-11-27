@@ -1,5 +1,5 @@
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T,class Allocator>
@@ -51,7 +51,7 @@ inline vector<T,Allocator>::~vector ()
 }               
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class T,class Allocator>
@@ -61,7 +61,7 @@ inline typename vector<T,Allocator>::allocator_type vector<T,Allocator>::get_all
 }
 
 /*
-    Операции общего назначения
+    РћРїРµСЂР°С†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
     
 template <class T,class Allocator>
@@ -88,7 +88,7 @@ inline bool vector<T,Allocator>::empty () const
   return begin () == end ();
 }
 
-//следующий допустимый размер для массива не меньший inc_size
+//СЃР»РµРґСѓСЋС‰РёР№ РґРѕРїСѓСЃС‚РёРјС‹Р№ СЂР°Р·РјРµСЂ РґР»СЏ РјР°СЃСЃРёРІР° РЅРµ РјРµРЅСЊС€РёР№ inc_size
 template <class T,class Allocator>
 inline typename vector<T,Allocator>::size_type vector<T,Allocator>::next_size (size_type inc_size) const
 {
@@ -114,7 +114,7 @@ inline bool vector<T,Allocator>::is_valid (iterator first,iterator last) const
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class T,class Allocator> inline typename vector<T,Allocator>::iterator vector<T,Allocator>::begin ()
@@ -165,7 +165,7 @@ inline typename vector<T,Allocator>::const_reverse_iterator vector<T,Allocator>:
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */   
 
 template <class T,class Allocator>
@@ -223,7 +223,7 @@ inline typename vector<T,Allocator>::const_reference vector<T,Allocator>::back (
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T,class Allocator> template <class Iter>
@@ -383,7 +383,7 @@ void vector<T,Allocator>::assign (size_type count,const value_type& val)
 }
 
 /*
-    Добавление / удаление элементов
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */                          
 
 template <class T,class Allocator>
@@ -407,7 +407,7 @@ inline void vector<T,Allocator>::pop_back ()
 }
 
 /*
-    Вставка элементов
+    Р’СЃС‚Р°РІРєР° СЌР»РµРјРµРЅС‚РѕРІ
 */       
 
 template <class T,class Allocator>
@@ -440,7 +440,7 @@ void vector<T,Allocator>::_insert (iterator position,const value_type& value)
       stl_raise_length_error (*this,size ()+1);
   
     const volatile size_type len        = next_size (1);
-    volatile iterator        new_start  = allocator_type::allocate (len,start), //обход предупреждения на gcc: 'new_start' might be used uninitialized in this function
+    volatile iterator        new_start  = allocator_type::allocate (len,start), //РѕР±С…РѕРґ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ РЅР° gcc: 'new_start' might be used uninitialized in this function
                              new_finish = new_start;
              
     try 
@@ -639,7 +639,7 @@ inline void vector<T,Allocator>::insert (iterator position,Iter first,Iter last)
 }
 
 /*
-    Удаление элементов
+    РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 */   
 
 template <class T,class Allocator>
@@ -678,7 +678,7 @@ inline void vector<T,Allocator>::clear ()
 }
 
 /*
-    Изменение размера массива
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° РјР°СЃСЃРёРІР°
 */ 
 
 template <class T,class Allocator>
@@ -707,7 +707,7 @@ void vector<T,Allocator>::reserve (size_type count)
 }
 
 /*
-    Обмен содержимого двух массивов
+    РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… РјР°СЃСЃРёРІРѕРІ
 */
 
 template <class T,class Allocator>
@@ -734,7 +734,7 @@ inline void swap (vector<T,Allocator>& a,vector<T,Allocator>& b)
 }
 
 /*
-    Операции сравнения
+    РћРїРµСЂР°С†РёРё СЃСЂР°РІРЅРµРЅРёСЏ
 */    
 
 template <class T,class Allocator>

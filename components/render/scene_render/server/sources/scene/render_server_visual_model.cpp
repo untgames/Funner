@@ -5,18 +5,18 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Описание реализации отображаемой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕР№ РјРѕРґРµР»Рё
 */
 
 typedef xtl::intrusive_ptr<Scissor> ScissorPtr;
 
 struct VisualModel::Impl
 {
-  ScissorPtr      scissor;              //область отсечения
-  manager::Entity entity;               //сущность
-  bool            need_update_world_tm; //флаг необходимости обновления мировой матрицы
+  ScissorPtr      scissor;              //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+  manager::Entity entity;               //СЃСѓС‰РЅРѕСЃС‚СЊ
+  bool            need_update_world_tm; //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РјРёСЂРѕРІРѕР№ РјР°С‚СЂРёС†С‹
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (manager::Entity& in_entity)
     : entity (in_entity)
     , need_update_world_tm (true)
@@ -25,7 +25,7 @@ struct VisualModel::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 VisualModel::VisualModel (RenderManager& render_manager)
@@ -56,7 +56,7 @@ VisualModel::~VisualModel ()
 }
 
 /*
-    Область отсечения
+    РћР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void VisualModel::SetScissor (render::scene::server::Scissor* node)
@@ -73,7 +73,7 @@ Scissor* VisualModel::Scissor () const
 }
 
 /*
-    Свойства шейдера
+    РЎРІРѕР№СЃС‚РІР° С€РµР№РґРµСЂР°
 */
 
 void VisualModel::SetDynamicShaderProperties (const common::PropertyMap& properties)
@@ -97,7 +97,7 @@ const common::PropertyMap& VisualModel::StaticShaderProperties () const
 }
 
 /*
-    Отображаемая сущность
+    РћС‚РѕР±СЂР°Р¶Р°РµРјР°СЏ СЃСѓС‰РЅРѕСЃС‚СЊ
 */
 
 manager::Entity& VisualModel::Entity ()
@@ -111,7 +111,7 @@ const manager::Entity& VisualModel::Entity () const
 }
 
 /*
-    Обход
+    РћР±С…РѕРґ
 */
 
 void VisualModel::VisitCore (ISceneVisitor& visitor)
@@ -120,7 +120,7 @@ void VisualModel::VisitCore (ISceneVisitor& visitor)
 }
 
 /*
-    Оповещение об обновлении мировой матрицы
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РјРёСЂРѕРІРѕР№ РјР°С‚СЂРёС†С‹
 */
 
 void VisualModel::OnWorldMatrixUpdated ()
@@ -129,7 +129,7 @@ void VisualModel::OnWorldMatrixUpdated ()
 }
 
 /*
-    Отрисовка
+    РћС‚СЂРёСЃРѕРІРєР°
 */
 
 void VisualModel::Draw (RenderingContext& context, void* user_data)

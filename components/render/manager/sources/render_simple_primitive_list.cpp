@@ -12,7 +12,7 @@ namespace
 {
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 render::low_level::UsageMode get_mode (MeshBufferUsage usage)
@@ -40,7 +40,7 @@ inline math::vec4ub convert_color (const math::vec4f& src_color)
 */
 
 /*
-    Генератор линий
+    Р“РµРЅРµСЂР°С‚РѕСЂ Р»РёРЅРёР№
 */
 
 struct LineGenerator
@@ -74,7 +74,7 @@ struct LineGenerator
 };
 
 /*
-    Генератор спрайтов
+    Р“РµРЅРµСЂР°С‚РѕСЂ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 struct SpriteGenerator
@@ -231,7 +231,7 @@ class OrientedBillboardSpriteGenerator: public SpriteGenerator
     math::mat4f        inv_mvp_tm;
 };
 
-/// Применение генератора к блоку спрайтов
+/// РџСЂРёРјРµРЅРµРЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР° Рє Р±Р»РѕРєСѓ СЃРїСЂР°Р№С‚РѕРІ
 template <class Generator, class Item>
 inline void generate (Generator& generator, unsigned int items_count, const Item* item, unsigned int base_vertex, DynamicPrimitiveVertex* dst_vertex, DynamicPrimitiveIndex* dst_index)
 {
@@ -292,13 +292,13 @@ inline void generate (unsigned int items_count, unsigned int base_vertex, Dynami
 */
 
 /*
-    Хранилище для материалов
+    РҐСЂР°РЅРёР»РёС‰Рµ РґР»СЏ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 class MaterialHolder: virtual public SimplePrimitiveListImplBase
 {
   public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     MaterialHolder (const MaterialManagerPtr& in_material_manager)
       : material_manager (in_material_manager)
     {
@@ -310,12 +310,12 @@ class MaterialHolder: virtual public SimplePrimitiveListImplBase
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!material_name)
           throw xtl::make_null_argument_exception ("", "material");
 
-          //замена материала
+          //Р·Р°РјРµРЅР° РјР°С‚РµСЂРёР°Р»Р°
 
         MaterialProxy proxy = material_manager->GetMaterialProxy (material_name);
 
@@ -378,9 +378,9 @@ class MaterialHolder: virtual public SimplePrimitiveListImplBase
     }
 
   private:
-    MaterialManagerPtr            material_manager; //менеджер материалов
-    stl::auto_ptr<MaterialProxy>  material;         //материал
-    MaterialPtr                   cached_material;  //закэшированный материал
+    MaterialManagerPtr            material_manager; //РјРµРЅРµРґР¶РµСЂ РјР°С‚РµСЂРёР°Р»РѕРІ
+    stl::auto_ptr<MaterialProxy>  material;         //РјР°С‚РµСЂРёР°Р»
+    MaterialPtr                   cached_material;  //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ РјР°С‚РµСЂРёР°Р»
 };
 
 /*
@@ -390,7 +390,7 @@ class MaterialHolder: virtual public SimplePrimitiveListImplBase
 class StandalonePrimitiveHolder: public MaterialHolder
 {
   public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type)
       : MaterialHolder (material_manager)
       , primitive_type (in_primitive_type)
@@ -401,7 +401,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
     {
     }
 
-/// Оповещение о необходимости обновления примитива
+/// РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ РїСЂРёРјРёС‚РёРІР°
     void PrimitivesUpdateNotify () { need_update_primitives = true; }
 
   protected:
@@ -410,7 +410,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
 
     render::manager::RendererPrimitive& Primitive () { return cached_primitive; }
 
-/// Сброс кэша
+/// РЎР±СЂРѕСЃ РєСЌС€Р°
     void ResetCacheCore ()
     {
       MaterialHolder::ResetCacheCore ();
@@ -419,7 +419,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
       cached_state_block_mask_hash = 0;
     }   
 
-/// Обновление кэша
+/// РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
     void UpdateCacheCore ()
     {
       try
@@ -434,7 +434,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
         {
           memset (&cached_primitive, 0, sizeof (cached_primitive));
           
-            //запрос состояния материала
+            //Р·Р°РїСЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°
 
           MaterialImpl* cached_material = CachedMaterial ();       
           
@@ -448,7 +448,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
             material_state_block->GetMask (mask);
           }
           
-            //установка вершинных/индексного буфера
+            //СѓСЃС‚Р°РЅРѕРІРєР° РІРµСЂС€РёРЅРЅС‹С…/РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
             
           mask.is_index_buffer = true;
           mask.is_layout       = true;
@@ -460,7 +460,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
           context.ISSetInputLayout  (device_manager.InputLayoutManager ().DynamicPrimitivesInputLayout ().get ());
           context.ISSetIndexBuffer  (ib.LowLevelBuffer ().get ());
           
-            //обновление блока состояний примитива
+            //РѕР±РЅРѕРІР»РµРЅРёРµ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РїСЂРёРјРёС‚РёРІР°
           
           size_t mask_hash = mask.Hash ();
           
@@ -472,7 +472,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
 
           cached_state_block->Capture (&context);
           
-            //кэширование параметров примитива для отрисовки
+            //РєСЌС€РёСЂРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРёРјРёС‚РёРІР° РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё
           
           cached_primitive.material    = cached_material;
           cached_primitive.state_block = cached_state_block.get ();
@@ -484,7 +484,7 @@ class StandalonePrimitiveHolder: public MaterialHolder
           cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
           cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
           
-            //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+            //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№ РІСЃРµРіРґР°, РїРѕСЃРєРѕР»СЊРєСѓ Р»СЋР±С‹Рµ РёР·РјРµРЅРµРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°/РїСЂРёРјРёС‚РёРІР° РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕС‚РѕР±СЂР°Р¶РµРЅС‹ РЅР° Р·Р°РІРёСЃРёРјС‹Рµ РєСЌС€Рё
             
           InvalidateCacheDependencies ();
 
@@ -517,7 +517,7 @@ class BatchingStateBlockHolder: public MaterialHolder
   public:
     using MaterialHolder::UpdateCache;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BatchingStateBlockHolder (const MaterialManagerPtr& material_manager, const BatchingManagerPtr& in_batching_manager)
       : MaterialHolder (material_manager)
       , batching_manager (in_batching_manager)
@@ -525,14 +525,14 @@ class BatchingStateBlockHolder: public MaterialHolder
       AttachCacheSource (*batching_manager);
     }
 
-/// Менеджер пакетирования
+/// РњРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
     render::manager::BatchingManager& BatchingManager () { return *batching_manager; }
 
-/// Блок состояния
+/// Р‘Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёСЏ
     LowLevelStateBlockPtr StateBlock () { return cached_low_level_state_block; }
 
   protected:
-/// Сброс кэша
+/// РЎР±СЂРѕСЃ РєСЌС€Р°
     void ResetCacheCore ()
     {
       MaterialHolder::ResetCacheCore ();
@@ -540,7 +540,7 @@ class BatchingStateBlockHolder: public MaterialHolder
       cached_state_block = BatchStateBlockPtr ();      
     }   
 
-/// Обновление кэша
+/// РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
     void UpdateCacheCore ()
     {
       try
@@ -585,7 +585,7 @@ class BatchingStateBlockHolder: public MaterialHolder
 };
 
 /*
-    Хранилище элементов списка днамических примитивов
+    РҐСЂР°РЅРёР»РёС‰Рµ СЌР»РµРјРµРЅС‚РѕРІ СЃРїРёСЃРєР° РґРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 template <class T, class Base> class PrimitiveListStorage: public Base, public SimplePrimitiveListImpl<T>
@@ -596,7 +596,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
     using Base::InvalidateCacheDependencies;
     using Base::InvalidateCache;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     PrimitiveListStorage (const MaterialManagerPtr& material_manager)
       : Base (material_manager)
       , need_update_buffers (true)
@@ -624,18 +624,18 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
     {
     } 
 
-/// Количество примитивов
+/// РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Size () { return items.size (); }
 
-/// Получение примитивов
+/// РџРѕР»СѓС‡РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     Item* Items () { return items.empty () ? (Item*)0 : &items [0]; }
 
-/// Добавление / обновление примитивов
+/// Р”РѕР±Р°РІР»РµРЅРёРµ / РѕР±РЅРѕРІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Add (size_t count, const Item* src_items)
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return items.size ();
@@ -643,7 +643,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
         if (!src_items)
           throw xtl::make_null_argument_exception ("", "items");
 
-          //добавление
+          //РґРѕР±Р°РІР»РµРЅРёРµ
 
         items.insert (items.end (), src_items, src_items + count);
 
@@ -664,7 +664,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return;
@@ -678,7 +678,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
         if (items.size () - first < count)
           throw xtl::make_range_exception ("", "count", count, items.size () - first);
 
-          //обновление спрайтов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїСЂР°Р№С‚РѕРІ
 
         stl::copy (src_items, src_items + count, &items [first]);
 
@@ -691,7 +691,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
       }
     }
 
-/// Удаление примитивов
+/// РЈРґР°Р»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     void Remove (size_t first, size_t count)
     {
       if (first >= items.size ())
@@ -719,7 +719,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
       InvalidateCacheDependencies ();
     }
 
-/// Резервируемое пространство
+/// Р РµР·РµСЂРІРёСЂСѓРµРјРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ
     void Reserve (size_t count)
     {
       size_t capacity = items.capacity ();
@@ -769,7 +769,7 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public S
 };
 
 /*
-    Экземпляр пакетного списка примитивов
+    Р­РєР·РµРјРїР»СЏСЂ РїР°РєРµС‚РЅРѕРіРѕ СЃРїРёСЃРєР° РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 class BatchingInstance: public DynamicPrimitive, private render::manager::RendererPrimitiveGroup
@@ -777,7 +777,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
   public:
     typedef xtl::intrusive_ptr<BatchingStateBlockHolder> PrototypePtr;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BatchingInstance (const PrototypePtr& in_prototype, render::low_level::PrimitiveType primitive_type, size_t flags = 0)
       : DynamicPrimitive (*this, flags)
       , prototype (in_prototype)
@@ -801,36 +801,36 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       }
     }
 
-/// Менеджер пакетирования
+/// РњРµРЅРµРґР¶РµСЂ РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
     render::manager::BatchingManager& BatchingManager () { return *batching_manager; }
 
   protected:
-/// Прототип
+/// РџСЂРѕС‚РѕС‚РёРї
     BatchingStateBlockHolder& Prototype () { return *prototype; }
 
-/// Примитив
+/// РџСЂРёРјРёС‚РёРІ
     render::manager::RendererPrimitive& Primitive ()
     {
       return cached_primitive; 
     }
 
-///Заполнение примитива
+///Р—Р°РїРѕР»РЅРµРЅРёРµ РїСЂРёРјРёС‚РёРІР°
     void UpdatePrimitive (unsigned int verts_count, unsigned int inds_count, DynamicPrimitiveVertex** out_vertices, DynamicPrimitiveIndex** out_indices, unsigned int* out_base_vertex)
     {
       try
       {
-          //выделение вершин
+          //РІС‹РґРµР»РµРЅРёРµ РІРµСЂС€РёРЅ
 
         if (out_vertices) *out_vertices = batching_manager->AllocateDynamicVertices (verts_count, out_base_vertex);
         else              batching_manager->PreallocateDynamicVertices (verts_count);
 
-            //выделение индексов
+            //РІС‹РґРµР»РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ
 
         const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
 
         *out_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary, inds_count);
 
-            //формирование примитива
+            //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїСЂРёРјРёС‚РёРІР°
 
         cached_primitive.first = (unsigned int)(*out_indices - *indices_base);
         cached_primitive.count = inds_count;
@@ -842,11 +842,11 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       }
     }
 
-///Получение указателя на индексы (должен вызываться между OnPrerenderCore & OnRenderCore, обязательно после UpdatePrimitive)
+///РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РёРЅРґРµРєСЃС‹ (РґРѕР»Р¶РµРЅ РІС‹Р·С‹РІР°С‚СЊСЃСЏ РјРµР¶РґСѓ OnPrerenderCore & OnRenderCore, РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРѕСЃР»Рµ UpdatePrimitive)
     DynamicPrimitiveIndex* TempIndices () { return const_cast<DynamicPrimitiveIndex*> (*cached_primitive.dynamic_indices) + cached_primitive.first; }
 
   private:
-/// Обновление кэша
+/// РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
     void UpdateCacheCore ()
     {
       try
@@ -899,7 +899,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
 
     static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StandaloneLineAndOrientedSpriteList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
       : StandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE)
       , Generator (generator)
@@ -907,19 +907,19 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
     {
     }
 
-///Статический примитив рендеринга
+///РЎС‚Р°С‚РёС‡РµСЃРєРёР№ РїСЂРёРјРёС‚РёРІ СЂРµРЅРґРµСЂРёРЅРіР°
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return &StandalonePrimitiveHolder::Primitive (); }
 
-///Создание экземпляра
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
       throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
     }
 
-///Количество примитивов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Size () { return VertexBuffer ().Size () / VERTICES_PER_PRIMITIVE; }
 
-///Добавление / обновление примитивов
+///Р”РѕР±Р°РІР»РµРЅРёРµ / РѕР±РЅРѕРІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Add (size_t count, const Item* items)
     {
       try
@@ -927,7 +927,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
         DynamicVertexBuffer& vb = VertexBuffer ();
         DynamicIndexBuffer&  ib = IndexBuffer ();
 
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return vb.Size () / VERTICES_PER_PRIMITIVE;
@@ -935,7 +935,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
         if (!items)
           throw xtl::make_null_argument_exception ("", "items");      
 
-          //добавление
+          //РґРѕР±Р°РІР»РµРЅРёРµ
 
         size_t new_verts_count = vb.Size () + count * VERTICES_PER_PRIMITIVE,
                new_inds_count  = ib.Size () + count * INDICES_PER_PRIMITIVE,
@@ -971,7 +971,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
         DynamicVertexBuffer& vb = VertexBuffer ();
         DynamicIndexBuffer&  ib = IndexBuffer ();
 
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return;
@@ -987,7 +987,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
         if (current_items_count - first < count)
           throw xtl::make_range_exception ("", "count", count, current_items_count - first);
 
-          //обновление элементов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 
         size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
                base_index  = first * INDICES_PER_PRIMITIVE;
@@ -1005,7 +1005,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
       }
     }
 
-///Удаление примитивов
+///РЈРґР°Р»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     void Remove (size_t first, size_t count)
     {
       DynamicVertexBuffer& vb = VertexBuffer ();
@@ -1052,7 +1052,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
       InvalidateCacheDependencies ();
     }
 
-///Резервируемое пространство
+///Р РµР·РµСЂРІРёСЂСѓРµРјРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ
     size_t Capacity () { return VertexBuffer ().Capacity () / VERTICES_PER_PRIMITIVE; }
 
     void Reserve (size_t count)
@@ -1125,15 +1125,15 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 
     static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
 
-/// Экземпляр списка примитивов
+/// Р­РєР·РµРјРїР»СЏСЂ СЃРїРёСЃРєР° РїСЂРёРјРёС‚РёРІРѕРІ
     class Instance: public BatchingInstance
     {
       public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
         Instance (const PrototypePtr& prototype) : BatchingInstance (prototype, PRIMITIVE_TYPE) { }
 
       private:
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
         void UpdateOnPrerenderCore (EntityImpl& entity)
         {
           try
@@ -1147,7 +1147,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 
             UpdatePrimitive (verts_count, inds_count, &vertices, &indices, &base_vertex);
 
-              //формирование вершин и индексов
+              //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РІРµСЂС€РёРЅ Рё РёРЅРґРµРєСЃРѕРІ
 
             generate (static_cast<Generator&> (prototype), items_count, base_vertex, indices);
 
@@ -1156,7 +1156,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
             const DynamicPrimitiveVertex* src_vert = prototype.Vertices ();
             DynamicPrimitiveVertex*       dst_vert = vertices;
 
-              //TODO: кэшировать вершины (копировать, если не изменялись)
+              //TODO: РєСЌС€РёСЂРѕРІР°С‚СЊ РІРµСЂС€РёРЅС‹ (РєРѕРїРёСЂРѕРІР°С‚СЊ, РµСЃР»Рё РЅРµ РёР·РјРµРЅСЏР»РёСЃСЊ)
 
             for (size_t count=verts_count; count--; src_vert++, dst_vert++)
             {             
@@ -1176,17 +1176,17 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix) {}
     };
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BatchingLineAndOrientedSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const Generator& generator)
       : BatchingStateBlockHolder (material_manager, batching_manager)
       , Generator (generator)
     {
     }
 
-///Статический примитив рендеринга
+///РЎС‚Р°С‚РёС‡РµСЃРєРёР№ РїСЂРёРјРёС‚РёРІ СЂРµРЅРґРµСЂРёРЅРіР°
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
-///Создание экземпляра
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
       try
@@ -1200,15 +1200,15 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
       }
     }
 
-///Количество примитивов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Size () { return vertices.size () / VERTICES_PER_PRIMITIVE; }
 
-///Добавление / обновление примитивов
+///Р”РѕР±Р°РІР»РµРЅРёРµ / РѕР±РЅРѕРІР»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     size_t Add (size_t count, const Item* items)
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return vertices.size () / VERTICES_PER_PRIMITIVE;
@@ -1216,7 +1216,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         if (!items)
           throw xtl::make_null_argument_exception ("", "items");      
 
-          //добавление
+          //РґРѕР±Р°РІР»РµРЅРёРµ
 
         size_t new_verts_count = vertices.size () + count * VERTICES_PER_PRIMITIVE, base_vertex = vertices.size ();
 
@@ -1237,7 +1237,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     {
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (!count)
           return;
@@ -1253,7 +1253,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         if (current_items_count - first < count)
           throw xtl::make_range_exception ("", "count", count, current_items_count - first);
 
-          //обновление элементов
+          //РѕР±РЅРѕРІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 
         size_t base_vertex = first * VERTICES_PER_PRIMITIVE;
 
@@ -1266,7 +1266,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
       }
     }
 
-///Удаление примитивов
+///РЈРґР°Р»РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
     void Remove (size_t first, size_t count)
     {
       const size_t current_items_count = vertices.size () / VERTICES_PER_PRIMITIVE;
@@ -1293,7 +1293,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
       vertices.resize (0);
     }
 
-///Резервируемое пространство
+///Р РµР·РµСЂРІРёСЂСѓРµРјРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ
     size_t Capacity () { return vertices.capacity () / VERTICES_PER_PRIMITIVE; }
 
     void Reserve (size_t count)
@@ -1312,7 +1312,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     }
 
   private:
-/// Вершины
+/// Р’РµСЂС€РёРЅС‹
     size_t VerticesCount () { return vertices.size (); }
 
     const DynamicPrimitiveVertex* Vertices () { return vertices.data (); }
@@ -1334,14 +1334,14 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
-/// Экземпляр
+/// Р­РєР·РµРјРїР»СЏСЂ
     template <class Generator>
     class Instance: public DynamicPrimitive, private render::manager::RendererPrimitiveGroup
     {
       public:
         typedef xtl::intrusive_ptr<StandaloneBillboardSpriteList> PrototypePtr;
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
         Instance (const PrototypePtr& in_prototype)
           : DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
           , prototype (in_prototype)
@@ -1351,7 +1351,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
         }
 
       private:
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
         void UpdateOnPrerenderCore (EntityImpl&) {}
 
         void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
@@ -1363,7 +1363,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
         PrototypePtr prototype;
     };
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     StandaloneBillboardSpriteList (const MaterialManagerPtr& material_manager, SpriteMode in_mode, const math::vec3f& in_view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
       : Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
       , mode (in_mode)
@@ -1371,10 +1371,10 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     {
     }
 
-///Статический примитив рендеринга
+///РЎС‚Р°С‚РёС‡РµСЃРєРёР№ РїСЂРёРјРёС‚РёРІ СЂРµРЅРґРµСЂРёРЅРіР°
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
-///Создание экземпляра
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
       try
@@ -1390,7 +1390,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     }
 
   private:
-/// Синхронизация буферов
+/// РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ Р±СѓС„РµСЂРѕРІ
     void SyncBuffers ()
     {
       render::low_level::IDevice& device = DeviceManager ().Device ();
@@ -1399,7 +1399,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
       IndexBuffer ().SyncBuffers (device);
     }
 
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
     template <class Generator> void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
     {
       try
@@ -1418,7 +1418,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
       }
     }
 
-/// Обновление буферов
+/// РћР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
     void UpdateBuffersCore ()
     {      
       try
@@ -1458,17 +1458,17 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
-/// Экземпляр списка примитивов
+/// Р­РєР·РµРјРїР»СЏСЂ СЃРїРёСЃРєР° РїСЂРёРјРёС‚РёРІРѕРІ
     class InstanceBase: public BatchingInstance
     {
       public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
         InstanceBase (const PrototypePtr& prototype)
           : BatchingInstance (prototype, BillboardSpriteGenerator::PRIMITIVE_TYPE, DynamicPrimitiveFlag_FrameDependent) 
         { }
 
       private:
-///Обновление
+///РћР±РЅРѕРІР»РµРЅРёРµ
         void UpdateOnPrerenderCore (EntityImpl& entity)
         {
           try
@@ -1495,7 +1495,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     class Instance: public InstanceBase
     {
       public:
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
         Instance (const PrototypePtr& prototype) : InstanceBase (prototype) { }
 
       private:
@@ -1509,7 +1509,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 
             DynamicPrimitiveVertex* vertices = BatchingManager ().AllocateDynamicVertices (verts_count, &base_vertex);
 
-              //формирование вершин и индексов
+              //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РІРµСЂС€РёРЅ Рё РёРЅРґРµРєСЃРѕРІ
 
             Generator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
 
@@ -1525,7 +1525,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
         }
     };
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     BatchingBillboardSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, SpriteMode in_mode, const math::vec3f& in_view_up)
       : Base (material_manager, batching_manager)
       , mode (in_mode)
@@ -1533,10 +1533,10 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     {
     }
 
-///Статический примитив рендеринга
+///РЎС‚Р°С‚РёС‡РµСЃРєРёР№ РїСЂРёРјРёС‚РёРІ СЂРµРЅРґРµСЂРёРЅРіР°
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
-///Создание экземпляра
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР°
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
       try
@@ -1552,7 +1552,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     }
 
   private:
-/// Обновление буферов
+/// РћР±РЅРѕРІР»РµРЅРёРµ Р±СѓС„РµСЂРѕРІ
     void UpdateBuffersCore () { }
 
   private:    
@@ -1563,7 +1563,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 }
 
 /*
-    Создание групп динамических примитивов
+    РЎРѕР·РґР°РЅРёРµ РіСЂСѓРїРї РґРёРЅР°РјРёС‡РµСЃРєРёС… РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 namespace render

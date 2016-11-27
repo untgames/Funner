@@ -4,10 +4,10 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1e9;  //РµСЃР»Рё СЂР°РґРёСѓСЃ/СЂР°СЃСЃС‚РѕСЏРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р° РїСЂРµРІС‹С€Р°РµС‚ СЌС‚Сѓ РІРµР»РёС‡РёРЅСѓ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‚СЃСЏ Р±РµСЃРєРѕРЅРµС‡РЅС‹Рµ bv
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PointLight::PointLight ()
@@ -21,7 +21,7 @@ PointLight::~PointLight ()
 }
 
 /*
-    Создание источника света
+    РЎРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 PointLight::Pointer PointLight::Create ()
@@ -30,7 +30,7 @@ PointLight::Pointer PointLight::Create ()
 }
 
 /*
-   Рассчёт ограничивающего объёма
+   Р Р°СЃСЃС‡С‘С‚ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‰РµРіРѕ РѕР±СЉС‘РјР°
 */
 
 void PointLight::UpdateBoundsCore ()
@@ -43,7 +43,7 @@ void PointLight::UpdateBoundsCore ()
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void PointLight::AcceptCore (Visitor& visitor)

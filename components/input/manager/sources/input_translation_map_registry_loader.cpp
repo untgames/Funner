@@ -43,13 +43,13 @@ void translation_map_registry_loader (const char* file_name, TranslationMapRegis
 }
 
 /*
-   Компонент загрузки карт трансляции
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё РєР°СЂС‚ С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 
 class KeyregLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     KeyregLoaderComponent () 
     {
       TranslationMapRegistryManager::RegisterLoader ("xkeyreg", &translation_map_registry_loader);

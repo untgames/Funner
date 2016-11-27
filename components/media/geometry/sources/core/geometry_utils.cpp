@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Получение характеристик
+    РџРѕР»СѓС‡РµРЅРёРµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє
 */
 
 namespace media
@@ -12,7 +12,7 @@ namespace media
 namespace geometry
 {
 
-//размер типа атрибута вершин в байтах
+//СЂР°Р·РјРµСЂ С‚РёРїР° Р°С‚СЂРёР±СѓС‚Р° РІРµСЂС€РёРЅ РІ Р±Р°Р№С‚Р°С…
 unsigned short get_type_size (VertexAttributeType type)
 {
   switch (type)
@@ -31,7 +31,7 @@ unsigned short get_type_size (VertexAttributeType type)
   return 0;
 }
 
-//количество компонентов
+//РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 unsigned char get_components_count (VertexAttributeType type)
 {
   switch (type)
@@ -50,7 +50,7 @@ unsigned char get_components_count (VertexAttributeType type)
   return 0;
 }
 
-//имя семантики
+//РёРјСЏ СЃРµРјР°РЅС‚РёРєРё
 const char* get_semantic_name (VertexAttributeSemantic semantic)
 {
   switch (semantic)
@@ -74,7 +74,7 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
   return "";
 }
 
-//получение семантики по имени
+//РїРѕР»СѓС‡РµРЅРёРµ СЃРµРјР°РЅС‚РёРєРё РїРѕ РёРјРµРЅРё
 VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic)
 {
   if (!name)
@@ -114,7 +114,7 @@ VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexA
   return default_semantic;
 }
 
-//имя типа
+//РёРјСЏ С‚РёРїР°
 const char* get_type_name (VertexAttributeType type)
 {
   switch (type)
@@ -133,7 +133,7 @@ const char* get_type_name (VertexAttributeType type)
   return "";
 }
 
-//получение типа по имени
+//РїРѕР»СѓС‡РµРЅРёРµ С‚РёРїР° РїРѕ РёРјРµРЅРё
 VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttributeType default_type)
 {
   if (!name)
@@ -168,7 +168,7 @@ VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttribute
   return default_type;
 }
 
-//проверка совместимости
+//РїСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
 {
   switch (semantic)

@@ -39,16 +39,16 @@ int main ()
   
   try
   {
-      //преобразование ключа
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєР»СЋС‡Р°
       
     FileCryptoParameters crypto_params (DECRYPT_METHOD, ENCRYPT_METHOD, KEY_STRING);
     
-      //установка параметров шифрования
+      //СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂРѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ
 
     FileSystem::SetCryptoParameters (CRYPTO_FILE_NAME, crypto_params);
     FileSystem::AddSearchPath (SEARCH_PATH, &PrintLog);
 
-      //чтение файла
+      //С‡С‚РµРЅРёРµ С„Р°Р№Р»Р°
       
     ReadFileContent (SOURCE_FILE);    
   }

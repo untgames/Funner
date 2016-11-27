@@ -4,16 +4,16 @@ using namespace scene_graph;
 using namespace common;
 
 /*
-    Описание реализации Listener
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Listener
 */
 
 struct Listener::Impl: public xtl::instance_counter<Listener>
 {
-  float gain; //усиление
+  float gain; //СѓСЃРёР»РµРЅРёРµ
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Listener::Listener ()
@@ -28,7 +28,7 @@ Listener::~Listener ()
 }
 
 /*
-    Создание слушателя
+    РЎРѕР·РґР°РЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 Listener::Pointer Listener::Create ()
@@ -37,7 +37,7 @@ Listener::Pointer Listener::Create ()
 }
 
 /*
-    Усиление
+    РЈСЃРёР»РµРЅРёРµ
 */
 
 float Listener::Gain () const
@@ -56,7 +56,7 @@ void Listener::SetGain (float gain)
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РїРѕСЃРµС‰РµРЅРёРё РѕР±СЉРµРєС‚Р°
 */
 
 void Listener::AcceptCore (Visitor& visitor)
@@ -66,7 +66,7 @@ void Listener::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void Listener::BindProperties (common::PropertyBindingMap& bindings)

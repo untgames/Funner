@@ -3,23 +3,23 @@
 using namespace common;
 
 /*
-    Описание реализации
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 */
 
 struct WxfWriter::Impl
 {
-  OutputTextStream stream;           //поток вывода
-  size_t           frame_indent;     //отступ фрейма
-  size_t           attr_indent;      //отступ атрибутов от имени тэга
-  size_t           current_indent;   //текущий отступ
-  bool             begin_frame_flag; //флага начала фрейма
+  OutputTextStream stream;           //РїРѕС‚РѕРє РІС‹РІРѕРґР°
+  size_t           frame_indent;     //РѕС‚СЃС‚СѓРї С„СЂРµР№РјР°
+  size_t           attr_indent;      //РѕС‚СЃС‚СѓРї Р°С‚СЂРёР±СѓС‚РѕРІ РѕС‚ РёРјРµРЅРё С‚СЌРіР°
+  size_t           current_indent;   //С‚РµРєСѓС‰РёР№ РѕС‚СЃС‚СѓРї
+  bool             begin_frame_flag; //С„Р»Р°РіР° РЅР°С‡Р°Р»Р° С„СЂРµР№РјР°
   
   Impl (const WriteFunction& writer, size_t in_frame_indent, size_t in_attr_indent)
     : stream (writer), frame_indent (in_frame_indent), attr_indent (in_attr_indent), current_indent (0), begin_frame_flag (true) {}
 };
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 WxfWriter::WxfWriter (const char* file_name, size_t frame_indent, size_t attr_indent)
@@ -39,7 +39,7 @@ WxfWriter::~WxfWriter ()
 }
 
 /*
-    Поток вывода
+    РџРѕС‚РѕРє РІС‹РІРѕРґР°
 */
 
 const OutputTextStream& WxfWriter::Stream () const
@@ -53,23 +53,23 @@ OutputTextStream& WxfWriter::Stream ()
 }
 
 /*
-    Размеры отступов
+    Р Р°Р·РјРµСЂС‹ РѕС‚СЃС‚СѓРїРѕРІ
 */
 
-//отступ фреймов
+//РѕС‚СЃС‚СѓРї С„СЂРµР№РјРѕРІ
 size_t WxfWriter::FrameIndent () const
 {
   return impl->frame_indent;
 }
 
-//отступ от тэга до списка атрибутов
+//РѕС‚СЃС‚СѓРї РѕС‚ С‚СЌРіР° РґРѕ СЃРїРёСЃРєР° Р°С‚СЂРёР±СѓС‚РѕРІ
 size_t WxfWriter::AttributesIndent () const
 {
   return impl->attr_indent;
 }
 
 /*
-    Работа с фреймами
+    Р Р°Р±РѕС‚Р° СЃ С„СЂРµР№РјР°РјРё
 */
 
 void WxfWriter::BeginFrame ()
@@ -102,7 +102,7 @@ void WxfWriter::EndFrame ()
 }
 
 /*
-    Сериализация атрибутов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 void WxfWriter::Write (const char* tag)
@@ -114,7 +114,7 @@ void WxfWriter::Write (const char* tag)
 }
 
 /*
-    Вставка комментария
+    Р’СЃС‚Р°РІРєР° РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 */
 
 void WxfWriter::WriteComment (const char* comment)
@@ -172,7 +172,7 @@ void WxfWriter::WriteComment (const wchar_t*)
 }
 
 /*
-    Сброс буферов потока
+    РЎР±СЂРѕСЃ Р±СѓС„РµСЂРѕРІ РїРѕС‚РѕРєР°
 */
 
 void WxfWriter::Flush ()
@@ -181,7 +181,7 @@ void WxfWriter::Flush ()
 }
 
 /*
-    Печать отступа
+    РџРµС‡Р°С‚СЊ РѕС‚СЃС‚СѓРїР°
 */
 
 void WxfWriter::WriteIndent ()
@@ -197,7 +197,7 @@ void WxfWriter::WriteIndent (size_t indent)
 }
 
 /*
-    Проверка корректности wxf-тэга
+    РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё wxf-С‚СЌРіР°
 */
 
 void WxfWriter::CheckTag (const char* tag, const char* function_name)

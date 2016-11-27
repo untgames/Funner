@@ -4,7 +4,7 @@ using namespace social;
 using namespace social::game_kit;
 
 /*
-   Конструктор / Деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 UtilityImpl::UtilityImpl ()
@@ -20,7 +20,7 @@ UtilityImpl::~UtilityImpl ()
 }
 
 /*
-   Утилиты для конвертирования типов
+   РЈС‚РёР»РёС‚С‹ РґР»СЏ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ С‚РёРїРѕРІ
 */
 
 void UtilityImpl::FillUser (GKPlayer* player, User& user)

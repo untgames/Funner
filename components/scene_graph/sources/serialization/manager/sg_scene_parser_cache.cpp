@@ -4,7 +4,7 @@ using namespace scene_graph;
 using detail::ISceneAttachment;
 
 /*
-    Описание реализации кэша парсера сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСЌС€Р° РїР°СЂСЃРµСЂР° СЃС†РµРЅС‹
 */
 
 namespace
@@ -33,11 +33,11 @@ typedef stl::hash_multimap<size_t, CacheValuePtr> CacheMap;
 
 struct SceneParserCache::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneParserCache>
 {
-  CacheMap cache; //кэш значений
+  CacheMap cache; //РєСЌС€ Р·РЅР°С‡РµРЅРёР№
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 SceneParserCache::SceneParserCache ()
@@ -64,7 +64,7 @@ SceneParserCache& SceneParserCache::operator = (const SceneParserCache& cache)
 }
 
 /*
-    Установка значения
+    РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ
 */
 
 void SceneParserCache::SetValueCore (const common::ParseNode& decl, detail::ISceneAttachment* in_attachment)
@@ -92,7 +92,7 @@ void SceneParserCache::SetValueCore (const common::ParseNode& decl, detail::ISce
 }
 
 /*
-    Удаление значения
+    РЈРґР°Р»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 void SceneParserCache::ResetValue (const common::ParseNode& decl)
@@ -101,7 +101,7 @@ void SceneParserCache::ResetValue (const common::ParseNode& decl)
 }
 
 /*
-    Поиск значения
+    РџРѕРёСЃРє Р·РЅР°С‡РµРЅРёСЏ
 */
 
 ISceneAttachment* SceneParserCache::FindValueCore (const common::ParseNode& decl, const std::type_info& type) const
@@ -116,7 +116,7 @@ ISceneAttachment* SceneParserCache::FindValueCore (const common::ParseNode& decl
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void SceneParserCache::Clear ()
@@ -125,7 +125,7 @@ void SceneParserCache::Clear ()
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void SceneParserCache::Swap (SceneParserCache& cache)

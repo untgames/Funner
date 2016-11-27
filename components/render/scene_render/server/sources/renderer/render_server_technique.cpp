@@ -4,25 +4,25 @@ using namespace render;
 using namespace render::scene::server;
 
 /*
-    Описание реализации техники рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С‚РµС…РЅРёРєРё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct Technique::Impl
 {
-  stl::string                                           name;                            //имя техники
-  common::PropertyMap                                   properties;                      //свойства
-  common::PropertyMap                                   default_properties;              //свойства по умолчанию
-  common::PropertyMap                                   binded_properties;               //значения свойств после связывания
-  common::PropertyBindingMap                            property_bindings;               //связывание методом техники со свойствами
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> binded_properties_synchronizer;  //синхронизатор свойств после связывания
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> default_properties_synchronizer; //синхронизатор свойств по умолчанию
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> properties_synchronizer;         //синхронизатор свойств
-  bool                                                  need_update_properties;          //флаг необходимости обновления свойств
-  bool                                                  need_bind_properties;            //флаг необходимости биндинга свойств
-  xtl::auto_connection                                  properties_update_connection;    //соединение с сигналом обновления свойств
-  common::PropertyMap::EventHandler                     properties_update_handler;       //обработчик сигнала обновления свойств
+  stl::string                                           name;                            //РёРјСЏ С‚РµС…РЅРёРєРё
+  common::PropertyMap                                   properties;                      //СЃРІРѕР№СЃС‚РІР°
+  common::PropertyMap                                   default_properties;              //СЃРІРѕР№СЃС‚РІР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  common::PropertyMap                                   binded_properties;               //Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ РїРѕСЃР»Рµ СЃРІСЏР·С‹РІР°РЅРёСЏ
+  common::PropertyBindingMap                            property_bindings;               //СЃРІСЏР·С‹РІР°РЅРёРµ РјРµС‚РѕРґРѕРј С‚РµС…РЅРёРєРё СЃРѕ СЃРІРѕР№СЃС‚РІР°РјРё
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> binded_properties_synchronizer;  //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ РїРѕСЃР»Рµ СЃРІСЏР·С‹РІР°РЅРёСЏ
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> default_properties_synchronizer; //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> properties_synchronizer;         //СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ СЃРІРѕР№СЃС‚РІ
+  bool                                                  need_update_properties;          //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  bool                                                  need_bind_properties;            //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё Р±РёРЅРґРёРЅРіР° СЃРІРѕР№СЃС‚РІ
+  xtl::auto_connection                                  properties_update_connection;    //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРёРіРЅР°Р»РѕРј РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
+  common::PropertyMap::EventHandler                     properties_update_handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРёРіРЅР°Р»Р° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : need_update_properties (true) 
     , need_bind_properties (true)
@@ -31,7 +31,7 @@ struct Technique::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Technique::Technique ()
@@ -45,7 +45,7 @@ Technique::~Technique ()
 }
 
 /*
-    Имя техники
+    РРјСЏ С‚РµС…РЅРёРєРё
 */
 
 void Technique::SetName (const char* name)
@@ -62,11 +62,11 @@ const char* Technique::Name () const
 }
 
 /*
-    Камера
+    РљР°РјРµСЂР°
 */
 
 /*
-    Свойства по умолчанию
+    РЎРІРѕР№СЃС‚РІР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void Technique::SetDefaultProperties (const common::PropertyMap& properties)
@@ -98,7 +98,7 @@ const common::PropertyMap& Technique::DefaultProperties ()
 }
 
 /*
-    Свойства рендеринга
+    РЎРІРѕР№СЃС‚РІР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void Technique::SetProperties (const common::PropertyMap& properties)
@@ -124,7 +124,7 @@ void Technique::UpdateProperties ()
 }
 
 /*
-    Связывание свойств техники с методами техники
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ С‚РµС…РЅРёРєРё СЃ РјРµС‚РѕРґР°РјРё С‚РµС…РЅРёРєРё
 */
 
 void Technique::BindProperties (common::PropertyBindingMap&)
@@ -132,18 +132,18 @@ void Technique::BindProperties (common::PropertyBindingMap&)
 }
 
 /*
-    Отрисовка
+    РћС‚СЂРёСЃРѕРІРєР°
 */
 
 void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& private_data)
 {
   try
   {
-      //обновление свойств
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 
     if (impl->need_update_properties)
     {
-        //биндинг свойств
+        //Р±РёРЅРґРёРЅРі СЃРІРѕР№СЃС‚РІ
 
       if (impl->need_bind_properties)
       {        
@@ -156,7 +156,7 @@ void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& pr
         impl->need_bind_properties = false;
       }
 
-        //обновление свойств по умолчанию
+        //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
       if (!impl->default_properties_synchronizer)
       {
@@ -165,30 +165,30 @@ void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& pr
         impl->default_properties_synchronizer->CopyFromPropertyMap (); //updates only once
       }
 
-        //обновление свойств
+        //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ
 
       if (!impl->properties_synchronizer)
       {
-          //применение свойств по умолчанию
+          //РїСЂРёРјРµРЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
         impl->binded_properties_synchronizer->CopyFromPropertyMap ();
         impl->default_properties_synchronizer->CopyFromPropertyMap ();
 
-          //созданеи синхронизатора
+          //СЃРѕР·РґР°РЅРµРё СЃРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂР°
 
         impl->properties_synchronizer.reset (new common::PropertyBindingMapSynchronizer (impl->property_bindings, impl->properties));
       }
 
       impl->properties_synchronizer->CopyFromPropertyMap ();
 
-        //оповещение об обновлении
+        //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё
 
       UpdatePropertiesCore ();
 
       impl->need_update_properties = false;
     }
 
-      //отрисовка кадра
+      //РѕС‚СЂРёСЃРѕРІРєР° РєР°РґСЂР°
 
     UpdateFrameCore (context, private_data);
   }

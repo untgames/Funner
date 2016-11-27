@@ -17,7 +17,7 @@ int main ()
   
   try
   {
-      //запись данных
+      //Р·Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
     
     StdFile out_file (CRYPTO_FILE_NAME, FileMode_ReadWrite);
     CryptoFile crypto_file (out_file, DECRYPT_METHOD, ENCRYPT_METHOD, KEY, KEY_BITS);
@@ -36,7 +36,7 @@ int main ()
     out_file.Close ();
     crypto_file.Close ();
     
-      //чтение данных
+      //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
     
     InputFile in_file (CRYPTO_FILE_NAME);
 

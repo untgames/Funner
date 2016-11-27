@@ -1,4 +1,4 @@
-//Тестирование алгоритма partial_sort (first, middle, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° partial_sort (first, middle, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

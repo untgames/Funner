@@ -663,7 +663,7 @@ psd_status psd_get_image_resource(psd_context * context)
 							psd_get_path(context, sizeofdata);
 						}
 						// If the file contains a resource of type 8BIM with an ID of 2999, then this resource
-						// contains a Pascal®Cstyle string containing the name of the clipping path to use with this
+						// contains a Pascal–ÅCstyle string containing the name of the clipping path to use with this
 						// image when saving it as an EPS file???
 						else if(ID == 2999)
 						{

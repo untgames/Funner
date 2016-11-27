@@ -3,14 +3,14 @@
 using namespace debug;
 
 /*
-    Описание реализации символа
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРёРјРІРѕР»Р°
 */
 
 struct Symbol::Impl: public xtl::reference_counter
 {
-  stl::string name;          //имя символа
-  size_t      start_address; //начальный адрес
-  size_t      size;          //размер
+  stl::string name;          //РёРјСЏ СЃРёРјРІРѕР»Р°
+  size_t      start_address; //РЅР°С‡Р°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ
+  size_t      size;          //СЂР°Р·РјРµСЂ
   
   Impl (const char* in_name, size_t in_start_address, size_t in_size)
     : name (in_name)
@@ -21,7 +21,7 @@ struct Symbol::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / присваивание / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Symbol::Symbol ()
@@ -55,7 +55,7 @@ Symbol& Symbol::operator = (const Symbol& symbol)
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* Symbol::Name () const
@@ -72,7 +72,7 @@ void Symbol::SetName (const char* name)
 }
 
 /*
-    Начальный адрес
+    РќР°С‡Р°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ
 */
 
 void Symbol::SetStartAddress (size_t addr)
@@ -86,7 +86,7 @@ size_t Symbol::StartAddress () const
 }
 
 /*
-    Размер
+    Р Р°Р·РјРµСЂ
 */
 
 void Symbol::SetSize (size_t size)
@@ -100,7 +100,7 @@ size_t Symbol::Size () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Symbol::Swap (Symbol& symbol)

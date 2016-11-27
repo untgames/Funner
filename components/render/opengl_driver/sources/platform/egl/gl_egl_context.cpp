@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::egl;
 
 /*
-    Описание реализации контекста
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 typedef stl::vector<IContextListener*> ListenerArray;
@@ -13,20 +13,20 @@ typedef xtl::com_ptr<Adapter>          AdapterPtr;
 
 struct Context::Impl
 {  
-  Log                       log;                   //протокол драйвера отрисовки
-  Output::Pointer           output;                //целевое устройство вывода
-  AdapterPtr                adapter;               //целевой адаптер отрисовки  
-  NativeDisplayType         display;               //соединение с дисплеем
-  EGLDisplay                egl_display;           //целевой дисплей отрисовки
-  EGLSurface                egl_surface;           //целевая поверхность отрисовки
-  EGLContext                egl_context;           //целевой контекст отрисовки
-  bool                      vsync;                 //включена ли вертикальная синхронизация
-  ListenerArray             listeners;             //слушатели событий контекста
-  xtl::trackable::slot_type on_destroy_swap_chain; //обработчик удаления цепочки обмена  
-  PrimarySwapChain*         swap_chain;            //текущая цепочка обмена
-  static Impl*              current_context;       //текущий контекст
+  Log                       log;                   //РїСЂРѕС‚РѕРєРѕР» РґСЂР°Р№РІРµСЂР° РѕС‚СЂРёСЃРѕРІРєРё
+  Output::Pointer           output;                //С†РµР»РµРІРѕРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
+  AdapterPtr                adapter;               //С†РµР»РµРІРѕР№ Р°РґР°РїС‚РµСЂ РѕС‚СЂРёСЃРѕРІРєРё  
+  NativeDisplayType         display;               //СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  EGLDisplay                egl_display;           //С†РµР»РµРІРѕР№ РґРёСЃРїР»РµР№ РѕС‚СЂРёСЃРѕРІРєРё
+  EGLSurface                egl_surface;           //С†РµР»РµРІР°СЏ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ РѕС‚СЂРёСЃРѕРІРєРё
+  EGLContext                egl_context;           //С†РµР»РµРІРѕР№ РєРѕРЅС‚РµРєСЃС‚ РѕС‚СЂРёСЃРѕРІРєРё
+  bool                      vsync;                 //РІРєР»СЋС‡РµРЅР° Р»Рё РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
+  ListenerArray             listeners;             //СЃР»СѓС€Р°С‚РµР»Рё СЃРѕР±С‹С‚РёР№ РєРѕРЅС‚РµРєСЃС‚Р°
+  xtl::trackable::slot_type on_destroy_swap_chain; //РѕР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°  
+  PrimarySwapChain*         swap_chain;            //С‚РµРєСѓС‰Р°СЏ С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  static Impl*              current_context;       //С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
     : display (0)
     , egl_display (0)
@@ -38,7 +38,7 @@ struct Context::Impl
   {    
   }
   
-///Сброс текущего контекста
+///РЎР±СЂРѕСЃ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void ResetContext ()
   {
     if (current_context != this)
@@ -53,7 +53,7 @@ struct Context::Impl
     current_context = 0;
   }
 
-///Обработчик удаления цепочки обмена
+///РћР±СЂР°Р±РѕС‚С‡РёРє СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
   void OnDestroySwapChain ()
   {    
     if (current_context == this)
@@ -64,7 +64,7 @@ struct Context::Impl
     egl_surface = 0;    
   }
 
-///Оповещение о потере контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕС‚РµСЂРµ РєРѕРЅС‚РµРєСЃС‚Р°
   void LostCurrentNotify ()
   {
     try
@@ -74,11 +74,11 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Оповещение об установке текущего контекста
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
   void SetCurrentNotify ()
   {
     try
@@ -88,7 +88,7 @@ struct Context::Impl
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
@@ -96,21 +96,21 @@ struct Context::Impl
 Context::Impl* Context::Impl::current_context = 0;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Context::Context (ISwapChain* in_swap_chain)
 {
   try
   {
-      //проверка корректности аргументов
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
     PrimarySwapChain* swap_chain = cast_object<PrimarySwapChain> (in_swap_chain, "", "swap_chain");    
 
-      //создание реализации
+      //СЃРѕР·РґР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё
 
     impl = new Impl;    
 
@@ -120,7 +120,7 @@ Context::Context (ISwapChain* in_swap_chain)
     
     DisplayLock lock (impl->display);
 
-      //создание контекста            
+      //СЃРѕР·РґР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°            
 
     impl->log.Printf ("Create context (id=%d)...", GetId ());
     
@@ -137,7 +137,7 @@ Context::Context (ISwapChain* in_swap_chain)
     if (!impl->egl_context)
       raise_error ("::eglCreateContext");          
       
-      //оповещение о создании контекста
+      //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР·РґР°РЅРёРё РєРѕРЅС‚РµРєСЃС‚Р°
     
     impl->log.Printf ("...context successfully created (handle=%08x)", impl->egl_context);
   }
@@ -154,12 +154,12 @@ Context::~Context ()
   {
     impl->log.Printf ("Delete context (id=%d)...", GetId ());
     
-      //отмена текущего контекста
+      //РѕС‚РјРµРЅР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     if (Impl::current_context == impl.get ())
       impl->ResetContext ();
 
-      //удаление контекста
+      //СѓРґР°Р»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
       
     DisplayLock lock (impl->display);
 
@@ -171,12 +171,12 @@ Context::~Context ()
   }
   catch (...)
   {
-    //подавление всех исключений
+    //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
   }
 }
 
 /*
-    Установка текущего контектса
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєС‚СЃР°
 */
 
 void Context::MakeCurrent (ISwapChain* swap_chain)
@@ -188,11 +188,11 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
     if (swap_chain != impl->swap_chain)
     {
-        //изменение текущей цепочки обмена
+        //РёР·РјРµРЅРµРЅРёРµ С‚РµРєСѓС‰РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       PrimarySwapChain* casted_swap_chain = cast_object<PrimarySwapChain> (swap_chain, "", "swap_chain");
 
-        //подписка на событие удаления цепочки обмена
+        //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ СѓРґР°Р»РµРЅРёСЏ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
@@ -207,7 +207,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       impl->vsync = desc.vsync;
     }
     
-      //оповещение о потере текущего контекста
+      //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРѕС‚РµСЂРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
     
     if (Impl::current_context)
     {
@@ -218,7 +218,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
     DisplayLock lock (impl->display);
     
-      //установка текущего контекста                
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°                
 
     if (!eglMakeCurrent (impl->egl_display, impl->egl_surface, impl->egl_surface, impl->egl_context))
       raise_error ("::eglMakeCurrent");
@@ -228,7 +228,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       
     Impl::current_context = impl.get ();
 
-      //оповещение об установке текущего контекста
+      //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓСЃС‚Р°РЅРѕРІРєРµ С‚РµРєСѓС‰РµРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
     impl->SetCurrentNotify ();
   }
@@ -240,7 +240,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 }
 
 /*
-    Проверка совместимости цепочки обмена с контекстом
+    РџСЂРѕРІРµСЂРєР° СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё С†РµРїРѕС‡РєРё РѕР±РјРµРЅР° СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј
 */
 
 bool Context::IsCompatible (ISwapChain* in_swap_chain)
@@ -249,7 +249,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
   {
     PrimarySwapChain* swap_chain = cast_object<PrimarySwapChain> (in_swap_chain, "", "swap_chain");
 
-    return swap_chain->GetEglDisplay () == impl->output->GetEglDisplay (); //скорее всего не корректно!!!
+    return swap_chain->GetEglDisplay () == impl->output->GetEglDisplay (); //СЃРєРѕСЂРµРµ РІСЃРµРіРѕ РЅРµ РєРѕСЂСЂРµРєС‚РЅРѕ!!!
   }
   catch (xtl::exception& exception)
   {
@@ -259,7 +259,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
 }
 
 /*
-    Получение интерфейса библиотеки OpenGL
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° Р±РёР±Р»РёРѕС‚РµРєРё OpenGL
 */
 
 ILibrary& Context::GetLibrary ()
@@ -268,7 +268,7 @@ ILibrary& Context::GetLibrary ()
 }
 
 /*
-    Подписка на события контекста
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 void Context::AttachListener (IContextListener* listener)

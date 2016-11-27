@@ -3,7 +3,7 @@
 
 #include <FBaseSys.h>
 
-///точка входа в приложение
+///С‚РѕС‡РєР° РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ
 _EXPORT_ int OspMain (int argc, char *argv [])
 {
   const char* env [] = {0};

@@ -18,7 +18,7 @@ namespace common
 {
 
 /*
-    Компрессия / декомпрессия в Base64
+    РљРѕРјРїСЂРµСЃСЃРёСЏ / РґРµРєРѕРјРїСЂРµСЃСЃРёСЏ РІ Base64
 */
 
 void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string& result)

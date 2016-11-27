@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc& in_desc, const void* data)
@@ -19,7 +19,7 @@ InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc&
 
     dx_desc.ByteWidth = desc.size;
 
-      //преобразование параметров
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
 
     switch (desc.usage_mode)
     {
@@ -31,7 +31,7 @@ InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc&
         throw xtl::make_argument_exception ("", "desc.usage_mode", desc.usage_mode);
     }
 
-      //проверка корректности флагов доступа
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С„Р»Р°РіРѕРІ РґРѕСЃС‚СѓРїР°
 
     switch (desc.access_flags)
     {
@@ -68,7 +68,7 @@ InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc&
       if (desc.bind_flags & flags [i].src_flag)
         dx_desc.BindFlags |= flags [i].dst_flag;    
 
-      //создание буфера
+      //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
     ID3D11Buffer* dx_buffer = 0;
 
@@ -97,7 +97,7 @@ InputBuffer::~InputBuffer ()
 }
 
 /*
-    Получение дескриптора буфера
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° Р±СѓС„РµСЂР°
 */
 
 void InputBuffer::GetDesc (BufferDesc& out_desc)
@@ -106,19 +106,19 @@ void InputBuffer::GetDesc (BufferDesc& out_desc)
 }
 
 /*
-    Чтение / запись из буфера
+    Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РёР· Р±СѓС„РµСЂР°
 */
 
 void InputBuffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
 {
   try
   {
-      //проверка возможности установки данных
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
       
     if (!(desc.access_flags & AccessFlag_Write))
       throw xtl::format_operation_exception ("", "Can't set buffer data (no AccessFlag_Write in desc.access_flags)");
 
-      //отсечение
+      //РѕС‚СЃРµС‡РµРЅРёРµ
 
     if (offset >= desc.size)
       return;
@@ -129,16 +129,16 @@ void InputBuffer::SetData (size_t offset, size_t size, const void* data, IDevice
     if (!size)
       return;
 
-      //проверка корректности результирующего буфера
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР°
 
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
-      //преобразование контекста
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
 
-      //запись
+      //Р·Р°РїРёСЃСЊ
 
     D3D11_MAPPED_SUBRESOURCE subresource;
 
@@ -162,12 +162,12 @@ void InputBuffer::GetData (size_t offset, size_t size, void* data, IDeviceContex
 {
   try
   {
-      //проверка возможности установки данных
+      //РїСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё РґР°РЅРЅС‹С…
       
     if (!(desc.access_flags & AccessFlag_Read))
       throw xtl::format_operation_exception ("", "Can't get buffer data (no AccessFlag_Read in desc.access_flags)");
 
-      //отсечение
+      //РѕС‚СЃРµС‡РµРЅРёРµ
 
     if (offset >= desc.size)
       return;
@@ -178,16 +178,16 @@ void InputBuffer::GetData (size_t offset, size_t size, void* data, IDeviceContex
     if (!size)
       return;
 
-      //проверка корректности результирующего буфера
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР°
 
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
-      //преобразование контекста
+      //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 
     ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
 
-      //чтение
+      //С‡С‚РµРЅРёРµ
 
     D3D11_MAPPED_SUBRESOURCE subresource;
 

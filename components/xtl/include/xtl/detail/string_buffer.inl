@@ -1,5 +1,5 @@
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T, class Allocator>
@@ -8,7 +8,7 @@ inline basic_string_buffer<T, Allocator>::basic_string_buffer (const allocator_t
   {}
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class T, class Allocator>
@@ -18,7 +18,7 @@ inline typename basic_string_buffer<T, Allocator>::allocator_type basic_string_b
 }
 
 /*
-    Размер буфера / объём буфера (количество доступной памяти)
+    Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР° / РѕР±СЉС‘Рј Р±СѓС„РµСЂР° (РєРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅРѕР№ РїР°РјСЏС‚Рё)
 */
 
 template <class T, class Allocator>
@@ -38,7 +38,7 @@ inline typename basic_string_buffer<T, Allocator>::size_type basic_string_buffer
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class T, class Allocator>
@@ -48,7 +48,7 @@ inline bool basic_string_buffer<T, Allocator>::empty () const
 }
 
 /*
-    Данные
+    Р”Р°РЅРЅС‹Рµ
 */
 
 template <class T, class Allocator>
@@ -91,7 +91,7 @@ void basic_string_buffer<T, Allocator>::terminate_string ()
 }
 
 /*
-    Изменение размера буфера / резервирование памяти
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° / СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё
 */
 
 template <class T, class Allocator>
@@ -109,7 +109,7 @@ inline void basic_string_buffer<T, Allocator>::reserve (size_type new_size, bool
 }
 
 /*
-    Очистка буфера
+    РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂР°
 */
 
 template <class T, class Allocator>
@@ -119,7 +119,7 @@ inline void basic_string_buffer<T, Allocator>::clear ()
 }
 
 /*
-    Добавление строки
+    Р”РѕР±Р°РІР»РµРЅРёРµ СЃС‚СЂРѕРєРё
 */
 
 template <class T, class Allocator>
@@ -206,7 +206,7 @@ inline basic_string_buffer<T, Allocator> basic_string_buffer<T, Allocator>::oper
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T, class Allocator>

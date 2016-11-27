@@ -9,7 +9,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* COMMON_CONNECTION_LIBRARY = "Common.Connection";
@@ -20,14 +20,14 @@ namespace engine
 {
 
 /*
-    Регистрация библиотеки работы с деревьями строк
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РґРµСЂРµРІСЊСЏРјРё СЃС‚СЂРѕРє
 */
 
 void bind_common_signals (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_CONNECTION_LIBRARY);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
   
   lib.Register ("Disconnect",    make_invoker (&xtl::connection::disconnect));
   lib.Register ("Block",         make_invoker (&xtl::connection::block));
@@ -36,7 +36,7 @@ void bind_common_signals (Environment& environment)
   lib.Register ("get_Connected", make_invoker (&xtl::connection::connected));
   lib.Register ("IsEqual",       make_invoker (&xtl::connection::operator ==));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<xtl::connection> (COMMON_CONNECTION_LIBRARY);
 }

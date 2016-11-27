@@ -8,7 +8,7 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Допустимые кодировок
+///Р”РѕРїСѓСЃС‚РёРјС‹Рµ РєРѕРґРёСЂРѕРІРѕРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum Encoding
 {
@@ -30,7 +30,7 @@ void convert_encoding (Encoding       source_encoding,
                        size_t&        destination_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перекодировка UTF8 <-> wchar_t
+///РџРµСЂРµРєРѕРґРёСЂРѕРІРєР° UTF8 <-> wchar_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 stl::string  to_utf8_string  (const wchar_t* string, size_t length);
 stl::string  to_utf8_string  (const wchar_t* string);
@@ -40,7 +40,7 @@ stl::wstring to_wstring_from_utf8 (const char* string);
 stl::wstring to_wstring_from_utf8 (const stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перекодировка char <-> wchar_t
+///РџРµСЂРµРєРѕРґРёСЂРѕРІРєР° char <-> wchar_t
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 stl::string  tostring  (const wchar_t* string, size_t length);
 stl::string  tostring  (const wchar_t* string);
@@ -50,7 +50,7 @@ stl::wstring towstring (const char* string);
 stl::wstring towstring (const stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сжатие wchar_t строк
+///РЎР¶Р°С‚РёРµ wchar_t СЃС‚СЂРѕРє
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 size_t       wchar_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length);
 size_t       wchar_decompress (const wchar_t* source, char* destination, size_t max_destination_length);

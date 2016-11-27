@@ -6,24 +6,24 @@ namespace
 {
 
 /*
-    Вспомогательный класс построения опций шейдера
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 struct ShaderOptionsBuilder: public xtl::reference_counter
 {
   struct OptionDesc
   {
-    const char*          name;  //имя свойства
-    int                  index; //индекс свойства в карте свойств
-    common::PropertyType type;  //тип свойства
+    const char*          name;  //РёРјСЏ СЃРІРѕР№СЃС‚РІР°
+    int                  index; //РёРЅРґРµРєСЃ СЃРІРѕР№СЃС‚РІР° РІ РєР°СЂС‚Рµ СЃРІРѕР№СЃС‚РІ
+    common::PropertyType type;  //С‚РёРї СЃРІРѕР№СЃС‚РІР°
   };
   
   typedef stl::vector<OptionDesc> OptionDescArray;
   
-  common::StringArray defines;      //строки с именами опций
-  OptionDescArray     option_descs; //список опций
+  common::StringArray defines;      //СЃС‚СЂРѕРєРё СЃ РёРјРµРЅР°РјРё РѕРїС†РёР№
+  OptionDescArray     option_descs; //СЃРїРёСЃРѕРє РѕРїС†РёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ShaderOptionsBuilder (const common::PropertyLayout& layout, const common::StringArray& in_defines)
     : defines (in_defines.Clone ())
   {
@@ -44,7 +44,7 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
     }
   }
   
-///Получение опций компиляции шейдера
+///РџРѕР»СѓС‡РµРЅРёРµ РѕРїС†РёР№ РєРѕРјРїРёР»СЏС†РёРё С€РµР№РґРµСЂР°
   void GetShaderOptions (const common::PropertyMap& properties, ShaderOptions& out_options, stl::string& value_buffer)
   {
     out_options.options.clear ();
@@ -61,7 +61,7 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
       if (need_add_space)
         out_options.options += ' ';
 
-        //TODO: сделать формирование массивов свойств (в зависимости от типа)
+        //TODO: СЃРґРµР»Р°С‚СЊ С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ СЃРІРѕР№СЃС‚РІ (РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РёРїР°)
 
       need_add_space       = true;
       out_options.options += option_desc.name;     
@@ -79,13 +79,13 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
 typedef xtl::intrusive_ptr<ShaderOptionsBuilder> ShaderOptionsBuilderPtr;
 
 /*
-    Ключ поиска объекта построения опций шейдера
+    РљР»СЋС‡ РїРѕРёСЃРєР° РѕР±СЉРµРєС‚Р° РїРѕСЃС‚СЂРѕРµРЅРёСЏ РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 struct ShaderOptionsBuilderKey
 {
-  size_t layout_hash;      //хэш лэйаута
-  size_t properties_count; //количество свойств
+  size_t layout_hash;      //С…СЌС€ Р»СЌР№Р°СѓС‚Р°
+  size_t properties_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
   
   ShaderOptionsBuilderKey (size_t in_layout_hash, size_t in_properties_count)
     : layout_hash (in_layout_hash)
@@ -107,20 +107,20 @@ size_t hash (const ShaderOptionsBuilderKey& key)
 }
 
 /*
-    Описание реализации списка макро-определений шейдера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїРёСЃРєР° РјР°РєСЂРѕ-РѕРїСЂРµРґРµР»РµРЅРёР№ С€РµР№РґРµСЂР°
 */
 
 typedef CacheMap<ShaderOptionsBuilderKey, ShaderOptionsBuilderPtr> ShaderOptionsBuilderMap;
 
 struct ShaderOptionsLayout::Impl: public xtl::trackable
 {
-  common::StringArray     defines;      //список названий макро-определений
-  ShaderOptionsBuilderMap builders;     //генераторы опций шейдера
-  stl::string             value_buffer; //временный буфер для формирования опций
-  bool                    need_flush;   //кэш требуется сбросить
-  size_t                  hash;         //хэш лэйаута
+  common::StringArray     defines;      //СЃРїРёСЃРѕРє РЅР°Р·РІР°РЅРёР№ РјР°РєСЂРѕ-РѕРїСЂРµРґРµР»РµРЅРёР№
+  ShaderOptionsBuilderMap builders;     //РіРµРЅРµСЂР°С‚РѕСЂС‹ РѕРїС†РёР№ С€РµР№РґРµСЂР°
+  stl::string             value_buffer; //РІСЂРµРјРµРЅРЅС‹Р№ Р±СѓС„РµСЂ РґР»СЏ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕРїС†РёР№
+  bool                    need_flush;   //РєСЌС€ С‚СЂРµР±СѓРµС‚СЃСЏ СЃР±СЂРѕСЃРёС‚СЊ
+  size_t                  hash;         //С…СЌС€ Р»СЌР№Р°СѓС‚Р°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const CacheManagerPtr& cache_manager)
     : builders (cache_manager)
     , need_flush (false)
@@ -128,7 +128,7 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
   {
   }
   
-///Сброс кэша
+///РЎР±СЂРѕСЃ РєСЌС€Р°
   void FlushCache ()
   {
     builders.Clear ();
@@ -150,7 +150,7 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderOptionsLayout::ShaderOptionsLayout (const CacheManagerPtr& cache_manager)
@@ -171,7 +171,7 @@ ShaderOptionsLayout::~ShaderOptionsLayout ()
 }
 
 /*
-    Количество закэшированных генераторов опций
+    РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹С… РіРµРЅРµСЂР°С‚РѕСЂРѕРІ РѕРїС†РёР№
 */
 
 size_t ShaderOptionsLayout::CachedShaderBuildersCount ()
@@ -183,7 +183,7 @@ size_t ShaderOptionsLayout::CachedShaderBuildersCount ()
 }
 
 /*
-    Макро-определения
+    РњР°РєСЂРѕ-РѕРїСЂРµРґРµР»РµРЅРёСЏ
 */
 
 size_t ShaderOptionsLayout::Size ()
@@ -229,7 +229,7 @@ void ShaderOptionsLayout::Clear ()
 }
 
 /*
-    Получение опций шейдера
+    РџРѕР»СѓС‡РµРЅРёРµ РѕРїС†РёР№ С€РµР№РґРµСЂР°
 */
 
 void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, ShaderOptions& out_options)
@@ -261,7 +261,7 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
 }
 
 /*
-    Хэш
+    РҐСЌС€
 */
 
 size_t ShaderOptionsLayout::Hash ()
@@ -281,7 +281,7 @@ size_t ShaderOptionsLayout::Hash ()
 }
 
 /*
-    Получение объекта оповещения об удалении
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° РѕРїРѕРІРµС‰РµРЅРёСЏ РѕР± СѓРґР°Р»РµРЅРёРё
 */
 
 xtl::trackable& ShaderOptionsLayout::GetTrackable ()

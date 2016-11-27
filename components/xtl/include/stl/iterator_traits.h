@@ -9,7 +9,7 @@ namespace stl
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Категории итераторов
+///РљР°С‚РµРіРѕСЂРёРё РёС‚РµСЂР°С‚РѕСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct input_iterator_tag {};
 struct output_iterator_tag {};
@@ -17,12 +17,12 @@ struct forward_iterator_tag: public input_iterator_tag {};
 struct bidirectional_iterator_tag: public forward_iterator_tag {};
 struct random_access_iterator_tag: public bidirectional_iterator_tag {};
 
-//тэги "ложных" итераторов
+//С‚СЌРіРё "Р»РѕР¶РЅС‹С…" РёС‚РµСЂР°С‚РѕСЂРѕРІ
 struct int_iterator_tag {};
 struct float_iterator_tag {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание итератора
+///РћРїРёСЃР°РЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Category, class T, class Distance=ptrdiff_t, class Pointer=T*, class Reference=T&>
 struct iterator 
@@ -35,7 +35,7 @@ struct iterator
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Таблица конфигурации итераторов
+///РўР°Р±Р»РёС†Р° РєРѕРЅС„РёРіСѓСЂР°С†РёРё РёС‚РµСЂР°С‚РѕСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iterator> struct iterator_traits 
 {
@@ -47,7 +47,7 @@ template <class Iterator> struct iterator_traits
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Специализации конфигураций итераторов
+///РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РєРѕРЅС„РёРіСѓСЂР°С†РёР№ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct iterator_traits<T*>:                public iterator<random_access_iterator_tag, T> {};
 template <class T> struct iterator_traits<const T*>:          public iterator<random_access_iterator_tag, T, ptrdiff_t, const T*, const T&> {};
@@ -73,13 +73,13 @@ template <> struct iterator_traits<wchar_t>: public iterator<int_iterator_tag, w
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Категория итератора
+///РљР°С‚РµРіРѕСЂРёСЏ РёС‚РµСЂР°С‚РѕСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter> 
 typename iterator_traits<Iter>::iterator_category iterator_category ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Операции над итераторами
+///РћРїРµСЂР°С†РёРё РЅР°Рґ РёС‚РµСЂР°С‚РѕСЂР°РјРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter>
 typename iterator_traits<Iter>::difference_type distance (Iter first, Iter last);

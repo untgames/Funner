@@ -1,4 +1,4 @@
-//Тестирование алгоритма min (a,b)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° min (a,b)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

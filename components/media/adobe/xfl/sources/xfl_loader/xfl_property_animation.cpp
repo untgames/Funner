@@ -4,7 +4,7 @@ using namespace common;
 using namespace media::adobe::xfl;
 
 /*
-    Разбор анимируемого свойства
+    Р Р°Р·Р±РѕСЂ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
 */
 
 void XflParser::ParsePropertyAnimation (Parser::Iterator iter, PropertyAnimation& property, const char* property_prefix)

@@ -4,17 +4,17 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Описание реализации цели рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 struct RenderTargetImpl::Impl
 {
-  DeviceManagerPtr    device_manager;  //менеджер устройства отрисовки
-  LowLevelTexturePtr  texture;         //целевая текстура
-  LowLevelViewPtr     view;            //отображение для рендеринга в текстуру
-  unsigned int        width;           //ширина цели рендеринга
-  unsigned int        height;          //высота цели рендеринга
-  math::vec2ui        viewport_offset; //смещение облсти вывода
+  DeviceManagerPtr    device_manager;  //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  LowLevelTexturePtr  texture;         //С†РµР»РµРІР°СЏ С‚РµРєСЃС‚СѓСЂР°
+  LowLevelViewPtr     view;            //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РґР»СЏ СЂРµРЅРґРµСЂРёРЅРіР° РІ С‚РµРєСЃС‚СѓСЂСѓ
+  unsigned int        width;           //С€РёСЂРёРЅР° С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  unsigned int        height;          //РІС‹СЃРѕС‚Р° С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
+  math::vec2ui        viewport_offset; //СЃРјРµС‰РµРЅРёРµ РѕР±Р»СЃС‚Рё РІС‹РІРѕРґР°
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -25,7 +25,7 @@ struct RenderTargetImpl::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetImpl::RenderTargetImpl (const DeviceManagerPtr& device_manager, render::low_level::ITexture* texture, unsigned int layer, unsigned int mip_level)
@@ -54,7 +54,7 @@ RenderTargetImpl::~RenderTargetImpl ()
 }
 
 /*
-    Получение отображения (в случае отсутствия - исключение)
+    РџРѕР»СѓС‡РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ (РІ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ - РёСЃРєР»СЋС‡РµРЅРёРµ)
 */
 
 render::low_level::IView& RenderTargetImpl::View ()
@@ -66,7 +66,7 @@ render::low_level::IView& RenderTargetImpl::View ()
 }
 
 /*
-    Обновление текстуры
+    РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, unsigned int layer, unsigned int mip_level)
@@ -109,7 +109,7 @@ void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, unsigned
 }
 
 /*
-    Размеры цели рендеринга
+    Р Р°Р·РјРµСЂС‹ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void RenderTargetImpl::Resize (unsigned int width, unsigned int height)
@@ -129,7 +129,7 @@ unsigned int RenderTargetImpl::Height ()
 }
 
 /*
-    Смещение области вывода от начала координат цели рендеринга
+    РЎРјРµС‰РµРЅРёРµ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° РѕС‚ РЅР°С‡Р°Р»Р° РєРѕРѕСЂРґРёРЅР°С‚ С†РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 void RenderTargetImpl::SetViewportOffset (const math::vec2ui& offset)
@@ -143,7 +143,7 @@ const math::vec2ui& RenderTargetImpl::ViewportOffset ()
 }
 
 /*
-    Захват изображения
+    Р—Р°С…РІР°С‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 */
 
 void RenderTargetImpl::Capture (media::Image& image)

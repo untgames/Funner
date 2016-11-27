@@ -19,10 +19,10 @@ namespace xphys_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* LOG_NAME = "media.physics.XmlPhysicsLibraryLoader"; //имя потока протоколирования
+const char* LOG_NAME = "media.physics.XmlPhysicsLibraryLoader"; //РёРјСЏ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 template <unsigned int Size>
 void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& value)
@@ -48,13 +48,13 @@ void read (Parser::Iterator iter, const char* str, math::quatf& value)
 }
 
 /*
-    Загрузчик физической библиотеки в формате Xml
+    Р—Р°РіСЂСѓР·С‡РёРє С„РёР·РёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё РІ С„РѕСЂРјР°С‚Рµ Xml
 */
 
 class XmlPhysicsLibraryLoader
 {
   private:
-      //слияние библиотек
+      //СЃР»РёСЏРЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
     template <class T>
     void MergeCollections (const media::physics::PhysicsLibraryCollection<T>& source, media::physics::PhysicsLibraryCollection<T>& destination)
     {
@@ -71,7 +71,7 @@ class XmlPhysicsLibraryLoader
       MergeCollections (source_library.Scenes (),           target_library.Scenes ());
     }
 
-      //разбор подключаемых файлов
+      //СЂР°Р·Р±РѕСЂ РїРѕРґРєР»СЋС‡Р°РµРјС‹С… С„Р°Р№Р»РѕРІ
     void ParseInclude (Parser::Iterator include_iter)
     {
       try
@@ -85,7 +85,7 @@ class XmlPhysicsLibraryLoader
       }
     }
 
-      //разбор материала
+      //СЂР°Р·Р±РѕСЂ РјР°С‚РµСЂРёР°Р»Р°
     void ParseMaterial (Parser::Iterator material_iter)
     {
       Material material;
@@ -116,7 +116,7 @@ class XmlPhysicsLibraryLoader
       library.Materials ().Attach (material.Name (), material);
     }
 
-      //разбор сетки
+      //СЂР°Р·Р±РѕСЂ СЃРµС‚РєРё
     void ParseTriangleMesh (Parser::Iterator mesh_iter)
     {
       static const char* METHOD_NAME = "media::physics::XmlPhysicsLibraryLoader::ParseTriangleMesh";
@@ -156,7 +156,7 @@ class XmlPhysicsLibraryLoader
       library.TriangleMeshes ().Attach (mesh.Name (), mesh);
     }
 
-      //разбор геометрического тела
+      //СЂР°Р·Р±РѕСЂ РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРѕРіРѕ С‚РµР»Р°
     void ParseShape (Parser::Iterator shape_iter)
     {
       static const char* METHOD_NAME = "media::physics::XmlPhysicsLibrary::ParseShape";
@@ -242,7 +242,7 @@ class XmlPhysicsLibraryLoader
       library.Shapes ().Attach (shape.Name (), shape);
     }
 
-    //разбор твёрдого тела
+    //СЂР°Р·Р±РѕСЂ С‚РІС‘СЂРґРѕРіРѕ С‚РµР»Р°
     void ParseRigidBody (Parser::Iterator body_iter)
     {
       static const char* METHOD_NAME = "media::physics::XmlPhysicsLibraryLoader::ParseRigidBody";
@@ -311,7 +311,7 @@ class XmlPhysicsLibraryLoader
       library.RigidBodies ().Attach (body.Name (), body);
     }
 
-      //разбор фильтра коллизий
+      //СЂР°Р·Р±РѕСЂ С„РёР»СЊС‚СЂР° РєРѕР»Р»РёР·РёР№
     void ParseCollisionFilter (Parser::Iterator filter_iter, Scene& scene)
     {
       CollisionFilter filter;
@@ -323,7 +323,7 @@ class XmlPhysicsLibraryLoader
       scene.CollisionFilters ().Add (filter);
     }
 
-      //разбор сцены
+      //СЂР°Р·Р±РѕСЂ СЃС†РµРЅС‹
     void ParseScene (Parser::Iterator scene_iter)
     {
       Scene scene;
@@ -343,7 +343,7 @@ class XmlPhysicsLibraryLoader
       library.Scenes ().Attach (scene.Name (), scene);
     }
 
-      //разбор библиотеки
+      //СЂР°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
     void ParseLibrary (Parser::Iterator library_iter)
     {
       for_each_child (*library_iter, "include", xtl::bind (&XmlPhysicsLibraryLoader::ParseInclude, this, _1));
@@ -360,7 +360,7 @@ class XmlPhysicsLibraryLoader
     {
       ParseLibrary (parser.Root ().First ("physics_library"));
 
-        //протоколирование
+        //РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 
       Log log (LOG_NAME);
 
@@ -370,12 +370,12 @@ class XmlPhysicsLibraryLoader
     }
     
   private:
-    Parser         parser;   //парсер
-    PhysicsLibrary library;  //библиотека в которую ведется чтение данных
+    Parser         parser;   //РїР°СЂСЃРµСЂ
+    PhysicsLibrary library;  //Р±РёР±Р»РёРѕС‚РµРєР° РІ РєРѕС‚РѕСЂСѓСЋ РІРµРґРµС‚СЃСЏ С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class XPhysLoaderComponent

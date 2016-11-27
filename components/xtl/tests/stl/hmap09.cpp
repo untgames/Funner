@@ -1,4 +1,4 @@
-// Тестирование функции equal_range
+// ╨в╨╡╤Б╤В╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╤Д╤Г╨╜╨║╤Ж╨╕╨╕ equal_range
 #include <stdio.h>
 #include <stl/hash_map>
 #include "test.h"
@@ -16,7 +16,7 @@ int main ()
   hm1.insert_pair (2, 20);
   hm1.insert_pair (3, 30);
 
-  //Поиск всех элементов с ключом 3
+  //╨Я╨╛╨╕╤Б╨║ ╨▓╤Б╨╡╤Е ╤Н╨╗╨╡╨╝╨╡╨╜╤В╨╛╨▓ ╤Б ╨║╨╗╤О╤З╨╛╨╝ 3
   pair <hash_map<int,int>::const_iterator,
         hash_map<int,int>::const_iterator> p1, p2;
 

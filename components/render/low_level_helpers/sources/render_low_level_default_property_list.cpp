@@ -3,7 +3,7 @@
 using namespace render::low_level::helpers;
 
 /*
-    Количество свойств
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРІРѕР№СЃС‚РІ
 */
 
 size_t DefaultPropertyList::GetSize ()
@@ -12,7 +12,7 @@ size_t DefaultPropertyList::GetSize ()
 }
 
 /*
-    Получение ключа и его значения
+    РџРѕР»СѓС‡РµРЅРёРµ РєР»СЋС‡Р° Рё РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 const char* DefaultPropertyList::GetKey (size_t index)

@@ -1,4 +1,4 @@
-//Тестирование алгоритма next_permutation (first,last,less)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° next_permutation (first,last,less)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

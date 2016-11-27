@@ -1,5 +1,5 @@
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -62,7 +62,7 @@ inline weak_ptr<T>::~weak_ptr ()
 }
 
 /*
-    Операторы присваивания
+    РћРїРµСЂР°С‚РѕСЂС‹ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 */
 
 template <class T>
@@ -96,7 +96,7 @@ inline void weak_ptr<T>::assign (T1* in_ptr, shared_counter* in_counter)
 }
 
 /*
-    Сброс
+    РЎР±СЂРѕСЃ
 */
 
 template <class T>
@@ -106,7 +106,7 @@ inline void weak_ptr<T>::reset ()
 }
 
 /*
-    Информация о состоянии указателя    
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё СѓРєР°Р·Р°С‚РµР»СЏ    
 */
 
 template <class T>
@@ -116,7 +116,7 @@ inline long weak_ptr<T>::use_count () const
 }
 
 /*
-    Получение shared_ptr
+    РџРѕР»СѓС‡РµРЅРёРµ shared_ptr
 */
 
 template <class T>
@@ -136,7 +136,7 @@ shared_ptr<T> weak_ptr<T>::lock () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>
@@ -158,7 +158,7 @@ inline void swap (weak_ptr<T>& p1, weak_ptr<T>& p2)
 }
 
 /*
-    Сравнение указателей
+    РЎСЂР°РІРЅРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T> template <class T1>

@@ -1,4 +1,4 @@
-//Тестирование алгоритма uninitialized_copy (first, last, result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° uninitialized_copy (first, last, result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

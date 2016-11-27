@@ -7,24 +7,24 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char* DEFAULT_PROGRAM_NAME = ""; //имя программы по умолчанию
+const char* DEFAULT_PROGRAM_NAME = ""; //РёРјСЏ РїСЂРѕРіСЂР°РјРјС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 /*
-    Текстурная карта
+    РўРµРєСЃС‚СѓСЂРЅР°СЏ РєР°СЂС‚Р°
 */
 
 struct Texmap: public xtl::reference_counter, public CacheHolder
 {
-  TextureProxy            texture;               //прокси текстуры
-  SamplerProxy            sampler;               //сэмплер текстуры
-  bool                    is_dynamic;            //является ли текстура динамической
-  size_t                  semantic_hash;         //хеш имени семантики
-  TexturePtr              cached_texture;        //закэшированная текстура
-  LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
-  LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
+  TextureProxy            texture;               //РїСЂРѕРєСЃРё С‚РµРєСЃС‚СѓСЂС‹
+  SamplerProxy            sampler;               //СЃСЌРјРїР»РµСЂ С‚РµРєСЃС‚СѓСЂС‹
+  bool                    is_dynamic;            //СЏРІР»СЏРµС‚СЃСЏ Р»Рё С‚РµРєСЃС‚СѓСЂР° РґРёРЅР°РјРёС‡РµСЃРєРѕР№
+  size_t                  semantic_hash;         //С…РµС€ РёРјРµРЅРё СЃРµРјР°РЅС‚РёРєРё
+  TexturePtr              cached_texture;        //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅР°СЏ С‚РµРєСЃС‚СѓСЂР°
+  LowLevelSamplerStatePtr cached_sampler;        //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ СЃСЌРјРїР»РµСЂ
+  LowLevelTexturePtr      cached_device_texture; //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅР°СЏ С‚РµРєСЃС‚СѓСЂР°
   
   Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic, const char* semantic)
     : texture (in_texture_proxy)
@@ -88,7 +88,7 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
 }
 
 /*
-    Описание реализации материала
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјР°С‚РµСЂРёР°Р»Р°
 */
 
 typedef xtl::intrusive_ptr<Texmap> TexmapPtr;
@@ -97,23 +97,23 @@ typedef stl::vector<size_t>        TagHashArray;
 
 struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;               //менеджер устройства отрисовки
-  TextureManagerPtr          texture_manager;              //менеджер текстур
-  ProgramManagerPtr          program_manager;              //менеджер программ
-  stl::string                name;                         //имя материала
-  TagHashArray               tags;                         //тэги материала
-  ProgramProxy               program;                      //прокси программы
-  PropertyBuffer             properties;                   //свойства материала
-  ProgramParametersLayoutPtr material_properties_layout;   //расположение свойств материала
-  TexmapArray                texmaps;                      //текстурные карты
-  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры
-  size_t                     cached_state_block_mask_hash; //хэш закэшированной маски блока состояний материала
-  ProgramPtr                 cached_program;               //закэшированная программа
-  LowLevelStateBlockPtr      cached_state_block;           //закэшированный блок состояний
-  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы
-  Log                        log;                          //протокол отладочных сообщений
+  DeviceManagerPtr           device_manager;               //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TextureManagerPtr          texture_manager;              //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+  ProgramManagerPtr          program_manager;              //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРіСЂР°РјРј
+  stl::string                name;                         //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  TagHashArray               tags;                         //С‚СЌРіРё РјР°С‚РµСЂРёР°Р»Р°
+  ProgramProxy               program;                      //РїСЂРѕРєСЃРё РїСЂРѕРіСЂР°РјРјС‹
+  PropertyBuffer             properties;                   //СЃРІРѕР№СЃС‚РІР° РјР°С‚РµСЂРёР°Р»Р°
+  ProgramParametersLayoutPtr material_properties_layout;   //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р°
+  TexmapArray                texmaps;                      //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєР°СЂС‚С‹
+  bool                       has_dynamic_textures;         //РµСЃС‚СЊ Р»Рё РІ РјР°С‚РµСЂРёР°Р»Рµ РґРёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРєСЃС‚СѓСЂС‹
+  size_t                     cached_state_block_mask_hash; //С…СЌС€ Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅРѕР№ РјР°СЃРєРё Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РјР°С‚РµСЂРёР°Р»Р°
+  ProgramPtr                 cached_program;               //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅР°СЏ РїСЂРѕРіСЂР°РјРјР°
+  LowLevelStateBlockPtr      cached_state_block;           //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ Р±Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№
+  ProgramParametersLayoutPtr cached_properties_layout;     //СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р° Рё РїСЂРѕРіСЂР°РјРјС‹
+  Log                        log;                          //РїСЂРѕС‚РѕРєРѕР» РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, const char* in_name)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
@@ -134,7 +134,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       log.Printf ("Material '%s' has been created (id=%u)", name.c_str (), Id ());
   }
 
-///Конструктор копирования
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
   Impl (Impl& impl)
     : device_manager (impl.device_manager)
     , texture_manager (impl.texture_manager)
@@ -173,10 +173,10 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     }    
   }  
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного
+      //РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕС‡РёСЃС‚РєР° РєРѕР»Р»РµРєС†РёСЏ РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РѕС‚СЃР»РµР¶РёРІР°С‚СЊ РїРѕСЂСЏРґРѕРє СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РґРѕ Рё РїРѕСЃР»Рµ СѓРґР°Р»РµРЅРёСЏ РґР°РЅРЅРѕРіРѕ
       
     cached_program               = ProgramPtr ();
     cached_properties_layout     = ProgramParametersLayoutPtr ();
@@ -187,7 +187,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       log.Printf ("Material '%s' has been destroyed (id=%u)", name.c_str (), Id ());
   }
   
-///Работа с кэшем
+///Р Р°Р±РѕС‚Р° СЃ РєСЌС€РµРј
   void ResetCacheCore ()
   {
     if (device_manager->Settings ().HasDebugLog ())
@@ -206,14 +206,14 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   {
     try
     {
-      bool need_invalidate_deps = false; //флаг необходимости обновления зависимых от материала кэшей
+      bool need_invalidate_deps = false; //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ Р·Р°РІРёСЃРёРјС‹С… РѕС‚ РјР°С‚РµСЂРёР°Р»Р° РєСЌС€РµР№
       
       bool has_debug_log = device_manager->Settings ().HasDebugLog ();
       
       if (has_debug_log)
         log.Printf ("Update material '%s' cache (id=%u)", name.c_str (), Id ());
         
-        //кэширование программы рендеринга
+        //РєСЌС€РёСЂРѕРІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 
       ProgramPtr old_program = cached_program;
 
@@ -229,19 +229,19 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       }
       else throw xtl::format_operation_exception ("", "Null program '%s' for material '%s' (id=%u)", program.Name (), name.c_str (), Id ());
       
-        //кэширование константного буфера материала
+        //РєСЌС€РёСЂРѕРІР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° РјР°С‚РµСЂРёР°Р»Р°
       
       LowLevelBufferPtr device_properties = properties.Buffer ();      
       
       render::low_level::IDevice&        device  = device_manager->Device ();
       render::low_level::IDeviceContext& context = device_manager->ImmediateContext ();
       
-        //установка константного буфера и сброс программы рендеринга в устройстве отрисовки
+        //СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР° Рё СЃР±СЂРѕСЃ РїСЂРѕРіСЂР°РјРјС‹ СЂРµРЅРґРµСЂРёРЅРіР° РІ СѓСЃС‚СЂРѕР№СЃС‚РІРµ РѕС‚СЂРёСЃРѕРІРєРё
 
       context.SSSetConstantBuffer (ProgramParametersSlot_Material, device_properties.get ());
       context.SSSetConstantBuffer (ProgramParametersSlot_Program, 0);
       
-        //применение настроек программы к состоянию устройства отрисовки (для объединения их с настройками материала)
+        //РїСЂРёРјРµРЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє РїСЂРѕРіСЂР°РјРјС‹ Рє СЃРѕСЃС‚РѕСЏРЅРёСЋ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё (РґР»СЏ РѕР±СЉРµРґРёРЅРµРЅРёСЏ РёС… СЃ РЅР°СЃС‚СЂРѕР№РєР°РјРё РјР°С‚РµСЂРёР°Р»Р°)
         
       StateBlockMask mask;        
 
@@ -251,22 +251,22 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
         if (program_state_block)
         {
-            //получение маски флагов программы рендеринга
+            //РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃРєРё С„Р»Р°РіРѕРІ РїСЂРѕРіСЂР°РјРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 
           program_state_block->GetMask (mask);
 
-            //применение настроек программы рендеринга
+            //РїСЂРёРјРµРЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє РїСЂРѕРіСЂР°РјРјС‹ СЂРµРЅРґРµСЂРёРЅРіР°
 
           program_state_block->Apply (&context);
         }
       }
 
-        //определение настроек материала
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє РјР°С‚РµСЂРёР°Р»Р°
 
       mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
       mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
 
-        //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
+        //СѓСЃС‚Р°РЅРѕРІРєР° СЃС‚Р°С‚РёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚ Рё РёС… СЃСЌРјРїР»РµСЂРѕРІ РІ РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
       if (cached_program)
       {
@@ -320,7 +320,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         }
       }
 
-        //проверка необходимости пересоздания блока состояний материала
+        //РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃРѕР·РґР°РЅРёСЏ Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№ РјР°С‚РµСЂРёР°Р»Р°
 
       size_t state_block_mask_hash = mask.Hash ();
 
@@ -334,11 +334,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         need_invalidate_deps         = true;
       }
 
-        //сохранение состояния контекста устройства отрисовки
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
 
       cached_state_block->Capture (&context);
 
-        //обновление зависимых кэшей
+        //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјС‹С… РєСЌС€РµР№
 
       if (need_invalidate_deps)
         InvalidateCacheDependencies ();
@@ -353,7 +353,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     }
   }
 
-/// Поиск карты по семантике
+/// РџРѕРёСЃРє РєР°СЂС‚С‹ РїРѕ СЃРµРјР°РЅС‚РёРєРµ
   TexmapPtr FindTexmapBySemantic (const char* semantic)
   {
     if (!semantic)
@@ -374,7 +374,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, const char* name)
@@ -394,7 +394,7 @@ MaterialImpl::~MaterialImpl ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* MaterialImpl::Name ()
@@ -414,7 +414,7 @@ void MaterialImpl::SetName (const char* name)
 }
 
 /*
-    Тэги
+    РўСЌРіРё
 */
 
 size_t MaterialImpl::TagsCount ()
@@ -435,7 +435,7 @@ const size_t* MaterialImpl::Tags ()
 }
 
 /*
-    Блок состояний материала
+    Р‘Р»РѕРє СЃРѕСЃС‚РѕСЏРЅРёР№ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 LowLevelStateBlockPtr MaterialImpl::StateBlock ()
@@ -446,7 +446,7 @@ LowLevelStateBlockPtr MaterialImpl::StateBlock ()
 }
 
 /*
-    Программа шейдинга
+    РџСЂРѕРіСЂР°РјРјР° С€РµР№РґРёРЅРіР°
 */
 
 ProgramPtr MaterialImpl::Program ()
@@ -455,7 +455,7 @@ ProgramPtr MaterialImpl::Program ()
 }
 
 /*
-    Получение текстуры
+    РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 unsigned int MaterialImpl::TexturesCount ()
@@ -508,7 +508,7 @@ LowLevelSamplerStatePtr MaterialImpl::Sampler (unsigned int index)
 }
 
 /*
-    Есть ли в материале динамические текстуры
+    Р•СЃС‚СЊ Р»Рё РІ РјР°С‚РµСЂРёР°Р»Рµ РґРёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРєСЃС‚СѓСЂС‹
 */
 
 bool MaterialImpl::HasDynamicTextures ()
@@ -517,19 +517,19 @@ bool MaterialImpl::HasDynamicTextures ()
 }
 
 /*
-    Обновление материала
+    РћР±РЅРѕРІР»РµРЅРёРµ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 void MaterialImpl::Update (const media::rfx::Material& material)
 {
   try
   {
-      //сохранение свойств материала, получение прокси-программы материала
+      //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р°, РїРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё-РїСЂРѕРіСЂР°РјРјС‹ РјР°С‚РµСЂРёР°Р»Р°
     
     common::PropertyMap new_properties = material.Properties ();
     ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
     
-      //создание текстурных карт
+      //СЃРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°СЂС‚
     
     TexmapArray new_texmaps;
 
@@ -541,7 +541,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       
-        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ СЏРІР»СЏРµС‚СЃСЏ Р»Рё С‚РµРєСЃС‚СѓСЂР° РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕ РїСЂРµС„РёРєСЃСѓ РµС‘ РёРјРµРЅРё Рё РїРѕС‚РѕРјСѓ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅРѕ РѕРґРЅРѕРєСЂР°С‚РЅРѕ
       
       bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (texmap.Image ());
 
@@ -554,18 +554,18 @@ void MaterialImpl::Update (const media::rfx::Material& material)
       new_texmaps.push_back (new_texmap);
     }
     
-      //копирование тэгов материала
+      //РєРѕРїРёСЂРѕРІР°РЅРёРµ С‚СЌРіРѕРІ РјР°С‚РµСЂРёР°Р»Р°
     
     TagHashArray new_tag_hashes (material.TagHashes (), material.TagHashes () + material.TagsCount ());
     
     if (new_tag_hashes.empty ())
       impl->log.Printf ("Warning: material '%s' has no tags. Will not be displayed", material.Name ());
       
-      //получение объекта расположения свойств материала
+      //РїРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р°
     
     ProgramParametersLayoutPtr new_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
     
-      //регистрация обновлений
+      //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±РЅРѕРІР»РµРЅРёР№
 
     if (new_program != impl->program)
     {
@@ -584,7 +584,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->material_properties_layout = new_layout;
     impl->has_dynamic_textures       = new_has_dynamic_textures;
     
-      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р° СЃ Р·Р°РІРёСЃРёРјРѕСЃС‚СЏРјРё (РїРѕСЃРєРѕР»СЊРєСѓ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊСЃСЏ СЃРѕСЃС‚РѕСЏРЅРёРµ С‚СЌРіРѕРІ Рё РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ)
       
     impl->InvalidateCache ();
   }
@@ -596,7 +596,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 }
 
 /*
-    Обновление отдельных текстур
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕС‚РґРµР»СЊРЅС‹С… С‚РµРєСЃС‚СѓСЂ
 */
 
 void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, const char* sampler)
@@ -640,13 +640,13 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
       image_name = texmap->texture.Name ();
     }
 
-      //пересоздание карты
+      //РїРµСЂРµСЃРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹
 
     bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (image_name);
 
     TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (image_name), impl->texture_manager->GetSamplerProxy (sampler), is_dynamic_image, semantic), false);
 
-      //обновление массива карт
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РјР°СЃСЃРёРІР° РєР°СЂС‚
 
     bool found = false;
 
@@ -662,7 +662,7 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
     if (!found)
       impl->texmaps.push_back (new_texmap);
 
-      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р° СЃ Р·Р°РІРёСЃРёРјРѕСЃС‚СЏРјРё (РїРѕСЃРєРѕР»СЊРєСѓ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊСЃСЏ СЃРѕСЃС‚РѕСЏРЅРёРµ С‚СЌРіРѕРІ Рё РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ)
 
     if (is_dynamic_image)
       impl->has_dynamic_textures = true;
@@ -697,7 +697,7 @@ const char* MaterialImpl::TexmapSampler (const char* semantic)
 }
 
 /*
-    Получение объекта расположения параметров программы шейдинга
+    РџРѕР»СѓС‡РµРЅРёРµ РѕР±СЉРµРєС‚Р° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РїСЂРѕРіСЂР°РјРјС‹ С€РµР№РґРёРЅРіР°
 */
 
 ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
@@ -716,12 +716,12 @@ ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void MaterialImpl::UpdateCacheCore ()
 {
-    //обновление зависимых кэшей (реакция на Impl::InvalidateCacheDependencies)
+    //РѕР±РЅРѕРІР»РµРЅРёРµ Р·Р°РІРёСЃРёРјС‹С… РєСЌС€РµР№ (СЂРµР°РєС†РёСЏ РЅР° Impl::InvalidateCacheDependencies)
 
   InvalidateCacheDependencies ();
 }

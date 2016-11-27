@@ -1,4 +1,4 @@
-//Тестирование алгоритма transform (first1, last1, first2, result, op)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° transform (first1, last1, first2, result, op)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

@@ -1,5 +1,5 @@
 /*
-    Базовый узел
+    Р‘Р°Р·РѕРІС‹Р№ СѓР·РµР»
 */
 
 inline list_node_base::list_node_base ()
@@ -25,7 +25,7 @@ inline void list_node_base::transfer (list_node_base* position,list_node_base* f
 }
 
 /*
-    Итератор
+    РС‚РµСЂР°С‚РѕСЂ
 */
 
 template <class T>
@@ -107,7 +107,7 @@ inline bool list_iterator<T>::operator != (const list_iterator& i) const
 }  
 
 /*
-    Получение unqualified итератора
+    РџРѕР»СѓС‡РµРЅРёРµ unqualified РёС‚РµСЂР°С‚РѕСЂР°
 */
 
 template <class T>
@@ -117,7 +117,7 @@ inline typename list_iterator<T>::iterator list_iterator<T>::get_unqualified_ite
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T,class Allocator>
@@ -160,7 +160,7 @@ inline list<T,Allocator>::~list ()
 }
 
 /*
-    Аллокатор
+    РђР»Р»РѕРєР°С‚РѕСЂ
 */
 
 template <class T,class Allocator>
@@ -170,7 +170,7 @@ inline typename list<T,Allocator>::allocator_type list<T,Allocator>::get_allocat
 }
 
 /*
-    Функции общего назначения
+    Р¤СѓРЅРєС†РёРё РѕР±С‰РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T,class Allocator>
@@ -192,7 +192,7 @@ inline typename list<T,Allocator>::size_type list<T,Allocator>::max_size () cons
 }
 
 /*
-    Получение итераторов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂРѕРІ
 */
 
 template <class T,class Allocator> inline typename list<T,Allocator>::iterator list<T,Allocator>::begin ()
@@ -243,7 +243,7 @@ inline typename list<T,Allocator>::const_reverse_iterator list<T,Allocator>::ren
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T,class Allocator>
@@ -271,7 +271,7 @@ inline typename list<T,Allocator>::const_reference list<T,Allocator>::back () co
 }
 
 /*
-    Создание / удаление узлов
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СѓР·Р»РѕРІ
 */
 
 template <class T,class Allocator> 
@@ -318,7 +318,7 @@ inline void list<T,Allocator>::delete_node (Node* p)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T,class Allocator>
@@ -365,7 +365,7 @@ inline void list<T,Allocator>::assign (Iter first,Iter last)
 }
 
 /*
-    Вставка
+    Р’СЃС‚Р°РІРєР°
 */    
 
 template <class T,class Allocator> 
@@ -410,7 +410,7 @@ inline void list<T,Allocator>::insert (iterator position,Iter first,Iter last)
 }
 
 /*
-    Удаление
+    РЈРґР°Р»РµРЅРёРµ
 */
 
 template <class T,class Allocator> 
@@ -449,7 +449,7 @@ void list<T,Allocator>::clear ()
 }
 
 /*
-    Добавление / удаление элемента
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°
 */
 
 template <class T,class Allocator> 
@@ -491,7 +491,7 @@ inline void list<T,Allocator>::pop_back ()
 }
 
 /*
-    Изменение размера списка
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° СЃРїРёСЃРєР°
 */
 
 template <class T,class Allocator>
@@ -513,7 +513,7 @@ inline void list<T,Allocator>::resize (size_type new_size)
 }
 
 /*
-    Обмен содержимого двух списков
+    РћР±РјРµРЅ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РґРІСѓС… СЃРїРёСЃРєРѕРІ
 */
 
 template <class T,class Allocator>
@@ -605,7 +605,7 @@ inline void list<T,Allocator>::splice (iterator dst_pos,list& src_list,iterator 
 }
 
 /*
-    Алгоритмы
+    РђР»РіРѕСЂРёС‚РјС‹
 */
 
 template <class T,class Allocator>
@@ -765,7 +765,7 @@ inline void list<T,Allocator>::sort ()
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T,class Allocator>

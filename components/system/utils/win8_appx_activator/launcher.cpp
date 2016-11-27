@@ -12,10 +12,10 @@
 //#define DEBUG_LOG
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const int SHELL_PORT = 1663; //порт, на который соединяется launcher
+const int SHELL_PORT = 1663; //РїРѕСЂС‚, РЅР° РєРѕС‚РѕСЂС‹Р№ СЃРѕРµРґРёРЅСЏРµС‚СЃСЏ launcher
 
 
 /*++
@@ -66,7 +66,7 @@ HRESULT LaunchApp(const std::wstring& strAppUserModelId, PDWORD pdwProcessId)
     return hrResult;
 }
 
-//получение строки с сообщением об ошибке
+//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ СЃРѕРѕР±С‰РµРЅРёРµРј РѕР± РѕС€РёР±РєРµ
 std::string get_error_message (DWORD error_code)
 {
   static const size_t MAX_BUFFER_SIZE = 1024;
@@ -79,7 +79,7 @@ std::string get_error_message (DWORD error_code)
   FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                  0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
 
-    //отсечение завершающих \n и пробелов
+    //РѕС‚СЃРµС‡РµРЅРёРµ Р·Р°РІРµСЂС€Р°СЋС‰РёС… \n Рё РїСЂРѕР±РµР»РѕРІ
 
   char* iter = (char*)buffer;
   
@@ -170,7 +170,7 @@ std::string tostring (const std::wstring& s)
 
 int launch (const wchar_t* app_name)
 {
-    //активация приложения
+    //Р°РєС‚РёРІР°С†РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
 
   HRESULT hrResult = S_OK;
 
@@ -196,14 +196,14 @@ int wmain(int argc, wchar_t* argv[])
 
   std::wstring app_name = argv [1];
 
-    //активация приложения
+    //Р°РєС‚РёРІР°С†РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
 
   if (argc < 2)
     return launch (app_name.c_str ());
 
   launch (app_name.c_str ());
 
-    //передача параметров
+    //РїРµСЂРµРґР°С‡Р° РїР°СЂР°РјРµС‚СЂРѕРІ
 
   std::wstring dll_name = argv [2], cur_dir = argv [3];
 
@@ -218,7 +218,7 @@ int wmain(int argc, wchar_t* argv[])
     return 1;
   }
 
-    //инициализация telnet
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ telnet
   
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 

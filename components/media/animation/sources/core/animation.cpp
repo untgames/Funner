@@ -4,7 +4,7 @@ using namespace media;
 using namespace media::animation;
 
 /*
-   Реализация анимации
+   Р РµР°Р»РёР·Р°С†РёСЏ Р°РЅРёРјР°С†РёРё
 */
 
 namespace
@@ -14,8 +14,8 @@ typedef stl::vector<Channel> ChannelsArray;
 
 struct ChannelGroup : public xtl::reference_counter
 {
-  stl::string   target_name; //имя анимируемого объекта
-  ChannelsArray channels;    //каналы
+  stl::string   target_name; //РёРјСЏ Р°РЅРёРјРёСЂСѓРµРјРѕРіРѕ РѕР±СЉРµРєС‚Р°
+  ChannelsArray channels;    //РєР°РЅР°Р»С‹
 
   ChannelGroup (const char* in_target_name)
     : target_name (in_target_name)
@@ -29,9 +29,9 @@ typedef stl::vector<ChannelGroupPtr>     ChannelGroupsArray;
 
 struct Animation::Impl : public xtl::reference_counter
 {
-  stl::string        name;            //имя анимации
-  EventTrack         event_track;     //трек событий
-  ChannelGroupsArray channel_groups;  //каналы анимации
+  stl::string        name;            //РёРјСЏ Р°РЅРёРјР°С†РёРё
+  EventTrack         event_track;     //С‚СЂРµРє СЃРѕР±С‹С‚РёР№
+  ChannelGroupsArray channel_groups;  //РєР°РЅР°Р»С‹ Р°РЅРёРјР°С†РёРё
 
   Impl () {}
 
@@ -101,7 +101,7 @@ struct Animation::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Animation::Animation ()
@@ -133,7 +133,7 @@ Animation& Animation::operator = (const Animation& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Animation Animation::Clone () const
@@ -142,7 +142,7 @@ Animation Animation::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Animation::Id () const
@@ -151,7 +151,7 @@ size_t Animation::Id () const
 }
 
 /*
-   Имя анимации
+   РРјСЏ Р°РЅРёРјР°С†РёРё
 */
 
 const char* Animation::Name () const
@@ -168,7 +168,7 @@ void Animation::Rename (const char* name)
 }
     
 /*
-   Перебор анимируемых объектов
+   РџРµСЂРµР±РѕСЂ Р°РЅРёРјРёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ
 */
 
 unsigned int Animation::TargetsCount () const
@@ -197,7 +197,7 @@ int Animation::FindTarget (const char* target_name) const
 }
 
 /*
-   Количество каналов
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ
 */
 
 unsigned int Animation::ChannelsCount (unsigned int target_index) const
@@ -209,7 +209,7 @@ unsigned int Animation::ChannelsCount (unsigned int target_index) const
 }
 
 /*
-   Перебор каналов
+   РџРµСЂРµР±РѕСЂ РєР°РЅР°Р»РѕРІ
 */
 
 const animation::Channel& Animation::Channel (unsigned int target_index, unsigned int channel_index) const
@@ -233,7 +233,7 @@ animation::Channel& Animation::Channel (unsigned int target_index, unsigned int 
 }
           
 /*
-   Добавление/удаление каналов
+   Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РєР°РЅР°Р»РѕРІ
 */
 
 void Animation::AddChannel (unsigned int target_index, const animation::Channel& channel)
@@ -300,7 +300,7 @@ void Animation::RemoveAllChannels ()
 }
 
 /*
-   Очередь событий
+   РћС‡РµСЂРµРґСЊ СЃРѕР±С‹С‚РёР№
 */
 
 const EventTrack& Animation::Events () const
@@ -314,7 +314,7 @@ EventTrack& Animation::Events ()
 }
 
 /*
-    Получение временных лимитов
+    РџРѕР»СѓС‡РµРЅРёРµ РІСЂРµРјРµРЅРЅС‹С… Р»РёРјРёС‚РѕРІ
 */
 
 void Animation::GetTimeLimits (float& min_time, float& max_time) const
@@ -348,7 +348,7 @@ float Animation::MaxTime () const
 }
 
 /*
-    Минимальное / максимальное неотсеченное время (-INF/INF в случае открытого диапазона)
+    РњРёРЅРёРјР°Р»СЊРЅРѕРµ / РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РЅРµРѕС‚СЃРµС‡РµРЅРЅРѕРµ РІСЂРµРјСЏ (-INF/INF РІ СЃР»СѓС‡Р°Рµ РѕС‚РєСЂС‹С‚РѕРіРѕ РґРёР°РїР°Р·РѕРЅР°)
 */
 
 float Animation::MinUnwrappedTime () const
@@ -370,7 +370,7 @@ float Animation::MaxUnwrappedTime () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Animation::Swap (Animation& source)
@@ -385,7 +385,7 @@ namespace animation
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Animation& animation1, Animation& animation2)

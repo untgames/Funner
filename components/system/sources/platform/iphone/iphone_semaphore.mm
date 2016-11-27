@@ -7,7 +7,7 @@ struct syslib::semaphore_handle
   dispatch_semaphore_t semaphore;
 };
 
-//создание семафора
+//СЃРѕР·РґР°РЅРёРµ СЃРµРјР°С„РѕСЂР°
 semaphore_t IPhoneThreadManager::CreateSemaphore (size_t initial_value)
 {
   stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
@@ -20,7 +20,7 @@ semaphore_t IPhoneThreadManager::CreateSemaphore (size_t initial_value)
   return handle.release ();
 }
 
-//уничтожение семафора
+//СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ СЃРµРјР°С„РѕСЂР°
 void IPhoneThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle || !handle->semaphore)
@@ -31,7 +31,7 @@ void IPhoneThreadManager::DestroySemaphore (semaphore_t handle)
   delete handle;
 }
 
-//ожидание следующей задачи
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void IPhoneThreadManager::WaitSemaphore (semaphore_t handle)
 {
   if (!handle)
@@ -40,7 +40,7 @@ void IPhoneThreadManager::WaitSemaphore (semaphore_t handle)
   dispatch_semaphore_wait (handle->semaphore, DISPATCH_TIME_FOREVER);
 }
 
-//ожидание следующей задачи с таймаутом
+//РѕР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё СЃ С‚Р°Р№РјР°СѓС‚РѕРј
 bool IPhoneThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   if (!handle)
@@ -49,7 +49,7 @@ bool IPhoneThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_mill
   return dispatch_semaphore_wait (handle->semaphore, dispatch_time (DISPATCH_TIME_NOW, wait_in_milliseconds * 1000000)) == 0;
 }
 
-//попытка ожидания следующей задачи
+//РїРѕРїС‹С‚РєР° РѕР¶РёРґР°РЅРёСЏ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 bool IPhoneThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   if (!handle)
@@ -58,7 +58,7 @@ bool IPhoneThreadManager::TryWaitSemaphore (semaphore_t handle)
   return dispatch_semaphore_wait (handle->semaphore, DISPATCH_TIME_NOW) == 0;
 }
 
-//посылка следующей задачи
+//РїРѕСЃС‹Р»РєР° СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё
 void IPhoneThreadManager::PostSemaphore (semaphore_t handle)
 {
   if (!handle)

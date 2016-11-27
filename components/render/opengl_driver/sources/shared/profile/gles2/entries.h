@@ -16,12 +16,12 @@ namespace opengl
 class ILibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Òî÷êè âõîäà OpenGL
+///Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct GlEntries
 {
   /*
-      Òî÷êè âõîäà OpenGL ES 2.0
+      Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° OpenGL ES 2.0
   */
 
   void         (GL_APIENTRY* ActiveTexture)(GLenum texture);
@@ -168,7 +168,7 @@ struct GlEntries
   void         (GL_APIENTRY* Viewport)(GLint x, GLint y, GLsizei width, GLsizei height);
   
   /*
-      Òî÷êè âõîäà ðàñøèðåíèé OpenGL
+      Ð¢Ð¾Ñ‡ÐºÐ¸ Ð²Ñ…Ð¾Ð´Ð° Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ð¹ OpenGL
   */
 
   PFNGLDEBUGMESSAGECONTROLKHRPROC DebugMessageControlKHR;
@@ -368,18 +368,18 @@ struct GlEntries
   PFNGLENDTILINGQCOMPROC EndTilingQCOM;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Èíèöèàëèçàöèÿ òî÷åê âõîäà
+///Ð˜Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ Ñ‚Ð¾Ñ‡ÐµÐº Ð²Ñ…Ð¾Ð´Ð°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init (ILibrary&);  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Ïîëó÷åíèå òàáëèöû òî÷åê âõîäà äëÿ òåêóùåãî êîíòåêñòà
+///ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ Ñ‚Ð¾Ñ‡ÐµÐº Ð²Ñ…Ð¾Ð´Ð° Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ ÐºÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const GlEntries* get_gl_entries ();
 
 /*
-    Ïåðåîïðåäåëåíèÿ OpenGL ES 2.0
+    ÐŸÐµÑ€ÐµÐ¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ OpenGL ES 2.0
 */
 
 #define glActiveTexture get_gl_entries ()->ActiveTexture
@@ -526,7 +526,7 @@ const GlEntries* get_gl_entries ();
 #define glViewport get_gl_entries ()->Viewport
 
 /*
-    Ïåðåîïðåäåëåíèÿ ðàñøèðåíèé OpenGL
+    ÐŸÐµÑ€ÐµÐ¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ð¹ OpenGL
 */
 
 #define glDebugMessageControlKHR get_gl_entries ()->DebugMessageControlKHR

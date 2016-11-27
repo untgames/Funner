@@ -7,16 +7,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-//const char*    LOG_NAME           = "system.bada.application"; //поток протоколирования
-const wchar_t* APPLICATION_NAME   = DEFAULT_APP_NAME;          //имя приложения
-const wchar_t* APPLICATION_ID     = DEFAULT_APP_ID;            //идентификатор приложения
-const wchar_t* APPLICATION_SECRET = DEFAULT_APP_SECRET;        //секретный код приложения
+//const char*    LOG_NAME           = "system.bada.application"; //РїРѕС‚РѕРє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const wchar_t* APPLICATION_NAME   = DEFAULT_APP_NAME;          //РёРјСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ
+const wchar_t* APPLICATION_ID     = DEFAULT_APP_ID;            //РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
+const wchar_t* APPLICATION_SECRET = DEFAULT_APP_SECRET;        //СЃРµРєСЂРµС‚РЅС‹Р№ РєРѕРґ РїСЂРёР»РѕР¶РµРЅРёСЏ
 
 /*
-    Описание реализации bada-приложения
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё bada-РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 struct ApplicationDelegate: public IApplicationDelegate
@@ -24,14 +24,14 @@ struct ApplicationDelegate: public IApplicationDelegate
   IApplicationListener* listener;
   bool                  idle_state;
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   ApplicationDelegate ()
   {
     listener   = 0;
     idle_state = false;
   }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
   void Run ()
   {
     Osp::Base::Collection::ArrayList* args = new Osp::Base::Collection::ArrayList;
@@ -60,23 +60,23 @@ struct ApplicationDelegate: public IApplicationDelegate
     delete args;    
   }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
   void Exit (int code)
   {
   }
   
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
   void SetIdleState (bool state)
   {
   }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
   void SetListener (IApplicationListener* in_listener)
   {
     listener = in_listener;
   }
   
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
   void AddRef ()
   {
   }
@@ -85,7 +85,7 @@ struct ApplicationDelegate: public IApplicationDelegate
   {
   }  
   
-///Оповещение о старте приложения  
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃС‚Р°СЂС‚Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ  
   bool OnAppInitializing (Osp::App::Application& app, Osp::App::AppRegistry& app_registry)
   {
     if (listener)
@@ -96,34 +96,34 @@ struct ApplicationDelegate: public IApplicationDelegate
     return true;    
   }
   
-///Оповещение о завершении приложения
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ Р·Р°РІРµСЂС€РµРЅРёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
   bool OnAppTerminating (Osp::App::Application& app, Osp::App::AppRegistry& app_registry, bool forced_termination)
   {
     return true;
   }
   
-///Оповещение о перемещении фрейма приложения на передний план
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё С„СЂРµР№РјР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° РїРµСЂРµРґРЅРёР№ РїР»Р°РЅ
   void OnForeground (Osp::App::Application& app)
   {
   }
   
-///Оповещение о перемещении фрейма приложения на задний план
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё С„СЂРµР№РјР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° Р·Р°РґРЅРёР№ РїР»Р°РЅ
   void OnBackground (Osp::App::Application& app)
   {
   }
   
-///Оповещение о нехватке памяти
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµС…РІР°С‚РєРµ РїР°РјСЏС‚Рё
   void OnLowMemory (Osp::App::Application& app)
   {
   }
   
-///Оповещение о низком уровне батареи
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРёР·РєРѕРј СѓСЂРѕРІРЅРµ Р±Р°С‚Р°СЂРµРё
   void OnBatteryLevelChanged (Osp::App::Application& app, Osp::System::BatteryLevel battery_level)
   {
   }
 };
 
-//текущее приложение
+//С‚РµРєСѓС‰РµРµ РїСЂРёР»РѕР¶РµРЅРёРµ
 DefaultApplication* current_application = 0;
 
 }
@@ -131,10 +131,10 @@ DefaultApplication* current_application = 0;
 typedef common::Singleton<ApplicationDelegate> ApplicationSingleton;
 
 /*
-    Bada-приложение
+    Bada-РїСЂРёР»РѕР¶РµРЅРёРµ
 */
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 DefaultApplication::DefaultApplication ()
 {
   if (current_application)
@@ -143,13 +143,13 @@ DefaultApplication::DefaultApplication ()
   current_application = this;
 }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 DefaultApplication::~DefaultApplication ()
 {
   current_application = 0;
 }
   
-///Создание экземпляра приложения
+///РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° РїСЂРёР»РѕР¶РµРЅРёСЏ
 Osp::App::Application* DefaultApplication::CreateInstance ()
 {
   if (current_application)
@@ -158,7 +158,7 @@ Osp::App::Application* DefaultApplication::CreateInstance ()
   return new DefaultApplication;
 }
 
-///Имя приложения    
+///РРјСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ    
 Osp::Base::String DefaultApplication::GetAppName(void) const
 {
   static Osp::Base::String app_name (APPLICATION_NAME);
@@ -166,43 +166,43 @@ Osp::Base::String DefaultApplication::GetAppName(void) const
   return app_name;
 }
 
-///Оповещение о старте приложения
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃС‚Р°СЂС‚Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ
 bool DefaultApplication::OnAppInitializing (Osp::App::AppRegistry& app_registry)
 {
   return ApplicationSingleton::Instance ()->OnAppInitializing (*this, app_registry);
 }
 
-///Оповещение о завершении приложения
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ Р·Р°РІРµСЂС€РµРЅРёРё РїСЂРёР»РѕР¶РµРЅРёСЏ
 bool DefaultApplication::OnAppTerminating (Osp::App::AppRegistry& app_registry, bool forced_termination)
 {
   return ApplicationSingleton::Instance ()->OnAppTerminating (*this, app_registry, forced_termination);
 }
 
-///Оповещение о перемещении фрейма приложения на передний план
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё С„СЂРµР№РјР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° РїРµСЂРµРґРЅРёР№ РїР»Р°РЅ
 void DefaultApplication::OnForeground ()
 {
   ApplicationSingleton::Instance ()->OnForeground (*this);
 }
 
-///Оповещение о перемещении фрейма приложения на задний план
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё С„СЂРµР№РјР° РїСЂРёР»РѕР¶РµРЅРёСЏ РЅР° Р·Р°РґРЅРёР№ РїР»Р°РЅ
 void DefaultApplication::OnBackground ()
 {
   ApplicationSingleton::Instance ()->OnBackground (*this);
 }
 
-///Оповещение о нехватке памяти
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРµС…РІР°С‚РєРµ РїР°РјСЏС‚Рё
 void DefaultApplication::OnLowMemory ()
 {
   ApplicationSingleton::Instance ()->OnLowMemory (*this);
 }
 
-///Оповещение о низком уровне батареи
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РЅРёР·РєРѕРј СѓСЂРѕРІРЅРµ Р±Р°С‚Р°СЂРµРё
 void DefaultApplication::OnBatteryLevelChanged (Osp::System::BatteryLevel battery_level)
 {
   ApplicationSingleton::Instance ()->OnBatteryLevelChanged (*this, battery_level);
 }
 
-///Идентификатор приложения
+///РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ
 Osp::App::AppId DefaultApplication::GetAppId () const
 {
   static Osp::App::AppId app_id (APPLICATION_ID);
@@ -210,7 +210,7 @@ Osp::App::AppId DefaultApplication::GetAppId () const
   return app_id;      
 }
 
-///Секретный код приложения
+///РЎРµРєСЂРµС‚РЅС‹Р№ РєРѕРґ РїСЂРёР»РѕР¶РµРЅРёСЏ
 Osp::App::AppSecret DefaultApplication::GetAppSecret () const
 {
   static Osp::App::AppSecret app_secret (APPLICATION_SECRET);
@@ -219,7 +219,7 @@ Osp::App::AppSecret DefaultApplication::GetAppSecret () const
 }
 
 /*
-    Создание объекта приложения
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* BadaApplicationManager::CreateDefaultApplicationDelegate ()
@@ -228,7 +228,7 @@ IApplicationDelegate* BadaApplicationManager::CreateDefaultApplicationDelegate (
 }
 
 /*
-    Получение экземпляра текущего приложения
+    РџРѕР»СѓС‡РµРЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° С‚РµРєСѓС‰РµРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 namespace syslib

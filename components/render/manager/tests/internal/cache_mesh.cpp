@@ -16,7 +16,7 @@ int main ()
     
     RenderManager render_manager = test.RenderManager ();    
     
-      //создание материала и примитива
+      //СЃРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»Р° Рё РїСЂРёРјРёС‚РёРІР°
       
     printf ("--- Load resources ---\n");
 

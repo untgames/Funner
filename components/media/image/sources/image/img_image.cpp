@@ -5,7 +5,7 @@ using namespace common;
 using namespace media;
 
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Image::Image (ImageImpl* in_impl)
@@ -135,7 +135,7 @@ Image::~Image ()
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Image& Image::operator = (const Image& source)
@@ -146,7 +146,7 @@ Image& Image::operator = (const Image& source)
 }
 
 /*
-    Клонирование
+    РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 Image Image::Clone () const
@@ -163,7 +163,7 @@ Image Image::Clone () const
 }
 
 /*
-    Имя картинки
+    РРјСЏ РєР°СЂС‚РёРЅРєРё
 */
 
 const char* Image::Name () const
@@ -180,7 +180,7 @@ void Image::Rename (const char* new_name)
 }
 
 /*
-    Формат картинки
+    Р¤РѕСЂРјР°С‚ РєР°СЂС‚РёРЅРєРё
 */
 
 PixelFormat Image::Format () const
@@ -227,7 +227,7 @@ void Image::Resize (unsigned int width, unsigned int height, unsigned int depth)
 }
 
 /*
-    Заполнение определенным значением
+    Р—Р°РїРѕР»РЅРµРЅРёРµ РѕРїСЂРµРґРµР»РµРЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј
 */
 
 void Image::Fill (PixelFormat format, const void* data)
@@ -260,7 +260,7 @@ void Image::Fill (PixelFormat format, const void* data)
 }
 
 /*
-    Работа с образом
+    Р Р°Р±РѕС‚Р° СЃ РѕР±СЂР°Р·РѕРј
 */
 
 const void* Image::Bitmap (unsigned int z) const
@@ -355,7 +355,7 @@ void Image::GetImage (unsigned int x, unsigned int y, unsigned int z, unsigned i
 }
 
 /*
-    Загрузка / сохранение
+    Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void Image::Load (const char* file_name)
@@ -422,7 +422,7 @@ void Image::DefaultSaver (const char* file_name, const Image& image, const char*
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Image::Swap (Image& image)
@@ -441,7 +441,7 @@ void swap (Image& image1,Image& image2)
 }
 
 /*
-    Регистрация сериализаторов по умолчанию
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void Image::RegisterDefaultSavers ()

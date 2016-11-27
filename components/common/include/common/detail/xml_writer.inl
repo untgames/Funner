@@ -1,5 +1,5 @@
 /*
-    Перегрузки вывода различных типов атрибутов
+    РџРµСЂРµРіСЂСѓР·РєРё РІС‹РІРѕРґР° СЂР°Р·Р»РёС‡РЅС‹С… С‚РёРїРѕРІ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class T>
@@ -49,7 +49,7 @@ inline void XmlWriter::WriteXmlTextData (const stl::basic_string<Char, Traits, A
 }
 
 /*
-    Сериализация атрибутов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class T>
@@ -103,7 +103,7 @@ inline void XmlWriter::WriteAttribute (const char* name, const T& value, const c
 }
 
 /*
-    Запись данных в узел
+    Р—Р°РїРёСЃСЊ РґР°РЅРЅС‹С… РІ СѓР·РµР»
 */
 
 template <class T>
@@ -175,7 +175,7 @@ inline void XmlWriter::WriteCData (const T& value, const char* format)
 }
 
 /*
-    Обобщённая сериализация узлов (BeginNode+WriteData+EndNode)
+    РћР±РѕР±С‰С‘РЅРЅР°СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ СѓР·Р»РѕРІ (BeginNode+WriteData+EndNode)
 */
 
 inline void XmlWriter::WriteNode (const char* name)
@@ -253,7 +253,7 @@ inline void XmlWriter::WriteNodeCData (const char* name, const T& value, const c
 }
 
 /*
-    Блок сериализации узлов Xml
+    Р‘Р»РѕРє СЃРµСЂРёР°Р»РёР·Р°С†РёРё СѓР·Р»РѕРІ Xml
 */
 
 inline XmlNodeScope::XmlNodeScope (XmlWriter& in_writer, const char* frame_tag)

@@ -1,5 +1,5 @@
 /*
-    Конструкторы / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class T>
@@ -127,7 +127,7 @@ inline shared_ptr<T>::~shared_ptr ()
 }
 
 /*
-    Функции для инициализации weak_ptr в объектах класса enable_shared_from_this
+    Р¤СѓРЅРєС†РёРё РґР»СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё weak_ptr РІ РѕР±СЉРµРєС‚Р°С… РєР»Р°СЃСЃР° enable_shared_from_this
 */
 
 template <class T> template <class T1, class T2>
@@ -143,7 +143,7 @@ inline void shared_ptr<T>::sp_enable_shared_from_this (...) const
 }
 
 /*
-    Операторы присваивания
+    РћРїРµСЂР°С‚РѕСЂС‹ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
 */
 
 template <class T>
@@ -179,7 +179,7 @@ inline typename detail::sp_enable_if_auto_ptr<Ptr, shared_ptr<T>&>::type shared_
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T>
@@ -213,7 +213,7 @@ inline T* get_pointer (const shared_ptr<T>& p)
 }
 
 /*
-    Информация о состоянии указателя
+    РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё СѓРєР°Р·Р°С‚РµР»СЏ
 */
 
 template <class T>
@@ -235,7 +235,7 @@ inline bool shared_ptr<T>::operator ! () const
 }
 
 /*
-    Установка нового значения
+    РЈСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 template <class T>
@@ -257,7 +257,7 @@ inline void shared_ptr<T>::reset (T1* in_ptr, Deleter deleter)
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 template <class T>
@@ -279,7 +279,7 @@ inline void swap (shared_ptr<T>& p1, shared_ptr<T>& p2)
 }
 
 /*
-    Получение удаляющего функтора
+    РџРѕР»СѓС‡РµРЅРёРµ СѓРґР°Р»СЏСЋС‰РµРіРѕ С„СѓРЅРєС‚РѕСЂР°
 */
 
 template <class T> template <class Deleter>
@@ -295,7 +295,7 @@ inline Deleter* get_deleter (const shared_ptr<T>& p)
 }
 
 /*
-    Сравнение указателей
+    РЎСЂР°РІРЅРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T> template <class T1>
@@ -335,7 +335,7 @@ inline bool shared_ptr<T>::operator >= (const shared_ptr<T1>& p) const
 }
 
 /*
-    Приведение указателей
+    РџСЂРёРІРµРґРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№
 */
 
 template <class T1, class T2>

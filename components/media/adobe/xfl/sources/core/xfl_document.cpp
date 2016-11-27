@@ -9,27 +9,27 @@ typedef media::CollectionImpl<Timeline, INamedCollection<Timeline> > TimelineCol
 namespace
 {
 
-const char*  XFL_LOADERS_MASK   = "media.adobe.xfl.loaders.*"; //маска имён компонентов загрузки xfl-документов
-const float  DEFAULT_FRAME_RATE = 25.0f;                       //количество кадров в секунду по умолчанию
-const size_t DEFAULT_WIDTH      = 1;                           //ширина по умолчанию
-const size_t DEFAULT_HEIGHT     = 1;                           //высота по умолчанию
+const char*  XFL_LOADERS_MASK   = "media.adobe.xfl.loaders.*"; //РјР°СЃРєР° РёРјС‘РЅ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Р·Р°РіСЂСѓР·РєРё xfl-РґРѕРєСѓРјРµРЅС‚РѕРІ
+const float  DEFAULT_FRAME_RATE = 25.0f;                       //РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t DEFAULT_WIDTH      = 1;                           //С€РёСЂРёРЅР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t DEFAULT_HEIGHT     = 1;                           //РІС‹СЃРѕС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 }
 
 /*
-    Описание реализации XFL документа
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё XFL РґРѕРєСѓРјРµРЅС‚Р°
 */
 
 struct Document::Impl : public xtl::reference_counter
 {
-  stl::string        name;             //имя документа
-  math::vec3f        background_color; //цвет фона
-  float              framerate;        //частота кадров
-  size_t             width;            //ширина
-  size_t             height;           //высота
-  ResourceCollection resources;        //ресурсы
-  SymbolCollection   symbols;          //элементы анимации
-  TimelineCollection timelines;        //анимации
+  stl::string        name;             //РёРјСЏ РґРѕРєСѓРјРµРЅС‚Р°
+  math::vec3f        background_color; //С†РІРµС‚ С„РѕРЅР°
+  float              framerate;        //С‡Р°СЃС‚РѕС‚Р° РєР°РґСЂРѕРІ
+  size_t             width;            //С€РёСЂРёРЅР°
+  size_t             height;           //РІС‹СЃРѕС‚Р°
+  ResourceCollection resources;        //СЂРµСЃСѓСЂСЃС‹
+  SymbolCollection   symbols;          //СЌР»РµРјРµРЅС‚С‹ Р°РЅРёРјР°С†РёРё
+  TimelineCollection timelines;        //Р°РЅРёРјР°С†РёРё
   
   Impl ()
     : framerate (DEFAULT_FRAME_RATE)
@@ -40,7 +40,7 @@ struct Document::Impl : public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Document::Document ()
@@ -86,7 +86,7 @@ Document& Document::operator = (const Document& source)
 }
 
 /*
-   Имя
+   РРјСЏ
 */
 
 const char* Document::Name () const
@@ -103,7 +103,7 @@ void Document::SetName (const char* name)
 }
 
 /*
-   Цвет фона
+   Р¦РІРµС‚ С„РѕРЅР°
 */
 
 const math::vec3f& Document::BackgroundColor () const
@@ -117,7 +117,7 @@ void Document::SetBackgroundColor (const math::vec3f& background_color)
 }
 
 /*
-   Частота кадров
+   Р§Р°СЃС‚РѕС‚Р° РєР°РґСЂРѕРІ
 */
 
 float Document::FrameRate () const
@@ -131,7 +131,7 @@ void Document::SetFrameRate (float framerate)
 }
 
 /*
-   Ширина/высота кадра
+   РЁРёСЂРёРЅР°/РІС‹СЃРѕС‚Р° РєР°РґСЂР°
 */
 
 size_t Document::Width () const
@@ -155,7 +155,7 @@ void Document::SetHeight (size_t height)
 }
 
 /*
-   Используемые ресурсы
+   РСЃРїРѕР»СЊР·СѓРµРјС‹Рµ СЂРµСЃСѓСЂСЃС‹
 */
 
 Document::ResourceList& Document::Resources ()
@@ -169,7 +169,7 @@ const Document::ResourceList& Document::Resources () const
 }
 
 /*
-   Элементы анимации
+   Р­Р»РµРјРµРЅС‚С‹ Р°РЅРёРјР°С†РёРё
 */
 
 Document::SymbolList& Document::Symbols ()
@@ -183,7 +183,7 @@ const Document::SymbolList& Document::Symbols () const
 }
 
 /*
-   Анимации
+   РђРЅРёРјР°С†РёРё
 */
 
 Document::TimelineList& Document::Timelines ()
@@ -197,7 +197,7 @@ const Document::TimelineList& Document::Timelines () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Document::Swap (Document& document)
@@ -215,7 +215,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Document& document1, Document& document2)

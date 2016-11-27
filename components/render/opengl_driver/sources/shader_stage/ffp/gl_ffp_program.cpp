@@ -8,13 +8,13 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
+const unsigned int FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРјРµС‰РµРЅРёР№ РґРёРЅР°РјРёС‡РµСЃРєРёС… РїР°СЂР°РјРµС‚СЂРѕРІ
 
 /*
-    Пара: тэг - значение
+    РџР°СЂР°: С‚СЌРі - Р·РЅР°С‡РµРЅРёРµ
 */
 
 struct Tag2Value
@@ -24,7 +24,7 @@ struct Tag2Value
 };
 
 /*
-    Парсер FFP-шейдеров
+    РџР°СЂСЃРµСЂ FFP-С€РµР№РґРµСЂРѕРІ
 */
 
 class FfpProgramParser
@@ -35,11 +35,11 @@ class FfpProgramParser
        dynamic_parameters (in_dynamic_parameters),
        parser (shader_desc.name, shader_desc.source_code_size, shader_desc.source_code, "wxf")
     {
-        //разбор шейдера
+        //СЂР°Р·Р±РѕСЂ С€РµР№РґРµСЂР°
 
       ParseShader ();
 
-        //проверка ошибок разбора
+        //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє СЂР°Р·Р±РѕСЂР°
         
       ParseLog log = parser.Log ();
 
@@ -51,7 +51,7 @@ class FfpProgramParser
     }
     
   private:
-      //добавление динамического параметра
+      //РґРѕР±Р°РІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
     void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FfpDynamicParameterType type, unsigned int count)
     {
       FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
@@ -70,7 +70,7 @@ class FfpProgramParser
       param.field_offsets.reserve (FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE);
     }
     
-      //добавление смещения на динамический параметр
+      //РґРѕР±Р°РІР»РµРЅРёРµ СЃРјРµС‰РµРЅРёСЏ РЅР° РґРёРЅР°РјРёС‡РµСЃРєРёР№ РїР°СЂР°РјРµС‚СЂ
     void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, unsigned int offset, FfpDynamicParameterType type, unsigned int count)
     {
       FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
@@ -99,7 +99,7 @@ class FfpProgramParser
       param.field_offsets.push_back (offset);
     }  
     
-      //разбор значений
+      //СЂР°Р·Р±РѕСЂ Р·РЅР°С‡РµРЅРёР№
     template <class T, FfpDynamicParameterType Type>
     void ParseValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
@@ -113,14 +113,14 @@ class FfpProgramParser
 
       if (attributes_count == 1 && isalpha (*attributes [0]))
       {
-          //добавление динамического параметра
+          //РґРѕР±Р°РІР»РµРЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 
         AddDynamicParameterField (iter, attributes [0], offset, Type, count);
 
         return;
       }
 
-        //проверка корректности числа атрибутов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё С‡РёСЃР»Р° Р°С‚СЂРёР±СѓС‚РѕРІ
 
       if (attributes_count < count)
       {
@@ -129,7 +129,7 @@ class FfpProgramParser
         return;
       }
 
-        //разбор атрибутов
+        //СЂР°Р·Р±РѕСЂ Р°С‚СЂРёР±СѓС‚РѕРІ
 
       Parser::AttributeIterator attr_iter = xtl::io::make_token_iterator (attributes, attributes + count);
 
@@ -139,19 +139,19 @@ class FfpProgramParser
         parser.Log ().Error (*iter, "Error at read attribute #%u", parsed_attributes_count);
     }
 
-      //разбор целочисленных значений
+      //СЂР°Р·Р±РѕСЂ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
     void ParseIntegerValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
       ParseValues<int, FfpDynamicParameterType_Int> (iter, node_name, offset, count);
     }
 
-      //разбор вещественных значений
+      //СЂР°Р·Р±РѕСЂ РІРµС‰РµСЃС‚РІРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
     void ParseFloatValues (Parser::Iterator iter, const char* node_name, unsigned int offset, unsigned int count)
     {
       ParseValues<float, FfpDynamicParameterType_Float> (iter, node_name, offset, count);
     }
     
-      //разбор векторов
+      //СЂР°Р·Р±РѕСЂ РІРµРєС‚РѕСЂРѕРІ
     void ParseVector4f (Parser::Iterator iter, const char* node_name, unsigned int offset)
     {
       ParseFloatValues (iter, node_name, offset, 4);
@@ -162,13 +162,13 @@ class FfpProgramParser
       ParseFloatValues (iter, node_name, offset, 3);
     }
 
-      //разбор матрицы
+      //СЂР°Р·Р±РѕСЂ РјР°С‚СЂРёС†С‹
     void ParseMatrix4f (Parser::Iterator iter, const char* node_name, unsigned int offset)
     {
       ParseFloatValues (iter, node_name, offset, 16);
     }
     
-      //разбор объявления параметров
+      //СЂР°Р·Р±РѕСЂ РѕР±СЉСЏРІР»РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
     void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FfpDynamicParameterType type, unsigned int count)
     {
       for (Parser::NamesakeIterator iter=params_iter->First (name); iter; ++iter)
@@ -184,7 +184,7 @@ class FfpProgramParser
       }
     }
     
-      //разбор строкового свойства
+      //СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРѕРІРѕРіРѕ СЃРІРѕР№СЃС‚РІР°
     void ParseEnum (Parser::Iterator iter, const char* node_name, unsigned int offset, const Tag2Value* pairs)
     {
       iter = iter->First (node_name);
@@ -198,7 +198,7 @@ class FfpProgramParser
         return;
       }
 
-        //поиск значения, соответствующего прочитанной строке
+        //РїРѕРёСЃРє Р·РЅР°С‡РµРЅРёСЏ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїСЂРѕС‡РёС‚Р°РЅРЅРѕР№ СЃС‚СЂРѕРєРµ
 
       const char* value = iter->Attribute (0);
 
@@ -210,12 +210,12 @@ class FfpProgramParser
           return;
         }
 
-        //если соответствие не найдено - сообщаем об ошибке
+        //РµСЃР»Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ - СЃРѕРѕР±С‰Р°РµРј РѕР± РѕС€РёР±РєРµ
 
       parser.Log ().Error (*iter, "Unknown value '%s'", value);
     }
     
-      //разбор параметров источника освещения
+      //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° РѕСЃРІРµС‰РµРЅРёСЏ
     void ParseLight (Parser::Iterator light_iter, unsigned int base_offset)
     {
       static const Tag2Value light_types [] = {
@@ -239,7 +239,7 @@ class FfpProgramParser
       ParseFloatValues   (light_iter, "QuadraticAttenuation", base_offset + offsetof (LightDesc, quadratic_attenuation), 1);
     }    
   
-      //разбор параметров текстрирования
+      //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСЃС‚СЂРёСЂРѕРІР°РЅРёСЏ
     void ParseTexmap (Parser::Iterator texmap_iter, unsigned int base_offset)
     {
       ParseMatrix4f (texmap_iter, "Transform", base_offset + (unsigned int)offsetof (TexmapDesc, transform));
@@ -271,7 +271,7 @@ class FfpProgramParser
       ParseEnum (texmap_iter, "Blend", base_offset + offsetof (TexmapDesc, blend), texture_blend_modes);
     }
   
-      //разбор шейдера
+      //СЂР°Р·Р±РѕСЂ С€РµР№РґРµСЂР°
     void ParseShader ()
     {
       Parser::Iterator program_iter = parser.Root ();
@@ -279,7 +279,7 @@ class FfpProgramParser
       if (!program_iter)
         return;
         
-        //разбор объявлений параметров
+        //СЂР°Р·Р±РѕСЂ РѕР±СЉСЏРІР»РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ
         
       Parser::Iterator params_iter = program_iter->First ("Parameters");
         
@@ -298,7 +298,7 @@ class FfpProgramParser
           parser.Log ().Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
       }
       
-        //разбор параметров растеризации
+        //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 
       ParseFloatValues   (program_iter, "PointSize",          offsetof (FfpState, rasterization.point_size), 1);
       ParseFloatValues   (program_iter, "LineWidth",          offsetof (FfpState, rasterization.line_width), 1);
@@ -306,13 +306,13 @@ class FfpProgramParser
       ParseIntegerValues (program_iter, "LineStipplePattern", offsetof (FfpState, rasterization.line_stipple_pattern), 1);
 
 
-        //разбор параметров трансформации
+        //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё
 
       ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FfpState, viewer.projection_matrix));
       ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FfpState, viewer.view_matrix));
       ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FfpState, object.matrix));
       
-        //разбор параметров материала
+        //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°С‚РµСЂРёР°Р»Р°
       
       ParseVector4f    (program_iter, "EmissionColor", offsetof (FfpState, material.emission_color));
       ParseVector4f    (program_iter, "AmbientColor",  offsetof (FfpState, material.ambient_color));
@@ -348,7 +348,7 @@ class FfpProgramParser
       ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FfpState, material.alpha_reference), 1);
       ParseIntegerValues (program_iter, "Normalize",        offsetof (FfpState, modes.normalize), 1);
 
-        //разбор параметров освещения
+        //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РѕСЃРІРµС‰РµРЅРёСЏ
         
       unsigned int light_index = 0;
         
@@ -357,7 +357,7 @@ class FfpProgramParser
         ParseLight (light_iter, (unsigned int)offsetof (FfpState, lights [0]) + light_index * sizeof (LightDesc));
       }
 
-        //разбор параметров текстурирования
+        //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ
 
       for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
@@ -373,15 +373,15 @@ class FfpProgramParser
     }    
 
   private:
-    FfpState&               base_state;         //базовое состояние ffp-шейдера
-    FfpDynamicParameterMap& dynamic_parameters; //динамические параметры
-    Parser                  parser;             //парсер исходного текста ffp-шейдера
+    FfpState&               base_state;         //Р±Р°Р·РѕРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ ffp-С€РµР№РґРµСЂР°
+    FfpDynamicParameterMap& dynamic_parameters; //РґРёРЅР°РјРёС‡РµСЃРєРёРµ РїР°СЂР°РјРµС‚СЂС‹
+    Parser                  parser;             //РїР°СЂСЃРµСЂ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° ffp-С€РµР№РґРµСЂР°
 };
 
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FfpProgram::FfpProgram (const ContextManager& manager, const ShaderDesc& shader_desc, const LogFunction& error_log)
@@ -389,7 +389,7 @@ FfpProgram::FfpProgram (const ContextManager& manager, const ShaderDesc& shader_
 {
   static const char* METHOD_NAME = "render::low_level::opengl::FfpProgram::FfpProgram";
 
-    //инициализация состояния ffp-шейдера
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ ffp-С€РµР№РґРµСЂР°
     
   memset (&base_state, 0, sizeof base_state);
   
@@ -419,7 +419,7 @@ FfpProgram::FfpProgram (const ContextManager& manager, const ShaderDesc& shader_
   base_state.rasterization.line_stipple_pattern = ~0;
   base_state.rasterization.line_stipple_factor  = 1;
 
-    //разбор ffp-шейдера
+    //СЂР°Р·Р±РѕСЂ ffp-С€РµР№РґРµСЂР°
 
   if (!shader_desc.profile)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.profile");
@@ -440,7 +440,7 @@ FfpProgram::~FfpProgram ()
 }
 
 /*
-    Работа с динамическими параметрами
+    Р Р°Р±РѕС‚Р° СЃ РґРёРЅР°РјРёС‡РµСЃРєРёРјРё РїР°СЂР°РјРµС‚СЂР°РјРё
 */
 
 const FfpDynamicParameter* FfpProgram::FindDynamicParameter (const char* name) const
@@ -457,7 +457,7 @@ const FfpDynamicParameter* FfpProgram::FindDynamicParameter (const char* name) c
 }
 
 /*
-    Создание программы, устанавливаемой в контекст OpenGL
+    РЎРѕР·РґР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјРѕР№ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 IBindableProgram* FfpProgram::CreateBindableProgram (ProgramParametersLayout* layout)

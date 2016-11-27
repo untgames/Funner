@@ -9,13 +9,13 @@ namespace
 {
 
 /*
-    Канал с динамической текстурой
+    РљР°РЅР°Р» СЃ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ С‚РµРєСЃС‚СѓСЂРѕР№
 */
 
 struct DynamicTextureChannel: public xtl::reference_counter
 {
-  DynamicTexturePtr dynamic_texture; //динамическая текстура
-  unsigned int      channel_index;   //номер канала
+  DynamicTexturePtr dynamic_texture; //РґРёРЅР°РјРёС‡РµСЃРєР°СЏ С‚РµРєСЃС‚СѓСЂР°
+  unsigned int      channel_index;   //РЅРѕРјРµСЂ РєР°РЅР°Р»Р°
 };
 
 typedef xtl::intrusive_ptr<DynamicTextureChannel> DynamicTextureChannelPtr;
@@ -24,18 +24,18 @@ typedef stl::vector<DynamicTextureChannelPtr>     DynamicTextureChannelArray;
 }
 
 /*
-    Описание реализации хранилища динамических текстур материала
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё С…СЂР°РЅРёР»РёС‰Р° РґРёРЅР°РјРёС‡РµСЃРєРёС… С‚РµРєСЃС‚СѓСЂ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct DynamicTextureMaterialStorage::Impl
 {
-  TextureManagerPtr                 texture_manager;  //менеджер текстур
-  EntityImpl&                       owner;            //владелец хранилища текстур
-  MaterialPtr                       material;         //материал
-  DynamicTextureChannelArray        dynamic_textures; //динамические текстуры
-  render::low_level::StateBlockMask state_block_mask; //маска блока состояний
+  TextureManagerPtr                 texture_manager;  //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+  EntityImpl&                       owner;            //РІР»Р°РґРµР»РµС† С…СЂР°РЅРёР»РёС‰Р° С‚РµРєСЃС‚СѓСЂ
+  MaterialPtr                       material;         //РјР°С‚РµСЂРёР°Р»
+  DynamicTextureChannelArray        dynamic_textures; //РґРёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРєСЃС‚СѓСЂС‹
+  render::low_level::StateBlockMask state_block_mask; //РјР°СЃРєР° Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const TextureManagerPtr& in_texture_manager, const MaterialPtr& in_material, EntityImpl& in_owner)
     : texture_manager (in_texture_manager)
     , owner (in_owner)
@@ -52,7 +52,7 @@ struct DynamicTextureMaterialStorage::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DynamicTextureMaterialStorage::DynamicTextureMaterialStorage (const TextureManagerPtr& texture_manager, const MaterialPtr& material, EntityImpl& entity)
@@ -66,7 +66,7 @@ DynamicTextureMaterialStorage::~DynamicTextureMaterialStorage ()
 }
 
 /*
-    Получение маски блока состояний
+    РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃРєРё Р±Р»РѕРєР° СЃРѕСЃС‚РѕСЏРЅРёР№
 */
 
 void DynamicTextureMaterialStorage::UpdateMask (render::low_level::StateBlockMask& mask)
@@ -85,7 +85,7 @@ void DynamicTextureMaterialStorage::UpdateMask (render::low_level::StateBlockMas
 }
 
 /*
-    Применение текстур материала
+    РџСЂРёРјРµРЅРµРЅРёРµ С‚РµРєСЃС‚СѓСЂ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 void DynamicTextureMaterialStorage::Apply (render::low_level::IDeviceContext& context)
@@ -113,7 +113,7 @@ void DynamicTextureMaterialStorage::Apply (render::low_level::IDeviceContext& co
 }
 
 /*
-    Обновление кэша
+    РћР±РЅРѕРІР»РµРЅРёРµ РєСЌС€Р°
 */
 
 void DynamicTextureMaterialStorage::ResetCacheCore ()

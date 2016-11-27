@@ -30,7 +30,7 @@ namespace bin_mesh_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char HEADER [4] = {'B', 'M', 'S', 'H'};
@@ -59,13 +59,13 @@ stl::string file_read_string (InputFile& file)
 }
 
 /*
-    Загрузчик меш-моделей в формате Xml
+    Р—Р°РіСЂСѓР·С‡РёРє РјРµС€-РјРѕРґРµР»РµР№ РІ С„РѕСЂРјР°С‚Рµ Xml
 */
 
 class BinMeshLibraryLoader
 {
   private:
-      //чтение вершинного формата
+      //С‡С‚РµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
     void ReadVertexStreamChannel (VertexFormat& vertex_format)
     {
       VertexAttributeSemantic semantic;
@@ -81,17 +81,17 @@ class BinMeshLibraryLoader
       vertex_format.AddAttribute (name.c_str (), semantic, type, offset);
     }
 
-      //чтение вершинного потока
+      //С‡С‚РµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
     void ReadVertexStream (uint32_t id)
     {
-        //определение числа вершин и размера вершины
+        //РѕРїСЂРµРґРµР»РµРЅРёРµ С‡РёСЃР»Р° РІРµСЂС€РёРЅ Рё СЂР°Р·РјРµСЂР° РІРµСЂС€РёРЅС‹
 
       uint32_t vertices_count, vertex_size;
 
       file_read (input_file, &vertices_count, sizeof (vertices_count));
       file_read (input_file, &vertex_size, sizeof (vertex_size));
 
-        //разбор вершинного формата
+        //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 
       VertexFormat vertex_format;
       uint32_t     vertex_stream_channels_count;
@@ -101,20 +101,20 @@ class BinMeshLibraryLoader
       for (uint32_t i = 0; i < vertex_stream_channels_count; i++)
         ReadVertexStreamChannel (vertex_format);
 
-        //создание вершинного потока
+        //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ РїРѕС‚РѕРєР°
 
       VertexStream vs (vertices_count, VertexDeclaration (vertex_format, vertex_size));
 
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
       file_read (input_file, vs.Data (), vertices_count * vertex_size);
 
-        //регистрация потока
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕС‚РѕРєР°
 
       vertex_streams.insert_pair (id, vs);
     }
 
-      //чтение вершинных потоков
+      //С‡С‚РµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ
     void ReadVertexStreams ()
     {
       uint32_t vertex_streams_count;
@@ -125,27 +125,27 @@ class BinMeshLibraryLoader
         ReadVertexStream (i);
     }
 
-      //чтение потока вершинных весов
+      //С‡С‚РµРЅРёРµ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
     void ReadVertexWeightStream (uint32_t id)
     {
       uint32_t weights_count;
 
       file_read (input_file, &weights_count, sizeof (weights_count));
 
-        //создание потока
+        //СЃРѕР·РґР°РЅРёРµ РїРѕС‚РѕРєР°
 
       VertexWeightStream vws (weights_count);
 
-        //чтение весов
+        //С‡С‚РµРЅРёРµ РІРµСЃРѕРІ
 
       file_read (input_file, vws.Data (), weights_count * sizeof (VertexWeight));
 
-        //регистрация потока
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕС‚РѕРєР°
 
       vertex_weights.insert_pair (id, vws);
     }
 
-    //чтение потоков вершинных весов
+    //С‡С‚РµРЅРёРµ РїРѕС‚РѕРєРѕРІ РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
     void ReadVertexWeights ()
     {
       uint32_t vertex_weights_streams_count;
@@ -156,16 +156,16 @@ class BinMeshLibraryLoader
         ReadVertexWeightStream (i);
     }
 
-      //чтение вершинного буфера
+      //С‡С‚РµРЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void ReadVertexBuffer (uint32_t id)
     {
       static const char* METHOD_NAME = "media::geometry::BinMeshLibraryLoader::ReadVertexBuffer";
 
-         //создание вершинного буфера
+         //СЃРѕР·РґР°РЅРёРµ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       VertexBuffer vb;
 
-         //разбор потока вершинных весов
+         //СЂР°Р·Р±РѕСЂ РїРѕС‚РѕРєР° РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
 
       uint32_t has_weights;
 
@@ -188,7 +188,7 @@ class BinMeshLibraryLoader
         vb.AttachWeights (weights_iter->second);
       }
 
-         //разбор вершинных потоков
+         //СЂР°Р·Р±РѕСЂ РІРµСЂС€РёРЅРЅС‹С… РїРѕС‚РѕРєРѕРІ
 
       uint32_t streams_count;
 
@@ -208,12 +208,12 @@ class BinMeshLibraryLoader
         vb.Attach (stream_iter->second);
       }
 
-         //регистрация вершинного буфера
+         //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµСЂС€РёРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       vertex_buffers.insert_pair (id, vb);
     }
 
-      //чтение вершинных буферов
+      //С‡С‚РµРЅРёРµ РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
     void ReadVertexBuffers ()
     {
       uint32_t vertex_buffers_count;
@@ -224,7 +224,7 @@ class BinMeshLibraryLoader
         ReadVertexBuffer (i);
     }
 
-      //чтение индексного буфера
+      //С‡С‚РµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
     void ReadIndexBuffer (uint32_t id)
     {
       IndexType data_type = IndexType_Default;
@@ -235,20 +235,20 @@ class BinMeshLibraryLoader
 
       file_read (input_file, &indices_count, sizeof (indices_count));
       
-        //создание буфера
+        //СЃРѕР·РґР°РЅРёРµ Р±СѓС„РµСЂР°
 
       IndexBuffer ib (indices_count, data_type);
 
-        //чтение индексов
+        //С‡С‚РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ
 
       file_read (input_file, ib.Data (), indices_count * get_index_type_size (data_type));
 
-        //регистрация потока
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРѕС‚РѕРєР°
 
       index_buffers.insert_pair (id, ib);
     }
 
-      //чтение индексных буферов
+      //С‡С‚РµРЅРёРµ РёРЅРґРµРєСЃРЅС‹С… Р±СѓС„РµСЂРѕРІ
     void ReadIndexBuffers ()
     {
       uint32_t index_buffers_count;
@@ -259,7 +259,7 @@ class BinMeshLibraryLoader
         ReadIndexBuffer (i);
     }
 
-      //чтение примитива
+      //С‡С‚РµРЅРёРµ РїСЂРёРјРёС‚РёРІР°
     void ReadPrimitive (Mesh& mesh)
     {
       static const char* METHOD_NAME = "media::geometry::BinMeshLibraryLoader::ParsePrimitive";
@@ -332,12 +332,12 @@ class BinMeshLibraryLoader
       mesh.AddPrimitive (type, vertex_buffer_index, first, count, base_vertex, material.data ());
     }
 
-      //чтение меша
+      //С‡С‚РµРЅРёРµ РјРµС€Р°
     void ReadMesh ()
     {
       static const char* METHOD_NAME = "media::geometry::BinMeshLibraryLoader::ParseMesh";
       
-        //чтение идентификатора меша
+        //С‡С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РјРµС€Р°
         
       uint32_t id_length;
       
@@ -349,7 +349,7 @@ class BinMeshLibraryLoader
       
       id.data ()[id_length] = '\0';
 
-        //чтение имени меша
+        //С‡С‚РµРЅРёРµ РёРјРµРЅРё РјРµС€Р°
 
       uint32_t name_length;
 
@@ -361,13 +361,13 @@ class BinMeshLibraryLoader
 
       name.data ()[name_length] = '\0';
 
-        //создание меша
+        //СЃРѕР·РґР°РЅРёРµ РјРµС€Р°
 
       Mesh mesh;
 
       mesh.Rename (name.data ());
 
-        //чтение индексного буфера
+        //С‡С‚РµРЅРёРµ РёРЅРґРµРєСЃРЅРѕРіРѕ Р±СѓС„РµСЂР°
 
       uint32_t has_index_buffer;
 
@@ -395,7 +395,7 @@ class BinMeshLibraryLoader
       if (ib)
         mesh.Attach (*ib);
 
-        //поиск вершинных буферов
+        //РїРѕРёСЃРє РІРµСЂС€РёРЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
 
       uint32_t vertex_buffers_count;
 
@@ -415,7 +415,7 @@ class BinMeshLibraryLoader
         mesh.Attach (iter->second);
       }
 
-        //чтение примитивов
+        //С‡С‚РµРЅРёРµ РїСЂРёРјРёС‚РёРІРѕРІ
 
       uint32_t primitives_count;
 
@@ -424,12 +424,12 @@ class BinMeshLibraryLoader
       for (uint32_t i = 0; i < primitives_count; i++)
         ReadPrimitive (mesh);
 
-        //присоединение меша к модели
+        //РїСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РјРµС€Р° Рє РјРѕРґРµР»Рё
 
       library.Attach (id.data (), mesh);
     }
 
-      //чтение мешей
+      //С‡С‚РµРЅРёРµ РјРµС€РµР№
     void ReadMeshes ()
     {
       uint32_t meshes_count;
@@ -440,7 +440,7 @@ class BinMeshLibraryLoader
         ReadMesh ();
     }
 
-      //разбор библиотеки
+      //СЂР°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё
     void ReadLibrary ()
     {
       ReadVertexStreams ();
@@ -455,7 +455,7 @@ class BinMeshLibraryLoader
     {
       static const char* METHOD_NAME = "media::geometry::BinMeshLibraryLoader::BinMeshLibraryLoader";
 
-        //проверка заголовка файла
+        //РїСЂРѕРІРµСЂРєР° Р·Р°РіРѕР»РѕРІРєР° С„Р°Р№Р»Р°
 
       char header [4] = {0, 0, 0, 0};
 
@@ -473,7 +473,7 @@ class BinMeshLibraryLoader
         throw xtl::format_operation_exception (METHOD_NAME, "File '%s' has unsupported version %d, supported version - %d", file_name,
           version, VERSION);
 
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
       ReadLibrary ();
     }
@@ -485,16 +485,16 @@ class BinMeshLibraryLoader
     typedef stl::hash_map<uint32_t, IndexBuffer>        IndexBufferMap;
 
   private:
-    InputFile             input_file;     //исходный файл
-    MeshLibrary&          library;        //библиотека
-    VertexStreamMap       vertex_streams; //загруженные вершинные потоки
-    VertexWeightStreamMap vertex_weights; //загруженные потоки вершинных весов
-    VertexBufferMap       vertex_buffers; //загруженные вершинные буферы
-    IndexBufferMap        index_buffers;  //загруженные индексные буферы
+    InputFile             input_file;     //РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р»
+    MeshLibrary&          library;        //Р±РёР±Р»РёРѕС‚РµРєР°
+    VertexStreamMap       vertex_streams; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ РїРѕС‚РѕРєРё
+    VertexWeightStreamMap vertex_weights; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РїРѕС‚РѕРєРё РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
+    VertexBufferMap       vertex_buffers; //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РІРµСЂС€РёРЅРЅС‹Рµ Р±СѓС„РµСЂС‹
+    IndexBufferMap        index_buffers;  //Р·Р°РіСЂСѓР¶РµРЅРЅС‹Рµ РёРЅРґРµРєСЃРЅС‹Рµ Р±СѓС„РµСЂС‹
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class BinMeshLoaderComponent

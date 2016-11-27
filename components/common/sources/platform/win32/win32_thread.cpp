@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Получение идентификатора текущей нити
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РµРєСѓС‰РµР№ РЅРёС‚Рё
 */
    
 Win32Platform::threadid_t Win32Platform::GetCurrentThreadId ()

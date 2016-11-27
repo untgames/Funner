@@ -2,7 +2,7 @@
 #define __MYSTL_CHAR_TRAITS__
 
 #include <string.h>
-#include <wchar.h> //cwchar имеет проблемы компиляции на mingw 3.4.5
+#include <wchar.h> //cwchar РёРјРµРµС‚ РїСЂРѕР±Р»РµРјС‹ РєРѕРјРїРёР»СЏС†РёРё РЅР° mingw 3.4.5
 
 #include <stl/functional>
 
@@ -10,7 +10,7 @@ namespace stl
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Базовые cимвольные операции
+///Р‘Р°Р·РѕРІС‹Рµ cРёРјРІРѕР»СЊРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 ////////////////////////////////////////////////////////////////////////////////////////
 template <class Char,class Int>
 struct char_traits_base
@@ -19,24 +19,24 @@ struct char_traits_base
   typedef Int  int_type;
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Присваивание
+///РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 ////////////////////////////////////////////////////////////////////////////////////////
   static void       assign (char_type& dst,const char_type& src);
   static char_type* assign (char_type* dst,size_t count,const char_type& ch);
   
 ////////////////////////////////////////////////////////////////////////////////////////
-///Быстрая инициализация
+///Р‘С‹СЃС‚СЂР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 ////////////////////////////////////////////////////////////////////////////////////////  
-  static void fast_init (char_type* dst,size_t count); //по умолчанию инициализация Char ()
+  static void fast_init (char_type* dst,size_t count); //РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Char ()
   
 ////////////////////////////////////////////////////////////////////////////////////////
-///Копирование
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
 ////////////////////////////////////////////////////////////////////////////////////////
   static char_type* copy (char_type* dst,const char_type* src,size_t count);
   static char_type* move (char_type* dst,const char_type* src,size_t count);
   
 ////////////////////////////////////////////////////////////////////////////////////////
-///Сравнение сомволов и строк
+///РЎСЂР°РІРЅРµРЅРёРµ СЃРѕРјРІРѕР»РѕРІ Рё СЃС‚СЂРѕРє
 ////////////////////////////////////////////////////////////////////////////////////////  
   static bool eq          (const char_type&,const char_type&);
   static bool eq_int_type (const int_type&,const int_type&);  
@@ -44,19 +44,19 @@ struct char_traits_base
   static int  compare     (const char_type*,const char_type*,size_t count);
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Поиск символа / длина строки
+///РџРѕРёСЃРє СЃРёРјРІРѕР»Р° / РґР»РёРЅР° СЃС‚СЂРѕРєРё
 ////////////////////////////////////////////////////////////////////////////////////////      
   static const char_type* find   (const char_type*,size_t count,const char_type& ch);
   static size_t           length (const char_type*);  
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования    
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ    
 ////////////////////////////////////////////////////////////////////////////////////////
   static const char_type to_char_type (const int_type&);
   static const int_type  to_int_type  (const char_type&);
   
 ////////////////////////////////////////////////////////////////////////////////////////
-///Маркер EOF / NULL
+///РњР°СЂРєРµСЂ EOF / NULL
 ////////////////////////////////////////////////////////////////////////////////////////      
   static const int_type  eof     ();
   static const int_type  not_eof (const int_type&);
@@ -66,7 +66,7 @@ struct char_traits_base
 template <class Char> struct char_traits: public char_traits_base<Char,Char> {};
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Специализация символьных операций char
+///РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ СЃРёРјРІРѕР»СЊРЅС‹С… РѕРїРµСЂР°С†РёР№ char
 ////////////////////////////////////////////////////////////////////////////////////////
 template <> 
 struct char_traits<char>: public char_traits_base<char,int>
@@ -75,7 +75,7 @@ struct char_traits<char>: public char_traits_base<char,int>
   static char*       move        (char*,const char*,size_t);
   static char*       assign      (char*,size_t,const char&);  
   static void        assign      (char&,char);
-  static void        fast_init   (char* dst,size_t count) {} //инициализация отсутствует
+  static void        fast_init   (char* dst,size_t count) {} //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
   static int         compare     (const char*,const char*,size_t); 
   static size_t      length      (const char*);
   static const char* find        (const char*,size_t count,const char&);
@@ -83,19 +83,19 @@ struct char_traits<char>: public char_traits_base<char,int>
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Специализация символьных операций wchar_t
+///РЎРїРµС†РёР°Р»РёР·Р°С†РёСЏ СЃРёРјРІРѕР»СЊРЅС‹С… РѕРїРµСЂР°С†РёР№ wchar_t
 ////////////////////////////////////////////////////////////////////////////////////////
 template <>
 struct char_traits<wchar_t>: public char_traits_base<wchar_t,wint_t>
 {
-  static void     fast_init (wchar_t* dst,size_t count) {} //инициализация отсутствует
+  static void     fast_init (wchar_t* dst,size_t count) {} //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
   static wchar_t* copy      (wchar_t*,const wchar_t*,size_t);
   static wchar_t* move      (wchar_t*,const wchar_t*,size_t);
   static size_t   length    (const wchar_t*);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Функтор проверки равенства символов
+///Р¤СѓРЅРєС‚РѕСЂ РїСЂРѕРІРµСЂРєРё СЂР°РІРµРЅСЃС‚РІР° СЃРёРјРІРѕР»РѕРІ
 ////////////////////////////////////////////////////////////////////////////////////////
 template <class Traits>
 struct eq_traits: public binary_function<typename Traits::char_type,typename Traits::char_type,bool>
@@ -106,7 +106,7 @@ struct eq_traits: public binary_function<typename Traits::char_type,typename Tra
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
-///Функтор проверки порядка следования символов
+///Р¤СѓРЅРєС‚РѕСЂ РїСЂРѕРІРµСЂРєРё РїРѕСЂСЏРґРєР° СЃР»РµРґРѕРІР°РЅРёСЏ СЃРёРјРІРѕР»РѕРІ
 ////////////////////////////////////////////////////////////////////////////////////////
 template <class Traits>
 struct lt_traits: public binary_function<typename Traits::char_type,typename Traits::char_type,bool>

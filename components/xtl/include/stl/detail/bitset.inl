@@ -1,11 +1,11 @@
 /*
-    Вспомогательные массивы
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјР°СЃСЃРёРІС‹
 */
 
 template <bool dummy> struct bitset_arrays
 {
-  static unsigned char bit_count [256]; //количество битов в байте
-  static unsigned char first_one [256]; //первый бит в байте
+  static unsigned char bit_count [256]; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РёС‚РѕРІ РІ Р±Р°Р№С‚Рµ
+  static unsigned char first_one [256]; //РїРµСЂРІС‹Р№ Р±РёС‚ РІ Р±Р°Р№С‚Рµ
 };
 
 template <bool dummy> unsigned char bitset_arrays<dummy>::bit_count [] = {
@@ -31,7 +31,7 @@ template <bool dummy> unsigned char bitset_arrays<dummy>::first_one [] = {
 };
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <size_t bits>
@@ -85,7 +85,7 @@ inline bitset<bits>::bitset (const T* s,size_t pos,size_t count,T e0)
   size_t len = char_traits<T>::length (s);
 
   if (pos > len)
-    raise_length_error ("bitset",pos); ////переделать!!!!
+    raise_length_error ("bitset",pos); ////РїРµСЂРµРґРµР»Р°С‚СЊ!!!!
 
   if (len-pos < count)
     count = len-pos;
@@ -94,7 +94,7 @@ inline bitset<bits>::bitset (const T* s,size_t pos,size_t count,T e0)
 }
 
 /*
-    Вспомогательные функции
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
 */
 
 template <size_t bits>
@@ -162,7 +162,7 @@ void bitset<bits>::raise_overflow_error (const char* name) const
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <size_t bits>
@@ -178,7 +178,7 @@ inline typename bitset<bits>::reference bitset<bits>::operator [] (size_t pos)
 }
 
 /*
-    Установка / сброс / инверсия бита
+    РЈСЃС‚Р°РЅРѕРІРєР° / СЃР±СЂРѕСЃ / РёРЅРІРµСЂСЃРёСЏ Р±РёС‚Р°
 */
 
 template <size_t bits>
@@ -259,7 +259,7 @@ bitset<bits>& bitset<bits>::flip ()
 }
 
 /*
-    Тестирование бита / подсчёт количества битов
+    РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р±РёС‚Р° / РїРѕРґСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІР° Р±РёС‚РѕРІ
 */
 
 template <size_t bits>
@@ -308,7 +308,7 @@ size_t bitset<bits>::count () const
 }
 
 /*
-    Побитовые операции
+    РџРѕР±РёС‚РѕРІС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <size_t bits>
@@ -421,7 +421,7 @@ inline bitset<bits> bitset<bits>::operator ~ () const
 }
 
 /*
-    Поиск
+    РџРѕРёСЃРє
 */
 
 template <size_t bits>
@@ -493,7 +493,7 @@ size_t bitset<bits>::find_next (size_t prev) const
 }
 
 /*
-    Преобразования
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 */
 
 template <size_t bits>
@@ -595,7 +595,7 @@ T* bitset<bits>::to_string (T* buf,T e0) const
 }
 
 /*
-    Копирование из строки
+    РљРѕРїРёСЂРѕРІР°РЅРёРµ РёР· СЃС‚СЂРѕРєРё
 */
 
 template <size_t bits> template <class T>

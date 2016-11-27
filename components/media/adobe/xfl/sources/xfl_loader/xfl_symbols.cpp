@@ -11,7 +11,7 @@ const size_t DEFAULT_SYMBOLS_COUNT = 512;
 }
 
 /*
-    Разбор библиотеки элементов анимации
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё СЌР»РµРјРµРЅС‚РѕРІ Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseSymbols (common::Parser::Iterator iter)
@@ -29,7 +29,7 @@ void XflParser::ParseSymbols (common::Parser::Iterator iter)
 }
 
 /*
-    Разбор элемента анимации
+    Р Р°Р·Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseSymbol (Parser::Iterator iter, Symbol& symbol)

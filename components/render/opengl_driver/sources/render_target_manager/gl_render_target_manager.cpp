@@ -9,14 +9,14 @@ namespace
 
 /*
 ===================================================================================================
-    Описание состояния менеджера целевых буферов рендеринга
+    РћРїРёСЃР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 ===================================================================================================    
 */
 
 class RenderTargetManagerState: public IStageState
 {
   public:  
-///Конструкторы
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
     RenderTargetManagerState (RenderTargetManagerState* in_main_state)
       : owner ()
       , main_state (in_main_state)
@@ -29,7 +29,7 @@ class RenderTargetManagerState: public IStageState
     {
     }
 
-///Установка текущего отображения буфера цвета
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р±СѓС„РµСЂР° С†РІРµС‚Р°
     void SetRenderTargetView (unsigned int view_index, View* view)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetRenderTargetView");
@@ -42,7 +42,7 @@ class RenderTargetManagerState: public IStageState
       UpdateNotify ();
     }
     
-///Получение текущего отображения буфера цвета
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р±СѓС„РµСЂР° С†РІРµС‚Р°
     View* GetRenderTargetView (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetRenderTargetView");
@@ -56,14 +56,14 @@ class RenderTargetManagerState: public IStageState
         views [i] = render_targets [i].view.get ();
     }
 
-///Получение состояния буферов цвета
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р±СѓС„РµСЂРѕРІ С†РІРµС‚Р°
     void HasRenderTargetViews (bool state [DEVICE_RENDER_TARGET_SLOTS_COUNT])
     {
       for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         state [i] = render_targets [i].view.get () != 0;
     }
     
-///Установка текущего отображения буфера попиксельного отсечения
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
     void SetDepthStencilView (View* in_depth_stencil_view)
     {
       if (depth_stencil_view == in_depth_stencil_view)
@@ -74,10 +74,10 @@ class RenderTargetManagerState: public IStageState
       UpdateNotify ();
     }    
 
-///Получение текущего отображения буфера попиксельного отсечения
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
     View* GetDepthStencilView () { return depth_stencil_view.get (); }    
 
-///Установка текущей области вывода
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     void SetViewport (unsigned int view_index, const Viewport& in_viewport)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetViewport");
@@ -88,7 +88,7 @@ class RenderTargetManagerState: public IStageState
       UpdateNotify ();
     }
     
-///Получение текущей области вывода
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     const Viewport& GetViewport (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetViewport");
@@ -96,7 +96,7 @@ class RenderTargetManagerState: public IStageState
       return render_target.viewport;
     }
     
-///Установка текущей области отсечения
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
     void SetScissor (unsigned int view_index, const Rect& in_scissor)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::SetScissor");
@@ -107,7 +107,7 @@ class RenderTargetManagerState: public IStageState
       UpdateNotify ();
     }
 
-///Получение текущей области отсечения
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
     const Rect& GetScissor (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetScissor");
@@ -115,7 +115,7 @@ class RenderTargetManagerState: public IStageState
       return render_target.scissor;
     }
 
-///Получение хэша области вывода
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
     size_t GetViewportHash (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetViewportHash");
@@ -137,7 +137,7 @@ class RenderTargetManagerState: public IStageState
       return render_targets [view_index].viewport_rect_hash;
     }
 
-///Получение хэша области отсечения
+///РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
     size_t GetScissorHash (unsigned int view_index)
     {
       RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::opengl::RenderTargetManagerState::GetScissorHash");
@@ -151,14 +151,14 @@ class RenderTargetManagerState: public IStageState
       return render_target.scissor_hash;
     }    
 
-///Захват состояния
+///Р—Р°С…РІР°С‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Capture (const StateBlockMask& mask)
     {
       if (main_state)
         Copy (*main_state, mask);
     }
     
-///Восстановление состояния
+///Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
@@ -166,7 +166,7 @@ class RenderTargetManagerState: public IStageState
     }
 
   private:    
-///Копирование состояния
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     void Copy (RenderTargetManagerState& source, const StateBlockMask& mask)
     {
       if (mask.os_render_target_views || mask.rs_viewports || mask.rs_scissors)
@@ -183,7 +183,7 @@ class RenderTargetManagerState: public IStageState
         SetDepthStencilView (source.GetDepthStencilView ());
     }
     
-///Оповещение об обновлении состояния уровня
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
     void UpdateNotify ()
     {
       if (!owner)
@@ -195,7 +195,7 @@ class RenderTargetManagerState: public IStageState
   private:
     RenderTargetManagerState (const RenderTargetManagerState&); //no impl
 
-///Получение буфера цвета
+///РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° С†РІРµС‚Р°
     struct RenderTargetDesc;
 
     RenderTargetDesc& GetRenderTarget (unsigned int view_index, const char* source)
@@ -212,14 +212,14 @@ class RenderTargetManagerState: public IStageState
 
     struct RenderTargetDesc
     {
-      ViewPtr  view;                      //текущее отображение буферов цвета
-      Viewport viewport;                  //область вывода
-      Rect     scissor;                   //область отсечения
-      size_t   viewport_hash;             //хеш области вывода
-      size_t   viewport_rect_hash;        //хэш области вывода для области отсечения
-      size_t   scissor_hash;              //хэш области отсечения
-      bool     need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
-      bool     need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
+      ViewPtr  view;                      //С‚РµРєСѓС‰РµРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂРѕРІ С†РІРµС‚Р°
+      Viewport viewport;                  //РѕР±Р»Р°СЃС‚СЊ РІС‹РІРѕРґР°
+      Rect     scissor;                   //РѕР±Р»Р°СЃС‚СЊ РѕС‚СЃРµС‡РµРЅРёСЏ
+      size_t   viewport_hash;             //С…РµС€ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+      size_t   viewport_rect_hash;        //С…СЌС€ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР° РґР»СЏ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
+      size_t   scissor_hash;              //С…СЌС€ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
+      bool     need_recalc_viewport_hash; //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
+      bool     need_recalc_scissor_hash;  //С„Р»Р°Рі РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїРµСЂРµСЃС‡С‘С‚Р° С…СЌС€Р° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
       RenderTargetDesc () 
         : viewport_hash ()
@@ -234,37 +234,37 @@ class RenderTargetManagerState: public IStageState
     };
 
   private:
-    ContextObject*              owner;                                             //владелец состояния уровня
-    RenderTargetManagerStatePtr main_state;                                        //основное состояние уровня
-    RenderTargetDesc            render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //дескрипторы целей рендеринга
-    ViewPtr                     depth_stencil_view;                                //текущее отображение буфера попиксельного отсечения
+    ContextObject*              owner;                                             //РІР»Р°РґРµР»РµС† СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
+    RenderTargetManagerStatePtr main_state;                                        //РѕСЃРЅРѕРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ СѓСЂРѕРІРЅСЏ
+    RenderTargetDesc            render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //РґРµСЃРєСЂРёРїС‚РѕСЂС‹ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
+    ViewPtr                     depth_stencil_view;                                //С‚РµРєСѓС‰РµРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂР° РїРѕРїРёРєСЃРµР»СЊРЅРѕРіРѕ РѕС‚СЃРµС‡РµРЅРёСЏ
 };                                                                                 
 
 }
 
 /*
 ===================================================================================================
-    Описание реализации менеджера целевых буферов рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 ===================================================================================================
 */
 
 struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManagerState
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const ContextManager& context_manager, ISwapChain* swap_chain) :
       ContextObject (context_manager),      
       RenderTargetManagerState (static_cast<ContextObject*> (this)),
       need_update_render_targets (false)
     {
-        //регистрация менеджеров буферов кадра
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµРЅРµРґР¶РµСЂРѕРІ Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
 
       register_swap_chain_manager (render_target_registry, GetContextManager (), swap_chain);
 
       if (GetCaps ().has_ext_framebuffer_object)
         register_fbo_manager (render_target_registry, GetContextManager (), swap_chain);
       
-        //инициализация отображений
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 
       SwapChainDesc swap_chain_desc;
 
@@ -283,11 +283,11 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       SetRenderTargetView (0, default_render_target_view.get ());
       SetDepthStencilView (default_depth_stencil_view.get ());
 
-        //установка текущего буфера кадра
+        //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР°
 
       BindRenderTargets ();      
 
-        //инициализация маски буферов, которые можно очищать
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃРєРё Р±СѓС„РµСЂРѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РѕС‡РёС‰Р°С‚СЊ
         
       clear_views_mask = ~0;
 
@@ -300,7 +300,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       if (!swap_chain_desc.frame_buffer.stencil_bits)
         clear_views_mask &= ~ClearFlag_Stencil;
 
-        //инициализация области вывода
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 
       Viewport default_viewport;
 
@@ -311,7 +311,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       default_viewport.min_depth = 0.0f;
       default_viewport.max_depth = 1.0f;
       
-        //инициализация области отсечения
+        //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
       
       for (unsigned int i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         SetViewport (i, default_viewport);      
@@ -327,10 +327,10 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         SetScissor (i, default_scissor);
     }
     
-///Получение реестра буферов кадра
+///РџРѕР»СѓС‡РµРЅРёРµ СЂРµРµСЃС‚СЂР° Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
     RenderTargetRegistry& GetRenderTargetRegistry () { return render_target_registry; }
     
-///Создание отображения
+///РЎРѕР·РґР°РЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
     View* CreateView (ITexture* texture, const ViewDesc& desc)
     {
       ViewPtr view (new View (GetContextManager (), texture, desc), false);
@@ -342,20 +342,20 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       return view.get ();
     }
     
-///Установка текущих отображений
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РёС… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
     void SetRenderTargetView (unsigned int render_target_slot, IView* in_render_target_view)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::RenderTargetManager::Impl::SetRenderTargetView";
       
-        //приведение типов отображений
+        //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 
       View* render_target_view = cast_object<View> (GetContextManager (), in_render_target_view, METHOD_NAME, "render_target_view");
 
-        //обновление текущего состояния уровня
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 
       RenderTargetManagerState::SetRenderTargetView (render_target_slot, render_target_view);
 
-        //установка флага необходимости обновления целевых буферов отрисовки
+        //СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
       need_update_render_targets = true;
     }
@@ -364,20 +364,20 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     {
       static const char* METHOD_NAME = "render::low_level::opengl::RenderTargetManager::Impl::SetDepthStencilView";
       
-        //приведение типов отображений
+        //РїСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 
       View* depth_stencil_view = cast_object<View> (GetContextManager (), in_depth_stencil_view, METHOD_NAME, "depth_stencil_view");
 
-        //обновление текущего состояния уровня
+        //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ
 
       RenderTargetManagerState::SetDepthStencilView (depth_stencil_view);
 
-        //установка флага необходимости обновления целевых буферов отрисовки
+        //СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РѕР±РЅРѕРІР»РµРЅРёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
       need_update_render_targets = true;
     }
 
-///Обновление целевых буферов отрисовки
+///РћР±РЅРѕРІР»РµРЅРёРµ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
     void UpdateRenderTargets ()
     {
       if (updatable_frame_buffer)
@@ -386,22 +386,22 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       need_update_render_targets = false;
     }
 
-///Установка состояния менеджера в контекст OpenGL
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РјРµРЅРµРґР¶РµСЂР° РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     void Bind ()
     {
       //TODO: MRT support
 
       try
       {      
-          //установка целей рендеринга
+          //СѓСЃС‚Р°РЅРѕРІРєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
         
         BindRenderTargets ();
 
-          //установка областей вывода и отсечения
+          //СѓСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР° Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
         UpdateViewportAndScissor (0);
 
-          //проверка ошибок
+          //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
         CheckErrors ("");
       }
@@ -412,7 +412,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       }
     }
 
-///Установка областей вывода и отсечения
+///РЈСЃС‚Р°РЅРѕРІРєР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР° Рё РѕС‚СЃРµС‡РµРЅРёСЏ
     void UpdateViewportAndScissor (unsigned int render_target_slot)
     {
       try
@@ -447,7 +447,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           SetContextCacheValue (CacheEntry_ScissorHash0 + render_target_slot, scissor_hash);
         }
 
-          //оповещение об изменении целевых буферов отрисовки
+          //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 
         GetCurrentFrameBuffer ().InvalidateRenderTargets (render_target_slot, GetViewport (render_target_slot));
       }
@@ -458,14 +458,14 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       }
     }
 
-///Очистка буферов цвета и глубина-трафарет
+///РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂРѕРІ С†РІРµС‚Р° Рё РіР»СѓР±РёРЅР°-С‚СЂР°С„Р°СЂРµС‚
     void ClearViews (unsigned int clear_flags, unsigned int views_count, const unsigned int* render_target_indices, const Color4f* colors, float depth, unsigned char stencil)
     {
       //TODO: MRT support
 
       try
       {
-          //проверка корректности аргументов
+          //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
         if (views_count && !render_target_indices)
           throw xtl::make_null_argument_exception ("", "render_target_indices");
@@ -476,15 +476,15 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         if (views_count > 1 || (views_count && render_target_indices [0] != 0))
           throw xtl::format_not_supported_exception ("", "MRT not supported");
 
-          //маскировка буферов, которые можно очищать
+          //РјР°СЃРєРёСЂРѕРІРєР° Р±СѓС„РµСЂРѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РѕС‡РёС‰Р°С‚СЊ
 
         clear_flags &= clear_views_mask;
 
-          //установка целей рендеринга и активного контекста
+          //СѓСЃС‚Р°РЅРѕРІРєР° С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР° Рё Р°РєС‚РёРІРЅРѕРіРѕ РєРѕРЅС‚РµРєСЃС‚Р°
 
         BindRenderTargets ();
 
-          //получение значений кэш переменных
+          //РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РєСЌС€ РїРµСЂРµРјРµРЅРЅС‹С…
 
         GLbitfield mask = 0;
         
@@ -493,7 +493,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
              need_restore_stencil_write_mask = false,
              need_restore_scissor_test       = false;
              
-          //настройка параметров очистки буфера цвета
+          //РЅР°СЃС‚СЂРѕР№РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° С†РІРµС‚Р°
         
         if ((clear_flags & ClearFlag_RenderTarget) && views_count)
         {
@@ -518,7 +518,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           mask |= GL_COLOR_BUFFER_BIT;
         }
         
-          //настройка параметров очистки буфера глубины
+          //РЅР°СЃС‚СЂРѕР№РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° РіР»СѓР±РёРЅС‹
 
         if (clear_flags & ClearFlag_Depth)
         {
@@ -545,7 +545,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           mask |= GL_DEPTH_BUFFER_BIT;        
         }
         
-          //настройка параметров очистки буфера трафарета
+          //РЅР°СЃС‚СЂРѕР№РєР° РїР°СЂР°РјРµС‚СЂРѕРІ РѕС‡РёСЃС‚РєРё Р±СѓС„РµСЂР° С‚СЂР°С„Р°СЂРµС‚Р°
 
         if (clear_flags & ClearFlag_Stencil)
         {
@@ -566,7 +566,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           mask |= GL_STENCIL_BUFFER_BIT;
         }
         
-          //настройка области отсечения
+          //РЅР°СЃС‚СЂРѕР№РєР° РѕР±Р»Р°СЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 
         size_t current_scissor_state = GetContextCacheValue (CacheEntry_ScissorEnable);
 
@@ -601,16 +601,16 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
             need_restore_scissor_test = true;
           }
 
-            //оповещение об обновлении буферов рендеринга
+            //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё Р±СѓС„РµСЂРѕРІ СЂРµРЅРґРµСЂРёРЅРіР°
 
           GetCurrentFrameBuffer ().InvalidateRenderTargets (0);
         }
 
-          //очистка выбранных буферов
+          //РѕС‡РёСЃС‚РєР° РІС‹Р±СЂР°РЅРЅС‹С… Р±СѓС„РµСЂРѕРІ
           
         glClear (mask);
         
-          //восстановление состояния OpenGL
+          //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ OpenGL
         
         if (need_restore_color_write_mask)
         {
@@ -650,19 +650,19 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     typedef xtl::com_ptr<View>               ViewPtr;
 
   private:
-///Добавление отображения
+///Р”РѕР±Р°РІР»РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
     void AddView (const xtl::com_ptr<View>& view)
     {
       view->RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
     }
 
-///Удаление отображения
+///РЈРґР°Р»РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
     void RemoveView (View* view)
     {
       render_target_registry.ReleaseResources (view);
     }
 
-///Получение текущего буфера кадра (TODO: оптимизировать!!!!)
+///РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ Р±СѓС„РµСЂР° РєР°РґСЂР° (TODO: РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ!!!!)
     IFrameBuffer& GetCurrentFrameBuffer ()
     {
       View* render_target_views [DEVICE_RENDER_TARGET_SLOTS_COUNT];
@@ -676,7 +676,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       return render_target_registry.GetFrameBuffer (render_target_views [0], GetDepthStencilView ());
     }
 
-///Установка текущих целевых буферов отрисовки в контекст OpenGL
+///РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РёС… С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
     void BindRenderTargets ()
     {
       if (need_update_render_targets)
@@ -692,16 +692,16 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
     }
 
   private:
-    RenderTargetRegistry render_target_registry;     //реестр буферов кадра
-    bool                 need_update_render_targets; //флаг, указывающий на необходимость обновления целевых буферов отрисовки
-    FrameBufferPtr       updatable_frame_buffer;     //обновляемый буфера кадра
-    ViewPtr              default_render_target_view; //отображение буфера цвета по умолчанию
-    ViewPtr              default_depth_stencil_view; //отображение буфера глубина-трафарет по умолчанию
-    unsigned int         clear_views_mask;           //маска буферов, которые можно очищать (необходима для работы с Direct3D wrapper)
+    RenderTargetRegistry render_target_registry;     //СЂРµРµСЃС‚СЂ Р±СѓС„РµСЂРѕРІ РєР°РґСЂР°
+    bool                 need_update_render_targets; //С„Р»Р°Рі, СѓРєР°Р·С‹РІР°СЋС‰РёР№ РЅР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
+    FrameBufferPtr       updatable_frame_buffer;     //РѕР±РЅРѕРІР»СЏРµРјС‹Р№ Р±СѓС„РµСЂР° РєР°РґСЂР°
+    ViewPtr              default_render_target_view; //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂР° С†РІРµС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    ViewPtr              default_depth_stencil_view; //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ Р±СѓС„РµСЂР° РіР»СѓР±РёРЅР°-С‚СЂР°С„Р°СЂРµС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    unsigned int         clear_views_mask;           //РјР°СЃРєР° Р±СѓС„РµСЂРѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РѕС‡РёС‰Р°С‚СЊ (РЅРµРѕР±С…РѕРґРёРјР° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Direct3D wrapper)
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderTargetManager::RenderTargetManager (const ContextManager& context_manager, ISwapChain* swap_chain)
@@ -714,7 +714,7 @@ RenderTargetManager::~RenderTargetManager ()
 }
 
 /*
-    Создание объекта состояния устройства
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 IStageState* RenderTargetManager::CreateStageState ()
@@ -723,7 +723,7 @@ IStageState* RenderTargetManager::CreateStageState ()
 }
 
 /*
-    Создание текстур
+    РЎРѕР·РґР°РЅРёРµ С‚РµРєСЃС‚СѓСЂ
 */
 
 ITexture* RenderTargetManager::CreateTexture (const TextureDesc& desc)
@@ -769,7 +769,7 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* swap_chain
 }
 
 /*
-    Создание отображений
+    РЎРѕР·РґР°РЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc& desc)
@@ -787,7 +787,7 @@ IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc& desc)
 }
 
 /*
-    Выбор целевых отображений
+    Р’С‹Р±РѕСЂ С†РµР»РµРІС‹С… РѕС‚РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void RenderTargetManager::SetRenderTargetView (unsigned int render_target_slot, IView* render_target_view)
@@ -832,7 +832,7 @@ void RenderTargetManager::HasRenderTargetViews (bool states [DEVICE_RENDER_TARGE
 }
 
 /*
-    Настройка областей вывода и отсечения
+    РќР°СЃС‚СЂРѕР№РєР° РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР° Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 */
 
 void RenderTargetManager::SetViewport (unsigned int render_target_slot, const Viewport& viewport)
@@ -857,7 +857,7 @@ const Rect& RenderTargetManager::GetScissor (unsigned int render_target_slot) co
 
 
 /*
-    Очистка буферов отрисовки
+    РћС‡РёСЃС‚РєР° Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void RenderTargetManager::ClearRenderTargetView (unsigned int render_target_slot, const Color4f& color)
@@ -879,7 +879,7 @@ void RenderTargetManager::ClearViews (unsigned int clear_flags, unsigned int vie
 }
 
 /*
-    Оповещение об изменении целевых буферов отрисовки / обновление целевых буферов отрисовки
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё / РѕР±РЅРѕРІР»РµРЅРёРµ С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РѕС‚СЂРёСЃРѕРІРєРё
 */
 
 void RenderTargetManager::UpdateRenderTargets ()
@@ -896,7 +896,7 @@ void RenderTargetManager::UpdateRenderTargets ()
 }
 
 /*
-    Установка состояния уровня в контекст OpenGL
+    РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СѓСЂРѕРІРЅСЏ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 */
 
 void RenderTargetManager::Bind ()

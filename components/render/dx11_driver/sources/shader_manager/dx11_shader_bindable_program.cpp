@@ -4,7 +4,7 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_program, const ProgramParametersLayout* in_layout)
@@ -17,7 +17,7 @@ BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_prog
     if (!parameters_layout && program.GetConstantBufferLayoutsCount ())
       throw xtl::format_operation_exception ("", "Null program parameters layout but program requires it (%u constant buffer layouts found)", program.GetConstantBufferLayoutsCount ());
      
-      //создание прототипов буферов
+      //СЃРѕР·РґР°РЅРёРµ РїСЂРѕС‚РѕС‚РёРїРѕРІ Р±СѓС„РµСЂРѕРІ
 
     buffer_prototypes.reserve (program.GetConstantBufferLayoutsCount ());
 
@@ -25,7 +25,7 @@ BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_prog
     {
       const ProgramBufferLayout& buffer_layout = program.GetConstantBufferLayout (i);
 
-        //создание прототипа (без карты прототипов)
+        //СЃРѕР·РґР°РЅРёРµ РїСЂРѕС‚РѕС‚РёРїР° (Р±РµР· РєР°СЂС‚С‹ РїСЂРѕС‚РѕС‚РёРїРѕРІ)
 
       TargetConstantBufferPrototypePtr prototype (new TargetConstantBufferPrototype (library, *parameters_layout, buffer_layout), false);
 
@@ -44,7 +44,7 @@ BindableProgram::~BindableProgram ()
 }
 
 /*
-    Биндинг в контекст
+    Р‘РёРЅРґРёРЅРі РІ РєРѕРЅС‚РµРєСЃС‚
 */
 
 void BindableProgram::Bind 
@@ -56,7 +56,7 @@ void BindableProgram::Bind
 {
   try
   {
-      //поиск входного лэйаута
+      //РїРѕРёСЃРє РІС…РѕРґРЅРѕРіРѕ Р»СЌР№Р°СѓС‚Р°
 
     if (!program_context.input_layout)
     {
@@ -65,7 +65,7 @@ void BindableProgram::Bind
       context.IASetInputLayout (program_context.input_layout.get ());
     }
 
-      //биндинг программы
+      //Р±РёРЅРґРёРЅРі РїСЂРѕРіСЂР°РјРјС‹
 
     if (!program_context.program_binded)
     {      
@@ -74,7 +74,7 @@ void BindableProgram::Bind
       program_context.program_binded = true;
     }
 
-      //поиск и биндинг буферов
+      //РїРѕРёСЃРє Рё Р±РёРЅРґРёРЅРі Р±СѓС„РµСЂРѕРІ
 //TODO: bindable buffers cache for dirty switch optimization    
 //    if (program_context.has_dirty_buffers)
     {
@@ -104,7 +104,7 @@ void BindableProgram::Bind
         buffer.Bind (context, buffers);
       }
 
-        //установка контекста
+        //СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅС‚РµРєСЃС‚Р°
 
       context.CSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Compute]);
       context.DSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Domain]);

@@ -6,24 +6,24 @@ using namespace render::low_level::opengl;
 
 /*
 ===================================================================================================
-    Устройство вывода
+    РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РІС‹РІРѕРґР°
 ===================================================================================================
 */
 
 /*
-    Описание реализации устройства вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 struct Output::Impl
 {
-  Screen       screen;     //экран
-  PropertyList properties; //свойства устройства
+  Screen       screen;     //СЌРєСЂР°РЅ
+  PropertyList properties; //СЃРІРѕР№СЃС‚РІР° СѓСЃС‚СЂРѕР№СЃС‚РІР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const Screen& in_screen)
     : screen (in_screen)
   {
-      //заполнение свойств устройства вывода
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
     
     common::PropertyMap in_properties;
     
@@ -41,7 +41,7 @@ struct Output::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Output::Output (const syslib::Screen& screen)
@@ -62,7 +62,7 @@ Output::~Output ()
 }
 
 /*
-    Платформо-зависимый дескриптор окна
+    РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°
 */
 
 const void* Output::Handle ()
@@ -79,7 +79,7 @@ const void* Output::Handle ()
 }
 
 /*
-    Получение имени
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
 */
 
 const char* Output::GetName ()
@@ -96,7 +96,7 @@ const char* Output::GetName ()
 }
 
 /*
-    Получение списка видео-режимов
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ
 */
 
 size_t Output::GetModesCount ()
@@ -133,7 +133,7 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 }
 
 /*
-    Установка текущего видео-режима
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 void Output::SetCurrentMode (const OutputModeDesc& desc)
@@ -190,7 +190,7 @@ void Output::RestoreDefaultMode ()
 }
 
 /*
-    Управление гамма-коррекцией
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№
 */
 
 void Output::SetGammaRamp (const render::low_level::Color3f table [256])
@@ -220,7 +220,7 @@ void Output::GetGammaRamp (render::low_level::Color3f table [256])
 }
 
 /*
-    Список свойств устройства вывода
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 IPropertyList* Output::GetProperties ()
@@ -230,12 +230,12 @@ IPropertyList* Output::GetProperties ()
 
 /*
 ===================================================================================================
-    Класс, инкапсулирующий работу с низкоуровневыми устройствами вывода
+    РљР»Р°СЃСЃ, РёРЅРєР°РїСЃСѓР»РёСЂСѓСЋС‰РёР№ СЂР°Р±РѕС‚Сѓ СЃ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІС‹РјРё СѓСЃС‚СЂРѕР№СЃС‚РІР°РјРё РІС‹РІРѕРґР°
 ===================================================================================================
 */
 
 /*
-    Описание реализации менеджера устройств вывода
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 typedef xtl::com_ptr<Output>   OutputPtr;
@@ -243,10 +243,10 @@ typedef stl::vector<OutputPtr> OutputArray;
 
 struct OutputManager::Impl: public xtl::reference_counter
 {
-  OutputArray  outputs;  //устройства вывода
-  static Impl* instance; //глобальный экземпляр реализации менеджера устройств вывода
+  OutputArray  outputs;  //СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+  static Impl* instance; //РіР»РѕР±Р°Р»СЊРЅС‹Р№ СЌРєР·РµРјРїР»СЏСЂ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     size_t screens_count = ScreenManager::ScreensCount ();
@@ -259,7 +259,7 @@ struct OutputManager::Impl: public xtl::reference_counter
     instance = this;      
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     instance = 0;
@@ -269,7 +269,7 @@ struct OutputManager::Impl: public xtl::reference_counter
 OutputManager::Impl* OutputManager::Impl::instance = 0;
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 OutputManager::OutputManager ()
@@ -294,7 +294,7 @@ OutputManager::~OutputManager ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t OutputManager::GetOutputsCount () const
@@ -327,7 +327,7 @@ Output* OutputManager::GetOutput (size_t index) const
 }
 
 /*
-    Поиск устройства вывода, перекрытие которого с окном максимально
+    РџРѕРёСЃРє СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°, РїРµСЂРµРєСЂС‹С‚РёРµ РєРѕС‚РѕСЂРѕРіРѕ СЃ РѕРєРЅРѕРј РјР°РєСЃРёРјР°Р»СЊРЅРѕ
 */
 
 Output* OutputManager::FindContainingOutput (const void* native_window_handle) const

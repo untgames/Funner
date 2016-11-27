@@ -5,7 +5,7 @@ using namespace script::lua;
 using namespace common;
 
 /*
-    Функция заказа памяти
+    Р¤СѓРЅРєС†РёСЏ Р·Р°РєР°Р·Р° РїР°РјСЏС‚Рё
 */
 
 namespace
@@ -39,7 +39,7 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
     return 0;
   }
 }
@@ -47,7 +47,7 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 StateHolder::StateHolder ()

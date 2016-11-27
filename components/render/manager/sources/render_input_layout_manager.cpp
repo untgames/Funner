@@ -24,7 +24,7 @@ inline size_t hash (const VertexFormat& vf)
 }
 
 /*
-    Описание реализации менеджера лэйаутов геометрии
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° Р»СЌР№Р°СѓС‚РѕРІ РіРµРѕРјРµС‚СЂРёРё
 */
 
 typedef stl::hash_map<size_t, LowLevelInputLayoutPtr> InputLayoutMap;
@@ -32,12 +32,12 @@ typedef stl::hash_set<media::geometry::VertexFormat>  VertexFormatSet;
 
 struct InputLayoutManager::Impl
 {
-  LowLevelDevicePtr      device;                    //устройство отрисовки
-  InputLayoutMap         layouts;                   //закэшированные лэйауты
-  VertexFormatSet        vertex_formats;            //вершинные форматы
-  Log                    log;                       //протокол отладочных сообщений
-  SettingsPtr            settings;                  //настройки менеджера рендеринга
-  LowLevelInputLayoutPtr dynamic_primitives_layout; //лэйаут для спрайтов
+  LowLevelDevicePtr      device;                    //СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РѕС‚СЂРёСЃРѕРІРєРё
+  InputLayoutMap         layouts;                   //Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Рµ Р»СЌР№Р°СѓС‚С‹
+  VertexFormatSet        vertex_formats;            //РІРµСЂС€РёРЅРЅС‹Рµ С„РѕСЂРјР°С‚С‹
+  Log                    log;                       //РїСЂРѕС‚РѕРєРѕР» РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
+  SettingsPtr            settings;                  //РЅР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
+  LowLevelInputLayoutPtr dynamic_primitives_layout; //Р»СЌР№Р°СѓС‚ РґР»СЏ СЃРїСЂР°Р№С‚РѕРІ
   
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
     : device (in_device)
@@ -54,7 +54,7 @@ struct InputLayoutManager::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InputLayoutManager::InputLayoutManager (const LowLevelDevicePtr& device, const SettingsPtr& settings)
@@ -77,7 +77,7 @@ InputLayoutManager::~InputLayoutManager ()
 }
 
 /*
-    Получение константной копии
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕР№ РєРѕРїРёРё
 */
 
 media::geometry::VertexFormat InputLayoutManager::Clone (const media::geometry::VertexFormat& format) const
@@ -106,7 +106,7 @@ media::geometry::VertexFormat InputLayoutManager::Clone (const media::geometry::
 }
 
 /*
-    Создание лэйаута
+    РЎРѕР·РґР°РЅРёРµ Р»СЌР№Р°СѓС‚Р°
 */
 
 LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const render::low_level::InputLayoutDesc& desc)
@@ -201,7 +201,7 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
 }
 
 /*
-    Лэйауты для спрайтов и линий
+    Р›СЌР№Р°СѓС‚С‹ РґР»СЏ СЃРїСЂР°Р№С‚РѕРІ Рё Р»РёРЅРёР№
 */
 
 void InputLayoutManager::InitDynamicPrimitivesLayout ()
@@ -245,7 +245,7 @@ const LowLevelInputLayoutPtr& InputLayoutManager::DynamicPrimitivesInputLayout (
 }
 
 /*
-    Получение хэша атрибутов
+    РџРѕР»СѓС‡РµРЅРёРµ С…СЌС€Р° Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 size_t InputLayoutManager::GetVertexAttributesHash (size_t count, const render::low_level::VertexAttribute* attributes)

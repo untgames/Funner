@@ -38,7 +38,7 @@
 #include <media/compressed_image.h>
 
 /*
-    Џолучение смещениЯ полЯ в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
+    РџСЋС‹С”СћС…СЌС€С… С‘СЊС…в€™С…СЌС€в–Ђ СЏСЋС‹в–Ђ С‚ С‘Р„РЃС”СЉР„С”РЃС… (СЂСЌСЂС‹СЋСѓ offsetof, СЉСЋСЊСЏС€С‹С€РЃС”С…СЊв€љС‰ СЃС…С‡ СЏРЃС…С„С”СЏРЃС…С†С„С…СЌС€С‰ СЌСЂ gcc)
 */
 
 #ifdef _MSC_VER
@@ -66,7 +66,7 @@ typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IStateBlock>              StateBlockPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
-// режим вывода логов
+// РЃС…С†С€СЊ С‚в€љС‚СЋС„СЂ С‹СЋСѓСЋС‚
 enum OutputMode
 {
   OutputMode_Success     = 1,
@@ -80,7 +80,7 @@ enum OutputMode
   OutputMode_Num
 };
 
-//тестовое приложение
+//Р„С…С‘Р„СЋС‚СЋС… СЏРЃС€С‹СЋС†С…СЌС€С…
 struct Test
 {
   syslib::Window window;

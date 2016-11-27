@@ -6,26 +6,26 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_PARAMETERS_COUNT = 4;   //количество параметров по умолчанию
-const size_t TO_STRING_RESERVE_SIZE   = 256; //количество символов, резервируемых в строке дампа
+const size_t DEFAULT_PARAMETERS_COUNT = 4;   //РєРѕР»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const size_t TO_STRING_RESERVE_SIZE   = 256; //РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРІРѕР»РѕРІ, СЂРµР·РµСЂРІРёСЂСѓРµРјС‹С… РІ СЃС‚СЂРѕРєРµ РґР°РјРїР°
 
 }
 
 /*
-    Реализация дескриптора шлюза
+    Р РµР°Р»РёР·Р°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° С€Р»СЋР·Р°
 */
 
 typedef stl::vector<const std::type_info*> InfoArray;
 
 struct InvokerSignature::Impl: public xtl::reference_counter
 {
-  const std::type_info*      result_type;        //тип результата
-  InfoArray                  parameter_types;    //типы параметров  
-  stl::auto_ptr<stl::string> string;             //строка с текстом сигнатуры
-  bool                       need_update_string; //нужно ли обновлять строку с текстом сигнатуры
+  const std::type_info*      result_type;        //С‚РёРї СЂРµР·СѓР»СЊС‚Р°С‚Р°
+  InfoArray                  parameter_types;    //С‚РёРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ  
+  stl::auto_ptr<stl::string> string;             //СЃС‚СЂРѕРєР° СЃ С‚РµРєСЃС‚РѕРј СЃРёРіРЅР°С‚СѓСЂС‹
+  bool                       need_update_string; //РЅСѓР¶РЅРѕ Р»Рё РѕР±РЅРѕРІР»СЏС‚СЊ СЃС‚СЂРѕРєСѓ СЃ С‚РµРєСЃС‚РѕРј СЃРёРіРЅР°С‚СѓСЂС‹
   
   Impl ()
     : result_type (&typeid (void))
@@ -36,7 +36,7 @@ struct InvokerSignature::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InvokerSignature::InvokerSignature ()
@@ -63,7 +63,7 @@ InvokerSignature& InvokerSignature::operator = (const InvokerSignature& signatur
 }
 
 /*
-    Тип возвращаемого значения
+    РўРёРї РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 */
 
 const std::type_info& InvokerSignature::ResultType () const
@@ -78,7 +78,7 @@ void InvokerSignature::SetResultType (const std::type_info& type)
 }
 
 /*
-    Количество параметров
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 size_t InvokerSignature::ParametersCount () const
@@ -87,7 +87,7 @@ size_t InvokerSignature::ParametersCount () const
 }
 
 /*
-    Типы параметров
+    РўРёРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 const std::type_info& InvokerSignature::ParameterType (size_t index) const
@@ -109,7 +109,7 @@ void InvokerSignature::SetParameterType (size_t index, const std::type_info& typ
 }
 
 /*
-    Добавление / удаление типов параметров
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ С‚РёРїРѕРІ РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 size_t InvokerSignature::AddParameterType (const std::type_info& type)
@@ -139,7 +139,7 @@ void InvokerSignature::RemoveAllParameterTypes ()
 }
 
 /*
-    Приведение к строке
+    РџСЂРёРІРµРґРµРЅРёРµ Рє СЃС‚СЂРѕРєРµ
 */
 
 namespace
@@ -197,7 +197,7 @@ const char* InvokerSignature::ToString () const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 bool InvokerSignature::operator == (const InvokerSignature& signature) const
@@ -211,7 +211,7 @@ bool InvokerSignature::operator != (const InvokerSignature& signature) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void InvokerSignature::Swap (InvokerSignature& signature)

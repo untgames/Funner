@@ -15,7 +15,7 @@ struct ReplacementComponent
 
 typedef stl::vector <ReplacementComponent> ReplacementComponents;
 
-//заполнение массива компонентов строки
+//Р·Р°РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ СЃС‚СЂРѕРєРё
 void process_replacement_component (const char* prefix, const char* replacement, ReplacementComponents& replacement_components)
 {
   replacement_components.push_back (ReplacementComponent (prefix, replacement));
@@ -24,13 +24,13 @@ void process_replacement_component (const char* prefix, const char* replacement,
 }
 
 /*
-    Реализация реестра настроек
+    Р РµР°Р»РёР·Р°С†РёСЏ СЂРµРµСЃС‚СЂР° РЅР°СЃС‚СЂРѕРµРє
 */
 
 struct Config::Impl : public xtl::reference_counter
 {
   public:
-    //Установка/получение/удаление переменных
+    //РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
     void SetVar (const char* name, const char* value)
     {
       variables [name] = value;
@@ -65,7 +65,7 @@ struct Config::Impl : public xtl::reference_counter
       }
     }
 
-    //Вычисление строки с заменами на основе установленных переменных
+    //Р’С‹С‡РёСЃР»РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ Р·Р°РјРµРЅР°РјРё РЅР° РѕСЃРЅРѕРІРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
     void Eval (const char* value, stl::string& result)
     {
       replacement_components.clear ();
@@ -80,7 +80,7 @@ struct Config::Impl : public xtl::reference_counter
       }
     }
 
-    //Обход всех переменных / переменных по маске
+    //РћР±С…РѕРґ РІСЃРµС… РїРµСЂРµРјРµРЅРЅС‹С… / РїРµСЂРµРјРµРЅРЅС‹С… РїРѕ РјР°СЃРєРµ
     void EnumerateVars (const EnumHandler& handler) const
     {
       for (VarMap::const_iterator iter = variables.begin (), end = variables.end (); iter != end; ++iter)
@@ -96,13 +96,13 @@ struct Config::Impl : public xtl::reference_counter
       }
     }
 
-    //Вызов обработчиков сохранения переменных
+    //Р’С‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С…
     void Save ()
     {
       save_signal ();
     }
 
-    //Регистрация обработчиков сохранения переменных
+    //Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С…
     xtl::connection RegisterSaveHandler (const SaveHandler& handler)
     {
       return save_signal.connect (handler);
@@ -114,7 +114,7 @@ struct Config::Impl : public xtl::reference_counter
     typedef stl::vector <stl::string>                StringVector;
 
   private:
-    //вычисление значения переменной с разрешением замен
+    //РІС‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃ СЂР°Р·СЂРµС€РµРЅРёРµРј Р·Р°РјРµРЅ
     stl::string ResolveVar (const char* var_name, StringVector forbidden_var_names = StringVector ())
     {
       if (!xtl::xstrlen (var_name))
@@ -153,7 +153,7 @@ struct Config::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструктор/деструктор/копирование
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ/РєРѕРїРёСЂРѕРІР°РЅРёРµ
 */
 
 Config::Config ()
@@ -179,7 +179,7 @@ Config& Config::operator = (const Config& source)
 }
 
 /*
-   Установка/получение/удаление переменных
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
 */
 
 void Config::SetVar (const char* name, const char* value)
@@ -212,7 +212,7 @@ void Config::RemoveVars (const char* var_name_mask)
 }
 
 /*
-   Вычисление строки с заменами на основе установленных переменных
+   Р’С‹С‡РёСЃР»РµРЅРёРµ СЃС‚СЂРѕРєРё СЃ Р·Р°РјРµРЅР°РјРё РЅР° РѕСЃРЅРѕРІРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
 */
 
 void Config::Eval (const char* value, stl::string& result) const
@@ -242,7 +242,7 @@ stl::string Config::Eval (const char* value) const
 }
 
 /*
-   Обход всех переменных / переменных по маске
+   РћР±С…РѕРґ РІСЃРµС… РїРµСЂРµРјРµРЅРЅС‹С… / РїРµСЂРµРјРµРЅРЅС‹С… РїРѕ РјР°СЃРєРµ
 */
 
 void Config::EnumerateVars (const EnumHandler& handler) const
@@ -262,7 +262,7 @@ void Config::EnumerateVars (const char* var_name_mask, const EnumHandler& handle
 }
 
 /*
-   Вызов обработчиков сохранения переменных
+   Р’С‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С…
 */
 
 void Config::Save ()
@@ -271,7 +271,7 @@ void Config::Save ()
 }
 
 /*
-   Регистрация обработчиков сохранения переменных
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С…
 */
 
 xtl::connection Config::RegisterSaveHandler (const SaveHandler& handler)
@@ -280,7 +280,7 @@ xtl::connection Config::RegisterSaveHandler (const SaveHandler& handler)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Config::Swap (Config& source)
@@ -292,7 +292,7 @@ namespace engine
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Config& source1, Config& source2)

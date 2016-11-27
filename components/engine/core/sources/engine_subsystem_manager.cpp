@@ -6,22 +6,22 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  LOG_PREFIX                      = "engine"; //префикс потока протоколирования
-const size_t DEFAULT_SUBSYSTEMS_RESERVE_SIZE = 128;      //резервируемое количество подсистем
+const char*  LOG_PREFIX                      = "engine"; //РїСЂРµС„РёРєСЃ РїРѕС‚РѕРєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+const size_t DEFAULT_SUBSYSTEMS_RESERVE_SIZE = 128;      //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґСЃРёСЃС‚РµРј
 
 }
 
 /*
-    Реализация движка
+    Р РµР°Р»РёР·Р°С†РёСЏ РґРІРёР¶РєР°
 */
 
 struct SubsystemManager::Impl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const char* in_name)
       : name (in_name),
         log (common::format ("%s.%s", LOG_PREFIX, in_name).c_str ()),
@@ -30,16 +30,16 @@ struct SubsystemManager::Impl
       subsystems.reserve (DEFAULT_SUBSYSTEMS_RESERVE_SIZE);
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Impl ()
     {
       RemoveAll ();
     }
 
-///Протокол
+///РџСЂРѕС‚РѕРєРѕР»
    common::Log& Log () { return log; }
 
-///Установка имени
+///РЈСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё
     void SetName (const char* in_name)
     {
       if (!in_name)
@@ -52,13 +52,13 @@ struct SubsystemManager::Impl
       common::Log (common::format ("%s.%s", LOG_PREFIX, in_name).c_str ()).Swap (log);
     }
 
-///Получение имени
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё
     const char* Name () { return name.c_str (); }
 
-///Количество запущенных подсистем
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїСѓС‰РµРЅРЅС‹С… РїРѕРґСЃРёСЃС‚РµРј
     size_t SubsystemsCount () const { return subsystems.size (); }
 
-///Получение подсистемы
+///РџРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРјС‹
     ISubsystemControl& Subsystem (size_t index) const
     {
       if (index >= subsystems.size ())
@@ -67,12 +67,12 @@ struct SubsystemManager::Impl
       return *subsystems [index];
     }
 
-///Добавление подсистемы
+///Р”РѕР±Р°РІР»РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРјС‹
     void Add (const char* name, ISubsystem* subsystem)
     {
       static const char* METHOD_NAME = "engine::SubsystemManager::AddSubsystem";
 
-        //проверка корректности аргументов
+        //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ
 
       if (!name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -106,7 +106,7 @@ struct SubsystemManager::Impl
       }
     }
 
-///Удаление подсистемы
+///РЈРґР°Р»РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРјС‹
     void Remove (ISubsystem* subsystem)
     {
       if (!subsystem)
@@ -124,7 +124,7 @@ struct SubsystemManager::Impl
       }
     }
 
-///Удаление подсистем по маске имени
+///РЈРґР°Р»РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРј РїРѕ РјР°СЃРєРµ РёРјРµРЅРё
     void Remove (const char* subsystems_name_masks)
     {
       if (!subsystems_name_masks)
@@ -160,7 +160,7 @@ struct SubsystemManager::Impl
       }
     }
 
-///Удаление всех подсистем
+///РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РїРѕРґСЃРёСЃС‚РµРј
     void RemoveAll ()
     {
       while (!subsystems.empty ())
@@ -171,7 +171,7 @@ struct SubsystemManager::Impl
       }
     }
     
-///Выполнение команды
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
     void Execute (const char* command)
     {
       for (Subsystems::iterator iter=subsystems.begin (), end=subsystems.end (); iter!=end; ++iter)
@@ -205,7 +205,7 @@ struct SubsystemManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SubsystemManager::SubsystemManager ()
@@ -220,7 +220,7 @@ SubsystemManager::~SubsystemManager ()
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 void SubsystemManager::SetName (const char* name)
@@ -234,7 +234,7 @@ const char* SubsystemManager::Name () const
 }
 
 /*
-    Запуск систем
+    Р—Р°РїСѓСЃРє СЃРёСЃС‚РµРј
 */
 
 void SubsystemManager::Start (const common::ParseNode& configuration_root, const char* subsystems_name_masks)
@@ -274,7 +274,7 @@ void SubsystemManager::Start (const char* configuration_file_name, const char* s
 }
 
 /*
-   Перезапуск подсистем
+   РџРµСЂРµР·Р°РїСѓСЃРє РїРѕРґСЃРёСЃС‚РµРј
 */
 
 void SubsystemManager::Restart (const common::ParseNode& configuration_root, const char* subsystems_name_masks)
@@ -290,7 +290,7 @@ void SubsystemManager::Restart (const char* configuration_file_name, const char*
 }
 
 /*
-    Перебор подсистем
+    РџРµСЂРµР±РѕСЂ РїРѕРґСЃРёСЃС‚РµРј
 */
 
 size_t SubsystemManager::SubsystemsCount () const
@@ -304,7 +304,7 @@ ISubsystemControl& SubsystemManager::Subsystem (size_t index) const
 }
 
 /*
-    Добавление / удаление подсистем
+    Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ РїРѕРґСЃРёСЃС‚РµРј
 */
 
 void SubsystemManager::Add (const char* name, ISubsystem* subsystem)
@@ -333,7 +333,7 @@ void SubsystemManager::RemoveAll ()
 }
 
 /*
-    Посылка команды подсистемам
+    РџРѕСЃС‹Р»РєР° РєРѕРјР°РЅРґС‹ РїРѕРґСЃРёСЃС‚РµРјР°Рј
 */
 
 void SubsystemManager::Execute (const char* command)

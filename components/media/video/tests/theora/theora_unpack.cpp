@@ -21,7 +21,7 @@ struct Params;
 
 typedef void (*ProcessOption)(const char* arg, Params& params);
 
-//пиксел
+//РїРёРєСЃРµР»
 struct rgba_t
 {
   unsigned char r;
@@ -30,30 +30,30 @@ struct rgba_t
   unsigned char a;
 };
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  ProcessOption process;       //функция-обработчик опции
-  const char*   name;          //имя команды
-  char          short_name;    //короткое имя
-  const char*   argument_name; //имя аргумента
-  const char*   tip;           //подсказка
+  ProcessOption process;       //С„СѓРЅРєС†РёСЏ-РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїС†РёРё
+  const char*   name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char          short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*   argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*   tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                  //массив опций
-  size_t        options_count;            //количество опций
-  stl::string   theora_name;              //имя исходного файла
-  stl::string   output_frames_dir_name;   //имя каталога с сохранёнными кадрами
-  stl::string   frames_format;            //формат кадров
-  stl::string   mask_color;               //цвет маски
-  stl::string   mask_color_range;         //разброс цвета маски
-  bool          print_help;               //нужно ли печатать сообщение помощи
+  const Option* options;                  //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;            //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string   theora_name;              //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+  stl::string   output_frames_dir_name;   //РёРјСЏ РєР°С‚Р°Р»РѕРіР° СЃ СЃРѕС…СЂР°РЅС‘РЅРЅС‹РјРё РєР°РґСЂР°РјРё
+  stl::string   frames_format;            //С„РѕСЂРјР°С‚ РєР°РґСЂРѕРІ
+  stl::string   mask_color;               //С†РІРµС‚ РјР°СЃРєРё
+  stl::string   mask_color_range;         //СЂР°Р·Р±СЂРѕСЃ С†РІРµС‚Р° РјР°СЃРєРё
+  bool          print_help;               //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
-//печать ошибки с выходом из программы
+//РїРµС‡Р°С‚СЊ РѕС€РёР±РєРё СЃ РІС‹С…РѕРґРѕРј РёР· РїСЂРѕРіСЂР°РјРјС‹
 void error (const char* format, ...)
 {
   va_list args;
@@ -68,7 +68,7 @@ void error (const char* format, ...)
   exit (1);
 }
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", APPLICATION_NAME);
@@ -95,31 +95,31 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка имени пути сохранения кадров
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР°РґСЂРѕРІ
 void command_line_result_frames_dir (const char* file_name, Params& params)
 {
   params.output_frames_dir_name = file_name;
 }
 
-//установка формата сохранения кадров
+//СѓСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ РєР°РґСЂРѕРІ
 void command_line_result_frames_format (const char* value, Params& params)
 {
   params.frames_format = value;
 }
 
-//установка цвета маски
+//СѓСЃС‚Р°РЅРѕРІРєР° С†РІРµС‚Р° РјР°СЃРєРё
 void command_line_mask_color (const char* value, Params& params)
 {
   params.mask_color = value;
 }
 
-//установка разброса цвета маски
+//СѓСЃС‚Р°РЅРѕРІРєР° СЂР°Р·Р±СЂРѕСЃР° С†РІРµС‚Р° РјР°СЃРєРё
 void command_line_mask_color_range (const char* value, Params& params)
 {
   params.mask_color_range = value;
 }
 
-//разбор командной строки
+//СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
@@ -135,7 +135,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   params.options       = options;
   params.options_count = options_count;
 
-    //разбор командной строки
+    //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 
   for (int i=1; i<argc; i++)
   {
@@ -164,7 +164,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     stl::string   option_argument;
     const Option* option = 0;
 
-      //разбор длинных опций
+      //СЂР°Р·Р±РѕСЂ РґР»РёРЅРЅС‹С… РѕРїС†РёР№
 
     if (long_option)
     {
@@ -206,7 +206,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
       option_name = LONG_OPTION_NAME_PREFIX + option_name;
     }
 
-      //разбор коротких опций
+      //СЂР°Р·Р±РѕСЂ РєРѕСЂРѕС‚РєРёС… РѕРїС†РёР№
 
     if (short_option)
     {
@@ -255,7 +255,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
         arg = "";
     }
 
-      //получение аргумента
+      //РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚Р°
 
     for (;*arg; arg++)
     {
@@ -311,7 +311,7 @@ void log_handler (const char* log_name, const char* message)
   printf ("%s: %s\n", log_name, message);
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.theora_name.empty ())
@@ -336,7 +336,7 @@ int main (int argc, const char *argv[])
 {
   common::LogFilter log_filter ("*", &log_handler);
 
-  //инициализация
+  //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
   Params params;
 
   params.options          = 0;
@@ -346,14 +346,14 @@ int main (int argc, const char *argv[])
   params.mask_color_range = "0;0;0";
   params.print_help       = false;
 
-  //разбор командной строки
+  //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
   command_line_parse (argc, argv, params);
 
-  // --help только печатает сообщение помощи
+  // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
   if (params.print_help)
     return 0;
 
-  //проверка корректности ввода
+  //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
   validate (params);
 
   if (!common::FileSystem::IsDir (params.output_frames_dir_name.c_str ()))

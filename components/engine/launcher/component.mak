@@ -1,5 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES
 TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
@@ -20,7 +20,7 @@ ENGINE.FUNNER_SHARED_LIBRARY.COMPILER_DEFINES  := LAUNCHER_VERSION='$(LAUNCHER_V
 ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.common compile.system link.engine.launcher_shared
 ENGINE.FUNNER_SHARED_LIBRARY.EXCLUDE_IMPORTS := link.common.auto_license_generator                                             
                                              
-#Цель - сборка движка
+#Р¦РµР»СЊ - СЃР±РѕСЂРєР° РґРІРёР¶РєР°
 ifeq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
 endif
@@ -39,13 +39,13 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common 
 ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator
 ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
 
-#Цель - объединение библиотек для iPhone
+#Р¦РµР»СЊ - РѕР±СЉРµРґРёРЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРє РґР»СЏ iPhone
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.TYPE     := lipo-lib
 ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
 
-#Цель - application
+#Р¦РµР»СЊ - application
 ifneq (,$(filter android,$(PROFILES)))
 ENGINE.LAUNCHER.SOURCES.NAME                    := funner
 ENGINE.LAUNCHER.SOURCES.TYPE                    := dynamic-lib
@@ -85,7 +85,7 @@ ifneq (,$(filter tabletos,$(PROFILES)))
 ENGINE.LAUNCHER.SOURCES.LINK_TOOL                := $(SPACE)
 endif
 
-#Цель - console application
+#Р¦РµР»СЊ - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
 ENGINE.CLAUNCHER.SOURCES.NAME                := clauncher
 ENGINE.CLAUNCHER.SOURCES.INCLUDE_DIRS        := include
@@ -99,7 +99,7 @@ ENGINE.CLAUNCHER.SOURCES.linux.SOURCE_DIRS   := $(ENGINE.LAUNCHER.SOURCES.linux.
 ENGINE.CLAUNCHER.SOURCES.macosx.LINK_FLAGS   := $(ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS)
 ENGINE.CLAUNCHER.SOURCES.linux.LIBS          := $(ENGINE.LAUNCHER.SOURCES.linux.LIBS)
 
-#Цель - launcher tests
+#Р¦РµР»СЊ - launcher tests
 ENGINE.CLAUNCHER.TESTS.TYPE              := test-suite
 ENGINE.CLAUNCHER.TESTS.SOURCE_DIRS       := tests
 ENGINE.CLAUNCHER.TESTS.USED_APPLICATIONS := clauncher

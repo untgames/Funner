@@ -7,16 +7,16 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  DRIVER_NAME    = "DX11";                  //имя драйвера
-const char*  COMPONENT_NAME = "render.low_level.dx11"; //имя компонента
+const char*  DRIVER_NAME    = "DX11";                  //РёРјСЏ РґСЂР°Р№РІРµСЂР°
+const char*  COMPONENT_NAME = "render.low_level.dx11"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 
 }
 
 /*
-    Компонент драйвера
+    РљРѕРјРїРѕРЅРµРЅС‚ РґСЂР°Р№РІРµСЂР°
 */
 
 namespace components

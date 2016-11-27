@@ -2,7 +2,7 @@ namespace detail
 {
 
 /*
-    Обработчики удаления объектов пары trackable-trackable
+    РћР±СЂР°Р±РѕС‚С‡РёРєРё СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РїР°СЂС‹ trackable-trackable
 */
 
 class dual_trackable_handler;
@@ -97,7 +97,7 @@ inline void dual_trackable_handler_wrapper<selector>::operator () () const
 }
 
 /*
-    Дуальное соединение между двумя trackable
+    Р”СѓР°Р»СЊРЅРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ РјРµР¶РґСѓ РґРІСѓРјСЏ trackable
 */
 
 struct trackable_connection: public connection
@@ -107,7 +107,7 @@ struct trackable_connection: public connection
 };
 
 /*
-    Функтор разрыва соединения
+    Р¤СѓРЅРєС‚РѕСЂ СЂР°Р·СЂС‹РІР° СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 struct connection_disconnector
@@ -122,7 +122,7 @@ struct connection_disconnector
 }
 
 /*
-    Деструктор
+    Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 inline trackable::~trackable ()
@@ -133,12 +133,12 @@ inline trackable::~trackable ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Добавление обработчиков удаления объекта
+    Р”РѕР±Р°РІР»РµРЅРёРµ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 */
 
 inline connection trackable::connect_tracker (const function_type& fn)
@@ -156,7 +156,7 @@ inline connection trackable::connect_tracker (const function_type& fn, trackable
   return detail::trackable_connection (new detail::dual_trackable_handler (fn, *this, owner));
 }
 
-//разрыв соединения при удалении объекта
+//СЂР°Р·СЂС‹РІ СЃРѕРµРґРёРЅРµРЅРёСЏ РїСЂРё СѓРґР°Р»РµРЅРёРё РѕР±СЉРµРєС‚Р°
 inline connection trackable::connect_tracker (const connection& c)
 {
   return connect_tracker (function_type (detail::connection_disconnector (c)));
@@ -174,7 +174,7 @@ inline void trackable::disconnect_all_trackers ()
 }
 
 /*
-    Количество обработчиков
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
 */
 
 inline size_t trackable::num_trackers () const

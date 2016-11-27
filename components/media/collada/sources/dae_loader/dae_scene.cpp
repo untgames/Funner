@@ -10,7 +10,7 @@ const char* UNNAMED_NODE_FORMAT = "__unnamed_node_%u__";
 }
 
 /*
-    Разбор библиотеки визуальных сцен
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РІРёР·СѓР°Р»СЊРЅС‹С… СЃС†РµРЅ
 */
 
 void DaeParser::ParseLibraryVisualScenes (Parser::Iterator iter)
@@ -25,7 +25,7 @@ void DaeParser::ParseLibraryVisualScenes (Parser::Iterator iter)
 }
 
 /*
-    Разбор визуальной сцены
+    Р Р°Р·Р±РѕСЂ РІРёР·СѓР°Р»СЊРЅРѕР№ СЃС†РµРЅС‹
 */
 
 void DaeParser::ParseVisualScene (Parser::Iterator iter)
@@ -33,7 +33,7 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
   const char *id   = get<const char*> (*iter, "id"),
              *name = get<const char*> (*iter, "name", "");
 
-    //создание сцены
+    //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
   Node scene;
   
@@ -51,13 +51,13 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
   
   for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (scene)));
   
-    //добавление сцены в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ СЃС†РµРЅС‹ РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
     
   model.Scenes ().Insert (id, scene);
 }
 
 /*
-    Разбор узла
+    Р Р°Р·Р±РѕСЂ СѓР·Р»Р°
 */
 
 void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
@@ -76,55 +76,55 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     id = common::format (UNNAMED_NODE_FORMAT, unnamed_node_index++);
   }
 
-    //создание узла
+    //СЃРѕР·РґР°РЅРёРµ СѓР·Р»Р°
   
   Node node;
   
   node.SetId (id.c_str ());
 
-    //разбор преобразований узла
+    //СЂР°Р·Р±РѕСЂ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ СѓР·Р»Р°
 
   ParseTransform (iter, id.c_str (), node);
   
-    //биндинг к родительскому узлу
+    //Р±РёРЅРґРёРЅРі Рє СЂРѕРґРёС‚РµР»СЊСЃРєРѕРјСѓ СѓР·Р»Сѓ
     
   parent.Nodes ().Add (node);
   
-    //установка дополнительного идентификатора
+    //СѓСЃС‚Р°РЅРѕРІРєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
 
   if (*sid)
     node.SetSubId (sid);
     
-    //установка имени узла
+    //СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СѓР·Р»Р°
     
   if (*name)
     node.SetName (name);    
   
-    //добавление узла в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ СѓР·Р»Р° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
     
   model.Nodes ().Insert (id.c_str (), node);
   
-    //разбор инстанцированной геометрии
+    //СЂР°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕР№ РіРµРѕРјРµС‚СЂРёРё
     
   for_each_child (*iter, "instance_geometry", bind (&DaeParser::ParseInstanceGeometry, this, _1, ref (node.Meshes ())));
   
-    //разбор инстанцированных контроллеров
+    //СЂР°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… РєРѕРЅС‚СЂРѕР»Р»РµСЂРѕРІ
     
   for_each_child (*iter, "instance_controller", bind (&DaeParser::ParseInstanceController, this, _1, ref (node.Controllers ())));
   
-    //разбор инстанцированных источников света
+    //СЂР°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
     
   for_each_child (*iter, "instance_light", bind (&DaeParser::ParseInstanceLight, this, _1, ref (node.Lights ())));
   
-    //разбор инстанцированных камер
+    //СЂР°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅС‹С… РєР°РјРµСЂ
     
   for_each_child (*iter, "instance_camera", bind (&DaeParser::ParseInstanceCamera, this, _1, ref (node.Cameras ())));
 
-    //разбор вложенных узлов
+    //СЂР°Р·Р±РѕСЂ РІР»РѕР¶РµРЅРЅС‹С… СѓР·Р»РѕРІ
 
   for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (node)));  
 
-    //чтение пользовательских свойств
+    //С‡С‚РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… СЃРІРѕР№СЃС‚РІ
 
   for (Parser::NamesakeIterator extra_technique_iter = iter->First ("extra.technique"); extra_technique_iter; ++extra_technique_iter)
   {
@@ -151,7 +151,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
 }
 
 /*
-    Разбор преобразований узла
+    Р Р°Р·Р±РѕСЂ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ СѓР·Р»Р°
 */
 
 void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, Node& node)
@@ -170,7 +170,7 @@ void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, Node
 
       tm = tm * sub_tm;
 
-      //занесение ссылки на матрицу в карту семантик анимаций
+      //Р·Р°РЅРµСЃРµРЅРёРµ СЃСЃС‹Р»РєРё РЅР° РјР°С‚СЂРёС†Сѓ РІ РєР°СЂС‚Сѓ СЃРµРјР°РЅС‚РёРє Р°РЅРёРјР°С†РёР№
       const char* sid = get<const char*> (*i, "sid", "");
 
       if (xtl::xstrlen (sid))
@@ -219,60 +219,60 @@ void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, Node
     }
   }
 
-    //установка преобразований узла
+    //СѓСЃС‚Р°РЅРѕРІРєР° РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№ СѓР·Р»Р°
  
   node.SetTransform (tm);  
 }
 
 /*
-    Разбор инстанцированного источника света
+    Р Р°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void DaeParser::ParseInstanceLight (Parser::Iterator iter, Node::LightList& lights)
 {
   const char* url = get<const char*> (*iter, "url");  
 
-  url++; //избавляемся от префисного '#'
+  url++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёСЃРЅРѕРіРѕ '#'
 
   Light* light = model.Lights ().Find (url);
 
   if (!light)
     raise_parser_exception (*iter, "No light with id='%s' detected", url);
 
-    //добавление источнкиа света в коллекцию узла
+    //РґРѕР±Р°РІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРєРёР° СЃРІРµС‚Р° РІ РєРѕР»Р»РµРєС†РёСЋ СѓР·Р»Р°
 
   lights.Add (*light);
 }
 
 /*
-    Разбор инстанцированной камеры
+    Р Р°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕР№ РєР°РјРµСЂС‹
 */
 
 void DaeParser::ParseInstanceCamera (Parser::Iterator iter, Node::CameraList& cameras)
 {
   const char* url = get<const char*> (*iter, "url");
 
-  url++; //избавляемся от префисного '#'
+  url++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёСЃРЅРѕРіРѕ '#'
 
   Camera* camera = model.Cameras ().Find (url);
   
   if (!camera)
     raise_parser_exception (*iter, "No camera with id='%s' detected", url);
 
-    //добавление камеры в коллекцию узла
+    //РґРѕР±Р°РІР»РµРЅРёРµ РєР°РјРµСЂС‹ РІ РєРѕР»Р»РµРєС†РёСЋ СѓР·Р»Р°
 
   cameras.Add (*camera);
 }
 
 /*
-    Разбор инстанцированной геометрии
+    Р Р°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕР№ РіРµРѕРјРµС‚СЂРёРё
 */
 
 void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& meshes)
 {
   const char* url = get<const char*> (*iter, "url");  
 
-  url++; //избавляемся от префисного '#'
+  url++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёСЃРЅРѕРіРѕ '#'
 
   Mesh* mesh = model.Meshes ().Find (url);
 
@@ -283,24 +283,24 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
 
   imesh.SetMesh (url);
 
-    //разбор прикреплённых материалов
+    //СЂР°Р·Р±РѕСЂ РїСЂРёРєСЂРµРїР»С‘РЅРЅС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
   
   for_each_child (*iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (imesh.MaterialBinds ())));
   
-    //добавление меша в коллекцию узла
+    //РґРѕР±Р°РІР»РµРЅРёРµ РјРµС€Р° РІ РєРѕР»Р»РµРєС†РёСЋ СѓР·Р»Р°
     
   meshes.Add (imesh);
 }
 
 /*
-    Разбор инстанцированного контроллера
+    Р Р°Р·Р±РѕСЂ РёРЅСЃС‚Р°РЅС†РёСЂРѕРІР°РЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::ControllerList& controllers)
 {
   const char* url = get<const char*> (*iter, "url");
 
-  url++; //избавляемся от префисного '#'
+  url++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёСЃРЅРѕРіРѕ '#'
 
   Skin*  skin  = model.Skins ().Find (url);
   Morph* morph = model.Morphs ().Find (url);
@@ -312,11 +312,11 @@ void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::Controller
   
   icontroller.SetController (url);
   
-    //разбор прикреплённых материалов
+    //СЂР°Р·Р±РѕСЂ РїСЂРёРєСЂРµРїР»С‘РЅРЅС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
     
   for_each_child (*iter, "bind_material", bind (&DaeParser::ParseBindMaterial, this, _1, ref (icontroller.MaterialBinds ())));
   
-    //разбор корней поиска соединений
+    //СЂР°Р·Р±РѕСЂ РєРѕСЂРЅРµР№ РїРѕРёСЃРєР° СЃРѕРµРґРёРЅРµРЅРёР№
     
   for (Parser::NamesakeIterator skeleton_iter=iter->First ("skeleton"); skeleton_iter; ++skeleton_iter)
   {
@@ -325,13 +325,13 @@ void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::Controller
     icontroller.InsertJointSearchRoot (root_id);
   }  
 
-    //добавление контроллера в коллекцию узла
+    //РґРѕР±Р°РІР»РµРЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІ РєРѕР»Р»РµРєС†РёСЋ СѓР·Р»Р°
 
   controllers.Add (icontroller);
 }
 
 /*
-    Разбор прикреплённого материала
+    Р Р°Р·Р±РѕСЂ РїСЂРёРєСЂРµРїР»С‘РЅРЅРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
@@ -343,18 +343,18 @@ void DaeParser::ParseBindMaterial (Parser::Iterator iter, MaterialBinds& binds)
     const char *target = get<const char*> (*i, "target"),
                *symbol = get<const char*> (*i, "symbol");
 
-    target++; //избавляемся от префисного '#'
+    target++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёСЃРЅРѕРіРѕ '#'
 
     Material* material = model.Materials ().Find (target);
     
     if (!material)
       raise_parser_exception (*i, "No material with id='%s' detected", target);
 
-      //добавляем материал в список присоединённых материалов
+      //РґРѕР±Р°РІР»СЏРµРј РјР°С‚РµСЂРёР°Р» РІ СЃРїРёСЃРѕРє РїСЂРёСЃРѕРµРґРёРЅС‘РЅРЅС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
 
     binds.SetMaterial (symbol, target);
 
-      //разбор текстурных каналов
+      //СЂР°Р·Р±РѕСЂ С‚РµРєСЃС‚СѓСЂРЅС‹С… РєР°РЅР°Р»РѕРІ
 
     for (Parser::NamesakeIterator j=i->First ("bind_vertex_input"); j; ++j)
     {

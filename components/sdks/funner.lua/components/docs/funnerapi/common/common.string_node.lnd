@@ -1,20 +1,20 @@
 /*
    Class: Common.StringNode
  
-   Используется для работы с деревьями строк.
+   РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РґРµСЂРµРІСЊСЏРјРё СЃС‚СЂРѕРє.
  */
 
 /*
-   Group: Функции
+   Group: Р¤СѓРЅРєС†РёРё
  
  */
 
 /*
    Function: Create
  
-   Создание узла дерева.
+   РЎРѕР·РґР°РЅРёРµ СѓР·Р»Р° РґРµСЂРµРІР°.
   
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      <Common.StringNode>
  */
 
@@ -23,10 +23,10 @@ Create ()
 /*
    Function: Clone
  
-   Создание копии узла, содержащей также и копии всех дочерних узлов.
-   При простом копировании создаётся ссылка.
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё СѓР·Р»Р°, СЃРѕРґРµСЂР¶Р°С‰РµР№ С‚Р°РєР¶Рµ Рё РєРѕРїРёРё РІСЃРµС… РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ.
+   РџСЂРё РїСЂРѕСЃС‚РѕРј РєРѕРїРёСЂРѕРІР°РЅРёРё СЃРѕР·РґР°С‘С‚СЃСЏ СЃСЃС‹Р»РєР°.
   
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      <Common.StringNode>
  */
 
@@ -35,12 +35,12 @@ Clone ()
 /*
    Function: Attribute
  
-   Получение значения атрибута по индексу.
+   РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ Р°С‚СЂРёР±СѓС‚Р° РїРѕ РёРЅРґРµРєСЃСѓ.
  
-   Параметры:
-     index - индекс атрубита
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ Р°С‚СЂСѓР±РёС‚Р°
  
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      string
  */
 
@@ -49,10 +49,10 @@ Attribute (index)
 /*
    Function: ReserveAttributes
  
-   Резервирование памяти под атрибуты.
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ Р°С‚СЂРёР±СѓС‚С‹.
  
-   Параметры:
-     count - количество резервируемых атрибутов
+   РџР°СЂР°РјРµС‚СЂС‹:
+     count - РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР·РµСЂРІРёСЂСѓРµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
  */
 
 ReserveAttributes (count)
@@ -60,11 +60,11 @@ ReserveAttributes (count)
 /*
    Function: SetAttribute
  
-   Установка атрибута по индексу.
+   РЈСЃС‚Р°РЅРѕРІРєР° Р°С‚СЂРёР±СѓС‚Р° РїРѕ РёРЅРґРµРєСЃСѓ.
  
-   Параметры:
-     index - индекс атрибута
-     value - строковое значение атрибута
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ Р°С‚СЂРёР±СѓС‚Р°
+     value - СЃС‚СЂРѕРєРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
  */
 
 SetAttribute (index, value)
@@ -72,12 +72,12 @@ SetAttribute (index, value)
 /*
    Function: AddAttribute (value)
  
-   Добавление атрибута последним в массив атрибутов.
+   Р”РѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р° РїРѕСЃР»РµРґРЅРёРј РІ РјР°СЃСЃРёРІ Р°С‚СЂРёР±СѓС‚РѕРІ.
  
-   Параметры:
-     value - значение нового атрибута
+   РџР°СЂР°РјРµС‚СЂС‹:
+     value - Р·РЅР°С‡РµРЅРёРµ РЅРѕРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р°
  
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      number
  */
 
@@ -86,11 +86,11 @@ AddAttribute (value)
 /*
    Function: AddAttribute (index, value)
  
-   Добавление атрибута со значением value в положение index. Атрибуты с индексом index и больше сдвигаются.
+   Р”РѕР±Р°РІР»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р° СЃРѕ Р·РЅР°С‡РµРЅРёРµРј value РІ РїРѕР»РѕР¶РµРЅРёРµ index. РђС‚СЂРёР±СѓС‚С‹ СЃ РёРЅРґРµРєСЃРѕРј index Рё Р±РѕР»СЊС€Рµ СЃРґРІРёРіР°СЋС‚СЃСЏ.
  
-   Параметры:
-     index - индекс атрибута
-     value - строковое значение атрибута
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ Р°С‚СЂРёР±СѓС‚Р°
+     value - СЃС‚СЂРѕРєРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р°
  */
 
 AddAttribute (index, value)
@@ -98,10 +98,10 @@ AddAttribute (index, value)
 /*
    Function: RemoveAttribute
  
-   Удаление атрибута по индексу.
+   РЈРґР°Р»РµРЅРёРµ Р°С‚СЂРёР±СѓС‚Р° РїРѕ РёРЅРґРµРєСЃСѓ.
  
-   Параметры:
-     index - индекс атрибута
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ Р°С‚СЂРёР±СѓС‚Р°
  */
 
 RemoveAttribute (index)
@@ -109,7 +109,7 @@ RemoveAttribute (index)
 /*
    Function: RemoveAllAttributes
  
-   Удаление всех атрибутов.
+   РЈРґР°Р»РµРЅРёРµ РІСЃРµС… Р°С‚СЂРёР±СѓС‚РѕРІ.
  */
 
 RemoveAllAttributes ()
@@ -117,12 +117,12 @@ RemoveAllAttributes ()
 /*
    Function: Child
  
-   Получение дочернего узла по индексу.
+   РџРѕР»СѓС‡РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїРѕ РёРЅРґРµРєСЃСѓ.
  
-   Параметры:
-     index - индекс узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ СѓР·Р»Р°
  
-   Возвращает:
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
      <Common.StringNode>
  */
 
@@ -131,10 +131,10 @@ Child (index)
 /*
    Function: ReserveChildren
  
-   Резервирование памяти под count потомков.
+   Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ count РїРѕС‚РѕРјРєРѕРІ.
  
-   Параметры:
-     count - количество потомков
+   РџР°СЂР°РјРµС‚СЂС‹:
+     count - РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕС‚РѕРјРєРѕРІ
  */
 
 ReserveChildren (count)
@@ -142,10 +142,10 @@ ReserveChildren (count)
 /*
    Function: AddChild (child_node)
  
-   Добавление дочернего узла child_node последним в массив дочерних узлов.
+   Р”РѕР±Р°РІР»РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° child_node РїРѕСЃР»РµРґРЅРёРј РІ РјР°СЃСЃРёРІ РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ.
  
-   Параметры:
-     child_node - узел <Common.StringNode>
+   РџР°СЂР°РјРµС‚СЂС‹:
+     child_node - СѓР·РµР» <Common.StringNode>
  */
 
 AddChild (child_node)
@@ -153,11 +153,11 @@ AddChild (child_node)
 /*
    Function: AddChild (index, child_node)
  
-   Добавление дочернего узла child_node в положение index. Дочерние узлы с индексом index и больше сдвигаются.
+   Р”РѕР±Р°РІР»РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° child_node РІ РїРѕР»РѕР¶РµРЅРёРµ index. Р”РѕС‡РµСЂРЅРёРµ СѓР·Р»С‹ СЃ РёРЅРґРµРєСЃРѕРј index Рё Р±РѕР»СЊС€Рµ СЃРґРІРёРіР°СЋС‚СЃСЏ.
  
-   Параметры:
-     index - индекс дочернего узла
-     child_node - узел <Common.StringNode>
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р°
+     child_node - СѓР·РµР» <Common.StringNode>
  */
 
 AddChild (index, child_node)
@@ -165,38 +165,38 @@ AddChild (index, child_node)
 /*
    Function: RemoveChild
  
-   Удаление дочернего узла.
+   РЈРґР°Р»РµРЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р°.
  
-   Параметры:
-     index - индекс дочернего узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     index - РёРЅРґРµРєСЃ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р°
  */
 RemoveChild (index)
 
 /*
    Function: RemoveAllChildren
  
-   Удаление всех дочерних узлов.
+   РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ.
  */
 RemoveAllChildren ()
 
 /*
    Function: LoadXml
  
-   Возвращает корневой узел XML из строки или файла
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» XML РёР· СЃС‚СЂРѕРєРё РёР»Рё С„Р°Р№Р»Р°
  
-   Параметры:
-     param - имя загружаемого XML файла либо строка с XML содержимым (определяется автоматически)
+   РџР°СЂР°РјРµС‚СЂС‹:
+     param - РёРјСЏ Р·Р°РіСЂСѓР¶Р°РµРјРѕРіРѕ XML С„Р°Р№Р»Р° Р»РёР±Рѕ СЃС‚СЂРѕРєР° СЃ XML СЃРѕРґРµСЂР¶РёРјС‹Рј (РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё)
  */
 
-LoadXml (зфкфь)
+LoadXml (Р·С„РєС„СЊ)
 
 /*
    Function: LoadXmlFromFile
  
-   Возвращает корневой узел загруженного из xml-файла дерева.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ РёР· xml-С„Р°Р№Р»Р° РґРµСЂРµРІР°.
  
-   Параметры:
-     filename - имя загружаемого XML файла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     filename - РёРјСЏ Р·Р°РіСЂСѓР¶Р°РµРјРѕРіРѕ XML С„Р°Р№Р»Р°
  */
 
 LoadXmlFromFile (filename)
@@ -204,10 +204,10 @@ LoadXmlFromFile (filename)
 /*
    Function: LoadXmlFromString
  
-   Возвращает корневой узел загруженного из xml-строки дерева.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕСЂРЅРµРІРѕР№ СѓР·РµР» Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ РёР· xml-СЃС‚СЂРѕРєРё РґРµСЂРµРІР°.
  
-   Параметры:
-     string - строка с XML содержимым
+   РџР°СЂР°РјРµС‚СЂС‹:
+     string - СЃС‚СЂРѕРєР° СЃ XML СЃРѕРґРµСЂР¶РёРјС‹Рј
  */
 
 LoadXmlFromString (string)
@@ -215,10 +215,10 @@ LoadXmlFromString (string)
 /*
    Function: SaveXml
  
-   Сохраняет дерево в xml-файл.
+   РЎРѕС…СЂР°РЅСЏРµС‚ РґРµСЂРµРІРѕ РІ xml-С„Р°Р№Р».
  
-   Параметры:
-     filename - имя сохраняемого XML файла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     filename - РёРјСЏ СЃРѕС…СЂР°РЅСЏРµРјРѕРіРѕ XML С„Р°Р№Р»Р°
  */
 
 SaveXml (filename)
@@ -226,13 +226,13 @@ SaveXml (filename)
 /*
    Function: Find (name)
  
-   Поиск узла с именем name в узле start_node и его дочерних узлах.
+   РџРѕРёСЃРє СѓР·Р»Р° СЃ РёРјРµРЅРµРј name РІ СѓР·Р»Рµ start_node Рё РµРіРѕ РґРѕС‡РµСЂРЅРёС… СѓР·Р»Р°С….
  
-   Параметры:
-     name - имя узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     name - РёРјСЏ СѓР·Р»Р°
  
-   Возвращает:
-     <Common.StringNode> в случае, если узел найден, либо null если узел с указанным именем отсутствует.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
+     <Common.StringNode> РІ СЃР»СѓС‡Р°Рµ, РµСЃР»Рё СѓР·РµР» РЅР°Р№РґРµРЅ, Р»РёР±Рѕ null РµСЃР»Рё СѓР·РµР» СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚.
  */
 
 Find (name)
@@ -240,14 +240,14 @@ Find (name)
 /*
    Function: Find (name, value)
  
-   Поиск узла с именем name и значением нулевого атрибута value в дочерних узлах.
+   РџРѕРёСЃРє СѓР·Р»Р° СЃ РёРјРµРЅРµРј name Рё Р·РЅР°С‡РµРЅРёРµРј РЅСѓР»РµРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р° value РІ РґРѕС‡РµСЂРЅРёС… СѓР·Р»Р°С….
  
-   Параметры:
-     name - имя узла
-     value - значение нулевого атрибута узла для поиска
+   РџР°СЂР°РјРµС‚СЂС‹:
+     name - РёРјСЏ СѓР·Р»Р°
+     value - Р·РЅР°С‡РµРЅРёРµ РЅСѓР»РµРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р° СѓР·Р»Р° РґР»СЏ РїРѕРёСЃРєР°
  
-   Возвращает:
-     <Common.StringNode> в случае, если узел найден, либо null если узел с указанным именем отсутствует.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
+     <Common.StringNode> РІ СЃР»СѓС‡Р°Рµ, РµСЃР»Рё СѓР·РµР» РЅР°Р№РґРµРЅ, Р»РёР±Рѕ null РµСЃР»Рё СѓР·РµР» СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚.
  */
 
 Find (name, value)
@@ -255,13 +255,13 @@ Find (name, value)
 /*
    Function: Get (name)
  
-   Возвращение значения нулевого атрибута узла с именем name.
+   Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РЅСѓР»РµРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р° СѓР·Р»Р° СЃ РёРјРµРЅРµРј name.
  
-   Параметры:
-     name - имя узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     name - РёРјСЏ СѓР·Р»Р°
  
-   Возвращает:
-     Если у узла есть потомок с именем name и у него есть нулевой атрибут, возвращается его нулевой атрибут. Иначе выбрасывается исключение.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
+     Р•СЃР»Рё Сѓ СѓР·Р»Р° РµСЃС‚СЊ РїРѕС‚РѕРјРѕРє СЃ РёРјРµРЅРµРј name Рё Сѓ РЅРµРіРѕ РµСЃС‚СЊ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚, РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РµРіРѕ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚. РРЅР°С‡Рµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚СЃСЏ РёСЃРєР»СЋС‡РµРЅРёРµ.
  */
 
 Get (name)
@@ -269,13 +269,13 @@ Get (name)
 /*
    Function: Get (name,default_value)
  
-   Возвращение значения нулевого атрибута узла с именем name.
+   Р’РѕР·РІСЂР°С‰РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РЅСѓР»РµРІРѕРіРѕ Р°С‚СЂРёР±СѓС‚Р° СѓР·Р»Р° СЃ РёРјРµРЅРµРј name.
  
-   Параметры:
-     name - имя узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     name - РёРјСЏ СѓР·Р»Р°
  
-   Возвращает:
-     Если у узла есть потомок с именем name и у него есть нулевой атрибут, возвращается его нулевой атрибут. Иначе возвращается default_value.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
+     Р•СЃР»Рё Сѓ СѓР·Р»Р° РµСЃС‚СЊ РїРѕС‚РѕРјРѕРє СЃ РёРјРµРЅРµРј name Рё Сѓ РЅРµРіРѕ РµСЃС‚СЊ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚, РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РµРіРѕ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚. РРЅР°С‡Рµ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ default_value.
  */
 
 Get (name, default_value)
@@ -283,31 +283,31 @@ Get (name, default_value)
 /*
    Function: Set
  
-   Установка значения узла.
+   РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ СѓР·Р»Р°.
  
-   Параметры:
-     name - имя узла
-     value - значение узла
+   РџР°СЂР°РјРµС‚СЂС‹:
+     name - РёРјСЏ СѓР·Р»Р°
+     value - Р·РЅР°С‡РµРЅРёРµ СѓР·Р»Р°
  
-   Возвращает:
-     Если у узла есть потомок с именем name и у него есть нулевой атрибут, то его нулевой атрибут устанавливается в значение value. Иначе происходит его создание.
+   Р’РѕР·РІСЂР°С‰Р°РµС‚:
+     Р•СЃР»Рё Сѓ СѓР·Р»Р° РµСЃС‚СЊ РїРѕС‚РѕРјРѕРє СЃ РёРјРµРЅРµРј name Рё Сѓ РЅРµРіРѕ РµСЃС‚СЊ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚, С‚Рѕ РµРіРѕ РЅСѓР»РµРІРѕР№ Р°С‚СЂРёР±СѓС‚ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РІ Р·РЅР°С‡РµРЅРёРµ value. РРЅР°С‡Рµ РїСЂРѕРёСЃС…РѕРґРёС‚ РµРіРѕ СЃРѕР·РґР°РЅРёРµ.
  */
 
 Set (name, value)
 
 /*
-   Group: Поля
+   Group: РџРѕР»СЏ
  
  */
 
 /*
    Property: Name
  
-   Имя узла.
+   РРјСЏ СѓР·Р»Р°.
  
-   Доступ:
+   Р”РѕСЃС‚СѓРї:
  
-     Получение/установка.
+     РџРѕР»СѓС‡РµРЅРёРµ/СѓСЃС‚Р°РЅРѕРІРєР°.
  */
 
 Name
@@ -315,11 +315,11 @@ Name
 /*
    Property: AttributesCount
  
-   Количество атрибутов.
+   РљРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ.
  
-   Доступ:
+   Р”РѕСЃС‚СѓРї:
  
-     Получение.
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 
 AttributesCount
@@ -327,14 +327,14 @@ AttributesCount
 /*
    Property: AttributesCapacity
  
-   Размер зарезервированного под атрибуты места.
+   Р Р°Р·РјРµСЂ Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅРѕРіРѕ РїРѕРґ Р°С‚СЂРёР±СѓС‚С‹ РјРµСЃС‚Р°.
  
-   Примечание:
-     Перераспределение памяти не возникнет при добавлении новых атрибутов пока количество атрибутов меньше этого значения.
+   РџСЂРёРјРµС‡Р°РЅРёРµ:
+     РџРµСЂРµСЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РЅРµ РІРѕР·РЅРёРєРЅРµС‚ РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РЅРѕРІС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ РїРѕРєР° РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РјРµРЅСЊС€Рµ СЌС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ.
  
-   Доступ:
+   Р”РѕСЃС‚СѓРї:
  
-     Получение.
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 
 AttributesCapacity
@@ -342,11 +342,11 @@ AttributesCapacity
 /*
    Property: ChildrenCount
  
-   Количество дочерних узлов.
+   РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ.
  
-   Доступ:
+   Р”РѕСЃС‚СѓРї:
  
-     Получение.
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 
 ChildrenCount
@@ -354,25 +354,25 @@ ChildrenCount
 /*
    Property: ChildrenCapacity
  
-   Размер места, зарезервированного для дочерних узлов.
+   Р Р°Р·РјРµСЂ РјРµСЃС‚Р°, Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРЅРѕРіРѕ РґР»СЏ РґРѕС‡РµСЂРЅРёС… СѓР·Р»РѕРІ.
  
-   Примечание:
-     Перераспределение памяти не возникнет при добавлении новых потомков пока количество потомков меньше этого значения.
+   РџСЂРёРјРµС‡Р°РЅРёРµ:
+     РџРµСЂРµСЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РЅРµ РІРѕР·РЅРёРєРЅРµС‚ РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РЅРѕРІС‹С… РїРѕС‚РѕРјРєРѕРІ РїРѕРєР° РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕС‚РѕРјРєРѕРІ РјРµРЅСЊС€Рµ СЌС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ.
  
-   Доступ:
+   Р”РѕСЃС‚СѓРї:
  
-     Получение.
+     РџРѕР»СѓС‡РµРЅРёРµ.
  */
 
 ChildrenCapacity
 
 /*
-   Group: Примеры
+   Group: РџСЂРёРјРµСЂС‹
  
  */
 
 /*
-  Topic: Пример кода
+  Topic: РџСЂРёРјРµСЂ РєРѕРґР°
  
   (start code) 
   function clone_test ()
@@ -388,16 +388,16 @@ ChildrenCapacity
 
     local node2 = node1:Clone ()
 
-    print ("Node 1 attributes сount: " .. tostring (node1.AttributesCount))
-    print ("Node 2 attributes сount: " .. tostring (node2.AttributesCount))
+    print ("Node 1 attributes СЃount: " .. tostring (node1.AttributesCount))
+    print ("Node 2 attributes СЃount: " .. tostring (node2.AttributesCount))
     print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
     print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
 
     node1:RemoveAllAttributes ()
     node1:RemoveAllChildren ()
 
-    print ("Node 1 attributes сount: " .. tostring (node1.AttributesCount))
-    print ("Node 2 attributes сount: " .. tostring (node2.AttributesCount))
+    print ("Node 1 attributes СЃount: " .. tostring (node1.AttributesCount))
+    print ("Node 2 attributes СЃount: " .. tostring (node2.AttributesCount))
     print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
     print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
   end
@@ -436,7 +436,7 @@ ChildrenCapacity
     local node = Common.StringNode.Create ()
 
     print ("Name: '" .. node.Name .. "'")
-    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Attributes СЃount: " .. node.AttributesCount)
     print ("Children count: " .. node.ChildrenCount)
     print ("Attributes capacity: " .. node.AttributesCapacity)
     print ("Children capacity: " .. node.ChildrenCapacity)
@@ -462,24 +462,24 @@ ChildrenCapacity
     node:AddChild (child)
 
     print ("Name: '" .. node.Name .. "'")
-    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Attributes СЃount: " .. node.AttributesCount)
     print ("Children count: " .. node.ChildrenCount)
 
     print ("First child name is " .. node:Child (0).Name)
 
     node:AddAttribute (0, "New first attribute value")
 
-    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Attributes СЃount: " .. node.AttributesCount)
     print ("First attribute value is " .. node:Attribute (0))
     print ("Second attribute value is " .. node:Attribute (1))
 
     node:RemoveAttribute (1)
 
-    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Attributes СЃount: " .. node.AttributesCount)
 
     node:RemoveAllAttributes ()
 
-    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Attributes СЃount: " .. node.AttributesCount)
 
     local child2 = Common.StringNode.Create ()
 
@@ -532,13 +532,13 @@ ChildrenCapacity
  */
 
 /*
-  Topic: Результат
+  Topic: Р РµР·СѓР»СЊС‚Р°С‚
  
   (start code) 
   Results of common_string_tree_test:
   Test library:
   Name: ''
-  Attributes сount: 0
+  Attributes СЃount: 0
   Children count: 0
   Attributes capacity: 0
   Children capacity: 0
@@ -549,14 +549,14 @@ ChildrenCapacity
   Children capacity: 4
   Second attribute value is New second attribute value
   Name: 'Node'
-  Attributes сount: 2
+  Attributes СЃount: 2
   Children count: 1
   First child name is Child Node
-  Attributes сount: 3
+  Attributes СЃount: 3
   First attribute value is New first attribute value
   Second attribute value is First attribute value
-  Attributes сount: 2
-  Attributes сount: 0
+  Attributes СЃount: 2
+  Attributes СЃount: 0
   First child name is Child2 Node
   Children count: 2
   Node 'Child2 Node' found
@@ -566,12 +566,12 @@ ChildrenCapacity
   Child2 attribute0 = new child2 attribute0
   Children count: 1
   Children count: 0
-  Node 1 attributes сount: 1
-  Node 2 attributes сount: 1
+  Node 1 attributes СЃount: 1
+  Node 2 attributes СЃount: 1
   Node 1 children count: 1
   Node 2 children count: 1
-  Node 1 attributes сount: 0
-  Node 2 attributes сount: 1
+  Node 1 attributes СЃount: 0
+  Node 2 attributes СЃount: 1
   Node 1 children count: 0
   Node 2 children count: 1
   Node 'RootNode'

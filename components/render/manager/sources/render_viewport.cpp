@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 ViewportImpl::ViewportImpl ()
@@ -21,7 +21,7 @@ ViewportImpl::ViewportImpl (const render::manager::Rect& rect, float in_min_dept
 }
 
 /*
-    Размеры области
+    Р Р°Р·РјРµСЂС‹ РѕР±Р»Р°СЃС‚Рё
 */
 
 RectAreaImpl& ViewportImpl::Area ()
@@ -30,7 +30,7 @@ RectAreaImpl& ViewportImpl::Area ()
 }
 
 /*
-    Диапазон глубины для области вывода
+    Р”РёР°РїР°Р·РѕРЅ РіР»СѓР±РёРЅС‹ РґР»СЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
 */
 
 float ViewportImpl::MinDepth ()

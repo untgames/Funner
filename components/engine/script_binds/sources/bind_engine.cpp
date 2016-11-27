@@ -24,7 +24,7 @@ namespace debug_script_bind
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* COMPONENT_NAME             = "script.binds.Engine";
@@ -33,7 +33,7 @@ const char* ATTACHMENT_REGISTRY_PREFIX = "Engine";
 const char* SUBSYSTEM_MANAGER_LIBRARY  = "Engine.SubsystemManagerClass";
 
 /*
-    Регистрация библиотек
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
 */
 
 template <class T> void register_attachment (const char* name, T& value)
@@ -179,7 +179,7 @@ void bind_subsystem_manager_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

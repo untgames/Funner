@@ -1,4 +1,4 @@
-// Тестирование upper_bound ()
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ upper_bound ()
 #include <stdio.h>
 #include <stl/set>
 #include "test.h"

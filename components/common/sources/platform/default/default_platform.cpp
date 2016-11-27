@@ -3,7 +3,7 @@
 using namespace common;
 
 /*
-    Получение системного распределителя памяти
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅРѕРіРѕ СЂР°СЃРїСЂРµРґРµР»РёС‚РµР»СЏ РїР°РјСЏС‚Рё
 */
 
 ICustomAllocator* DefaultPlatform::GetSystemAllocator ()
@@ -12,7 +12,7 @@ ICustomAllocator* DefaultPlatform::GetSystemAllocator ()
 }
 
 /*
-    Получение файловых систем
+    РџРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј
 */
 
 ICustomFileSystem* DefaultPlatform::GetFileSystem ()
@@ -26,7 +26,7 @@ ICustomFileSystem* DefaultPlatform::GetIOSystem ()
 }
 
 /*
-    Работа с блокировками
+    Р Р°Р±РѕС‚Р° СЃ Р±Р»РѕРєРёСЂРѕРІРєР°РјРё
 */
 
 void DefaultPlatform::InitLockable (lockable_t& lockable)
@@ -55,7 +55,7 @@ void DefaultPlatform::Unlock (lockable_t& lockable)
 }
     
 /*
-    Получение системного времени
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅРѕРіРѕ РІСЂРµРјРµРЅРё
 */
     
 size_t DefaultPlatform::GetMilliseconds ()
@@ -64,7 +64,7 @@ size_t DefaultPlatform::GetMilliseconds ()
 }
 
 /*
-    Получение идентификатора текущей нити
+    РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РµРєСѓС‰РµР№ РЅРёС‚Рё
 */
    
 DefaultPlatform::threadid_t DefaultPlatform::GetCurrentThreadId ()

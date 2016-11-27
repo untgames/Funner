@@ -4,7 +4,7 @@ using namespace media;
 using namespace media::freetype;
 
 /*
-    Загрузка шрифта
+    Р—Р°РіСЂСѓР·РєР° С€СЂРёС„С‚Р°
 */
 
 namespace components
@@ -14,13 +14,13 @@ namespace freetype_loader
 {
 
 /*
-   Компонент загрузки шрифтов
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё С€СЂРёС„С‚РѕРІ
 */
 
 class FreetypeLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     FreetypeLoaderComponent ()
     {
       FontManager::RegisterLoader ("ttf", &LoadFont);

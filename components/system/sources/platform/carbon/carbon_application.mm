@@ -13,16 +13,16 @@ namespace
 const char* LOG_NAME = "syslib.CarbonApplication";
 
 const double RECEIVE_EVENT_TIMEOUT         = 0.000000001;
-const UInt32 UNTGS_EVENT_CLASS             = 'untg';      //класс событий приложения
-const UInt32 APPLICATION_LOOP_START_EVENT  = 'alse';      //событие входа в цикл обработки
-const size_t UPDATE_SYSTEM_ACTIVITY_PERIOD = 30 * 1000;   //период обновления активности системы для предотвращения запуска хранителя экрана
+const UInt32 UNTGS_EVENT_CLASS             = 'untg';      //РєР»Р°СЃСЃ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
+const UInt32 APPLICATION_LOOP_START_EVENT  = 'alse';      //СЃРѕР±С‹С‚РёРµ РІС…РѕРґР° РІ С†РёРєР» РѕР±СЂР°Р±РѕС‚РєРё
+const size_t UPDATE_SYSTEM_ACTIVITY_PERIOD = 30 * 1000;   //РїРµСЂРёРѕРґ РѕР±РЅРѕРІР»РµРЅРёСЏ Р°РєС‚РёРІРЅРѕСЃС‚Рё СЃРёСЃС‚РµРјС‹ РґР»СЏ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ Р·Р°РїСѓСЃРєР° С…СЂР°РЅРёС‚РµР»СЏ СЌРєСЂР°РЅР°
 
 OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate);
 
 class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     CarbonApplicationDelegate ()
       : idle_enabled (false)
       , is_exited (false)
@@ -42,7 +42,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
         DisposeEventHandlerUPP (application_event_handler_proc);
     }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       static const char* METHOD_NAME = "syslib::CarbonApplicationDelegate::Run";
@@ -88,14 +88,14 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
         ReleaseEvent (first_event);
     }
 
-    //Старт главного цикла
+    //РЎС‚Р°СЂС‚ РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р°
     void OnApplicationEventLoopStarted ()
     {
       NSApplicationLoad ();
 
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-      [[[NSWindow alloc] init] release]; //хак для включения работы NSCursor на Mac 10.4
+      [[[NSWindow alloc] init] release]; //С…Р°Рє РґР»СЏ РІРєР»СЋС‡РµРЅРёСЏ СЂР°Р±РѕС‚С‹ NSCursor РЅР° Mac 10.4
 
       try
       {
@@ -115,7 +115,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
           while (!is_exited && !IsMessageQueueEmpty ())
             DoNextEvent ();
 
-           //если нет обработчиков OnIdle - приостанавливаем приложение
+           //РµСЃР»Рё РЅРµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ OnIdle - РїСЂРёРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїСЂРёР»РѕР¶РµРЅРёРµ
 
           if (!idle_enabled)
           {
@@ -145,7 +145,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       [pool release];
     }
 
-    //Событие выхода из приложения
+    //РЎРѕР±С‹С‚РёРµ РІС‹С…РѕРґР° РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void OnExit ()
     {
       if (listener)
@@ -154,7 +154,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       is_exited = true;
     }
 
-    //Выход из приложения
+    //Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       EventRef application_exit_event = 0;
@@ -180,7 +180,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
         ReleaseEvent (application_exit_event);
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       if (idle_enabled == state)
@@ -188,7 +188,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
 
       idle_enabled = state;
 
-      if (state && event_loop_started && IsMessageQueueEmpty ()) //Нельзя добавлять сообщения в очередь до старта главного цикла (иногда события блокируются)
+      if (state && event_loop_started && IsMessageQueueEmpty ()) //РќРµР»СЊР·СЏ РґРѕР±Р°РІР»СЏС‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕС‡РµСЂРµРґСЊ РґРѕ СЃС‚Р°СЂС‚Р° РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р° (РёРЅРѕРіРґР° СЃРѕР±С‹С‚РёСЏ Р±Р»РѕРєРёСЂСѓСЋС‚СЃСЏ)
       {
         EventRef dummy_event;
 
@@ -201,13 +201,13 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       }
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -219,7 +219,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     }
 
   private:
-///Проверка очереди событий на пустоту
+///РџСЂРѕРІРµСЂРєР° РѕС‡РµСЂРµРґРё СЃРѕР±С‹С‚РёР№ РЅР° РїСѓСЃС‚РѕС‚Сѓ
     bool IsMessageQueueEmpty ()
     {
       if (is_exited)
@@ -228,7 +228,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       return GetNumEventsInQueue (GetMainEventQueue ()) == 0;
     }
 
-///Ожидание события
+///РћР¶РёРґР°РЅРёРµ СЃРѕР±С‹С‚РёСЏ
     void WaitMessage ()
     {
       EventRef next_event;
@@ -237,7 +237,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
                                  "syslib::CarbonApplicationDelegate::WaitMessage", "Can't wait for next message, error at '::ReceiveNextEvent'");
     }
 
-///Обработка следующего события
+///РћР±СЂР°Р±РѕС‚РєР° СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРѕР±С‹С‚РёСЏ
     void DoNextEvent ()
     {
       EventRef event;
@@ -262,7 +262,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     EventHandlerUPP       application_event_handler_proc;
 };
 
-//Обработка первого события приложения с целью запуска главного цикла
+//РћР±СЂР°Р±РѕС‚РєР° РїРµСЂРІРѕРіРѕ СЃРѕР±С‹С‚РёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ СЃ С†РµР»СЊСЋ Р·Р°РїСѓСЃРєР° РіР»Р°РІРЅРѕРіРѕ С†РёРєР»Р°
 OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate)
 {
   CarbonApplicationDelegate* delegate = (CarbonApplicationDelegate*)application_delegate;
@@ -281,17 +281,17 @@ OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_
   return noErr;
 }
 
-///Данные приложения
+///Р”Р°РЅРЅС‹Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ
 class ApplicationImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ApplicationImpl ()
       : screen_saver_state (true)
       , activity_update_timer (xtl::bind (&ApplicationImpl::UpdateActivity, this), UPDATE_SYSTEM_ACTIVITY_PERIOD, TimerState_Paused)
       {}
 
-    ///Деструктор
+    ///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ApplicationImpl ()
     {
       try
@@ -304,7 +304,7 @@ class ApplicationImpl
       }
     }
 
-///Установка состояния скрин-сейвера
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
     void SetScreenSaverState (bool state)
     {
       if (state == screen_saver_state)
@@ -332,8 +332,8 @@ class ApplicationImpl
     }
 
   private:
-    bool  screen_saver_state;     //состояние скрин-сейвера
-    Timer activity_update_timer;  //таймер обновления активности приложения для предотвращения запуска скрин-сейвера
+    bool  screen_saver_state;     //СЃРѕСЃС‚РѕСЏРЅРёРµ СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
+    Timer activity_update_timer;  //С‚Р°Р№РјРµСЂ РѕР±РЅРѕРІР»РµРЅРёСЏ Р°РєС‚РёРІРЅРѕСЃС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ РґР»СЏ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ Р·Р°РїСѓСЃРєР° СЃРєСЂРёРЅ-СЃРµР№РІРµСЂР°
 };
 
 typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
@@ -341,7 +341,7 @@ typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* CarbonApplicationManager::CreateDefaultApplicationDelegate ()
@@ -350,7 +350,7 @@ IApplicationDelegate* CarbonApplicationManager::CreateDefaultApplicationDelegate
 }
 
 /*
-   Открытие URL во внешнем браузере
+   РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void CarbonApplicationManager::OpenUrl (const char* url)
@@ -367,7 +367,7 @@ void CarbonApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-   Управление энергосбережением
+   РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void CarbonApplicationManager::SetScreenSaverState (bool state)

@@ -3,7 +3,7 @@
 using namespace network;
 
 /*
-   Получение ip-адреса по имени хоста
+   РџРѕР»СѓС‡РµРЅРёРµ ip-Р°РґСЂРµСЃР° РїРѕ РёРјРµРЅРё С…РѕСЃС‚Р°
 */
 
 void UnistdPlatform::GetAddressByHostName (const char* host_name, size_t& address_size, unsigned char (&address) [16])

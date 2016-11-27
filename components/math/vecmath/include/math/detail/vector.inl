@@ -16,7 +16,7 @@ namespace detail
 {
 
 /*
-    Получение указателя на компоненты
+    РџРѕР»СѓС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ РЅР° РєРѕРјРїРѕРЅРµРЅС‚С‹
 */
 
 template <class T, unsigned int Size>
@@ -68,7 +68,7 @@ inline const T* get_components (const vector<T, 2>& v)
 }
 
 /*
-    Покомпонентные векторные операции
+    РџРѕРєРѕРјРїРѕРЅРµРЅС‚РЅС‹Рµ РІРµРєС‚РѕСЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 struct vec_add {
@@ -152,7 +152,7 @@ struct vec_div_scalar {
 };
 
 /*
-    Векторное присваивание
+    Р’РµРєС‚РѕСЂРЅРѕРµ РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 struct vec_copy {
@@ -192,7 +192,7 @@ struct vec_assign_scalar {
 };
 
 /*
-        Утилиты
+        РЈС‚РёР»РёС‚С‹
 */
 
 struct vec_neg {
@@ -270,7 +270,7 @@ struct vec_max {
 };
 
 /*
-    Векторное произведение
+    Р’РµРєС‚РѕСЂРЅРѕРµ РїСЂРѕРёР·РІРµРґРµРЅРёРµ
 */
 
 struct vec_cross_product {
@@ -320,7 +320,7 @@ inline void init_data (T* start, T* end)
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T, unsigned int Size>
@@ -390,7 +390,7 @@ vector<T, Size>::vector (const vector<value_type, size-1>& v, const value_type& 
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T, unsigned int Size> template <unsigned int Size1>
@@ -415,7 +415,7 @@ vector<T, Size>& vector<T, Size>::operator = (const T& a)
 }
 
 /*
-    Операции доступа
+    РћРїРµСЂР°С†РёРё РґРѕСЃС‚СѓРїР°
 */
 
 template <class T, unsigned int Size>
@@ -431,7 +431,7 @@ const typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsign
 }
 
 /*
-    Базовые унарные опреации
+    Р‘Р°Р·РѕРІС‹Рµ СѓРЅР°СЂРЅС‹Рµ РѕРїСЂРµР°С†РёРё
 */
 
 template <class T, unsigned int Size>
@@ -447,7 +447,7 @@ vector<T, Size> vector<T, Size>::operator - () const
 }
 
 /*
-    Базовые бинарные операции
+    Р‘Р°Р·РѕРІС‹Рµ Р±РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T, unsigned int Size>
@@ -535,7 +535,7 @@ vector<T, Size> vector<T, Size>::operator / (const T& a) const
 }
 
 /*
-    Сравнение векторов
+    РЎСЂР°РІРЅРµРЅРёРµ РІРµРєС‚РѕСЂРѕРІ
 */
 
 template <class T, unsigned int Size>
@@ -555,7 +555,7 @@ bool vector<T, Size>::operator != (const vector& v) const
 }
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 template <class T, unsigned int Size> 
@@ -588,7 +588,7 @@ vector<T, Size> max (const vector<T, Size>& a, const vector<T, Size>& b)
 } 
 
 /*
-    Длина и нормализация
+    Р”Р»РёРЅР° Рё РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ
 */
 
 template <class T, unsigned int Size> 
@@ -636,7 +636,7 @@ bool equal (const vector<T, Size>& a, const vector<T, Size>& b, const T& eps)
 }
 
 /*
-    Векторное произведение
+    Р’РµРєС‚РѕСЂРЅРѕРµ РїСЂРѕРёР·РІРµРґРµРЅРёРµ
 */
 
 template <class T>

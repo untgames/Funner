@@ -13,7 +13,7 @@ struct sensor_handle;
 namespace syslib
 {
 
-/// Дескриптор сенсора
+/// Р”РµСЃРєСЂРёРїС‚РѕСЂ СЃРµРЅСЃРѕСЂР°
 struct sensor_handle
 {
   global_ref<jobject>   sensor;
@@ -32,7 +32,7 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char* ANDROID_SENSOR_MANAGER_CLASS_NAME    = "android/hardware/SensorManager";
@@ -40,7 +40,7 @@ const char* ANDROID_SENSOR_CLASS_NAME            = "android/hardware/Sensor";
 const char* ANDROID_LIST_CLASS_NAME              = "java/util/List";
 const char* LOG_NAME                             = "system.android.sensors";
 
-/// Типы сенсоров
+/// РўРёРїС‹ СЃРµРЅСЃРѕСЂРѕРІ
 enum SensorType
 {
   SENSOR_TYPE_ACCELEROMETER       = 1,
@@ -59,7 +59,7 @@ enum SensorType
   SENSOR_TYPE_ALL                 = -1,    
 };
 
-/// Типы частоты обновления сенсоров
+/// РўРёРїС‹ С‡Р°СЃС‚РѕС‚С‹ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРµРЅСЃРѕСЂРѕРІ
 enum SensorRateType
 {
   SENSOR_DELAY_FASTEST = 0,
@@ -68,7 +68,7 @@ enum SensorRateType
   SENSOR_DELAY_NORMAL  = 3,  
 };
 
-/// Ориентации
+/// РћСЂРёРµРЅС‚Р°С†РёРё
 enum Orientation
 {
   ORIENTATION_ROTATION_0,
@@ -78,19 +78,19 @@ enum Orientation
 };
 
 /*
-    JNI шлюз к менеджеру сенсоров
+    JNI С€Р»СЋР· Рє РјРµРЅРµРґР¶РµСЂСѓ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 class JniSensorManager
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     JniSensorManager ()
       : log (LOG_NAME)
     {
       try
       {                 
-          //сохранение общих методов и классов SensorManager
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РѕР±С‰РёС… РјРµС‚РѕРґРѕРІ Рё РєР»Р°СЃСЃРѕРІ SensorManager
           
         JNIEnv& env = get_env ();        
 
@@ -113,7 +113,7 @@ class JniSensorManager
         register_listener_method   = find_method (&env, sensor_manager_class.get (), "registerListener", "(Landroid/hardware/SensorEventListener;Landroid/hardware/Sensor;I)Z");
         unregister_listener_method = find_method (&env, sensor_manager_class.get (), "unregisterListener", "(Landroid/hardware/SensorEventListener;Landroid/hardware/Sensor;)V");
         
-          //сохранение общих методов и классов List
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РѕР±С‰РёС… РјРµС‚РѕРґРѕРІ Рё РєР»Р°СЃСЃРѕРІ List
         
         list_class = local_ref<jclass> (env.FindClass (ANDROID_LIST_CLASS_NAME), false);
         
@@ -123,7 +123,7 @@ class JniSensorManager
         get_list_size_method = find_method (&env, list_class.get (), "size", "()I");
         get_list_item_method = find_method (&env, list_class.get (), "get", "(I)Ljava/lang/Object;");
         
-          //сохранение общих методов и классов Sensor
+          //СЃРѕС…СЂР°РЅРµРЅРёРµ РѕР±С‰РёС… РјРµС‚РѕРґРѕРІ Рё РєР»Р°СЃСЃРѕРІ Sensor
           
         sensor_class = local_ref<jclass> (env.FindClass (ANDROID_SENSOR_CLASS_NAME), false);
         
@@ -142,7 +142,7 @@ class JniSensorManager
         if (env.ExceptionOccurred ())
           env.ExceptionClear ();         
                 
-          //заполнение таблиц сенсоров
+          //Р·Р°РїРѕР»РЅРµРЅРёРµ С‚Р°Р±Р»РёС† СЃРµРЅСЃРѕСЂРѕРІ
         
         AddSensors (SENSOR_TYPE_ALL);        
       }
@@ -153,13 +153,13 @@ class JniSensorManager
       }      
     }
     
-///Количество сенсоров
+///РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
     size_t SensorsCount () { return sensors.size (); }
     
-///Получение сенсора
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
     global_ref<jobject> Sensor (size_t index) { return sensors [index]; }
     
-///Получение имени сенсора
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё СЃРµРЅСЃРѕСЂР°
     jstring SensorName       (const global_ref<jobject>& sensor) { return (jstring)get_env ().CallObjectMethod (sensor.get (), get_sensor_name_method); }
     jstring SensorVendor     (const global_ref<jobject>& sensor) { return (jstring)get_env ().CallObjectMethod (sensor.get (), get_sensor_vendor_method); }
     int     SensorType       (const global_ref<jobject>& sensor) { return get_env ().CallIntMethod (sensor.get (), get_sensor_type_method); }
@@ -169,7 +169,7 @@ class JniSensorManager
     float   SensorPower      (const global_ref<jobject>& sensor) { return get_env ().CallFloatMethod (sensor.get (), get_sensor_power_method); }
     float   SensorResolution (const global_ref<jobject>& sensor) { return get_env ().CallFloatMethod (sensor.get (), get_sensor_resolution_method); }    
     
-///Обработчик события изменения сенсора
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃРµРЅСЃРѕСЂР°
     void OnSensorChanged (sensor_handle& handle, jlong timestamp, const local_ref<jfloatArray>& values, Orientation orientation)
     {
       try
@@ -239,7 +239,7 @@ class JniSensorManager
       }
     }
     
-///Начало получения событий от сенсора
+///РќР°С‡Р°Р»Рѕ РїРѕР»СѓС‡РµРЅРёСЏ СЃРѕР±С‹С‚РёР№ РѕС‚ СЃРµРЅСЃРѕСЂР°
     void StartSensorPolling (sensor_handle& handle, ISensorEventListener& listener)
     {            
       if (handle.app_listener)
@@ -253,7 +253,7 @@ class JniSensorManager
       handle.app_listener = &listener;
     }
     
-///Конец получения событий от сенсора
+///РљРѕРЅРµС† РїРѕР»СѓС‡РµРЅРёСЏ СЃРѕР±С‹С‚РёР№ РѕС‚ СЃРµРЅСЃРѕСЂР°
     void StopSensorPolling (sensor_handle& handle)
     {
       if (!handle.app_listener)
@@ -265,7 +265,7 @@ class JniSensorManager
     }    
 
   private:
-///Получение менеджер сенсоров
+///РџРѕР»СѓС‡РµРЅРёРµ РјРµРЅРµРґР¶РµСЂ СЃРµРЅСЃРѕСЂРѕРІ
     local_ref<jobject> GetSensorManager ()
     {
       JNIEnv& env = get_env ();
@@ -292,7 +292,7 @@ class JniSensorManager
       return sensor_manager;
     }
   
-///Добавление сенсоров
+///Р”РѕР±Р°РІР»РµРЅРёРµ СЃРµРЅСЃРѕСЂРѕРІ
     void AddSensors (int type)
     {
       try
@@ -333,25 +333,25 @@ class JniSensorManager
     typedef stl::vector<SensorPtr> SensorArray;
       
   private:
-    common::Log         log;                           //поток отладочного протоколирования
-    SensorArray         sensors;                       //список сенсоров
-    global_ref<jclass>  sensor_manager_class;          //класс менеджера сенсоров
-    jmethodID           get_sensor_list_method;        //метод получения списка сенсоров
-    jmethodID           register_listener_method;      //метод подписки на события сенсоров
-    jmethodID           unregister_listener_method;    //метод отмены подписки на события сенсоров
-    global_ref<jclass>  list_class;                    //класс работы со списком
-    jmethodID           get_list_size_method;          //метод получения количества элементов в списке
-    jmethodID           get_list_item_method;          //метод получения элемента списка
-    global_ref<jclass>  sensor_class;                  //класс работы с сенсором
-    jmethodID           get_sensor_name_method;        //метод получения имени сенсора
-    jmethodID           get_sensor_type_method;        //метод получения типа сенсора
-    jmethodID           get_sensor_vendor_method;      //метод получения производителя сенсора
-    jmethodID           get_sensor_max_range_method;   //метод получения максимального значения сенсора
-    jmethodID           get_sensor_min_delay_method;   //метод получения минимальной задержки между событиями сенсора
-    jmethodID           get_sensor_version_method;     //метод получения версии сенсора
-    jmethodID           get_sensor_resolution_method;  //метод получения разрешающей способности сенсора
-    jmethodID           get_sensor_power_method;       //метод получения потребления энергии сенсором
-    global_ref<jobject> event_listener;                //слушатель событий сенсоров
+    common::Log         log;                           //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    SensorArray         sensors;                       //СЃРїРёСЃРѕРє СЃРµРЅСЃРѕСЂРѕРІ
+    global_ref<jclass>  sensor_manager_class;          //РєР»Р°СЃСЃ РјРµРЅРµРґР¶РµСЂР° СЃРµРЅСЃРѕСЂРѕРІ
+    jmethodID           get_sensor_list_method;        //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ СЃРїРёСЃРєР° СЃРµРЅСЃРѕСЂРѕРІ
+    jmethodID           register_listener_method;      //РјРµС‚РѕРґ РїРѕРґРїРёСЃРєРё РЅР° СЃРѕР±С‹С‚РёСЏ СЃРµРЅСЃРѕСЂРѕРІ
+    jmethodID           unregister_listener_method;    //РјРµС‚РѕРґ РѕС‚РјРµРЅС‹ РїРѕРґРїРёСЃРєРё РЅР° СЃРѕР±С‹С‚РёСЏ СЃРµРЅСЃРѕСЂРѕРІ
+    global_ref<jclass>  list_class;                    //РєР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїРёСЃРєРѕРј
+    jmethodID           get_list_size_method;          //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ РІ СЃРїРёСЃРєРµ
+    jmethodID           get_list_item_method;          //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
+    global_ref<jclass>  sensor_class;                  //РєР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃ СЃРµРЅСЃРѕСЂРѕРј
+    jmethodID           get_sensor_name_method;        //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РёРјРµРЅРё СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_type_method;        //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ С‚РёРїР° СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_vendor_method;      //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЏ СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_max_range_method;   //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_min_delay_method;   //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РјРёРЅРёРјР°Р»СЊРЅРѕР№ Р·Р°РґРµСЂР¶РєРё РјРµР¶РґСѓ СЃРѕР±С‹С‚РёСЏРјРё СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_version_method;     //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РІРµСЂСЃРёРё СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_resolution_method;  //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ СЂР°Р·СЂРµС€Р°СЋС‰РµР№ СЃРїРѕСЃРѕР±РЅРѕСЃС‚Рё СЃРµРЅСЃРѕСЂР°
+    jmethodID           get_sensor_power_method;       //РјРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РїРѕС‚СЂРµР±Р»РµРЅРёСЏ СЌРЅРµСЂРіРёРё СЃРµРЅСЃРѕСЂРѕРј
+    global_ref<jobject> event_listener;                //СЃР»СѓС€Р°С‚РµР»СЊ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂРѕРІ
 };
 
 typedef common::Singleton<JniSensorManager> JniSensorManagerSingleton;
@@ -382,13 +382,13 @@ sensor_handle::sensor_handle (const global_ref<jobject>& in_sensor)
     if (type == SENSOR_TYPE_ACCELEROMETER)
       value_multiplier = 1.f / 9.8f;
 
-      //получение методов создания и удаления слушателя
+      //РїРѕР»СѓС‡РµРЅРёРµ РјРµС‚РѕРґРѕРІ СЃРѕР·РґР°РЅРёСЏ Рё СѓРґР°Р»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
 
     jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(JLandroid/content/Context;)V");
 
     reset_reference_method = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
 
-      //создание слушателя
+      //СЃРѕР·РґР°РЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 
     event_listener = local_ref<jobject> (get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ()), false);
 
@@ -406,7 +406,7 @@ sensor_handle::~sensor_handle ()
 {
   try
   {
-      //сброс ссылки
+      //СЃР±СЂРѕСЃ СЃСЃС‹Р»РєРё
 
     get_env ().CallVoidMethod (event_listener.get (), reset_reference_method);
   }
@@ -417,7 +417,7 @@ sensor_handle::~sensor_handle ()
 
 
 /*
-    Количество сенсоров
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 size_t AndroidSensorManager::GetSensorsCount ()
@@ -434,7 +434,7 @@ size_t AndroidSensorManager::GetSensorsCount ()
 }
 
 /*
-    Создание / удаление сенсора
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
 */
 
 sensor_t AndroidSensorManager::CreateSensor (size_t sensor_index)
@@ -461,7 +461,7 @@ void AndroidSensorManager::DestroySensor (sensor_t handle)
 }
 
 /*
-    Имя сенсора
+    РРјСЏ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string AndroidSensorManager::GetSensorName (sensor_t handle)
@@ -481,7 +481,7 @@ stl::string AndroidSensorManager::GetSensorName (sensor_t handle)
 }
 
 /*
-    Производитель сенсора
+    РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string AndroidSensorManager::GetSensorVendor (sensor_t handle)
@@ -501,7 +501,7 @@ stl::string AndroidSensorManager::GetSensorVendor (sensor_t handle)
 }
 
 /*
-    Тип устройства
+    РўРёРї СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 stl::string AndroidSensorManager::GetSensorType (sensor_t handle)
@@ -538,7 +538,7 @@ stl::string AndroidSensorManager::GetSensorType (sensor_t handle)
 }
 
 /*
-    Максимальное значение
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 */
 
 float AndroidSensorManager::GetSensorMaxRange (sensor_t handle)
@@ -558,7 +558,7 @@ float AndroidSensorManager::GetSensorMaxRange (sensor_t handle)
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void AndroidSensorManager::SetSensorUpdateRate (sensor_t handle, float rate)
@@ -591,7 +591,7 @@ float AndroidSensorManager::GetSensorUpdateRate (sensor_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* AndroidSensorManager::GetNativeSensorHandle (sensor_t handle)
@@ -603,7 +603,7 @@ const void* AndroidSensorManager::GetNativeSensorHandle (sensor_t handle)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void AndroidSensorManager::GetSensorProperties (sensor_t handle, common::PropertyMap& properties)
@@ -627,7 +627,7 @@ void AndroidSensorManager::GetSensorProperties (sensor_t handle, common::Propert
 }
 
 /*
-    Чтение событий сенсора
+    Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
 */
 
 void AndroidSensorManager::StartSensorPolling (sensor_t handle, ISensorEventListener& listener)
@@ -672,7 +672,7 @@ namespace syslib
 namespace android
 {
 
-/// регистрация методов обратного вызова менеджера сенсоров
+/// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РјРµС‚РѕРґРѕРІ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РјРµРЅРµРґР¶РµСЂР° СЃРµРЅСЃРѕСЂРѕРІ
 void register_sensor_manager_callbacks (JNIEnv* env)
 {
   try

@@ -186,7 +186,7 @@ struct syslib::web_view_handle
 }*/
 
 /*
-   Создание/уничтожение web-view
+   РЎРѕР·РґР°РЅРёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ web-view
 */
 
 web_view_t CarbonWindowManager::CreateWebView (IWebViewListener* listener)
@@ -202,7 +202,7 @@ void CarbonWindowManager::DestroyWebView (web_view_t handle)
 }
 
 /*
-   Присоединенное окно
+   РџСЂРёСЃРѕРµРґРёРЅРµРЅРЅРѕРµ РѕРєРЅРѕ
 */
 
 window_t CarbonWindowManager::GetWindow (web_view_t handle)
@@ -214,7 +214,7 @@ window_t CarbonWindowManager::GetWindow (web_view_t handle)
 }
 
 /*
-   Загрузка данных
+   Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
 */
 
 void CarbonWindowManager::LoadRequest (web_view_t handle, const char* uri)
@@ -279,7 +279,7 @@ void CarbonWindowManager::LoadData (web_view_t handle, const char* data, size_t 
 }
 
 /*
-   Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+   РџРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹ / РѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РіСЂСѓР·РєРё / РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ Р·Р°РіСЂСѓР·РєРё
 */
 
 void CarbonWindowManager::Reload (web_view_t handle)
@@ -307,7 +307,7 @@ bool CarbonWindowManager::IsLoading (web_view_t handle)
 }
 
 /*
-   Средства навигации
+   РЎСЂРµРґСЃС‚РІР° РЅР°РІРёРіР°С†РёРё
 */
 
 bool CarbonWindowManager::CanGoBack (web_view_t handle)

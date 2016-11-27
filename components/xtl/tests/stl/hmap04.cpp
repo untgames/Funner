@@ -1,4 +1,4 @@
-// í•·‚®‡Æ¢†≠®• erase () ® clear ()
+// –¢–µ—Å—Ç–∏—Ä–æ–≤–∞–Ω–∏–µ erase () –∏ clear ()
 #include <stdio.h>
 #include <stl/hash_map>
 #include <stl/string>

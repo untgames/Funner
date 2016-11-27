@@ -1,19 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Синхронизатор буфера
+///РЎРёРЅС…СЂРѕРЅРёР·Р°С‚РѕСЂ Р±СѓС„РµСЂР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вспомогательные структуры
+///Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     struct Chunk
     {
-      size_t                          slot;       //индекс слота
-      size_t                          src_offset; //смещение в исходном буфере
-      size_t                          dst_offset; //смещение в результирующем буфере
-      size_t                          size;       //размер блока
-      ShaderParameterConvertOperation operation;  //операция преобразования
+      size_t                          slot;       //РёРЅРґРµРєСЃ СЃР»РѕС‚Р°
+      size_t                          src_offset; //СЃРјРµС‰РµРЅРёРµ РІ РёСЃС…РѕРґРЅРѕРј Р±СѓС„РµСЂРµ
+      size_t                          dst_offset; //СЃРјРµС‰РµРЅРёРµ РІ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРј Р±СѓС„РµСЂРµ
+      size_t                          size;       //СЂР°Р·РјРµСЂ Р±Р»РѕРєР°
+      ShaderParameterConvertOperation operation;  //РѕРїРµСЂР°С†РёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 
       Chunk () : slot (), src_offset (), dst_offset (), size (), operation (ShaderParameterConvertOperation_Copy) {}
 
@@ -22,8 +22,8 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
 
     struct Slot
     {
-      size_t first_chunk;          //индекс первого блока
-      size_t min_src_buffer_size;  //минимальный размер буфера
+      size_t first_chunk;          //РёРЅРґРµРєСЃ РїРµСЂРІРѕРіРѕ Р±Р»РѕРєР°
+      size_t min_src_buffer_size;  //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР°
 
       Slot () : first_chunk (), min_src_buffer_size () {}
     };
@@ -31,27 +31,27 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
     typedef stl::vector<Chunk> ChunkArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ShaderBuffersSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение минимального размера буфера для указанного слота
-/// (без проверок корректности аргументов)
+///РџРѕР»СѓС‡РµРЅРёРµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЃР»РѕС‚Р°
+/// (Р±РµР· РїСЂРѕРІРµСЂРѕРє РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetMinSourceBufferSize      (size_t slot_index) const { return slots [slot_index].min_src_buffer_size; }
     size_t GetMinDestinationBufferSize ()                  const { return min_dst_buffer_size; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение слотов и блоков
+///РџРѕР»СѓС‡РµРЅРёРµ СЃР»РѕС‚РѕРІ Рё Р±Р»РѕРєРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t       GetChunksCount () const { return chunks.size (); }
     const Chunk* GetChunks      () const { return chunks.empty () ? (Chunk*)0 : &chunks [0]; }
     const Slot*  GetSlots       () const { return &slots [0]; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Копирование
-/// (без проверок корректности аргументов)
+///РљРѕРїРёСЂРѕРІР°РЅРёРµ
+/// (Р±РµР· РїСЂРѕРІРµСЂРѕРє РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё Р°СЂРіСѓРјРµРЅС‚РѕРІ)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CopyTo (size_t slot_index, const char* src_buffer, char* dst_buffer) const
     {
@@ -84,9 +84,9 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
     }
 
   private:
-    ChunkArray chunks;                                     //блоки синхронизации
-    Slot       slots [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //соответствие слоты константного буфера
-    size_t     min_dst_buffer_size;                        //минимальный размер результирующего буфера
+    ChunkArray chunks;                                     //Р±Р»РѕРєРё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+    Slot       slots [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЃР»РѕС‚С‹ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
+    size_t     min_dst_buffer_size;                        //РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ Р±СѓС„РµСЂР°
 };
 
 typedef xtl::intrusive_ptr<ShaderBuffersSynchronizer> ShaderBuffersSynchronizerPtr;

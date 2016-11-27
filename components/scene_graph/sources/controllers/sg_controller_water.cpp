@@ -7,29 +7,29 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const float DEFAULT_VISCOSITY = 0.1f;  //вязкость по умолчанию
-const float TIME_STEP         = 0.03f; //шаг интеграции
-const float NORMAL_Z_FACTOR   = -4.0f; //коэффициент масштабирования нормали
+const float DEFAULT_VISCOSITY = 0.1f;  //РІСЏР·РєРѕСЃС‚СЊ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+const float TIME_STEP         = 0.03f; //С€Р°Рі РёРЅС‚РµРіСЂР°С†РёРё
+const float NORMAL_Z_FACTOR   = -4.0f; //РєРѕСЌС„С„РёС†РёРµРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РЅРѕСЂРјР°Р»Рё
 
 }
 
 /*
-    Описание реализации контроллера воды
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІРѕРґС‹
 */
 
 typedef stl::vector<float> WaterField;
 
 struct Water::Impl: public xtl::instance_counter<Water>
 {
-  HeightMap*  height_map; //карта высот
-  float       viscosity;  //вязкость
-  float       current_dt; //текущее накопленный шаг времени
-  WaterField  fields [2]; //поля расчёт воды
-  float*      prev_field; //предыдущее поле
-  float*      next_field; //следующее поле
+  HeightMap*  height_map; //РєР°СЂС‚Р° РІС‹СЃРѕС‚
+  float       viscosity;  //РІСЏР·РєРѕСЃС‚СЊ
+  float       current_dt; //С‚РµРєСѓС‰РµРµ РЅР°РєРѕРїР»РµРЅРЅС‹Р№ С€Р°Рі РІСЂРµРјРµРЅРё
+  WaterField  fields [2]; //РїРѕР»СЏ СЂР°СЃС‡С‘С‚ РІРѕРґС‹
+  float*      prev_field; //РїСЂРµРґС‹РґСѓС‰РµРµ РїРѕР»Рµ
+  float*      next_field; //СЃР»РµРґСѓСЋС‰РµРµ РїРѕР»Рµ
 
   Impl (HeightMap& in_height_map)
     : height_map (&in_height_map)
@@ -42,7 +42,7 @@ struct Water::Impl: public xtl::instance_counter<Water>
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Water::Water (HeightMap& map)
@@ -59,7 +59,7 @@ Water::~Water ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 Water::Pointer Water::Create (HeightMap& map)
@@ -68,7 +68,7 @@ Water::Pointer Water::Create (HeightMap& map)
 }
 
 /*
-    Вязкость
+    Р’СЏР·РєРѕСЃС‚СЊ
 */
 
 void Water::SetViscosity (float value)
@@ -82,7 +82,7 @@ float Water::Viscosity () const
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void Water::Update (const TimeValue& time_value)
@@ -141,7 +141,7 @@ void Water::Update (const TimeValue& time_value)
 }
 
 /*
-    Изменение размеров карты
+    РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РєР°СЂС‚С‹
 */
 
 void Water::OnChangeSizes ()
@@ -151,7 +151,7 @@ void Water::OnChangeSizes ()
     
   try
   {
-      //инициализация полей
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕР»РµР№
     
     impl->fields [0].clear ();
     impl->fields [1].clear ();
@@ -185,7 +185,7 @@ void Water::OnChangeSizes ()
 }
 
 /*
-    Узел был удалён
+    РЈР·РµР» Р±С‹Р» СѓРґР°Р»С‘РЅ
 */
 
 void Water::OnNodeDetached ()
@@ -202,7 +202,7 @@ void Water::OnNodeDetached ()
 }
 
 /*
-    Добавление возмущения
+    Р”РѕР±Р°РІР»РµРЅРёРµ РІРѕР·РјСѓС‰РµРЅРёСЏ
 */
 
 void Water::PutStorm (const math::vec3f& position, float amplitude, float radius)

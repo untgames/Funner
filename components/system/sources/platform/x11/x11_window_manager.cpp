@@ -7,20 +7,20 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_WINDOW_X       = 0;            //координата X по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_Y       = 0;            //координата Y по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_WIDTH   = 100;          //ширина по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_HEIGHT  = 100;          //высота по умолчанию при создании окна
-const size_t EVENT_WAIT_TIMEOUT_SEC = 1;            //тайм-аут при ожидании сообщения
-const char*  LOG_NAME               = "system.x11"; //имя канала протоколирования
+const size_t DEFAULT_WINDOW_X       = 0;            //РєРѕРѕСЂРґРёРЅР°С‚Р° X РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РїСЂРё СЃРѕР·РґР°РЅРёРё РѕРєРЅР°
+const size_t DEFAULT_WINDOW_Y       = 0;            //РєРѕРѕСЂРґРёРЅР°С‚Р° Y РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РїСЂРё СЃРѕР·РґР°РЅРёРё РѕРєРЅР°
+const size_t DEFAULT_WINDOW_WIDTH   = 100;          //С€РёСЂРёРЅР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РїСЂРё СЃРѕР·РґР°РЅРёРё РѕРєРЅР°
+const size_t DEFAULT_WINDOW_HEIGHT  = 100;          //РІС‹СЃРѕС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РїСЂРё СЃРѕР·РґР°РЅРёРё РѕРєРЅР°
+const size_t EVENT_WAIT_TIMEOUT_SEC = 1;            //С‚Р°Р№Рј-Р°СѓС‚ РїСЂРё РѕР¶РёРґР°РЅРёРё СЃРѕРѕР±С‰РµРЅРёСЏ
+const char*  LOG_NAME               = "system.x11"; //РёРјСЏ РєР°РЅР°Р»Р° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
 typedef ::Window XWindow;
 
 /*
-    Блокировка соединения X11
+    Р‘Р»РѕРєРёСЂРѕРІРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ X11
 */
 
 class DisplayLock
@@ -41,7 +41,7 @@ class DisplayLock
 };
 
 /*
-    Преобразование виртуальных кодов клавиш в syslib::Key
+    РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РІРёСЂС‚СѓР°Р»СЊРЅС‹С… РєРѕРґРѕРІ РєР»Р°РІРёС€ РІ syslib::Key
 */
 
 Key VirtualKey2SystemKey (KeySym vkey)
@@ -150,7 +150,7 @@ Key VirtualKey2SystemKey (KeySym vkey)
 }
 
 /*
-    Интерфейс диспетчеризации оконных сообщений
+    РРЅС‚РµСЂС„РµР№СЃ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёРё РѕРєРѕРЅРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 */
 
 class IWindowMessageHandler
@@ -163,13 +163,13 @@ class IWindowMessageHandler
 };
 
 /*
-    Менеджер соединения с дисплеем
+    РњРµРЅРµРґР¶РµСЂ СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ РґРёСЃРїР»РµРµРј
 */
 
 class DisplayManagerImpl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DisplayManagerImpl ()
       : log (LOG_NAME)
       , display (0)
@@ -178,7 +178,7 @@ class DisplayManagerImpl
     {
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~DisplayManagerImpl ()
     {       
       try
@@ -206,7 +206,7 @@ class DisplayManagerImpl
       }
     }
     
-///Ссылка на дисплей
+///РЎСЃС‹Р»РєР° РЅР° РґРёСЃРїР»РµР№
     void SetDisplayString (const char* in_display_string)
     {
       static const char* METHOD_NAME = "syslib::x11::DisplayManagerImpl::SetDisplay";
@@ -225,7 +225,7 @@ class DisplayManagerImpl
       return display_string.c_str ();
     }
     
-///Необходимость синхронизации
+///РќРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
     void SetSyncMode (bool state)
     {
       if (sync_mode == state)
@@ -246,7 +246,7 @@ class DisplayManagerImpl
       return sync_mode;
     }
     
-///Получение дисплея
+///РџРѕР»СѓС‡РµРЅРёРµ РґРёСЃРїР»РµСЏ
     ::Display* Display ()
     {
       try
@@ -282,7 +282,7 @@ class DisplayManagerImpl
           XSynchronize (display, sync_mode);
         }
                   
-          //запуск нити обработки событий
+          //Р·Р°РїСѓСЃРє РЅРёС‚Рё РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№
           
         log.Printf ("...starting X11 events processing thread");
 
@@ -297,7 +297,7 @@ class DisplayManagerImpl
       }
     }
     
-///Регистрация окна
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР°
     void RegisterWindow (XWindow window, IWindowMessageHandler* handler)
     {
       handlers [window] = handler;
@@ -309,12 +309,12 @@ class DisplayManagerImpl
     }
     
   private:
-///Функция нити обработки событий окна
+///Р¤СѓРЅРєС†РёСЏ РЅРёС‚Рё РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
     int EventsThreadRoutine ()
     {
       log.Printf ("X11 events thread started");      
       
-        //получение файлового дескриптора соединения с дисплеем
+        //РїРѕР»СѓС‡РµРЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ РґРёСЃРїР»РµРµРј
         
       int display_connection_fd = 0;
       
@@ -324,20 +324,20 @@ class DisplayManagerImpl
         display_connection_fd = ConnectionNumber (display);
       }
       
-        //настройка тайм-аута
+        //РЅР°СЃС‚СЂРѕР№РєР° С‚Р°Р№Рј-Р°СѓС‚Р°
       
       timeval timeout;
       
       timeout.tv_usec = 0;
       timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
 
-        //цикл обработки событий
+        //С†РёРєР» РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№
         
       XEvent event;
         
       while (event_loop)
       {
-          //ожидание появления события
+          //РѕР¶РёРґР°РЅРёРµ РїРѕСЏРІР»РµРЅРёСЏ СЃРѕР±С‹С‚РёСЏ
         
         fd_set in_fds;
         
@@ -345,26 +345,26 @@ class DisplayManagerImpl
         FD_SET  (display_connection_fd, &in_fds);
         
         if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))                
-          continue; //событие не пришло
+          continue; //СЃРѕР±С‹С‚РёРµ РЅРµ РїСЂРёС€Р»Рѕ
           
-          //обработка поступивших событий
+          //РѕР±СЂР°Р±РѕС‚РєР° РїРѕСЃС‚СѓРїРёРІС€РёС… СЃРѕР±С‹С‚РёР№
           
         DisplayLock lock (display);
           
         while (XPending (display))
         {
-            //извлечение события из очереди
+            //РёР·РІР»РµС‡РµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РёР· РѕС‡РµСЂРµРґРё
           
           XNextEvent (display, &event);
           
-            //поиск соответствующего обработчика
+            //РїРѕРёСЃРє СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
             
           WindowHandlerMap::iterator iter = handlers.find (reinterpret_cast<XAnyEvent&> (event).window);
           
           if (iter == handlers.end ())
             continue;
             
-            //диспетчеризация сообщения
+            //РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ СЃРѕРѕР±С‰РµРЅРёСЏ
 
           try
           {
@@ -393,13 +393,13 @@ class DisplayManagerImpl
     typedef stl::hash_map<XWindow, IWindowMessageHandler*> WindowHandlerMap;
 
   private:
-    common::Log           log;            //канал протоколирования
-    stl::string           display_string; //строка инициализации дисплея
-    ::Display*            display;        //ссылка на дисплей
-    bool                  sync_mode;      //находится ли соединение в режиме синхронизации
-    stl::auto_ptr<Thread> events_thread;  //нить обработки событий окна
-    bool                  event_loop;     //класс находится в состоянии обработки событий
-    WindowHandlerMap      handlers;       //отображение системных окон на внутренние структуры обработки сообщений
+    common::Log           log;            //РєР°РЅР°Р» РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+    stl::string           display_string; //СЃС‚СЂРѕРєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РґРёСЃРїР»РµСЏ
+    ::Display*            display;        //СЃСЃС‹Р»РєР° РЅР° РґРёСЃРїР»РµР№
+    bool                  sync_mode;      //РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РІ СЂРµР¶РёРјРµ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+    stl::auto_ptr<Thread> events_thread;  //РЅРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РѕРєРЅР°
+    bool                  event_loop;     //РєР»Р°СЃСЃ РЅР°С…РѕРґРёС‚СЃСЏ РІ СЃРѕСЃС‚РѕСЏРЅРёРё РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№
+    WindowHandlerMap      handlers;       //РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… РѕРєРѕРЅ РЅР° РІРЅСѓС‚СЂРµРЅРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
 };
 
 typedef common::Singleton<DisplayManagerImpl> DisplayManagerSingleton;
@@ -413,13 +413,13 @@ typedef common::Singleton<DisplayManagerImpl> DisplayManagerSingleton;
 */
 
 /*
-    Описание реализации курсора
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСѓСЂСЃРѕСЂР°
 */
 
 struct syslib::cursor_handle
 {
-  Display* display; //ссылка на соединение с дисплеем
-  Cursor   cursor;  //ссылка на X11 курсор
+  Display* display; //СЃСЃС‹Р»РєР° РЅР° СЃРѕРµРґРёРЅРµРЅРёРµ СЃ РґРёСЃРїР»РµРµРј
+  Cursor   cursor;  //СЃСЃС‹Р»РєР° РЅР° X11 РєСѓСЂСЃРѕСЂ
 
   cursor_handle (Display* in_display)
     : display (in_display)
@@ -428,28 +428,28 @@ struct syslib::cursor_handle
 };
 
 /*
-    Описание реализации окна
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР°
 */
 
 struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue::Handler
 {
-  Display*             display;               //дисплей для данного окна
-  XWindow              window;                //дескриптор окна
-  bool                 is_destroyed;          //удалено ли окно
-  bool                 background_state;      //ложное свойство - состояние фона
-  Rect                 window_rect;           //область окна
-  bool                 window_rect_init;      //инициализирована ли область окна
-  Cursor               invisible_cursor;      //невидимый курсор
-  bool                 is_cursor_visible;     //видим ли курсор
-  cursor_t             active_cursor;         //активный курсор окна
-  syslib::Color        background_color;      //цвет заднего фона
-  MessageQueue&        message_queue;         //очередь событий
-  WindowMessageHandler message_handler;       //функция обработки сообщений окна
-  void*                user_data;             //пользовательские данные для функции обратного вызова
-  bool                 is_multitouch_enabled; //включен ли multi touch
-  Atom                 wm_delete;             //атом свойства WM_DELETE_WINDOW
+  Display*             display;               //РґРёСЃРїР»РµР№ РґР»СЏ РґР°РЅРЅРѕРіРѕ РѕРєРЅР°
+  XWindow              window;                //РґРµСЃРєСЂРёРїС‚РѕСЂ РѕРєРЅР°
+  bool                 is_destroyed;          //СѓРґР°Р»РµРЅРѕ Р»Рё РѕРєРЅРѕ
+  bool                 background_state;      //Р»РѕР¶РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ - СЃРѕСЃС‚РѕСЏРЅРёРµ С„РѕРЅР°
+  Rect                 window_rect;           //РѕР±Р»Р°СЃС‚СЊ РѕРєРЅР°
+  bool                 window_rect_init;      //РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅР° Р»Рё РѕР±Р»Р°СЃС‚СЊ РѕРєРЅР°
+  Cursor               invisible_cursor;      //РЅРµРІРёРґРёРјС‹Р№ РєСѓСЂСЃРѕСЂ
+  bool                 is_cursor_visible;     //РІРёРґРёРј Р»Рё РєСѓСЂСЃРѕСЂ
+  cursor_t             active_cursor;         //Р°РєС‚РёРІРЅС‹Р№ РєСѓСЂСЃРѕСЂ РѕРєРЅР°
+  syslib::Color        background_color;      //С†РІРµС‚ Р·Р°РґРЅРµРіРѕ С„РѕРЅР°
+  MessageQueue&        message_queue;         //РѕС‡РµСЂРµРґСЊ СЃРѕР±С‹С‚РёР№
+  WindowMessageHandler message_handler;       //С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РѕРєРЅР°
+  void*                user_data;             //РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ РґР»СЏ С„СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР°
+  bool                 is_multitouch_enabled; //РІРєР»СЋС‡РµРЅ Р»Рё multi touch
+  Atom                 wm_delete;             //Р°С‚РѕРј СЃРІРѕР№СЃС‚РІР° WM_DELETE_WINDOW
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   window_handle (WindowMessageHandler in_message_handler, void* in_user_data)
     : display (DisplayManagerSingleton::Instance ()->Display ())
     , window (0)
@@ -468,7 +468,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     message_queue.RegisterHandler (*this);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~window_handle ()
   {
     try
@@ -481,7 +481,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     }
   }
   
-///Получение контекста события
+///РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° СЃРѕР±С‹С‚РёСЏ
   void GetEventContext (WindowEventContext& context)
   {
     memset (&context, 0, sizeof (context));
@@ -489,7 +489,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     context.handle = this;
   }
   
-///Установка состояния клавиш
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РєР»Р°РІРёС€
   void GetKeysState (unsigned int state, WindowEventContext& context)
   {
     context.keyboard_alt_pressed        = false;
@@ -500,7 +500,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     context.mouse_middle_button_pressed = (state & Button2Mask) != 0;
   }
   
-///Отложенное сообщение
+///РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ
   struct Message: public MessageQueue::Message
   {
     WindowEvent        event;
@@ -528,7 +528,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   };
   
   
-///Обработчик события
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ
   void ProcessEvent (const XEvent& event)
   {
     xtl::intrusive_ptr<Message> message (new Message (*this), false);
@@ -674,7 +674,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     }
   }
   
-///Оповещение о возникновении события
+///РћРїРѕРІРµС‰РµРЅРёРµ Рѕ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё СЃРѕР±С‹С‚РёСЏ
   void Notify (WindowEvent event, const xtl::intrusive_ptr<Message>& message)
   {
     XUnlockDisplay (display);
@@ -694,13 +694,13 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }  
 };
 
 /*
-    Создание/закрытие/уничтожение окна
+    РЎРѕР·РґР°РЅРёРµ/Р·Р°РєСЂС‹С‚РёРµ/СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕРєРЅР°
 */
 
 namespace
@@ -791,7 +791,7 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
 {
   try
   {
-      //определение стиля окна
+      //РѕРїСЂРµРґРµР»РµРЅРёРµ СЃС‚РёР»СЏ РѕРєРЅР°
       
     switch (style)
     {
@@ -802,16 +802,16 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
         throw xtl::make_argument_exception ("", "style", style);
     }
     
-      //блокировка соединения с дисплеем
+      //Р±Р»РѕРєРёСЂРѕРІРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ РґРёСЃРїР»РµРµРј
       
     ::Display   *display = DisplayManagerSingleton::Instance ()->Display ();
     DisplayLock lock (display);
     
-      //создание дескриптора окна
+      //СЃРѕР·РґР°РЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 
     stl::auto_ptr<window_handle> impl (new window_handle (handler, user_data));
       
-      //создание окна
+      //СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°
 
     int blackColor = BlackPixel (impl->display, DefaultScreen (impl->display));
     
@@ -828,7 +828,7 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       
     try
     {      
-        //создание невидимого курсора
+        //СЃРѕР·РґР°РЅРёРµ РЅРµРІРёРґРёРјРѕРіРѕ РєСѓСЂСЃРѕСЂР°
         
       char data [1] = {0};
 
@@ -846,7 +846,7 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       if (!impl->invisible_cursor)
         throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
         
-        //замена обработчика закрытия окна
+        //Р·Р°РјРµРЅР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
       
       impl->wm_delete = XInternAtom (impl->display, "WM_DELETE_WINDOW", True);
 
@@ -856,16 +856,16 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       if (!XSetWMProtocols (impl->display, impl->window, &impl->wm_delete, 1))
         throw xtl::format_operation_exception ("", "XSetWMProtocols failed");
 
-        //удаление заголовка окна
+        //СѓРґР°Р»РµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РѕРєРЅР°
         
       if (style == WindowStyle_PopUp)
         WmNoDecorations (impl->display, impl->window, DefaultRootWindow (impl->display));
       
-        //регистрация окна в менеджере соединения с дисплеем
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРєРЅР° РІ РјРµРЅРµРґР¶РµСЂРµ СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ РґРёСЃРїР»РµРµРј
 
       DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, impl.get ());
       
-        //настройка получения событий
+        //РЅР°СЃС‚СЂРѕР№РєР° РїРѕР»СѓС‡РµРЅРёСЏ СЃРѕР±С‹С‚РёР№
 
       XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask |
                                                  KeyPressMask | KeyReleaseMask | ButtonReleaseMask |
@@ -953,7 +953,7 @@ void XlibWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
-    Получение платформо-зависимого дескриптора окна
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РѕРєРЅР°
 */
 
 const void* XlibWindowManager::GetNativeWindowHandle (window_t handle)
@@ -970,7 +970,7 @@ const void* XlibWindowManager::GetNativeDisplayHandle (window_t handle)
 }
 
 /*
-    Заголовок окна
+    Р—Р°РіРѕР»РѕРІРѕРє РѕРєРЅР°
 */
 
 void XlibWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
@@ -1017,7 +1017,7 @@ void XlibWindowManager::GetWindowTitle (window_t handle, size_t buffer_size_in_c
 }
 
 /*
-    Область окна / клиентская область
+    РћР±Р»Р°СЃС‚СЊ РѕРєРЅР° / РєР»РёРµРЅС‚СЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ
 */
 
 void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
@@ -1115,7 +1115,7 @@ void XlibWindowManager::GetClientRect (window_t handle, Rect& rect)
 }
 
 /*
-    Установка флагов окна
+    РЈСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіРѕРІ РѕРєРЅР°
 */
 
 void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
@@ -1129,16 +1129,16 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
     
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
       {
         if (!XMapWindow (handle->display, handle->window))
           throw xtl::format_operation_exception ("", "XMapWindow failed");          
 
         break;
       }
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         break; //TODO
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
       {
 //        if (!XSetInputFocus (handle->display, handle->window, RevertToNone, CurrentTime))
 //          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
@@ -1191,7 +1191,7 @@ bool XlibWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
     
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
+      case WindowFlag_Visible: //РІРёРґРёРјРѕСЃС‚СЊ РѕРєРЅР°
       {
         XWindowAttributes window_attributes_return;
 
@@ -1200,10 +1200,10 @@ bool XlibWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
           
         return window_attributes_return.map_state == IsViewable;
       }
-      case WindowFlag_Active: //активность окна
+      case WindowFlag_Active: //Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕРєРЅР°
         return false; //TODO
 //        break;
-      case WindowFlag_Focus: //фокус ввода
+      case WindowFlag_Focus: //С„РѕРєСѓСЃ РІРІРѕРґР°
       {
         XWindow focused_window = 0;
         int revert_to_return = 0;
@@ -1236,7 +1236,7 @@ bool XlibWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 }
 
 /*
-    Установка родительского окна
+    РЈСЃС‚Р°РЅРѕРІРєР° СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР°
 */
 
 void XlibWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
@@ -1292,7 +1292,7 @@ const void* XlibWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
-    Обновление окна
+    РћР±РЅРѕРІР»РµРЅРёРµ РѕРєРЅР°
 */
 
 void XlibWindowManager::InvalidateWindow (window_t handle)
@@ -1313,7 +1313,7 @@ void XlibWindowManager::InvalidateWindow (window_t handle)
 }
 
 /*
-    Положение курсора
+    РџРѕР»РѕР¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 void XlibWindowManager::SetCursorPosition (const Point& position)
@@ -1403,7 +1403,7 @@ syslib::Point XlibWindowManager::GetCursorPosition (window_t handle)
 }
 
 /*
-    Видимость курсора
+    Р’РёРґРёРјРѕСЃС‚СЊ РєСѓСЂСЃРѕСЂР°
 */
 
 void XlibWindowManager::SetCursorVisible (window_t handle, bool state)
@@ -1455,7 +1455,7 @@ bool XlibWindowManager::GetCursorVisible (window_t handle)
 }
 
 /*
-    Изображение курсора
+    РР·РѕР±СЂР°Р¶РµРЅРёРµ РєСѓСЂСЃРѕСЂР°
 */
 
 cursor_t XlibWindowManager::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
@@ -1571,7 +1571,7 @@ void XlibWindowManager::SetCursor (window_t handle, cursor_t cursor)
 }
 
 /*
-    Цвет фона
+    Р¦РІРµС‚ С„РѕРЅР°
 */
 
 void XlibWindowManager::SetBackgroundColor (window_t handle, const Color& color)
@@ -1656,10 +1656,10 @@ bool XlibWindowManager::GetBackgroundState (window_t handle)
 }
 
 /*
-    Получение имени клавиши
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°РІРёС€Рё
 */
 
-//возвращается длина строки без учёта '\0'
+//РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё Р±РµР· СѓС‡С‘С‚Р° '\0'
 size_t XlibWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
 {
   static const char* METHOD_NAME = "syslib::XlibWindowManager::GetKeyName";
@@ -1688,7 +1688,7 @@ size_t XlibWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, ch
 }
 
 /*
-   Установка/получение multitouch режима
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ multitouch СЂРµР¶РёРјР°
 */
 
 void XlibWindowManager::SetMultitouchEnabled (window_t window, bool state)

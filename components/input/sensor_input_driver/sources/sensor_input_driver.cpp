@@ -8,8 +8,8 @@ using namespace input::low_level::sensor_input_driver;
 namespace
 {
 
-const char* COMPONENT_NAME = "input.low_level.SensorInputDriver"; //имя компонента
-const char* DRIVER_NAME    = "SensorInputDriver";                 //имя драйвера
+const char* COMPONENT_NAME = "input.low_level.SensorInputDriver"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
+const char* DRIVER_NAME    = "SensorInputDriver";                 //РёРјСЏ РґСЂР°Р№РІРµСЂР°
 
 void default_log_handler (const char*)
 {
@@ -18,7 +18,7 @@ void default_log_handler (const char*)
 }
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Driver::Driver ()
@@ -49,7 +49,7 @@ Driver::~Driver ()
 }
 
 /*
-    Описание драйвера
+    РћРїРёСЃР°РЅРёРµ РґСЂР°Р№РІРµСЂР°
 */
 
 const char* Driver::GetDescription ()
@@ -58,7 +58,7 @@ const char* Driver::GetDescription ()
 }
 
 /*
-    Перечисление доступных устройств ввода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІРІРѕРґР°
 */
 
 size_t Driver::GetDevicesCount ()
@@ -93,7 +93,7 @@ const char* Driver::GetDeviceFullName (size_t index)
 }
 
 /*
-    Создаение устройства ввода
+    РЎРѕР·РґР°РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІРІРѕРґР°
 */
 
 IDevice* Driver::CreateDevice (const char* full_name, const char*)
@@ -117,7 +117,7 @@ IDevice* Driver::CreateDevice (const char* full_name, const char*)
 }
 
 /*
-    Отладочное протоколирование
+    РћС‚Р»Р°РґРѕС‡РЅРѕРµ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ
 */
 
 void Driver::SetDebugLog (const LogHandler& log)
@@ -131,7 +131,7 @@ const Driver::LogHandler& Driver::GetDebugLog ()
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void Driver::AddRef ()
@@ -145,7 +145,7 @@ void Driver::Release ()
 }
 
 /*
-    Компонент драйвера
+    РљРѕРјРїРѕРЅРµРЅС‚ РґСЂР°Р№РІРµСЂР°
 */
 
 namespace components

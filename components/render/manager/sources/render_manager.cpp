@@ -7,15 +7,15 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const unsigned int WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
+const unsigned int WINDOW_ARRAY_RESERVE_SIZE = 8; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РѕРєРѕРЅ
 
 }
 
 /*
-    Описание реализации менеджера рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 typedef xtl::signal<void (RenderManager&, Window&)> WindowSignal;
@@ -24,22 +24,22 @@ typedef stl::vector<WindowImpl*>                    WindowArray;
 
 struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerListener
 {
-  RenderManagerImpl*  owner;                                         //владелец
-  SettingsPtr         settings;                                      //настройки рендеринга
-  Log                 log;                                           //протокол сообщений
-  DeviceManagerPtr    device_manager;                                //менеджер устройства отрисовки
-  CacheManagerPtr     cache_manager;                                 //менеджер кэширования
-  PropertyCachePtr    property_cache;                                //кэш буферов свойств
-  WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
-  Signal              signals [RenderManagerEvent_Num];              //сигналы менеджера
-  WindowArray         windows;                                       //окна
-  TextureManagerPtr   textures;                                      //текстуры
-  PrimitiveManagerPtr primitives;                                    //примитивы
-  ProgramManagerPtr   programs;                                      //программы
-  MaterialManagerPtr  materials;                                     //материалы
-  EffectManagerPtr    effects;                                       //эффекты
+  RenderManagerImpl*  owner;                                         //РІР»Р°РґРµР»РµС†
+  SettingsPtr         settings;                                      //РЅР°СЃС‚СЂРѕР№РєРё СЂРµРЅРґРµСЂРёРЅРіР°
+  Log                 log;                                           //РїСЂРѕС‚РѕРєРѕР» СЃРѕРѕР±С‰РµРЅРёР№
+  DeviceManagerPtr    device_manager;                                //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  CacheManagerPtr     cache_manager;                                 //РјРµРЅРµРґР¶РµСЂ РєСЌС€РёСЂРѕРІР°РЅРёСЏ
+  PropertyCachePtr    property_cache;                                //РєСЌС€ Р±СѓС„РµСЂРѕРІ СЃРІРѕР№СЃС‚РІ
+  WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //РѕРєРѕРЅРЅС‹Рµ СЃРёРіРЅР°Р»С‹
+  Signal              signals [RenderManagerEvent_Num];              //СЃРёРіРЅР°Р»С‹ РјРµРЅРµРґР¶РµСЂР°
+  WindowArray         windows;                                       //РѕРєРЅР°
+  TextureManagerPtr   textures;                                      //С‚РµРєСЃС‚СѓСЂС‹
+  PrimitiveManagerPtr primitives;                                    //РїСЂРёРјРёС‚РёРІС‹
+  ProgramManagerPtr   programs;                                      //РїСЂРѕРіСЂР°РјРјС‹
+  MaterialManagerPtr  materials;                                     //РјР°С‚РµСЂРёР°Р»С‹
+  EffectManagerPtr    effects;                                       //СЌС„С„РµРєС‚С‹
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
     , settings (new render::manager::Settings, false)
@@ -48,7 +48,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
   
-///Получение менеджера устройства
+///РџРѕР»СѓС‡РµРЅРёРµ РјРµРЅРµРґР¶РµСЂР° СѓСЃС‚СЂРѕР№СЃС‚РІР°
   render::manager::DeviceManager& DeviceManager ()
   {
     if (!device_manager)
@@ -57,7 +57,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     return *device_manager;
   }
 
-///Получение кэша буферов свойств
+///РџРѕР»СѓС‡РµРЅРёРµ РєСЌС€Р° Р±СѓС„РµСЂРѕРІ СЃРІРѕР№СЃС‚РІ
   render::manager::PropertyCache& PropertyCache ()
   {
     if (!property_cache)
@@ -66,7 +66,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     return *property_cache;
   }
   
-///Оповещение об удалении окна
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± СѓРґР°Р»РµРЅРёРё РѕРєРЅР°
   void OnWindowDestroy (WindowImpl* window)
   {
     for (WindowArray::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
@@ -82,7 +82,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
       }
   }
   
-///Оконные оповещения
+///РћРєРѕРЅРЅС‹Рµ РѕРїРѕРІРµС‰РµРЅРёСЏ
   void WindowEventNotify (RenderManagerWindowEvent event, render::manager::Window& window)
   {
     if (window_signals [event].empty ())
@@ -104,7 +104,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     }
   }
   
-///Оповещение об обновлении кофигурации эффектов
+///РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё РєРѕС„РёРіСѓСЂР°С†РёРё СЌС„С„РµРєС‚РѕРІ
   void OnConfigurationChanged ()
   {
     if (signals [RenderManagerEvent_OnConfigurationChanged].empty ())
@@ -128,7 +128,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 RenderManagerImpl::RenderManagerImpl ()
@@ -137,7 +137,7 @@ RenderManagerImpl::RenderManagerImpl ()
   {
     impl = new Impl (this);
     
-      //загрузка компонентов
+      //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
     
     media::Image::RegisterDefaultLoaders ();
     media::CompressedImage::RegisterDefaultLoaders ();
@@ -156,7 +156,7 @@ RenderManagerImpl::~RenderManagerImpl ()
 }
 
 /*
-    Строка описания устройства рендеринга
+    РЎС‚СЂРѕРєР° РѕРїРёСЃР°РЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 const char* RenderManagerImpl::Description ()
@@ -165,7 +165,7 @@ const char* RenderManagerImpl::Description ()
 }
 
 /*
-    Менеджеры ресурсов
+    РњРµРЅРµРґР¶РµСЂС‹ СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 DeviceManager& RenderManagerImpl::DeviceManager ()
@@ -259,7 +259,7 @@ EffectManager& RenderManagerImpl::EffectManager ()
 }
 
 /*
-    Создание окна рендеринга
+    РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 WindowPtr RenderManagerImpl::CreateWindow (INativeWindow* native_window, common::PropertyMap& properties)
@@ -289,7 +289,7 @@ WindowPtr RenderManagerImpl::CreateWindow (INativeWindow* native_window, common:
 }
 
 /*
-    Перебор окон рендеринга
+    РџРµСЂРµР±РѕСЂ РѕРєРѕРЅ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 size_t RenderManagerImpl::WindowsCount ()
@@ -306,7 +306,7 @@ WindowPtr RenderManagerImpl::Window (size_t index)
 }
 
 /*
-    Создание целей рендеринга
+    РЎРѕР·РґР°РЅРёРµ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (unsigned int width, unsigned int height, render::manager::PixelFormat format)
@@ -386,7 +386,7 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (unsigned int width,
 }
 
 /*
-    Создание объектов
+    РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ
 */
 
 FramePtr RenderManagerImpl::CreateFrame ()
@@ -416,7 +416,7 @@ EntityPtr RenderManagerImpl::CreateEntity ()
 }
 
 /*
-    Загрузка ресурсов
+    Р—Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 */
 
 void RenderManagerImpl::LoadResource (const char* resource_name)
@@ -550,7 +550,7 @@ void RenderManagerImpl::UnloadResource (const media::geometry::MeshLibrary& libr
 }
 
 /*
-    Регистрация на события
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅР° СЃРѕР±С‹С‚РёСЏ
 */
 
 xtl::connection RenderManagerImpl::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const
@@ -577,7 +577,7 @@ xtl::connection RenderManagerImpl::RegisterEventHandler (RenderManagerEvent even
 }
 
 /*
-    Управление кэшированием
+    РЈРїСЂР°РІР»РµРЅРёРµ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 */
 
 void RenderManagerImpl::UpdateCache ()
@@ -591,7 +591,7 @@ void RenderManagerImpl::ResetCache ()
 }
 
 /*
-    Настройки менеджера рендеринга
+    РќР°СЃС‚СЂРѕР№РєРё РјРµРЅРµРґР¶РµСЂР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 render::manager::Settings& RenderManagerImpl::Settings ()

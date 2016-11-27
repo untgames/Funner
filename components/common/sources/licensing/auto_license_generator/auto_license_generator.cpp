@@ -13,7 +13,7 @@ namespace auto_license_generator
 const char* ALLOWED_COMPONENT = "*";
 const char* COMPONENT_NAME    = "common.licensing.loaders.AutoLicenseGenerator";
 
-//генерация и загрузка лицензии
+//РіРµРЅРµСЂР°С†РёСЏ Рё Р·Р°РіСЂСѓР·РєР° Р»РёС†РµРЅР·РёРё
 void load_license ()
 {
   time_t current_time;
@@ -63,7 +63,7 @@ void load_license ()
 }
 
 /*
-    Компонент, регистрирующий создателя лицензии
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ СЃРѕР·РґР°С‚РµР»СЏ Р»РёС†РµРЅР·РёРё
 */
 
 class AutoLicenseGeneratorComponent

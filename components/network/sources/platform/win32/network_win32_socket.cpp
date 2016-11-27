@@ -10,13 +10,13 @@ const char* LOG_NAME = "network.socket";
 const int LISTEN_QUEUE_SIZE = 4;
 
 /*
-   Сокет
+   РЎРѕРєРµС‚
 */
 
 class WinSocket : public SocketImpl, public xtl::reference_counter
 {
   public:
-///Конструктор/деструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     WinSocket (SOCKET in_socket, const SocketAddress& in_remote_address)
     : socket (in_socket)
     , local_address_getted (false)
@@ -90,7 +90,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Адреса сторон
+///РђРґСЂРµСЃР° СЃС‚РѕСЂРѕРЅ
     const SocketAddress& LocalAddress ()
     {
       if (local_address_getted)
@@ -125,7 +125,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       throw xtl::format_operation_exception ("network::WinSocket::RemoteAddress", "Can't get remote address, there was no accepted connection");
     }
 
-///Протокол
+///РџСЂРѕС‚РѕРєРѕР»
     SocketProtocol Protocol ()
     {
       try
@@ -147,7 +147,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Закрытие каналов передачи данных
+///Р—Р°РєСЂС‹С‚РёРµ РєР°РЅР°Р»РѕРІ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С…
     bool IsReceiveClosed ()
     {
       return receive_closed;
@@ -196,7 +196,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       send_closed = true;
     }
 
-///Соединение
+///РЎРѕРµРґРёРЅРµРЅРёРµ
     void Bind (const SocketAddress& address)
     {
       try
@@ -241,7 +241,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       connected = true;
     }
 
-///Приём соединений
+///РџСЂРёС‘Рј СЃРѕРµРґРёРЅРµРЅРёР№
     void Listen ()
     {
       try
@@ -308,7 +308,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Флаги сокета
+///Р¤Р»Р°РіРё СЃРѕРєРµС‚Р°
     bool IsConnected ()
     {
       return connected;
@@ -423,7 +423,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Параметры сокета
+///РџР°СЂР°РјРµС‚СЂС‹ СЃРѕРєРµС‚Р°
     void SetReceiveBufferSize (unsigned int size)
     {
       try
@@ -476,7 +476,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Чтение / запись данных
+///Р§С‚РµРЅРёРµ / Р·Р°РїРёСЃСЊ РґР°РЅРЅС‹С…
     unsigned int Receive (void* buffer, unsigned int size, unsigned int timeout_in_milliseconds)
     {
       try
@@ -548,7 +548,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Количество байт доступных для чтения без блокировки
+///РљРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚ РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ С‡С‚РµРЅРёСЏ Р±РµР· Р±Р»РѕРєРёСЂРѕРІРєРё
     unsigned int ReceiveAvailable ()
     {
       try
@@ -567,7 +567,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
       }
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef () { addref (this); }
     void Release () { release (this); }
 
@@ -721,21 +721,21 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     }
 
   private:
-    SOCKET        socket;                   //дескриптор сокета
-    SocketAddress local_address;            //локальный адресс сокета
-    bool          local_address_getted;     //был ли получен локальный адрес
-    SocketAddress remote_address;           //удаленный адрес сокета
-    bool          remote_address_getted;    //был ли получен удаленный адрес
-    bool          receive_closed;           //закрыт ли прием
-    bool          send_closed;              //закрыта ли передача
-    bool          connected;                //соединен ли сокет
-    bool          bound;                    //привязан ли сокет
+    SOCKET        socket;                   //РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРѕРєРµС‚Р°
+    SocketAddress local_address;            //Р»РѕРєР°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃСЃ СЃРѕРєРµС‚Р°
+    bool          local_address_getted;     //Р±С‹Р» Р»Рё РїРѕР»СѓС‡РµРЅ Р»РѕРєР°Р»СЊРЅС‹Р№ Р°РґСЂРµСЃ
+    SocketAddress remote_address;           //СѓРґР°Р»РµРЅРЅС‹Р№ Р°РґСЂРµСЃ СЃРѕРєРµС‚Р°
+    bool          remote_address_getted;    //Р±С‹Р» Р»Рё РїРѕР»СѓС‡РµРЅ СѓРґР°Р»РµРЅРЅС‹Р№ Р°РґСЂРµСЃ
+    bool          receive_closed;           //Р·Р°РєСЂС‹С‚ Р»Рё РїСЂРёРµРј
+    bool          send_closed;              //Р·Р°РєСЂС‹С‚Р° Р»Рё РїРµСЂРµРґР°С‡Р°
+    bool          connected;                //СЃРѕРµРґРёРЅРµРЅ Р»Рё СЃРѕРєРµС‚
+    bool          bound;                    //РїСЂРёРІСЏР·Р°РЅ Р»Рё СЃРѕРєРµС‚
 };
 
 }
 
 /*
-   Создание сокета
+   РЎРѕР·РґР°РЅРёРµ СЃРѕРєРµС‚Р°
 */
 
 SocketImpl* Win32Platform::CreateSocket (SocketDomain socket_domain, SocketProtocol protocol)

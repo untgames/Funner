@@ -5,7 +5,7 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data, bool ignore_null_data)
@@ -13,11 +13,11 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";  
 
-    //установка текстуры в контекст OpenGL
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСЃС‚СѓСЂС‹ РІ РєРѕРЅС‚РµРєСЃС‚ OpenGL
 
   Bind ();
 
-     //преобразование формата пикселей
+     //РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№
 
   GLenum gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
          gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format),
@@ -56,18 +56,18 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
   if (data || !ignore_null_data)
   {    
-      //настройка расположения данных в буфере    
+      //РЅР°СЃС‚СЂРѕР№РєР° СЂР°СЃРїРѕР»РѕР¶РµРЅРёСЏ РґР°РЅРЅС‹С… РІ Р±СѓС„РµСЂРµ    
 
-    glPixelStorei (GL_UNPACK_ALIGNMENT, 1); //выравнивание начала строк
+    glPixelStorei (GL_UNPACK_ALIGNMENT, 1); //РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРє
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-    glPixelStorei (GL_UNPACK_SKIP_ROWS,   0); //количество пропускаемых строк
-    glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
+    glPixelStorei (GL_UNPACK_SKIP_ROWS,   0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… СЃС‚СЂРѕРє
+    glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0); //РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРїСѓСЃРєР°РµРјС‹С… РїРёРєСЃРµР»РµР№
 
 #endif
 
-      //создание mip-уровней
+      //СЃРѕР·РґР°РЅРёРµ mip-СѓСЂРѕРІРЅРµР№
 
     TextureDataSelector data_selector (tex_desc, data);
     bool                is_compressed_data = is_compressed (tex_desc.format);
@@ -85,7 +85,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
           supports_compressed = GetCaps ().has_ext_texture_compression_s3tc;
           is_dxt              = true;
           break;
-        case PixelFormat_RGB_PVRTC2:  //??? Эта проверка есть выше?
+        case PixelFormat_RGB_PVRTC2:  //??? Р­С‚Р° РїСЂРѕРІРµСЂРєР° РµСЃС‚СЊ РІС‹С€Рµ?
         case PixelFormat_RGB_PVRTC4:
         case PixelFormat_RGBA_PVRTC2:
         case PixelFormat_RGBA_PVRTC4:
@@ -144,7 +144,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
       {
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-        glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для нулевого mip-уровня)
+        glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //РґР»РёРЅР° СЃС‚СЂРѕРєРё РІ РїРёРєСЃРµР»СЏС… (РґР»СЏ РЅСѓР»РµРІРѕРіРѕ mip-СѓСЂРѕРІРЅСЏ)
         
 #endif
 
@@ -169,7 +169,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 #endif
     }    
 
-     //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
+     //СѓСЃС‚Р°РЅРѕРІРєР° СЂРµР°Р»СЊРЅРѕРіРѕ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ С„РѕСЂРјР°С‚Р° С…СЂР°РЅРµРЅРёСЏ РїРёРєСЃРµР»РµР№ (СЃРІСЏР·Р°РЅРѕ СЃ СѓСЃС‚Р°РЅРѕРІРєРѕР№ СЃР¶Р°С‚РѕРіРѕ С„РѕСЂРјР°С‚Р°)
 
     try
     {
@@ -183,13 +183,13 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
     }  
   }
 
-    //проверка ошибок
+    //РїСЂРѕРІРµСЂРєР° РѕС€РёР±РѕРє
 
   CheckErrors (METHOD_NAME);
 }
 
 /*
-    Установка данных
+    РЈСЃС‚Р°РЅРѕРІРєР° РґР°РЅРЅС‹С…
 */
 
 void Texture2D::SetUncompressedData

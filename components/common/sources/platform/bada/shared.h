@@ -8,7 +8,7 @@ namespace common
     class BadaFileSystem : public ICustomFileSystem {
         public:
             
-            //Работа с файлом
+            //Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
             file_t     FileOpen     (const char* name,filemode_t mode_flags,size_t buffer_size);
             void       FileClose    (file_t);
             size_t     FileRead     (file_t,void* buf,size_t size);
@@ -21,19 +21,19 @@ namespace common
             bool       FileEof      (file_t);
             void       FileFlush    (file_t);
 
-            //Управление расположением файлов
+            //РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
             void Remove (const char* file_name);
             void Rename (const char* file_name,const char* new_name);
             void Mkdir  (const char* dir_name);
    
-            //Получение информации о файле
+            //РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
             bool IsFileExist (const char* file_name);
             bool GetFileInfo (const char* file_name,FileInfo& info);   
    
-            //Поиск файла
+            //РџРѕРёСЃРє С„Р°Р№Р»Р°
             void Search (const char* wc_mask,const FileSearchHandler& handler);
 
-            //Подсчёт ссылок
+            //РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
             void AddRef  () {}
             void Release () {}
     };

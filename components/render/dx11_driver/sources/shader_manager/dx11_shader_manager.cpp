@@ -4,14 +4,14 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-    Описание реализации менеджера шейдеров
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° С€РµР№РґРµСЂРѕРІ
 */
 
 struct ShaderManager::Impl: public DeviceObject
 {
-  ShaderLibraryPtr shader_library; //библиотека шейдеров
+  ShaderLibraryPtr shader_library; //Р±РёР±Р»РёРѕС‚РµРєР° С€РµР№РґРµСЂРѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
     , shader_library (new ShaderLibrary (device_manager), false)
@@ -20,7 +20,7 @@ struct ShaderManager::Impl: public DeviceObject
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShaderManager::ShaderManager (const DeviceManager& device_manager)
@@ -33,7 +33,7 @@ ShaderManager::~ShaderManager ()
 }
 
 /*
-    Создание шейдеров
+    РЎРѕР·РґР°РЅРёРµ С€РµР№РґРµСЂРѕРІ
 */
 
 IProgramParametersLayout* ShaderManager::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
@@ -63,7 +63,7 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
 }
 
 /*
-    Создание константного буфера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚РЅРѕРіРѕ Р±СѓС„РµСЂР°
 */
 
 IBuffer* ShaderManager::CreateConstantBuffer (const BufferDesc& desc, const void* data)
@@ -80,7 +80,7 @@ IBuffer* ShaderManager::CreateConstantBuffer (const BufferDesc& desc, const void
 }
     
 /*
-    Получение строки поддерживаемых контекстом профилей шейдеров
+    РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… РєРѕРЅС‚РµРєСЃС‚РѕРј РїСЂРѕС„РёР»РµР№ С€РµР№РґРµСЂРѕРІ
 */
 
 const char* ShaderManager::GetShaderProfilesString () const
@@ -89,7 +89,7 @@ const char* ShaderManager::GetShaderProfilesString () const
 }
 
 /*
-    Получение библиотеки шейдеров
+    РџРѕР»СѓС‡РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё С€РµР№РґРµСЂРѕРІ
 */
 
 ShaderLibrary& ShaderManager::GetShaderLibrary () const

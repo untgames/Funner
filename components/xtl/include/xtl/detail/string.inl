@@ -1,5 +1,5 @@
 /*
-    Сравнение строк
+    ╨б╤А╨░╨▓╨╜╨╡╨╜╨╕╨╡ ╤Б╤В╤А╨╛╨║
 */
 
 inline int xstrcmp (const char* s1, const char* s2)
@@ -39,7 +39,7 @@ inline int xstrnicmp (const char* s1, const char* s2, size_t max_count)
 }
 
 /*
-    Получение длины строки
+    ╨Я╨╛╨╗╤Г╤З╨╡╨╜╨╕╨╡ ╨┤╨╗╨╕╨╜╤Л ╤Б╤В╤А╨╛╨║╨╕
 */
 
 inline size_t xstrlen (const char* s)
@@ -60,7 +60,7 @@ inline size_t xstrlen (const wchar_t* s)
 }
 
 /*
-    Копирование строк
+    ╨Ъ╨╛╨┐╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╤Б╤В╤А╨╛╨║
 */
 
 inline char* xstrncpy (char* dst, const char* src, int length)
@@ -89,7 +89,7 @@ inline wchar_t* xstrncpy (wchar_t* dst, const wchar_t* src, int length)
 }
 
 /*
-    Форматированный вывод в строку
+    ╨д╨╛╤А╨╝╨░╤В╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨▓╤Л╨▓╨╛╨┤ ╨▓ ╤Б╤В╤А╨╛╨║╤Г
 */
 
 inline int xsnprintf (char* buffer, size_t count, const char* format, ...)

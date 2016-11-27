@@ -3,17 +3,17 @@
 using namespace common;
 
 /*
-    Описание реализации связывания свойства
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРІСЏР·С‹РІР°РЅРёСЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 struct PropertyBinding::Impl: public xtl::reference_counter
 {
-  stl::auto_ptr<detail::IPropertySetter> setter; //функция установки
-  stl::auto_ptr<detail::IPropertyGetter> getter; //функция чтения
+  stl::auto_ptr<detail::IPropertySetter> setter; //С„СѓРЅРєС†РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё
+  stl::auto_ptr<detail::IPropertyGetter> getter; //С„СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 PropertyBinding::PropertyBinding ()
@@ -40,7 +40,7 @@ PropertyBinding& PropertyBinding::operator = (const PropertyBinding& binding)
 }
 
 /*
-    Сброс setter / getter для свойства
+    РЎР±СЂРѕСЃ setter / getter РґР»СЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 void PropertyBinding::ResetSetter ()
@@ -54,7 +54,7 @@ void PropertyBinding::ResetGetter ()
 }
 
 /*
-    Установка setter / getter для свойства
+    РЈСЃС‚Р°РЅРѕРІРєР° setter / getter РґР»СЏ СЃРІРѕР№СЃС‚РІР°
 */
 
 void PropertyBinding::SetSetterCore (detail::IPropertySetter* setter)
@@ -78,7 +78,7 @@ detail::IPropertySetter* PropertyBinding::SetterCore () const
 }
 
 /*
-    Проверка наличия setter/getter
+    РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ setter/getter
 */
 
 bool PropertyBinding::HasSetter () const
@@ -92,7 +92,7 @@ bool PropertyBinding::HasGetter () const
 }
 
 /*
-    Синхронизация с картой свойств
+    РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃ РєР°СЂС‚РѕР№ СЃРІРѕР№СЃС‚РІ
 */
 
 void PropertyBinding::CopyFromPropertyMap (const PropertyMap& map, size_t property_index)
@@ -165,7 +165,7 @@ void PropertyBinding::CopyToPropertyMap (PropertyMap& map, const char* property_
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void PropertyBinding::Swap (PropertyBinding& binding)

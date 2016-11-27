@@ -6,7 +6,7 @@ using namespace render::low_level::opengl::windows;
 namespace
 {
 
-//проверка корректности оконного дескриптора
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РѕРєРѕРЅРЅРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 HWND check_output_window (const SwapChainDesc& desc)
 {
   HWND window = (HWND)desc.window_handle;
@@ -20,7 +20,7 @@ HWND check_output_window (const SwapChainDesc& desc)
 }
 
 /*
-    Описание реализации PrimarySwapChain
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё PrimarySwapChain
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
@@ -28,19 +28,19 @@ typedef xtl::signal<void ()>  ChangeDisplayModeSignal;
 
 struct PrimarySwapChain::Impl: private IWindowListener
 {
-  Log                     log;                     //протокол
-  AdapterPtr              adapter;                 //адаптер
-  WglExtensionEntries     wgl_extension_entries;   //таблица WGL-расширений
-  HWND                    output_window;           //окно вывода
-  HDC                     output_context;          //контекст вывода
-  int                     pixel_format_index;      //индекс формата пикселей устройства вывода
-  DummyWindow             listener_window;         //следящее окно
-  SwapChainDesc           desc;                    //дескриптор цепочки обмена
-  ChangeDisplayModeSignal cdm_signal;              //сигнал, оповещающий об изменении видео-режима
-  PropertyList            properties;              //свойства цепочки обмена
-  bool                    need_twice_swap_buffers; //нужно ли дважды обменивать буферы (см. функцию PrimarySwapChain::Present)
+  Log                     log;                     //РїСЂРѕС‚РѕРєРѕР»
+  AdapterPtr              adapter;                 //Р°РґР°РїС‚РµСЂ
+  WglExtensionEntries     wgl_extension_entries;   //С‚Р°Р±Р»РёС†Р° WGL-СЂР°СЃС€РёСЂРµРЅРёР№
+  HWND                    output_window;           //РѕРєРЅРѕ РІС‹РІРѕРґР°
+  HDC                     output_context;          //РєРѕРЅС‚РµРєСЃС‚ РІС‹РІРѕРґР°
+  int                     pixel_format_index;      //РёРЅРґРµРєСЃ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+  DummyWindow             listener_window;         //СЃР»РµРґСЏС‰РµРµ РѕРєРЅРѕ
+  SwapChainDesc           desc;                    //РґРµСЃРєСЂРёРїС‚РѕСЂ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  ChangeDisplayModeSignal cdm_signal;              //СЃРёРіРЅР°Р», РѕРїРѕРІРµС‰Р°СЋС‰РёР№ РѕР± РёР·РјРµРЅРµРЅРёРё РІРёРґРµРѕ-СЂРµР¶РёРјР°
+  PropertyList            properties;              //СЃРІРѕР№СЃС‚РІР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  bool                    need_twice_swap_buffers; //РЅСѓР¶РЅРѕ Р»Рё РґРІР°Р¶РґС‹ РѕР±РјРµРЅРёРІР°С‚СЊ Р±СѓС„РµСЂС‹ (СЃРј. С„СѓРЅРєС†РёСЋ PrimarySwapChain::Present)
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
     : adapter (pixel_format.adapter),
       output_window (check_output_window (in_desc)),
@@ -49,7 +49,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
       listener_window (output_window, this),
       need_twice_swap_buffers (false)
   {
-      //получение контекста
+      //РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
       
     log.Printf ("...get device context");
 
@@ -58,7 +58,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     if (!output_context)
       raise_error ("GetDC");
 
-      //инициализация таблицы расширений
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ СЂР°СЃС€РёСЂРµРЅРёР№
 
     if (pixel_format.wgl_extension_entries)
     {
@@ -69,7 +69,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
       memset (&wgl_extension_entries, 0, sizeof wgl_extension_entries);
     }
 
-      //установка состояния FullScreen
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ FullScreen
 
     if (in_desc.fullscreen)
     {
@@ -78,7 +78,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
       SetFullscreenState (true, in_desc.frame_buffer.color_bits);
     }
 
-      //установка свойств цепочки обмена
+      //СѓСЃС‚Р°РЅРѕРІРєР° СЃРІРѕР№СЃС‚РІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
     stl::string extensions_string = get_wgl_extensions_string (wgl_extension_entries, output_context).c_str ();
 
@@ -96,7 +96,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
             extensions_string += ' ';
             extensions_string += bugs;
             
-              //определение необходимости дваждый обновлять буферы при первой перерисовке
+              //РѕРїСЂРµРґРµР»РµРЅРёРµ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РґРІР°Р¶РґС‹Р№ РѕР±РЅРѕРІР»СЏС‚СЊ Р±СѓС„РµСЂС‹ РїСЂРё РїРµСЂРІРѕР№ РїРµСЂРµСЂРёСЃРѕРІРєРµ
 
             need_twice_swap_buffers = strstr (bugs, "GLBUG_swap_buffers_twice_call") != 0;
           }
@@ -107,7 +107,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
 
     properties.AddProperty ("gl_extensions", extensions_string.c_str ());
 
-      //установка текущего формата пикселей для контекста отрисовки      
+      //СѓСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ РґР»СЏ РєРѕРЅС‚РµРєСЃС‚Р° РѕС‚СЂРёСЃРѕРІРєРё      
       
     log.Printf ("...set pixel format");    
 
@@ -115,7 +115,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
 
     adapter->GetLibrary ().SetPixelFormat (output_context, pixel_format_index);
 
-      //инициализация дескриптора цепочки обмена
+      //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґРµСЃРєСЂРёРїС‚РѕСЂР° С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 
     desc.frame_buffer.width        = GetDeviceCaps (output_context, HORZRES);
     desc.frame_buffer.height       = GetDeviceCaps (output_context, VERTRES);
@@ -131,7 +131,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     desc.window_handle             = in_desc.window_handle;
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     log.Printf ("...release device context");
@@ -142,7 +142,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     log.Printf ("...release resources");
   }  
   
-///Установка состояния полноэкранного режима
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРіРѕ СЂРµР¶РёРјР°
   void SetFullscreenState (bool state, unsigned int color_bits)
   {
     if (GetFullscreenState () == state)
@@ -178,7 +178,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
     }
   }
 
-///Получение состояния полноэкранного режима
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРіРѕ СЂРµР¶РёРјР°
   bool GetFullscreenState ()
   {
     Output* output = adapter->FindContainingOutput (output_window);
@@ -199,14 +199,14 @@ struct PrimarySwapChain::Impl: private IWindowListener
            size_t (window_rect.bottom - window_rect.top) == mode_desc.height && desc.frame_buffer.color_bits >= mode_desc.color_bits;
   }  
   
-///Обмен текущего заднего буфера и переднего буфера
+///РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
   void Present ()
   {
     IAdapterLibrary& library = adapter->GetLibrary ();
     
     if (need_twice_swap_buffers)
     {
-        //в некоторых реализациях OpenGL (например, MSOGL) после первой перерисовки нужно дважы обменять буферы
+        //РІ РЅРµРєРѕС‚РѕСЂС‹С… СЂРµР°Р»РёР·Р°С†РёСЏС… OpenGL (РЅР°РїСЂРёРјРµСЂ, MSOGL) РїРѕСЃР»Рµ РїРµСЂРІРѕР№ РїРµСЂРµСЂРёСЃРѕРІРєРё РЅСѓР¶РЅРѕ РґРІР°Р¶С‹ РѕР±РјРµРЅСЏС‚СЊ Р±СѓС„РµСЂС‹
 
       library.SwapBuffers (output_context);
 
@@ -216,33 +216,33 @@ struct PrimarySwapChain::Impl: private IWindowListener
     library.SwapBuffers (output_context);    
   }
   
-///Обработка события удаления окна
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ РѕРєРЅР°
   void OnDestroy ()
   {
-      //если текущий контекст вывода является контекстом вывода окна - сбрасываем текущий контекст
+      //РµСЃР»Рё С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚ РІС‹РІРѕРґР° СЏРІР»СЏРµС‚СЃСЏ РєРѕРЅС‚РµРєСЃС‚РѕРј РІС‹РІРѕРґР° РѕРєРЅР° - СЃР±СЂР°СЃС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РєРѕРЅС‚РµРєСЃС‚
 
     if (adapter->GetLibrary ().GetCurrentDC () == output_context)
       adapter->GetLibrary ().MakeCurrent (0, 0);
   }
 
-///Обработка события изменения видео-режима
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ РІРёРґРµРѕ-СЂРµР¶РёРјР°
   void OnDisplayModeChange ()
   {
     try
     {
-        //оповещение об изменении видео-режима
+        //РѕРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РІРёРґРµРѕ-СЂРµР¶РёРјР°
 
       cdm_signal ();
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }    
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& desc, const PixelFormatDesc& pixel_format)
@@ -277,12 +277,12 @@ PrimarySwapChain::~PrimarySwapChain ()
   }
   catch (...)
   {
-    //подавляем все исключения
+    //РїРѕРґР°РІР»СЏРµРј РІСЃРµ РёСЃРєР»СЋС‡РµРЅРёСЏ
   }
 }
 
 /*
-    Получение адаптера
+    РџРѕР»СѓС‡РµРЅРёРµ Р°РґР°РїС‚РµСЂР°
 */
 
 IAdapter* PrimarySwapChain::GetAdapter ()
@@ -291,41 +291,41 @@ IAdapter* PrimarySwapChain::GetAdapter ()
 }
 
 /*
-    Реалиация интерфейса IDeviceContext
+    Р РµР°Р»РёР°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР° IDeviceContext
 */
 
-//получение реализации адаптера
+//РїРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґР°РїС‚РµСЂР°
 Adapter* PrimarySwapChain::GetAdapterImpl ()
 {
   return impl->adapter.get ();
 }
 
-//контекст устройства вывода
+//РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 HDC PrimarySwapChain::GetDC ()
 {
   return impl->output_context;
 }
 
-//получение формата пикселей цепочки обмена
+//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚Р° РїРёРєСЃРµР»РµР№ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 int PrimarySwapChain::GetPixelFormat ()
 {
   return impl->pixel_format_index;
 }
 
-//есть ли вертикальная синхронизация
+//РµСЃС‚СЊ Р»Рё РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
 bool PrimarySwapChain::HasVSync ()
 {
   return impl->desc.vsync;
 }
 
-//получение таблицы WGL-расширений
+//РїРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ WGL-СЂР°СЃС€РёСЂРµРЅРёР№
 const WglExtensionEntries& PrimarySwapChain::GetWglExtensionEntries ()
 {
   return impl->wgl_extension_entries;
 }
 
 /*
-    Получение дескриптора
+    РџРѕР»СѓС‡РµРЅРёРµ РґРµСЃРєСЂРёРїС‚РѕСЂР°
 */
 
 void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
@@ -334,7 +334,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 }
 
 /*
-    Список свойств цепочки обмена
+    РЎРїРёСЃРѕРє СЃРІРѕР№СЃС‚РІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
 */
 
 IPropertyList* PrimarySwapChain::GetProperties ()
@@ -343,7 +343,7 @@ IPropertyList* PrimarySwapChain::GetProperties ()
 }
 
 /*
-    Получение устройства вывода с максимальным размером области перекрытия
+    РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј РѕР±Р»Р°СЃС‚Рё РїРµСЂРµРєСЂС‹С‚РёСЏ
 */
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
@@ -352,7 +352,7 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 }
 
 /*
-    Обмен текущего заднего буфера и переднего буфера
+    РћР±РјРµРЅ С‚РµРєСѓС‰РµРіРѕ Р·Р°РґРЅРµРіРѕ Р±СѓС„РµСЂР° Рё РїРµСЂРµРґРЅРµРіРѕ Р±СѓС„РµСЂР°
 */
 
 void PrimarySwapChain::Present ()
@@ -370,7 +370,7 @@ void PrimarySwapChain::Present ()
 }
 
 /*
-    Установка / взятие состояния full-screen mode
+    РЈСЃС‚Р°РЅРѕРІРєР° / РІР·СЏС‚РёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ full-screen mode
 */
 
 void PrimarySwapChain::SetFullscreenState (bool state)
@@ -384,7 +384,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-    Подписка на событие измененения видео-режима
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёРµ РёР·РјРµРЅРµРЅРµРЅРёСЏ РІРёРґРµРѕ-СЂРµР¶РёРјР°
 */
 
 xtl::connection PrimarySwapChain::RegisterDisplayModeChangeHandler (const EventHandler& handler)

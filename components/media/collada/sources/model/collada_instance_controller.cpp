@@ -4,21 +4,21 @@ using namespace media::collada;
 using namespace common;
 
 /*
-    Описание реализации InstanceController
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё InstanceController
 */
 
 typedef stl::vector<size_t> StringOffsetArray;
 
 struct InstanceController::Impl: public xtl::reference_counter
 {
-  stl::string                   controller;        //имя контроллера
-  media::collada::MaterialBinds binds;             //присоединённые материалы
-  stl::string                   search_root_names; //имена корней поиска соединений
-  StringOffsetArray             search_roots;      //смещения в search_root_names
+  stl::string                   controller;        //РёРјСЏ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
+  media::collada::MaterialBinds binds;             //РїСЂРёСЃРѕРµРґРёРЅС‘РЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹
+  stl::string                   search_root_names; //РёРјРµРЅР° РєРѕСЂРЅРµР№ РїРѕРёСЃРєР° СЃРѕРµРґРёРЅРµРЅРёР№
+  StringOffsetArray             search_roots;      //СЃРјРµС‰РµРЅРёСЏ РІ search_root_names
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 InstanceController::InstanceController ()
@@ -45,7 +45,7 @@ InstanceController& InstanceController::operator = (const InstanceController& ic
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 InstanceController InstanceController::Clone () const
@@ -54,7 +54,7 @@ InstanceController InstanceController::Clone () const
 }
 
 /*
-    Контроллер
+    РљРѕРЅС‚СЂРѕР»Р»РµСЂ
 */
 
 const char* InstanceController::Controller () const
@@ -71,7 +71,7 @@ void InstanceController::SetController (const char* controller_id)
 }
 
 /*
-    Определение имени базового меша
+    РћРїСЂРµРґРµР»РµРЅРёРµ РёРјРµРЅРё Р±Р°Р·РѕРІРѕРіРѕ РјРµС€Р°
 */
 
 const char* InstanceController::FindBaseMesh (const Model& model) const
@@ -100,7 +100,7 @@ const char* InstanceController::FindBaseMesh (const Model& model) const
 }
 
 /*
-    Присоединённые материалы
+    РџСЂРёСЃРѕРµРґРёРЅС‘РЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹
 */
 
 media::collada::MaterialBinds& InstanceController::MaterialBinds ()
@@ -114,7 +114,7 @@ const media::collada::MaterialBinds& InstanceController::MaterialBinds () const
 }
 
 /*
-    Ссылки на корни поиска узлов для скининга
+    РЎСЃС‹Р»РєРё РЅР° РєРѕСЂРЅРё РїРѕРёСЃРєР° СѓР·Р»РѕРІ РґР»СЏ СЃРєРёРЅРёРЅРіР°
 */
 
 size_t InstanceController::JointSearchRootsCount () const

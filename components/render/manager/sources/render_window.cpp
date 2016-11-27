@@ -4,7 +4,7 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
-    Описание реализации окна рендеринга
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РѕРєРЅР° СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 typedef xtl::signal<void (Window&)> WindowSignal;
@@ -12,22 +12,22 @@ typedef xtl::com_ptr<INativeWindow> INativeWindowPtr;
 
 struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 {
-  WindowImpl*              owner;                     //окно-владелец
-  INativeWindowPtr         native_window;             //нативное окно
-  stl::string              name;                      //имя окна
-  DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки
-  low_level::SwapChainDesc swap_chain_desc;           //параметры цепочки обмена
-  LowLevelSwapChainPtr     swap_chain;                //цепочка обмена
-  LowLevelAdapterPtr       adapter;                   //адаптер отрисовки
-  RenderTargetPtr          color_buffer;              //буфер цвета окна
-  RenderTargetPtr          depth_stencil_buffer;      //буфер глубины окна
-  unsigned int             width;                     //ширина окна
-  unsigned int             height;                    //высота окна
-  WindowSignal             signals [WindowEvent_Num]; //сигналы окна
-  Log                      log;                       //протокол
-  SettingsPtr              settings;                  //настройки рендеринга
+  WindowImpl*              owner;                     //РѕРєРЅРѕ-РІР»Р°РґРµР»РµС†
+  INativeWindowPtr         native_window;             //РЅР°С‚РёРІРЅРѕРµ РѕРєРЅРѕ
+  stl::string              name;                      //РёРјСЏ РѕРєРЅР°
+  DeviceManagerPtr         device_manager;            //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  low_level::SwapChainDesc swap_chain_desc;           //РїР°СЂР°РјРµС‚СЂС‹ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
+  LowLevelSwapChainPtr     swap_chain;                //С†РµРїРѕС‡РєР° РѕР±РјРµРЅР°
+  LowLevelAdapterPtr       adapter;                   //Р°РґР°РїС‚РµСЂ РѕС‚СЂРёСЃРѕРІРєРё
+  RenderTargetPtr          color_buffer;              //Р±СѓС„РµСЂ С†РІРµС‚Р° РѕРєРЅР°
+  RenderTargetPtr          depth_stencil_buffer;      //Р±СѓС„РµСЂ РіР»СѓР±РёРЅС‹ РѕРєРЅР°
+  unsigned int             width;                     //С€РёСЂРёРЅР° РѕРєРЅР°
+  unsigned int             height;                    //РІС‹СЃРѕС‚Р° РѕРєРЅР°
+  WindowSignal             signals [WindowEvent_Num]; //СЃРёРіРЅР°Р»С‹ РѕРєРЅР°
+  Log                      log;                       //РїСЂРѕС‚РѕРєРѕР»
+  SettingsPtr              settings;                  //РЅР°СЃС‚СЂРѕР№РєРё СЂРµРЅРґРµСЂРёРЅРіР°
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (WindowImpl* in_owner, const SettingsPtr& in_settings)
     : owner (in_owner)
     , width (0)
@@ -36,7 +36,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     memset (&swap_chain_desc, 0, sizeof swap_chain_desc);    
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     try
@@ -49,7 +49,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
   
-///Создание цепочки обмена
+///РЎРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
   void CreateSwapChain (void* handle, const char* adapter_mask)
   {
     try
@@ -98,7 +98,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
   
-///Создание целей рендеринга
+///РЎРѕР·РґР°РЅРёРµ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
   void CreateRenderTargets ()
   {
     try
@@ -147,14 +147,14 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
   
-///Обновление размеров окна
+///РћР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
   void UpdateSizes (unsigned int in_width, unsigned int in_height)
   {
     width  = in_width;
     height = in_height;
   }
 
-///Обработка события перерисовки окна
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РїРµСЂРµСЂРёСЃРѕРІРєРё РѕРєРЅР°
   void OnPaint ()
   {
     try
@@ -176,7 +176,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
 
-///Обработка события изменения размеров окна
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
   void OnSizeChanged (unsigned int width, unsigned int height)
   {
     try
@@ -206,7 +206,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
   
-///Обработка события смены оконного дескриптора
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СЃРјРµРЅС‹ РѕРєРѕРЅРЅРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР°
   void OnHandleChanged (void* handle)
   {
     try
@@ -244,7 +244,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
   }
   
-///Обработчик события изменения области вывода
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ РѕР±Р»Р°СЃС‚Рё РІС‹РІРѕРґР°
   void OnViewportChanged (const Rect& viewport)
   {
     try
@@ -275,7 +275,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 namespace
@@ -307,7 +307,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
     
     log.Printf ("Creating render window");
     
-      //заполнение параметров цепочки обмена
+      //Р·Р°РїРѕР»РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
       
     low_level::SwapChainDesc swap_chain_desc;
     
@@ -336,7 +336,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
       }
     }
     
-      //создание цепочки обмена
+      //СЃРѕР·РґР°РЅРёРµ С†РµРїРѕС‡РєРё РѕР±РјРµРЅР°
     
     impl = new Impl (this, settings);
     
@@ -388,15 +388,15 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
       impl->CreateSwapChain (window.GetHandle (), adapter_mask);
     }
     
-      //обновление размеров
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ
       
     impl->UpdateSizes (window.GetWidth (), window.GetHeight ());
     
-      //подписка на события окна
+      //РїРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РѕРєРЅР°
 
     window.AttachListener (impl.get ());
     
-      //создание целей рендеринга
+      //СЃРѕР·РґР°РЅРёРµ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
       
     impl->CreateRenderTargets ();
   }
@@ -412,7 +412,7 @@ WindowImpl::~WindowImpl ()
 }
 
 /*
-    Менеджер устройства
+    РњРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 DeviceManagerPtr& WindowImpl::DeviceManager ()
@@ -421,7 +421,7 @@ DeviceManagerPtr& WindowImpl::DeviceManager ()
 }
 
 /*
-    Идентификатор окна
+    РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕРєРЅР°
 */
 
 void WindowImpl::SetName (const char* name)
@@ -438,7 +438,7 @@ const char* WindowImpl::Name ()
 }
 
 /*
-    Цели рендеринга
+    Р¦РµР»Рё СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 const RenderTargetPtr& WindowImpl::ColorBuffer ()
@@ -458,7 +458,7 @@ const RenderTargetPtr& WindowImpl::DepthStencilBuffer ()
 }
 
 /*
-    Размеры целей рендеринга
+    Р Р°Р·РјРµСЂС‹ С†РµР»РµР№ СЂРµРЅРґРµСЂРёРЅРіР°
 */
 
 unsigned int WindowImpl::Width ()
@@ -472,7 +472,7 @@ unsigned int WindowImpl::Height ()
 }
 
 /*
-    Принудительное обновление содержимого окна (обмен буферов)
+    РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РѕРєРЅР° (РѕР±РјРµРЅ Р±СѓС„РµСЂРѕРІ)
 */
 
 void WindowImpl::SwapBuffers ()
@@ -489,7 +489,7 @@ void WindowImpl::SwapBuffers ()
 }
 
 /*
-    Регистрация обработчиков событий
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
 */
 
 xtl::connection WindowImpl::RegisterEventHandler (WindowEvent event, const EventHandler& handler) const

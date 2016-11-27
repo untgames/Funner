@@ -3,7 +3,7 @@
 using namespace render::manager;
 
 /*
-    Описание реализации менеджера материалов
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 namespace
@@ -13,9 +13,9 @@ typedef stl::vector<MaterialProxy> MaterialProxyList;
 
 struct MaterialLibraryEntry: public xtl::reference_counter
 {
-  const media::rfx::MaterialLibrary* source_library; //ссылка на исходную библиотеку материалов (может быть недействительна на момент обращения)
-  stl::string                        resource_name;  //имя ресурса
-  MaterialProxyList                  materials;      //материалы библиотеки
+  const media::rfx::MaterialLibrary* source_library; //СЃСЃС‹Р»РєР° РЅР° РёСЃС…РѕРґРЅСѓСЋ Р±РёР±Р»РёРѕС‚РµРєСѓ РјР°С‚РµСЂРёР°Р»РѕРІ (РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµРґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° РЅР° РјРѕРјРµРЅС‚ РѕР±СЂР°С‰РµРЅРёСЏ)
+  stl::string                        resource_name;  //РёРјСЏ СЂРµСЃСѓСЂСЃР°
+  MaterialProxyList                  materials;      //РјР°С‚РµСЂРёР°Р»С‹ Р±РёР±Р»РёРѕС‚РµРєРё
   
   MaterialLibraryEntry () : source_library (0) {}
   
@@ -38,15 +38,15 @@ typedef stl::hash_map<stl::hash_key<const char*>, MaterialProxy> MaterialProxyMa
 
 struct MaterialManager::Impl
 {
-  DeviceManagerPtr      device_manager;   //менеджер устройства отрисовки
-  TextureManagerPtr     texture_manager;  //менеджер текстур
-  ProgramManagerPtr     program_manager;  //менеджер программ
-  MaterialProxyManager  proxy_manager;    //менеджер прокси объектов
-  MaterialLibraryList   loaded_libraries; //список загруженных библиотек
-  MaterialProxyMap      shared_materials; //список совместно используемых материалов
-  Log                   log;              //протокол сообщений
+  DeviceManagerPtr      device_manager;   //РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕС‚СЂРёСЃРѕРІРєРё
+  TextureManagerPtr     texture_manager;  //РјРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ
+  ProgramManagerPtr     program_manager;  //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРіСЂР°РјРј
+  MaterialProxyManager  proxy_manager;    //РјРµРЅРµРґР¶РµСЂ РїСЂРѕРєСЃРё РѕР±СЉРµРєС‚РѕРІ
+  MaterialLibraryList   loaded_libraries; //СЃРїРёСЃРѕРє Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… Р±РёР±Р»РёРѕС‚РµРє
+  MaterialProxyMap      shared_materials; //СЃРїРёСЃРѕРє СЃРѕРІРјРµСЃС‚РЅРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
+  Log                   log;              //РїСЂРѕС‚РѕРєРѕР» СЃРѕРѕР±С‰РµРЅРёР№
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
@@ -54,14 +54,14 @@ struct MaterialManager::Impl
   {
   }
   
-///Загрузка библиотеки
+///Р—Р°РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
   void LoadMaterialLibrary (const media::rfx::MaterialLibrary& library, const char* name)
   {        
     try
     {
       log.Printf ("Loading material library '%s' with %u materials", name && *name ? name : library.Name (), library.Size ());
       
-        //проверка повторной загрузки
+        //РїСЂРѕРІРµСЂРєР° РїРѕРІС‚РѕСЂРЅРѕР№ Р·Р°РіСЂСѓР·РєРё
       
       for (MaterialLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
       {
@@ -71,7 +71,7 @@ struct MaterialManager::Impl
           throw xtl::format_operation_exception ("", "Material library '%s' has been alredy loaded", *name ? name : *library.Name () ? library.Name () : "<reference>");
       }
       
-        //создание новой библиотеки
+        //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
         
       MaterialLibraryEntryPtr entry (new MaterialLibraryEntry, false);
       
@@ -97,7 +97,7 @@ struct MaterialManager::Impl
         entry->materials.push_back (proxy);
       }
 
-        //регистрация библиотеки
+        //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
         
       loaded_libraries.push_back (entry);      
     }
@@ -108,7 +108,7 @@ struct MaterialManager::Impl
     }
   }
   
-///Выгрузка библиотеки
+///Р’С‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРєРё
   void UnloadMaterialLibrary (const media::rfx::MaterialLibrary* source_library, const char* name)
   {
     log.Printf ("Unloading material library '%s'", name && *name ? name : source_library ? source_library->Name () : "");  
@@ -127,7 +127,7 @@ struct MaterialManager::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 MaterialManager::MaterialManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager)
@@ -140,7 +140,7 @@ MaterialManager::~MaterialManager ()
 }
 
 /*
-    Создание материалов
+    РЎРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 MaterialPtr MaterialManager::CreateMaterial ()
@@ -157,7 +157,7 @@ MaterialPtr MaterialManager::CreateMaterial ()
 }
 
 /*
-    Проверка: является ли ресурс библиотекой материалов
+    РџСЂРѕРІРµСЂРєР°: СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЂРµСЃСѓСЂСЃ Р±РёР±Р»РёРѕС‚РµРєРѕР№ РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 bool MaterialManager::IsMaterialLibraryResource (const char* name)
@@ -166,7 +166,7 @@ bool MaterialManager::IsMaterialLibraryResource (const char* name)
 }
 
 /*
-    Загрузка / выгрузка библиотек материалов
+    Р—Р°РіСЂСѓР·РєР° / РІС‹РіСЂСѓР·РєР° Р±РёР±Р»РёРѕС‚РµРє РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void MaterialManager::LoadMaterialLibrary (const char* name)
@@ -214,7 +214,7 @@ void MaterialManager::UnloadMaterialLibrary (const media::rfx::MaterialLibrary& 
 }
 
 /*
-    Регистрация совместно используемых материалов
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕРІРјРµСЃС‚РЅРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
 */
 
 void MaterialManager::ShareMaterial (const char* name, const MaterialPtr& material)
@@ -262,7 +262,7 @@ void MaterialManager::UnshareMaterial (const char* name)
 }
 
 /*
-    Получение прокси
+    РџРѕР»СѓС‡РµРЅРёРµ РїСЂРѕРєСЃРё
 */
 
 MaterialProxy MaterialManager::GetMaterialProxy (const char* name)
@@ -271,7 +271,7 @@ MaterialProxy MaterialManager::GetMaterialProxy (const char* name)
 }
 
 /*
-    Поиск загруженного материала
+    РџРѕРёСЃРє Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 MaterialPtr MaterialManager::FindMaterial (const char* name)
@@ -280,7 +280,7 @@ MaterialPtr MaterialManager::FindMaterial (const char* name)
 }
 
 /*
-    Установка материала по умолчанию
+    РЈСЃС‚Р°РЅРѕРІРєР° РјР°С‚РµСЂРёР°Р»Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 void MaterialManager::SetDefaultMaterial (const MaterialPtr& material)
@@ -294,7 +294,7 @@ MaterialPtr MaterialManager::DefaultMaterial ()
 }
 
 /*
-    Ссылка на менеджер устройства
+    РЎСЃС‹Р»РєР° РЅР° РјРµРЅРµРґР¶РµСЂ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 render::manager::DeviceManager& MaterialManager::DeviceManager ()

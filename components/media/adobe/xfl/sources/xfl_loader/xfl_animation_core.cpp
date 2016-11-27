@@ -11,7 +11,7 @@ const size_t DEFAULT_PROPERTIES_COUNT = 8;
 }
 
 /*
-    Разбор кадра анимации
+    Р Р°Р·Р±РѕСЂ РєР°РґСЂР° Р°РЅРёРјР°С†РёРё
 */
 
 void XflParser::ParseAnimationCore (Parser::Iterator iter, AnimationCore& animation)
@@ -32,7 +32,7 @@ void XflParser::ParseAnimationCore (Parser::Iterator iter, AnimationCore& animat
 }
 
 /*
-    Разбор анимируемых свойств
+    Р Р°Р·Р±РѕСЂ Р°РЅРёРјРёСЂСѓРµРјС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void XflParser::ParsePropertyAnimationContainer (Parser::Iterator iter, AnimationCore& animation, const char* in_property_prefix)

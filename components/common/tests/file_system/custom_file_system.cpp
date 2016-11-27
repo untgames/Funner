@@ -19,7 +19,7 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       printf ("MyFileSystem::~MyFileSystem\n");
     }
 
-///Работа с файлом
+///Р Р°Р±РѕС‚Р° СЃ С„Р°Р№Р»РѕРј
     file_t FileOpen (const char* name, filemode_t mode_flags, size_t buffer_size)
     {
       throw xtl::make_not_implemented_exception ("MyFileSystem::FileOpen");
@@ -74,7 +74,7 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       throw xtl::make_not_implemented_exception ("MyFileSystem::FileFlush");
     }
 
-///Управление расположением файлов
+///РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»РѕРІ
     void Remove (const char* file_name)
     {
       throw xtl::make_not_implemented_exception ("MyFileSystem::Remove");
@@ -90,7 +90,7 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       throw xtl::make_not_implemented_exception ("MyFileSystem::Mkdir");
     }
 
-///Получение информации о файле
+///РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
     bool IsFileExist (const char* file_name)
     {
       return false;
@@ -101,7 +101,7 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       return false;
     }
 
-///Информация о файловой системе
+///РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
     filesize_t GetFreeSpace (const char* path)
     {
       return (filesize_t)-1;
@@ -112,7 +112,7 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       return (filesize_t)-1;
     }
 
-//Файловые атрибуты
+//Р¤Р°Р№Р»РѕРІС‹Рµ Р°С‚СЂРёР±СѓС‚С‹
     void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
     {
       throw xtl::make_not_implemented_exception ("MyFileSystem::SetFileAttribute");
@@ -133,13 +133,13 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       throw xtl::make_not_implemented_exception ("MyFileSystem::RemoveFileAttribute");
     }
 
-///Поиск файла
+///РџРѕРёСЃРє С„Р°Р№Р»Р°
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {
       throw xtl::make_not_implemented_exception ("MyFileSystem::Search");
     }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
 //      printf ("MyFileSystem::AddRef\n");

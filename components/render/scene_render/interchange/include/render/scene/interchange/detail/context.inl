@@ -1,7 +1,7 @@
 namespace detail
 {
 
-/// Интерфейс получения сообщений
+/// РРЅС‚РµСЂС„РµР№СЃ РїРѕР»СѓС‡РµРЅРёСЏ СЃРѕРѕР±С‰РµРЅРёР№
 template <class Deserializer> class IIncomingCommandsProcessor
 {
   public:
@@ -12,7 +12,7 @@ template <class Deserializer> class IIncomingCommandsProcessor
 
 }
 
-/// Обработчик входящих команд
+/// РћР±СЂР°Р±РѕС‚С‡РёРє РІС…РѕРґСЏС‰РёС… РєРѕРјР°РЅРґ
 template <class Serializer, class Deserializer> template <class Processor>
 class Context<Serializer, Deserializer>::IncomingCommandsProcessorImpl: public detail::IIncomingCommandsProcessor<Deserializer>
 {
@@ -68,7 +68,7 @@ class Context<Serializer, Deserializer>::IncomingCommandsProcessorImpl: public d
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Serializer, class Deserializer> template <class Processor>
@@ -91,7 +91,7 @@ inline Context<Serializer, Deserializer>::~Context ()
 }
 
 /*
-    Установка активного соединения
+    РЈСЃС‚Р°РЅРѕРІРєР° Р°РєС‚РёРІРЅРѕРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 template <class Serializer, class Deserializer>
@@ -117,7 +117,7 @@ inline IConnection* Context<Serializer, Deserializer>::Counterparty () const
 }
 
 /*
-    Отсылка исходящих команд на выполнение
+    РћС‚СЃС‹Р»РєР° РёСЃС…РѕРґСЏС‰РёС… РєРѕРјР°РЅРґ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ
 */
 
 template <class Serializer, class Deserializer>
@@ -153,7 +153,7 @@ inline void Context<Serializer, Deserializer>::Flush ()
 }
 
 /*
-    Обработка входящих команд
+    РћР±СЂР°Р±РѕС‚РєР° РІС…РѕРґСЏС‰РёС… РєРѕРјР°РЅРґ
 */
 
 template <class Serializer, class Deserializer>

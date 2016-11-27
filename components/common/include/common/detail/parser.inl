@@ -1,5 +1,5 @@
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 namespace detail
@@ -16,7 +16,7 @@ void for_each_child_impl (Iter iter, Fn& fn)
     }
     catch (ParserException&)
     {
-      //сообщение уже запротоколировано при генерации исключения
+      //СЃРѕРѕР±С‰РµРЅРёРµ СѓР¶Рµ Р·Р°РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРѕ РїСЂРё РіРµРЅРµСЂР°С†РёРё РёСЃРєР»СЋС‡РµРЅРёСЏ
     }
     catch (std::exception& exception)
     {
@@ -44,7 +44,7 @@ void for_each_child_impl (Iter iter, Fn& fn)
 }
 
 /*
-    Полученеи первого потомка
+    РџРѕР»СѓС‡РµРЅРµРё РїРµСЂРІРѕРіРѕ РїРѕС‚РѕРјРєР°
 */
 
 inline ParseNode get_first_child (const ParseNode& node, const char* name)
@@ -58,7 +58,7 @@ inline ParseNode get_first_child (const ParseNode& node, const char* name)
 }
 
 /*
-    Получение итератора атрибутов
+    РџРѕР»СѓС‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР° Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 inline Parser::AttributeIterator make_attribute_iterator (const ParseNode& node)
@@ -75,7 +75,7 @@ inline Parser::AttributeIterator make_attribute_iterator (const ParseNode& node,
 }
 
 /*
-    Чтение атрибутов
+    Р§С‚РµРЅРёРµ Р°С‚СЂРёР±СѓС‚РѕРІ
 */
 
 template <class T>
@@ -129,7 +129,7 @@ inline void read (const ParseNode& node, const char* name, OutIter first, size_t
 namespace detail
 {
 
-//обёртка для хранения возвращаемого значения (для обхода предупреждения g++ 'value may be used uninitialized')
+//РѕР±С‘СЂС‚РєР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РґР»СЏ РѕР±С…РѕРґР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ g++ 'value may be used uninitialized')
 template <class T> struct ResultValueHolder
 {
   T value;
@@ -163,7 +163,7 @@ inline T get (const ParseNode& node, const char* name, const T& default_value)
 }
 
 /*
-    Применение функционала ко всем вложенным узлам
+    РџСЂРёРјРµРЅРµРЅРёРµ С„СѓРЅРєС†РёРѕРЅР°Р»Р° РєРѕ РІСЃРµРј РІР»РѕР¶РµРЅРЅС‹Рј СѓР·Р»Р°Рј
 */
 
 template <class Fn>

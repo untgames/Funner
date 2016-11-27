@@ -2,7 +2,7 @@
 
 using namespace common;
 
-//TODO: ввести режимы лексического разбора (см. ParseContentText)!!!
+//TODO: РІРІРµСЃС‚Рё СЂРµР¶РёРјС‹ Р»РµРєСЃРёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР° (СЃРј. ParseContentText)!!!
 
 namespace
 {
@@ -39,21 +39,21 @@ namespace xml_parser
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const double XML_VERSION               = 1.0f;                 //версия поддерживаемой спецификации XML
-const char*  XML_PARSER_COMPONENT_NAME = "common.parsers.xml"; //имя компонента xml-парсера
-const size_t ATTRIBUTES_CACHE_SIZE     = 256;                  //количество кэшируемых атрибутов
+const double XML_VERSION               = 1.0f;                 //РІРµСЂСЃРёСЏ РїРѕРґРґРµСЂР¶РёРІР°РµРјРѕР№ СЃРїРµС†РёС„РёРєР°С†РёРё XML
+const char*  XML_PARSER_COMPONENT_NAME = "common.parsers.xml"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р° xml-РїР°СЂСЃРµСЂР°
+const size_t ATTRIBUTES_CACHE_SIZE     = 256;                  //РєРѕР»РёС‡РµСЃС‚РІРѕ РєСЌС€РёСЂСѓРµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
 /*
-    Парсер XML-документов
+    РџР°СЂСЃРµСЂ XML-РґРѕРєСѓРјРµРЅС‚РѕРІ
 */
 
 class XmlParser
 {
   public:
-///Грамматический разбор
+///Р“СЂР°РјРјР°С‚РёС‡РµСЃРєРёР№ СЂР°Р·Р±РѕСЂ
     static void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* name, size_t buffer_size, char* buffer)
     {
       try
@@ -67,7 +67,7 @@ class XmlParser
       }
     }
 
-///Автоматическое определение возможности разбора парсером
+///РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕРїСЂРµРґРµР»РµРЅРёРµ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂР°Р·Р±РѕСЂР° РїР°СЂСЃРµСЂРѕРј
     static bool Check (size_t buffer_size, const char* buffer)
     {
       static const unsigned char PROLOG_UCS4BE []      = { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
@@ -100,7 +100,7 @@ class XmlParser
     }
 
   private:    
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     XmlParser (ParseTreeBuilder& in_builder, ParseLog& in_log, const char* in_name, size_t buffer_size, char* in_buffer)
       : builder (in_builder)
       , log (in_log)
@@ -184,7 +184,7 @@ class XmlParser
       ParseDocument ();
     }
     
-///Рестарт парсинга документа с конвертирование буфера в utf-8
+///Р РµСЃС‚Р°СЂС‚ РїР°СЂСЃРёРЅРіР° РґРѕРєСѓРјРµРЅС‚Р° СЃ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёРµ Р±СѓС„РµСЂР° РІ utf-8
     void ResetLexer (const char* encoding)
     {
       Warning (0, "non utf-8 encoding %s used (this decreases parsing perfomance)", encoding);
@@ -213,7 +213,7 @@ class XmlParser
       lexer.Reset (buffer);
     }
 
-///Работа с атрибутами
+///Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
     void AddAttribute (const char* attribute)
     {
       if (attributes_count == attributes.size ())
@@ -232,7 +232,7 @@ class XmlParser
       attributes_count = 0;
     }
     
-///Протоколирование ошибки разбора
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°
     void Error (const char* format, ...)
     {
       va_list list;
@@ -249,7 +249,7 @@ class XmlParser
       log.VError (name, line_number, format, list);
     }
 
-///Протоколирование предупреждения разбора
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ СЂР°Р·Р±РѕСЂР°
     void Warning (const char* format, ...)
     {
       va_list list;
@@ -266,7 +266,7 @@ class XmlParser
       log.VWarning (name, line_number, format, list);
     }        
 
-///Обработка лексической ошибки
+///РћР±СЂР°Р±РѕС‚РєР° Р»РµРєСЃРёС‡РµСЃРєРѕР№ РѕС€РёР±РєРё
     void ProcessLexError ()
     {
       switch (lexer.Status ())
@@ -297,7 +297,7 @@ class XmlParser
       }
     }
 
-///Обработка ошибки
+///РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
     void ProcessError ()
     {
       switch (lexer.Lexem ())
@@ -372,7 +372,7 @@ class XmlParser
       }      
     }
 
-///Утилиты разбора
+///РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
     void ParseProcessingInstruction ()
     {
       lexer.NextLexem ();
@@ -606,7 +606,7 @@ class XmlParser
         switch (lexer.Lexem ())
         {
           case XmlLexem_TagBeginBracket:
-            builder.EndNode (); //восстановление после ошибки
+            builder.EndNode (); //РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїРѕСЃР»Рµ РѕС€РёР±РєРё
             return;
           case XmlLexem_TagEndBracket:
             lexer.NextLexem (true);
@@ -723,7 +723,7 @@ class XmlParser
                         case XmlEncoding_Unknown:
                           encoding = XmlEncoding_FromPI;
 
-                          if (xtl::xstrcmp (value, "utf-8")) //не нужно конвертировать из utf8 в utf8
+                          if (xtl::xstrcmp (value, "utf-8")) //РЅРµ РЅСѓР¶РЅРѕ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РёР· utf8 РІ utf8
                           {
                             ResetLexer (value);
                             return true;
@@ -783,10 +783,10 @@ class XmlParser
     {
       enum XmlInstruction
       {
-        XmlInstruction_Undefined,  //неопределена
-        XmlInstruction_Version,    //версия формата
-        XmlInstruction_Encoding,   //кодовая страница
-        XmlInstruction_Standalone, //нет ссылок на внешние файлы
+        XmlInstruction_Undefined,  //РЅРµРѕРїСЂРµРґРµР»РµРЅР°
+        XmlInstruction_Version,    //РІРµСЂСЃРёСЏ С„РѕСЂРјР°С‚Р°
+        XmlInstruction_Encoding,   //РєРѕРґРѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°
+        XmlInstruction_Standalone, //РЅРµС‚ СЃСЃС‹Р»РѕРє РЅР° РІРЅРµС€РЅРёРµ С„Р°Р№Р»С‹
       };
 
       struct String2Instruction
@@ -959,19 +959,19 @@ class XmlParser
     typedef stl::vector<const char*> AttributeCache;
 
   private:
-    ParseTreeBuilder&                builder;          //построитель дерева грамматического разбора
-    ParseLog&                        log;              //протокол грамматического разбора
-    XmlLexer                         lexer;            //лексический анализатор
-    XmlEncoding                      encoding;         //кодировка разбираемого буфера
-    char*                            buffer;           //разбираемый буфер
-    const char*                      name;             //имя разбираемого буфера
-    AttributeCache                   attributes;       //кеш атрибутов
-    size_t                           attributes_count; //количество атрибутов в кеше
-    xtl::uninitialized_storage<char> utf8_buffer;      //буфер после конвертации в UTF-8
+    ParseTreeBuilder&                builder;          //РїРѕСЃС‚СЂРѕРёС‚РµР»СЊ РґРµСЂРµРІР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    ParseLog&                        log;              //РїСЂРѕС‚РѕРєРѕР» РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    XmlLexer                         lexer;            //Р»РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
+    XmlEncoding                      encoding;         //РєРѕРґРёСЂРѕРІРєР° СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ Р±СѓС„РµСЂР°
+    char*                            buffer;           //СЂР°Р·Р±РёСЂР°РµРјС‹Р№ Р±СѓС„РµСЂ
+    const char*                      name;             //РёРјСЏ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ Р±СѓС„РµСЂР°
+    AttributeCache                   attributes;       //РєРµС€ Р°С‚СЂРёР±СѓС‚РѕРІ
+    size_t                           attributes_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РІ РєРµС€Рµ
+    xtl::uninitialized_storage<char> utf8_buffer;      //Р±СѓС„РµСЂ РїРѕСЃР»Рµ РєРѕРЅРІРµСЂС‚Р°С†РёРё РІ UTF-8
 };
 
 /*
-    Компонент, регистрирующий XML-парсер
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ XML-РїР°СЂСЃРµСЂ
 */
 
 class XmlParserComponent

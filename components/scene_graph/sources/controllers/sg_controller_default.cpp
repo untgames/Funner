@@ -4,18 +4,18 @@ using namespace scene_graph;
 using namespace scene_graph::controllers;
 
 /*
-    Описание реализации контроллера воды
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР° РІРѕРґС‹
 */
 
 struct DefaultController::Impl: public xtl::instance_counter<DefaultController>
 {
-  UpdateFunction updater; //функция обновления контроллера
+  UpdateFunction updater; //С„СѓРЅРєС†РёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
   
   Impl (const UpdateFunction& in_updater) : updater (in_updater) {}
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 DefaultController::DefaultController (Node& node, const UpdateFunction& updater)
@@ -30,7 +30,7 @@ DefaultController::~DefaultController ()
 }
 
 /*
-    Создание контроллера
+    РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 DefaultController::Pointer DefaultController::Create (Node& node)
@@ -44,7 +44,7 @@ DefaultController::Pointer DefaultController::Create (Node& node, const UpdateFu
 }
 
 /*
-    Обновление
+    РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void DefaultController::Update (const TimeValue& time)

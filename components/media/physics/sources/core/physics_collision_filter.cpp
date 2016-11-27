@@ -3,14 +3,14 @@
 using namespace media::physics;
 
 /*
-   Реализация материала
+   Р РµР°Р»РёР·Р°С†РёСЏ РјР°С‚РµСЂРёР°Р»Р°
 */
 
 struct CollisionFilter::Impl : public xtl::reference_counter
 {
-  stl::string group1_wildcard; //маска имен первой группы
-  stl::string group2_wildcard; //маска имен второй группы
-  bool        collides;        //сталкиваются ли группы
+  stl::string group1_wildcard; //РјР°СЃРєР° РёРјРµРЅ РїРµСЂРІРѕР№ РіСЂСѓРїРїС‹
+  stl::string group2_wildcard; //РјР°СЃРєР° РёРјРµРЅ РІС‚РѕСЂРѕР№ РіСЂСѓРїРїС‹
+  bool        collides;        //СЃС‚Р°Р»РєРёРІР°СЋС‚СЃСЏ Р»Рё РіСЂСѓРїРїС‹
 
   Impl ()
     : collides (false)
@@ -18,7 +18,7 @@ struct CollisionFilter::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 CollisionFilter::CollisionFilter ()
@@ -50,7 +50,7 @@ CollisionFilter& CollisionFilter::operator = (const CollisionFilter& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 CollisionFilter CollisionFilter::Clone () const
@@ -59,7 +59,7 @@ CollisionFilter CollisionFilter::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t CollisionFilter::Id () const
@@ -68,7 +68,7 @@ size_t CollisionFilter::Id () const
 }
 
 /*
-   Маски имен групп
+   РњР°СЃРєРё РёРјРµРЅ РіСЂСѓРїРї
 */
 
 const char* CollisionFilter::Group1Wildcard () const
@@ -98,7 +98,7 @@ void CollisionFilter::SetGroup2Wildcard (const char* wildcard)
 }
 
 /*
-   Установка фильтрации, сталкиваются ли тела групп
+   РЈСЃС‚Р°РЅРѕРІРєР° С„РёР»СЊС‚СЂР°С†РёРё, СЃС‚Р°Р»РєРёРІР°СЋС‚СЃСЏ Р»Рё С‚РµР»Р° РіСЂСѓРїРї
 */
 
 bool CollisionFilter::IsCollides () const
@@ -112,7 +112,7 @@ void CollisionFilter::SetCollides (bool collides)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void CollisionFilter::Swap (CollisionFilter& source)
@@ -127,7 +127,7 @@ namespace physics
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (CollisionFilter& filter1, CollisionFilter& filter2)

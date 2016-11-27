@@ -13,12 +13,12 @@ namespace
 {
 
 /*
-    Определение багов и несоответствий спецификации
+    РћРїСЂРµРґРµР»РµРЅРёРµ Р±Р°РіРѕРІ Рё РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№ СЃРїРµС†РёС„РёРєР°С†РёРё
 */
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
-/*//определение бага функции glGetTexImage при работе с 3D-текстурой
+/*//РѕРїСЂРµРґРµР»РµРЅРёРµ Р±Р°РіР° С„СѓРЅРєС†РёРё glGetTexImage РїСЂРё СЂР°Р±РѕС‚Рµ СЃ 3D-С‚РµРєСЃС‚СѓСЂРѕР№
 bool detect_texture3d_bug ()
 {
   if (!glTexImage3D && !glTexImage3DEXT)
@@ -69,12 +69,12 @@ bool detect_texture3d_bug ()
 }
 
 /*
-    Определение багов драйверов OpenGL
+    РћРїСЂРµРґРµР»РµРЅРёРµ Р±Р°РіРѕРІ РґСЂР°Р№РІРµСЂРѕРІ OpenGL
 */
 
 void detect_opengl_bugs (stl::string& extensions)
 {
-    //определение бага отключено, из-за crash при вызове glGetTexImage на старых драйверах ATI
+    //РѕРїСЂРµРґРµР»РµРЅРёРµ Р±Р°РіР° РѕС‚РєР»СЋС‡РµРЅРѕ, РёР·-Р·Р° crash РїСЂРё РІС‹Р·РѕРІРµ glGetTexImage РЅР° СЃС‚Р°СЂС‹С… РґСЂР°Р№РІРµСЂР°С… ATI
 
 //  if (detect_texture3d_bug ())
 //    extensions += " GLBUG_texture3D_get_tex_image";

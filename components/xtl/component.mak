@@ -1,9 +1,9 @@
 ###################################################################################################
-#Определения и константы
+#РћРїСЂРµРґРµР»РµРЅРёСЏ Рё РєРѕРЅСЃС‚Р°РЅС‚С‹
 ###################################################################################################
 TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.INFO
 
-#Цель №1 - STL tests
+#Р¦РµР»СЊ в„–1 - STL tests
 XTL.STL.TESTS.TYPE               := test-suite
 XTL.STL.TESTS.INCLUDE_DIRS       := include
 XTL.STL.TESTS.SOURCE_DIRS        := tests/stl
@@ -16,7 +16,7 @@ XTL.STL.TESTS.DOCUMENTATION_DIRS := include
 XTL.STL.TESTS.bada.IMPORTS       := compile.extern.bada
 XTL.STL.TESTS.wince.IMPORTS      := link.extern.wcecompat
 
-#Цель №2 - TR1 tests
+#Р¦РµР»СЊ в„–2 - TR1 tests
 XTL.TR1.TESTS.TYPE                        := test-suite
 XTL.TR1.TESTS.INCLUDE_DIRS                := include
 XTL.TR1.TESTS.SOURCE_DIRS                 := tests/tr1/type_traits tests/tr1/smart_ptr tests/tr1/functional tests/tr1/tuple tests/tr1/array
@@ -32,7 +32,7 @@ XTL.TR1.TESTS.pthread_static_library.LIBS := pthread
 XTL.TR1.TESTS.bada.IMPORTS                := compile.extern.bada
 XTL.TR1.TESTS.wince.IMPORTS               := link.extern.wcecompat
 
-#Цель №3 - XTL tests
+#Р¦РµР»СЊ в„–3 - XTL tests
 XTL.XTL.TESTS.TYPE                 := test-suite
 XTL.XTL.TESTS.INCLUDE_DIRS         := include
 XTL.XTL.TESTS.SOURCE_DIRS          := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/rational tests/xtl/any tests/xtl/exception tests/xtl/types

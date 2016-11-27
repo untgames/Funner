@@ -12,7 +12,7 @@ int main ()
     
     RenderManager render_manager = test.RenderManager ();    
     
-      //создание материала и примитива
+      //СЃРѕР·РґР°РЅРёРµ РјР°С‚РµСЂРёР°Р»Р° Рё РїСЂРёРјРёС‚РёРІР°
       
     printf ("--- Load resources ---\n");
 
@@ -31,7 +31,7 @@ int main ()
 
     primitive.UpdateCache ();
 
-      //обновление полного состояния материала
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕР»РЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РјР°С‚РµСЂРёР°Р»Р°
       
     printf ("--- Update full material state ---\n");        
     
@@ -56,7 +56,7 @@ int main ()
     
     primitive.UpdateCache ();
 
-      //обновление свойств материала с сохранение их структуры
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р° СЃ СЃРѕС…СЂР°РЅРµРЅРёРµ РёС… СЃС‚СЂСѓРєС‚СѓСЂС‹
       
     printf ("--- Update material properties (with same layout) ---\n");
       
@@ -64,7 +64,7 @@ int main ()
     
     primitive.UpdateCache ();
     
-      //обновление свойств материала с изменением их структуры        
+      //РѕР±РЅРѕРІР»РµРЅРёРµ СЃРІРѕР№СЃС‚РІ РјР°С‚РµСЂРёР°Р»Р° СЃ РёР·РјРµРЅРµРЅРёРµРј РёС… СЃС‚СЂСѓРєС‚СѓСЂС‹        
     
     printf ("--- Update material properties (with new layout) ---\n");
       
@@ -74,7 +74,7 @@ int main ()
     
     primitive.UpdateCache ();
 
-      //обновление текстур
+      //РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСЃС‚СѓСЂ
       
     printf ("--- Unload texture ---\n");      
       
@@ -95,7 +95,7 @@ int main ()
 
     primitive.UpdateCache ();        
 
-      //обновление программы
+      //РѕР±РЅРѕРІР»РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
       
     printf ("--- Update program ---\n");            
       

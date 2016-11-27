@@ -4,25 +4,25 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t DEFAULT_BATCH_VERTICES_COUNT = 8192;                             //резервируемое количество вершин в пакете
-const size_t DEFAULT_BATCH_INDICES_COUNT  = DEFAULT_BATCH_VERTICES_COUNT * 2; //резервируемое количество индексов в пакете
+const size_t DEFAULT_BATCH_VERTICES_COUNT = 8192;                             //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ РїР°РєРµС‚Рµ
+const size_t DEFAULT_BATCH_INDICES_COUNT  = DEFAULT_BATCH_VERTICES_COUNT * 2; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ РІ РїР°РєРµС‚Рµ
 
 /*
-    Описание реализации менеджера пакетирования
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РјРµРЅРµРґР¶РµСЂР° РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 */
 
 namespace
 {
 
-/// Группа пакетирования
+/// Р“СЂСѓРїРїР° РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 struct BatchGroup: public xtl::reference_counter
 {
-  stl::string  wildcard;       //маска имени
-  unsigned int vertices_count; //количество вершин
-  unsigned int indices_count;  //количество индексов
+  stl::string  wildcard;       //РјР°СЃРєР° РёРјРµРЅРё
+  unsigned int vertices_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ
+  unsigned int indices_count;  //РєРѕР»РёС‡РµСЃС‚РІРѕ РёРЅРґРµРєСЃРѕРІ
 
   BatchGroup (const char* in_wildcard, unsigned int in_vertices_count, unsigned int in_indices_count)
     : wildcard (in_wildcard)
@@ -40,12 +40,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, render::manager::PrimitiveBuff
 
 struct BatchingManager::Impl
 {
-  manager::RenderManager render_manager; //менеджер рендеринга
-  common::Log            log;            //поток отладочного протоколирования
-  BatchMap               batches;        //пакеты
-  BatchGroupList         batch_groups;   //группы пакетов
+  manager::RenderManager render_manager; //РјРµРЅРµРґР¶РµСЂ СЂРµРЅРґРµСЂРёРЅРіР°
+  common::Log            log;            //РїРѕС‚РѕРє РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
+  BatchMap               batches;        //РїР°РєРµС‚С‹
+  BatchGroupList         batch_groups;   //РіСЂСѓРїРїС‹ РїР°РєРµС‚РѕРІ
 
-/// Конструктор
+/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const manager::RenderManager& in_render_manager, const common::Log& in_log)
     : render_manager (in_render_manager)
     , log (in_log)
@@ -54,7 +54,7 @@ struct BatchingManager::Impl
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 BatchingManager::BatchingManager (const render::manager::RenderManager& manager, const common::Log& log)
@@ -67,7 +67,7 @@ BatchingManager::~BatchingManager ()
 }
 
 /*
-    Добавление групп пакетирования
+    Р”РѕР±Р°РІР»РµРЅРёРµ РіСЂСѓРїРї РїР°РєРµС‚РёСЂРѕРІР°РЅРёСЏ
 */
 
 void BatchingManager::AddBatchGroup (const char* group_wildcard, unsigned int vertices_count, unsigned int indices_count)
@@ -100,7 +100,7 @@ void BatchingManager::RemoveAllBatchGroups ()
 }
 
 /*
-    Получение буфера примитивов
+    РџРѕР»СѓС‡РµРЅРёРµ Р±СѓС„РµСЂР° РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 render::manager::PrimitiveBuffers BatchingManager::GetBatch (const char* name)
@@ -143,7 +143,7 @@ render::manager::PrimitiveBuffers BatchingManager::GetBatch (const char* name)
 }
 
 /*
-    Удаление всех пакетов
+    РЈРґР°Р»РµРЅРёРµ РІСЃРµС… РїР°РєРµС‚РѕРІ
 */
 
 void BatchingManager::RemoveAllBatches ()
@@ -154,7 +154,7 @@ void BatchingManager::RemoveAllBatches ()
 }
 
 /*
-    Очистка
+    РћС‡РёСЃС‚РєР°
 */
 
 void BatchingManager::Clear ()
@@ -164,7 +164,7 @@ void BatchingManager::Clear ()
 }
 
 /*
-    Перезагрузка конфигурации
+    РџРµСЂРµР·Р°РіСЂСѓР·РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё
 */
 
 void BatchingManager::ReloadConfiguration (const common::ParseNode& node)

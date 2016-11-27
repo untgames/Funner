@@ -2,7 +2,7 @@ namespace detail
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Итератор слотов для аккумулирования результата распространения сигнала
+///РС‚РµСЂР°С‚РѕСЂ СЃР»РѕС‚РѕРІ РґР»СЏ Р°РєРєСѓРјСѓР»РёСЂРѕРІР°РЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚Р° СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ СЃРёРіРЅР°Р»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Slot, class Args> class signal_invoke_iterator
 {  
@@ -140,7 +140,7 @@ template <> struct default_signal_accumulator<void>
 */
 
 /*
-    Конструкторы / деструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class Signature, class Accumulator>
@@ -159,7 +159,7 @@ inline signal<Signature, Accumulator>::~signal ()
 }
 
 /*
-    Установка / разрыв соединения
+    РЈСЃС‚Р°РЅРѕРІРєР° / СЂР°Р·СЂС‹РІ СЃРѕРµРґРёРЅРµРЅРёСЏ
 */
 
 template <class Signature, class Accumulator>
@@ -208,7 +208,7 @@ void signal<Signature, Accumulator>::disconnect_all ()
   if (!first)
     return;
 
-    //данная функция предполагает возможность очистки списка обработчиков во время распространения сигнала
+    //РґР°РЅРЅР°СЏ С„СѓРЅРєС†РёСЏ РїСЂРµРґРїРѕР»Р°РіР°РµС‚ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РѕС‡РёСЃС‚РєРё СЃРїРёСЃРєР° РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РІРѕ РІСЂРµРјСЏ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ СЃРёРіРЅР°Р»Р°
 
   for (slot_impl* i=first->previos (); i!=first;)
   {
@@ -223,7 +223,7 @@ void signal<Signature, Accumulator>::disconnect_all ()
 }
 
 /*
-    Проверка на пустоту
+    РџСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 */
 
 template <class Signature, class Accumulator>
@@ -233,7 +233,7 @@ inline bool signal<Signature, Accumulator>::empty () const
 }
 
 /*
-    Количество слотов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃР»РѕС‚РѕРІ
 */
 
 template <class Signature, class Accumulator>
@@ -251,7 +251,7 @@ inline size_t signal<Signature, Accumulator>::num_slots () const
 }
 
 /*
-    Распространение сигнала
+    Р Р°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёРµ СЃРёРіРЅР°Р»Р°
 */
 
 template <class Signature, class Accumulator> template <class Tuple>

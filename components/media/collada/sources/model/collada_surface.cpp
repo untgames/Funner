@@ -39,7 +39,7 @@ struct Channel<T, const char*>
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Список каналов поверхности
+///РЎРїРёСЃРѕРє РєР°РЅР°Р»РѕРІ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, class Key> class ChannelListImpl: public Surface::IChannelList<T, Key>
 {
@@ -76,13 +76,13 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество каналов / проверка на пустоту
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°РЅР°Р»РѕРІ / РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚РѕС‚Сѓ
 ///////////////////////////////////////////////////////////////////////////////////////////////////      
     unsigned int Size    () const { return (unsigned int)channels.size (); }
     bool         IsEmpty () const { return channels.empty (); }
         
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание / удаление канала
+///РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ РєР°РЅР°Р»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int Create (Key name)
     {
@@ -135,7 +135,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя канала
+///РРјСЏ РєР°РЅР°Р»Р°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Key Name (unsigned int channel) const
     {
@@ -146,7 +146,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск канала по имени. Возвращает номер канала, или -1 в случае неудачи
+///РџРѕРёСЃРє РєР°РЅР°Р»Р° РїРѕ РёРјРµРЅРё. Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅРѕРјРµСЂ РєР°РЅР°Р»Р°, РёР»Рё -1 РІ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     int Find (Key name) const
     {
@@ -168,7 +168,7 @@ template <class T, class Key> class ChannelListImpl: public Surface::IChannelLis
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Данные
+///Р”Р°РЅРЅС‹Рµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const T* Data (unsigned int channel) const
     {
@@ -211,7 +211,7 @@ typedef ChannelListImpl<VertexInfluence, const char*> InfluenceChannelListImpl;
 }
 
 /*
-    Реализация surface
+    Р РµР°Р»РёР·Р°С†РёСЏ surface
 */
 
 typedef stl::vector<Vertex> VertexArray;
@@ -219,13 +219,13 @@ typedef stl::vector<unsigned int> IndexArray;
 
 struct Surface::Impl: public xtl::reference_counter
 {
-  stl::string               material_name;      //имя материала
-  collada::PrimitiveType    primitive_type;     //тип примитивов
-  VertexArray               vertices;           //вершины
-  IndexArray                indices;            //индексы
-  ColorChannelListImpl      color_channels;     //каналы вершинных цветов
-  TexVertexChannelListImpl  texvertex_channels; //каналы текстурирования
-  InfluenceChannelListImpl  influence_channels; //каналы вершинных весов
+  stl::string               material_name;      //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  collada::PrimitiveType    primitive_type;     //С‚РёРї РїСЂРёРјРёС‚РёРІРѕРІ
+  VertexArray               vertices;           //РІРµСЂС€РёРЅС‹
+  IndexArray                indices;            //РёРЅРґРµРєСЃС‹
+  ColorChannelListImpl      color_channels;     //РєР°РЅР°Р»С‹ РІРµСЂС€РёРЅРЅС‹С… С†РІРµС‚РѕРІ
+  TexVertexChannelListImpl  texvertex_channels; //РєР°РЅР°Р»С‹ С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРёСЏ
+  InfluenceChannelListImpl  influence_channels; //РєР°РЅР°Р»С‹ РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
   
   Impl (collada::PrimitiveType in_primitive_type, unsigned int in_vertices_count, unsigned int in_indices_count) :
     primitive_type (in_primitive_type), vertices (in_vertices_count), indices (in_indices_count),
@@ -247,7 +247,7 @@ struct Surface::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Surface::Surface (media::collada::PrimitiveType type, unsigned int verts_count, unsigned int indices_count)
@@ -274,7 +274,7 @@ Surface& Surface::operator = (const Surface& srf)
 }
 
 /*
-    Создание копии
+    РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Surface Surface::Clone () const
@@ -283,7 +283,7 @@ Surface Surface::Clone () const
 }
 
 /*
-    Имя материала поверхности
+    РРјСЏ РјР°С‚РµСЂРёР°Р»Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё
 */
 
 const char* Surface::Material () const
@@ -300,7 +300,7 @@ void Surface::SetMaterial (const char* name)
 }
 
 /*
-    Тип примитивов
+    РўРёРї РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 PrimitiveType Surface::PrimitiveType () const
@@ -309,7 +309,7 @@ PrimitiveType Surface::PrimitiveType () const
 }
 
 /*
-    Количество вершин и индексов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ Рё РёРЅРґРµРєСЃРѕРІ
 */
 
 unsigned int Surface::VerticesCount () const
@@ -323,7 +323,7 @@ unsigned int Surface::IndicesCount () const
 }
 
 /*
-    Работа с вершинами
+    Р Р°Р±РѕС‚Р° СЃ РІРµСЂС€РёРЅР°РјРё
 */
 
 Vertex* Surface::Vertices ()
@@ -337,7 +337,7 @@ const Vertex* Surface::Vertices () const
 }
 
 /*
-    Индексы примитивов
+    РРЅРґРµРєСЃС‹ РїСЂРёРјРёС‚РёРІРѕРІ
 */
 
 unsigned int* Surface::Indices ()
@@ -351,7 +351,7 @@ const unsigned int* Surface::Indices () const
 }
 
 /*
-    Работа с каналами вершинных цветов
+    Р Р°Р±РѕС‚Р° СЃ РєР°РЅР°Р»Р°РјРё РІРµСЂС€РёРЅРЅС‹С… С†РІРµС‚РѕРІ
 */
 
 Surface::ColorChannelList& Surface::ColorChannels ()
@@ -365,7 +365,7 @@ const Surface::ColorChannelList& Surface::ColorChannels () const
 }
 
 /*
-    Работа с каналами текстурированных вершин
+    Р Р°Р±РѕС‚Р° СЃ РєР°РЅР°Р»Р°РјРё С‚РµРєСЃС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹С… РІРµСЂС€РёРЅ
 */
 
 Surface::TexVertexChannelList& Surface::TexVertexChannels ()
@@ -379,7 +379,7 @@ const Surface::TexVertexChannelList& Surface::TexVertexChannels () const
 }
 
 /*
-    Работа с каналами вершинных весов
+    Р Р°Р±РѕС‚Р° СЃ РєР°РЅР°Р»Р°РјРё РІРµСЂС€РёРЅРЅС‹С… РІРµСЃРѕРІ
 */
 
 Surface::InfluenceChannelList& Surface::InfluenceChannels ()

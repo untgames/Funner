@@ -1,4 +1,4 @@
-//Тестирование алгоритма find
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° find
 #include <stdio.h>
 #include <stl/list>
 #include <stl/algorithm>

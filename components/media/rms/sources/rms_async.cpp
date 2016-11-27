@@ -10,14 +10,14 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t MAX_OPERATION_STEP_DURATION = 50;                //максимальное время выполнения шага операций в миллисекундах
-const char*  LOG_NAME                    = "media.rms.async"; //имя протокола
+const size_t MAX_OPERATION_STEP_DURATION = 50;                //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ С€Р°РіР° РѕРїРµСЂР°С†РёР№ РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С…
+const char*  LOG_NAME                    = "media.rms.async"; //РёРјСЏ РїСЂРѕС‚РѕРєРѕР»Р°
 
 /*
-    Интерфейс операции
+    РРЅС‚РµСЂС„РµР№СЃ РѕРїРµСЂР°С†РёРё
 */
 
 class IAsyncOperationHandler
@@ -32,13 +32,13 @@ class IAsyncOperationHandler
 };
 
 /*
-    Менеджер асинхронных операций
+    РњРµРЅРµРґР¶РµСЂ Р°СЃРёРЅС…СЂРѕРЅРЅС‹С… РѕРїРµСЂР°С†РёР№
 */
 
 class AsyncOperationManager
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     AsyncOperationManager ()
       : log (LOG_NAME)
       , action_handler (xtl::bind (&AsyncOperationManager::DoTimedStep, this))
@@ -51,7 +51,7 @@ class AsyncOperationManager
         operations.pop_back ();
     }
   
-///Добавление операции
+///Р”РѕР±Р°РІР»РµРЅРёРµ РѕРїРµСЂР°С†РёРё
     void AddOperation (IAsyncOperationHandler* operation)
     {            
       if (!operation)
@@ -73,7 +73,7 @@ class AsyncOperationManager
       }
     }
     
-///Удаление операции
+///РЈРґР°Р»РµРЅРёРµ РѕРїРµСЂР°С†РёРё
     void RemoveOperation (IAsyncOperationHandler* operation)
     {
       if (!operation)
@@ -94,7 +94,7 @@ class AsyncOperationManager
         }
     }
     
-///Выполнение операций
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёР№
     void DoTimedStep ()
     {
       size_t end_time = common::milliseconds () + MAX_OPERATION_STEP_DURATION;      
@@ -149,24 +149,24 @@ typedef common::Singleton<AsyncOperationManager> AsyncOperationManagerSingleton;
 }
 
 /*
-    Описание реализации асинхронной операции
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°СЃРёРЅС…СЂРѕРЅРЅРѕР№ РѕРїРµСЂР°С†РёРё
 */
 
 typedef stl::list<AsyncOperation::TaskHandler> TaskList;
 
 struct AsyncOperation::Impl: public IAsyncOperationHandler
 {
-  AsyncOperation& owner;                //ссылка на владельца
-  size_t          ref_count;            //счётчик ссылок
-  ProgressState   state;                //текущее состояние
-  size_t          estimate_steps_count; //количество шагов для выполнения операции
-  size_t          finished_steps_count; //количество выполненных шагов
-  stl::string     resource_name;        //имя текущего обрабатываемого ресурса
-  stl::string     stage_name;           //имя этапа загрузки
-  ProgressHandler progress_handler;     //обработчик оповещения о выполнении операции
-  TaskList        tasks;                //задачи
+  AsyncOperation& owner;                //СЃСЃС‹Р»РєР° РЅР° РІР»Р°РґРµР»СЊС†Р°
+  size_t          ref_count;            //СЃС‡С‘С‚С‡РёРє СЃСЃС‹Р»РѕРє
+  ProgressState   state;                //С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+  size_t          estimate_steps_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ С€Р°РіРѕРІ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёРё
+  size_t          finished_steps_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‹РїРѕР»РЅРµРЅРЅС‹С… С€Р°РіРѕРІ
+  stl::string     resource_name;        //РёРјСЏ С‚РµРєСѓС‰РµРіРѕ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ СЂРµСЃСѓСЂСЃР°
+  stl::string     stage_name;           //РёРјСЏ СЌС‚Р°РїР° Р·Р°РіСЂСѓР·РєРё
+  ProgressHandler progress_handler;     //РѕР±СЂР°Р±РѕС‚С‡РёРє РѕРїРѕРІРµС‰РµРЅРёСЏ Рѕ РІС‹РїРѕР»РЅРµРЅРёРё РѕРїРµСЂР°С†РёРё
+  TaskList        tasks;                //Р·Р°РґР°С‡Рё
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (AsyncOperation& in_owner, const ProgressHandler& in_progress_handler)
     : owner (in_owner)
     , ref_count (1)
@@ -178,13 +178,13 @@ struct AsyncOperation::Impl: public IAsyncOperationHandler
     AsyncOperationManagerSingleton::Instance ()->AddOperation (this);
   }
   
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     RemoveOperation ();
   }
   
-///Удаление операции из очереди обработки менеджера асинхронных операций
+///РЈРґР°Р»РµРЅРёРµ РѕРїРµСЂР°С†РёРё РёР· РѕС‡РµСЂРµРґРё РѕР±СЂР°Р±РѕС‚РєРё РјРµРЅРµРґР¶РµСЂР° Р°СЃРёРЅС…СЂРѕРЅРЅС‹С… РѕРїРµСЂР°С†РёР№
   void RemoveOperation ()
   {
     try
@@ -196,7 +196,7 @@ struct AsyncOperation::Impl: public IAsyncOperationHandler
     }    
   }
   
-///Обновление прогресса
+///РћР±РЅРѕРІР»РµРЅРёРµ РїСЂРѕРіСЂРµСЃСЃР°
   void UpdateProgress ()
   {
     try
@@ -210,7 +210,7 @@ struct AsyncOperation::Impl: public IAsyncOperationHandler
     }    
   }
   
-///Выполнение шага операции  
+///Р’С‹РїРѕР»РЅРµРЅРёРµ С€Р°РіР° РѕРїРµСЂР°С†РёРё  
   void DoStep ()
   {
     if (state != ProgressState_Processing || tasks.empty ())
@@ -248,7 +248,7 @@ struct AsyncOperation::Impl: public IAsyncOperationHandler
     }
   }
 
-///Подсчёт ссылок  
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє  
   void AddRef ()
   {
     ref_count++;
@@ -262,7 +262,7 @@ struct AsyncOperation::Impl: public IAsyncOperationHandler
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 AsyncOperation::AsyncOperation (const ProgressHandler& progress_handler)
@@ -283,7 +283,7 @@ AsyncOperation::~AsyncOperation ()
 }
 
 /*
-    Создание операции
+    РЎРѕР·РґР°РЅРёРµ РѕРїРµСЂР°С†РёРё
 */
 
 AsyncOperation::Pointer AsyncOperation::Create (const ProgressHandler& progress_handler)
@@ -307,7 +307,7 @@ AsyncOperation::Pointer AsyncOperation::Create ()
 }
 
 /*
-    Добавление задач
+    Р”РѕР±Р°РІР»РµРЅРёРµ Р·Р°РґР°С‡
 */
 
 void AsyncOperation::AddTask (const TaskHandler& task_handler)
@@ -316,7 +316,7 @@ void AsyncOperation::AddTask (const TaskHandler& task_handler)
 }
 
 /*
-    Состояние операции
+    РЎРѕСЃС‚РѕСЏРЅРёРµ РѕРїРµСЂР°С†РёРё
 */
 
 void AsyncOperation::SetState (ProgressState state)
@@ -340,7 +340,7 @@ ProgressState AsyncOperation::State ()
 }
 
 /*
-    Оценка количества шагов выполнения операции
+    РћС†РµРЅРєР° РєРѕР»РёС‡РµСЃС‚РІР° С€Р°РіРѕРІ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёРё
 */
 
 void AsyncOperation::AddEstimateSteps (size_t steps_count)
@@ -354,7 +354,7 @@ void AsyncOperation::AddFinishedSteps (size_t steps_count)
 }
 
 /*
-    Прогресс выполнения операции
+    РџСЂРѕРіСЂРµСЃСЃ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёРё
 */
 
 float AsyncOperation::Value ()
@@ -369,7 +369,7 @@ float AsyncOperation::Value ()
 }
 
 /*
-    Имя текущего обрабатываемого ресурса
+    РРјСЏ С‚РµРєСѓС‰РµРіРѕ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјРѕРіРѕ СЂРµСЃСѓСЂСЃР°
 */
 
 const char* AsyncOperation::Resource ()
@@ -386,7 +386,7 @@ void AsyncOperation::SetResource (const char* name)
 }
 
 /*
-    Имя этапа обработки
+    РРјСЏ СЌС‚Р°РїР° РѕР±СЂР°Р±РѕС‚РєРё
 */
 
 const char* AsyncOperation::Stage ()
@@ -403,7 +403,7 @@ void AsyncOperation::SetStage (const char* name)
 }
 
 /*
-   Оповещение об обновлении
+   РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РѕР±РЅРѕРІР»РµРЅРёРё
 */
 
 void AsyncOperation::UpdateProgress ()
@@ -412,7 +412,7 @@ void AsyncOperation::UpdateProgress ()
 }
 
 /*
-    Подсчёт ссылок
+    РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
 */
 
 void AsyncOperation::AddRef ()
@@ -426,7 +426,7 @@ void AsyncOperation::Release ()
 }
 
 /*
-    Выполнение операции из очереди
+    Р’С‹РїРѕР»РЅРµРЅРёРµ РѕРїРµСЂР°С†РёРё РёР· РѕС‡РµСЂРµРґРё
 */
 
 bool AsyncOperation::DoStep ()

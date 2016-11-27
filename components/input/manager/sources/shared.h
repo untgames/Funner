@@ -38,26 +38,26 @@ namespace input
 {
 
 /*
-    Транслятор событий
+    РўСЂР°РЅСЃР»СЏС‚РѕСЂ СЃРѕР±С‹С‚РёР№
 */
 
 class EventTranslator: public TranslationMap::ITranslator
 {
   public:
-      //конструктор/деструктор
+      //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     EventTranslator (const char* input_event, const char* event_replacement, const char* tag="");
     ~EventTranslator ();
 
-      //выполнение замены
+      //РІС‹РїРѕР»РЅРµРЅРёРµ Р·Р°РјРµРЅС‹
     bool Replace (const common::StringArray& event_components, stl::string& result);
 
-      //переопределение виртуальный функций - информация об объекте
+      //РїРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ РІРёСЂС‚СѓР°Р»СЊРЅС‹Р№ С„СѓРЅРєС†РёР№ - РёРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕР±СЉРµРєС‚Рµ
     const char* InputEvent  () { return str_event_wildcard.c_str (); }
     const char* Replacement () { return str_event_replacement.c_str (); }
     const char* Tag         () { return str_tag.c_str (); }
 
   private:
-      //Разбиение строки замены на составляющие
+      //Р Р°Р·Р±РёРµРЅРёРµ СЃС‚СЂРѕРєРё Р·Р°РјРµРЅС‹ РЅР° СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ
     void ParseFormatString (const char* prefix, const char* replacement_tag);
 
   private:

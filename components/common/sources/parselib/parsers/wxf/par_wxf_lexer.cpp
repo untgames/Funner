@@ -2,21 +2,21 @@
 
 using namespace common;
 
-//!!добавить таблицы в разборе identifier/value
+//!!РґРѕР±Р°РІРёС‚СЊ С‚Р°Р±Р»РёС†С‹ РІ СЂР°Р·Р±РѕСЂРµ identifier/value
 
 namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-char DUMMY_CHAR = ' '; //символ используемый для фиктивного затирания при лексическом разборе
+char DUMMY_CHAR = ' '; //СЃРёРјРІРѕР» РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РґР»СЏ С„РёРєС‚РёРІРЅРѕРіРѕ Р·Р°С‚РёСЂР°РЅРёСЏ РїСЂРё Р»РµРєСЃРёС‡РµСЃРєРѕРј СЂР°Р·Р±РѕСЂРµ
 
 }
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 WxfLexer::WxfLexer ()
@@ -27,7 +27,7 @@ WxfLexer::WxfLexer ()
 }
 
 /*
-    Сброс буфера разбора
+    РЎР±СЂРѕСЃ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР°
 */
 
 void WxfLexer::Reset (char* buffer)
@@ -44,7 +44,7 @@ void WxfLexer::Reset (char* buffer)
 }
 
 /*
-    Установка ошибки
+    РЈСЃС‚Р°РЅРѕРІРєР° РѕС€РёР±РєРё
 */
 
 void WxfLexer::SetError (WxfLexerStatus status, char* error_position)
@@ -70,7 +70,7 @@ void WxfLexer::SetErrorAndSkip (WxfLexerStatus status, char* error_position)
 }
 
 /*
-    Утилиты разбора
+    РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
 */
 
 void WxfLexer::SkipRestOfLine ()

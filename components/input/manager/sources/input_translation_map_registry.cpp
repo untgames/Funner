@@ -9,7 +9,7 @@ namespace
 struct RegistryNode
 {
   public:
-///Регистрация / удаление трансляторов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ / СѓРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
     void Register (const StringArray& tokens, size_t current_node, size_t last_node, const char* in_translation_map, const char* in_profile)
     {
       if (current_node == last_node)
@@ -49,7 +49,7 @@ struct RegistryNode
         iter->second->Unregister (tokens, current_node + 1, last_node);
     }
 
-///Поиск трансляторов
+///РџРѕРёСЃРє С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
     const char* Find (const StringArray& tokens, size_t current_node, size_t last_node)
     {
       if (current_node == last_node)
@@ -81,13 +81,13 @@ struct RegistryNode
         return GetTranslationMap ();
     }
 
-///Очистка
+///РћС‡РёСЃС‚РєР°
     void Clear ()
     {
       children.clear ();
     }
 
-///Перечисление
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ
     void Enumerate (TranslationMapRegistry::IEnumerator& enumerator)
     {
       if (!translation_map.empty ())
@@ -119,12 +119,12 @@ struct RegistryNode
 }
 
 /*
-   Реестр таблиц трансляции
+   Р РµРµСЃС‚СЂ С‚Р°Р±Р»РёС† С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 struct TranslationMapRegistry::Impl : public xtl::reference_counter
 {
   public:
-///Регистрация / удаление трансляторов
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ / СѓРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
     void Register (const char* profile, const char* translation_map)
     {
       static const char* METHOD_NAME = "input::TranslationMapRegistry::Add";
@@ -166,7 +166,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       root.Unregister (profile_nodes, 0, profile_nodes.Size ());
     }
 
-///Поиск трансляторов
+///РџРѕРёСЃРє С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
     const char* Find (const char* profile)
     {
       StringArray profile_nodes;
@@ -201,13 +201,13 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       }
     }
 
-///Очистка
+///РћС‡РёСЃС‚РєР°
     void Clear ()
     {
       root.Clear ();
     }
 
-///Перечисление записей
+///РџРµСЂРµС‡РёСЃР»РµРЅРёРµ Р·Р°РїРёСЃРµР№
     void Enumerate (TranslationMapRegistry::IEnumerator& enumerator)
     {
       root.Enumerate (enumerator);
@@ -234,11 +234,11 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
 };
 
 /*
-   Реестр таблиц трансляции
+   Р РµРµСЃС‚СЂ С‚Р°Р±Р»РёС† С‚СЂР°РЅСЃР»СЏС†РёРё
 */
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 TranslationMapRegistry::TranslationMapRegistry ()
@@ -275,7 +275,7 @@ TranslationMapRegistry& TranslationMapRegistry::operator = (const TranslationMap
 }
 
 /*
-   Регистрация / удаление трансляторов
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ / СѓРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
 */
 
 void TranslationMapRegistry::Register (const char* profile, const char* translation_map)
@@ -289,7 +289,7 @@ void TranslationMapRegistry::Unregister (const char* profile)
 }
 
 /*
-   Поиск трансляторов
+   РџРѕРёСЃРє С‚СЂР°РЅСЃР»СЏС‚РѕСЂРѕРІ
 */
 
 const char* TranslationMapRegistry::Find (const char* profile) const
@@ -303,7 +303,7 @@ const char* TranslationMapRegistry::FindNearest (const char* profile) const
 }
 
 /*
-   Очистка
+   РћС‡РёСЃС‚РєР°
 */
 
 void TranslationMapRegistry::Clear ()
@@ -312,7 +312,7 @@ void TranslationMapRegistry::Clear ()
 }
 
 /*
-   Перечисление записей
+   РџРµСЂРµС‡РёСЃР»РµРЅРёРµ Р·Р°РїРёСЃРµР№
 */
 
 void TranslationMapRegistry::Enumerate (IEnumerator& enumerator) const
@@ -321,7 +321,7 @@ void TranslationMapRegistry::Enumerate (IEnumerator& enumerator) const
 }
 
 /*
-   Загрузка / сохранение
+   Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void TranslationMapRegistry::Load (const char* file_name)
@@ -340,7 +340,7 @@ void TranslationMapRegistry::Save (const char* file_name) const
 }
   
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void TranslationMapRegistry::Swap (TranslationMapRegistry& registry)
@@ -352,7 +352,7 @@ namespace input
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (TranslationMapRegistry& registry1, TranslationMapRegistry& registry2)

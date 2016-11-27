@@ -24,7 +24,7 @@ typedef stl::vector<CompoundShapeElementPtr>     ShapesArray;
 }
 
 /*
-   Положение элемента тела
+   РџРѕР»РѕР¶РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° С‚РµР»Р°
 */
 
 Compound::ShapeTransform::ShapeTransform ()
@@ -35,7 +35,7 @@ Compound::ShapeTransform::ShapeTransform (math::vec3f in_position, math::quatf i
   {}
 
 /*
-   Реализация описания тела в виде набора тел
+   Р РµР°Р»РёР·Р°С†РёСЏ РѕРїРёСЃР°РЅРёСЏ С‚РµР»Р° РІ РІРёРґРµ РЅР°Р±РѕСЂР° С‚РµР»
 */
 
 struct Compound::Impl : public xtl::reference_counter
@@ -54,7 +54,7 @@ struct Compound::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы / деструктор / присваивание
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Compound::Compound ()
@@ -86,7 +86,7 @@ Compound& Compound::operator = (const Compound& source)
 }
     
 /*
-   Создание копии
+   РЎРѕР·РґР°РЅРёРµ РєРѕРїРёРё
 */
 
 Compound Compound::Clone () const
@@ -95,7 +95,7 @@ Compound Compound::Clone () const
 }
 
 /*
-   Идентификатор
+   РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 */
 
 size_t Compound::Id () const
@@ -104,7 +104,7 @@ size_t Compound::Id () const
 }
 
 /*
-   Добавление / удаление тел
+   Р”РѕР±Р°РІР»РµРЅРёРµ / СѓРґР°Р»РµРЅРёРµ С‚РµР»
 */
 
 size_t Compound::Size () const
@@ -157,7 +157,7 @@ void Compound::DetachAll ()
 }
 
 /*
-   Получение тел
+   РџРѕР»СѓС‡РµРЅРёРµ С‚РµР»
 */
 
 const media::physics::Shape& Compound::Shape (size_t index) const
@@ -187,7 +187,7 @@ Compound::ShapeTransform& Compound::Transform (size_t index)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Compound::Swap (Compound& source)
@@ -205,7 +205,7 @@ namespace shapes
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Compound& compound1, Compound& compound2)

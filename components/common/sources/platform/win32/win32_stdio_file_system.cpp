@@ -12,7 +12,7 @@ namespace
 {
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 inline bool TestFlag (size_t mask,size_t flag)
@@ -31,7 +31,7 @@ inline stl::wstring GetFullFileName (const char* file_name)
 }
 
 /*
-    Операции работы с файлом
+    РћРїРµСЂР°С†РёРё СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»РѕРј
 */
 
 Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name,filemode_t mode,size_t)
@@ -74,7 +74,7 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name,filemod
 }
 
 /*
-    Управление расположением файла
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµРј С„Р°Р№Р»Р°
 */
 
 void Win32FileSystem::Remove (const char* file_name)
@@ -139,7 +139,7 @@ void Win32FileSystem::Mkdir (const char* dir_name)
 }
 
 /*
-    Получение информации о файле
+    РџРѕР»СѓС‡РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С„Р°Р№Р»Рµ
 */
 
 bool Win32FileSystem::IsFileExist (const char* file_name)
@@ -170,7 +170,7 @@ bool Win32FileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 }
 
 /*
-   Информация о файловой системе
+   РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
 */
 
 filesize_t Win32FileSystem::GetFreeSpace (const char* path)
@@ -194,7 +194,7 @@ filesize_t Win32FileSystem::GetTotalSpace (const char* path)
 }
 
 /*
-    Поиск файлов
+    РџРѕРёСЃРє С„Р°Р№Р»РѕРІ
 */
 
 namespace

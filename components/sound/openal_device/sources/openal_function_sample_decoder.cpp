@@ -4,7 +4,7 @@ using namespace sound::low_level;
 using namespace sound::low_level::openal;
 
 /*
-   Класс работы с сэмплами работающий через предоставленную функцию
+   РљР»Р°СЃСЃ СЂР°Р±РѕС‚С‹ СЃ СЃСЌРјРїР»Р°РјРё СЂР°Р±РѕС‚Р°СЋС‰РёР№ С‡РµСЂРµР· РїСЂРµРґРѕСЃС‚Р°РІР»РµРЅРЅСѓСЋ С„СѓРЅРєС†РёСЋ
 */
 
 struct FunctionSampleDecoder::Impl : public xtl::reference_counter
@@ -17,7 +17,7 @@ struct FunctionSampleDecoder::Impl : public xtl::reference_counter
 };
 
 /*
-   Конструкторы/деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹/РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FunctionSampleDecoder::FunctionSampleDecoder (const IDevice::SampleReadFunction& fn)
@@ -36,7 +36,7 @@ FunctionSampleDecoder::~FunctionSampleDecoder ()
 }
 
 /*
-   Чтение декодированного звука количеством samples_count сэмплов начиная с first sample в data
+   Р§С‚РµРЅРёРµ РґРµРєРѕРґРёСЂРѕРІР°РЅРЅРѕРіРѕ Р·РІСѓРєР° РєРѕР»РёС‡РµСЃС‚РІРѕРј samples_count СЃСЌРјРїР»РѕРІ РЅР°С‡РёРЅР°СЏ СЃ first sample РІ data
 */
 
 unsigned int FunctionSampleDecoder::Read (unsigned int first_sample, unsigned int samples_count, void* data)
@@ -53,7 +53,7 @@ unsigned int FunctionSampleDecoder::Read (unsigned int first_sample, unsigned in
 }
 
 /*
-   Клонирование
+   РљР»РѕРЅРёСЂРѕРІР°РЅРёРµ
 */
 
 FunctionSampleDecoder* FunctionSampleDecoder::Clone ()

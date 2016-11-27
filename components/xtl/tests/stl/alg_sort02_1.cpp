@@ -1,4 +1,4 @@
-//Тестирование алгоритма nth_element (first, nth, last)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° nth_element (first, nth, last)
 #include <stdio.h>
 #include <stl/algorithm>
 #include "test.h"

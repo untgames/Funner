@@ -1,7 +1,7 @@
 namespace detail
 {
 
-//выбор типа аргумента
+//РІС‹Р±РѕСЂ С‚РёРїР° Р°СЂРіСѓРјРµРЅС‚Р°
 template <class T> struct invoker_argument     { typedef const T& type; };
 template <class T> struct invoker_argument<T&> { typedef T&       type; };
 
@@ -10,10 +10,10 @@ struct void_argument_type {};
 }
 
 /*
-    Специализации интерфейса обработчика полиморфного вызова функтора для разного числа аргументов
+    РЎРїРµС†РёР°Р»РёР·Р°С†РёРё РёРЅС‚РµСЂС„РµР№СЃР° РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° РґР»СЏ СЂР°Р·РЅРѕРіРѕ С‡РёСЃР»Р° Р°СЂРіСѓРјРµРЅС‚РѕРІ
 */
 
-//интерфейс обработчика полиморфного вызова функтора без аргументов
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° Р±РµР· Р°СЂРіСѓРјРµРЅС‚РѕРІ
 template <class Ret, class Base>
 struct invoker<Ret (), Base>: public Base
 {
@@ -23,7 +23,7 @@ struct invoker<Ret (), Base>: public Base
   virtual result_type operator () () = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 1-м аргументом
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 1-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј
 template <class T1, class Ret, class Base>
 struct invoker<Ret (T1), Base>: public Base
 {
@@ -34,7 +34,7 @@ struct invoker<Ret (T1), Base>: public Base
   virtual result_type operator () (arg1_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 2-мя аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 2-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class Ret, class Base>
 struct invoker<Ret (T1, T2), Base>: public Base
 {
@@ -46,7 +46,7 @@ struct invoker<Ret (T1, T2), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 3-мя аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 3-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3), Base>: public Base
 {
@@ -59,7 +59,7 @@ struct invoker<Ret (T1, T2, T3), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 4-мя аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 4-РјСЏ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4), Base>: public Base
 {
@@ -73,7 +73,7 @@ struct invoker<Ret (T1, T2, T3, T4), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 5-ю аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 5-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class T5, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4, T5), Base>: public Base
 {
@@ -88,7 +88,7 @@ struct invoker<Ret (T1, T2, T3, T4, T5), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 6-ю аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 6-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class T5, class T6, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4, T5, T6), Base>: public Base
 {
@@ -104,7 +104,7 @@ struct invoker<Ret (T1, T2, T3, T4, T5, T6), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 7-ю аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 7-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7), Base>: public Base
 {
@@ -121,7 +121,7 @@ struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type, arg7_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 8-ю аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 8-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8), Base>: public Base
 {
@@ -139,7 +139,7 @@ struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8), Base>: public Base
   virtual result_type operator () (arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, arg6_type, arg7_type, arg8_type) = 0;
 };
 
-//интерфейс обработчика полиморфного вызова функтора с 9-ю аргументами
+//РёРЅС‚РµСЂС„РµР№СЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° РїРѕР»РёРјРѕСЂС„РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС‚РѕСЂР° СЃ 9-СЋ Р°СЂРіСѓРјРµРЅС‚Р°РјРё
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class Ret, class Base>
 struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8, T9), Base>: public Base
 {
@@ -158,11 +158,11 @@ struct invoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8, T9), Base>: public Base
 };
 
 /*
-    Обработчик вызовов функтора
+    РћР±СЂР°Р±РѕС‚С‡РёРє РІС‹Р·РѕРІРѕРІ С„СѓРЅРєС‚РѕСЂР°
 */
 
 /*
-    Конструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 template <class Fn, class Base>
@@ -171,7 +171,7 @@ inline functional_invoker<Fn, Base>::functional_invoker (const Fn& in_fn)
   { }
 
 /*
-    Взятие функтора
+    Р’Р·СЏС‚РёРµ С„СѓРЅРєС‚РѕСЂР°
 */
 
 template <class Fn, class Base>
@@ -187,7 +187,7 @@ inline const Fn& functional_invoker<Fn, Base>::function () const
 }
 
 /*
-    Вызов
+    Р’С‹Р·РѕРІ
 */
   
 template <class Fn, class Base>

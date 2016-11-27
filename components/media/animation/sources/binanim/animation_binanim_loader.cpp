@@ -23,7 +23,7 @@ namespace bin_anim_loader
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char HEADER [4] = {'B', 'A', 'N', 'M'};
@@ -50,13 +50,13 @@ void file_read (InputFile& file, xtl::uninitialized_storage<char>& str)
 }
 
 /*
-    Загрузчик анимаций в бинарном формате
+    Р—Р°РіСЂСѓР·С‡РёРє Р°РЅРёРјР°С†РёР№ РІ Р±РёРЅР°СЂРЅРѕРј С„РѕСЂРјР°С‚Рµ
 */
 
 class BinAnimationLibraryLoader
 {
   private:
-    //чтение трека событий
+    //С‡С‚РµРЅРёРµ С‚СЂРµРєР° СЃРѕР±С‹С‚РёР№
     void ReadEvents (EventTrack track)
     {
       unsigned int events_count;
@@ -78,7 +78,7 @@ class BinAnimationLibraryLoader
       }
     }
 
-    //разбор канала анимации
+    //СЂР°Р·Р±РѕСЂ РєР°РЅР°Р»Р° Р°РЅРёРјР°С†РёРё
     template <class T> void ReadSpecificKeyInfo (math::spline_tcb_key<T>& key)
     {
       file_read (input_file, &key.tension,    sizeof (key.tension));
@@ -193,7 +193,7 @@ class BinAnimationLibraryLoader
         ReadAnimationChannel (animation);
     }
 
-    //чтение анимации
+    //С‡С‚РµРЅРёРµ Р°РЅРёРјР°С†РёРё
     void ReadAnimation (AnimationLibrary& library)
     {
       xtl::uninitialized_storage<char> id, name;
@@ -217,7 +217,7 @@ class BinAnimationLibraryLoader
     {
       static const char* METHOD_NAME = "media::animation::BinAnimationLibraryLoader::BinAnimationLibraryLoader";
 
-        //проверка заголовка файла
+        //РїСЂРѕРІРµСЂРєР° Р·Р°РіРѕР»РѕРІРєР° С„Р°Р№Р»Р°
 
       char header [4] = {0, 0, 0, 0};
 
@@ -235,7 +235,7 @@ class BinAnimationLibraryLoader
         throw xtl::format_operation_exception (METHOD_NAME, "File '%s' has unsupported version %d, supported version - %d", file_name,
                                                version, VERSION);
 
-        //чтение данных
+        //С‡С‚РµРЅРёРµ РґР°РЅРЅС‹С…
 
       unsigned int animations_count;
 
@@ -246,11 +246,11 @@ class BinAnimationLibraryLoader
     }
     
   private:
-    InputFile input_file; //исходный файл
+    InputFile input_file; //РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р»
 };
 
 /*
-    Автоматическая регистрация компонента
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚Р°
 */
 
 class BinAnimLoaderComponent

@@ -5,7 +5,7 @@ using namespace media;
 using namespace media::xfont;
 
 /*
-    Загрузка шрифта
+    Р—Р°РіСЂСѓР·РєР° С€СЂРёС„С‚Р°
 */
 
 namespace components
@@ -31,13 +31,13 @@ IFontDesc* xfont_load (const char* file_name)
 }
 
 /*
-   Компонент загрузки шрифтов
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё С€СЂРёС„С‚РѕРІ
 */
 
 class XFontLoaderComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     XFontLoaderComponent ()
     {
       FontManager::RegisterLoader ("xfont", &xfont_load);

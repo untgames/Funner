@@ -17,19 +17,19 @@ namespace freetype
 {
 
 /*
-   Шрифт
+   РЁСЂРёС„С‚
 */
 
 struct FreetypeFace::Impl
 {
-  DataBufferPtr   data;                    //данные файла шрифта
-  FreetypeLibrary library;                 //библиотека
-  FT_Face         face;                    //шрифт
-  unsigned int    current_size;            //текущий установленный размер шрифта
-  unsigned int    current_horizontal_dpi;  //текущее установленное разрешение целевого устройства вывода
-  unsigned int    current_vertical_dpi;    //текущее установленное разрешение целевого устройства вывода
+  DataBufferPtr   data;                    //РґР°РЅРЅС‹Рµ С„Р°Р№Р»Р° С€СЂРёС„С‚Р°
+  FreetypeLibrary library;                 //Р±РёР±Р»РёРѕС‚РµРєР°
+  FT_Face         face;                    //С€СЂРёС„С‚
+  unsigned int    current_size;            //С‚РµРєСѓС‰РёР№ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р°
+  unsigned int    current_horizontal_dpi;  //С‚РµРєСѓС‰РµРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРµ СЂР°Р·СЂРµС€РµРЅРёРµ С†РµР»РµРІРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+  unsigned int    current_vertical_dpi;    //С‚РµРєСѓС‰РµРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРµ СЂР°Р·СЂРµС€РµРЅРёРµ С†РµР»РµРІРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 
-  ///Конструктор / деструктор
+  ///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
   Impl (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, unsigned int face_index)
     : data (in_data)
     , library (in_library)
@@ -57,7 +57,7 @@ struct FreetypeFace::Impl
     }
   }
 
-  ///Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
+  ///РџРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµРіРѕ РґРѕСЃС‚СѓРїРЅРѕРіРѕ СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°, РµСЃР»Рё С‚Р°РєРѕР№ РЅРµ РЅР°Р№РґРµРЅ - РІРѕР·РІСЂР°С‰Р°РµС‚ 0
   unsigned int GetNearestFontSize (unsigned int size, unsigned int size_eps)
   {
     if (face->face_flags & FT_FACE_FLAG_SCALABLE)
@@ -100,7 +100,7 @@ struct FreetypeFace::Impl
     return size_found ? best_size : 0;
   }
 
-  ///Установка размера шрифта
+  ///РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°
   void SetSize (unsigned int size, unsigned int horizontal_dpi, unsigned int vertical_dpi)
   {
     if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
@@ -135,7 +135,7 @@ struct FreetypeFace::Impl
 }
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 FreetypeFace::FreetypeFace (const DataBufferPtr& data, const FreetypeLibrary& library, unsigned int face_index)
@@ -148,7 +148,7 @@ FreetypeFace::~FreetypeFace ()
 }
 
 /*
-   FreeType-дескриптор шрифта
+   FreeType-РґРµСЃРєСЂРёРїС‚РѕСЂ С€СЂРёС„С‚Р°
 */
 
 FT_Face FreetypeFace::FaceHandle ()
@@ -157,7 +157,7 @@ FT_Face FreetypeFace::FaceHandle ()
 }
 
 /*
-   Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
+   РџРѕР»СѓС‡РµРЅРёРµ Р±Р»РёР¶Р°Р№С€РµРіРѕ РґРѕСЃС‚СѓРїРЅРѕРіРѕ СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°, РµСЃР»Рё С‚Р°РєРѕР№ РЅРµ РЅР°Р№РґРµРЅ - РІРѕР·РІСЂР°С‰Р°РµС‚ 0
 */
 unsigned int FreetypeFace::GetNearestFontSize (unsigned int size, unsigned int size_eps)
 {
@@ -165,7 +165,7 @@ unsigned int FreetypeFace::GetNearestFontSize (unsigned int size, unsigned int s
 }
 
 /*
-   Установка размера шрифта
+   РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°
 */
 
 void FreetypeFace::SetSize (unsigned int size, unsigned int horizontal_dpi, unsigned int vertical_dpi)

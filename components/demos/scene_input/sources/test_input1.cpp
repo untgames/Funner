@@ -11,7 +11,7 @@ struct Test
 
   Test ()
   {
-      //создание сцены
+      //СЃРѕР·РґР°РЅРёРµ СЃС†РµРЅС‹
 
     sprite [0] = Sprite::Create ();
     
@@ -89,7 +89,7 @@ struct Test
     camera [1]->SetZNear    (0.7f);
     camera [1]->SetZFar     (1.0f);
 
-      //создание областей вывода
+      //СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°СЃС‚РµР№ РІС‹РІРѕРґР°
 
     Viewport vp1;
 
@@ -115,18 +115,18 @@ struct Test
 
     screen.Attach (vp2);
     
-      //настройка ввода
+      //РЅР°СЃС‚СЂРѕР№РєР° РІРІРѕРґР°
     
     application.InputManager ().SetScreen (&screen);
 //    application.InputManager ().SetTouchSize (1.0f);
 
-      //настройка целевых буферов вывода
+      //РЅР°СЃС‚СЂРѕР№РєР° С†РµР»РµРІС‹С… Р±СѓС„РµСЂРѕРІ РІС‹РІРѕРґР°
 
     RenderTarget& render_target = application.RenderTarget ();
 
     render_target.SetScreen (&screen);
 
-      //загрузка ресурсов
+      //Р·Р°РіСЂСѓР·РєР° СЂРµСЃСѓСЂСЃРѕРІ
 
     application.LoadResources ();
   }
@@ -164,11 +164,11 @@ int main ()
 
   try
   {
-      //настройка протоколирования
+      //РЅР°СЃС‚СЂРѕР№РєР° РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёСЏ
 
     common::LogFilter filter ("*", &log_print);
 
-      //запуск теста
+      //Р·Р°РїСѓСЃРє С‚РµСЃС‚Р°
 
     Test test;
 

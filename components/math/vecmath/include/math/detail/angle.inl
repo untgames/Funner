@@ -18,7 +18,7 @@ template <class T> T rad2deg (const T& value)
 }
 
 /*
-    Конструкторы
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹
 */
 
 template <class T>
@@ -58,7 +58,7 @@ angle<T>::angle (const angle<T1>& ang)
 }
 
 /*
-    Присваивание
+    РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 template <class T>
@@ -100,7 +100,7 @@ angle<T>& angle<T>::operator = (const angle<T1>& ang)
 }
 
 /*
-    Получение значения угла в различных системах измерений
+    РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ СѓРіР»Р° РІ СЂР°Р·Р»РёС‡РЅС‹С… СЃРёСЃС‚РµРјР°С… РёР·РјРµСЂРµРЅРёР№
 */
 
 template <class T>
@@ -128,7 +128,7 @@ typename angle<T>::value_type angle<T>::to_degree () const
 }
 
 /*
-    Унарные операции
+    РЈРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T>
@@ -144,7 +144,7 @@ angle<T> angle<T>::operator - () const
 }
 
 /*
-    Бинарные операции
+    Р‘РёРЅР°СЂРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T>
@@ -206,7 +206,7 @@ angle<T> angle<T>::operator / (const value_type& a) const
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 template <class T>
@@ -246,7 +246,7 @@ bool angle<T>::operator >= (const angle& ang) const
 }
 
 /*
-    Конвертации углов
+    РљРѕРЅРІРµСЂС‚Р°С†РёРё СѓРіР»РѕРІ
 */
 
 inline anglef radian (float value)
@@ -282,7 +282,7 @@ typename angle<T>::value_type degree (const angle<T>& ang)
 }
 
 /*
-    Основные операции
+    РћСЃРЅРѕРІРЅС‹Рµ РѕРїРµСЂР°С†РёРё
 */
 
 template <class T>

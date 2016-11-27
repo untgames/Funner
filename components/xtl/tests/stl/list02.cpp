@@ -1,4 +1,4 @@
-// Тестирование assign
+// РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ assign
 #include <stdio.h>
 #include <stl/list>
 #include "test.h"

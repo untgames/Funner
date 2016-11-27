@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+п»ї#include <stdio.h>
 #include <stdarg.h>
 #include <wchar.h>
 #include <time.h>
@@ -23,15 +23,15 @@ using namespace concurrency;
 #pragma comment (linker, "/defaultlib:ntdll.lib")
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const wchar_t* SHELL_HOST = L"127.0.0.1";   //хост, на который соединяется launcher 
-const wchar_t* SHELL_PORT = L"1663";        //порт, на который соединяется launcher
-const char*    ENTRY_NAME = "win8_startup"; //точка входа в тест
+const wchar_t* SHELL_HOST = L"127.0.0.1";   //С…РѕСЃС‚, РЅР° РєРѕС‚РѕСЂС‹Р№ СЃРѕРµРґРёРЅСЏРµС‚СЃСЏ launcher 
+const wchar_t* SHELL_PORT = L"1663";        //РїРѕСЂС‚, РЅР° РєРѕС‚РѕСЂС‹Р№ СЃРѕРµРґРёРЅСЏРµС‚СЃСЏ launcher
+const char*    ENTRY_NAME = "win8_startup"; //С‚РѕС‡РєР° РІС…РѕРґР° РІ С‚РµСЃС‚
 
 /*
-    Типы
+    РўРёРїС‹
 */
 
 typedef STRING ANSI_STRING, *PANSI_STRING;
@@ -156,7 +156,7 @@ struct ArgReader
 };
 
 /*
-    Функции
+    Р¤СѓРЅРєС†РёРё
 */
 
 std::string tostring (const wchar_t* string, int length)
@@ -264,7 +264,7 @@ int main(Platform::Array<Platform::String^>^)
 
     log.Printf ("Sucessfully connected\n");
  
-      //чтение параметров запуска
+      //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСѓСЃРєР°
       
     ArgReader arg_reader (log, socket);
       

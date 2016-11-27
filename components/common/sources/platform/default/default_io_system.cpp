@@ -7,18 +7,18 @@ using namespace common;
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание потокового файла стандартной библиотеки
+///РћРїРёСЃР°РЅРёРµ РїРѕС‚РѕРєРѕРІРѕРіРѕ С„Р°Р№Р»Р° СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct StdioFile
 {
-  const char* name;     //имя в StdioIOSystem
-  const char* dir_name; //имя каталога
-  FILE*       stream;   //поток
-  filemode_t  mode;     //режим работы
+  const char* name;     //РёРјСЏ РІ StdioIOSystem
+  const char* dir_name; //РёРјСЏ РєР°С‚Р°Р»РѕРіР°
+  FILE*       stream;   //РїРѕС‚РѕРє
+  filemode_t  mode;     //СЂРµР¶РёРј СЂР°Р±РѕС‚С‹
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Потоковые файлы стандартной библиотеки
+///РџРѕС‚РѕРєРѕРІС‹Рµ С„Р°Р№Р»С‹ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static StdioFile stdio_files [] = {
   {"stdout","stdout/",stdout,FileMode_Write},
@@ -27,7 +27,7 @@ static StdioFile stdio_files [] = {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество потоковых файлов стандартной библиотеки
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕС‚РѕРєРѕРІС‹С… С„Р°Р№Р»РѕРІ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 //////////////////////////////////////////////,/////////////////////////////////////////////////////
 const size_t STDIO_FILES_NUM = sizeof (stdio_files)/sizeof (StdioFile);
 
@@ -38,7 +38,7 @@ const size_t STDIO_FILES_NUM = sizeof (stdio_files)/sizeof (StdioFile);
 namespace
 {
 
-//проверка существования файла в домене
+//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р° РІ РґРѕРјРµРЅРµ
 bool is_file_exist (const char* file_name,StdioFile& file)
 {
   return !xtl::xstricmp (file.name,file_name) || !xtl::xstrnicmp (file.dir_name,file_name,strlen (file.dir_name));
@@ -73,7 +73,7 @@ size_t StdioIOSystem::FileWrite (file_t file,const void* buf,size_t size)
 {
   for (size_t i = 0; i < size; i++)
   {
-    if (printf ("%c", ((char*)buf) [i]) < 1) //llvm на Mac возвращает значения больше 1
+    if (printf ("%c", ((char*)buf) [i]) < 1) //llvm РЅР° Mac РІРѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёСЏ Р±РѕР»СЊС€Рµ 1
       throw xtl::format_operation_exception ("common::StdioIOSystem::FileWrite", "Can't write to file, error '%s'", common::strerror (errno));
   }
 

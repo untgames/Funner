@@ -10,19 +10,19 @@ namespace snddecl_saver
 {
 
 /*
-    Вспомогательный класс сохранения библиотеки деклараций звуков
+    Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ СЃРѕС…СЂР°РЅРµРЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё РґРµРєР»Р°СЂР°С†РёР№ Р·РІСѓРєРѕРІ
 */
 
 class SoundDeclarationLibrarySaver
 {
   private:
-    XmlWriter                      writer;  //сериализатор XML
-    const SoundDeclarationLibrary& library; //библиотека деклараций      
+    XmlWriter                      writer;  //СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ XML
+    const SoundDeclarationLibrary& library; //Р±РёР±Р»РёРѕС‚РµРєР° РґРµРєР»Р°СЂР°С†РёР№      
     
   private:
   
     /*
-        Сохранение декларации
+        РЎРѕС…СЂР°РЅРµРЅРёРµ РґРµРєР»Р°СЂР°С†РёРё
     */
 
     void SaveDeclarationParams (const SoundDeclaration& declaration)
@@ -54,31 +54,31 @@ class SoundDeclarationLibrarySaver
     {
       XmlWriter::Scope scope (writer, "declaration");
       
-        //сохранение базовых атрибутов
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ Р±Р°Р·РѕРІС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
       writer.WriteAttribute ("id", name);
       writer.WriteAttribute ("name", declaration.Name ());
       writer.WriteAttribute ("type", declaration.Type ());
       writer.WriteAttribute ("looping", declaration.Looping ());
       
-        //сохранение параметров      
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ      
         
       SaveDeclarationParams (declaration);
       
-        //сохранение сэмплов
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ СЃСЌРјРїР»РѕРІ
         
       SaveDeclarationSamples (declaration);
     }
   
     /*
-        Сохранение библиотеки
+        РЎРѕС…СЂР°РЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё
     */
     
     void SaveLibrary ()
     {
       XmlWriter::Scope scope (writer, "sound_declaration_library");
       
-        //сохранение деклараций
+        //СЃРѕС…СЂР°РЅРµРЅРёРµ РґРµРєР»Р°СЂР°С†РёР№
         
       for (SoundDeclarationLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
         SaveDeclaration (library.ItemId ((const SoundDeclarationLibrary::ConstIterator&)i), *i);
@@ -86,7 +86,7 @@ class SoundDeclarationLibrarySaver
     
   public:
     /*
-        Конструктор
+        РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     */
   
     SoundDeclarationLibrarySaver (const char* file_name, const SoundDeclarationLibrary& in_library)
@@ -97,7 +97,7 @@ class SoundDeclarationLibrarySaver
 };
 
 /*
-    Сохранение библиотеки деклараций звуков
+    РЎРѕС…СЂР°РЅРµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё РґРµРєР»Р°СЂР°С†РёР№ Р·РІСѓРєРѕРІ
 */
 
 void snddecl_save_library (const char* file_name, const SoundDeclarationLibrary& library)
@@ -106,13 +106,13 @@ void snddecl_save_library (const char* file_name, const SoundDeclarationLibrary&
 }
 
 /*
-   Компонент загрузки деклараций звука
+   РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РіСЂСѓР·РєРё РґРµРєР»Р°СЂР°С†РёР№ Р·РІСѓРєР°
 */
 
 class SnddeclSaverComponent
 {
   public:
-    //загрузка компонента
+    //Р·Р°РіСЂСѓР·РєР° РєРѕРјРїРѕРЅРµРЅС‚Р°
     SnddeclSaverComponent () 
     {
       SoundDeclarationManager::RegisterSaver ("snddecl", &snddecl_save_library);

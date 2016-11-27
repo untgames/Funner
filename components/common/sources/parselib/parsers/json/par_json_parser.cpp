@@ -9,23 +9,23 @@ namespace json_parser
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
 const char*  ARRAY_NODE_NAME            = "";
 const char*  ITEM_NODE_NAME             = "";
 const char*  OBJECT_NODE_NAME           = "";
-const char*  JSON_PARSER_COMPONENT_NAME = "common.parsers.json"; //имя компонента json-парсера
-const size_t ATTRIBUTES_CACHE_SIZE      = 256;                   //количество кэшируемых атрибутов
+const char*  JSON_PARSER_COMPONENT_NAME = "common.parsers.json"; //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р° json-РїР°СЂСЃРµСЂР°
+const size_t ATTRIBUTES_CACHE_SIZE      = 256;                   //РєРѕР»РёС‡РµСЃС‚РІРѕ РєСЌС€РёСЂСѓРµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
 /*
-    Парсер JSON-текста
+    РџР°СЂСЃРµСЂ JSON-С‚РµРєСЃС‚Р°
 */
 
 class JsonParser
 {
   public:
-///Грамматический разбор
+///Р“СЂР°РјРјР°С‚РёС‡РµСЃРєРёР№ СЂР°Р·Р±РѕСЂ
     static void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* name, size_t buffer_size, char* buffer)
     {
       try
@@ -40,7 +40,7 @@ class JsonParser
     }
 
   private:    
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     JsonParser (ParseTreeBuilder& in_builder, ParseLog& in_log, const char* in_name, size_t buffer_size, char* buffer)
       : builder (in_builder)
       , log (in_log)
@@ -56,7 +56,7 @@ class JsonParser
       ParseDocument ();
     }
     
-///Работа с атрибутами
+///Р Р°Р±РѕС‚Р° СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё
     void AddAttribute (const char* attribute)
     {
       if (attributes_count == attributes.size ())
@@ -75,7 +75,7 @@ class JsonParser
       attributes_count = 0;
     }
 
-///Протоколирование ошибки разбора
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°
     void Error (const char* format, ...)
     {
       va_list list;
@@ -92,7 +92,7 @@ class JsonParser
       log.VError (name, line_number, format, list);
     }
 
-///Обработка лексической ошибки
+///РћР±СЂР°Р±РѕС‚РєР° Р»РµРєСЃРёС‡РµСЃРєРѕР№ РѕС€РёР±РєРё
     void ProcessLexError ()
     {
       switch (lexer.Status ())
@@ -120,7 +120,7 @@ class JsonParser
       }
     }
 
-///Утилиты разбора
+///РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
     void AddArrayValue (const char* value, bool has_objects)
     {
       if (has_objects)
@@ -346,16 +346,16 @@ class JsonParser
     typedef stl::vector<const char*> AttributeCache;
 
   private:
-    ParseTreeBuilder& builder;          //построитель дерева грамматического разбора
-    ParseLog&         log;              //протокол грамматического разбора
-    JsonLexer         lexer;            //лексический анализатор
-    const char*       name;             //имя разбираемого буфера
-    AttributeCache    attributes;       //кеш атрибутов
-    size_t            attributes_count; //количество атрибутов в кеше
+    ParseTreeBuilder& builder;          //РїРѕСЃС‚СЂРѕРёС‚РµР»СЊ РґРµСЂРµРІР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    ParseLog&         log;              //РїСЂРѕС‚РѕРєРѕР» РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    JsonLexer         lexer;            //Р»РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
+    const char*       name;             //РёРјСЏ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ Р±СѓС„РµСЂР°
+    AttributeCache    attributes;       //РєРµС€ Р°С‚СЂРёР±СѓС‚РѕРІ
+    size_t            attributes_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РІ РєРµС€Рµ
 };
 
 /*
-    Компонент, регистрирующий JSON-парсер
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ JSON-РїР°СЂСЃРµСЂ
 */
 
 class JsonParserComponent

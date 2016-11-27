@@ -5,7 +5,7 @@ using namespace scene_graph::controllers;
 using namespace physics;
 
 /*
-   Контроллер устанавливающий трансформацию узла в соответствии с трансформацией тела
+   РљРѕРЅС‚СЂРѕР»Р»РµСЂ СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‰РёР№ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёСЋ СѓР·Р»Р° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРµР№ С‚РµР»Р°
 */
 
 struct SyncPhysicsToNode::Impl
@@ -43,7 +43,7 @@ struct SyncPhysicsToNode::Impl
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SyncPhysicsToNode::SyncPhysicsToNode (Node& node, const physics::RigidBody& body)
@@ -56,7 +56,7 @@ SyncPhysicsToNode::~SyncPhysicsToNode ()
 }
 
 /*
-   Создание контроллера
+   РЎРѕР·РґР°РЅРёРµ РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 */
 
 SyncPhysicsToNode::Pointer SyncPhysicsToNode::Create (Node& node, const physics::RigidBody& body)
@@ -65,7 +65,7 @@ SyncPhysicsToNode::Pointer SyncPhysicsToNode::Create (Node& node, const physics:
 }
 
 /*
-   Тело, с которым связан контроллер
+   РўРµР»Рѕ, СЃ РєРѕС‚РѕСЂС‹Рј СЃРІСЏР·Р°РЅ РєРѕРЅС‚СЂРѕР»Р»РµСЂ
 */
 
 const physics::RigidBody& SyncPhysicsToNode::AttachedBody () const
@@ -74,7 +74,7 @@ const physics::RigidBody& SyncPhysicsToNode::AttachedBody () const
 }
 
 /*
-   Обновление
+   РћР±РЅРѕРІР»РµРЅРёРµ
 */
 
 void SyncPhysicsToNode::Update (const TimeValue&)

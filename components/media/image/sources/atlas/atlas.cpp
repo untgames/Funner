@@ -4,18 +4,18 @@ using namespace media;
 using namespace common;
 
 /*
-    Реализация карты картинок
+    Р РµР°Р»РёР·Р°С†РёСЏ РєР°СЂС‚С‹ РєР°СЂС‚РёРЅРѕРє
 */
 
 struct Atlas::Impl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl ()
     {
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     Impl (const Impl& source)
     {
       tiles.reserve (source.tiles.size ());
@@ -24,7 +24,7 @@ struct Atlas::Impl
         tiles.push_back (TilePtr (new TileEntry (**iter), false));
     }
 
-///Количество тайлов
+///РљРѕР»РёС‡РµСЃС‚РІРѕ С‚Р°Р№Р»РѕРІ
     unsigned int TilesCount ()
     {
       return (unsigned int)tiles.size ();
@@ -51,13 +51,13 @@ struct Atlas::Impl
       return (unsigned int)images [(unsigned int)image_index]->tiles.size ();
     }
     
-///Количество изображений
+///РљРѕР»РёС‡РµСЃС‚РІРѕ РёР·РѕР±СЂР°Р¶РµРЅРёР№
     unsigned int ImagesCount () const
     {
       return (unsigned int)images.size ();
     }    
 
-///Поиск
+///РџРѕРёСЃРє
     const media::Tile* Find (const char* name)
     {
       if (!name)
@@ -71,7 +71,7 @@ struct Atlas::Impl
       return &(*iter)->tile;
     }
     
-///Получение тайла
+///РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р№Р»Р°
     const media::Tile& Tile (unsigned int index)
     {
       if (index >= TilesCount ())
@@ -125,7 +125,7 @@ struct Atlas::Impl
       return ImageTile ((unsigned int)image_index, index);
     }
     
-///Добавление тайла
+///Р”РѕР±Р°РІР»РµРЅРёРµ С‚Р°Р№Р»Р°
     unsigned int Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, unsigned int tag)
     {
       static const char* METHOD_NAME = "media::Atlas::Insert";
@@ -156,7 +156,7 @@ struct Atlas::Impl
       return (unsigned int)tiles.size () - 1;
     }
 
-///Изменение тайла
+///РР·РјРµРЅРµРЅРёРµ С‚Р°Р№Р»Р°
     void Set (unsigned int tile_index, const media::Tile& new_tile)
     {
       Set (tile_index, new_tile.name, new_tile.image, new_tile.origin, new_tile.size, new_tile.tag);
@@ -203,7 +203,7 @@ struct Atlas::Impl
       }
     }
     
-///Удаление тайла
+///РЈРґР°Р»РµРЅРёРµ С‚Р°Р№Р»Р°
     void Remove (unsigned int tile_index)
     {
       if (tile_index >= TilesCount ())
@@ -230,7 +230,7 @@ struct Atlas::Impl
       tiles.clear ();
     }
     
-///Получение имени изображения
+///РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     const char* ImageName (unsigned int image_index)
     {
       if (image_index >= images.size ())
@@ -239,7 +239,7 @@ struct Atlas::Impl
       return images [image_index]->name.c_str ();
     }
     
-///Поиск изображения по индексу
+///РџРѕРёСЃРє РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РїРѕ РёРЅРґРµРєСЃСѓ
     long long FindImageIndex (const char* name)
     {
       if (!name)
@@ -252,7 +252,7 @@ struct Atlas::Impl
       return -1;
     }    
     
-///Установка размеров изображения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЂР°Р·РјРµСЂРѕРІ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
     void SetImageSize (const char* image_name, const math::vec2ui& size)
     {
       long long image_index = FindImageIndex (image_name);
@@ -290,7 +290,7 @@ struct Atlas::Impl
       return images [index]->size;
     }        
     
-///Удаление пустых изображений
+///РЈРґР°Р»РµРЅРёРµ РїСѓСЃС‚С‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
     void RemoveEmptyImages ()
     {
       for (ImageArray::iterator iter=images.begin (); iter!=images.end ();)
@@ -390,7 +390,7 @@ struct Atlas::Impl
 
 
 /*
-   Конструкторы / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Atlas::Atlas ()
@@ -429,7 +429,7 @@ Atlas::~Atlas ()
 }
 
 /*
-   Присваивание
+   РџСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Atlas& Atlas::operator = (const Atlas& source)
@@ -443,7 +443,7 @@ Atlas& Atlas::operator = (const Atlas& source)
 }
 
 /*
-   Количество тайлов и изображений
+   РљРѕР»РёС‡РµСЃС‚РІРѕ С‚Р°Р№Р»РѕРІ Рё РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 unsigned int Atlas::TilesCount () const
@@ -467,7 +467,7 @@ unsigned int Atlas::ImageTilesCount (unsigned int image_index) const
 }
 
 /*
-   Поиск
+   РџРѕРёСЃРє
 */
 
 const media::Tile* Atlas::Find (const char* name) const
@@ -476,7 +476,7 @@ const media::Tile* Atlas::Find (const char* name) const
 }
 
 /*
-   Получение тайла
+   РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р№Р»Р°
 */
 
 const media::Tile& Atlas::Tile (unsigned int index) const
@@ -500,7 +500,7 @@ const media::Tile& Atlas::ImageTile (const char* image_name, unsigned int index)
 }
     
 /*
-   Добавление тайла
+   Р”РѕР±Р°РІР»РµРЅРёРµ С‚Р°Р№Р»Р°
 */
 
 unsigned int Atlas::Insert (const media::Tile& new_tile)
@@ -514,7 +514,7 @@ unsigned int Atlas::Insert (const char* name, const char* image, const math::vec
 }
 
 /*
-   Изменение тайла
+   РР·РјРµРЅРµРЅРёРµ С‚Р°Р№Р»Р°
 */
 
 void Atlas::Set (unsigned int tile_index, const media::Tile& new_tile)
@@ -528,7 +528,7 @@ void Atlas::Set (unsigned int tile_index, const char* name, const char* image, c
 }
     
 /*
-   Удаление тайла
+   РЈРґР°Р»РµРЅРёРµ С‚Р°Р№Р»Р°
 */
 
 void Atlas::Remove (unsigned int tile_index)
@@ -547,7 +547,7 @@ void Atlas::RemoveAllTiles ()
 }
 
 /*
-    Получение имени изображения
+    РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 */
 
 const char* Atlas::ImageName (unsigned int image_index) const
@@ -556,7 +556,7 @@ const char* Atlas::ImageName (unsigned int image_index) const
 }
 
 /*
-    Установка / получение размеров картинок
+    РЈСЃС‚Р°РЅРѕРІРєР° / РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РєР°СЂС‚РёРЅРѕРє
 */
 
 void Atlas::SetImageSize (unsigned int image_index, unsigned int width, unsigned int height)
@@ -595,7 +595,7 @@ const math::vec2ui& Atlas::ImageSize (const char* image_name) const
 }
 
 /*
-    Удаление пустых изображений
+    РЈРґР°Р»РµРЅРёРµ РїСѓСЃС‚С‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
 */
 
 void Atlas::RemoveEmptyImages ()
@@ -604,7 +604,7 @@ void Atlas::RemoveEmptyImages ()
 }
 
 /*
-   Загрузка / сохранение
+   Р—Р°РіСЂСѓР·РєР° / СЃРѕС…СЂР°РЅРµРЅРёРµ
 */
 
 void Atlas::Load (const char* file_name)
@@ -641,7 +641,7 @@ void Atlas::Save (const char* file_name)
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void Atlas::Swap (Atlas& atlas)
@@ -653,7 +653,7 @@ namespace media
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (Atlas& atlas1, Atlas& atlas2)

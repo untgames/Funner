@@ -9,31 +9,31 @@ namespace wxf_parser
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const char*  WXF_PARSER_COMPONENT_NAME = "common.parsers.wxf";    //имя компонента wxf-парсера
-const size_t MAX_INCLUDE_DEPTH         = 1024;                    //максимальная глубина вложений инклюдов
-const size_t SMALL_BUFFER_SIZE         = 16384;                   //размер буфера разбора для маленьких документов
-const size_t MEDIUM_BUFFER_SIZE        = 64 * SMALL_BUFFER_SIZE;  //размер буфера разбора для средних документов
-const size_t LARGE_BUFFER_SIZE         = 16 * MEDIUM_BUFFER_SIZE; //размер буфера разбора для больших документов
-const size_t ATTRIBUTES_CACHE_SIZE     = 256;                     //количество кэшируемых атрибутов
+const char*  WXF_PARSER_COMPONENT_NAME = "common.parsers.wxf";    //РёРјСЏ РєРѕРјРїРѕРЅРµРЅС‚Р° wxf-РїР°СЂСЃРµСЂР°
+const size_t MAX_INCLUDE_DEPTH         = 1024;                    //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРёР№ РёРЅРєР»СЋРґРѕРІ
+const size_t SMALL_BUFFER_SIZE         = 16384;                   //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР° РґР»СЏ РјР°Р»РµРЅСЊРєРёС… РґРѕРєСѓРјРµРЅС‚РѕРІ
+const size_t MEDIUM_BUFFER_SIZE        = 64 * SMALL_BUFFER_SIZE;  //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР° РґР»СЏ СЃСЂРµРґРЅРёС… РґРѕРєСѓРјРµРЅС‚РѕРІ
+const size_t LARGE_BUFFER_SIZE         = 16 * MEDIUM_BUFFER_SIZE; //СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЂР°Р·Р±РѕСЂР° РґР»СЏ Р±РѕР»СЊС€РёС… РґРѕРєСѓРјРµРЅС‚РѕРІ
+const size_t ATTRIBUTES_CACHE_SIZE     = 256;                     //РєРѕР»РёС‡РµСЃС‚РІРѕ РєСЌС€РёСЂСѓРµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ
 
 /*
-    Парсер wxf-файлов
+    РџР°СЂСЃРµСЂ wxf-С„Р°Р№Р»РѕРІ
 */
 
 class WxfParser
 {
   public:  
-///Разбор
+///Р Р°Р·Р±РѕСЂ
     static void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* name, size_t, char* buffer)
     {
       WxfParser (builder, log, name, buffer, 0);
     }
   
   private:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     WxfParser (ParseTreeBuilder& in_builder, ParseLog& in_log, const char* in_name, char* buffer, size_t in_include_depth)
       : builder (in_builder),
         log (in_log),
@@ -50,7 +50,7 @@ class WxfParser
       ParseRoot ();      
     }  
   
-///Протоколирование ошибки разбора  
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РєРё СЂР°Р·Р±РѕСЂР°  
     void Error (const char* format, ...)
     {
       va_list list;
@@ -59,7 +59,7 @@ class WxfParser
       log.VError (name, lexer.LineNumber (), format, list);
     }
 
-///Протоколирование предупреждения разбора    
+///РџСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ СЂР°Р·Р±РѕСЂР°    
     void Warning (const char* format, ...)
     {
       va_list list;
@@ -68,7 +68,7 @@ class WxfParser
       log.VWarning (name, lexer.LineNumber (), format, list);
     }
     
-///Утилиты разбора
+///РЈС‚РёР»РёС‚С‹ СЂР°Р·Р±РѕСЂР°
     void ProcessLexError ()
     {
       switch (lexer.Status ())
@@ -207,13 +207,13 @@ class WxfParser
         return;
       }
       
-        //загрузка буфера
+        //Р·Р°РіСЂСѓР·РєР° Р±СѓС„РµСЂР°
 
       stl::string buffer;
 
       FileSystem::LoadTextFile (file_name, buffer);
 
-        //разбор
+        //СЂР°Р·Р±РѕСЂ
 
       builder.SetSource (file_name);
 
@@ -221,7 +221,7 @@ class WxfParser
 
       builder.SetSource (name);
 
-        //переход к следующей лексеме
+        //РїРµСЂРµС…РѕРґ Рє СЃР»РµРґСѓСЋС‰РµР№ Р»РµРєСЃРµРјРµ
 
       lexer.NextLexem ();      
     }
@@ -459,17 +459,17 @@ class WxfParser
     typedef stl::vector<const char*> AttributeCache;
 
   private:
-    ParseTreeBuilder& builder;          //построитель дерева грамматического разбора
-    ParseLog&         log;              //протокол грамматического разбора
-    WxfLexer          lexer;            //лексический анализатор
-    size_t            include_depth;    //текущая глубина вложений инклюдов
-    const char*       name;             //имя разбираемого текстового буфера
-    AttributeCache    attributes;       //кэш атрибутов
-    size_t            attributes_count; //количество атрибутов в кэше
+    ParseTreeBuilder& builder;          //РїРѕСЃС‚СЂРѕРёС‚РµР»СЊ РґРµСЂРµРІР° РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    ParseLog&         log;              //РїСЂРѕС‚РѕРєРѕР» РіСЂР°РјРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЂР°Р·Р±РѕСЂР°
+    WxfLexer          lexer;            //Р»РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
+    size_t            include_depth;    //С‚РµРєСѓС‰Р°СЏ РіР»СѓР±РёРЅР° РІР»РѕР¶РµРЅРёР№ РёРЅРєР»СЋРґРѕРІ
+    const char*       name;             //РёРјСЏ СЂР°Р·Р±РёСЂР°РµРјРѕРіРѕ С‚РµРєСЃС‚РѕРІРѕРіРѕ Р±СѓС„РµСЂР°
+    AttributeCache    attributes;       //РєСЌС€ Р°С‚СЂРёР±СѓС‚РѕРІ
+    size_t            attributes_count; //РєРѕР»РёС‡РµСЃС‚РІРѕ Р°С‚СЂРёР±СѓС‚РѕРІ РІ РєСЌС€Рµ
 };
 
 /*
-    Компонент, регистрирующий WXF-парсер
+    РљРѕРјРїРѕРЅРµРЅС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓСЋС‰РёР№ WXF-РїР°СЂСЃРµСЂ
 */
 
 class WxfParserComponent

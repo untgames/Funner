@@ -9,7 +9,7 @@ namespace
 class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     DefaultApplicationDelegate ()
     {
       idle_enabled = false;
@@ -17,7 +17,7 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
       listener     = 0;
     }
 
-///Запуск цикла обработки сообщений
+///Р—Р°РїСѓСЃРє С†РёРєР»Р° РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№
     void Run ()
     {
       if (listener)
@@ -30,7 +30,7 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
     }
 
-///Выход из приложения
+///Р’С‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Exit (int code)
     {
       is_exited = true;
@@ -39,19 +39,19 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
         listener->OnExit (code);
     }
 
-///Установка необходимости вызова событий idle
+///РЈСЃС‚Р°РЅРѕРІРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹Р·РѕРІР° СЃРѕР±С‹С‚РёР№ idle
     void SetIdleState (bool state)
     {
       idle_enabled = state;
     }
 
-///Установка слушателя событий приложения
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ СЃРѕР±С‹С‚РёР№ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void SetListener (IApplicationListener* in_listener)
     {
       listener = in_listener;
     }
     
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
     void AddRef ()
     {
       addref (this);
@@ -71,7 +71,7 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
 }
 
 /*
-    Создание делегата приложения
+    РЎРѕР·РґР°РЅРёРµ РґРµР»РµРіР°С‚Р° РїСЂРёР»РѕР¶РµРЅРёСЏ
 */
 
 IApplicationDelegate* DefaultApplicationManager::CreateDefaultApplicationDelegate ()
@@ -80,7 +80,7 @@ IApplicationDelegate* DefaultApplicationManager::CreateDefaultApplicationDelegat
 }
 
 /*
-    Приостановка выполнения нити на miliseconds милисекунд
+    РџСЂРёРѕСЃС‚Р°РЅРѕРІРєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РЅРёС‚Рё РЅР° miliseconds РјРёР»РёСЃРµРєСѓРЅРґ
 */
 
 void DefaultApplicationManager::Sleep (size_t milliseconds)
@@ -91,7 +91,7 @@ void DefaultApplicationManager::Sleep (size_t milliseconds)
 }
 
 /*
-    Открытие URL во внешнем браузере
+    РћС‚РєСЂС‹С‚РёРµ URL РІРѕ РІРЅРµС€РЅРµРј Р±СЂР°СѓР·РµСЂРµ
 */
 
 void DefaultApplicationManager::OpenUrl (const char* url)
@@ -100,7 +100,7 @@ void DefaultApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-    Получение значения переменной среды
+    РџРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃСЂРµРґС‹
 */
 
 stl::string DefaultApplicationManager::GetEnvironmentVariable (const char* name)
@@ -114,7 +114,7 @@ stl::string DefaultApplicationManager::GetEnvironmentVariable (const char* name)
 }
 
 /*
-    Управление энергосбережением
+    РЈРїСЂР°РІР»РµРЅРёРµ СЌРЅРµСЂРіРѕСЃР±РµСЂРµР¶РµРЅРёРµРј
 */
 
 void DefaultApplicationManager::SetScreenSaverState (bool state)
@@ -128,7 +128,7 @@ bool DefaultApplicationManager::GetScreenSaverState ()
 }
 
 /*
-    Управление режимом работы в фоне
+    РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј СЂР°Р±РѕС‚С‹ РІ С„РѕРЅРµ
 */
 
 void DefaultApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode)
@@ -141,7 +141,7 @@ ApplicationBackgroundMode DefaultApplicationManager::GetApplicationBackgroundMod
 }
 
 /*
-    Получение системных свойств
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРёСЃС‚РµРјРЅС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void DefaultApplicationManager::GetSystemProperties (common::PropertyMap& properties)
@@ -161,7 +161,7 @@ void DefaultApplicationManager::GetSystemProperties (common::PropertyMap& proper
 }
 
 /*
-    Обработка системных сообщений нити
+    РћР±СЂР°Р±РѕС‚РєР° СЃРёСЃС‚РµРјРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РЅРёС‚Рё
 */
 
 void DefaultApplicationManager::ProcessThreadMessages ()

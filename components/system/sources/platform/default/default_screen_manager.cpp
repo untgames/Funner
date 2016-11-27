@@ -4,7 +4,7 @@ namespace syslib
 {
 
 /*
-    Генерация исключения: работа с экранами невозможна на системе по умолчанию
+    Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ: СЂР°Р±РѕС‚Р° СЃ СЌРєСЂР°РЅР°РјРё РЅРµРІРѕР·РјРѕР¶РЅР° РЅР° СЃРёСЃС‚РµРјРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 */
 
 namespace
@@ -18,7 +18,7 @@ void raise (const char* method_name)
 }
 
 /*
-    Перечисление экранов
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЌРєСЂР°РЅРѕРІ
 */
 
 size_t DefaultScreenManager::GetScreensCount ()
@@ -27,7 +27,7 @@ size_t DefaultScreenManager::GetScreensCount ()
 }
 
 /*
-    Создание / удаление экрана
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЌРєСЂР°РЅР°
 */
 
 screen_t DefaultScreenManager::CreateScreen  (size_t screen_index)
@@ -43,7 +43,7 @@ void DefaultScreenManager::DestroyScreen (screen_t)
 }
 
 /*
-    Имя экрана
+    РРјСЏ СЌРєСЂР°РЅР°
 */
 
 const char* DefaultScreenManager::GetScreenName (screen_t)
@@ -54,7 +54,7 @@ const char* DefaultScreenManager::GetScreenName (screen_t)
 }
 
 /*
-    Получение списка видео-режимов экрана
+    РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІРёРґРµРѕ-СЂРµР¶РёРјРѕРІ СЌРєСЂР°РЅР°
 */
 
 size_t DefaultScreenManager::GetScreenModesCount (screen_t)
@@ -70,7 +70,7 @@ void DefaultScreenManager::GetScreenMode (screen_t, size_t mode_index, ScreenMod
 }
 
 /*
-    Установка текущего видео-режима экрана
+    РЈСЃС‚Р°РЅРѕРІРєР° С‚РµРєСѓС‰РµРіРѕ РІРёРґРµРѕ-СЂРµР¶РёРјР° СЌРєСЂР°РЅР°
 */
 
 void DefaultScreenManager::SetScreenCurrentMode (screen_t, const ScreenModeDesc&)
@@ -89,7 +89,7 @@ void DefaultScreenManager::GetScreenDefaultMode (screen_t, ScreenModeDesc&)
 }
 
 /*
-    Управление гамма-коррекцией экрана
+    РЈРїСЂР°РІР»РµРЅРёРµ РіР°РјРјР°-РєРѕСЂСЂРµРєС†РёРµР№ СЌРєСЂР°РЅР°
 */
 
 void DefaultScreenManager::SetScreenGammaRamp (screen_t, const Color3f table [256])
@@ -103,7 +103,7 @@ void DefaultScreenManager::GetScreenGammaRamp (screen_t, Color3f table [256])
 }
 
 /*
-    Поиск экрана вмещающего окно
+    РџРѕРёСЃРє СЌРєСЂР°РЅР° РІРјРµС‰Р°СЋС‰РµРіРѕ РѕРєРЅРѕ
 */
 
 screen_t DefaultScreenManager::FindContainingScreen (const void*)
@@ -114,7 +114,7 @@ screen_t DefaultScreenManager::FindContainingScreen (const void*)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* DefaultScreenManager::GetNativeScreenHandle (screen_t)
@@ -125,7 +125,7 @@ const void* DefaultScreenManager::GetNativeScreenHandle (screen_t)
 }
 
 /*
-    Получение платформо-зависимых свойств экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ СЌРєСЂР°РЅР°
 */
 
 void DefaultScreenManager::GetScreenProperties (screen_t, common::PropertyMap& properties)

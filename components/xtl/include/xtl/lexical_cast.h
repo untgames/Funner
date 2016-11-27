@@ -22,11 +22,11 @@ namespace xtl
 {
 
 /*
-    В отличие от boost, lexical_cast работает через двойное приведение source_type->stl::string->destination_type
+    Р’ РѕС‚Р»РёС‡РёРµ РѕС‚ boost, lexical_cast СЂР°Р±РѕС‚Р°РµС‚ С‡РµСЂРµР· РґРІРѕР№РЅРѕРµ РїСЂРёРІРµРґРµРЅРёРµ source_type->stl::string->destination_type
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования тип -> строка
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‚РёРї -> СЃС‚СЂРѕРєР°
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void to_string (stl::string& buffer, const stl::string&);
 void to_string (stl::string& buffer, const char* value);
@@ -46,7 +46,7 @@ void to_string (stl::string& buffer, long value);
 void to_string (stl::string& buffer, unsigned long value);
 void to_string (stl::string& buffer, long long value);
 void to_string (stl::string& buffer, unsigned long long value);
-void to_string (stl::string& buffer, const volatile bool& value); //const volatile& для избежания неявного преобразования к bool в xtl::any
+void to_string (stl::string& buffer, const volatile bool& value); //const volatile& РґР»СЏ РёР·Р±РµР¶Р°РЅРёСЏ РЅРµСЏРІРЅРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє bool РІ xtl::any
 void to_string (stl::string& buffer, float value);
 void to_string (stl::string& buffer, const double& value);
 void to_string (stl::string& buffer, const long double& value);
@@ -55,7 +55,7 @@ void to_string (stl::string& buffer, const void* pointer);
 template <class T> stl::string to_string (const T& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования строка -> тип
+///РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ СЃС‚СЂРѕРєР° -> С‚РёРї
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void to_value (const stl::string& buffer, stl::string&);
 void to_value (const stl::string& buffer, stl::wstring&);
@@ -80,18 +80,18 @@ void to_value (const stl::string& buffer, void*& pointer);
 template <class T> T to_value (const stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексикографическое преобразование
+///Р›РµРєСЃРёРєРѕРіСЂР°С„РёС‡РµСЃРєРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class DstT, class SrcT> DstT lexical_cast (const SrcT&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вывод диапазонов
+///Р’С‹РІРѕРґ РґРёР°РїР°Р·РѕРЅРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Iter>
 void to_string (stl::string& buffer, Iter first, Iter last, const char* separator);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение к строке математических типов
+///РџСЂРёРІРµРґРµРЅРёРµ Рє СЃС‚СЂРѕРєРµ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёС… С‚РёРїРѕРІ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class String, class T, unsigned int Size>
 void to_string (String& buffer, const math::vector<T, Size>& value);

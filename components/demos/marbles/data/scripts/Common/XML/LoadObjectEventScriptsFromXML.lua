@@ -1,26 +1,26 @@
 --[[
-  используется для загрузки скриптов обработки событий из XML файла
-  и регистрации этих обработчиков в обьекте
+  РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ Р·Р°РіСЂСѓР·РєРё СЃРєСЂРёРїС‚РѕРІ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёР№ РёР· XML С„Р°Р№Р»Р°
+  Рё СЂРµРіРёСЃС‚СЂР°С†РёРё СЌС‚РёС… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РІ РѕР±СЊРµРєС‚Рµ
 ]]
 
 
 function LoadObjectEventScriptsFromXML (obj, Scripts, xml, Events, Params)
-  --проверка входных параметров
+  --РїСЂРѕРІРµСЂРєР° РІС…РѕРґРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
   AssertionPrefix("ERROR: LoadObjectEventScriptsFromXML(obj, Scripts, xml, Events, Params)")
     assert(obj, " - obj is nil")
     assert(obj.RegisterEventHandler, " - obj has no event manager")
     assert(type(Scripts)=="table", " - Scripts is not a table")
     assert(xml, " - xml is nil")
-    assert(Events," - Events is nil")-- таблица с названиями событий, для которых нужно загрузить скрипты
+    assert(Events," - Events is nil")-- С‚Р°Р±Р»РёС†Р° СЃ РЅР°Р·РІР°РЅРёСЏРјРё СЃРѕР±С‹С‚РёР№, РґР»СЏ РєРѕС‚РѕСЂС‹С… РЅСѓР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ СЃРєСЂРёРїС‚С‹
   AssertionPrefix()
   
-  -- регистрация скрипта события
+  -- СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРєСЂРёРїС‚Р° СЃРѕР±С‹С‚РёСЏ
   local function RegisterEventScript(EventScriptName, Event)
     --print("Registering event script: ", EventScriptName)
     obj.RegisterEventHandler(Event, GetScriptByName(Scripts, EventScriptName), Params)
   end
    
-  -- загрузка скриптов обработки события
+  -- Р·Р°РіСЂСѓР·РєР° СЃРєСЂРёРїС‚РѕРІ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕР±С‹С‚РёСЏ
   local function TryLoadEventScript(Event)
     assert(Event,"ERROR: TryLoadEventScript(Event) - name is nil")
     local EventScriptNames=xml.ReadStringByName("OnEvent_"..tostring(Event))
@@ -30,6 +30,6 @@ function LoadObjectEventScriptsFromXML (obj, Scripts, xml, Events, Params)
     end
   end
    
-  --загрузка скриптов для всех указанных событий
+  --Р·Р°РіСЂСѓР·РєР° СЃРєСЂРёРїС‚РѕРІ РґР»СЏ РІСЃРµС… СѓРєР°Р·Р°РЅРЅС‹С… СЃРѕР±С‹С‚РёР№
   ForEachInTable(Events, TryLoadEventScript)
 end

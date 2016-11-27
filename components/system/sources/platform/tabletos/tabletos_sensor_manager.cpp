@@ -295,7 +295,7 @@ typedef common::Singleton<TabletOsSensorManagerImpl> TabletOsSensorManagerImplSi
 }
 
 /*
-    Количество сенсоров
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 size_t TabletOsSensorManager::GetSensorsCount ()
@@ -304,7 +304,7 @@ size_t TabletOsSensorManager::GetSensorsCount ()
 }
 
 /*
-    Создание / удаление сенсора
+    РЎРѕР·РґР°РЅРёРµ / СѓРґР°Р»РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
 */
 
 sensor_t TabletOsSensorManager::CreateSensor (size_t sensor_index)
@@ -331,7 +331,7 @@ void TabletOsSensorManager::DestroySensor (sensor_t sensor)
 }
 
 /*
-    Имя сенсора
+    РРјСЏ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string TabletOsSensorManager::GetSensorName (sensor_t sensor)
@@ -340,7 +340,7 @@ stl::string TabletOsSensorManager::GetSensorName (sensor_t sensor)
 }
 
 /*
-    Производитель сенсора
+    РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
 */
 
 stl::string TabletOsSensorManager::GetSensorVendor (sensor_t)
@@ -349,7 +349,7 @@ stl::string TabletOsSensorManager::GetSensorVendor (sensor_t)
 }
 
 /*
-    Тип устройства
+    РўРёРї СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 stl::string TabletOsSensorManager::GetSensorType (sensor_t handle)
@@ -386,7 +386,7 @@ stl::string TabletOsSensorManager::GetSensorType (sensor_t handle)
 }
 
 /*
-    Максимальное значение
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 */
 
 float TabletOsSensorManager::GetSensorMaxRange (sensor_t sensor)
@@ -406,7 +406,7 @@ float TabletOsSensorManager::GetSensorMaxRange (sensor_t sensor)
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void TabletOsSensorManager::SetSensorUpdateRate (sensor_t sensor, float rate)
@@ -442,7 +442,7 @@ float TabletOsSensorManager::GetSensorUpdateRate (sensor_t sensor)
 }
 
 /*
-    Получение платформо-зависимого дескриптора экрана
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° СЌРєСЂР°РЅР°
 */
 
 const void* TabletOsSensorManager::GetNativeSensorHandle (sensor_t sensor)
@@ -463,7 +463,7 @@ const void* TabletOsSensorManager::GetNativeSensorHandle (sensor_t sensor)
 }
 
 /*
-    Получение платформо-зависимых свойств
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void TabletOsSensorManager::GetSensorProperties (sensor_t sensor, common::PropertyMap& properties)
@@ -483,7 +483,7 @@ void TabletOsSensorManager::GetSensorProperties (sensor_t sensor, common::Proper
 }
 
 /*
-    Чтение событий сенсора
+    Р§С‚РµРЅРёРµ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
 */
 
 void TabletOsSensorManager::StartSensorPolling (sensor_t sensor, ISensorEventListener &listener)

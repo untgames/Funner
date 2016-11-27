@@ -3,7 +3,7 @@
 */
 
 /*
-    Вывод строк
+    Р’С‹РІРѕРґ СЃС‚СЂРѕРє
 */
 
 template <class Traits, class Allocator>
@@ -19,7 +19,7 @@ inline void write (OutputTextStream& stream, const stl::basic_string<wchar_t, Tr
 }
 
 /*
-    Вывод интервалов
+    Р’С‹РІРѕРґ РёРЅС‚РµСЂРІР°Р»РѕРІ
 */
 
 template <class InIter>
@@ -91,7 +91,7 @@ inline void write (OutputTextStream& stream, const xtl::iterator_range<FwdIter>&
 }
 
 /*
-    Сериализация математических типов
+    РЎРµСЂРёР°Р»РёР·Р°С†РёСЏ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёС… С‚РёРїРѕРІ
 */
 
 template <class T, unsigned int Size>

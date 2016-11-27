@@ -13,7 +13,7 @@ namespace math_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    РљРѕРЅСЃС‚Р°РЅС‚С‹ (РёРјРµРЅР° Р±РёР±Р»РёРѕС‚РµРє)
 */
 
 const char* MATHLIB_LIBRARY      = "Math";
@@ -26,7 +26,7 @@ const char* BINDER_NAME          = "Math";
 const char* COMPONENT_NAME       = "script.binds.Math";
 
 /*
-    Создание шлюзов унарных и бинарных операций
+    РЎРѕР·РґР°РЅРёРµ С€Р»СЋР·РѕРІ СѓРЅР°СЂРЅС‹С… Рё Р±РёРЅР°СЂРЅС‹С… РѕРїРµСЂР°С†РёР№
 */
 
 template <class Ret, class Arg1, class Arg2, template <class, class, class> class Operation>
@@ -42,7 +42,7 @@ inline Invoker make_unary_invoker ()
 }
 
 /*
-    Селекторы компонент вектора
+    РЎРµР»РµРєС‚РѕСЂС‹ РєРѕРјРїРѕРЅРµРЅС‚ РІРµРєС‚РѕСЂР°
 */
 
 template <class T> struct vec_get_element
@@ -66,7 +66,7 @@ template <class T> struct vec_set_element
 };
 
 /*
-    Селекторы кортежей
+    РЎРµР»РµРєС‚РѕСЂС‹ РєРѕСЂС‚РµР¶РµР№
 */
 
 template <class T, unsigned int Size, unsigned int TupleSize> class vec_get_tuple
@@ -148,7 +148,7 @@ inline Invoker make_vec_set_tuple_invoker (unsigned int i1, unsigned int i2=0, u
 }
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 template <class T, unsigned int Size>
@@ -164,7 +164,7 @@ math::vector<T, Size> vec_cross (const math::vector<T, Size>& v1, const math::ve
 }
 
 /*
-    Селекторы компонент матрицы
+    РЎРµР»РµРєС‚РѕСЂС‹ РєРѕРјРїРѕРЅРµРЅС‚ РјР°С‚СЂРёС†С‹
 */
 
 vec3f get_mat4f_row (const mat4f& m, unsigned int i)
@@ -183,7 +183,7 @@ float get_mat4f_element (mat4f m, unsigned int i, unsigned int j)
 }
 
 /*
-    Селекторы элементов матрицы
+    РЎРµР»РµРєС‚РѕСЂС‹ СЌР»РµРјРµРЅС‚РѕРІ РјР°С‚СЂРёС†С‹
 */
 
 template <class T, unsigned int Size>
@@ -211,7 +211,7 @@ void matrix_set_element (matrix<T, Size>& m, unsigned int row, unsigned int colu
 }
 
 /*
-    Селекторы строк матрицы
+    РЎРµР»РµРєС‚РѕСЂС‹ СЃС‚СЂРѕРє РјР°С‚СЂРёС†С‹
 */
 
 template <class T, unsigned int Size> struct matrix_get_row
@@ -239,7 +239,7 @@ template <class T, unsigned int Size> struct matrix_set_row
 };
 
 /*
-    Создание вектора
+    РЎРѕР·РґР°РЅРёРµ РІРµРєС‚РѕСЂР°
 */
 
 vec2f create_vec2 (float x, float y)
@@ -273,7 +273,7 @@ vec4f create_scalar4 (float scalar)
 }
 
 /*
-    Создание матрицы
+    РЎРѕР·РґР°РЅРёРµ РјР°С‚СЂРёС†С‹
 */
 
 mat4f create_mat4 (float a)
@@ -282,7 +282,7 @@ mat4f create_mat4 (float a)
 }
 
 /*
-    Селекторы компонент кватерниона
+    РЎРµР»РµРєС‚РѕСЂС‹ РєРѕРјРїРѕРЅРµРЅС‚ РєРІР°С‚РµСЂРЅРёРѕРЅР°
 */
 
 template <class T>
@@ -304,7 +304,7 @@ void quat_set_element (quat<T>& q, unsigned int index, T value)
 }
 
 /*
-    Создание кватерниона
+    РЎРѕР·РґР°РЅРёРµ РєРІР°С‚РµСЂРЅРёРѕРЅР°
 */
 
 template <class T>
@@ -320,7 +320,7 @@ quat<T> create_quat (T x, T y, T z, T w)
 }
 
 /*
-    Утилиты кватерниона
+    РЈС‚РёР»РёС‚С‹ РєРІР°С‚РµСЂРЅРёРѕРЅР°
 */
 
 template <class T>
@@ -330,20 +330,20 @@ quat<T> quat_normalize (const quat<T>& q)
 }
 
 /*
-    Генерация последовательностей xyz
+    Р“РµРЅРµСЂР°С†РёСЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№ xyz
 */
 
 template <class VecType, unsigned int Size>
 void register_vector_selector (unsigned int index, InvokerRegistry& lib)
 { 
-    //расчёт индексов компонент
+    //СЂР°СЃС‡С‘С‚ РёРЅРґРµРєСЃРѕРІ РєРѕРјРїРѕРЅРµРЅС‚
     
   unsigned int indices [Size < 4 ? 4 : Size] = {0, 0, 0, 0};
 
   for (unsigned int i=0; i<Size; index /= 4, i++)
     indices [i] = index % 4;
 
-    //формирование базового имени
+    //С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ Р±Р°Р·РѕРІРѕРіРѕ РёРјРµРЅРё
 
   static const char component_names [] = {'x', 'y', 'z', 'w'};      
 
@@ -354,7 +354,7 @@ void register_vector_selector (unsigned int index, InvokerRegistry& lib)
 
   *s = '\0';
   
-    //регистрация обработчиков
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
    
   lib.Register (name, make_vec_get_tuple_invoker<VecType, Size> (indices [0], indices [1], indices [2], indices [3]));
   
@@ -371,7 +371,7 @@ void register_vector_selectors (InvokerRegistry& lib)
 }
 
 /*
-    Регистрация библиотеки работы с векторами
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ РІРµРєС‚РѕСЂР°РјРё
 */
 
 template <class T, unsigned int Size>
@@ -381,7 +381,7 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   typedef matrix<T, Size>       matrix_type;
   typedef matrix<T, Size+1>     big_matrix_type;
 
-    //регистрация скалярных селекторов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРєР°Р»СЏСЂРЅС‹С… СЃРµР»РµРєС‚РѕСЂРѕРІ
 
   vec_lib.Register ("get_x", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (0)));
   vec_lib.Register ("get_y", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (1)));
@@ -400,19 +400,19 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   vec_lib.Register ("set_2", "set_z");
   vec_lib.Register ("set_3", "set_w");  
 
-    //регистрация векторных селекторов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІРµРєС‚РѕСЂРЅС‹С… СЃРµР»РµРєС‚РѕСЂРѕРІ
 
   register_vector_selectors<vec_type, 2> (vec_lib);
   register_vector_selectors<vec_type, 3> (vec_lib);
   register_vector_selectors<vec_type, 4> (vec_lib);
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   vec_lib.Register ("__unm", make_unary_invoker<vec_type, vec_type, negate> ());
   vec_lib.Register ("__add", make_binary_invoker<vec_type, vec_type, vec_type, plus> ());
   vec_lib.Register ("__sub", make_binary_invoker<vec_type, vec_type, vec_type, minus> ());
 
-    //регистрация перегруженных операций (умножение/деление на скаляр и вектор)
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹С… РѕРїРµСЂР°С†РёР№ (СѓРјРЅРѕР¶РµРЅРёРµ/РґРµР»РµРЅРёРµ РЅР° СЃРєР°Р»СЏСЂ Рё РІРµРєС‚РѕСЂ)
 
   vec_lib.Register ("__mul", make_invoker (make_binary_invoker<vec_type, vec_type, big_matrix_type, multiplies> (),
                                            make_binary_invoker<vec_type, vec_type, matrix_type, multiplies> (),
@@ -422,7 +422,7 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   vec_lib.Register ("__div", make_invoker (make_binary_invoker<vec_type, vec_type, vec_type, divides> (),
                                            make_binary_invoker<vec_type, vec_type, T, divides> ()));
 
-    //регистрация функций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№
 
   vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (xtl::implicit_cast<typename vec_type::value_type (*)(const vec_type&)> (&math::length<T, Size>)));
   vec_lib.Register ("get_qlength", make_invoker<T (vec_type)> (&math::qlen<T, Size>));
@@ -440,7 +440,7 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
   typedef math::vector<T, Size>   vec_type;
   typedef math::vector<T, Size-1> small_vec_type;
 
-    //регистрация селекторов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРµР»РµРєС‚РѕСЂРѕРІ
 
   mat_lib.Register ("get", make_invoker (&matrix_get_element<T, Size>));
   mat_lib.Register ("set", make_invoker (&matrix_set_element<T, Size>));
@@ -454,13 +454,13 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
   mat_lib.Register ("set_2", make_invoker<void (matrix_type&, vec_type)> (matrix_set_row<T, Size> (2)));
   mat_lib.Register ("set_3", make_invoker<void (matrix_type&, vec_type)> (matrix_set_row<T, Size> (3)));  
   
-    //регистрация операций над матрицами
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№ РЅР°Рґ РјР°С‚СЂРёС†Р°РјРё
 
   mat_lib.Register ("__add", make_binary_invoker<matrix_type, matrix_type, matrix_type, plus> ());
   mat_lib.Register ("__sub", make_binary_invoker<matrix_type, matrix_type, matrix_type, minus> ());
   mat_lib.Register ("__div", make_binary_invoker<matrix_type, matrix_type, T, divides> ());
 
-    //регистрация перегруженных операций (умножение на скаляр, вектор и матрицу)
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РїРµСЂРµРіСЂСѓР¶РµРЅРЅС‹С… РѕРїРµСЂР°С†РёР№ (СѓРјРЅРѕР¶РµРЅРёРµ РЅР° СЃРєР°Р»СЏСЂ, РІРµРєС‚РѕСЂ Рё РјР°С‚СЂРёС†Сѓ)
 
   mat_lib.Register ("__mul", make_invoker (make_binary_invoker<matrix_type, matrix_type, matrix_type, multiplies> (),
                                            make_binary_invoker<vec_type, matrix_type, vec_type, multiplies> (),
@@ -468,7 +468,7 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
                                            make_binary_invoker<matrix_type, matrix_type, T, multiplies> (),
                                            make_binary_invoker<matrix_type, T, matrix_type, multiplies> ()));
 
-    //регистрация функций над матрицами
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ РЅР°Рґ РјР°С‚СЂРёС†Р°РјРё
     
   mat_lib.Register ("transpose", make_invoker (&math::transpose<T, Size>));
   mat_lib.Register ("inverse", make_invoker (&math::inverse<T, Size>));
@@ -482,7 +482,7 @@ void bind_quat_library (InvokerRegistry& quat_lib)
 //  typedef vector<T, Size>    vec_type;
   typedef quat<T>         quat_type;  
 
-    //регистрация селекторов
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРµР»РµРєС‚РѕСЂРѕРІ
 
   quat_lib.Register ("get", make_invoker (&quat_get_element<T>));
   quat_lib.Register ("set", make_invoker (&quat_set_element<T>));
@@ -503,7 +503,7 @@ void bind_quat_library (InvokerRegistry& quat_lib)
   quat_lib.Register ("set_2", "set_z");
   quat_lib.Register ("set_3", "set_w");  
   
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
     
   quat_lib.Register ("__unm", make_unary_invoker<quat_type, quat_type, negate> ());
   quat_lib.Register ("__add", make_binary_invoker<quat_type, quat_type, quat_type, plus> ());
@@ -513,7 +513,7 @@ void bind_quat_library (InvokerRegistry& quat_lib)
                                             make_binary_invoker<quat_type, T, quat_type, multiplies> ()));
 
   
-    //регистрация функций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№
     
 // vec_lib.Register ("get_length",  make_invoker<T (quat_type)> (&math::length<T, Size>));
 //  vec_lib.Register ("get_qlength", make_invoker<T (quat_type)> (&math::qlen<T, Size>));
@@ -522,10 +522,10 @@ void bind_quat_library (InvokerRegistry& quat_lib)
 }
 
 /*
-    Регистрация общих функций
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±С‰РёС… С„СѓРЅРєС†РёР№
 */
 
-//получение знака
+//РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°РєР°
 float get_sign (float x)
 {
   if (x < 0.0f) return -1.0f;
@@ -575,12 +575,12 @@ void bind_math_utility_library (InvokerRegistry& lib)
 }
 
 /*
-    Регистрация математической библиотеки
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё
 */
 
 void bind_math_library (Environment& environment)
 {
-    //создание библиотек
+    //СЃРѕР·РґР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРє
     
   InvokerRegistry global_lib = environment.Library ("global");
   InvokerRegistry math_lib   = environment.CreateLibrary (MATHLIB_LIBRARY);
@@ -590,7 +590,7 @@ void bind_math_library (Environment& environment)
   InvokerRegistry mat4_lib   = environment.CreateLibrary (MATHLIB_MAT4_LIBRARY);
   InvokerRegistry quat_lib   = environment.CreateLibrary (MATHLIB_QUAT_LIBRARY);
   
-    //регистрация библиотек
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРє
   
   bind_math_common_library         (math_lib);
   bind_math_utility_library<float> (math_lib);
@@ -600,12 +600,12 @@ void bind_math_library (Environment& environment)
   bind_matrix_library<float, 4>    (mat4_lib);
   bind_quat_library<float>         (quat_lib);
   
-    //регистрация специфических операций над векторами
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ СЃРїРµС†РёС„РёС‡РµСЃРєРёС… РѕРїРµСЂР°С†РёР№ РЅР°Рґ РІРµРєС‚РѕСЂР°РјРё
 
   vec3_lib.Register ("cross", make_invoker<vec3f (vec3f, vec3f)> (&vec_cross<float, 3>));
 //  vec4_lib.Register ("cross", make_invoker<vec4f (vec4f, vec4f)> (&vec_cross<float, 4>));
 
-    //регистрация функций создания векторов и матриц
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ РІРµРєС‚РѕСЂРѕРІ Рё РјР°С‚СЂРёС†
 
   math_lib.Register   ("vec2", make_invoker (make_invoker (&create_vec2), make_invoker (&create_scalar2)));
   math_lib.Register   ("vec3", make_invoker (make_invoker (&create_vec3), make_invoker (&create_scalar3)));
@@ -620,7 +620,7 @@ void bind_math_library (Environment& environment)
   quat_lib.Register   ("quat", make_invoker (make_invoker (&create_quat<float>), make_invoker (&create_quat1<float>)));
   global_lib.Register ("quat", quat_lib, "quat");
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<vec2f> (MATHLIB_VEC2_LIBRARY);
   environment.RegisterType<vec3f> (MATHLIB_VEC3_LIBRARY);
@@ -630,7 +630,7 @@ void bind_math_library (Environment& environment)
 }
 
 /*
-    Компонент
+    РљРѕРјРїРѕРЅРµРЅС‚
 */
 
 class Component

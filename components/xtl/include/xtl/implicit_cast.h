@@ -4,10 +4,10 @@
 namespace xtl
 {
 
-//аргумент явного приведения типов
+//Р°СЂРіСѓРјРµРЅС‚ СЏРІРЅРѕРіРѕ РїСЂРёРІРµРґРµРЅРёСЏ С‚РёРїРѕРІ
 template <class T> struct implicit_cast_argument { typedef T type; };
 
-//функция-обёртка для явного приведения типов
+//С„СѓРЅРєС†РёСЏ-РѕР±С‘СЂС‚РєР° РґР»СЏ СЏРІРЅРѕРіРѕ РїСЂРёРІРµРґРµРЅРёСЏ С‚РёРїРѕРІ
 template <class T> inline T implicit_cast (typename implicit_cast_argument<T>::type x)
 {
   return x;

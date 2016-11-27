@@ -3,7 +3,7 @@
 function CreateMultiTextLine()
   local MultiLine={}
   MultiLine.Node=Scene.Node.Create()
-  local TextLines={} --текстовые линии в которые будет производится вывожд текста
+  local TextLines={} --С‚РµРєСЃС‚РѕРІС‹Рµ Р»РёРЅРёРё РІ РєРѕС‚РѕСЂС‹Рµ Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІС‹РІРѕР¶Рґ С‚РµРєСЃС‚Р°
   
   local MaxTextLength=nil
   MultiLine.StringLengthTerminal=" "
@@ -12,7 +12,7 @@ function CreateMultiTextLine()
   MultiLine.Color=vec4(1,1,1,1)
   
   ------------------------------------------------------------------------------------------------------
-  -- методы
+  -- РјРµС‚РѕРґС‹
   ------------------------------------------------------------------------------------------------------
   
   local Height=0
@@ -51,7 +51,7 @@ function CreateMultiTextLine()
       text=tostring(text) 
     end
     MultiLine.Text=text
-    -- анализ полученного текста и генерация строк при необходимости
+    -- Р°РЅР°Р»РёР· РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ С‚РµРєСЃС‚Р° Рё РіРµРЅРµСЂР°С†РёСЏ СЃС‚СЂРѕРє РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
     local strings={}
     if MaxTextLength then
       if MaxTextLength>0 then
@@ -60,11 +60,11 @@ function CreateMultiTextLine()
     else
       strings[1]=text
     end
-    -- устаревшие строки отсоединяются от узла
+    -- СѓСЃС‚Р°СЂРµРІС€РёРµ СЃС‚СЂРѕРєРё РѕС‚СЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ РѕС‚ СѓР·Р»Р°
     ForEachInTable(TextLines, function(line)
       line:Unbind()
     end)
-    -- создаются новые строки с текстом и присоединяются к узлу
+    -- СЃРѕР·РґР°СЋС‚СЃСЏ РЅРѕРІС‹Рµ СЃС‚СЂРѕРєРё СЃ С‚РµРєСЃС‚РѕРј Рё РїСЂРёСЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ Рє СѓР·Р»Сѓ
     TextLines={}
     local TextLineIndex=0
     ForEachInTable(strings, function(str)

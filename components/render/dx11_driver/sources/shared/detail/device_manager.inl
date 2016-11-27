@@ -1,5 +1,5 @@
 /*
-    Приведение типов объектов с проверкой совместимости
+    РџСЂРёРІРµРґРµРЅРёРµ С‚РёРїРѕРІ РѕР±СЉРµРєС‚РѕРІ СЃ РїСЂРѕРІРµСЂРєРѕР№ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 */
 
 template <class DstT, class SrcT>
@@ -28,7 +28,7 @@ inline DstT* cast_object (const DeviceObject& owner, SrcT* ptr, const char* sour
 }
 
 /*
-    Получение контекста
+    РџРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р°
 */
 
 inline ID3D11DeviceContext& get_dx_context (const DeviceManager& owner, IDeviceContext* context, const char* source)

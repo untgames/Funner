@@ -20,7 +20,7 @@ namespace scene_graph_script_binds
 {
 
 /*
-    Создание хелперов
+    РЎРѕР·РґР°РЅРёРµ С…РµР»РїРµСЂРѕРІ
 */
 
 helpers::Box::Pointer create_box_helper ()
@@ -29,7 +29,7 @@ helpers::Box::Pointer create_box_helper ()
 }
 
 /*
-   Регистрация библиотеки работы с хелперами
+   Р РµРіРёСЃС‚СЂР°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°Р±РѕС‚С‹ СЃ С…РµР»РїРµСЂР°РјРё
 */
 
 void set_bound_box (helpers::Box& entity, const bound_volumes::aaboxf& box)
@@ -41,19 +41,19 @@ void bind_box_helper_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_BOX_HELPER_LIBRARY);
 
-    //наследование
+    //РЅР°СЃР»РµРґРѕРІР°РЅРёРµ
 
   lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
-    //регистрация функций создания
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С„СѓРЅРєС†РёР№ СЃРѕР·РґР°РЅРёСЏ
 
   lib.Register ("Create", make_invoker (&create_box_helper));
 
-    //регистрация операций
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ РѕРїРµСЂР°С†РёР№
 
   lib.Register ("set_BoundBox", make_invoker (&set_bound_box));
 
-    //регистрация типов данных
+    //СЂРµРіРёСЃС‚СЂР°С†РёСЏ С‚РёРїРѕРІ РґР°РЅРЅС‹С…
 
   environment.RegisterType<helpers::Box> (SCENE_BOX_HELPER_LIBRARY);
 }

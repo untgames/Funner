@@ -5,13 +5,13 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых моделей
+const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРёР·СѓР°Р»РёР·РёСЂСѓРµРјС‹С… РјРѕРґРµР»РµР№
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ShadowMapRenderer::ShadowMapRenderer (server::RenderManager& manager, const common::ParseNode& node)
@@ -67,7 +67,7 @@ ShadowMapRenderer::~ShadowMapRenderer ()
 }
 
 /*
-    Обновление карты
+    РћР±РЅРѕРІР»РµРЅРёРµ РєР°СЂС‚С‹
 */
 
 namespace

@@ -10,7 +10,7 @@ int main ()
   
   printf ("Mesh name: '%s'\n", model->MeshName ());
   
-    //ïðîâåðêà êîìïèëèðóåìîñòè
+    //Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° ÐºÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼Ð¾ÑÑ‚Ð¸
   
   model->SetInfiniteBounds ();
   model->SetBoundBox (aaboxf (-10.0f, 10.0f));

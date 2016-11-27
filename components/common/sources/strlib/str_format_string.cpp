@@ -7,7 +7,7 @@ namespace
 typedef xtl::function<void (const char* prefix, const char* replacement_tag)> NewTokenHandler;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void parse_replacement (const char*& s, stl::string& replacement_tag)
@@ -36,7 +36,7 @@ namespace common
 {
 
 /*
-    Разбор форматированных строк
+    Р Р°Р·Р±РѕСЂ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅС‹С… СЃС‚СЂРѕРє
 */
 
 void parse_format_string (const char* format_string, const xtl::function<void (const char* prefix, const char* replacement_tag)>& fn)

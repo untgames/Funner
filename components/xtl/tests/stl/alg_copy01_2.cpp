@@ -1,4 +1,4 @@
-//Тестирование алгоритма copy_n (first, count, result)
+//РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р°Р»РіРѕСЂРёС‚РјР° copy_n (first, count, result)
 #include <stdio.h>
 #include <stl/algorithm>
 #include <stl/vector>

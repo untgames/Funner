@@ -3,7 +3,7 @@
 using namespace media::collada;
 
 /*
-    Разбор библиотеки источников света
+    Р Р°Р·Р±РѕСЂ Р±РёР±Р»РёРѕС‚РµРєРё РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р°
 */
 
 void DaeParser::ParseLibraryLights (Parser::Iterator iter)
@@ -18,7 +18,7 @@ void DaeParser::ParseLibraryLights (Parser::Iterator iter)
 }
 
 /*
-    Разбор источника света
+    Р Р°Р·Р±РѕСЂ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 */
 
 void DaeParser::ParseLight (Parser::Iterator light_iter)
@@ -33,7 +33,7 @@ void DaeParser::ParseLight (Parser::Iterator light_iter)
   if (iter->NextNamesake ())
     raise_parser_exception (iter->NextNamesake (), "Only one 'technique_common' tag allowed");
 
-    //чтение типа источника света
+    //С‡С‚РµРЅРёРµ С‚РёРїР° РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
 
   static String2Value<LightType> light_types [] = {
     {"ambient",     LightType_Ambient},
@@ -58,22 +58,22 @@ void DaeParser::ParseLight (Parser::Iterator light_iter)
   if (i == light_types_count)
     raise_parser_exception (*iter, "Incorrect 'technique_common' tag. No light type sub-tag (one of 'ambient', 'directional', 'point' or 'spot')");
   
-    //создание источника света
+    //СЃРѕР·РґР°РЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
     
   Light light;
   
   light.SetId (id);
   
-    //установка типа источника
+    //СѓСЃС‚Р°РЅРѕРІРєР° С‚РёРїР° РёСЃС‚РѕС‡РЅРёРєР°
     
   light.SetType (type);
   
-    //чтение цвета
+    //С‡С‚РµРЅРёРµ С†РІРµС‚Р°
   
   if (common::ParseNode param_node = iter->First ("color.#text"))
     light.SetColor (get<vec3f> (param_node, ""));
     
-    //чтение интенсивности
+    //С‡С‚РµРЅРёРµ РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚Рё
 
   for (Parser::NamesakeIterator technique_iter=light_iter->First ("extra.technique"); technique_iter; ++technique_iter)
   {
@@ -87,7 +87,7 @@ void DaeParser::ParseLight (Parser::Iterator light_iter)
     }
   }
   
-    //чтение параметров источника света
+    //С‡С‚РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РёСЃС‚РѕС‡РЅРёРєР° СЃРІРµС‚Р°
     
   static String2Value<LightParam> light_params [] = {
     {"constant_attenuation.#text",  LightParam_AttenuationConstant},
@@ -103,7 +103,7 @@ void DaeParser::ParseLight (Parser::Iterator light_iter)
     if (common::ParseNode param_node = iter->First (light_params [i].string))
       light.SetParam (light_params [i].value, get<float> (param_node, ""));
     
-    //добавление источника в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ РёСЃС‚РѕС‡РЅРёРєР° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
   
   model.Lights ().Insert (id, light);
 }

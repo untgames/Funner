@@ -27,7 +27,7 @@ const size_t DEFAULT_LAST_GLYPH_CODE    = 255;
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
 /*
-    Утилиты
+    РЈС‚РёР»РёС‚С‹
 */
 
 void error (const char* format, ...)
@@ -45,42 +45,42 @@ void error (const char* format, ...)
 }
 
 /*
-    Обработка командной строки
+    РћР±СЂР°Р±РѕС‚РєР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 */
 
 struct Params;
 
-//опция
+//РѕРїС†РёСЏ
 struct Option
 {
-  CommandLine::SwitchHandler handler;       //обработчик ключа
-  const char*                name;          //имя команды
-  char                       short_name;    //короткое имя
-  const char*                argument_name; //имя аргумента
-  const char*                tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //РѕР±СЂР°Р±РѕС‚С‡РёРє РєР»СЋС‡Р°
+  const char*                name;          //РёРјСЏ РєРѕРјР°РЅРґС‹
+  char                       short_name;    //РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ
+  const char*                argument_name; //РёРјСЏ Р°СЂРіСѓРјРµРЅС‚Р°
+  const char*                tip;           //РїРѕРґСЃРєР°Р·РєР°
 };
 
-//параметры запуска
+//РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСѓСЃРєР°
 struct Params
 {
-  const Option* options;                //массив опций
-  size_t        options_count;          //количество опций
-  stl::string   source_font;            //имя исходного шрифта
-  stl::string   result_image;           //имя результирующего изображения
-  stl::string   result_xml_image_name;  //имя результирующего изображения в xml
-  stl::string   result_font;            //имя результирующего шрифта
-  stl::string   char_map_file;          //имя файла содержащего символы для генерации шрифта
-  stl::string   char_map_file_encoding; //кодировка файла содержащего символы для генерации шрифта
-  float         stroke_width;           //ширина обводки
-  int           force_advance;          //генерировать отступ равный ширине плюс данное значение
-  int           glyph_interval;         //интервал между символами в картинке
-  int           glyph_size;             //максимальный размер изображения одного символа
-  int           first_glyph_code;       //код первого индекса генерируемого диапазона символов
-  int           last_glyph_code;        //код последнего индекса генерируемого диапазона символов
-  bool          use_force_advance;      //генерировать ли значение отступа
-  bool          fast_convert;           //быстрая генерация
-  bool          silent;                 //минимальное число сообщений
-  bool          print_help;             //нужно ли печатать сообщение помощи
+  const Option* options;                //РјР°СЃСЃРёРІ РѕРїС†РёР№
+  size_t        options_count;          //РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїС†РёР№
+  stl::string   source_font;            //РёРјСЏ РёСЃС…РѕРґРЅРѕРіРѕ С€СЂРёС„С‚Р°
+  stl::string   result_image;           //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+  stl::string   result_xml_image_name;  //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ xml
+  stl::string   result_font;            //РёРјСЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С€СЂРёС„С‚Р°
+  stl::string   char_map_file;          //РёРјСЏ С„Р°Р№Р»Р° СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ СЃРёРјРІРѕР»С‹ РґР»СЏ РіРµРЅРµСЂР°С†РёРё С€СЂРёС„С‚Р°
+  stl::string   char_map_file_encoding; //РєРѕРґРёСЂРѕРІРєР° С„Р°Р№Р»Р° СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ СЃРёРјРІРѕР»С‹ РґР»СЏ РіРµРЅРµСЂР°С†РёРё С€СЂРёС„С‚Р°
+  float         stroke_width;           //С€РёСЂРёРЅР° РѕР±РІРѕРґРєРё
+  int           force_advance;          //РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РѕС‚СЃС‚СѓРї СЂР°РІРЅС‹Р№ С€РёСЂРёРЅРµ РїР»СЋСЃ РґР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  int           glyph_interval;         //РёРЅС‚РµСЂРІР°Р» РјРµР¶РґСѓ СЃРёРјРІРѕР»Р°РјРё РІ РєР°СЂС‚РёРЅРєРµ
+  int           glyph_size;             //РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
+  int           first_glyph_code;       //РєРѕРґ РїРµСЂРІРѕРіРѕ РёРЅРґРµРєСЃР° РіРµРЅРµСЂРёСЂСѓРµРјРѕРіРѕ РґРёР°РїР°Р·РѕРЅР° СЃРёРјРІРѕР»РѕРІ
+  int           last_glyph_code;        //РєРѕРґ РїРѕСЃР»РµРґРЅРµРіРѕ РёРЅРґРµРєСЃР° РіРµРЅРµСЂРёСЂСѓРµРјРѕРіРѕ РґРёР°РїР°Р·РѕРЅР° СЃРёРјРІРѕР»РѕРІ
+  bool          use_force_advance;      //РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ Р»Рё Р·РЅР°С‡РµРЅРёРµ РѕС‚СЃС‚СѓРїР°
+  bool          fast_convert;           //Р±С‹СЃС‚СЂР°СЏ РіРµРЅРµСЂР°С†РёСЏ
+  bool          silent;                 //РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРѕРѕР±С‰РµРЅРёР№
+  bool          print_help;             //РЅСѓР¶РЅРѕ Р»Рё РїРµС‡Р°С‚Р°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 };
 
 void log_handler (const char* log, const char* message)
@@ -89,7 +89,7 @@ void log_handler (const char* log, const char* message)
   fflush (stdout);
 }
 
-//получение подсказки по программе
+//РїРѕР»СѓС‡РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё РїРѕ РїСЂРѕРіСЂР°РјРјРµ
 void command_line_help (const char*, Params& params)
 {
   printf ("%s [<OPTIONS>] <SOURCE> ...\n", PROGRAM_NAME);
@@ -116,86 +116,86 @@ void command_line_help (const char*, Params& params)
   params.print_help = true;
 }
 
-//установка параметра вывода детальной информации
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° РІС‹РІРѕРґР° РґРµС‚Р°Р»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
 }
 
-//установка параметра быстрого конвертирования
+//СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂР°РјРµС‚СЂР° Р±С‹СЃС‚СЂРѕРіРѕ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ
 void command_line_fast_convert (const char*, Params& params)
 {
   params.fast_convert = true;
 }
 
-//установка имени результирующего файла картинки
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° РєР°СЂС‚РёРЅРєРё
 void command_line_result_image_name (const char* file_name, Params& params)
 {
   params.result_image = file_name;
 }
 
-//установка имени результирующего файла картинки в xml
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° РєР°СЂС‚РёРЅРєРё РІ xml
 void command_line_result_xml_image_name (const char* file_name, Params& params)
 {
   params.result_xml_image_name = file_name;
 }
 
-//установка имени результирующего файла шрифта
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р° С€СЂРёС„С‚Р°
 void command_line_result_font (const char* file_name, Params& params)
 {
   params.result_font = file_name;
 }
 
-//установка имени файла содержащего символы для генерации
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРјРµРЅРё С„Р°Р№Р»Р° СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ СЃРёРјРІРѕР»С‹ РґР»СЏ РіРµРЅРµСЂР°С†РёРё
 void command_line_char_map_file (const char* file_name, Params& params)
 {
   params.char_map_file = file_name;
 }
 
-//установка кодировки файла содержащего символы для генерации
+//СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРґРёСЂРѕРІРєРё С„Р°Р№Р»Р° СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ СЃРёРјРІРѕР»С‹ РґР»СЏ РіРµРЅРµСЂР°С†РёРё
 void command_line_char_map_file_encoding (const char* encoding, Params& params)
 {
   params.char_map_file_encoding = encoding;
 }
 
-//установка максимального размера изображения одного символа
+//СѓСЃС‚Р°РЅРѕРІРєР° РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
 void command_line_glyph_size (const char* size, Params& params)
 {
   params.glyph_size = atoi (size);
 }
 
-//установка ширины обводки символов
+//СѓСЃС‚Р°РЅРѕРІРєР° С€РёСЂРёРЅС‹ РѕР±РІРѕРґРєРё СЃРёРјРІРѕР»РѕРІ
 void command_line_stroke_width (const char* size, Params& params)
 {
   params.stroke_width = (float)atof (size);
 }
 
-//установка кода первого индекса генерируемого диапазона символов
+//СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРґР° РїРµСЂРІРѕРіРѕ РёРЅРґРµРєСЃР° РіРµРЅРµСЂРёСЂСѓРµРјРѕРіРѕ РґРёР°РїР°Р·РѕРЅР° СЃРёРјРІРѕР»РѕРІ
 void command_line_first_glyph_code (const char* index, Params& params)
 {
   params.first_glyph_code = atoi (index);
 }
 
-//установка кода последнего индекса генерируемого диапазона символов
+//СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРґР° РїРѕСЃР»РµРґРЅРµРіРѕ РёРЅРґРµРєСЃР° РіРµРЅРµСЂРёСЂСѓРµРјРѕРіРѕ РґРёР°РїР°Р·РѕРЅР° СЃРёРјРІРѕР»РѕРІ
 void command_line_last_glyph_code (const char* index, Params& params)
 {
   params.last_glyph_code = atoi (index);
 }
 
-//установка интервала между изображениями символов в картинке
+//СѓСЃС‚Р°РЅРѕРІРєР° РёРЅС‚РµСЂРІР°Р»Р° РјРµР¶РґСѓ РёР·РѕР±СЂР°Р¶РµРЅРёСЏРјРё СЃРёРјРІРѕР»РѕРІ РІ РєР°СЂС‚РёРЅРєРµ
 void command_line_glyph_interval (const char* size, Params& params)
 {
   params.glyph_interval = atoi (size);
 }
 
-//установка генерационного отступа между символами
+//СѓСЃС‚Р°РЅРѕРІРєР° РіРµРЅРµСЂР°С†РёРѕРЅРЅРѕРіРѕ РѕС‚СЃС‚СѓРїР° РјРµР¶РґСѓ СЃРёРјРІРѕР»Р°РјРё
 void command_line_force_advance (const char* size, Params& params)
 {
   params.force_advance     = atoi (size);
   params.use_force_advance = true;
 }
 
-//проверка корректности ввода
+//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 void validate (Params& params)
 {
   if (params.source_font.empty ())
@@ -300,7 +300,7 @@ void build (Params& params)
 
       for (IndexSet::iterator iter = char_set.begin (), end = char_set.end (); iter != end; ++iter, current_char++)
       {
-          //заполнение ненужных символов
+          //Р·Р°РїРѕР»РЅРµРЅРёРµ РЅРµРЅСѓР¶РЅС‹С… СЃРёРјРІРѕР»РѕРІ
         for (size_t i = 1, count = *iter - last_char_code; i < count; i++, current_char++)
           *current_char = '?';
 
@@ -370,7 +370,7 @@ int main (int argc, const char** argv)
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
 
-    //инициализация
+    //РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
 
   params.options           = options;
   params.options_count     = options_count;
@@ -392,10 +392,10 @@ int main (int argc, const char** argv)
 
   try
   {
-      //разбор командной строки
+      //СЂР°Р·Р±РѕСЂ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
     command_line.Process (argc, argv);
 
-      // --help только печатает сообщение помощи
+      // --help С‚РѕР»СЊРєРѕ РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕРјРѕС‰Рё
 
     if (params.print_help)
       return 0;
@@ -408,11 +408,11 @@ int main (int argc, const char** argv)
 
     params.source_font = command_line.Param (0);
 
-      //проверка корректности ввода
+      //РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РІРІРѕРґР°
 
     validate (params);
 
-      //построение шрифта
+      //РїРѕСЃС‚СЂРѕРµРЅРёРµ С€СЂРёС„С‚Р°
 
     build (params);
   }

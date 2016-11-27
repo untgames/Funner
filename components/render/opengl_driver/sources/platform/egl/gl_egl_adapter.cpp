@@ -8,27 +8,27 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t OUTPUT_ARRAY_RESERVE = 8;    //резервируемое количество устройств вывода
-const size_t MAX_EGL_CONFIGS      = 1024; //максимальное количество конфигураций
+const size_t OUTPUT_ARRAY_RESERVE = 8;    //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
+const size_t MAX_EGL_CONFIGS      = 1024; //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРЅС„РёРіСѓСЂР°С†РёР№
 
 }
 
 /*
-    Описание реализации адаптера
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РґР°РїС‚РµСЂР°
 */
 
 typedef stl::vector<Output*> OutputArray;
 
 struct Adapter::Impl
 {
-  Log         log;     //протокол работы OpenGL
-  OutputArray outputs; //зарегистрированные устройства вывода
-  Library     library; //библиотека точек входа OpenGL
+  Log         log;     //РїСЂРѕС‚РѕРєРѕР» СЂР°Р±РѕС‚С‹ OpenGL
+  OutputArray outputs; //Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
+  Library     library; //Р±РёР±Р»РёРѕС‚РµРєР° С‚РѕС‡РµРє РІС…РѕРґР° OpenGL
   
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     outputs.reserve (OUTPUT_ARRAY_RESERVE);
@@ -36,7 +36,7 @@ struct Adapter::Impl
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 Adapter::Adapter ()
@@ -57,7 +57,7 @@ Adapter::~Adapter ()
 }
 
 /*
-    Имя адаптера / путь к модулю / описание
+    РРјСЏ Р°РґР°РїС‚РµСЂР° / РїСѓС‚СЊ Рє РјРѕРґСѓР»СЋ / РѕРїРёСЃР°РЅРёРµ
 */
 
 const char* Adapter::GetName ()
@@ -76,7 +76,7 @@ const char* Adapter::GetDescription ()
 }
 
 /*
-    Перечисление доступных устройств вывода
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 size_t Adapter::GetOutputsCount ()
@@ -93,7 +93,7 @@ IOutput* Adapter::GetOutput (size_t index)
 }
 
 /*
-    Регистрация устройств вывода
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІ РІС‹РІРѕРґР°
 */
 
 void Adapter::RegisterOutput (Output* output)
@@ -119,7 +119,7 @@ void Adapter::UnregisterOutput (Output* output)
 }
 
 /*
-    Запрос устройства вывода
+    Р—Р°РїСЂРѕСЃ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 */
 
 Output::Pointer Adapter::GetOutput (const void* window_handle)
@@ -129,13 +129,13 @@ Output::Pointer Adapter::GetOutput (const void* window_handle)
     if (!window_handle)
       throw xtl::make_null_argument_exception ("", "window_handle");
       
-      //поиск устройства вывода среди уже созданных
+      //РїРѕРёСЃРє СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР° СЃСЂРµРґРё СѓР¶Рµ СЃРѕР·РґР°РЅРЅС‹С…
       
     for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
       if ((*iter)->GetWindowHandle () == window_handle)
         return *iter;
 
-      //создание нового устройства вывода
+      //СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° РІС‹РІРѕРґР°
 
     return Output::Pointer (new Output (this, window_handle), false);
   }
@@ -147,7 +147,7 @@ Output::Pointer Adapter::GetOutput (const void* window_handle)
 }
 
 /*
-    Библиотека
+    Р‘РёР±Р»РёРѕС‚РµРєР°
 */
 
 ILibrary& Adapter::GetLibrary ()
@@ -156,7 +156,7 @@ ILibrary& Adapter::GetLibrary ()
 }
 
 /*
-    Перечисление доступных форматов пикселей
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ РґРѕСЃС‚СѓРїРЅС‹С… С„РѕСЂРјР°С‚РѕРІ РїРёРєСЃРµР»РµР№
 */
 
 namespace

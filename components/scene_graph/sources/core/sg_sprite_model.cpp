@@ -4,21 +4,21 @@ using namespace scene_graph;
 using namespace math;
 
 /*
-    Описание реализации спрайтовой модели
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё СЃРїСЂР°Р№С‚РѕРІРѕР№ РјРѕРґРµР»Рё
 */
 
 typedef xtl::signal<void (SpriteModel& sender, SpriteModelEvent event_id)> SpriteModelSignal;
 
 struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
 {
-  stl::string       material;                       //имя материала
-  size_t            material_hash;                  //хэш имени материала
-  stl::string       batch;                          //имя пакета
-  size_t            batch_hash;                     //хэш пакета
-  SpriteMode        mode;                           //режим спрайтов
-  SpriteUsage       usage;                          //режим использования спрайтов
-  math::vec3f       up;                             //вектор вверх
-  SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 
+  stl::string       material;                       //РёРјСЏ РјР°С‚РµСЂРёР°Р»Р°
+  size_t            material_hash;                  //С…СЌС€ РёРјРµРЅРё РјР°С‚РµСЂРёР°Р»Р°
+  stl::string       batch;                          //РёРјСЏ РїР°РєРµС‚Р°
+  size_t            batch_hash;                     //С…СЌС€ РїР°РєРµС‚Р°
+  SpriteMode        mode;                           //СЂРµР¶РёРј СЃРїСЂР°Р№С‚РѕРІ
+  SpriteUsage       usage;                          //СЂРµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
+  math::vec3f       up;                             //РІРµРєС‚РѕСЂ РІРІРµСЂС…
+  SpriteModelSignal signals [SpriteModelEvent_Num]; //СЃРёРіРЅР°Р»С‹ РјРѕРґРµР»Рё 
 
   Impl ()
     : material_hash (0xffffffff)
@@ -29,7 +29,7 @@ struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
   {
   }
 
-    //оповещение о событии
+    //РѕРїРѕРІРµС‰РµРЅРёРµ Рѕ СЃРѕР±С‹С‚РёРё
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
   {
     try
@@ -41,13 +41,13 @@ struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 SpriteModel::SpriteModel ()
@@ -60,7 +60,7 @@ SpriteModel::~SpriteModel ()
 }
 
 /*
-    Материал
+    РњР°С‚РµСЂРёР°Р»
 */
 
 void SpriteModel::SetMaterial (const char* in_material)
@@ -90,7 +90,7 @@ size_t SpriteModel::MaterialHash () const
 }
 
 /*
-    Пакет
+    РџР°РєРµС‚
 */
 
 void SpriteModel::SetBatch (const char* in_batch)
@@ -122,7 +122,7 @@ size_t SpriteModel::BatchHash () const
 }
 
 /*
-    Режим спрайтов
+    Р РµР¶РёРј СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteModel::SetMode (SpriteMode mode)
@@ -153,7 +153,7 @@ SpriteMode SpriteModel::Mode () const
 }
 
 /*
-    Режим использования спрайтов
+    Р РµР¶РёРј РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteModel::SetUsage (SpriteUsage usage)
@@ -185,7 +185,7 @@ SpriteUsage SpriteModel::Usage () const
 }
 
 /*
-    Вектор "вверх"
+    Р’РµРєС‚РѕСЂ "РІРІРµСЂС…"
 */
 
 void SpriteModel::SetOrtUp (const math::vec3f& up)
@@ -206,7 +206,7 @@ const math::vec3f& SpriteModel::OrtUp () const
 }
 
 /*
-    Количество спрайтов / размер буфера спрайтов / получение массива спрайтов
+    РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРїСЂР°Р№С‚РѕРІ / СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° СЃРїСЂР°Р№С‚РѕРІ / РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° СЃРїСЂР°Р№С‚РѕРІ
 */
 
 size_t SpriteModel::SpriteDescsCount () const
@@ -225,7 +225,7 @@ const SpriteDesc* SpriteModel::SpriteDescs () const
 }
 
 /*
-    Динамическая диспетчеризация
+    Р”РёРЅР°РјРёС‡РµСЃРєР°СЏ РґРёСЃРїРµС‚С‡РµСЂРёР·Р°С†РёСЏ
 */
 
 void SpriteModel::AcceptCore (Visitor& visitor)
@@ -235,7 +235,7 @@ void SpriteModel::AcceptCore (Visitor& visitor)
 }
 
 /*
-    Подписка на события модели
+    РџРѕРґРїРёСЃРєР° РЅР° СЃРѕР±С‹С‚РёСЏ РјРѕРґРµР»Рё
 */
 
 xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const EventHandler& handler)
@@ -253,7 +253,7 @@ xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const
 }
 
 /*
-    Оповещение об изменении данных спрайтов
+    РћРїРѕРІРµС‰РµРЅРёРµ РѕР± РёР·РјРµРЅРµРЅРёРё РґР°РЅРЅС‹С… СЃРїСЂР°Р№С‚РѕРІ
 */
 
 void SpriteModel::UpdateSpriteDescsNotify ()
@@ -264,7 +264,7 @@ void SpriteModel::UpdateSpriteDescsNotify ()
 }
 
 /*
-    Связывание свойств
+    РЎРІСЏР·С‹РІР°РЅРёРµ СЃРІРѕР№СЃС‚РІ
 */
 
 void SpriteModel::BindProperties (common::PropertyBindingMap& bindings)

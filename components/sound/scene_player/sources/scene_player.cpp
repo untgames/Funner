@@ -31,21 +31,21 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const double STOP_EMITTER_DELAY = 0.2; //запаздывание при остановке звука
+const double STOP_EMITTER_DELAY = 0.2; //Р·Р°РїР°Р·РґС‹РІР°РЅРёРµ РїСЂРё РѕСЃС‚Р°РЅРѕРІРєРµ Р·РІСѓРєР°
 
 }
 
 /*
-    Эмиттер сцены
+    Р­РјРёС‚С‚РµСЂ СЃС†РµРЅС‹
 */
 
 class ScenePlayerEmitter: public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ScenePlayerEmitter (SoundEmitter& in_scene_emitter)
       : sound_manager (0)
       , scene_emitter (in_scene_emitter)
@@ -63,7 +63,7 @@ class ScenePlayerEmitter: public xtl::trackable
       on_change_scene = scene_emitter.RegisterEventHandler (NodeEvent_AfterSceneChange, xtl::bind (&ScenePlayerEmitter::OnSceneChange, this));
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ScenePlayerEmitter ()
     {
       try
@@ -74,11 +74,11 @@ class ScenePlayerEmitter: public xtl::trackable
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }  
     
-///Изменение менеджера звуков
+///РР·РјРµРЅРµРЅРёРµ РјРµРЅРµРґР¶РµСЂР° Р·РІСѓРєРѕРІ
     void SetSoundManager (SoundManager* in_sound_manager)
     {
       if (!in_sound_manager)
@@ -108,7 +108,7 @@ class ScenePlayerEmitter: public xtl::trackable
     SoundManager* GetSoundManager () { return sound_manager; }
     
   private:
-///Обработчик события обновления эмиттера сцены
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ СЌРјРёС‚С‚РµСЂР° СЃС†РµРЅС‹
     void OnUpdate ()
     {
       emitter.SetPosition  (scene_emitter.WorldPosition ());
@@ -116,7 +116,7 @@ class ScenePlayerEmitter: public xtl::trackable
       emitter.SetVolume    (scene_emitter.Gain ());
     }
     
-///Обработчик начала проигрывания звука в эмиттере
+///РћР±СЂР°Р±РѕС‚С‡РёРє РЅР°С‡Р°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР° РІ СЌРјРёС‚С‚РµСЂРµ
     void OnPlay ()
     {
       if (is_playing)
@@ -146,7 +146,7 @@ class ScenePlayerEmitter: public xtl::trackable
       }      
     }
 
-///Обработчик остановки проигрывания звука в эмиттере
+///РћР±СЂР°Р±РѕС‚С‡РёРє РѕСЃС‚Р°РЅРѕРІРєРё РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєР° РІ СЌРјРёС‚С‚РµСЂРµ
     void OnStop ()
     {      
       if (!is_playing)
@@ -164,36 +164,36 @@ class ScenePlayerEmitter: public xtl::trackable
       {
         need_release_scene_emitter = false;
 
-        scene_emitter.Release (); //должна быть последней операцией, поскольку может инициировать удаление текущего объекта
+        scene_emitter.Release (); //РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїРѕСЃР»РµРґРЅРµР№ РѕРїРµСЂР°С†РёРµР№, РїРѕСЃРєРѕР»СЊРєСѓ РјРѕР¶РµС‚ РёРЅРёС†РёРёСЂРѕРІР°С‚СЊ СѓРґР°Р»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РѕР±СЉРµРєС‚Р°
       }      
     }
 
-///Обработчик события изменения сцены
+///РћР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС†РµРЅС‹
     void OnSceneChange ()
     {     
       delete this;
     }
 
   private:
-    SoundManager*        sound_manager;              //менеджер звуков
-    SoundEmitter&        scene_emitter;              //эмиттер в сцене
-    sound::Emitter       emitter;                    //эмиттер в менеджере звуков
-    size_t               play_start_time;            //время начала проигрывания
-    float                play_start_offset;          //смещение начала проигрывания
-    bool                 is_playing;                 //проигрывается ли звук
-    bool                 need_release_scene_emitter; //нужно освобождать эмиттер в сцене
-    Action               auto_stop_action;           //действие автоматической остановки звука
-    xtl::auto_connection on_change_scene;            //соединение события изменения сцены
+    SoundManager*        sound_manager;              //РјРµРЅРµРґР¶РµСЂ Р·РІСѓРєРѕРІ
+    SoundEmitter&        scene_emitter;              //СЌРјРёС‚С‚РµСЂ РІ СЃС†РµРЅРµ
+    sound::Emitter       emitter;                    //СЌРјРёС‚С‚РµСЂ РІ РјРµРЅРµРґР¶РµСЂРµ Р·РІСѓРєРѕРІ
+    size_t               play_start_time;            //РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+    float                play_start_offset;          //СЃРјРµС‰РµРЅРёРµ РЅР°С‡Р°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ
+    bool                 is_playing;                 //РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ Р»Рё Р·РІСѓРє
+    bool                 need_release_scene_emitter; //РЅСѓР¶РЅРѕ РѕСЃРІРѕР±РѕР¶РґР°С‚СЊ СЌРјРёС‚С‚РµСЂ РІ СЃС†РµРЅРµ
+    Action               auto_stop_action;           //РґРµР№СЃС‚РІРёРµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ РѕСЃС‚Р°РЅРѕРІРєРё Р·РІСѓРєР°
+    xtl::auto_connection on_change_scene;            //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС†РµРЅС‹
 };
 
 /*
-    Слушатель сцены
+    РЎР»СѓС€Р°С‚РµР»СЊ СЃС†РµРЅС‹
 */
 
 class ScenePlayerListener: public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     ScenePlayerListener (scene_graph::Listener& in_scene_listener)
       : sound_manager (0)
       , scene_listener (in_scene_listener)
@@ -202,7 +202,7 @@ class ScenePlayerListener: public xtl::trackable
       connect_tracker (scene_listener.RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&ScenePlayerListener::OnDestroy, this)));
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~ScenePlayerListener ()
     {
       try
@@ -211,11 +211,11 @@ class ScenePlayerListener: public xtl::trackable
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
     
-///Изменение менеджера звуков
+///РР·РјРµРЅРµРЅРёРµ РјРµРЅРµРґР¶РµСЂР° Р·РІСѓРєРѕРІ
     void SetSoundManager (SoundManager* in_sound_manager)
     {
       if (sound_manager)
@@ -235,11 +235,11 @@ class ScenePlayerListener: public xtl::trackable
     
     SoundManager* GetSoundManager () { return sound_manager; }
     
-///Слушатель сцены
+///РЎР»СѓС€Р°С‚РµР»СЊ СЃС†РµРЅС‹
     scene_graph::Listener& GetSceneListener () { return scene_listener; }
 
   private:
-///Обработка события обновления слушателя
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
     void OnUpdate ()
     {
       if (!sound_manager)
@@ -255,32 +255,32 @@ class ScenePlayerListener: public xtl::trackable
       sound_manager->SetVolume   (scene_listener.Gain ());
     }
     
-///Обработка события удаления слушателя
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
     void OnDestroy ()
     {
       delete this;
     }
 
   private:
-    SoundManager*          sound_manager;  //менеджер звуков
-    scene_graph::Listener& scene_listener; //слушатель в сцене
+    SoundManager*          sound_manager;  //РјРµРЅРµРґР¶РµСЂ Р·РІСѓРєРѕРІ
+    scene_graph::Listener& scene_listener; //СЃР»СѓС€Р°С‚РµР»СЊ РІ СЃС†РµРЅРµ
 };
 
 /*
-    Описание реализация проигрывателя звуков сцены
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёСЏ РїСЂРѕРёРіСЂС‹РІР°С‚РµР»СЏ Р·РІСѓРєРѕРІ СЃС†РµРЅС‹
 */
 
 struct ScenePlayer::Impl
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     Impl ()
       : sound_manager (0)
       , scene (0)
     {
     }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~Impl ()
     {
       try      
@@ -291,11 +291,11 @@ struct ScenePlayer::Impl
       }
       catch (...)
       {
-        //подавление всех исключений
+        //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
       }
     }
 
-///Установка слушателя
+///РЈСЃС‚Р°РЅРѕРІРєР° СЃР»СѓС€Р°С‚РµР»СЏ
     void SetListener (scene_graph::Listener* in_listener, bool need_destroy_listener = true)
     {
       if ((!listener && !in_listener) || (listener && &listener->GetSceneListener () == in_listener))
@@ -336,7 +336,7 @@ struct ScenePlayer::Impl
       return &listener->GetSceneListener ();
     }
 
-///Установка менеджера
+///РЈСЃС‚Р°РЅРѕРІРєР° РјРµРЅРµРґР¶РµСЂР°
     void SetSoundManager (sound::SoundManager* in_sound_manager)
     {
       if (sound_manager == in_sound_manager)
@@ -372,7 +372,7 @@ struct ScenePlayer::Impl
     }
 
   private:
-///Смена сцены
+///РЎРјРµРЅР° СЃС†РµРЅС‹
     void SetScene (Scene* in_scene)
     {
       if (in_scene == scene)
@@ -380,14 +380,14 @@ struct ScenePlayer::Impl
         
       on_bind_node_connection.disconnect ();
         
-        //удаление всех эмиттеров
+        //СѓРґР°Р»РµРЅРёРµ РІСЃРµС… СЌРјРёС‚С‚РµСЂРѕРІ
         
       while (!emitters.empty ())      
         delete emitters.begin ()->second;
         
       emitters.clear ();
                         
-        //изменение сцены
+        //РёР·РјРµРЅРµРЅРёРµ СЃС†РµРЅС‹
 
       scene = in_scene;      
       
@@ -396,11 +396,11 @@ struct ScenePlayer::Impl
 
       try
       {
-          //добавление всех эмиттеров доступных в сцене
+          //РґРѕР±Р°РІР»РµРЅРёРµ РІСЃРµС… СЌРјРёС‚С‚РµСЂРѕРІ РґРѕСЃС‚СѓРїРЅС‹С… РІ СЃС†РµРЅРµ
 
         scene->Traverse (xtl::bind (&ScenePlayer::Impl::OnNewNode, this, _1));
 
-          //подписка на появление новых объектов
+          //РїРѕРґРїРёСЃРєР° РЅР° РїРѕСЏРІР»РµРЅРёРµ РЅРѕРІС‹С… РѕР±СЉРµРєС‚РѕРІ
 
         on_bind_node_connection = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind, xtl::bind (&ScenePlayer::Impl::OnNewNode, this, _2)); 
       }
@@ -411,7 +411,7 @@ struct ScenePlayer::Impl
       }      
     }
     
-///Обработка события изменения сцены у слушателя
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС†РµРЅС‹ Сѓ СЃР»СѓС€Р°С‚РµР»СЏ
     void OnChangeListenerScene ()
     {
       if (!listener)
@@ -420,13 +420,13 @@ struct ScenePlayer::Impl
       SetScene (listener->GetSceneListener ().Scene ());
     }
     
-///Обработка события удаления слушателя
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
     void OnDestroyListener ()
     {
       SetListener (0, false);
     }
   
-///Обработка события появления нового узла
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ РїРѕСЏРІР»РµРЅРёСЏ РЅРѕРІРѕРіРѕ СѓР·Р»Р°
     void OnNewNode (Node& node)
     {
       scene_graph::SoundEmitter* emitter = dynamic_cast<scene_graph::SoundEmitter*> (&node);
@@ -445,7 +445,7 @@ struct ScenePlayer::Impl
       scene_player_emitter.release ();
     }
 
-///Обработка события удаления эмиттера
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ СЌРјРёС‚С‚РµСЂР°
     void OnDestroyEmitter (SoundEmitter* node)
     {
       emitters.erase (node);
@@ -455,18 +455,18 @@ struct ScenePlayer::Impl
     typedef stl::hash_map<SoundEmitter*, ScenePlayerEmitter*> EmitterSet;      
 
   private:
-    stl::auto_ptr<ScenePlayerListener> listener;                      //слушатель
-    sound::SoundManager*               sound_manager;                 //менеджер звуков
-    EmitterSet                         emitters;                      //эмиттеры
-    Scene*                             scene;                         //текущая сцена
-    xtl::auto_connection               on_manager_destroy_connection; //соединение события удаления менеджера
-    xtl::auto_connection               on_bind_node_connection;       //соединение события появления нового узла в сцене
-    xtl::auto_connection               on_destroy_listener;           //соединение события удаления слушателя
-    xtl::auto_connection               on_change_listener_scene;      //соединение события изменения сцены слушателя
+    stl::auto_ptr<ScenePlayerListener> listener;                      //СЃР»СѓС€Р°С‚РµР»СЊ
+    sound::SoundManager*               sound_manager;                 //РјРµРЅРµРґР¶РµСЂ Р·РІСѓРєРѕРІ
+    EmitterSet                         emitters;                      //СЌРјРёС‚С‚РµСЂС‹
+    Scene*                             scene;                         //С‚РµРєСѓС‰Р°СЏ СЃС†РµРЅР°
+    xtl::auto_connection               on_manager_destroy_connection; //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ РјРµРЅРµРґР¶РµСЂР°
+    xtl::auto_connection               on_bind_node_connection;       //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РїРѕСЏРІР»РµРЅРёСЏ РЅРѕРІРѕРіРѕ СѓР·Р»Р° РІ СЃС†РµРЅРµ
+    xtl::auto_connection               on_destroy_listener;           //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ СѓРґР°Р»РµРЅРёСЏ СЃР»СѓС€Р°С‚РµР»СЏ
+    xtl::auto_connection               on_change_listener_scene;      //СЃРѕРµРґРёРЅРµРЅРёРµ СЃРѕР±С‹С‚РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС†РµРЅС‹ СЃР»СѓС€Р°С‚РµР»СЏ
 };
 
 /*
-   Конструктор / деструктор
+   РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 ScenePlayer::ScenePlayer ()
@@ -478,7 +478,7 @@ ScenePlayer::~ScenePlayer ()
 }
 
 /*
-   Установка/получение менеджера
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ РјРµРЅРµРґР¶РµСЂР°
 */
 
 void ScenePlayer::SetManager (sound::SoundManager* sound_manager)
@@ -492,7 +492,7 @@ sound::SoundManager* ScenePlayer::Manager () const
 }
 
 /*
-   Установка/получение слушателя
+   РЈСЃС‚Р°РЅРѕРІРєР°/РїРѕР»СѓС‡РµРЅРёРµ СЃР»СѓС€Р°С‚РµР»СЏ
 */
 
 void ScenePlayer::SetListener (scene_graph::Listener* listener)

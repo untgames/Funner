@@ -5,20 +5,20 @@ using namespace media::adobe::xfl;
 typedef media::CollectionImpl<PropertyAnimation, INamedCollection<PropertyAnimation> > PropertyAnimationCollection;
 
 /*
-   Описание реализации анимации кадра
+   РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё Р°РЅРёРјР°С†РёРё РєР°РґСЂР°
 */
 
 struct AnimationCore::Impl : public xtl::reference_counter
 {
-  float                       duration;       //длительность в секундах
-  bool                        orient_to_path; //автоориентация по пути
-  PropertyAnimationCollection properties;     //анимируемые свойства
+  float                       duration;       //РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РІ СЃРµРєСѓРЅРґР°С…
+  bool                        orient_to_path; //Р°РІС‚РѕРѕСЂРёРµРЅС‚Р°С†РёСЏ РїРѕ РїСѓС‚Рё
+  PropertyAnimationCollection properties;     //Р°РЅРёРјРёСЂСѓРµРјС‹Рµ СЃРІРѕР№СЃС‚РІР°
 
   Impl () : duration (0.0f), orient_to_path (false) {}
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 AnimationCore::AnimationCore ()
@@ -44,7 +44,7 @@ AnimationCore& AnimationCore::operator = (const AnimationCore& source)
 }
 
 /*
-   Длительность в секундах
+   Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РІ СЃРµРєСѓРЅРґР°С…
 */
 
 float AnimationCore::Duration () const
@@ -58,7 +58,7 @@ void AnimationCore::SetDuration (float duration)
 }
 
 /*
-   Должна ли происходить автоориентация по пути
+   Р”РѕР»Р¶РЅР° Р»Рё РїСЂРѕРёСЃС…РѕРґРёС‚СЊ Р°РІС‚РѕРѕСЂРёРµРЅС‚Р°С†РёСЏ РїРѕ РїСѓС‚Рё
 */
 
 bool AnimationCore::OrientToPath () const
@@ -72,7 +72,7 @@ void AnimationCore::SetOrientToPath (bool orient_to_path)
 }
 
 /*
-   Анимируемые свойства
+   РђРЅРёРјРёСЂСѓРµРјС‹Рµ СЃРІРѕР№СЃС‚РІР°
 */
 
 AnimationCore::PropertyAnimationList& AnimationCore::Properties ()
@@ -86,7 +86,7 @@ const AnimationCore::PropertyAnimationList& AnimationCore::Properties () const
 }
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void AnimationCore::Swap (AnimationCore& animation)
@@ -104,7 +104,7 @@ namespace xfl
 {
 
 /*
-   Обмен
+   РћР±РјРµРЅ
 */
 
 void swap (AnimationCore& animation1, AnimationCore& animation2)

@@ -7,36 +7,36 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const size_t COMMAND_ARRAY_RESERVE_SIZE = 16; //резервируемое число команд в буфере
+const size_t COMMAND_ARRAY_RESERVE_SIZE = 16; //СЂРµР·РµСЂРІРёСЂСѓРµРјРѕРµ С‡РёСЃР»Рѕ РєРѕРјР°РЅРґ РІ Р±СѓС„РµСЂРµ
 
 }
 
 /*
-    Описание реализации построителя списка команд
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РїРѕСЃС‚СЂРѕРёС‚РµР»СЏ СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 */
 
 typedef stl::vector<detail::ICommand*> CommandArray;
 
 struct CommandListBuilder::Impl: public xtl::reference_counter, public ICommandListExecuter
 {
-  CommandArray commands; //команды
+  CommandArray commands; //РєРѕРјР°РЅРґС‹
 
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
   Impl ()
   {
     commands.reserve (COMMAND_ARRAY_RESERVE_SIZE);
   }
 
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
   ~Impl ()
   {
     DeleteCommands ();
   }
   
-///Удаление команд
+///РЈРґР°Р»РµРЅРёРµ РєРѕРјР°РЅРґ
   void DeleteCommands ()
   {
     for (CommandArray::iterator iter=commands.begin (), end=commands.end (); iter!=end; ++iter)
@@ -45,7 +45,7 @@ struct CommandListBuilder::Impl: public xtl::reference_counter, public ICommandL
     commands.clear ();
   }
 
-///Выполнение очереди команд
+///Р’С‹РїРѕР»РЅРµРЅРёРµ РѕС‡РµСЂРµРґРё РєРѕРјР°РЅРґ
   void ExecuteCommands ()
   {
     try
@@ -57,17 +57,17 @@ struct CommandListBuilder::Impl: public xtl::reference_counter, public ICommandL
     }
     catch (...)
     {
-      //подавление всех исключений
+      //РїРѕРґР°РІР»РµРЅРёРµ РІСЃРµС… РёСЃРєР»СЋС‡РµРЅРёР№
     }
   }
 
-///Подсчёт ссылок
+///РџРѕРґСЃС‡С‘С‚ СЃСЃС‹Р»РѕРє
   void AddRef () { addref (this); }
   void Release () { release (this); }
 };
 
 /*
-    Конструктор / деструктор
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ
 */
 
 CommandListBuilder::CommandListBuilder ()
@@ -82,7 +82,7 @@ CommandListBuilder::~CommandListBuilder ()
 }
 
 /*
-    Добавление команды
+    Р”РѕР±Р°РІР»РµРЅРёРµ РєРѕРјР°РЅРґС‹
 */
 
 void CommandListBuilder::AddCore (detail::ICommand* command)
@@ -94,7 +94,7 @@ void CommandListBuilder::AddCore (detail::ICommand* command)
 }
 
 /*
-    Завершение списка команд
+    Р—Р°РІРµСЂС€РµРЅРёРµ СЃРїРёСЃРєР° РєРѕРјР°РЅРґ
 */
 
 CommandListBuilder::ExecuterPtr CommandListBuilder::Finish ()
@@ -102,11 +102,11 @@ CommandListBuilder::ExecuterPtr CommandListBuilder::Finish ()
   if (!impl)
     impl = new Impl;
 
-    //возвращение класса, выполнящего команды вручную
+    //РІРѕР·РІСЂР°С‰РµРЅРёРµ РєР»Р°СЃСЃР°, РІС‹РїРѕР»РЅСЏС‰РµРіРѕ РєРѕРјР°РЅРґС‹ РІСЂСѓС‡РЅСѓСЋ
 
   ExecuterPtr executer = impl;
 
-    //очистка списка
+    //РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР°
 
   release (impl);
 

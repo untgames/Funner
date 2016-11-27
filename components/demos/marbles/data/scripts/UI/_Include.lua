@@ -1,6 +1,6 @@
 print("loading data/scripts/UI/* files")
 
-  UI={} --интерфейс пользователя
+  UI={} --РёРЅС‚РµСЂС„РµР№СЃ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
   
   local Folder="data/scripts/UI"
   dofile(Folder.."/CreateWinRectStyle.lua")
@@ -14,7 +14,7 @@ print("loading data/scripts/UI/* files")
   dofile(Folder.."/WindowEditor.lua")
   dofile(Folder.."/WindowManager.lua")
 
-  --инициализация
+  --РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ
     InitWindowEditor()
     InitWindowManager(screen)
     

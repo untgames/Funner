@@ -4,13 +4,13 @@ using namespace common;
 using namespace syslib;
 
 /*
-    Описание реализации курсора
+    РћРїРёСЃР°РЅРёРµ СЂРµР°Р»РёР·Р°С†РёРё РєСѓСЂСЃРѕСЂР°
 */
 
 struct WindowCursor::Impl: public xtl::reference_counter
 {
-  stl::string  image_name;   //имя курсора
-  cursor_t     handle;       //дескриптор курсора
+  stl::string  image_name;   //РёРјСЏ РєСѓСЂСЃРѕСЂР°
+  cursor_t     handle;       //РґРµСЃРєСЂРёРїС‚РѕСЂ РєСѓСЂСЃРѕСЂР°
   
   Impl () : handle (0) {}
   
@@ -30,7 +30,7 @@ struct WindowCursor::Impl: public xtl::reference_counter
 };
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 WindowCursor::WindowCursor ()
@@ -73,7 +73,7 @@ WindowCursor& WindowCursor::operator = (const WindowCursor& cursor)
 }
 
 /*
-    Имя курсора
+    РРјСЏ РєСѓСЂСЃРѕСЂР°
 */
 
 const char* WindowCursor::Image () const
@@ -82,7 +82,7 @@ const char* WindowCursor::Image () const
 }
 
 /*
-    Получение низкоуровневого дескриптора курсора
+    РџРѕР»СѓС‡РµРЅРёРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРіРѕ РґРµСЃРєСЂРёРїС‚РѕСЂР° РєСѓСЂСЃРѕСЂР°
 */
 
 const void* WindowCursor::Handle () const
@@ -91,7 +91,7 @@ const void* WindowCursor::Handle () const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void WindowCursor::Swap (WindowCursor& cursor)

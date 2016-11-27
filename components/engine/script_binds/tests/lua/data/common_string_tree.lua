@@ -11,16 +11,16 @@ function clone_test ()
 
   local node2 = node1:Clone ()
 
-  print ("Node 1 attributes áount: " .. tostring (node1.AttributesCount))
-  print ("Node 2 attributes áount: " .. tostring (node2.AttributesCount))
+  print ("Node 1 attributes count: " .. tostring (node1.AttributesCount))
+  print ("Node 2 attributes count: " .. tostring (node2.AttributesCount))
   print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
   print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
 
   node1:RemoveAllAttributes ()
   node1:RemoveAllChildren ()
 
-  print ("Node 1 attributes áount: " .. tostring (node1.AttributesCount))
-  print ("Node 2 attributes áount: " .. tostring (node2.AttributesCount))
+  print ("Node 1 attributes count: " .. tostring (node1.AttributesCount))
+  print ("Node 2 attributes count: " .. tostring (node2.AttributesCount))
   print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
   print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
 end
@@ -110,7 +110,7 @@ function test ()
   local node = Common.StringNode.Create ()
 
   print ("Name: '" .. node.Name .. "'")
-  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Attributes count: " .. node.AttributesCount)
   print ("Children count: " .. node.ChildrenCount)
   print ("Attributes capacity: " .. node.AttributesCapacity)
   print ("Children capacity: " .. node.ChildrenCapacity)
@@ -136,24 +136,24 @@ function test ()
   node:AddChild (child)
 
   print ("Name: '" .. node.Name .. "'")
-  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Attributes count: " .. node.AttributesCount)
   print ("Children count: " .. node.ChildrenCount)
 
   print ("First child name is " .. node:Child (0).Name)
 
   node:AddAttribute (0, "New first attribute value")
 
-  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Attributes count: " .. node.AttributesCount)
   print ("First attribute value is " .. node:Attribute (0))
   print ("Second attribute value is " .. node:Attribute (1))
 
   node:RemoveAttribute (1)
 
-  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Attributes count: " .. node.AttributesCount)
 
   node:RemoveAllAttributes ()
 
-  print ("Attributes áount: " .. node.AttributesCount)
+  print ("Attributes count: " .. node.AttributesCount)
 
   local child2 = Common.StringNode.Create ()
 

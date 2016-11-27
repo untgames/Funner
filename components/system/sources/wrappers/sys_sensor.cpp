@@ -6,10 +6,10 @@ namespace
 {
 
 /*
-    Константы
+    РљРѕРЅСЃС‚Р°РЅС‚С‹
 */
 
-const float DEFAULT_SENSOR_MANAGER_UPDATE_RATE = 10.0f; //частота обновления сенсоров по умолчанию
+const float DEFAULT_SENSOR_MANAGER_UPDATE_RATE = 10.0f; //С‡Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРµРЅСЃРѕСЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
 }
 
@@ -25,7 +25,7 @@ namespace syslib
 class SensorImpl: public ISensorEventListener, public xtl::reference_counter, public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SensorImpl (size_t index)
       : handle ()
       , paused (false)
@@ -48,7 +48,7 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }
     }
     
-///Деструктор
+///Р”РµСЃС‚СЂСѓРєС‚РѕСЂ
     ~SensorImpl ()
     {
       try
@@ -64,19 +64,19 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }
     }
     
-///Дескриптор сенсора
+///Р”РµСЃРєСЂРёРїС‚РѕСЂ СЃРµРЅСЃРѕСЂР°
     sensor_t Handle () { return handle; }
     
-///Имя сенсора
+///РРјСЏ СЃРµРЅСЃРѕСЂР°
     const char* Name () { return name.c_str (); }
     
-///Тип сенсора
+///РўРёРї СЃРµРЅСЃРѕСЂР°
     const char* Type () { return type.c_str (); }
     
-///Производитель сенсора
+///РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
     const char* Vendor () { return vendor.c_str (); }
     
-///Регистрация обработчиков событий
+///Р РµРіРёСЃС‚СЂР°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ СЃРѕР±С‹С‚РёР№
     xtl::connection RegisterEventHandler (const Sensor::EventHandler& handler)
     {
       xtl::connection connection;
@@ -107,7 +107,7 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }
     }
     
-///Опрос сенсора
+///РћРїСЂРѕСЃ СЃРµРЅСЃРѕСЂР°
     void Poll ()
     {
       try
@@ -139,7 +139,7 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }
     }
     
-///Реакция на паузу приложения
+///Р РµР°РєС†РёСЏ РЅР° РїР°СѓР·Сѓ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Pause ()
     {
       try
@@ -161,7 +161,7 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }
     }
     
-///Реакция на восстановление приложения
+///Р РµР°РєС†РёСЏ РЅР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Resume ()
     {
       try
@@ -183,7 +183,7 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
       }      
     }
 
-///Обработка события сенсора
+///РћР±СЂР°Р±РѕС‚РєР° СЃРѕР±С‹С‚РёСЏ СЃРµРЅСЃРѕСЂР°
     void OnSensorChanged (const SensorEvent& event)
     {
       Lock lock (mutex);
@@ -233,14 +233,14 @@ class SensorImpl: public ISensorEventListener, public xtl::reference_counter, pu
     }
   
   private:
-    Mutex       mutex;  //мьютекс доступа к сенсору
-    sensor_t    handle; //дескриптор сенсора
-    Signal      signal; //сигнал событий сенсора
-    bool        paused; //флаг паузы принятия событий сенсора
-    stl::string name;   //имя сенсора
-    stl::string type;   //тип сенсора
-    stl::string vendor; //производитель сенсора
-    EventQueue  events; //события сенсора
+    Mutex       mutex;  //РјСЊСЋС‚РµРєСЃ РґРѕСЃС‚СѓРїР° Рє СЃРµРЅСЃРѕСЂСѓ
+    sensor_t    handle; //РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРµРЅСЃРѕСЂР°
+    Signal      signal; //СЃРёРіРЅР°Р» СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
+    bool        paused; //С„Р»Р°Рі РїР°СѓР·С‹ РїСЂРёРЅСЏС‚РёСЏ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
+    stl::string name;   //РёРјСЏ СЃРµРЅСЃРѕСЂР°
+    stl::string type;   //С‚РёРї СЃРµРЅСЃРѕСЂР°
+    stl::string vendor; //РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ СЃРµРЅСЃРѕСЂР°
+    EventQueue  events; //СЃРѕР±С‹С‚РёСЏ СЃРµРЅСЃРѕСЂР°
 };
 
 }
@@ -250,11 +250,11 @@ namespace
 
 typedef xtl::intrusive_ptr<SensorImpl> SensorPtr;
 
-/// Менеджер сенсоров
+/// РњРµРЅРµРґР¶РµСЂ СЃРµРЅСЃРѕСЂРѕРІ
 class SensorManagerImpl: public xtl::trackable
 {
   public:
-///Конструктор
+///РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
     SensorManagerImpl ()
       : paused (false)      
       , update_rate (0.0f)
@@ -277,7 +277,7 @@ class SensorManagerImpl: public xtl::trackable
       }
     }
     
-///Получение сенсора
+///РџРѕР»СѓС‡РµРЅРёРµ СЃРµРЅСЃРѕСЂР°
     SensorImpl& GetSensor (size_t index)
     {
       try
@@ -306,7 +306,7 @@ class SensorManagerImpl: public xtl::trackable
       }
     }
     
-///Реакция на паузу приложения
+///Р РµР°РєС†РёСЏ РЅР° РїР°СѓР·Сѓ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Pause ()
     {
       try
@@ -327,7 +327,7 @@ class SensorManagerImpl: public xtl::trackable
       }
     }
     
-///Реакция на восстановление приложения
+///Р РµР°РєС†РёСЏ РЅР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
     void Resume ()
     {
       try
@@ -348,7 +348,7 @@ class SensorManagerImpl: public xtl::trackable
       }
     }
     
-///Частота опроса очередей сенсоров
+///Р§Р°СЃС‚РѕС‚Р° РѕРїСЂРѕСЃР° РѕС‡РµСЂРµРґРµР№ СЃРµРЅСЃРѕСЂРѕРІ
     void SetUpdateRate (float rate)
     {
       if (update_rate == rate)
@@ -365,7 +365,7 @@ class SensorManagerImpl: public xtl::trackable
     }
 
   private:
-///Обновление сенсоров
+///РћР±РЅРѕРІР»РµРЅРёРµ СЃРµРЅСЃРѕСЂРѕРІ
     void PollSensors ()
     {
       try
@@ -388,10 +388,10 @@ class SensorManagerImpl: public xtl::trackable
     typedef stl::vector<SensorPtr> SensorArray;    
 
   private:
-    SensorArray          sensors;      //список сенсоров
-    bool                 paused;       //флаг паузы приложения
-    float                update_rate;  //частота обновления сенсоров
-    stl::auto_ptr<Timer> timer;        //таймер обновления сенсоров
+    SensorArray          sensors;      //СЃРїРёСЃРѕРє СЃРµРЅСЃРѕСЂРѕРІ
+    bool                 paused;       //С„Р»Р°Рі РїР°СѓР·С‹ РїСЂРёР»РѕР¶РµРЅРёСЏ
+    float                update_rate;  //С‡Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРµРЅСЃРѕСЂРѕРІ
+    stl::auto_ptr<Timer> timer;        //С‚Р°Р№РјРµСЂ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРµРЅСЃРѕСЂРѕРІ
 };
 
 typedef common::Singleton<SensorManagerImpl> SensorManagerSingleton;
@@ -399,7 +399,7 @@ typedef common::Singleton<SensorManagerImpl> SensorManagerSingleton;
 }
 
 /*
-    Конструкторы / деструктор / присваивание
+    РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹ / РґРµСЃС‚СЂСѓРєС‚РѕСЂ / РїСЂРёСЃРІР°РёРІР°РЅРёРµ
 */
 
 Sensor::Sensor (size_t sensor_index)  
@@ -435,7 +435,7 @@ Sensor& Sensor::operator = (const Sensor& sensor)
 }
 
 /*
-    Имя
+    РРјСЏ
 */
 
 const char* Sensor::Name () const
@@ -444,7 +444,7 @@ const char* Sensor::Name () const
 }
 
 /*
-    Тип устройства
+    РўРёРї СѓСЃС‚СЂРѕР№СЃС‚РІР°
 */
 
 const char* Sensor::Type () const
@@ -453,7 +453,7 @@ const char* Sensor::Type () const
 }
 
 /*
-    Производитель
+    РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ
 */
 
 const char* Sensor::Vendor () const
@@ -462,7 +462,7 @@ const char* Sensor::Vendor () const
 }
 
 /*
-    Максимальное значение
+    РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 */
 
 float Sensor::MaxRange () const
@@ -479,7 +479,7 @@ float Sensor::MaxRange () const
 }
 
 /*
-    Частота обновления
+    Р§Р°СЃС‚РѕС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ
 */
 
 void Sensor::SetUpdateRate (float rate)
@@ -509,7 +509,7 @@ float Sensor::UpdateRate () const
 }
 
 /*
-    Платформо-зависимый дескриптор сенсора
+    РџР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹Р№ РґРµСЃРєСЂРёРїС‚РѕСЂ СЃРµРЅСЃРѕСЂР°
 */
 
 const void* Sensor::Handle () const
@@ -526,7 +526,7 @@ const void* Sensor::Handle () const
 }
 
 /*
-    Получение платформо-зависимых свойств
+    РџРѕР»СѓС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјРѕ-Р·Р°РІРёСЃРёРјС‹С… СЃРІРѕР№СЃС‚РІ
 */
 
 void Sensor::GetProperties (common::PropertyMap& properties) const
@@ -545,7 +545,7 @@ void Sensor::GetProperties (common::PropertyMap& properties) const
 }
 
 /*
-    Регистрация событий сенсора
+    Р РµРіРёСЃС‚СЂР°С†РёСЏ СЃРѕР±С‹С‚РёР№ СЃРµРЅСЃРѕСЂР°
 */
 
 xtl::connection Sensor::RegisterEventHandler (const EventHandler& handler) const
@@ -562,7 +562,7 @@ xtl::connection Sensor::RegisterEventHandler (const EventHandler& handler) const
 }
 
 /*
-    Обмен
+    РћР±РјРµРЅ
 */
 
 void Sensor::Swap (Sensor& sensor)
@@ -581,7 +581,7 @@ void swap (Sensor& sensor1, Sensor& sensor2)
 }
 
 /*
-    Сравнение
+    РЎСЂР°РІРЅРµРЅРёРµ
 */
 
 bool Sensor::operator == (const Sensor& sensor) const
@@ -601,7 +601,7 @@ bool Sensor::operator != (const Sensor& sensor) const
 */
 
 /*
-    Перечисление сенсоров
+    РџРµСЂРµС‡РёСЃР»РµРЅРёРµ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 size_t SensorManager::SensorsCount ()
@@ -631,7 +631,7 @@ syslib::Sensor SensorManager::Sensor (size_t index)
 }
 
 /*
-    Поиск сенсора по типу
+    РџРѕРёСЃРє СЃРµРЅСЃРѕСЂР° РїРѕ С‚РёРїСѓ
 */
 
 int SensorManager::FindSensorByType (const char* type)
@@ -654,7 +654,7 @@ int SensorManager::FindSensorByType (const char* type)
 }
 
 /*
-    Частота опроса очередей сенсоров
+    Р§Р°СЃС‚РѕС‚Р° РѕРїСЂРѕСЃР° РѕС‡РµСЂРµРґРµР№ СЃРµРЅСЃРѕСЂРѕРІ
 */
 
 void SensorManager::SetUpdateRate (float rate)

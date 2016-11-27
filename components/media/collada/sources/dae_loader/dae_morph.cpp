@@ -4,7 +4,7 @@ using namespace stl;
 using namespace media::collada;
 
 /*
-    Разбор источника
+    Р Р°Р·Р±РѕСЂ РёСЃС‚РѕС‡РЅРёРєР°
 */
 
 void DaeParser::ParseFloatArray (Parser::Iterator iter, stl::vector<float>& source)
@@ -36,7 +36,7 @@ void DaeParser::ParseIdrefArray (Parser::Iterator iter, stl::vector<string>& sou
 }
 
 /*
-    Разбор морфа
+    Р Р°Р·Р±РѕСЂ РјРѕСЂС„Р°
 */
 
 void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
@@ -51,21 +51,21 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
   if (!iter->First ("targets"))
     raise_parser_exception (*iter, "No 'targets' sub-tag");
 
-  base_mesh++; //убираем префиксный '#'
+  base_mesh++; //СѓР±РёСЂР°РµРј РїСЂРµС„РёРєСЃРЅС‹Р№ '#'
 
   Mesh* mesh = model.Meshes ().Find (base_mesh);
 
   if (!mesh)
     raise_parser_exception (*iter, "Incorrect url '%s'. No mesh in library", base_mesh);
 
-    //создание морфера
+    //СЃРѕР·РґР°РЅРёРµ РјРѕСЂС„РµСЂР°
 
   Morph morph;
   
   morph.SetId (id);
   morph.SetBaseMesh (base_mesh);
   
-    //разбор параметров морфера
+    //СЂР°Р·Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РјРѕСЂС„РµСЂР°
    
   const char* method = get<const char*> (*iter, "method");
 
@@ -83,7 +83,7 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
     const char *semantic    = get<const char*> (*targets_iter, "semantic"),
                *source_name = get<const char*> (*targets_iter, "source");
 
-    source_name++; //избавляемся от префиксого '#'
+    source_name++; //РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РїСЂРµС„РёРєСЃРѕРіРѕ '#'
 
     if (!::strcmp (semantic, "MORPH_TARGET"))
     {
@@ -135,19 +135,19 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
     if (!mesh)
       raise_parser_exception (*iter, "Incorrect url '%s'. No mesh in library", targets [i].c_str ());
 
-      //создание цели
+      //СЃРѕР·РґР°РЅРёРµ С†РµР»Рё
 
     MorphTarget target;
 
     target.SetMesh   (targets [i].c_str ());
     target.SetWeight (weights [i]);
 
-      //добавление цели в морфер
+      //РґРѕР±Р°РІР»РµРЅРёРµ С†РµР»Рё РІ РјРѕСЂС„РµСЂ
       
     morph.Targets ().Add (target);
   }
   
-    //добавление морфера в библиотеку
+    //РґРѕР±Р°РІР»РµРЅРёРµ РјРѕСЂС„РµСЂР° РІ Р±РёР±Р»РёРѕС‚РµРєСѓ
     
   model.Morphs ().Insert (id, morph);
 }
