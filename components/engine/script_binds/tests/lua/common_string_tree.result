@@ -1,7 +1,7 @@
 Results of common_string_tree_test:
 Test library:
 Name: ''
-Attributes сount: 0
+Attributes count: 0
 Children count: 0
 Attributes capacity: 0
 Children capacity: 0
@@ -12,14 +12,14 @@ Attributes capacity: 4
 Children capacity: 4
 Second attribute value is New second attribute value
 Name: 'Node'
-Attributes сount: 2
+Attributes count: 2
 Children count: 1
 First child name is Child Node
-Attributes сount: 3
+Attributes count: 3
 First attribute value is New first attribute value
 Second attribute value is First attribute value
-Attributes сount: 2
-Attributes сount: 0
+Attributes count: 2
+Attributes count: 0
 First child name is Child2 Node
 Children count: 2
 Node 'Child2 Node' found
@@ -31,12 +31,12 @@ Children count: 1
 Children count: 0
 Node found: attr1
 Node found: attr2
-Node 1 attributes сount: 1
-Node 2 attributes сount: 1
+Node 1 attributes count: 1
+Node 2 attributes count: 1
 Node 1 children count: 1
 Node 2 children count: 1
-Node 1 attributes сount: 0
-Node 2 attributes сount: 1
+Node 1 attributes count: 0
+Node 2 attributes count: 1
 Node 1 children count: 0
 Node 2 children count: 1
 Node 'RootNode'
@@ -329,7 +329,7 @@ Children
         End of children
         Node 'hex'
         Attributes:
-        0 = ─гфХзшжль╖пъпНю╜К
+        0 = ģ䕧覫췯ꯍ
         End of attributes
         Children
         End of children
@@ -440,7 +440,7 @@ Children
         End of attributes
         Children
         End of children
-        Node '/\"ьл╛ык╛ъоШя│Юы│Ъю╜К
+        Node '/\"쫾몾ꮘﳞ볚
 	`1~!@#$%^&*()_+-=[]{}|;:',./<>?'
         Attributes:
         0 = A key can be any string
