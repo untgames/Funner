@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_PARTICLES_PARTICLE_SYSTEM_HEADER
 #define MEDIALIB_PARTICLES_PARTICLE_SYSTEM_HEADER
 
-#include <media/particels/particle_scene.h>
+#include <media/particles/particle_scene.h>
 
 namespace media
 {

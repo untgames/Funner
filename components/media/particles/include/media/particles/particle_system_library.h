@@ -1,5 +1,17 @@
-#ifndef MEDIALIB_PARTICLES_PARTICLE_SCENE_HEADER
-#define MEDIALIB_PARTICLES_PARTICLE_SCENE_HEADER
+#ifndef MEDIALIB_PARTICLES_PARTICLE_SYSTEM_LIBRARY_HEADER
+#define MEDIALIB_PARTICLES_PARTICLE_SYSTEM_LIBRARY_HEADER
+
+#include <common/serializer_manager.h>
+
+#include <media/particles/particle_system.h>
+
+namespace xtl
+{
+
+//forward decalration
+template <class T> class iterator;
+
+}
 
 namespace media
 {
@@ -7,109 +19,103 @@ namespace media
 namespace particles
 {
 
-typedef xtl::rational<size_t> TimeValue;  //particle scene time type
+//forward decalration
+class IParticleSystemPrototype;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Particle texture coordinates desc
+///Particle systems library
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ParticleTexDesc
-{
-  math::vec2f tex_offset;  //tex coord offset
-  math::vec2f tex_size;    //tex coord size
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Particle scene
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class ParticleScene
+class ParticleSystemLibrary
 {
   public:
+    typedef xtl::iterator<IParticleSystemPrototype*>       Iterator;
+    typedef xtl::iterator<const IParticleSystemPrototype*> ConstIterator;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructors / destructor / assignment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ParticleScene  ();
-    ParticleScene  (const ParticleScene&);
-    ~ParticleScene ();
+    ParticleSystemLibrary  ();
+    ParticleSystemLibrary  (const ParticleSystemLibrary&);
+    ParticleSystemLibrary  (const char* file_name);
+    ~ParticleSystemLibrary ();
 
-    ParticleScene& operator = (const ParticleScene&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Particle material
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* MaterialName    () const;
-    void        SetMaterialName ();
+    ParticleSystemLibrary& operator = (const ParticleSystemLibrary&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Particles animation parameters
+///Library name
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int AnimationFramesCount    () const;
-    void         SetAnimationFramesCount (unsigned int count);
-
-    unsigned int AnimationFramesPerSecond    () const;
-    void         SetAnimationFramesPerSecond (unsigned int count);
-
-          ParticleTexInfo* AnimationFrames ();
-    const ParticleTexInfo* AnimationFrames () const;
+    const char* Name    () const;
+    void        SetName (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Access to particles data
+///Create particle system using particle system config handler attached to given id
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const ParticleList& Particles () const;
-          ParticleList& Particles ();
+    ParticleSystem CreateParticleSystem (const char* id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Scene position offset, used if it's needed to apply some offset for whole scene
-///(for example random offset for fireworks explosions)
+///Attached config handlers count / check for emptiness
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::vec3f& Offset    () const;
-    void               SetOffset (const math::vec3f&);
+    size_t Size    () const;
+    bool   IsEmpty () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Start time offset - particle scene will not start for this time
+///Iterators
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetStartTimeOffset (float time);
-    float StartTimeOffset    () const;
+    Iterator      CreateIterator ();
+    ConstIterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Scene bound box. If bound box was set, it will be always returned. If it was not set or was
-///reset bound box will be recalculated on request using actual particles data
+///Get element identifier
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                        SetBoundBox   (const bound_volumes::aabbf& box);
-    void                        ResetBoundBox ();
-    const bound_volumes::aabbf& BoundBox      () const;
+    const char* ItemId (const ConstIterator&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Attaching / detaching of particles processors
+///Find element
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AttachProcessor     (IParticleProcessor& processor);
-    void DetachProcessor     (IParticleProcessor& processor);
-    void DetachAllProcessors ();
+          IParticleSystemPrototype* Find (const char* id);
+    const IParticleSystemPrototype* Find (const char* id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Scene current time and prev update time
+///Attach / detach element
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const TimeValue& Time           () const;
-    const TimeValue& PrevUpdateTime () const;
+    void Attach    (const char* id, const IParticleSystemPrototype&);
+    void Detach    (const char* id); //no throw
+    void DetachAll ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Perform scene update (updates all particles)
+///Clear library (detach all items and clear name)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Update (const TimeValue& time);
+    void Clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Load / Unload
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Load (const char* file_name);
+    void Unload (const char* file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Swap (ParticleScene&);
+    void Swap (ParticleSystemLibrary&);    
 
   private:
-  	struct Impl;
-  	Impl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void swap (ParticleScene&, ParticleScene&);
+void swap (ParticleSystemLibrary&, ParticleSystemLibrary&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Particle system libraries manager
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::ResourceSerializerManager
+<
+  void (const char* file_name, ParticleSystemLibrary& library),
+  void (const char* file_name, ParticleSystemLibrary& library)
+> ParticleSystemLibraryManager;
 
 }
 
