@@ -11,6 +11,5 @@
 #include <common/component.h>
 
 #include <media/particles/particle_system_library.h>
-#include <media/particles/particle_system_prototype.h>
 
 #endif
