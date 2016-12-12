@@ -2,6 +2,7 @@
 #define MEDIALIB_PARTICLES_SHARED_HEADER
 
 #include <stl/hash_map>
+#include <stl/map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>

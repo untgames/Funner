@@ -1,6 +1,10 @@
 #ifndef MEDIALIB_PARTICLES_PARTICLE_LIST_HEADER
 #define MEDIALIB_PARTICLES_PARTICLE_LIST_HEADER
 
+#include <stl/utility>
+
+#include <xtl/functional_fwd>
+
 #include <math/angle.h>
 #include <math/vector.h>
 
@@ -19,17 +23,21 @@ class ParticlePool;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ParticleNode
 {
-  ParticleNode* prev; //previous particle
-  ParticleNode* next; //next particle
+  ParticleNode* prev;      //previous particle
+  ParticleNode* next;      //next particle
+  void*         pool_link; //pool link for internal usage
 
-  ParticleBase ();
+  ParticleNode ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Particle data
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct Particle: private ParticleBase
+struct Particle: private ParticleNode
 {
+  friend class ParticleList;
+  template <class T1> friend class ParticleIterator;
+
   math::vec3f  position;              //position
   math::vec3f  position_speed;        //speed
   math::vec3f  position_acceleration; //acceleration
@@ -61,7 +69,7 @@ template <class T> class ParticleIterator
     typedef T&                                           reference;
     typedef ParticleIterator<value_type>                 iterator;
     typedef ParticleIterator<const value_type>           const_iterator;
-    typedef bidirectional_iterator_tag                   iterator_category;
+    typedef stl::bidirectional_iterator_tag              iterator_category;
 
     ParticleIterator ();
     ParticleIterator (const iterator&);
@@ -116,9 +124,9 @@ template <class T> class ParticleIterator
 class ParticleList
 {
   public:
-    typedef ParticleIterator<Particle>                Iterator;
-    typedef ParticleIterator<const Particle>          ConstIterator;
-    typedef xtl::function<void (void* particle_data)> ParticleInitializer;
+    typedef ParticleIterator<Particle>               Iterator;
+    typedef ParticleIterator<const Particle>         ConstIterator;
+    typedef xtl::function<void (Particle* particle)> ParticleInitializer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructors / destructor / assignment
@@ -157,9 +165,9 @@ class ParticleList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Add / remove particles
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ParticleIterator Add    ();
-    void             Remove (ParticleIterator);
-    void             Clear  ();
+    Iterator Add    ();
+    void     Remove (Iterator);
+    void     Clear  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap
@@ -197,6 +205,7 @@ class ParticlePool
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Capacity (size_t particle_size = sizeof (Particle)) const;
     void   Reserve  (size_t count, size_t particle_size = sizeof (Particle));
+    void   Shrink   (size_t count, size_t particle_size = sizeof (Particle));
 
   private:
     struct Impl;

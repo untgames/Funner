@@ -5,6 +5,7 @@
 inline ParticleNode::ParticleNode ()
   : prev ()
   , next ()
+  //pool_link should not be initialized
  { }
 
 inline Particle::Particle ()
@@ -98,4 +99,10 @@ template <class T>
 inline typename ParticleIterator<T>::iterator ParticleIterator<T>::get_unqualified_iterator () const
 {
   return iterator (node);
+}
+
+template <class T>
+inline bool ParticleIterator<T>::empty () const
+{
+  return node == 0;
 }
