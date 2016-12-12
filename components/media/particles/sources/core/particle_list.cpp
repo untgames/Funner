@@ -46,8 +46,10 @@ struct ParticleSubPool: public xtl::reference_counter
       {
         ParticleNode* result = first;
 
-        first       = first->next;
-        first->prev = 0;
+        first = first->next;
+
+        if (first)
+          first->prev = 0;
 
         static_cast<BufferDesc*> (result->pool_link)->available_count--;
 
@@ -103,13 +105,16 @@ struct ParticleSubPool: public xtl::reference_counter
       particle->next      = reinterpret_cast<ParticleNode*> (it + particle_size);
     }
 
-    reinterpret_cast<ParticleNode*> (desc.buffer.data ())->prev = 0;
+    ParticleNode* new_first = reinterpret_cast<ParticleNode*> (desc.buffer.data ());
+    ParticleNode* last      = reinterpret_cast<ParticleNode*> (desc.buffer.data () + desc.buffer.size () - particle_size);
 
-    ParticleNode* last = reinterpret_cast<ParticleNode*> (desc.buffer.data () + desc.buffer.size () - particle_size);
+    new_first->prev = 0;
+    last->next      = first;
 
-    last->next  = first;
-    first->prev = last;
-    first       = last;
+    if (first)
+      first->prev = last;
+
+    first = new_first;
 
     capacity += count;
   }
@@ -155,7 +160,7 @@ struct ParticleSubPool: public xtl::reference_counter
 
       char* particle_ptr = desc.buffer.data ();
 
-      for (size_t i=0; i<count; i++, particle_ptr += particle_size)
+      for (size_t i=0; i<desc.capacity; i++, particle_ptr += particle_size)
       {
         ParticleNode* particle = reinterpret_cast<ParticleNode*> (particle_ptr);
 
@@ -165,8 +170,10 @@ struct ParticleSubPool: public xtl::reference_counter
         }
         else
         {
-          first       = particle->next;
-          first->prev = 0;
+          first = particle->next;
+
+          if (first)
+            first->prev = 0;
         }
 
         if (particle->next)
@@ -217,6 +224,8 @@ struct ParticlePool::Impl: public xtl::reference_counter
 
   ParticleSubPool* FindPool (size_t particle_size)
   {
+    particle_size = GetNextHigherPowerOfTwo (particle_size);
+
     if (particle_size == last_particle_size)
       return last_particle_subpool;
 
@@ -260,24 +269,9 @@ struct ParticlePool::Impl: public xtl::reference_counter
     return *subpool;
   }
 
-  ParticleNode* Allocate (size_t particle_size)
-  {
-    ParticleSubPool& subpool = GetPool (particle_size);
-
-    return subpool.Allocate ();
-  }
-
-  void Free (ParticleNode* particle, size_t particle_size)
-  {
-    ParticleSubPool* subpool = FindPool (particle_size);
-
-    if (subpool)
-      subpool->Free (particle);
-  }
-
   size_t Capacity (size_t particle_size)
   {
-    ParticleSubPool* subpool = FindPool (GetNextHigherPowerOfTwo (particle_size));
+    ParticleSubPool* subpool = FindPool (particle_size);
 
     if (subpool)
       return subpool->Capacity ();
@@ -294,7 +288,7 @@ struct ParticlePool::Impl: public xtl::reference_counter
 
   void Shrink (size_t count, size_t particle_size)
   {
-    ParticleSubPool* subpool = FindPool (GetNextHigherPowerOfTwo (particle_size));
+    ParticleSubPool* subpool = FindPool (particle_size);
 
     if (subpool)
       subpool->Shrink (count);
@@ -358,6 +352,7 @@ void ParticlePool::Shrink (size_t count, size_t particle_size)
 struct ParticleList::Impl: public xtl::reference_counter
 {
   ParticlePool        pool;            //pool for particles
+  ParticleSubPoolPtr  subpool;         //subpool for particles
   size_t              particle_size;   //size of particle
   size_t              particles_count; //particles count
   bool                has_initializer; //is this list has initializer
@@ -367,6 +362,7 @@ struct ParticleList::Impl: public xtl::reference_counter
 
   Impl (const ParticlePool& in_pool, size_t in_particle_size, const ParticleInitializer& in_initializer)
     : pool (in_pool)
+    , subpool (&pool.impl->GetPool (in_particle_size))
     , particle_size (in_particle_size)
     , particles_count ()
     , has_initializer (in_initializer)
@@ -380,7 +376,7 @@ struct ParticleList::Impl: public xtl::reference_counter
 
   ParticleNode* Add ()
   {
-    ParticleNode* particle = pool.impl->Allocate (particle_size);
+    ParticleNode* particle = subpool->Allocate ();
 
     if (has_initializer)
       initializer (static_cast<Particle*> (particle));
@@ -413,7 +409,7 @@ struct ParticleList::Impl: public xtl::reference_counter
 
     particles_count--;
 
-    pool.impl->Free (particle, particle_size);
+    subpool->Free (particle);
   }
 };
 
