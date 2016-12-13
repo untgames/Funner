@@ -26,6 +26,7 @@ typedef stl::vector<ParticleTexDesc>           ParticleTexDescArray;
 struct ParticleScene::Impl: public xtl::reference_counter
 {
   ParticleList           particles;
+  stl::string            name;
   stl::string            material_name;
   ParticleTexDescArray   animation_frames;
   unsigned int           animation_fps;
@@ -35,6 +36,7 @@ struct ParticleScene::Impl: public xtl::reference_counter
   bool                   is_manual_bound_box;
   bool                   is_dirty_bound_box;
   ParticleProcessorArray processors;
+  bool                   first_step;
   TimeValue              time;
   TimeValue              prev_time;
 
@@ -42,6 +44,7 @@ struct ParticleScene::Impl: public xtl::reference_counter
     : animation_fps ()
     , is_manual_bound_box (false)
     , is_dirty_bound_box (true)
+    , first_step (true)
   {
     processors.reserve (PARTICLE_PROCESSOR_ARRAY_RESERVE);
   }
@@ -67,7 +70,7 @@ ParticleScene::~ParticleScene ()
   if (impl->decrement ())
   {
     DetachAllProcessors ();
-    delete this;
+    delete impl;
   }
 }
 
@@ -75,6 +78,23 @@ ParticleScene& ParticleScene::operator = (const ParticleScene& scene)
 {
   ParticleScene (scene).Swap (*this);
   return *this;
+}
+
+/*
+    Name
+*/
+
+const char* ParticleScene::Name () const
+{
+  return impl->name.c_str ();
+}
+
+void ParticleScene::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::particles::ParticleScene::SetName", "name");
+
+  impl->name = name;
 }
 
 /*
@@ -314,9 +334,6 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
     impl->prev_time = impl->time;
     impl->time      = time;
 
-    if (impl->processors.empty ())
-      return;
-
       //mark bound volumes as dirty
 
     impl->is_dirty_bound_box = !impl->is_manual_bound_box;
@@ -328,6 +345,12 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
       ParticleProcessorInstance& instance = *it;
 
       instance.processor->Process (*this, generator, instance.instance_data);
+    }
+
+    if (impl->first_step)
+    {
+      impl->first_step = false;
+      return;
     }
 
       //do common logic for updates

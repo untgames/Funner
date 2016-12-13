@@ -3,7 +3,8 @@
 #include <new>
 
 #include <xtl/function.h>
+#include <xtl/rational.h>
 
-#include <media/particles/particle_list.h>
+#include <media/particles/particle_system.h>
 
 using namespace media::particles;
