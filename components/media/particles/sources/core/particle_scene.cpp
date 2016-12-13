@@ -14,10 +14,12 @@ const size_t PARTICLE_PROCESSOR_ARRAY_RESERVE = 8;
     Implementation details
 */
 
+typedef xtl::com_ptr<IParticleProcessor> ParticleProcessorPtr;
+
 struct ParticleProcessorInstance
 {
-  IParticleProcessor* processor;
-  void*               instance_data;
+  ParticleProcessorPtr processor;
+  void*                instance_data;
 };
 
 typedef stl::vector<ParticleProcessorInstance> ParticleProcessorArray;
@@ -243,14 +245,17 @@ const bound_volumes::aaboxf& ParticleScene::BoundBox () const
     Attaching / detaching of particles processors
 */
 
-void ParticleScene::AttachProcessor (IParticleProcessor& processor)
+void ParticleScene::AttachProcessor (IParticleProcessor* processor)
 {
   try
   {
+    if (!processor)
+      throw xtl::make_null_argument_exception ("", "processor");
+
     ParticleProcessorInstance instance;
 
-    instance.processor     = &processor;
-    instance.instance_data = processor.AttachScene (*this);
+    instance.processor     = processor;
+    instance.instance_data = processor->AttachScene (*this);
 
     try
     {
@@ -258,7 +263,7 @@ void ParticleScene::AttachProcessor (IParticleProcessor& processor)
     }
     catch (...)
     {
-      processor.DetachScene (*this, instance.instance_data);
+      processor->DetachScene (*this, instance.instance_data);
       throw;
     }
   }
@@ -276,14 +281,14 @@ struct ParticleProcessorComparator
 {
   IParticleProcessor* processor;
 
-  ParticleProcessorComparator (IParticleProcessor& in_processor) : processor (&in_processor) {}
+  ParticleProcessorComparator (IParticleProcessor* in_processor) : processor (in_processor) {}
 
   bool operator () (const ParticleProcessorInstance& instance) const { return processor == instance.processor; }
 };
 
 }
 
-void ParticleScene::DetachProcessor (IParticleProcessor& processor)
+void ParticleScene::DetachProcessor (IParticleProcessor* processor)
 {
   ParticleProcessorArray::iterator first = stl::remove_if (impl->processors.begin (), impl->processors.end (), ParticleProcessorComparator (processor));
 
@@ -291,7 +296,7 @@ void ParticleScene::DetachProcessor (IParticleProcessor& processor)
   {
     ParticleProcessorInstance& instance = *it;
 
-    processor.DetachScene (*this, instance.instance_data);
+    processor->DetachScene (*this, instance.instance_data);
   }
   
   impl->processors.erase (first, impl->processors.end ());
@@ -350,6 +355,17 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
     if (impl->first_step)
     {
       impl->first_step = false;
+
+      for (ParticleList::Iterator it=impl->particles.CreateIterator (); it; ++it)
+      {
+        Particle& p = *it;
+  
+        p.position_acceleration  = math::vec3f ();
+        p.rotation_speed  = math::anglef ();
+        p.size_speed  = math::vec2f ();
+        p.color_speed  = math::vec4f ();
+      }
+
       return;
     }
 
