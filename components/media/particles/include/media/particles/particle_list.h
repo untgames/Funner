@@ -4,6 +4,7 @@
 #include <stl/utility>
 
 #include <xtl/functional_fwd>
+#include <xtl/rational.h>
 
 #include <math/angle.h>
 #include <math/vector.h>
@@ -17,6 +18,8 @@ namespace particles
 //forward declaration
 class ParticleList;
 class ParticlePool;
+
+typedef xtl::rational<size_t> TimeValue;  //particle scene time type
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Particle node
@@ -38,17 +41,19 @@ struct Particle: private ParticleNode
   friend class ParticleList;
   template <class T1> friend class ParticleIterator;
 
-  math::vec3f  position;              //position
-  math::vec3f  position_speed;        //speed
-  math::vec3f  position_acceleration; //acceleration
-  math::anglef rotation;              //rotation (particle is billboard sprite, so only one-axis rotation)
-  math::anglef rotation_speed;        //rotation change speed
-  math::vec2f  size;                  //size
-  math::vec2f  size_speed;            //size change speed
-  math::vec4f  color;                 //color
-  math::vec4f  color_speed;           //color change speed
-  float        lifetime;              //lifetime left
-  unsigned int animation_frame;       //animation frame
+  math::vec3f  position;               //position
+  math::vec3f  position_speed;         //speed
+  math::vec3f  position_acceleration;  //acceleration
+  math::anglef rotation;               //rotation (particle is billboard sprite, so only one-axis rotation)
+  math::anglef rotation_speed;         //rotation change speed
+  math::vec2f  size;                   //size
+  math::vec2f  size_speed;             //size change speed
+  math::vec4f  color;                  //color
+  math::vec4f  color_speed;            //color change speed
+  TimeValue    creation_time;          //particle creation time
+  float        lifetime;               //lifetime left
+  unsigned int animation_frame;        //animation frame
+  unsigned int animation_frame_offset; //offset index for animation frames
 
   Particle ();
 };

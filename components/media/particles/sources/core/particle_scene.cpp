@@ -2,8 +2,6 @@
 
 using namespace media::particles;
 
-//TODO: animation frames for particles
-
 /*
     Constants
 */
@@ -364,6 +362,10 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
         p.rotation_speed  = math::anglef ();
         p.size_speed  = math::vec2f ();
         p.color_speed  = math::vec4f ();
+        p.animation_frame = p.animation_frame_offset;
+
+        if (!p.creation_time.denominator ())
+          p.creation_time = time;
       }
 
       return;
@@ -371,11 +373,16 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
 
       //do common logic for updates
 
-    float dt = (time - impl->prev_time).cast<float> ();
+    float        dt                     = (time - impl->prev_time).cast<float> ();
+    unsigned int animation_fps          = impl->animation_fps,
+                 animation_frames_count = impl->animation_frames.size ();
 
     for (ParticleList::Iterator it=impl->particles.CreateIterator (); it;)
     {
       Particle& p = *it;
+
+      if (!p.creation_time.denominator ())
+        p.creation_time = time;
 
       p.position_speed        += p.position_acceleration * dt;
       p.position              += p.position_speed * dt;
@@ -391,7 +398,10 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
       p.color       += p.color_speed * dt;
       p.color_speed  = math::vec4f ();
 
-      //todo: p.animation_frame ???
+      if (animation_frames_count)
+        p.animation_frame = static_cast<unsigned int> ((time - p.creation_time).cast<float> () * animation_fps + p.animation_frame_offset) % animation_frames_count;
+      else
+        p.animation_frame = p.animation_frame_offset;
 
       p.lifetime = stl::max (0.0f, p.lifetime - dt);
 

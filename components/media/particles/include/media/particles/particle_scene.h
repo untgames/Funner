@@ -6,21 +6,11 @@
 #include <media/particles/particle_list.h>
 #include <media/particles/random_generator.h>
 
-namespace xtl
-{
-
-//forward declaration
-template <class I> class rational;
-
-}
-
 namespace media
 {
 
 namespace particles
 {
-
-typedef xtl::rational<size_t> TimeValue;  //particle scene time type
 
 //forward declaration
 class ParticleScene;
