@@ -9,7 +9,7 @@ inline ParticleNode::ParticleNode ()
  { }
 
 inline Particle::Particle ()
-  : creation_time (0, 0)
+  : creation_time (0, TimeValue::int_type (-1))
   , lifetime ()
   , animation_frame ()
   , animation_frame_offset ()

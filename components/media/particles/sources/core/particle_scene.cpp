@@ -364,7 +364,7 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
         p.color_speed  = math::vec4f ();
         p.animation_frame = p.animation_frame_offset;
 
-        if (!p.creation_time.denominator ())
+        if (p.creation_time.denominator () == TimeValue::int_type (-1))
           p.creation_time = time;
       }
 
@@ -381,7 +381,7 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
     {
       Particle& p = *it;
 
-      if (!p.creation_time.denominator ())
+      if (p.creation_time.denominator () == TimeValue::int_type (-1))
         p.creation_time = time;
 
       p.position_speed        += p.position_acceleration * dt;
