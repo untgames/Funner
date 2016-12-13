@@ -8,6 +8,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
+#include <xtl/rational.h>
 
 #include <common/component.h>
 

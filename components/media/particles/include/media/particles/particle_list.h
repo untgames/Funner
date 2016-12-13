@@ -43,8 +43,8 @@ struct Particle: private ParticleNode
   math::vec3f  position_acceleration; //acceleration
   math::anglef rotation;              //rotation (particle is billboard sprite, so only one-axis rotation)
   math::anglef rotation_speed;        //rotation change speed
-  math::vec3f  size;                  //size
-  math::vec3f  size_speed;            //size change speed
+  math::vec2f  size;                  //size
+  math::vec2f  size_speed;            //size change speed
   math::vec4f  color;                 //color
   math::vec4f  color_speed;           //color change speed
   float        lifetime;              //lifetime left

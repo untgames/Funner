@@ -62,6 +62,8 @@ struct ParticleTexDesc
 {
   math::vec2f tex_offset;  //tex coord offset
   math::vec2f tex_size;    //tex coord size
+
+  ParticleTexDesc ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,19 +85,19 @@ class ParticleScene
 ///Particle material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* MaterialName    () const;
-    void        SetMaterialName ();
+    void        SetMaterialName (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Particles animation parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int AnimationFramesCount    () const;
     void         SetAnimationFramesCount (unsigned int count);
+  
+          ParticleTexDesc* AnimationFrames ();
+    const ParticleTexDesc* AnimationFrames () const;
 
     unsigned int AnimationFramesPerSecond    () const;
     void         SetAnimationFramesPerSecond (unsigned int count);
-
-          ParticleTexDesc* AnimationFrames ();
-    const ParticleTexDesc* AnimationFrames () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Access to particles data
@@ -113,8 +115,8 @@ class ParticleScene
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Start time offset - particle scene will not start for this time
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetStartTimeOffset (float time);
-    float StartTimeOffset    () const;
+    void             SetStartTimeOffset (const TimeValue& time);
+    const TimeValue& StartTimeOffset    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Scene bound box. If bound box was set, it will be always returned. If it was not set or was
@@ -156,6 +158,8 @@ class ParticleScene
 ///Swap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (ParticleScene&, ParticleScene&);
+
+#include <media/particles/detail/particle_scene.inl>
 
 }
 
