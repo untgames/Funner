@@ -307,7 +307,7 @@ const TimeValue& ParticleScene::PrevUpdateTime () const
     Perform scene update (updates all particles)
 */
 
-void ParticleScene::Update (const TimeValue& time)
+void ParticleScene::Update (const TimeValue& time, const RandomGenerator& generator)
 {
   try
   {
@@ -327,7 +327,7 @@ void ParticleScene::Update (const TimeValue& time)
     {
       ParticleProcessorInstance& instance = *it;
 
-      instance.processor->Process (*this, instance.instance_data);
+      instance.processor->Process (*this, generator, instance.instance_data);
     }
 
       //do common logic for updates
