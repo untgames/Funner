@@ -14,6 +14,8 @@ namespace
 const char* COMPONENT_NAME = "media.particles.loaders.ParticleDesignerPlistLoader"; //component name
 const char* LOG_NAME       = "media.particles.loaders.ParticleDesignerPlistLoader"; //log stream name
 
+typedef xtl::com_ptr<ParticleSystemPrototype> ParticleSystemPrototypePtr;
+
 ///gets value node for given key node if type matches or throws parser exception
 ParseNode get_plist_dict_value(ParseNode key_node, const char* value_type)
 {
@@ -32,11 +34,16 @@ T read_plist_dict_value (ParseNode key_node, const char* type_name)
   return get<T> (get_plist_dict_value (key_node, type_name), "#text");
 }
 
+template<class T>
+T read_plist_dict_value (ParseNode key_node, const char* type_name, const T& default_value)
+{
+  return get<T> (get_plist_dict_value (key_node, type_name), "#text", default_value);
+}
+
 const char* read_plist_dict_string (ParseNode key_node)
 {
   return read_plist_dict_value<const char*> (key_node, "string");
 }
-
 
 //read plist dict to PropertyMap
 void read_plist_dictionary (Parser::Iterator dict_iter, PropertyMap& properties)
@@ -53,7 +60,7 @@ void read_plist_dictionary (Parser::Iterator dict_iter, PropertyMap& properties)
     const char* value_type = value_node.Name ();
 
     if (!xtl::xstrcmp (value_type, "string"))
-      properties.SetProperty (key, read_plist_dict_value<const char*> (key_node, value_type));
+      properties.SetProperty (key, read_plist_dict_value<const char*> (key_node, value_type, ""));  //dict may have strings without #text value (<string></string>), use empty string for such situations
     else if (!xtl::xstrcmp (value_type, "real"))
       properties.SetProperty (key, read_plist_dict_value<float> (key_node, value_type));
     else if (!xtl::xstrcmp (value_type, "integer"))
@@ -87,20 +94,25 @@ class PlistLibraryLoader
       : document_folder_path (dir (file_name))
       , parser (file_name, "xml")
     {
-      if (parser.Root ().First ("array"))  //scene file has "array" element in root, emitter file has "dictionary" element in root
-        ParseSceneArray (parser.Root ().First ("array"));
-      else if (parser.Root ().First ("dict"))
+      ParseNode plist_root = parser.Root ().First ("plist");
+
+      if (!plist_root)
+        raise_parser_exception (parser.Root (), "Can't find 'plist' node at document root");
+
+      if (plist_root.First ("array"))  //scene file has "array" element in root, emitter file has "dictionary" element in root
+        ParseSceneArray (plist_root.First ("array"));
+      else if (plist_root.First ("dict"))
       {
-        ParticleSystemPrototype prototype;
+        ParticleSystemPrototypePtr prototype (new ParticleSystemPrototype (), false);
 
-        prototype.AddEmitter ("", math::vec2f ());
+        prototype->AddEmitter ("", math::vec2f ());
 
-        ParseEmitter (parser.Root ().First ("dict"), prototype);
+        ParseEmitter (plist_root.First ("dict"), prototype.get ());
 
-        library.Attach (file_name, prototype);
+        library.Attach (file_name, *prototype);
       }
       else
-        raise_parser_exception (parser.Root (), "Can't find 'array' or 'dict' node at document root");
+        raise_parser_exception (plist_root, "Can't find 'array' or 'dict' node at document root");
 
       //logging
       Log log (LOG_NAME);
@@ -127,8 +139,8 @@ class PlistLibraryLoader
     ///Parse scene entry of scene array
     void ParseSceneDict (Parser::Iterator scene_iter)
     {
-      ParticleSystemPrototype prototype;
-      const char*             prototype_name = 0;
+      ParticleSystemPrototypePtr prototype (new ParticleSystemPrototype (), false);
+      const char*                prototype_name = 0;
 
       for (ParseNode key_node = scene_iter->First ("key"); key_node; key_node = key_node.NextNamesake ())
       {
@@ -142,7 +154,7 @@ class PlistLibraryLoader
         {
           ParseNode emitters_array = get_plist_dict_value (key_node, "array");
 
-          for_each_child (emitters_array, "dict", xtl::bind (&PlistLibraryLoader::ParseSceneEmitter, this, _1, prototype));
+          for_each_child (emitters_array, "dict", xtl::bind (&PlistLibraryLoader::ParseSceneEmitter, this, _1, prototype.get ()));
         }
         else
           key_node.Log ().Warning (key_node, "Unsupported scene dictionary key '%s'", key);
@@ -156,21 +168,26 @@ class PlistLibraryLoader
 
       Parser emitter_parser (emitter_file_name.c_str (), "xml");
 
-      if (!emitter_parser.Root ().First ("dict"))
-        raise_parser_exception (*scene_iter, "No 'dict' node at document '%s' root", emitter_file_name.c_str ());
+      ParseNode plist_root = emitter_parser.Root ().First ("plist");
 
-      ParseEmitter (emitter_parser.Root ().First ("dict"), prototype);
+      if (!plist_root)
+        raise_parser_exception (*scene_iter, "Can't find 'plist' node at document '%s' root", emitter_file_name.c_str ());
+
+      if (!plist_root.First ("dict"))
+        raise_parser_exception (plist_root, "No 'dict' node at document root");
+
+      ParseEmitter (plist_root.First ("dict"), prototype.get ());
 
       //logging
       Log log (LOG_NAME);
 
       emitter_parser.Log ().Print (xtl::bind (&Log::Print, xtl::ref (log), _1));
 
-      library.Attach (prototype_name, prototype);
+      library.Attach (prototype_name, *prototype);
     }
 
     ///Parse scene emitter entry of scene entry
-    void ParseSceneEmitter (Parser::Iterator emitter_iter, ParticleSystemPrototype& prototype)
+    void ParseSceneEmitter (Parser::Iterator emitter_iter, ParticleSystemPrototype* prototype)
     {
       PropertyMap properties;
 
@@ -188,17 +205,17 @@ class PlistLibraryLoader
       if (properties.IsPresent ("y"))
         offset.y = properties.GetFloat ("y");
 
-      prototype.AddEmitter (properties.GetString ("name"), offset);
+      prototype->AddEmitter (properties.GetString ("name"), offset);
     }
 
     ///Parse emitter data
-    void ParseEmitter (Parser::Iterator emitter_iter, ParticleSystemPrototype& prototype)
+    void ParseEmitter (Parser::Iterator emitter_iter, ParticleSystemPrototype* prototype)
     {
       PropertyMap parameters;
 
       read_plist_dictionary (emitter_iter, parameters);
 
-      prototype.SetParameters (parameters);
+      prototype->SetParameters (parameters);
     }
     
   private:

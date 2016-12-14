@@ -21,6 +21,7 @@ struct EmitterDesc : public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<EmitterDesc> EmitterDescPtr;
 typedef stl::vector<EmitterDescPtr>     EmitterDescArray;
+typedef xtl::com_ptr<ParticleProcessor> ParticleProcessorPtr;
 
 }
 
@@ -30,15 +31,20 @@ typedef stl::vector<EmitterDescPtr>     EmitterDescArray;
 
 struct ParticleSystemPrototype::Impl
 {
-  EmitterDescArray  emitters;           //emitters entries
-  ParticleProcessor particle_processor; //particle processor
+  EmitterDescArray     emitters;           //emitters entries
+  ParticleProcessorPtr particle_processor; //particle processor
+
+  ///Constructor
+  Impl ()
+    : particle_processor (new ParticleProcessor (), false)
+    {}
 
   ///Configure particle system
   void Configure (ParticleSystem& system)
   {
     for (EmitterDescArray::iterator iter = emitters.begin (), end = emitters.end (); iter != end; ++iter)
     {
-      ParticleList  particle_list (particle_processor.ParticleSize (), xtl::bind (&ParticleProcessor::InitParticle, &particle_processor, _1));
+      ParticleList  particle_list (particle_processor->ParticleSize (), xtl::bind (&ParticleProcessor::InitParticle, particle_processor.get (), _1));
       ParticleScene scene (particle_list);
 
       scene.SetName   ((*iter)->name.c_str ());
@@ -46,7 +52,7 @@ struct ParticleSystemPrototype::Impl
 
       //TODO set material, animation
 
-      scene.AttachProcessor (&particle_processor);
+      scene.AttachProcessor (particle_processor.get ());
 
       system.AddScene (scene);
     }
@@ -83,7 +89,7 @@ void ParticleSystemPrototype::AddEmitter (const char* name, const math::vec2f& o
 
 void ParticleSystemPrototype::SetParameters (const common::PropertyMap& parameters)
 {
-  impl->particle_processor.SetParameters (parameters);
+  impl->particle_processor->SetParameters (parameters);
 }
 
 /*

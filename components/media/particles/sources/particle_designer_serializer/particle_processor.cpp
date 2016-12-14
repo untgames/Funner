@@ -95,9 +95,28 @@ struct ParticleData : public Particle
   RadiusModeParticleData  radius;   //radius mode data
 };
 
+//clamp value
 inline float clamp (float value, float min, float max)
 {
   return stl::min (stl::max (value, min), max);
+}
+
+//get float property or default value 0.f if such property doesn't exist
+float get_float_property (const common::PropertyMap& properties, const char* property_name)
+{
+  if (properties.IsPresent (property_name))
+    return properties.GetFloat (property_name);
+
+  return 0.f;
+}
+
+//get integer property or default value 0 if such property doesn't exist
+int get_integer_property (const common::PropertyMap& properties, const char* property_name)
+{
+  if (properties.IsPresent (property_name))
+    return properties.GetInteger (property_name);
+
+  return 0;
 }
 
 }
@@ -159,8 +178,8 @@ struct ParticleProcessor::Impl
     data.start_size_variance       = parameters.GetFloat   ("startParticleSizeVariance");
     data.finish_size               = parameters.GetFloat   ("finishParticleSize");
     data.finish_size_variance      = parameters.GetFloat   ("finishParticleSizeVariance");
-    data.start_position.x          = parameters.GetFloat   ("sourcePositionx");
-    data.start_position.y          = parameters.GetFloat   ("sourcePositiony");
+    data.start_position.x          = get_float_property    (parameters, "sourcePositionx");
+    data.start_position.y          = get_float_property    (parameters, "sourcePositiony");
     data.start_position_variance.x = parameters.GetFloat   ("sourcePositionVariancex");
     data.start_position_variance.y = parameters.GetFloat   ("sourcePositionVariancey");
     data.start_rotation            = parameters.GetFloat   ("rotationStart");
@@ -175,15 +194,15 @@ struct ParticleProcessor::Impl
     {
       GravityEmitterData& gravity_data = *(GravityEmitterData*)emitter_data.get ();
 
-      gravity_data.gravity.x                        = parameters.GetFloat   ("gravityx");
-      gravity_data.gravity.y                        = parameters.GetFloat   ("gravityy");
-      gravity_data.speed                            = parameters.GetFloat   ("speed");
-      gravity_data.speed_variance                   = parameters.GetFloat   ("speedVariance");
-      gravity_data.radial_acceleration              = parameters.GetFloat   ("radialAcceleration");
-      gravity_data.radial_acceleration_variance     = parameters.GetFloat   ("radialAccelVariance");
-      gravity_data.tangential_acceleration          = parameters.GetFloat   ("tangentialAcceleration");
-      gravity_data.tangential_acceleration_variance = parameters.GetFloat   ("tangentialAccelVariance");
-      gravity_data.rotation_is_dir                  = parameters.GetInteger ("rotationIsDir") != 0;
+      gravity_data.gravity.x                        = parameters.GetFloat  ("gravityx");
+      gravity_data.gravity.y                        = parameters.GetFloat  ("gravityy");
+      gravity_data.speed                            = parameters.GetFloat  ("speed");
+      gravity_data.speed_variance                   = parameters.GetFloat  ("speedVariance");
+      gravity_data.radial_acceleration              = parameters.GetFloat  ("radialAcceleration");
+      gravity_data.radial_acceleration_variance     = parameters.GetFloat  ("radialAccelVariance");
+      gravity_data.tangential_acceleration          = parameters.GetFloat  ("tangentialAcceleration");
+      gravity_data.tangential_acceleration_variance = parameters.GetFloat  ("tangentialAccelVariance");
+      gravity_data.rotation_is_dir                  = get_integer_property (parameters, "rotationIsDir") != 0;
     }
     else  //Radius
     {
@@ -216,16 +235,16 @@ struct ParticleProcessor::Impl
     //generate new particles
     if (particle_count < emitter_data->max_particles)
     {
-        emit_counter += scene.PrevUpdateTime () - scene.Time ();
+      emit_counter += scene.Time () - scene.PrevUpdateTime ();
 
-        if (emit_counter < 0)
-            emit_counter = 0;
+      if (emit_counter < 0)
+        emit_counter = 0;
 
-        int emit_count = stl::min (emitter_data->max_particles - particle_count, (emit_counter / emission_interval).cast<size_t> ());
+      int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<size_t> () / emission_interval));
 
-        AddParticles (particles, emit_count, random_generator);
+      AddParticles (particles, emit_count, random_generator);
 
-        emit_counter -= emission_interval * emit_count;
+      emit_counter -= emission_interval * emit_count;
     }
 
     //process particles

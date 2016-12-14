@@ -723,7 +723,7 @@ class XmlParser
                         case XmlEncoding_Unknown:
                           encoding = XmlEncoding_FromPI;
 
-                          if (xtl::xstrcmp (value, "utf-8")) //не нужно конвертировать из utf8 в utf8
+                          if (xtl::xstricmp (value, "utf-8")) //не нужно конвертировать из utf8 в utf8
                           {
                             ResetLexer (value);
                             return true;

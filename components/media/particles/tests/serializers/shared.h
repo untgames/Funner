@@ -5,6 +5,8 @@
 
 #include <xtl/iterator.h>
 
+#include <common/log.h>
+
 #include <media/particles/particle_system_library.h>
 
 using namespace media::particles;
