@@ -40,8 +40,9 @@ struct ParticleScene::Impl: public xtl::reference_counter
   TimeValue              time;
   TimeValue              prev_time;
 
-  Impl ()
-    : animation_fps ()
+  Impl (const ParticleList& list)
+    : particles (list)
+    , animation_fps ()
     , is_manual_bound_box (false)
     , is_dirty_bound_box (true)
     , first_step (true)
@@ -55,7 +56,12 @@ struct ParticleScene::Impl: public xtl::reference_counter
 */
 
 ParticleScene::ParticleScene ()
-  : impl (new Impl)
+  : impl (new Impl (ParticleList ()))
+{
+}
+
+ParticleScene::ParticleScene (const ParticleList& list)
+  : impl (new Impl (list))
 {
 }
 

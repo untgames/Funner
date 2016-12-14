@@ -26,6 +26,27 @@ struct ParticleSystemPrototypeDesc
 
 typedef stl::hash_map<stl::hash_key<const char*>, ParticleSystemPrototypeDesc> ParticleSystemPrototypeMap;
 
+///A more effect random number getter function, get from ejoy2d.
+static void RANDOM_M11(size_t count, float* values)
+{
+  unsigned int seed = rand ();
+
+  for (size_t i = 0; i < count; i++)
+  {
+    seed = seed * 134775813 + 1;
+
+    union
+    {
+        uint32_t d;
+        float f;
+    } u;
+
+    u.d = (((uint32_t)(seed) & 0x7fff) << 8) | 0x40000000;
+
+    values [i] = u.f - 3.0f;
+  }
+}
+
 }
 
 /*
@@ -106,7 +127,7 @@ void ParticleSystemLibrary::SetName (const char* name)
    Create particle system using particle system config handler attached to given id
 */
 
-ParticleSystem ParticleSystemLibrary::CreateParticleSystem (const char* id) const
+ParticleSystem ParticleSystemLibrary::CreateParticleSystem (const char* id, const RandomGenerator& random_generator) const
 {
   static const char* METHOD_NAME = "media::particles::ParticleSystemLibrary::CreateParticleSystem";
 
@@ -118,11 +139,16 @@ ParticleSystem ParticleSystemLibrary::CreateParticleSystem (const char* id) cons
   if (!prototype)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't find prototype with id '%s'", id);
 
-  ParticleSystem return_value;
+  ParticleSystem return_value (random_generator);
 
   prototype->Configure (return_value);
 
   return return_value;
+}
+
+ParticleSystem ParticleSystemLibrary::CreateParticleSystem (const char* id) const
+{
+  return CreateParticleSystem (id, RandomGenerator (&RANDOM_M11));
 }
 
 /*

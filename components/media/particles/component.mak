@@ -12,8 +12,8 @@ MEDIA.PARTICLES.PARTICLE_DESIGNER_SERIALIZER.SOURCES.IMPORTS     := compile.medi
 
 MEDIA.PARTICLES.TESTS.TYPE        := test-suite
 MEDIA.PARTICLES.TESTS.SOURCE_DIRS := tests/core
-MEDIA.PARTICLES.TESTS.IMPORTS     := compile.media.particles link.media.particles
+MEDIA.PARTICLES.TESTS.IMPORTS     := compile.media.particles link.media.particles compile.xtl
 
 MEDIA.PARTICLES.SERIALIZERS.TESTS.TYPE        := test-suite
 MEDIA.PARTICLES.SERIALIZERS.TESTS.SOURCE_DIRS := tests/serializers
-MEDIA.PARTICLES.SERIALIZERS.TESTS.IMPORTS     := compile.media.particles link.media.particles.particle_designer_serializer
+MEDIA.PARTICLES.SERIALIZERS.TESTS.IMPORTS     := compile.media.particles link.media.particles.particle_designer_serializer compile.common
