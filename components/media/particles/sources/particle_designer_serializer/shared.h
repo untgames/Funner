@@ -74,6 +74,10 @@ class ParticleProcessor : public IParticleProcessor, public xtl::reference_count
     void Release () { release (this); }
 
   private:
+    ParticleProcessor (const ParticleProcessor&);             //no impl
+    ParticleProcessor& operator = (const ParticleProcessor&); //no impl
+
+  private:
     struct Impl;
     Impl* impl;
 };
@@ -110,6 +114,10 @@ class ParticleSystemPrototype : public IParticleSystemPrototype, public xtl::ref
 //////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef () { addref (this); }
     void Release () { release (this); }
+
+  private:
+    ParticleSystemPrototype (const ParticleSystemPrototype&);             //no impl
+    ParticleSystemPrototype& operator = (const ParticleSystemPrototype&); //no impl
 
   private:
     struct Impl;
