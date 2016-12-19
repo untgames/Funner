@@ -52,8 +52,7 @@ class IParticleSystemPrototype
 class ParticleSystemLibrary
 {
   public:
-    typedef xtl::iterator<IParticleSystemPrototype*>       Iterator;
-    typedef xtl::iterator<const IParticleSystemPrototype*> ConstIterator;
+    typedef xtl::iterator<IParticleSystemPrototype* const> Iterator, ConstIterator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructors / destructor / assignment

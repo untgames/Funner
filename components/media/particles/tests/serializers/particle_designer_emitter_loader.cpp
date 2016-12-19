@@ -26,13 +26,13 @@ int main ()
 
       RandomGenerator random;
 
-      for (ParticleSystemLibrary::Iterator iter = library.CreateIterator (); iter; ++iter)
+      for (ParticleSystemLibrary::ConstIterator iter = library.CreateIterator (); iter; ++iter)
       {
         ParticleSystem system (random);
 
         (*iter)->Configure (system);
 
-//        printf ("Testing system '%s':", library.ItemId (iter));
+        printf ("Testing system '%s':\n", library.ItemId (iter));
         printf ("Scenes count %u:\n", system.ScenesCount ());
 
         for (size_t i = 0, scenes_count = system.ScenesCount (); i < scenes_count; i++)
