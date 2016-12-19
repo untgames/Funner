@@ -66,7 +66,6 @@ struct ParticleSystemPrototype::Impl
 ParticleSystemPrototype::ParticleSystemPrototype ()
   : impl (new Impl)
 {
-
 }
 
 ParticleSystemPrototype::~ParticleSystemPrototype ()

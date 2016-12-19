@@ -79,6 +79,7 @@ ParticleSystemLibrary::ParticleSystemLibrary (const char* file_name)
 {
   try
   {
+    SetName (file_name);
     Load (file_name);
   }
   catch (xtl::exception& e)

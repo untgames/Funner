@@ -274,6 +274,49 @@ inline rational<I>::operator unspecified_bool_type () const
     Сравнение
 */
 
+template <class I, class II>
+bool operator < (I value, const rational<II>& r)
+{
+  if (r.denominator () == 1)
+  {
+    return value < r.numerator ();
+  }
+  else
+  {
+    return r.denominator () * value < r.numerator ();
+  }
+}
+
+template <class I, class II>
+bool operator > (I value, const rational<II>& r)
+{
+  return r < value;
+}
+
+template <class I, class II>
+bool operator <= (I value, const rational<II>& r)
+{
+  return !(r < value);
+}
+
+template <class I, class II>
+bool operator >= (I value, const rational<II>& r)
+{
+  return !(value < r);
+}
+
+template <class I, class II>
+bool operator == (I value, const rational<II>& r)
+{
+  return r.numerator () == value * r.denominator ();
+}
+
+template <class I, class II>
+bool operator != (I value, const rational<II>& r)
+{
+  return !(value == r);
+}
+
 template <class I>
 inline bool rational<I>::operator < (const rational& r) const
 {

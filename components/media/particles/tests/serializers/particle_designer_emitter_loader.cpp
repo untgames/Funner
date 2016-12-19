@@ -21,7 +21,8 @@ int main ()
     {
       ParticleSystemLibrary library (LIBRARY_NAMES [current_library]);
 
-      //TODO dump info
+      printf ("  name: '%s'\n", library.Name ());
+      printf ("  size: %u\n", library.Size ());
 
       RandomGenerator random;
 
@@ -30,6 +31,17 @@ int main ()
         ParticleSystem system (random);
 
         (*iter)->Configure (system);
+
+//        printf ("Testing system '%s':", library.ItemId (iter));
+        printf ("Scenes count %u:\n", system.ScenesCount ());
+
+        for (size_t i = 0, scenes_count = system.ScenesCount (); i < scenes_count; i++)
+        {
+          ParticleScene& scene = system.Scene (i);
+
+          printf ("Scene %u name is '%s'\n", i, scene.Name ());
+          printf ("  Offset is %.2f %.2f %.2f\n", scene.Offset ().x, scene.Offset ().y, scene.Offset ().z);
+        }
 
         printf ("simulation:\n");
         TimeValue tv;

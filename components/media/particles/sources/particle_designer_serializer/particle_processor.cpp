@@ -8,6 +8,7 @@ namespace
 {
 
 //Constants
+const float DURATION_INFINITY                = -1;  //The Particle emitter lives forever.
 const float START_SIZE_EQUAL_TO_END_SIZE     = -1;  //The starting size of the particle is equal to the ending size.
 const float START_RADIUS_EQUAL_TO_END_RADIUS = -1;  //The starting radius of the particle is equal to the ending radius.
 
@@ -37,8 +38,6 @@ struct EmitterData
   float       finish_rotation_variance; //finish angle variance of particle
   float       lifespan;                 //life of particle
   float       lifespan_variance;        //life variance of particle
-  math::vec2f start_position;           //source position
-  math::vec2f start_position_variance;  //source position variance
   math::vec4f start_color;              //initial color of particle
   math::vec4f start_color_variance;     //initial color variance of particle
   math::vec4f finish_color;             //finish color of particle
@@ -58,6 +57,8 @@ struct GravityEmitterData : public EmitterData
   float       tangential_acceleration;          //gravity tangential acceleration
   float       tangential_acceleration_variance; //gravity tangential acceleration variance
   math::vec2f gravity;                          //gravity force
+  math::vec2f start_position;                   //source position
+  math::vec2f start_position_variance;          //source position variance
 };
 
 //data specific for radius emitter
@@ -74,18 +75,17 @@ struct RadiusEmitterData : public EmitterData
 //particle data specific for gravity mode
 struct GravityModeParticleData
 {
-  float       radial_acceleration;     //gravity radial acceleration
-  float       tangential_acceleration; //gravity tangential acceleration
-  math::vec2f direction;               //direction
+  float radial_acceleration;     //gravity radial acceleration
+  float tangential_acceleration; //gravity tangential acceleration
 };
 
 //particle data specific for radius mode
 struct RadiusModeParticleData
 {
-  float radius;       //radius
-  float radius_speed; //radius change speed
-  float angle;        //angle
-  float angle_speed;  //angle change speed
+  float        radius;       //radius
+  float        radius_speed; //radius change speed
+  math::anglef angle;        //angle
+  math::anglef angle_speed;  //angle change speed
 };
 
 //Particle designer-specific particle data
@@ -178,22 +178,22 @@ struct ParticleProcessor::Impl
     data.start_size_variance       = parameters.GetFloat   ("startParticleSizeVariance");
     data.finish_size               = parameters.GetFloat   ("finishParticleSize");
     data.finish_size_variance      = parameters.GetFloat   ("finishParticleSizeVariance");
-    data.start_position.x          = get_float_property    (parameters, "sourcePositionx");
-    data.start_position.y          = get_float_property    (parameters, "sourcePositiony");
-    data.start_position_variance.x = parameters.GetFloat   ("sourcePositionVariancex");
-    data.start_position_variance.y = parameters.GetFloat   ("sourcePositionVariancey");
     data.start_rotation            = parameters.GetFloat   ("rotationStart");
     data.start_rotation_variance   = parameters.GetFloat   ("rotationStartVariance");
     data.finish_rotation           = parameters.GetFloat   ("rotationEnd");
     data.finish_rotation_variance  = parameters.GetFloat   ("rotationEndVariance");
     data.lifespan                  = parameters.GetFloat   ("particleLifespan");
     data.lifespan_variance         = parameters.GetFloat   ("particleLifespanVariance");
-    data.y_coord_flipped           = parameters.IsPresent ("yCoordFlipped") ? parameters.GetInteger ("yCoordFlipped") : 1;
+    data.y_coord_flipped           = parameters.IsPresent  ("yCoordFlipped") ? parameters.GetInteger ("yCoordFlipped") : 1;
 
     if (emitter_mode == EmitterMode_Gravity)
     {
       GravityEmitterData& gravity_data = *(GravityEmitterData*)emitter_data.get ();
 
+      gravity_data.start_position.x                 = get_float_property   (parameters, "sourcePositionx");
+      gravity_data.start_position.y                 = get_float_property   (parameters, "sourcePositiony");
+      gravity_data.start_position_variance.x        = parameters.GetFloat  ("sourcePositionVariancex");
+      gravity_data.start_position_variance.y        = parameters.GetFloat  ("sourcePositionVariancey");
       gravity_data.gravity.x                        = parameters.GetFloat  ("gravityx");
       gravity_data.gravity.y                        = parameters.GetFloat  ("gravityy");
       gravity_data.speed                            = parameters.GetFloat  ("speed");
@@ -228,19 +228,24 @@ struct ParticleProcessor::Impl
     if (work_time < 0)
       return;
 
+    TimeValue rational_dt = scene.Time () - stl::max (scene.PrevUpdateTime (), scene.StartTimeOffset ());
+
+    if (rational_dt <= 0)
+      return;
+
     ParticleList& particles = scene.Particles ();
 
     size_t particle_count = particles.Count ();
 
     //generate new particles
-    if (particle_count < emitter_data->max_particles)
+    if ((emitter_data->duration == DURATION_INFINITY || emitter_data->duration > work_time.cast<float> ()) && particle_count < emitter_data->max_particles)
     {
-      emit_counter += scene.Time () - scene.PrevUpdateTime ();
+      emit_counter += rational_dt;
 
       if (emit_counter < 0)
         emit_counter = 0;
 
-      int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<size_t> () / emission_interval));
+      int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<float> () / emission_interval));
 
       AddParticles (particles, emit_count, random_generator);
 
@@ -248,6 +253,50 @@ struct ParticleProcessor::Impl
     }
 
     //process particles
+    if (emitter_mode == EmitterMode_Gravity)
+    {
+      float               y_coord_flipped = emitter_data->y_coord_flipped;
+      GravityEmitterData& gravity_data    = *(GravityEmitterData*)emitter_data.get ();
+
+      for (ParticleList::Iterator iter = particles.CreateIterator (); iter; ++iter)
+      {
+        ParticleData& particle = static_cast<ParticleData&> (*iter);
+
+        // radial acceleration
+        if (particle.position.x || particle.position.y)
+        {
+          math::vec2f radial     = math::normalize (math::vec2f (particle.position.x, particle.position.y));
+          math::vec2f tangential = math::vec2f (-radial.y * particle.gravity.tangential_acceleration, radial.x * particle.gravity.tangential_acceleration);
+
+          radial *= particle.gravity.radial_acceleration;
+
+          particle.position_acceleration += (radial + tangential + gravity_data.gravity) * y_coord_flipped;
+        }
+        else
+          particle.position_acceleration += gravity_data.gravity * y_coord_flipped;
+      }
+    }
+    else
+    {
+      float dt = rational_dt.cast<float> ();
+
+      //Use acceleration_dt as arrive to target point time for acceleration calculation. We should use lowest possible value for this param.
+      //Best value of dt * 1.4 was determined during testing of different angle / radius speeds and different dt as minimal possible which does not
+      //result in calculations going to infinity
+      float acceleration_dt        = dt * 1.4f;
+      float acceleration_dt_square = acceleration_dt * acceleration_dt;
+
+      for (ParticleList::Iterator iter = particles.CreateIterator (); iter; ++iter)
+      {
+        ParticleData& particle = static_cast<ParticleData&> (*iter);
+
+        particle.radius.angle  += particle.radius.angle_speed * dt;
+        particle.radius.radius += particle.radius.radius_speed * dt;
+
+        particle.position_acceleration.x += 2 * (math::cos (particle.radius.angle) * particle.radius.radius - particle.position.x - particle.position_speed.x * acceleration_dt) / acceleration_dt_square;
+        particle.position_acceleration.y += 2 * (math::sin (particle.radius.angle) * particle.radius.radius - particle.position.y - particle.position_speed.y * acceleration_dt) / acceleration_dt_square;
+      }
+    }
   }
 
   //Add new particles
@@ -260,11 +309,9 @@ struct ParticleProcessor::Impl
     {
       ParticleList::Iterator iter = list.Add ();
 
-      ParticleData& particle = (ParticleData&)*iter;
+      ParticleData& particle = static_cast<ParticleData&> (*iter);
 
       particle.lifetime      = stl::max (0.f, emitter_data->lifespan + emitter_data->lifespan_variance * random_generator.Generate ());
-      particle.position.x    = emitter_data->start_position.x + emitter_data->start_position_variance.x * random_generator.Generate ();
-      particle.position.y    = emitter_data->start_position.y + emitter_data->start_position_variance.y * random_generator.Generate ();
       particle.color.x       = clamp (emitter_data->start_color.x + emitter_data->start_color_variance.x * random_generator.Generate (), 0.f, 1.f);
       particle.color.y       = clamp (emitter_data->start_color.y + emitter_data->start_color_variance.y * random_generator.Generate (), 0.f, 1.f);
       particle.color.z       = clamp (emitter_data->start_color.z + emitter_data->start_color_variance.z * random_generator.Generate (), 0.f, 1.f);
@@ -280,17 +327,19 @@ struct ParticleProcessor::Impl
         particle.size_speed = (stl::max (0.f, emitter_data->finish_size + emitter_data->finish_size_variance * random_generator.Generate ()) - particle.size.x) / particle.lifetime;
       }
 
-      particle.rotation         = math::degree (emitter_data->start_rotation + emitter_data->start_rotation_variance * random_generator.Generate ());
-      particle.rotation_speed   = (math::degree (emitter_data->finish_rotation + emitter_data->finish_rotation_variance * random_generator.Generate ()) - particle.rotation) / particle.lifetime;
+      particle.rotation       = math::degree (emitter_data->start_rotation + emitter_data->start_rotation_variance * random_generator.Generate ());
+      particle.rotation_speed = (math::degree (emitter_data->finish_rotation + emitter_data->finish_rotation_variance * random_generator.Generate ()) - particle.rotation) / particle.lifetime;
 
       if (emitter_mode == EmitterMode_Gravity)
       {
+        particle.position.x                      = gravity_data.start_position.x + gravity_data.start_position_variance.x * random_generator.Generate ();
+        particle.position.y                      = gravity_data.start_position.y + gravity_data.start_position_variance.y * random_generator.Generate ();
         particle.gravity.radial_acceleration     = gravity_data.radial_acceleration + gravity_data.radial_acceleration_variance * random_generator.Generate ();
         particle.gravity.tangential_acceleration = gravity_data.tangential_acceleration + gravity_data.tangential_acceleration_variance * random_generator.Generate ();
 
         math::anglef a = math::degree(emitter_data->start_angle + emitter_data->start_angle_variance * random_generator.Generate ());
 
-        particle.gravity.direction = math::vec2f (cos (a), sin (a)) * (gravity_data.speed + gravity_data.speed_variance * random_generator.Generate ());
+        particle.position_speed = math::vec2f (cos (a), sin (a), 0) * (gravity_data.speed + gravity_data.speed_variance * random_generator.Generate ());
 
         if (gravity_data.rotation_is_dir)
           particle.rotation = -a; //TODO check if this is correct WHY -a and not a here????
@@ -300,8 +349,10 @@ struct ParticleProcessor::Impl
         //Need to check by Jacky
         // Set the default diameter of the particle from the source position
         particle.radius.radius      = radius_data.start_radius + radius_data.start_radius_variance * random_generator.Generate ();
-        particle.radius.angle       = emitter_data->start_angle + emitter_data->start_angle_variance * random_generator.Generate ();
-        particle.radius.angle_speed = radius_data.rotate + radius_data.rotate_variance * random_generator.Generate ();
+        particle.radius.angle       = math::degree (emitter_data->start_angle + emitter_data->start_angle_variance * random_generator.Generate ());
+        particle.radius.angle_speed = math::degree (radius_data.rotate + radius_data.rotate_variance * random_generator.Generate ());
+        particle.position.x         = math::cos (particle.radius.angle) * particle.radius.radius;
+        particle.position.y         = math::sin (particle.radius.angle) * particle.radius.radius * emitter_data->y_coord_flipped;
 
         if (radius_data.finish_radius == START_RADIUS_EQUAL_TO_END_RADIUS)
           particle.radius.radius_speed = 0.0f;
@@ -314,7 +365,7 @@ struct ParticleProcessor::Impl
   //Particle initializer
   void InitParticle (void* particle_data)
   {
-    //TODO
+    //do nothing
   }
 };
 

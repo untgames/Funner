@@ -42,8 +42,10 @@ struct RandomGenerator::Impl: public xtl::reference_counter
   {
     values.resize (VALUES_BATCH_SIZE);
 
-    current_value = &values [0];
-    finish_value  = &values [values.size ()];
+    FillValues ();
+
+    //current value is filled inside FillValues call above
+    finish_value = &values [values.size ()];
   }
 
   float Generate ()

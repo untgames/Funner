@@ -94,6 +94,8 @@ class PlistLibraryLoader
       : document_folder_path (dir (file_name))
       , parser (file_name, "xml")
     {
+      //TODO parse plist in special mode for reading #text with spaces
+
       ParseNode plist_root = parser.Root ().First ("plist");
 
       if (!plist_root)
