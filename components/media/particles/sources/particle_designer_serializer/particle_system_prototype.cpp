@@ -22,6 +22,7 @@ struct EmitterDesc : public xtl::reference_counter
 typedef xtl::intrusive_ptr<EmitterDesc> EmitterDescPtr;
 typedef stl::vector<EmitterDescPtr>     EmitterDescArray;
 typedef xtl::com_ptr<ParticleProcessor> ParticleProcessorPtr;
+typedef stl::vector<ParticleTexDesc>    ParticleTexDescArray;
 
 }
 
@@ -33,10 +34,14 @@ struct ParticleSystemPrototype::Impl
 {
   EmitterDescArray     emitters;           //emitters entries
   ParticleProcessorPtr particle_processor; //particle processor
+  stl::string          material_name;      //material name
+  ParticleTexDescArray animation_frames;   //animation frames
+  float                animation_fps;      //animation fps
 
   ///Constructor
   Impl ()
     : particle_processor (new ParticleProcessor (), false)
+    , animation_fps ()
     {}
 
   ///Configure particle system
@@ -47,10 +52,14 @@ struct ParticleSystemPrototype::Impl
       ParticleList  particle_list (particle_processor->ParticleSize (), xtl::bind (&ParticleProcessor::InitParticle, particle_processor.get (), _1));
       ParticleScene scene (particle_list);
 
-      scene.SetName   ((*iter)->name.c_str ());
+      scene.SetName ((*iter)->name.c_str ());
       scene.SetOffset (math::vec3f ((*iter)->offset.x, (*iter)->offset.y, 0));
+      scene.SetMaterialName (material_name.c_str ());
+      scene.SetAnimationFramesPerSecond (animation_fps);
+      scene.SetAnimationFramesCount (animation_frames.size ());
 
-      //TODO set material, animation
+      if (!animation_frames.empty ())
+        memcpy (scene.AnimationFrames (), &animation_frames [0], animation_frames.size () * sizeof (ParticleTexDescArray::value_type));
 
       scene.AttachProcessor (particle_processor.get ());
 
@@ -89,6 +98,40 @@ void ParticleSystemPrototype::AddEmitter (const char* name, const math::vec2f& o
 void ParticleSystemPrototype::SetParameters (const common::PropertyMap& parameters)
 {
   impl->particle_processor->SetParameters (parameters);
+}
+
+/*
+   Particle material
+*/
+
+void ParticleSystemPrototype::SetMaterialName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::particles::particle_designer_serializer::ParticleSystemPrototype::SetMaterialName", "name");
+
+  impl->material_name = name;
+}
+
+/*
+   Particles animation parameters
+*/
+
+void ParticleSystemPrototype::SetAnimationFramesCount (unsigned int count)
+{
+  impl->animation_frames.resize (count);
+}
+
+ParticleTexDesc* ParticleSystemPrototype::AnimationFrames ()
+{
+  if (!impl->animation_frames.empty ())
+    return &impl->animation_frames [0];
+
+  return 0;
+}
+
+void ParticleSystemPrototype::SetAnimationFramesPerSecond (float count)
+{
+  impl->animation_fps = count;
 }
 
 /*

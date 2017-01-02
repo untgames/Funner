@@ -40,7 +40,17 @@ int main ()
           ParticleScene& scene = system.Scene (i);
 
           printf ("Scene %u name is '%s'\n", i, scene.Name ());
+          printf ("  Material '%s':\n", scene.MaterialName ());
           printf ("  Offset is %.2f %.2f %.2f\n", scene.Offset ().x, scene.Offset ().y, scene.Offset ().z);
+          printf ("  Animation frames per second %.3f:\n", scene.AnimationFramesPerSecond ());
+          printf ("  Animation frames count %u:\n", scene.AnimationFramesCount ());
+
+          for (size_t j = 0, frames_count = scene.AnimationFramesCount (); j < frames_count; j++)
+          {
+            const ParticleTexDesc& tex_desc = scene.AnimationFrames () [j];
+
+            printf ("    Frame %u offset = [%.3f; %.3f] size = [%.3f; %.3f]\n", j, tex_desc.tex_offset.x, tex_desc.tex_offset.y, tex_desc.tex_size.x, tex_desc.tex_size.y);
+          }
         }
 
         printf ("simulation:\n");

@@ -74,6 +74,18 @@ void read_plist_dictionary (Parser::Iterator dict_iter, PropertyMap& properties)
   }
 }
 
+template <unsigned int Size>
+void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& value)
+{
+  StringArray components = common::split (str);
+
+  if (components.Size () != Size)
+    raise_parser_exception (*iter, "Invalid vector format");
+
+  for (unsigned int i = 0; i < Size; i++)
+    value [i] = (float)atof (components [i]);
+}
+
 }
 
 namespace components
@@ -110,6 +122,7 @@ class PlistLibraryLoader
         prototype->AddEmitter ("", math::vec2f ());
 
         ParseEmitter (plist_root.First ("dict"), prototype.get ());
+        ParseXparticleFile (file_name, prototype.get ());
 
         library.Attach (file_name, *prototype);
       }
@@ -125,6 +138,56 @@ class PlistLibraryLoader
     }
 
   private:
+    ///Try to load additional particle system info
+    void ParseXparticleFile (const char* plist_path, ParticleSystemPrototype* prototype)
+    {
+      stl::string xparticle_path = common::basename (plist_path).append (".xparticle");
+
+      //check if file with additional info exists
+      if (!common::FileSystem::IsFileExist (xparticle_path.c_str ()))
+        return;
+
+      Parser xparticle_parser (xparticle_path.c_str (), "xml");
+
+      ParseNode particle_system_node = xparticle_parser.Root ().First ("particle_system");
+
+      if (!particle_system_node)
+        raise_parser_exception (xparticle_parser.Root (), "Can't find 'particle_system' node at document '%s' root", xparticle_path.c_str ());
+
+      prototype->SetMaterialName (get<const char*> (particle_system_node, "material"));
+
+      ParseNode animation_frames_node = particle_system_node.First ("animation_frames");
+
+      if (animation_frames_node)
+      {
+        prototype->SetAnimationFramesPerSecond (get<float> (animation_frames_node, "fps"));
+
+        unsigned int frames_count = 0;
+
+        for (Parser::NamesakeIterator iter = animation_frames_node.First ("frame"); iter; ++iter, frames_count++);
+
+        prototype->SetAnimationFramesCount (frames_count);
+
+        ParticleTexDesc* current_frame = prototype->AnimationFrames ();
+
+        for (Parser::NamesakeIterator iter = animation_frames_node.First ("frame"); iter; ++iter, current_frame++)
+        {
+          read (iter, get<const char*> (*iter, "tex_offset"), current_frame->tex_offset);
+          read (iter, get<const char*> (*iter, "tex_size"), current_frame->tex_size);
+        }
+
+        if (animation_frames_node.Next ("animation_frames"))
+        {
+          animation_frames_node.Log ().Warning (animation_frames_node.Next ("animation_frames"), "More than one 'animation_frames' node not supported");
+        }
+      }
+
+      //logging
+      Log log (LOG_NAME);
+
+      xparticle_parser.Log ().Print (xtl::bind (&Log::Print, xtl::ref (log), _1));
+    }
+
     ///Merge readed library to out library
     void MergeLibraries (const ParticleSystemLibrary& source_library, ParticleSystemLibrary& target_library)
     {
@@ -179,6 +242,7 @@ class PlistLibraryLoader
         raise_parser_exception (plist_root, "No 'dict' node at document root");
 
       ParseEmitter (plist_root.First ("dict"), prototype.get ());
+      ParseXparticleFile (emitter_file_name.c_str (), prototype.get ());
 
       //logging
       Log log (LOG_NAME);

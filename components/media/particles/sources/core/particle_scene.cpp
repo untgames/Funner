@@ -29,7 +29,7 @@ struct ParticleScene::Impl: public xtl::reference_counter
   stl::string            name;
   stl::string            material_name;
   ParticleTexDescArray   animation_frames;
-  unsigned int           animation_fps;
+  float                  animation_fps;
   math::vec3f            offset;
   TimeValue              time_offset;
   bound_volumes::aaboxf  bound_box;
@@ -150,12 +150,12 @@ const ParticleTexDesc* ParticleScene::AnimationFrames () const
   return 0;
 }
 
-unsigned int ParticleScene::AnimationFramesPerSecond () const
+float ParticleScene::AnimationFramesPerSecond () const
 {
   return impl->animation_fps;
 }
 
-void ParticleScene::SetAnimationFramesPerSecond (unsigned int count)
+void ParticleScene::SetAnimationFramesPerSecond (float count)
 {
   impl->animation_fps = count;
 }
@@ -376,9 +376,9 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
 
       //do common logic for updates
 
-    float        dt                     = (time - impl->prev_time).cast<float> ();
-    unsigned int animation_fps          = impl->animation_fps,
-                 animation_frames_count = impl->animation_frames.size ();
+    float        dt                     = (time - impl->prev_time).cast<float> (),
+                 animation_fps          = impl->animation_fps;
+    unsigned int animation_frames_count = impl->animation_frames.size ();
 
     for (ParticleList::Iterator it=impl->particles.CreateIterator (); it;)
     {

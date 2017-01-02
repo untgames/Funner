@@ -94,8 +94,8 @@ class ParticleScene
           ParticleTexDesc* AnimationFrames ();
     const ParticleTexDesc* AnimationFrames () const;
 
-    unsigned int AnimationFramesPerSecond    () const;
-    void         SetAnimationFramesPerSecond (unsigned int count);
+    float AnimationFramesPerSecond    () const;
+    void  SetAnimationFramesPerSecond (float count);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Access to particles data

@@ -1,0 +1,341 @@
+Results of particle_designer_emitter_loader_test:
+
+Testing library 'data/particle_designer/fire big.plist':
+common.ComponentManager: Load components 'media.particles.loaders.*'
+common.ComponentManager: ...load components 'common.licensing.loaders.*'
+common.ComponentManager: ...load component 'common.licensing.loaders.AutoLicenseGenerator'
+common.ComponentManager: ...load components 'common.file_systems.*'
+common.ComponentManager: ...load component 'common.file_systems.StandardFilePathsMount'
+common.ComponentManager: ...load components 'common.parsers.*'
+common.ComponentManager: ...load component 'common.parsers.xml'
+common.ComponentManager: ...load component 'media.particles.loaders.ParticleDesignerPlistLoader'
+common.ComponentManager: ...components loaded successfully
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire big.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+  name: 'data/particle_designer/fire big.plist'
+  size: 1
+Testing system 'data/particle_designer/fire big.plist':
+Scenes count 1:
+Scene 0 name is ''
+  Material 'particle_fire_big':
+  Offset is 0.00 0.00 0.00
+  Animation frames per second 23.976:
+  Animation frames count 2:
+    Frame 0 offset = [0.000; 0.000] size = [0.969; 1.000]
+    Frame 1 offset = [0.200; 0.100] size = [0.300; 0.200]
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+exception: bad rational
+
+Testing library 'data/particle_designer/fireBall_keno_all-scene.plist':
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/smoke.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_ball&sell.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_Drago.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire_Вrago.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(5): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(20): error: node 'dict': File 'data/particle_designer/fire.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(35): error: node 'dict': File 'data/particle_designer/fire.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(50): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(65): error: node 'dict': File 'data/particle_designer/fire.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(80): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(230): error: node 'dict': File 'data/particle_designer/fire.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(329): error: node 'dict': File 'data/particle_designer/fire.plist' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
+  name: 'data/particle_designer/fireBall_keno_all-scene.plist'
+  size: 5
+Testing system 'light_sparks':
+Scenes count 16:
+Scene 0 name is 'Emitter'
+  Material '':
+  Offset is 1420.39 -15.87 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 1 name is 'Emitter'
+  Material '':
+  Offset is 1848.72 -12.53 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 2 name is 'Emitter'
+  Material '':
+  Offset is 620.08 -10.36 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 3 name is 'Emitter'
+  Material '':
+  Offset is 97.65 -7.02 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 4 name is 'Emitter'
+  Material '':
+  Offset is 1035.31 -11.88 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 5 name is 'Emitter'
+  Material '':
+  Offset is 1872.30 762.77 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 6 name is 'Emitter'
+  Material '':
+  Offset is 1831.92 886.73 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 7 name is 'Emitter'
+  Material '':
+  Offset is 1478.95 875.71 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 8 name is 'Emitter'
+  Material '':
+  Offset is 1420.39 779.67 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 9 name is 'Emitter'
+  Material '':
+  Offset is 327.19 428.51 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 10 name is 'Emitter'
+  Material '':
+  Offset is 199.12 253.40 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 11 name is 'Emitter'
+  Material '':
+  Offset is 459.83 632.47 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 12 name is 'Emitter'
+  Material '':
+  Offset is 1032.98 736.90 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 13 name is 'Emitter'
+  Material '':
+  Offset is 702.56 732.69 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 14 name is 'Emitter'
+  Material '':
+  Offset is 1563.54 931.37 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 15 name is 'Emitter'
+  Material '':
+  Offset is 1722.34 928.90 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 1 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 2 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 3 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 4 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 5 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 6 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 7 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 8 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 9 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 10 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 11 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 12 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 13 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 14 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 15 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(1.00): [49.483; -98.505; 0.000] - [171.965; -98.505; 0.000]
+  scene 1 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 2 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 3 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 4 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 5 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 6 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 7 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 8 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 9 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 10 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 11 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 12 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 13 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 14 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 15 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(2.00): [0.000; -146.368; 0.000] - [372.939; 0.000; 0.000]
+  scene 1 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 2 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 3 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 4 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 5 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 6 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 7 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 8 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 9 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 10 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 11 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 12 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 13 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 14 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 15 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 1 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 2 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 3 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 4 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 5 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 6 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 7 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 8 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 9 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 10 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 11 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 12 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 13 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 14 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 15 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+Testing system 'smoke':
+Scenes count 4:
+Scene 0 name is 'Emitter'
+  Material '':
+  Offset is 71.86 771.91 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 1 name is 'Emitter'
+  Material '':
+  Offset is 454.19 772.28 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 2 name is 'Emitter'
+  Material '':
+  Offset is 615.57 810.55 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+Scene 3 name is 'Emitter'
+  Material '':
+  Offset is 779.17 781.85 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 1 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 2 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 3 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(1.00): [-97.520; 17.934; 0.000] - [45.339; 107.897; 0.000]
+  scene 1 aabb(1.00): [-92.135; 13.075; 0.000] - [46.875; 110.281; 0.000]
+  scene 2 aabb(1.00): [-81.742; 9.534; 0.000] - [46.714; 115.568; 0.000]
+  scene 3 aabb(1.00): [-84.796; 3.433; 0.000] - [48.247; 108.655; 0.000]
+  scene 0 aabb(2.00): [-223.802; -56.437; 0.000] - [44.539; 205.962; 0.000]
+  scene 1 aabb(2.00): [-220.697; -43.191; 0.000] - [44.772; 227.995; 0.000]
+  scene 2 aabb(2.00): [-228.075; -31.374; 0.000] - [37.664; 210.791; 0.000]
+  scene 3 aabb(2.00): [-229.231; -50.988; 0.000] - [46.397; 209.631; 0.000]
+  scene 0 aabb(3.00): [-228.142; -17.184; 0.000] - [37.927; 199.293; 0.000]
+  scene 1 aabb(3.00): [-64.684; 13.400; 0.000] - [25.158; 90.649; 0.000]
+  scene 2 aabb(3.00): [-81.685; 29.510; 0.000] - [43.228; 98.894; 0.000]
+  scene 3 aabb(3.00): [-23.764; 37.884; 0.000] - [18.697; 92.276; 0.000]
+Testing system 'light_Drago':
+Scenes count 1:
+Scene 0 name is 'Emitter'
+  Material '':
+  Offset is 487.31 885.98 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(1.00): [-39.939; -39.913; 0.000] - [39.983; 40.000; 0.000]
+  scene 0 aabb(2.00): [-39.972; -39.682; 0.000] - [39.945; 39.818; 0.000]
+  scene 0 aabb(3.00): [-39.998; -39.955; 0.000] - [39.992; 39.997; 0.000]
+Testing system 'fire_Вrago':
+Scenes count 1:
+Scene 0 name is 'Emitter'
+  Material '':
+  Offset is 574.86 882.21 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(1.00): [2801.041; 547.988; 0.000] - [3153.718; 977.300; 0.000]
+  scene 0 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+Testing system 'light_ball&sell':
+Scenes count 1:
+Scene 0 name is 'Emitter'
+  Material '':
+  Offset is 1243.33 691.10 0.00
+  Animation frames per second 0.000:
+  Animation frames count 0:
+simulation:
+  scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  scene 0 aabb(1.00): [-14.994; -14.855; 0.000] - [14.994; 15.000; 0.000]
+  scene 0 aabb(2.00): [-29.989; -29.709; 0.000] - [29.988; 29.999; 0.000]
+  scene 0 aabb(3.00): [-44.983; -44.564; 0.000] - [44.983; 44.999; 0.000]
