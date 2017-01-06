@@ -50,6 +50,12 @@
 //  int WINAPI GetWindowTextA (HWND hWnd, LPSTR lpString, int nMaxCount);
 #endif
 
+#ifdef LINUX
+  #include <dlfcn.h>
+
+  #include <syslib/platform/x11.h>
+#endif
+
 #ifdef BADA
   #include <FUiControl.h>
 
@@ -205,7 +211,7 @@ class Library: public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение адреса точки входа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void* GetProcAddress (const char* name, size_t search_flags);
+    void* GetProcAddress (const char* name, unsigned int search_flags);
 
   private:
     Library (const Library&); //no impl
