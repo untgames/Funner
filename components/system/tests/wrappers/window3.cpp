@@ -1,7 +1,13 @@
 #include "shared.h"
 
+typedef xtl::shared_ptr<Window> WindowPtr;
+
+WindowPtr window_holder;
+
 void destroy (Window&, WindowEvent, const WindowEventContext&)
 {
+  window_holder.reset ();
+
   Application::Exit (0);
 }
 
@@ -25,29 +31,36 @@ void print_window_info (syslib::Window& window)
   printf ("window style: %s\n", get_name (window.Style ()));
 }
 
+void on_application_initialized ()
+{
+  window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
+
+  Window& window = *window_holder;
+
+  window.SetPosition (10, 10);
+  window.SetTitle ("Test window");
+
+  window.Show ();
+
+  print_window_info (window);
+
+  window.SetStyle (WindowStyle_PopUp);
+
+  print_window_info (window);
+
+  window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
+
+  window.Close ();
+}
+
 int main ()
 {
   printf ("Results of window3_test:\n");
 
   try
   {
-    Window window (WindowStyle_Overlapped, 400, 300);
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
 
-    window.SetPosition (10, 10);
-    window.SetTitle ("Test window");
-
-    window.Show ();
-
-    print_window_info (window);
-
-    window.SetStyle (WindowStyle_PopUp);
-
-    print_window_info (window);
-    
-    auto_connection connection = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
-    
-    window.Close ();
-    
     Application::Run ();
 
     return Application::GetExitCode ();

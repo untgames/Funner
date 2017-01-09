@@ -287,7 +287,7 @@ class DisplayManagerImpl
         log.Printf ("...starting X11 events processing thread");
 
         events_thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&DisplayManagerImpl::EventsThreadRoutine, this)));
-        
+
         return display;
       }
       catch (xtl::exception& e)
@@ -324,13 +324,6 @@ class DisplayManagerImpl
         display_connection_fd = ConnectionNumber (display);
       }
       
-        //настройка тайм-аута
-      
-      timeval timeout;
-      
-      timeout.tv_usec = 0;
-      timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
-
         //цикл обработки событий
         
       XEvent event;
@@ -343,8 +336,15 @@ class DisplayManagerImpl
         
         FD_ZERO (&in_fds);
         FD_SET  (display_connection_fd, &in_fds);
-        
-        if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))                
+
+          //настройка тайм-аута
+
+        timeval timeout;
+
+        timeout.tv_usec = 0;
+        timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
+
+        if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))
           continue; //событие не пришло
           
           //обработка поступивших событий
@@ -536,7 +536,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     WindowEventContext& context = message->context;
     
     GetEventContext (context);
-    
+
     switch (event.type)
     {
       case Expose:
@@ -791,6 +791,11 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
 {
   try
   {
+      //Проверка что приложение уже запущено, в противном случае возможна ситуация, что очередь событий будет удалена раньше окна, и при удалении окна произойдет креш, поскольку окно пошлет событие в удаленную очередь
+
+    if (!MessageQueueSingleton::IsInitialized ())
+      throw xtl::format_operation_exception ("", "Can't create window before application start (Message queue singleton is not initialized)");
+
       //определение стиля окна
       
     switch (style)
@@ -958,6 +963,9 @@ void XlibWindowManager::DestroyWindow (window_t handle)
 
 const void* XlibWindowManager::GetNativeWindowHandle (window_t handle)
 {
+  if (!handle)
+    return 0;
+
   return reinterpret_cast<const void*> (handle->window);
 }
 
@@ -1037,9 +1045,12 @@ void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
     changes.y      = (int)rect.top;
     changes.width  = rect.right - rect.left;
     changes.height = rect.bottom - rect.top;
-    
+
     if (!XConfigureWindow (handle->display, handle->window, CWX | CWY | CWWidth | CWHeight, &changes))
       throw xtl::format_operation_exception ("", "XConfigureWindow failed");
+
+    if (!XSync (handle->display, false))
+      throw xtl::format_operation_exception ("", "XConfigureWindow->XSync failed");
   }  
   catch (xtl::exception& e)
   {
