@@ -291,9 +291,11 @@ bool FreetypeFontDesc::CanCreateFont (unsigned int index, const FontCreationPara
     throw xtl::make_range_exception ("media::freetype::FreetypeFontDesc::CanCreateFont", "index", index, 0u, impl->faces.size ());
 
   if (!impl->faces [index]->GetNearestFontSize (params.font_size, params.font_size_eps))
+  {
     return false;
+  }
 
-  if (params.weight != FontWeight_Normal)  //not implemented
+  if (params.weight != FontWeight_Normal && params.weight != FontWeight_DontCare)  //not implemented
     return false;
 
   if (params.escapement)  //not implemented
