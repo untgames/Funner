@@ -825,11 +825,38 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     if (parent_handle) parent_window = (XWindow)parent_handle;
     else               parent_window = DefaultRootWindow (impl->display);
     
-    impl->window = XCreateSimpleWindow (impl->display, parent_window, DEFAULT_WINDOW_X, DEFAULT_WINDOW_Y,
-      DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 0, blackColor, blackColor);
+    common::PropertyMap init_params = common::parse_init_string (init_string);
+
+    int          window_x      = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
+                 window_y      = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
+    unsigned int window_width  = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
+                 window_height = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
+
+    impl->window = XCreateSimpleWindow (impl->display, parent_window, window_x, window_y,
+      window_width, window_height, 0, blackColor, blackColor);
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
+
+    //we should set size and position hints. Without this window manager may ignore params passed to XCreateSimpleWindow (Tested on Ubuntu 16.04)
+    XSizeHints size_hints = {0};
+
+    size_hints.flags  = PPosition | PSize;
+    size_hints.x      = window_x;
+    size_hints.y      = window_y;
+    size_hints.width  = window_width;
+    size_hints.height = window_height;
+
+    XSetWMNormalHints(impl->display, impl->window, &size_hints);
+
+    if (init_params.IsPresent ("fullscreen") && init_params.GetInteger ("fullscreen"))
+    {
+      //do fullscreen on window creation step, because it provides better fps comparing to changing this after window was shown
+      Atom fullscreen_atom = XInternAtom (impl->display, "_NET_WM_STATE_FULLSCREEN", True),
+           state_atom      = XInternAtom (impl->display, "_NET_WM_STATE", True);
+
+      XChangeProperty (impl->display, impl->window, state_atom, XA_ATOM, 32, PropModeReplace, (unsigned char*)&fullscreen_atom, 1);
+    }
       
     try
     {      

@@ -19,7 +19,7 @@ int main (int argc, const char* argv [], const char* env [])
   
   if (!library)
   {
-    printf ("Can't load engine library\n");
+    printf ("Can't load engine library, error '%s'\n", dlerror ());
     return 1;
   }
     
