@@ -447,6 +447,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   WindowMessageHandler message_handler;       //функция обработки сообщений окна
   void*                user_data;             //пользовательские данные для функции обратного вызова
   bool                 is_multitouch_enabled; //включен ли multi touch
+  bool                 is_fullscreen;         //находится ли окно в fullscreen режиме
   Atom                 wm_delete;             //атом свойства WM_DELETE_WINDOW
   
 ///Конструктор
@@ -463,6 +464,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     , message_handler (in_message_handler)
     , user_data (in_user_data)
     , is_multitouch_enabled (false)
+    , is_fullscreen (false)
     , wm_delete (0)
   {
     message_queue.RegisterHandler (*this);
@@ -849,7 +851,9 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
 
     XSetWMNormalHints(impl->display, impl->window, &size_hints);
 
-    if (init_params.IsPresent ("fullscreen") && init_params.GetInteger ("fullscreen"))
+    impl->is_fullscreen = init_params.IsPresent ("fullscreen") && init_params.GetInteger ("fullscreen");
+
+    if (impl->is_fullscreen)
     {
       //do fullscreen on window creation step, because it provides better fps comparing to changing this after window was shown
       Atom fullscreen_atom = XInternAtom (impl->display, "_NET_WM_STATE_FULLSCREEN", True),
@@ -1062,6 +1066,9 @@ void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
+    if (handle->is_fullscreen)
+      return;
+
     DisplayLock lock (handle->display);      
     
     XWindowChanges changes;
