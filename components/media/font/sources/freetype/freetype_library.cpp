@@ -56,7 +56,7 @@ struct FreetypeLibrary::Impl : public common::Lockable, public xtl::reference_co
     {
       FT_Error result = FT_Done_FreeType (library);
 
-      if (!result)
+      if (result)
         common::Log (LOG_NAME).Printf ("Can't destroy freetype library, error '%s'", get_free_type_error_name (result));
     }
   }
