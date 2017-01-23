@@ -55,9 +55,9 @@ void on_application_initialized ()
 
   window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
 
-  window.Close ();
-
   printf ("window pointer: %s\n", window_ptr ? "non null" : "null");
+
+  window.Close ();
 }
 
 int main ()
