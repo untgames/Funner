@@ -188,11 +188,11 @@ inline bool weak_ptr<T>::operator > (const weak_ptr<T1>& p) const
 template <class T> template <class T1>
 inline bool weak_ptr<T>::operator <= (const weak_ptr<T1>& p) const
 {
-  return (!p < *this);
+  return !(p < *this);
 }
 
 template <class T> template <class T1>
 inline bool weak_ptr<T>::operator >= (const weak_ptr<T1>& p) const
 {
-  return (!*this < p);
+  return !(*this < p);
 }
