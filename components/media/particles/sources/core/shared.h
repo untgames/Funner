@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_PARTICLES_SHARED_HEADER
 #define MEDIALIB_PARTICLES_SHARED_HEADER
 
+#include <stdint.h>
+
 #include <stl/hash_map>
 #include <stl/map>
 #include <stl/string>

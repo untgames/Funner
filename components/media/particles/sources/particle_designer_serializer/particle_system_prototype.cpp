@@ -56,7 +56,7 @@ struct ParticleSystemPrototype::Impl
       scene.SetOffset (math::vec3f ((*iter)->offset.x, (*iter)->offset.y, 0));
       scene.SetMaterialName (material_name.c_str ());
       scene.SetAnimationFramesPerSecond (animation_fps);
-      scene.SetAnimationFramesCount (animation_frames.size ());
+      scene.SetAnimationFramesCount ((unsigned int)animation_frames.size ());
 
       if (!animation_frames.empty ())
         memcpy (scene.AnimationFrames (), &animation_frames [0], animation_frames.size () * sizeof (ParticleTexDescArray::value_type));

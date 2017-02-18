@@ -126,7 +126,7 @@ void ParticleScene::SetMaterialName (const char* name)
 
 unsigned int ParticleScene::AnimationFramesCount () const
 {
-  return impl->animation_frames.size ();
+  return (unsigned int)impl->animation_frames.size ();
 }
 
 void ParticleScene::SetAnimationFramesCount (unsigned int count)
@@ -378,7 +378,7 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
 
     float        dt                     = (time - impl->prev_time).cast<float> (),
                  animation_fps          = impl->animation_fps;
-    unsigned int animation_frames_count = impl->animation_frames.size ();
+    unsigned int animation_frames_count = (unsigned int)impl->animation_frames.size ();
 
     for (ParticleList::Iterator it=impl->particles.CreateIterator (); it;)
     {

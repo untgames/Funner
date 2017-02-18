@@ -249,13 +249,13 @@ struct ParticleProcessor::Impl
 
       AddParticles (particles, emit_count, random_generator);
 
-      emit_counter -= emission_interval * emit_count;
+      emit_counter -= (size_t)(emission_interval * emit_count);
     }
 
     //process particles
     if (emitter_mode == EmitterMode_Gravity)
     {
-      float               y_coord_flipped = emitter_data->y_coord_flipped;
+      float               y_coord_flipped = (float)emitter_data->y_coord_flipped;
       GravityEmitterData& gravity_data    = *(GravityEmitterData*)emitter_data.get ();
 
       for (ParticleList::Iterator iter = particles.CreateIterator (); iter; ++iter)
