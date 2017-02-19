@@ -17,6 +17,7 @@
 #include <sg/line.h>
 #include <sg/mesh.h>
 #include <sg/page_curl.h>
+#include <sg/particle_emitter.h>
 #include <sg/scissor.h>
 #include <sg/sprite.h>
 #include <sg/text.h>
@@ -55,6 +56,7 @@ Node* create_node (scene_graph::PageCurl&, SceneManager& scene_manager);
 Node* create_node (scene_graph::SpriteModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::LineModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::TextModel&, SceneManager& scene_manager);
+Node* create_node (scene_graph::ParticleEmitter&, SceneManager& scene_manager);
 
 }
 

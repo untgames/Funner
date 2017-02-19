@@ -17,6 +17,7 @@
 #include <common/time.h>
 
 #include <media/font_library.h>
+#include <media/particles/particle_system_library.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>
@@ -26,6 +27,7 @@
 #include <sg/line.h>
 #include <sg/mesh.h>
 #include <sg/page_curl.h>
+#include <sg/particle_emitter.h>
 #include <sg/scissor.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>

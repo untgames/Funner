@@ -8,7 +8,7 @@ int main ()
   
   ParticleEmitter::Pointer particle_emitter (ParticleEmitter::Create ("particle_system1", particles_parent));
 
-  printf ("Declaration = '%s'\n", particle_emitter->DeclarationName ());
+  printf ("Particle system id = '%s'\n", particle_emitter->ParticleSystemId ());
   printf ("Particles parent exist = %s\n", particle_emitter->ParticlesParent ().get () ? "true" : "false");
 
   particles_parent = 0;

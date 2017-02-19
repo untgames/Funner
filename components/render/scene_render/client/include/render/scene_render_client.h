@@ -14,6 +14,13 @@ namespace media
 class Image;
 class FontLibrary;
 
+namespace particles
+{
+
+class ParticleSystemLibrary;
+
+}
+
 }
 
 namespace render
@@ -126,6 +133,13 @@ class Client
     void AttachFontLibrary      (const media::FontLibrary&);
     void DetachFontLibrary      (const media::FontLibrary&);
     void DetachAllFontLibraries ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединение библиотеки систем частиц
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachParticleSystemLibrary      (const media::particles::ParticleSystemLibrary&);
+    void DetachParticleSystemLibrary      (const media::particles::ParticleSystemLibrary&);
+    void DetachAllParticleSystemLibraries ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ожидание незавершенных операций

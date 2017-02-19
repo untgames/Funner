@@ -3,21 +3,18 @@
 using namespace scene_graph;
 
 /*
-    Описание реализации ParticleEmitter
+    ParticleEmitter implementation
 */
 
 struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 {
-  stl::string          declaration_name;                     //имя системы частиц
-  Node*                particles_parent;                     //узел, в системе координат которого генерируются частицы
-  xtl::auto_connection particles_parent_destroy_connection;  //соединение обработки удаления базового узла
+  stl::string          particle_system_id;                   //particle system identifier (as loaded in media::ParticleSystemLibrary)
+  Node*                particles_parent;                     //particles are emitted in coordinate space of this node
+  xtl::auto_connection particles_parent_destroy_connection;  //particles parent node's destroy connection
 
-  Impl (const char* in_declaration_name, Node::Pointer in_particles_parent)
-    : declaration_name (in_declaration_name), particles_parent (in_particles_parent.get ())
+  Impl (const char* in_particle_system_id, Node* in_particles_parent)
+    : particle_system_id (in_particle_system_id), particles_parent (in_particles_parent)
   {
-    if (!particles_parent)
-      throw xtl::make_null_argument_exception ("scene_graph::ParticleEmitter::ParticleEmitter", "particles_parent");
-
     particles_parent_destroy_connection = particles_parent->RegisterEventHandler (NodeEvent_BeforeDestroy, xtl::bind (&ParticleEmitter::Impl::OnBaseNodeDestroy, this));
   }
 
@@ -28,11 +25,11 @@ struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 };
 
 /*
-    Конструктор / деструктор
+    Constructor / destructor
 */
 
-ParticleEmitter::ParticleEmitter (const char* declaration_name, Node::Pointer particles_parent)
-  : impl (new Impl (declaration_name, particles_parent))
+ParticleEmitter::ParticleEmitter (const char* particle_system_id, Node::Pointer particles_parent)
+  : impl (new Impl (particle_system_id, particles_parent ? particles_parent.get () : this))
   {}
 
 ParticleEmitter::~ParticleEmitter ()
@@ -41,25 +38,25 @@ ParticleEmitter::~ParticleEmitter ()
 }
 
 /*
-    Создание эмиттера
+    Emitter creation
 */
 
-ParticleEmitter::Pointer ParticleEmitter::Create (const char* declaration_name, Node::Pointer particles_parent)
+ParticleEmitter::Pointer ParticleEmitter::Create (const char* particle_system_id, Node::Pointer particles_parent)
 {
-  return Pointer (new ParticleEmitter (declaration_name, particles_parent), false);
+  return Pointer (new ParticleEmitter (particle_system_id, particles_parent), false);
 }
 
 /*
-   Имя системы частиц
+   Particle system identifier (as loaded in media::ParticleSystemLibrary)
 */
 
-const char* ParticleEmitter::DeclarationName () const
+const char* ParticleEmitter::ParticleSystemId () const
 {
-  return impl->declaration_name.c_str ();
+  return impl->particle_system_id.c_str ();
 }
 
 /*
-   Узел, в системе координат которого генерируются частицы
+   Particles are emitted in coordinate space of this node
 */
 
 Node::Pointer ParticleEmitter::ParticlesParent () const
@@ -68,7 +65,7 @@ Node::Pointer ParticleEmitter::ParticlesParent () const
 }
 
 /*
-    Метод, вызываемый при посещении объекта
+    Method which is called when this node is visited
 */
 
 void ParticleEmitter::AcceptCore (Visitor& visitor)
