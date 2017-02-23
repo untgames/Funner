@@ -130,6 +130,10 @@ int main ()
 
     camera->BindToScene (test.scene);
 
+    scene_graph::DirectLight::Pointer light = scene_graph::DirectLight::Create ();
+
+    light->BindToParent (*camera);
+
       //настройка области вывода
 
     scene_graph::Viewport vp;

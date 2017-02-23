@@ -126,6 +126,10 @@ int main ()
     
     camera->BindToScene (scene);
     
+    scene_graph::DirectLight::Pointer light = scene_graph::DirectLight::Create ();
+
+    light->BindToParent (*camera);
+
     scene_graph::ParticleEmitter::Pointer emitter = scene_graph::ParticleEmitter::Create ("smoke");
     
     emitter->SetScale (math::vec3f (10.0f));
