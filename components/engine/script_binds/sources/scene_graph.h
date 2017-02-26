@@ -14,6 +14,7 @@
 #include <sg/mesh.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
+#include <sg/particle_emitter.h>
 #include <sg/scene.h>
 #include <sg/scissor.h>
 #include <sg/sound_emitter.h>
@@ -119,6 +120,7 @@ extern const char* SCENE_TEXT_MODEL_LIBRARY;
 extern const char* SCENE_TEXT_LINE_LIBRARY;
 extern const char* SCENE_STATIC_MESH_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
+extern const char* SCENE_PARTICLE_EMITTER_LIBRARY;
 
 /*
     Функции биндинга библиотек
@@ -149,6 +151,7 @@ void bind_line_library                            (script::Environment&);
 void bind_text_model_library                      (script::Environment&);
 void bind_text_line_library                       (script::Environment&);
 void bind_static_mesh_library                     (script::Environment&);
+void bind_particle_emitter_library                (script::Environment&);
 void bind_height_map_library                      (script::Environment&);
 void bind_controller_water_library                (script::Environment&);
 void bind_controller_water_library                (script::Environment&);

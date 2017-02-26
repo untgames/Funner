@@ -13,8 +13,13 @@ struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
   xtl::auto_connection particles_parent_destroy_connection;  //particles parent node's destroy connection
 
   Impl (const char* in_particle_system_id, Node* in_particles_parent)
-    : particle_system_id (in_particle_system_id), particles_parent (in_particles_parent)
+    : particles_parent (in_particles_parent)
   {
+    if (!in_particle_system_id)
+      throw xtl::make_null_argument_exception ("scene_graph::ParticleEmitter::Impl::Impl", "particle_system_id");
+
+    particle_system_id = in_particle_system_id;
+
     particles_parent_destroy_connection = particles_parent->RegisterEventHandler (NodeEvent_BeforeDestroy, xtl::bind (&ParticleEmitter::Impl::OnBaseNodeDestroy, this));
   }
 

@@ -50,6 +50,7 @@ const char* SCENE_TEXT_MODEL_LIBRARY                      = "Scene.TextModel";
 const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
 const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
+const char* SCENE_PARTICLE_EMITTER_LIBRARY                = "Scene.ParticleEmitter";
 const char* BINDER_NAME                                   = "SceneGraph";
 const char* COMPONENT_NAME                                = "script.binds.SceneGraph";
 
@@ -94,6 +95,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_text_model_library                      (environment);
   bind_text_line_library                       (environment);
   bind_static_mesh_library                     (environment);
+  bind_particle_emitter_library                (environment);
   bind_height_map_library                      (environment);
   bind_controller_water_library                (environment);
   bind_controller_move_to_node_point_library   (environment);
