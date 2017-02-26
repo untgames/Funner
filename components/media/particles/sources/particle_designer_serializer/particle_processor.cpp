@@ -322,10 +322,10 @@ struct ParticleProcessor::Impl
       particle.color_speed.w = (clamp (emitter_data->finish_color.w + emitter_data->finish_color_variance.w * random_generator.Generate (), 0.f, 1.f) - particle.color.w) / particle.lifetime;
       particle.size          = stl::max (emitter_data->start_size + emitter_data->start_size_variance * random_generator.Generate (), 0.f);
 
-      if (emitter_data->finish_size != START_SIZE_EQUAL_TO_END_SIZE)
-      {
+      if (emitter_data->finish_size == START_SIZE_EQUAL_TO_END_SIZE)
+        particle.size_speed = math::vec2f ();
+      else
         particle.size_speed = (stl::max (0.f, emitter_data->finish_size + emitter_data->finish_size_variance * random_generator.Generate ()) - particle.size.x) / particle.lifetime;
-      }
 
       particle.rotation       = math::degree (emitter_data->start_rotation + emitter_data->start_rotation_variance * random_generator.Generate ());
       particle.rotation_speed = (math::degree (emitter_data->finish_rotation + emitter_data->finish_rotation_variance * random_generator.Generate ()) - particle.rotation) / particle.lifetime;
@@ -339,7 +339,7 @@ struct ParticleProcessor::Impl
 
         math::anglef a = math::degree(emitter_data->start_angle + emitter_data->start_angle_variance * random_generator.Generate ());
 
-        particle.position_speed = math::vec2f (cos (a), sin (a), 0) * (gravity_data.speed + gravity_data.speed_variance * random_generator.Generate ());
+        particle.position_speed = math::vec3f (cos (a), sin (a), 0) * (gravity_data.speed + gravity_data.speed_variance * random_generator.Generate ());
 
         if (gravity_data.rotation_is_dir)
           particle.rotation = -a; //TODO check if this is correct WHY -a and not a here????
@@ -354,6 +354,8 @@ struct ParticleProcessor::Impl
         particle.position.x         = math::cos (particle.radius.angle) * particle.radius.radius;
         particle.position.y         = math::sin (particle.radius.angle) * particle.radius.radius * emitter_data->y_coord_flipped;
 
+        particle.position_speed = math::vec3f ();
+
         if (radius_data.finish_radius == START_RADIUS_EQUAL_TO_END_RADIUS)
           particle.radius.radius_speed = 0.0f;
         else
@@ -365,7 +367,13 @@ struct ParticleProcessor::Impl
   //Particle initializer
   void InitParticle (void* particle_data)
   {
-    //do nothing
+    ParticleData& particle = *static_cast<ParticleData*> (particle_data);
+
+    particle.position.z             = 0.f;
+    particle.position_acceleration  = math::vec3f ();
+    particle.creation_time          = TimeValue (0, -1);
+    particle.animation_frame        = 0;
+    particle.animation_frame_offset = 0;
   }
 };
 

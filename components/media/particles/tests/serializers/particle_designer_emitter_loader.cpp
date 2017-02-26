@@ -4,7 +4,26 @@ const char* LIBRARY_NAMES [] = { "data/particle_designer/fire big.plist", "data/
 
 void print_log (const char* log, const char* message)
 {
-  printf ("%s: %s\n", log, message);
+  stl::string filtered_message;
+
+  filtered_message.reserve (xtl::xstrlen (message));
+
+  common::StringArray message_lines = common::split (message, "\n", "");
+
+  for (size_t i = 0, count = message_lines.Size (); i < count; i++)
+  {
+    const char* line = message_lines [i];
+
+    if (i)
+      filtered_message += "\n";
+
+    if (common::wcmatch (line, "*common::*::FileOpen*"))
+      filtered_message += "    at common::FILE_SYSTEM::FileOpen";
+    else
+      filtered_message += line;
+  }
+
+  printf ("%s: %s\n", log, filtered_message.c_str ());
 }
 
 int main ()
@@ -64,7 +83,7 @@ int main ()
           {
             bound_volumes::aaboxf box = system.Scene (j).BoundBox ();
 
-            printf ("  scene %d aabb(%.2f): [%.3f; %.3f; %.3f] - [%.3f; %.3f; %.3f]\n", j, tv.cast<float> (), box.minimum ().x, box.minimum ().y, box.minimum ().z,
+            printf ("  scene %zu aabb(%.2f): [%.3f; %.3f; %.3f] - [%.3f; %.3f; %.3f]\n", j, tv.cast<float> (), box.minimum ().x, box.minimum ().y, box.minimum ().z,
                     box.maximum ().x, box.maximum ().y, box.maximum ().z);
           }
         }
