@@ -30,7 +30,9 @@ Scene 0 name is ''
     Frame 1 offset = [0.200; 0.100] size = [0.300; 0.200]
 simulation:
   scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-exception: bad rational
+  scene 0 aabb(1.00): [35.821; 143.391; 0.000] - [1137.345; 224.282; 0.000]
+  scene 0 aabb(2.00): [203.450; 144.305; 0.000] - [1100.556; 212.937; 0.000]
+  scene 0 aabb(3.00): [12.171; 143.511; 0.000] - [1130.546; 224.163; 0.000]
 
 Testing library 'data/particle_designer/fireBall_keno_all-scene.plist':
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/light_sparks.plist(2): error: There is no support of DTD in this version of parser
@@ -76,42 +78,42 @@ media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fire
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(2): error: syntax error. Unexpected '>'. Tag not opened
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(5): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(20): error: node 'dict': File 'data/particle_designer/fire.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(35): error: node 'dict': File 'data/particle_designer/fire.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(50): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(65): error: node 'dict': File 'data/particle_designer/fire.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(80): error: node 'dict': File 'data/particle_designer/sparks.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(230): error: node 'dict': File 'data/particle_designer/fire.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
 media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/fireBall_keno_all-scene.plist(329): error: node 'dict': File 'data/particle_designer/fire.plist' not found
-    at common::StdioFileSystem::FileOpen
+    at common::FILE_SYSTEM::FileOpen
     at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
@@ -216,7 +218,7 @@ simulation:
   scene 13 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 14 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 15 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(1.00): [49.483; -98.505; 0.000] - [171.965; -98.505; 0.000]
+  scene 0 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 1 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 2 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 3 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
@@ -232,7 +234,7 @@ simulation:
   scene 13 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 14 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 15 aabb(1.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(2.00): [0.000; -146.368; 0.000] - [372.939; 0.000; 0.000]
+  scene 0 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 1 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 2 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 3 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
@@ -291,18 +293,18 @@ simulation:
   scene 1 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 2 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 3 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(1.00): [-97.520; 17.934; 0.000] - [45.339; 107.897; 0.000]
-  scene 1 aabb(1.00): [-92.135; 13.075; 0.000] - [46.875; 110.281; 0.000]
-  scene 2 aabb(1.00): [-81.742; 9.534; 0.000] - [46.714; 115.568; 0.000]
-  scene 3 aabb(1.00): [-84.796; 3.433; 0.000] - [48.247; 108.655; 0.000]
-  scene 0 aabb(2.00): [-223.802; -56.437; 0.000] - [44.539; 205.962; 0.000]
-  scene 1 aabb(2.00): [-220.697; -43.191; 0.000] - [44.772; 227.995; 0.000]
-  scene 2 aabb(2.00): [-228.075; -31.374; 0.000] - [37.664; 210.791; 0.000]
-  scene 3 aabb(2.00): [-229.231; -50.988; 0.000] - [46.397; 209.631; 0.000]
-  scene 0 aabb(3.00): [-228.142; -17.184; 0.000] - [37.927; 199.293; 0.000]
-  scene 1 aabb(3.00): [-64.684; 13.400; 0.000] - [25.158; 90.649; 0.000]
-  scene 2 aabb(3.00): [-81.685; 29.510; 0.000] - [43.228; 98.894; 0.000]
-  scene 3 aabb(3.00): [-23.764; 37.884; 0.000] - [18.697; 92.276; 0.000]
+  scene 0 aabb(1.00): [-96.563; 11.158; 0.000] - [48.413; 108.289; 0.000]
+  scene 1 aabb(1.00): [-97.071; 12.728; 0.000] - [45.159; 110.391; 0.000]
+  scene 2 aabb(1.00): [-97.231; 7.591; 0.000] - [47.080; 110.704; 0.000]
+  scene 3 aabb(1.00): [-95.921; 6.830; 0.000] - [41.483; 107.010; 0.000]
+  scene 0 aabb(2.00): [-222.122; -30.001; 0.000] - [48.484; 194.606; 0.000]
+  scene 1 aabb(2.00): [-230.276; -49.958; 0.000] - [36.144; 231.391; 0.000]
+  scene 2 aabb(2.00): [-228.585; -50.148; 0.000] - [46.374; 220.001; 0.000]
+  scene 3 aabb(2.00): [-238.587; -34.915; 0.000] - [30.749; 218.923; 0.000]
+  scene 0 aabb(3.00): [-212.628; -31.862; 0.000] - [44.682; 186.723; 0.000]
+  scene 1 aabb(3.00): [-67.815; 18.930; 0.000] - [31.944; 103.307; 0.000]
+  scene 2 aabb(3.00): [-94.759; 9.438; 0.000] - [45.641; 95.715; 0.000]
+  scene 3 aabb(3.00): [-47.019; 5.531; 0.000] - [41.678; 90.277; 0.000]
 Testing system 'light_Drago':
 Scenes count 1:
 Scene 0 name is 'Emitter'
@@ -312,9 +314,9 @@ Scene 0 name is 'Emitter'
   Animation frames count 0:
 simulation:
   scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(1.00): [-39.939; -39.913; 0.000] - [39.983; 40.000; 0.000]
-  scene 0 aabb(2.00): [-39.972; -39.682; 0.000] - [39.945; 39.818; 0.000]
-  scene 0 aabb(3.00): [-39.998; -39.955; 0.000] - [39.992; 39.997; 0.000]
+  scene 0 aabb(1.00): [-39.999; -39.989; 0.000] - [39.998; 39.999; 0.000]
+  scene 0 aabb(2.00): [-39.990; -39.980; 0.000] - [39.634; 39.835; 0.000]
+  scene 0 aabb(3.00): [-39.979; -40.000; 0.000] - [40.000; 40.000; 0.000]
 Testing system 'fire_Вrago':
 Scenes count 1:
 Scene 0 name is 'Emitter'
@@ -324,7 +326,7 @@ Scene 0 name is 'Emitter'
   Animation frames count 0:
 simulation:
   scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(1.00): [2801.041; 547.988; 0.000] - [3153.718; 977.300; 0.000]
+  scene 0 aabb(1.00): [2782.991; 556.712; 0.000] - [3157.869; 991.342; 0.000]
   scene 0 aabb(2.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
   scene 0 aabb(3.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
 Testing system 'light_ball&sell':
@@ -336,6 +338,6 @@ Scene 0 name is 'Emitter'
   Animation frames count 0:
 simulation:
   scene 0 aabb(0.00): [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
-  scene 0 aabb(1.00): [-14.994; -14.855; 0.000] - [14.994; 15.000; 0.000]
-  scene 0 aabb(2.00): [-29.989; -29.709; 0.000] - [29.988; 29.999; 0.000]
-  scene 0 aabb(3.00): [-44.983; -44.564; 0.000] - [44.983; 44.999; 0.000]
+  scene 0 aabb(1.00): [-14.989; -14.992; 0.000] - [14.999; 14.999; 0.000]
+  scene 0 aabb(2.00): [-29.977; -29.984; 0.000] - [29.997; 29.999; 0.000]
+  scene 0 aabb(3.00): [-44.966; -44.976; 0.000] - [44.996; 44.998; 0.000]
