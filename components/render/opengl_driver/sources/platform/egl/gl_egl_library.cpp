@@ -8,6 +8,16 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+#if defined (LINUX)
+const char* OPENGL_LIB_PATH = "libGLESv2.so"; //OpenGL library file name (as found in Mesa 11.2.0)
+#elif defined (ANDROID)
+const char* OPENGL_LIB_PATH = "libGLESv1_CM.so"; //OpenGL library file name
+#endif
+
+/*
     Список стандартных точек входа
 */
 
@@ -313,7 +323,7 @@ DefaultEntry default_entries [] = {
 
 const size_t DEFAULT_ENTRIES_COUNT = sizeof (default_entries) / sizeof (*default_entries);
 
-#ifdef ANDROID
+#if defined (ANDROID) || defined (LINUX)
 
 ///Dynamic library wrapper for Android
 class DynamicLibrary
@@ -350,7 +360,7 @@ class GlesLibrary
 {
   public:
     GlesLibrary ()
-      : library ("libGLESv1_CM.so")
+      : library (OPENGL_LIB_PATH)
     {
     }
     
@@ -428,7 +438,7 @@ Library::~Library ()
     Получение адреса точки входа
 */
 
-void* Library::GetProcAddress (const char* name, size_t search_flags)
+void* Library::GetProcAddress (const char* name, unsigned int search_flags)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::egl::Library::GetProcAddress";
   

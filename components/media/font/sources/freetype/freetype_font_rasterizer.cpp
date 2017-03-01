@@ -125,7 +125,8 @@ void FreetypeFontRasterizer::BuildImage (unsigned int image_index, media::Image&
 
     if (out_image.Format () != impl->image_format && impl->image_format != media::PixelFormat_Default)
     {
-      common::Log (LOG_NAME).Printf ("Requested pixel format '%s' requires image convertation from '%s'", impl->image_format, out_image.Format ());
+      common::Log (LOG_NAME).Printf ("Requested pixel format '%s' requires image convertation from '%s'",
+    		                         get_format_name (impl->image_format), get_format_name (out_image.Format ()));
       out_image.Convert (impl->image_format);
     }
   }

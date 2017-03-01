@@ -287,7 +287,7 @@ class DisplayManagerImpl
         log.Printf ("...starting X11 events processing thread");
 
         events_thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&DisplayManagerImpl::EventsThreadRoutine, this)));
-        
+
         return display;
       }
       catch (xtl::exception& e)
@@ -324,13 +324,6 @@ class DisplayManagerImpl
         display_connection_fd = ConnectionNumber (display);
       }
       
-        //настройка тайм-аута
-      
-      timeval timeout;
-      
-      timeout.tv_usec = 0;
-      timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
-
         //цикл обработки событий
         
       XEvent event;
@@ -343,8 +336,15 @@ class DisplayManagerImpl
         
         FD_ZERO (&in_fds);
         FD_SET  (display_connection_fd, &in_fds);
-        
-        if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))                
+
+          //настройка тайм-аута
+
+        timeval timeout;
+
+        timeout.tv_usec = 0;
+        timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
+
+        if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))
           continue; //событие не пришло
           
           //обработка поступивших событий
@@ -447,6 +447,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   WindowMessageHandler message_handler;       //функция обработки сообщений окна
   void*                user_data;             //пользовательские данные для функции обратного вызова
   bool                 is_multitouch_enabled; //включен ли multi touch
+  bool                 is_fullscreen;         //находится ли окно в fullscreen режиме
   Atom                 wm_delete;             //атом свойства WM_DELETE_WINDOW
   
 ///Конструктор
@@ -463,6 +464,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     , message_handler (in_message_handler)
     , user_data (in_user_data)
     , is_multitouch_enabled (false)
+    , is_fullscreen (false)
     , wm_delete (0)
   {
     message_queue.RegisterHandler (*this);
@@ -536,7 +538,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     WindowEventContext& context = message->context;
     
     GetEventContext (context);
-    
+
     switch (event.type)
     {
       case Expose:
@@ -791,6 +793,11 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
 {
   try
   {
+      //Проверка что приложение уже запущено, в противном случае возможна ситуация, что очередь событий будет удалена раньше окна, и при удалении окна произойдет креш, поскольку окно пошлет событие в удаленную очередь
+
+    if (!MessageQueueSingleton::IsInitialized ())
+      throw xtl::format_operation_exception ("", "Can't create window before application start (Message queue singleton is not initialized)");
+
       //определение стиля окна
       
     switch (style)
@@ -820,11 +827,40 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     if (parent_handle) parent_window = (XWindow)parent_handle;
     else               parent_window = DefaultRootWindow (impl->display);
     
-    impl->window = XCreateSimpleWindow (impl->display, parent_window, DEFAULT_WINDOW_X, DEFAULT_WINDOW_Y,
-      DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 0, blackColor, blackColor);
+    common::PropertyMap init_params = common::parse_init_string (init_string);
+
+    int          window_x      = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
+                 window_y      = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
+    unsigned int window_width  = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
+                 window_height = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
+
+    impl->window = XCreateSimpleWindow (impl->display, parent_window, window_x, window_y,
+      window_width, window_height, 0, blackColor, blackColor);
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
+
+    //we should set size and position hints. Without this window manager may ignore params passed to XCreateSimpleWindow (Tested on Ubuntu 16.04)
+    XSizeHints size_hints = {0};
+
+    size_hints.flags  = PPosition | PSize;
+    size_hints.x      = window_x;
+    size_hints.y      = window_y;
+    size_hints.width  = window_width;
+    size_hints.height = window_height;
+
+    XSetWMNormalHints(impl->display, impl->window, &size_hints);
+
+    impl->is_fullscreen = init_params.IsPresent ("fullscreen") && init_params.GetInteger ("fullscreen");
+
+    if (impl->is_fullscreen)
+    {
+      //do fullscreen on window creation step, because it provides better fps comparing to changing this after window was shown
+      Atom fullscreen_atom = XInternAtom (impl->display, "_NET_WM_STATE_FULLSCREEN", True),
+           state_atom      = XInternAtom (impl->display, "_NET_WM_STATE", True);
+
+      XChangeProperty (impl->display, impl->window, state_atom, XA_ATOM, 32, PropModeReplace, (unsigned char*)&fullscreen_atom, 1);
+    }
       
     try
     {      
@@ -958,6 +994,9 @@ void XlibWindowManager::DestroyWindow (window_t handle)
 
 const void* XlibWindowManager::GetNativeWindowHandle (window_t handle)
 {
+  if (!handle)
+    return 0;
+
   return reinterpret_cast<const void*> (handle->window);
 }
 
@@ -1027,6 +1066,9 @@ void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
+    if (handle->is_fullscreen)
+      return;
+
     DisplayLock lock (handle->display);      
     
     XWindowChanges changes;
@@ -1037,9 +1079,12 @@ void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
     changes.y      = (int)rect.top;
     changes.width  = rect.right - rect.left;
     changes.height = rect.bottom - rect.top;
-    
+
     if (!XConfigureWindow (handle->display, handle->window, CWX | CWY | CWWidth | CWHeight, &changes))
       throw xtl::format_operation_exception ("", "XConfigureWindow failed");
+
+    if (!XSync (handle->display, false))
+      throw xtl::format_operation_exception ("", "XConfigureWindow->XSync failed");
   }  
   catch (xtl::exception& e)
   {

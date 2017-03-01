@@ -29,6 +29,7 @@
 #include <math/utility.h>
 #include <math/vector.h>
 
+#include <media/charset_manager.h>
 #include <media/image.h>
 #include <media/font_library.h>
 

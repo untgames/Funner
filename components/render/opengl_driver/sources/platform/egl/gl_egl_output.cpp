@@ -198,6 +198,19 @@ struct Output::Impl
   {
   }
 
+#elif defined LINUX
+
+///Платформо-зависимая инициализация
+  void PlatformInitialize ()
+  {
+    native_display = (NativeDisplayType)syslib::x11::DisplayManager::DisplayHandle ();
+  }
+
+///Платформо-зависимое освобождение ресурсов
+  void PlatformDone ()
+  {
+  }
+
 #else
   #error Unknown platform!
 #endif  
@@ -295,7 +308,7 @@ EGLDisplay Output::GetEglDisplay ()
 
 const void* Output::GetWindowHandle ()
 {
-  return impl->native_window;
+  return (const void*)impl->native_window;
 }
 
 NativeDisplayType Output::GetDisplay ()

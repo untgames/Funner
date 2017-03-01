@@ -7,6 +7,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/ref.h>
 #include <xtl/signal.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/trackable_ptr.h>
 
 #include <common/action_queue.h>

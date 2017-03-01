@@ -10,6 +10,8 @@ int thread2_run ()
   printf ("thread2 started\n");
   fflush (stdout);
 
+  while (!thread [0]);
+
   thread [0]->Cancel ();  
 
   return 0;

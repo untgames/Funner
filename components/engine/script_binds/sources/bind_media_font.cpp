@@ -20,14 +20,28 @@ namespace media_font_script_bind
 {
 
 /*
-    Константы (имена библиотек)
+    Constants
 */
 
+const char* CHARSET_MANAGER_LIBRARY             = "Media.CharsetManager";
 const char* FONT_LIBRARY_LIBRARY                = "Media.FontLibrary";
 const char* FONT_CREATION_PARAMS_LIBRARY        = "Media.FontCreationParams";
 const char* FONT_CREATION_PARAMS_NATIVE_LIBRARY = "Media.FontCreationParamsNative";
 const char* BINDER_NAME                         = "MediaFont";
 const char* COMPONENT_NAME                      = "script.binds.MediaFont";
+
+///Charset manager library registration
+void bind_charset_manager_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (CHARSET_MANAGER_LIBRARY);
+
+    //operations registration
+
+  lib.Register ("RegisterCharset",       make_invoker (&CharsetManager::RegisterCharset));
+  lib.Register ("UnregisterCharset",     make_invoker (&CharsetManager::UnregisterCharset));
+  lib.Register ("UnregisterAllCharsets", make_invoker (&CharsetManager::UnregisterAllCharsets));
+  lib.Register ("FindCharset",           make_invoker (&CharsetManager::FindCharset));
+}
 
 struct FontCreationParams: public media::FontCreationParams
 {
@@ -90,15 +104,15 @@ void bind_font_creation_params_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (FONT_CREATION_PARAMS_LIBRARY);
 
-    //регистрация функций создания
+    //create function registration
 
   lib.Register ("Create", make_invoker (&FontCreationParams::Create));
 
-    //регистрация операций
+    //operations registration
 
   lib.Register ("Clone",   make_invoker (&FontCreationParams::Clone));
 
-    //регистрация свойств
+    //properties registration
 
   lib.Register ("get_FontSize",      make_invoker (&FontCreationParams::FontSize));
   lib.Register ("set_FontSize",      make_invoker (&FontCreationParams::SetFontSize));
@@ -132,22 +146,22 @@ void bind_font_creation_params_library (Environment& environment)
   environment.RegisterType<media::FontCreationParams> (FONT_CREATION_PARAMS_NATIVE_LIBRARY);
 }
 
-///Функции
+///Functions
 FontLibrary create_font_library ()
 {
   return FontLibrary ();
 }
 
-///Регистрация библиотеки работы с библиотекой шрифтов
+///Fonts library library registration
 void bind_font_library_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (FONT_LIBRARY_LIBRARY);
 
-    //регистрация функций создания
+    //create functions registration
 
   lib.Register ("Create", make_invoker (&create_font_library));
 
-    //регистрация операций
+    //operations registration
 
   lib.Register ("LoadFont",    make_invoker (&FontLibrary::LoadFont));
   lib.Register ("UnloadFont",  make_invoker (&FontLibrary::UnloadFont));
@@ -167,7 +181,7 @@ void bind_font_library_library (Environment& environment)
 }
 
 /*
-    Компонент
+    Component
 */
 
 class Component
@@ -181,6 +195,7 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
+      bind_charset_manager_library (environment);
       bind_font_creation_params_library (environment);
       bind_font_library_library (environment);
     }
