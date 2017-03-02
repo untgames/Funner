@@ -249,7 +249,7 @@ struct ParticleProcessor::Impl
 
       AddParticles (particles, emit_count, random_generator, scene.Offset ());
 
-      emit_counter -= (size_t)(emission_interval * emit_count);
+      emit_counter -= TimeValue (emission_interval * emit_count * emit_counter.denominator(), emit_counter.denominator());
     }
 
     //process particles
@@ -302,8 +302,6 @@ struct ParticleProcessor::Impl
   //Add new particles
   void AddParticles (ParticleList& list, int count, const RandomGenerator& random_generator, const math::vec3f& offset)
   {
-    printf ("ADD PARTICLES %d\n", count);
-
     GravityEmitterData& gravity_data = *(GravityEmitterData*)emitter_data.get ();
     RadiusEmitterData&  radius_data  = *(RadiusEmitterData*)emitter_data.get ();
 
