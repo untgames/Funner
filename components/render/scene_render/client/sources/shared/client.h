@@ -18,6 +18,7 @@ namespace client
 
 class FontManager;
 class MaterialManager;
+class ParticleSystemManager;
 class SceneManager;
 
 typedef interchange::PropertyMapAutoWriter::Synchronizer PropertyMapSynchronizer;
@@ -99,9 +100,10 @@ class ClientImpl: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    client::SceneManager&    SceneManager    ();
-    client::MaterialManager& MaterialManager ();
-    client::FontManager&     FontManager     ();
+    client::SceneManager&          SceneManager          ();
+    client::MaterialManager&       MaterialManager       ();
+    client::FontManager&           FontManager           ();
+    client::ParticleSystemManager& ParticleSystemManager ();
 
   private:
     struct Impl;

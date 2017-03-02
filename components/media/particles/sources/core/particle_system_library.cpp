@@ -106,7 +106,16 @@ ParticleSystemLibrary& ParticleSystemLibrary::operator = (const ParticleSystemLi
 
   return *this;
 }
-    
+
+/*
+    Identifier
+*/
+
+size_t ParticleSystemLibrary::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
 /*
    Library name
 */

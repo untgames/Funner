@@ -35,24 +35,26 @@ void idle (Test& test)
       printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
       fflush (stdout);
 
-      if (!test.emitter.Scissor())
+/*      if (!test.emitter.Scissor())
       {
         printf ("SET SCISSOR\n");
 
         scene_graph::Scissor::Pointer scissor = scene_graph::Scissor::Create ();
 
-        scissor->SetScale (math::vec3f (1.f));
+        scissor->SetScale (math::vec3f (50.f));
         scissor->SetWorldPosition (math::vec3f (0.f, 2.f, 0.f));
 
         scissor->BindToScene (*test.emitter.Scene (), scene_graph::NodeBindMode_AddRef);
 
         test.emitter.SetScissor (scissor.get ());
-      }
+      }*/
 
       last_fps = common::milliseconds ();
       frames_count = 0;
       return;
     }
+
+    test.emitter.Scale (1.f, 1.f , 1.f);
     
     frames_count++;
     
@@ -74,7 +76,7 @@ int main ()
 
   try
   {
-    common::LogFilter log_filter ("render.*", &log_print);
+//    common::LogFilter log_filter ("render.*", &log_print);
 
     syslib::Window window (syslib::WindowStyle_Overlapped, 400, 400);
 
@@ -100,6 +102,7 @@ int main ()
 
     client.LoadResource ("data/render.rfx");
     client.LoadResource ("data/smoke.png");
+    client.LoadResource ("data/smoke.xmtl");
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
 
@@ -112,15 +115,14 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (-10.0f);
-    camera->SetRight  (10.0f);
-    camera->SetBottom (-10.0f);
-    camera->SetTop    (10.0f);
+    camera->SetLeft   (-100.0f);
+    camera->SetRight  (100.0f);
+    camera->SetBottom (-100.0f);
+    camera->SetTop    (100.0f);
     camera->SetZNear  (0.0f);
-    camera->SetZFar   (1000.0f);    
+    camera->SetZFar   (100.0f);
 
     camera->SetPosition (0, 0.0f, -1.0f);
-//    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
 
     scene_graph::Scene scene;
     
@@ -130,10 +132,11 @@ int main ()
 
     light->BindToParent (*camera);
 
-    scene_graph::ParticleEmitter::Pointer emitter = scene_graph::ParticleEmitter::Create ("smoke");
+    scene_graph::ParticleEmitter::Pointer emitter = scene_graph::ParticleEmitter::Create ("data/smoke.plist");
     
-    emitter->SetScale (math::vec3f (10.0f));
-    emitter->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
+/*    emitter->SetPosition (0, 0, 1);
+    emitter->SetScale (math::vec3f (0.8f));
+    emitter->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);*/
 
     emitter->BindToScene (scene);
     

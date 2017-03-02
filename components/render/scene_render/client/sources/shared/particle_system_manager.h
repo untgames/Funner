@@ -1,0 +1,77 @@
+#ifndef RENDER_SCENE_CLIENT_PARTICLE_SYSTEM_MANAGER_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_PARTICLE_SYSTEM_MANAGER_SHARED_HEADER
+
+#include <stl/auto_ptr.h>
+
+#include <xtl/shared_ptr.h>
+
+namespace media
+{
+
+namespace particles
+{
+
+//forward declarations
+class ParticleSystem;
+class ParticleSystemLibrary;
+
+}
+
+}
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace client
+{
+
+//forward declarations
+struct ParticleSystemRenderingTempCache;
+
+typedef xtl::shared_ptr<ParticleSystemRenderingTempCache> ParticleSystemRenderingTempCachePtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Particle systems manager
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ParticleSystemManager: public xtl::noncopyable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Constructor / destructor
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ParticleSystemManager  ();
+    ~ParticleSystemManager ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Create particle system
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    media::particles::ParticleSystem CreateParticleSystem (const char* particle_system_id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Attach / detach particle system libraries
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachParticleSystemLibrary      (const media::particles::ParticleSystemLibrary&);
+    void DetachParticleSystemLibrary      (const media::particles::ParticleSystemLibrary&);
+    void DetachAllParticleSystemLibraries ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Particle system rendering cache
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                                       SetParticleSystemRenderingTempCache (const ParticleSystemRenderingTempCachePtr&);
+    const ParticleSystemRenderingTempCachePtr& ParticleSystemRenderingTempCache    () const;
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+}
+
+}
+
+}
+
+#endif

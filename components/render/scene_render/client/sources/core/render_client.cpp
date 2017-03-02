@@ -233,7 +233,7 @@ void Client::AttachParticleSystemLibrary (const media::particles::ParticleSystem
 {
   try
   {
-	  //TODO
+    impl->connection->Client ().ParticleSystemManager ().AttachParticleSystemLibrary (library);
   }
   catch (xtl::exception& e)
   {
@@ -246,7 +246,7 @@ void Client::DetachParticleSystemLibrary (const media::particles::ParticleSystem
 {
   try
   {
-	  //TODO
+    impl->connection->Client ().ParticleSystemManager ().DetachParticleSystemLibrary (library);
   }
   catch (xtl::exception& e)
   {
@@ -259,7 +259,7 @@ void Client::DetachAllParticleSystemLibraries ()
 {
   try
   {
-	  //TODO
+    impl->connection->Client ().ParticleSystemManager ().DetachAllParticleSystemLibraries ();
   }
   catch (xtl::exception& e)
   {

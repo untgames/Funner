@@ -10,8 +10,10 @@
 
 #include <common/property_map.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <media/image.h>
+#include <media/particles/particle_system.h>
 
 #include <sg/light.h>
 #include <sg/line.h>
@@ -24,6 +26,7 @@
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
+#include <shared/particle_system_manager.h>
 
 #include "visual_model.h"
 
