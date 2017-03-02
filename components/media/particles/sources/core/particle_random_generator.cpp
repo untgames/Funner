@@ -21,7 +21,7 @@ struct DefaultRandomGenerator
   {
     for (float* value = values; count--; value++)
     {
-      *value = (float)(rand () / double (RAND_MAX));
+      *value = (float)(rand () / double (RAND_MAX) * 2.f - 1.f);
     }
   }
 };

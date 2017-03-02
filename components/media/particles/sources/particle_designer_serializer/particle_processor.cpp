@@ -247,7 +247,7 @@ struct ParticleProcessor::Impl
 
       int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<float> () / emission_interval));
 
-      AddParticles (particles, emit_count, random_generator);
+      AddParticles (particles, emit_count, random_generator, scene.Offset ());
 
       emit_counter -= (size_t)(emission_interval * emit_count);
     }
@@ -265,7 +265,7 @@ struct ParticleProcessor::Impl
         // radial acceleration
         if (particle.position.x || particle.position.y)
         {
-          math::vec2f radial     = math::normalize (math::vec2f (particle.position.x, particle.position.y));
+          math::vec2f radial     = math::normalize (math::vec2f (particle.position.x - scene.Offset ().x, particle.position.y - scene.Offset ().y));
           math::vec2f tangential = math::vec2f (-radial.y * particle.gravity.tangential_acceleration, radial.x * particle.gravity.tangential_acceleration);
 
           radial *= particle.gravity.radial_acceleration;
@@ -293,15 +293,17 @@ struct ParticleProcessor::Impl
         particle.radius.angle  += particle.radius.angle_speed * dt;
         particle.radius.radius += particle.radius.radius_speed * dt;
 
-        particle.position_acceleration.x += 2 * (math::cos (particle.radius.angle) * particle.radius.radius - particle.position.x - particle.position_speed.x * acceleration_dt) / acceleration_dt_square;
-        particle.position_acceleration.y += 2 * (math::sin (particle.radius.angle) * particle.radius.radius - particle.position.y - particle.position_speed.y * acceleration_dt) / acceleration_dt_square;
+        particle.position_acceleration.x += 2 * (math::cos (particle.radius.angle) * particle.radius.radius + scene.Offset ().x - particle.position.x - particle.position_speed.x * acceleration_dt) / acceleration_dt_square;
+        particle.position_acceleration.y += 2 * (math::sin (particle.radius.angle) * particle.radius.radius + scene.Offset ().y - particle.position.y - particle.position_speed.y * acceleration_dt) / acceleration_dt_square;
       }
     }
   }
 
   //Add new particles
-  void AddParticles (ParticleList& list, int count, const RandomGenerator& random_generator)
+  void AddParticles (ParticleList& list, int count, const RandomGenerator& random_generator, const math::vec3f& offset)
   {
+    printf ("ADD PARTICLES %d\n", count);
+
     GravityEmitterData& gravity_data = *(GravityEmitterData*)emitter_data.get ();
     RadiusEmitterData&  radius_data  = *(RadiusEmitterData*)emitter_data.get ();
 
@@ -361,6 +363,8 @@ struct ParticleProcessor::Impl
         else
           particle.radius.radius_speed = (radius_data.finish_radius + radius_data.finish_radius_variance * random_generator.Generate () - particle.radius.radius) / particle.lifetime;
       }
+
+      particle.position += offset;
     }
   }
 
