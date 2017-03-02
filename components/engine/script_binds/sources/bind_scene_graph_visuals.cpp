@@ -384,7 +384,7 @@ void bind_static_mesh_library (Environment& environment)
     Работа с эмиттером частиц
 */
 
-ParticleEmitter::Pointer create_particle_emitter (const char* particle_system_id, Node::Pointer particles_parent)
+ParticleEmitter::Pointer create_particle_emitter (const char* particle_system_id, Node* particles_parent)
 {
   return ParticleEmitter::Create (particle_system_id, particles_parent);
 }

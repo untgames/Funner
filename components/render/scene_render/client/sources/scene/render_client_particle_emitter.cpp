@@ -25,7 +25,7 @@ namespace
    Constants
 */
 
-const char*  DEFAULT_BATCH_NAME             = "";                    //default rendering batch name
+const char*  DEFAULT_BATCH_NAME             = "particles";           //default rendering batch name
 const char*  LOG_NAME                       = "render.scene.client"; //имя потока отладочного протоколирования
 const size_t DEFAULT_RESERVED_SPRITES_COUNT = 64;                    //default reserved sprites count
 
