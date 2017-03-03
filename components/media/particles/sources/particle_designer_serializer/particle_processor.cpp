@@ -255,7 +255,7 @@ struct ParticleProcessor::Impl
 
       AddParticles (particles, emit_count, random_generator, scene.Offset ());
 
-      emit_counter -= TimeValue (emission_interval * emit_count * emit_counter.denominator(), emit_counter.denominator());
+      emit_counter -= TimeValue ((size_t)(emission_interval * emit_count * emit_counter.denominator()), emit_counter.denominator());
     }
 
     //process particles
