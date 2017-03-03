@@ -217,7 +217,13 @@ struct ParticleProcessor::Impl
     }  //other cases is not possible (handled above)
 
     //pre-process data
-    emission_interval = data.lifespan / data.max_particles;
+
+    //calculate average lifespan, this is needed because lifespan may be close to zero with relatively large lifespan_variance
+    float min_lifespan     = stl::max (0.f, data.lifespan - data.lifespan_variance / 2.f),
+          max_lifespan     = data.lifespan + data.lifespan_variance / 2.f,
+          average_lifespan = min_lifespan + (max_lifespan - min_lifespan) / 2.f;
+
+    emission_interval = average_lifespan / data.max_particles;
   }
 
   //Process scene
