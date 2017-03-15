@@ -8,9 +8,10 @@ namespace
 {
 
 //Constants
-const float DURATION_INFINITY                = -1;  //The Particle emitter lives forever.
-const float START_SIZE_EQUAL_TO_END_SIZE     = -1;  //The starting size of the particle is equal to the ending size.
-const float START_RADIUS_EQUAL_TO_END_RADIUS = -1;  //The starting radius of the particle is equal to the ending radius.
+const float EPS                              = 0.001f; //Small number for comparing floats
+const float DURATION_INFINITY                = -1;     //The Particle emitter lives forever.
+const float START_SIZE_EQUAL_TO_END_SIZE     = -1;     //The starting size of the particle is equal to the ending size.
+const float START_RADIUS_EQUAL_TO_END_RADIUS = -1;     //The starting radius of the particle is equal to the ending radius.
 
 
 //supported emitter modes
@@ -268,10 +269,13 @@ struct ParticleProcessor::Impl
       {
         ParticleData& particle = static_cast<ParticleData&> (*iter);
 
+        float particle_position_x = particle.position.x - scene.Offset ().x,
+              particle_position_y = particle.position.y - scene.Offset ().y;
+
         // radial acceleration
-        if (particle.position.x || particle.position.y)
+        if (fabs (particle_position_x) > EPS || fabs (particle_position_y) > EPS)
         {
-          math::vec2f radial     = math::normalize (math::vec2f (particle.position.x - scene.Offset ().x, particle.position.y - scene.Offset ().y));
+          math::vec2f radial     = math::normalize (math::vec2f (particle_position_x, particle_position_y));
           math::vec2f tangential = math::vec2f (-radial.y * particle.gravity.tangential_acceleration, radial.x * particle.gravity.tangential_acceleration);
 
           radial *= particle.gravity.radial_acceleration;
