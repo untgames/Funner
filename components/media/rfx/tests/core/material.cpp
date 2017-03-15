@@ -18,8 +18,9 @@ int main ()
     material.Properties ().SetProperty ("Vector", vec4f (1.0f, 2.0f, 3.0f, 4.0f));
     
     material.SetProgram ("my_effect");
+    material.SetBlendMode ("my_blend_mode");
     material.SetName ("material1");
-    
+
     Texmap texmap;
     
     texmap.SetImage ("image.png");

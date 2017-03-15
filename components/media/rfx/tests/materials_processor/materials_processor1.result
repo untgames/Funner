@@ -49,7 +49,7 @@ Results of materials_processor_test1
       <texmap semantic="diffuse" image="data/textures/canyon_static_world/texture0044.dds"/>
       <texmap semantic="specular" image="data/textures/canyon_static_world/texture0044.dds"/>
     </material>
-    <material id="canyon_static_world.Material__3" name="Material__3" program="blinn">
+    <material id="canyon_static_world.Material__3" name="Material__3" program="blinn" blend_mode="my_blend_mode">
       <property name="Reflectivity" type="float" value="0"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="10"/>

@@ -85,7 +85,7 @@ void dump (const PropertyMap& properties)
 
 void dump (const Material& material)
 {
-  printf ("material (name='%s', program='%s', ", material.Name (), material.Program ());  
+  printf ("material (name='%s', program='%s', blend mode='%s'", material.Name (), material.Program (), material.BlendMode ());
   
   printf (", tags='");
   

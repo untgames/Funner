@@ -3,6 +3,7 @@ material:
   id='material1'
   name='My material'
   program='blinn'
+  blend mode=''
   tags='solid wireframe'
   properties:
     BlendEnable=0
@@ -16,6 +17,7 @@ material:
   id='material2'
   name='My material without layout'
   program='phong'
+  blend mode='my_blend_mode'
   tags='translucent'
   properties:
     BlendEnable=1
@@ -28,6 +30,7 @@ material:
   id='material4'
   name='My material 4'
   program=''
+  blend mode=''
   tags=''
   properties:
     BlendEnable=0
@@ -40,6 +43,7 @@ material:
   id='material3'
   name='My material'
   program='blinn'
+  blend mode=''
   tags='solid wireframe'
   properties:
     BlendEnable=0

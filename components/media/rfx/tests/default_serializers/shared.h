@@ -88,7 +88,8 @@ void dump (const Material& material, const char* id)
     tags += material.Tag (i);
   }  
 
-  printf ("material:\n  id='%s'\n  name='%s'\n  program='%s'\n  tags='%s'\n  properties:\n", id, material.Name (), material.Program (), tags.c_str ());
+  printf ("material:\n  id='%s'\n  name='%s'\n  program='%s'\n  blend mode='%s'\n  tags='%s'\n  properties:\n",
+          id, material.Name (), material.Program (), material.BlendMode (), tags.c_str ());
   
   dump (material.Properties (), "    ");
   

@@ -21,7 +21,7 @@
       <texmap image="test3.tga" sampler="mirror" semantic="diffuse"/>
       <instance_texmap source="texmap1"/>
     </material>
-    <material id="material2" name="My material without layout" program="phong" tags="translucent">
+    <material id="material2" name="My material without layout" program="phong" blend_mode="my_blend_mode" tags="translucent">
       <property name="BlendEnable" type="int" value="1"/>
       <property name="Direction" type="vector" count="2">8 7 6 5 4 3 2 1</property>
       <property name="Effect" type="string" value="my_effect1"/>
