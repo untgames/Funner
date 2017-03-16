@@ -651,6 +651,7 @@ struct RenderTargetContext
   bool          has_scissors;
   Rect          viewport_rects [DEVICE_RENDER_TARGET_SLOTS_COUNT];
   RectAreaImpl* scissors [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+//TODO: current blend mode hash
 
   RenderTargetContext ()
     : targets_count ()
@@ -1159,7 +1160,7 @@ struct RenderOperationsExecutor
 
       //обработка области отсечения объекта
 
-    if (operation_scissor != render_target_context.current_local_scissor)
+    if (operation_scissor != render_target_context.current_local_scissor) //TODO: change state if render_target_context.blend_mode_hash != operation.blend_mode_hash && operation.blend_mode_hash != 0
     {
       bool scissor_state = render_target_context.has_scissors || operation_scissor;
 
@@ -1170,6 +1171,8 @@ struct RenderOperationsExecutor
       
       render_target_context.current_local_scissor = operation_scissor;
     }
+
+//TODO: apply operation.blend_mode_hash if it is not equal to render_target_context.blend_mode_hash
 
       //установка локальных текстур
     

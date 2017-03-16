@@ -100,6 +100,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   DeviceManagerPtr           device_manager;               //менеджер устройства отрисовки
   TextureManagerPtr          texture_manager;              //менеджер текстур
   ProgramManagerPtr          program_manager;              //менеджер программ
+//TODO: EffectManagerPtr
+//TODO: BlendStateProxy custom_blend_state; + attach + chache processing
   stl::string                name;                         //имя материала
   TagHashArray               tags;                         //тэги материала
   ProgramProxy               program;                      //прокси программы
@@ -265,6 +267,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
       mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
       mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
+
+//TODO: update custom blend mode & mask (if there is custom blend mode)
 
         //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
 

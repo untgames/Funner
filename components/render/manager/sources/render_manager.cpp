@@ -215,7 +215,7 @@ MaterialManager& RenderManagerImpl::MaterialManager ()
   try
   {
     if (!impl->materials)
-      impl->materials = MaterialManagerPtr (new render::manager::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
+      impl->materials = MaterialManagerPtr (new render::manager::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false); //TODO &EffectManager()
 
     return *impl->materials;
   }

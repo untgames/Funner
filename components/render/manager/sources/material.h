@@ -7,7 +7,7 @@ class MaterialImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    MaterialImpl  (const DeviceManagerPtr&, const TextureManagerPtr&, const ProgramManagerPtr&, const char* name = "");
+    MaterialImpl  (const DeviceManagerPtr&, const TextureManagerPtr&, const ProgramManagerPtr&, const char* name = ""); //TODO: const EffectManagerPtr&
     MaterialImpl  (const MaterialImpl&);
     ~MaterialImpl ();
 
@@ -16,6 +16,8 @@ class MaterialImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Name    ();
     void        SetName (const char* id);
+
+//TODO: blend mode hash (0 if no custom blend mode)
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блок состояний материала

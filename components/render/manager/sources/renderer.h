@@ -83,6 +83,7 @@ struct RendererOperation
   DynamicPrimitive*               dynamic_primitive;        //динамический примитив, соответствующий операции (может быть 0)
   const BoxAreaImpl*              scissor;                  //область отсечения (может быть null)
   size_t                          batching_hash;            //хэш пакета
+//TODO: blend_mode_hash
 };
 
 inline size_t get_batching_hash (const RendererOperation& op)
