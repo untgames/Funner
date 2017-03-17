@@ -646,17 +646,18 @@ namespace
 ///Контекст целевых буферов рендеринга
 struct RenderTargetContext
 {
-  unsigned int  targets_count;
-  const rectf*  current_local_scissor;
-  bool          has_scissors;
-  Rect          viewport_rects [DEVICE_RENDER_TARGET_SLOTS_COUNT];
-  RectAreaImpl* scissors [DEVICE_RENDER_TARGET_SLOTS_COUNT];
-//TODO: current blend mode hash
+  unsigned int                    targets_count;
+  const rectf*                    current_local_scissor;
+  bool                            has_scissors;
+  Rect                            viewport_rects [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+  RectAreaImpl*                   scissors [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+  render::low_level::IBlendState* current_custom_blend_state;                         //текущий активный режим блендинга, в случае не использования режима блендинга прохода
 
   RenderTargetContext ()
     : targets_count ()
     , current_local_scissor ()
     , has_scissors ()
+    , current_custom_blend_state ()
   {  
   }
 };
@@ -1160,7 +1161,7 @@ struct RenderOperationsExecutor
 
       //обработка области отсечения объекта
 
-    if (operation_scissor != render_target_context.current_local_scissor) //TODO: change state if render_target_context.blend_mode_hash != operation.blend_mode_hash && operation.blend_mode_hash != 0
+    if (operation_scissor != render_target_context.current_local_scissor || (!operation.blend_state && render_target_context.current_custom_blend_state))
     {
       bool scissor_state = render_target_context.has_scissors || operation_scissor;
 
@@ -1170,9 +1171,15 @@ struct RenderOperationsExecutor
         SetScissorRects (render_target_context, operation_scissor);
       
       render_target_context.current_local_scissor = operation_scissor;
+
+      render_target_context.current_custom_blend_state = 0;
     }
 
-//TODO: apply operation.blend_mode_hash if it is not equal to render_target_context.blend_mode_hash
+    if (operation.blend_state != render_target_context.current_custom_blend_state)
+    {
+      device_context.OSSetBlendState (operation.blend_state);
+      render_target_context.current_custom_blend_state = operation.blend_state;
+    }
 
       //установка локальных текстур
     

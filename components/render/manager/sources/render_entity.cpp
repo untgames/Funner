@@ -84,6 +84,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       low_level::IStateBlock*  state_block;
       Program*                 program;
       ProgramParametersLayout* parameters_layout;
+      low_level::IBlendState*  blend_state;
     };
 
     void GetMaterialStateDesc (MaterialImpl* material, MaterialStateDesc& out_desc)
@@ -95,6 +96,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         out_desc.state_block       = 0;
         out_desc.program           = 0;
         out_desc.parameters_layout = 0;
+        out_desc.blend_state       = 0;
 
         return;
       }
@@ -114,6 +116,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         out_desc.state_block       = state.state_block.get ();
         out_desc.program           = state.program.get ();
         out_desc.parameters_layout = state.parameters_layout.get ();
+        out_desc.blend_state       = state.blend_state.get ();
 
         return;
       }
@@ -125,6 +128,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         out_desc.state_block       = 0;
         out_desc.parameters_layout = material->ParametersLayout ().get ();
         out_desc.program           = material->Program ().get ();
+        out_desc.blend_state       = material->BlendState ().get ();
 
         return;
       }
@@ -140,6 +144,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       out_desc.state_block       = state->state_block.get ();
       out_desc.program           = state->program.get ();
       out_desc.parameters_layout = state->parameters_layout.get ();
+      out_desc.blend_state       = state->blend_state.get ();
     }
         
 ///Кэш опций шейдера
@@ -252,6 +257,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       MaterialPtr                   material;
       size_t                        state_block_mask_hash;
       DynamicTextureMaterialStorage dynamic_textures;
+      LowLevelBlendStatePtr         blend_state;
       
       MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
@@ -330,6 +336,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
           if (program && common_data.shader_options_cache.Properties ().Size ())
             program = &program->DerivedProgram (common_data.shader_options_cache);
+
+          blend_state = material->BlendState ();
         }
         catch (xtl::exception& e)
         {
@@ -544,6 +552,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       operation.entity_parameters_layout = material_state.parameters_layout;
       operation.program                  = material_state.program;
       operation.scissor                  = scissor;
+      operation.blend_state              = material_state.blend_state;
       operation.batching_hash            = get_batching_hash (operation);
 
       cached_operations.push_back (operation);
