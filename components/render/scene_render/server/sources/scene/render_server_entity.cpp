@@ -73,7 +73,7 @@ Scene* Entity::SceneOwner () const
 
 void Entity::SetBounds (bool is_infinite, const bound_volumes::aaboxf& box)
 {
-  impl->is_infinite = true;
+  impl->is_infinite = is_infinite;
   impl->bound_box   = box;
 
   OnUpdateBounds ();
