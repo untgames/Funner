@@ -87,6 +87,24 @@ int main ()
                     box.maximum ().x, box.maximum ().y, box.maximum ().z);
           }
         }
+
+        printf ("simulation with spawning disabled:\n");
+
+        tv += 10;
+
+        common::PropertyMap processing_properties;
+
+        processing_properties.SetProperty ("particles.ParticleDesigner.EmitCountMultiplier", 0.f);
+
+        system.Update (tv, &processing_properties);
+
+        for (size_t j = 0, scenes_count = system.ScenesCount (); j < scenes_count; j++)
+        {
+          bound_volumes::aaboxf box = system.Scene (j).BoundBox ();
+
+          printf ("  scene %zu aabb(%.2f): [%.3f; %.3f; %.3f] - [%.3f; %.3f; %.3f]\n", j, tv.cast<float> (), box.minimum ().x, box.minimum ().y, box.minimum ().z,
+                  box.maximum ().x, box.maximum ().y, box.maximum ().z);
+        }
       }
     }
     catch (std::exception& e)

@@ -7,6 +7,7 @@
 #include <xtl/string.h>
 
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
 
 #include <media/particles/particle_system_library.h>

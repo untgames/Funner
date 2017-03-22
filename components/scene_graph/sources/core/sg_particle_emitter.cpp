@@ -6,14 +6,19 @@ using namespace scene_graph;
     ParticleEmitter implementation
 */
 
+typedef xtl::signal<void (ParticleEmitter& sender, ParticleEmitterEvent event)> ParticleEmitterSignal;
+
 struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 {
-  stl::string          particle_system_id;                   //particle system identifier (as loaded in media::ParticleSystemLibrary)
-  Node*                particles_parent;                     //particles are emitted in coordinate space of this node
-  xtl::auto_connection particles_parent_destroy_connection;  //particles parent node's destroy connection
+  stl::string           particle_system_id;                   //particle system identifier (as loaded in media::ParticleSystemLibrary)
+  xtl::auto_connection  particles_parent_destroy_connection;  //particles parent node's destroy connection
+  ParticleEmitterSignal signals [ParticleEmitterEvent_Num];   //signals
+  Node*                 particles_parent;                     //particles are emitted in coordinate space of this node
+  bool                  is_playing;                           //is emitter emits particles now
 
   Impl (const char* in_particle_system_id, Node* in_particles_parent)
     : particles_parent (in_particles_parent)
+    , is_playing (true)
   {
     if (!in_particle_system_id)
       throw xtl::make_null_argument_exception ("scene_graph::ParticleEmitter::Impl::Impl", "particle_system_id");
@@ -26,6 +31,26 @@ struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
   void OnBaseNodeDestroy ()
   {
     particles_parent = 0;
+  }
+
+  ///Notify about event
+  void Notify (ParticleEmitter& emitter, ParticleEmitterEvent event)
+  {
+      //ignore if we have no handlers for this event
+
+    if (!signals [event])
+      return;
+
+      //call event handlers
+
+    try
+    {
+      signals [event] (emitter, event);
+    }
+    catch (...)
+    {
+      //suppress all exceptions
+    }
   }
 };
 
@@ -67,6 +92,47 @@ const char* ParticleEmitter::ParticleSystemId () const
 Node::Pointer ParticleEmitter::ParticlesParent () const
 {
   return impl->particles_parent;
+}
+
+/*
+   Control simualtion process
+*/
+
+void ParticleEmitter::Play ()
+{
+  if (impl->is_playing)
+    return;
+
+  impl->is_playing = true;
+
+  impl->Notify (*this, ParticleEmitterEvent_OnPlay);
+}
+
+bool ParticleEmitter::IsPlaying () const
+{
+  return impl->is_playing;
+}
+
+void ParticleEmitter::Pause ()
+{
+  if (!impl->is_playing)
+    return;
+
+  impl->is_playing = false;
+
+  impl->Notify (*this, ParticleEmitterEvent_OnPause);
+}
+
+/*
+   Registration for ParticleEmitter events
+*/
+
+xtl::connection ParticleEmitter::RegisterEventHandler (ParticleEmitterEvent event, const EventHandler& handler) const
+{
+  if (event < 0 || event >= ParticleEmitterEvent_Num)
+    throw xtl::make_argument_exception ("scene_graph::ParticleEmitter::Event", "event", event);
+
+  return impl->signals [event].connect (handler);
 }
 
 /*

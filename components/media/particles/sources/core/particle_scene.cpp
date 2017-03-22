@@ -336,7 +336,7 @@ const TimeValue& ParticleScene::PrevUpdateTime () const
     Perform scene update (updates all particles)
 */
 
-void ParticleScene::Update (const TimeValue& time, const RandomGenerator& generator)
+void ParticleScene::Update (const TimeValue& time, const RandomGenerator& generator, const common::PropertyMap* properties)
 {
   try
   {
@@ -353,7 +353,7 @@ void ParticleScene::Update (const TimeValue& time, const RandomGenerator& genera
     {
       ParticleProcessorInstance& instance = *it;
 
-      instance.processor->Process (*this, generator, instance.instance_data);
+      instance.processor->Process (*this, generator, instance.instance_data, properties);
     }
 
     if (impl->first_step)

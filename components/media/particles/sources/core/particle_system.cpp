@@ -134,7 +134,7 @@ void ParticleSystem::DetachAllProcessors ()
     Update scenes
 */
 
-void ParticleSystem::Update (const TimeValue& time)
+void ParticleSystem::Update (const TimeValue& time, const common::PropertyMap* properties)
 {
   try
   {
@@ -149,7 +149,7 @@ void ParticleSystem::Update (const TimeValue& time)
 
       TimeValue local_time = time - start_time;
 
-      scene.Update (local_time, impl->random_generator);
+      scene.Update (local_time, impl->random_generator, properties);
     }
   }
   catch (xtl::exception& e)

@@ -29,10 +29,14 @@ void idle (Test& test)
   {
     static size_t last_fps = 0;
     static size_t frames_count = 0;
+    static int    spawn_enabled = 0;
+    static int    update_enabled = 1;
 
-    if (common::milliseconds () - last_fps > 1000)
+    size_t current_time = common::milliseconds ();
+
+    if (current_time - last_fps > 1000)
     {
-      printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+      printf ("FPS: %.2f\n", float (frames_count)/float (current_time - last_fps)*1000.f);
       fflush (stdout);
 
 /*      if (!test.emitter.Scissor())
@@ -49,8 +53,17 @@ void idle (Test& test)
         test.emitter.SetScissor (scissor.get ());
       }*/
 
-      last_fps = common::milliseconds ();
+      last_fps = current_time;
       frames_count = 0;
+      spawn_enabled++;
+      update_enabled++;
+
+      common::PropertyMap node_properties;
+
+      node_properties.SetProperty ("particles.ParticleDesigner.EmitCountMultiplier", spawn_enabled % 4 ? 0.f : 1.f);
+
+      test.emitter.SetProperties (&node_properties);
+
       return;
     }
 
@@ -61,6 +74,9 @@ void idle (Test& test)
 //    float angle = common::milliseconds () / 100.0f;
     
 //    test.emitter.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);
+
+    if (update_enabled % 4)
+      test.emitter.Update (scene_graph::TimeValue (current_time, 1000));
 
     test.target.Update ();      
   }

@@ -26,8 +26,51 @@ namespace
 */
 
 const char*  DEFAULT_BATCH_NAME             = "particles";           //default rendering batch name
-const char*  LOG_NAME                       = "render.scene.client"; //имя потока отладочного протоколирования
+const char*  LOG_NAME                       = "render.scene.client"; //log name
 const size_t DEFAULT_RESERVED_SPRITES_COUNT = 64;                    //default reserved sprites count
+
+/*
+    Node controller which tracks particle emitter play time
+*/
+
+class ParticleEmitterController : public scene_graph::Controller
+{
+  public:
+    typedef xtl::com_ptr<ParticleEmitterController> Pointer;
+
+    ///Controller creation
+    static Pointer Create (scene_graph::ParticleEmitter& node)
+    {
+      return Pointer (new ParticleEmitterController (node), false);
+    }
+
+    const TimeValue& PlayTime ()
+    {
+      return play_time;
+    }
+
+  protected:
+    ///Constructor
+    ParticleEmitterController (scene_graph::ParticleEmitter& node)
+      : scene_graph::Controller (node, scene_graph::ControllerTimeMode_Delta)
+      , emitter (&node)
+    {
+      //we do not need to own emitter or controller, because controller will be destroyed together with emitter render, which will be destroyed together with scene graph emitter
+      SetOwnerMode (scene_graph::ControllerOwnerMode_None);
+    }
+
+  private:
+    ///Update handler
+    void Update (const scene_graph::TimeValue& dt)
+    {
+      if (emitter->IsPlaying ())
+        play_time += dt;
+    }
+
+  private:
+    scene_graph::ParticleEmitter* emitter;    //emitter node
+    TimeValue                     play_time;  //total play time
+};
 
 /*
     Particle emitter
@@ -41,13 +84,14 @@ class ParticleEmitter: public VisualModel
       : VisualModel (model, manager, interchange::NodeType_SpriteList)
       , cache (GetRenderingCache (manager))
       , sprites (cache->sprites)
-      , start_time (common::milliseconds ())
       , reserved_sprites_count (0)
       , need_create_sprite_lists (true)
     {
       try
       {
         particle_system = manager.Client ().ParticleSystemManager ().CreateParticleSystem (model.ParticleSystemId ());
+
+        emitter_controller = ParticleEmitterController::Create (model);
       }
       catch (xtl::exception& e)
       {
@@ -109,8 +153,10 @@ class ParticleEmitter: public VisualModel
           need_create_sprite_lists = false;
         }
 
+        scene_graph::ParticleEmitter& source_node = SourceNode ();
+
         //update particle system
-        particle_system.Update (TimeValue (common::milliseconds () - start_time, 1000));
+        particle_system.Update (emitter_controller->PlayTime (), source_node.Properties ());
 
         //update particles list
         for (size_t i = 0, count = particle_system.ScenesCount (); i < count; i++)
@@ -198,10 +244,10 @@ class ParticleEmitter: public VisualModel
     }
 
   private:
+    ParticleEmitterController::Pointer  emitter_controller;       //emitter controller for tracking play time
     ParticleSystemRenderingTempCachePtr cache;                    //cache buffer
     SpriteBuffer&                       sprites;                  //sprites data buffer
     ParticleSystem                      particle_system;          //particle system of this emitter
-    size_t                              start_time;               //object creation time                        //TODO should use node time???
     size_t                              reserved_sprites_count;   //context buffer reserved sprites count
     bool                                need_create_sprite_lists; //sprite lists should be updated
 };

@@ -10,7 +10,7 @@ struct MyProcessor: IParticleProcessor, public xtl::reference_counter
   void AddRef () { addref (this); }
   void Release () { release (this); }
 
-  void Process (ParticleScene& scene, const RandomGenerator&, void*)
+  void Process (ParticleScene& scene, const RandomGenerator&, void*, const common::PropertyMap*)
   {
     for (ParticleList::Iterator it=scene.Particles ().CreateIterator (); it; ++it)
     {

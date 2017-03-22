@@ -8,6 +8,8 @@ namespace
 {
 
 //Constants
+const char* EMIT_COUNT_MULTIPLIER_PROPERTY_NAME = "particles.ParticleDesigner.EmitCountMultiplier"; //property name for emit count multiplier
+
 const float EPS                              = 0.001f; //Small number for comparing floats
 const float DURATION_INFINITY                = -1;     //The Particle emitter lives forever.
 const float START_SIZE_EQUAL_TO_END_SIZE     = -1;     //The starting size of the particle is equal to the ending size.
@@ -128,10 +130,26 @@ int get_integer_property (const common::PropertyMap& properties, const char* pro
 
 struct ParticleProcessor::Impl
 {
-  EmitterMode    emitter_mode;      //mode of emitter
-  EmitterDataPtr emitter_data;      //emitter data (can contain)
-  float          emission_interval; //interval beetween particle emission
-  TimeValue      emit_counter;      //counter used to emit new particles
+  EmitterMode    emitter_mode;            //mode of emitter
+  EmitterDataPtr emitter_data;            //emitter data (can contain)
+  TimeValue      emit_counter;            //counter used to emit new particles
+  float          emission_interval;       //interval beetween particle emission
+  float          emit_count_multiplier;   //multiplier for emit count (can be overriden via PropertyMap)
+  size_t         current_properties_hash; //current hash for ::Process properties (0 if properties was null)
+
+  Impl ()
+    : emitter_mode ()
+    , emission_interval ()
+    , current_properties_hash ()
+  {
+    SetDefaultProcessingProperties ();
+  }
+
+  ///Set default values for processing properties
+  void SetDefaultProcessingProperties ()
+  {
+    emit_count_multiplier = 1.f;
+  }
 
   ///Set parameters
   void SetParameters (const common::PropertyMap& parameters)
@@ -228,7 +246,7 @@ struct ParticleProcessor::Impl
   }
 
   //Process scene
-  void Process (ParticleScene& scene, const RandomGenerator& random_generator)
+  void Process (ParticleScene& scene, const RandomGenerator& random_generator, const common::PropertyMap* properties)
   {
     TimeValue work_time = scene.Time () - scene.StartTimeOffset ();
 
@@ -239,6 +257,31 @@ struct ParticleProcessor::Impl
 
     if (rational_dt <= 0)
       return;
+
+    //update cached params which can be modified via properties
+    if (properties)
+    {
+      if (current_properties_hash != properties->Hash ())  //passed properties was changed
+      {
+        SetDefaultProcessingProperties ();
+
+        //set cached variables for existing properties
+        if (properties->IsPresent (EMIT_COUNT_MULTIPLIER_PROPERTY_NAME))
+          emit_count_multiplier = properties->GetFloat (EMIT_COUNT_MULTIPLIER_PROPERTY_NAME);
+
+        current_properties_hash = properties->Hash ();
+      }
+    }
+    else   //passed properties is null
+    {
+      //properties was not null on previous update so we should use default now
+      if (current_properties_hash)
+      {
+        SetDefaultProcessingProperties ();
+
+        current_properties_hash = 0;
+      }
+    }
 
     ParticleList& particles = scene.Particles ();
 
@@ -254,7 +297,7 @@ struct ParticleProcessor::Impl
 
       int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<float> () / emission_interval));
 
-      AddParticles (particles, emit_count, random_generator, scene.Offset ());
+      AddParticles (particles, emit_count * emit_count_multiplier, random_generator, scene.Offset ());
 
       emit_counter -= TimeValue ((size_t)(emission_interval * emit_count * emit_counter.denominator()), emit_counter.denominator());
     }
@@ -420,7 +463,7 @@ void* ParticleProcessor::AttachScene (ParticleScene& scene)
   if (!impl->emitter_data)
     return 0;
 
-  scene.Particles ().Pool ().Reserve (impl->emitter_data->max_particles, ParticleSize ());
+  scene.Particles ().Pool ().Reserve (impl->emitter_data->max_particles, ParticleSize ());  //TODO max_particles should be calculated (max_particles / average_lifespan)
 
   //TODO check particle list compatibility
 
@@ -436,9 +479,9 @@ void ParticleProcessor::DetachScene (ParticleScene& scene, void* private_data)
    Process scene
 */
 
-void ParticleProcessor::Process (ParticleScene& scene, const RandomGenerator& random_generator, void* private_data)
+void ParticleProcessor::Process (ParticleScene& scene, const RandomGenerator& random_generator, void* private_data, const common::PropertyMap* properties)
 {
-  impl->Process (scene, random_generator);
+  impl->Process (scene, random_generator, properties);
 }
 
 /*
