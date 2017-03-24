@@ -301,7 +301,7 @@ struct ParticleProcessor::Impl
 
       int emit_count = stl::min ((int)(emitter_data->max_particles - particle_count), (int)(emit_counter.cast<float> () / emission_interval));
 
-      AddParticles (particles, emit_count * emit_count_multiplier, random_generator, scene.Offset ());
+      AddParticles (particles, (int)(emit_count * emit_count_multiplier), random_generator, scene.Offset ());
 
       emit_counter -= TimeValue ((size_t)(emission_interval * emit_count * emit_counter.denominator()), emit_counter.denominator());
     }
