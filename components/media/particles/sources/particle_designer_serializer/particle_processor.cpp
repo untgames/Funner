@@ -242,7 +242,11 @@ struct ParticleProcessor::Impl
           max_lifespan     = data.lifespan + data.lifespan_variance / 2.f,
           average_lifespan = min_lifespan + (max_lifespan - min_lifespan) / 2.f;
 
-    emission_interval = average_lifespan / data.max_particles;
+    //check if emission duration is less then average lifespan
+    if (data.duration != DURATION_INFINITY && data.duration < average_lifespan)
+      emission_interval = data.duration / data.max_particles;
+    else
+      emission_interval = average_lifespan / data.max_particles;
   }
 
   //Process scene
