@@ -65,16 +65,16 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
 
         size_t render_target_index = 0;
 
-        for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter, ++render_target_index)
+        for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter)
         {
-          const char* attachment        = get<const char*> (*iter, "Screen");
-          const char* target_attachment = get<const char*> (*iter, "Id");
-          const char* init_string       = get<const char*> (*iter, "InitString", "");
-
-          screen_map.insert_pair (attachment, render_target_index);
-
-          if (get<bool> (*iter, "IdleRender", true))
+          if (get<bool> (*iter, "IdleRender", true))  //TODO create render target without IdleRender enabled
           {
+            const char* attachment        = get<const char*> (*iter, "Screen");
+            const char* target_attachment = get<const char*> (*iter, "Id");
+            const char* init_string       = get<const char*> (*iter, "InitString", "");
+
+            screen_map.insert_pair (attachment, render_target_index);
+
             size_t      update_frequency = get<size_t> (*iter, "RenderFrequency", 0);
             stl::string on_after_update  = get<const char*> (*iter, "OnAfterUpdate", "");
             stl::string on_before_update = get<const char*> (*iter, "OnBeforeUpdate", "");
@@ -82,21 +82,23 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
             RenderTargetPtr target (new RenderTargetDesc (client.CreateRenderTarget (target_attachment, init_string), update_frequency, on_before_update, on_after_update, target_attachment), false);
 
             idle_render_targets.push_back (target);
+
+            render_target_index++;
           }
+        }
 
-          for (Parser::NamesakeIterator iter=node.First ("FontLibrary"); iter; ++iter)
-          {
-            const char* name = get<const char*> (*iter, "Id");
+        for (Parser::NamesakeIterator iter=node.First ("FontLibrary"); iter; ++iter)
+        {
+          const char* name = get<const char*> (*iter, "Id");
 
-            font_libraries.insert (name);
-          }
+          font_libraries.insert (name);
+        }
 
-          for (Parser::NamesakeIterator iter=node.First ("ParticleSystemLibrary"); iter; ++iter)
-          {
-            const char* name = get<const char*> (*iter, "Id");
+        for (Parser::NamesakeIterator iter=node.First ("ParticleSystemLibrary"); iter; ++iter)
+        {
+          const char* name = get<const char*> (*iter, "Id");
 
-            particle_system_libraries.insert (name);
-          }
+          particle_system_libraries.insert (name);
         }
 
         try
