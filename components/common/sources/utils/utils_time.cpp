@@ -157,7 +157,8 @@ Timer& Timer::operator = (const Timer& source)
 
 void Timer::SetTime (time_t time)
 {
-  impl->time = time;
+  impl->current_time = time * impl->precision;  //according to formula used in Impl::Update
+  impl->time         = time;
 }
 
 Timer::time_t Timer::Time () const

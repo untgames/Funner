@@ -1,0 +1,3 @@
+Results of timer_set_time_test:
+Before set time: parent timer time = 0.00, child_timer time = 0.00
+After set time: parent timer time = 1.00, child_timer time = 1.00
