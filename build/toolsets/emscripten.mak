@@ -12,7 +12,7 @@ endif
 ###################################################################################################
 #Constants
 ###################################################################################################
-PROFILES          += unistd emscripten has_windows no_dll no_threads
+PROFILES          += emscripten has_windows no_dll no_threads
 EXE_SUFFIX        := .js
 DLL_SUFFIX        := .so
 DLL_PREFIX        :=
