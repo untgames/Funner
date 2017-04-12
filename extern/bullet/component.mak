@@ -12,3 +12,4 @@ EXTERN.BULLET.clang.COMPILER_CFLAGS    := -w
 EXTERN.BULLET.msvc.COMPILER_CFLAGS     := -wd4305 -wd4244
 EXTERN.BULLET.vcx86-64.COMPILER_CFLAGS := -wd4267
 EXTERN.BULLET.bada.IMPORTS             := compile.extern.bada
+EXTERN.BULLET.emscripten.COMPILER_CFLAGS := -Wno-overloaded-virtual -Wno-reorder -Wno-unused-private-field -Wno-unused-variable

@@ -13,3 +13,4 @@ EXTERN.PCRE.msvc.COMPILER_DEFINES    := _CRT_SECURE_NO_DEPRECATE
 EXTERN.PCRE.vcx86-64.COMPILER_CFLAGS := -wd4244
 EXTERN.PCRE.g++.COMPILER_CFLAGS      := --no-warn
 EXTERN.PCRE.clang.COMPILER_CFLAGS    := -w
+EXTERN.PCRE.emscripten.COMPILER_CFLAGS := -Wno-unused-const-variable -Wno-self-assign

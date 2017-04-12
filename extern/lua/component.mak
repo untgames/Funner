@@ -19,6 +19,7 @@ EXTERN.LUALIB.clang.COMPILER_CFLAGS    := -w -x c++
 EXTERN.LUALIB.android.COMPILER_CFLAGS  := -include android_lconv_wrapper.h
 EXTERN.LUALIB.wince.COMPILER_CFLAGS    := -FIwince_wrapper.h -DLUA_ANSI
 EXTERN.LUALIB.wp8.COMPILER_CFLAGS      := -FIwp8_wrapper.h
+EXTERN.LUALIB.emscripten.COMPILER_CFLAGS := -Wno-empty-body
 
 #Target - LUA_UTILS
 EXTERN.LUA_UTILS.TYPE                   := test-suite

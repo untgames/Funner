@@ -23,6 +23,15 @@ EXTERN.DEVIL.mingw.COMPILER_DEFINES          := XMD_H
 EXTERN.DEVIL.bada_simulator.COMPILER_DEFINES := XMD_H
 EXTERN.DEVIL.bada_simulator.IMPORTS          := link.extern.bada_addons
 EXTERN.DEVIL.wince.IMPORTS                   := link.extern.wcecompat
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      := -Wno-absolute-value
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-invalid-source-encoding
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-macro-redefined
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-pointer-sign
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-self-assign
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-sizeof-pointer-memaccess
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-tautological-pointer-compare
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-unused-value
+EXTERN.DEVIL.emscripten.COMPILER_CFLAGS      += -Wno-unused-variable
 
 #Target - ILUDLL sources
 ifeq (,$(filter no_dll,$(PROFILES)))
@@ -38,3 +47,7 @@ EXTERN.ILU.LIBS                  := funner.extern.devil
 EXTERN.ILU.COMPILER_DEFINES      := HAVE_CONFIG_H
 EXTERN.ILU.g++.COMPILER_CFLAGS   := --no-warn
 EXTERN.ILU.clang.COMPILER_CFLAGS := -w
+EXTERN.ILU.emscripten.COMPILER_CFLAGS := -Wno-absolute-value
+EXTERN.ILU.emscripten.COMPILER_CFLAGS += -Wno-invalid-source-encoding
+EXTERN.ILU.emscripten.COMPILER_CFLAGS += -Wno-unused-value
+EXTERN.ILU.emscripten.COMPILER_CFLAGS += -Wno-unused-variable

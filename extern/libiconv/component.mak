@@ -16,6 +16,7 @@ EXTERN.LIBICONV.vcx86-64.COMPILER_CFLAGS := -wd4244 -wd4267
 EXTERN.LIBICONV.g++.COMPILER_CFLAGS      := --no-warn
 EXTERN.LIBICONV.clang.COMPILER_CFLAGS    := -w
 EXTERN.LIBICONV.has_iconv.TYPE           := ignore
+EXTERN.LIBICONV.emscripten.COMPILER_CFLAGS := -Wno-tautological-compare -Wno-parentheses-equality -Wno-static-in-inline -Wno-unused-variable -Wno-unused-function
 
 #Target - ICONV utility
 EXTERN.ICONV.SOURCES.TYPE                  := application
@@ -28,6 +29,7 @@ EXTERN.ICONV.SOURCES.msvc.COMPILER_CFLAGS  := -wd4013 -wd4018
 EXTERN.ICONV.SOURCES.g++.COMPILER_CFLAGS   := --no-warn
 EXTERN.ICONV.SOURCES.clang.COMPILER_CFLAGS := -w
 EXTERN.ICONV.SOURCES.has_iconv.TYPE        := ignore
+EXTERN.ICONV.SOURCES.emscripten.COMPILER_CFLAGS := -Wno-incompatible-pointer-types-discards-qualifiers
 
 #Target - ICONV tests
 EXTERN.ICONV.TESTS.TYPE              := test-suite

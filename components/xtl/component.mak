@@ -31,6 +31,8 @@ XTL.TR1.TESTS.unistd.SOURCE_DIRS          := tests/tr1/smart_ptr/mt-tests
 XTL.TR1.TESTS.pthread_static_library.LIBS := pthread
 XTL.TR1.TESTS.bada.IMPORTS                := compile.extern.bada
 XTL.TR1.TESTS.wince.IMPORTS               := link.extern.wcecompat
+XTL.TR1.TESTS.emscripten.COMPILER_CFLAGS  += -Wno-ignored-qualifiers -Wno-unused-local-typedef
+
 
 #Цель №3 - XTL tests
 XTL.XTL.TESTS.TYPE                 := test-suite
