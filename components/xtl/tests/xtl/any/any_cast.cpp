@@ -2,6 +2,10 @@
 
 #include <xtl/custom_cast_builtin.h>
 
+#if defined(__EMSCRIPTEN__)
+#define fflush
+#endif
+
 struct A: public dynamic_cast_root
 {
   virtual const char* name () const { return "class A"; }
