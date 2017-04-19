@@ -17,7 +17,11 @@ ifeq (,$(filter tabletos,$(PROFILES)))
 FUNNER_EXTERN_LIBS.COMPONENTS += jpeg libpng freetype
 endif
 
-FUNNER_EXTERN_LIBS.COMPONENTS += devil ogg vorbis vorbisfile lua libpsd theora shiny flac
+FUNNER_EXTERN_LIBS.COMPONENTS += devil ogg vorbis vorbisfile lua theora shiny flac
+
+ifeq (,$(filter emscripten,$(PROFILES)))
+FUNNER_EXTERN_LIBS.COMPONENTS += libpsd
+endif
 
 ifeq (,$(filter tabletos,$(PROFILES)))
 FUNNER_EXTERN_LIBS.COMPONENTS += openssl
@@ -28,7 +32,7 @@ ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.x86-64.COMPONENTS := geekinfo
 endif
 
-ifeq (,$(filter beagleboard,$(PROFILES))$(filter webos,$(PROFILES))$(filter tabletos,$(PROFILES)))
+ifeq (,$(filter beagleboard,$(PROFILES))$(filter webos,$(PROFILES))$(filter tabletos,$(PROFILES))$(filter emscripten,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 
