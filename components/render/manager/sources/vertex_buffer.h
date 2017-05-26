@@ -2,6 +2,35 @@ class InputLayoutManager;
 class PrimitiveBuffersImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вес соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct VertexJointWeight
+{
+  unsigned short joint_index; //индекс соединения
+  float          weight;      //вес соединения
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вершинный вес
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct VertexWeight
+{
+  VertexJointWeight* first_weight;  //указатель на первый вес вершины
+  unsigned short     weights_count; //количество весов на вершину
+  math::vec4f        position;      //базовая позиция (w компонента всегда 1; vec4 для SSE)
+  math::vec4f        normal;        //базовая нормаль (w компонента всегда 0; vec4 для SSE)
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вершина для скиннинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct SkinVertex
+{
+  math::vec4f position; //позиция
+  math::vec4f normal;   //нормаль
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершинный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class VertexBuffer: public Object
@@ -17,6 +46,22 @@ class VertexBuffer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int             StreamsCount ();
     const LowLevelBufferPtr* Streams      ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t VerticesCount () { return vertices_count; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вершинные веса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const VertexWeight* VertexWeights ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Временный буфер для расчета скин-вершин / слот для потока данных скин-меша
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SkinVertex* SkinVertices ();
+    int         SkinStreamIndex ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение лэйаута
@@ -25,18 +70,32 @@ class VertexBuffer: public Object
 
   private:
     media::geometry::VertexFormat Clone (InputLayoutManager& manager, const media::geometry::VertexFormat& format);
+    void ProcessVertexWeights (const media::geometry::VertexBuffer&);
     
   private:
     typedef stl::vector<LowLevelBufferPtr>              BufferArray;
     typedef stl::vector<low_level::VertexAttribute>     VertexAttributeArray;  
-    typedef stl::vector<media::geometry::VertexFormat>  VertexFormatArray;  
+    typedef stl::vector<media::geometry::VertexFormat>  VertexFormatArray;
+    typedef stl::vector<VertexJointWeight>              VertexJointWeightArray;
+    typedef stl::vector<VertexWeight>                   VertexWeightArray;
+    typedef stl::vector<SkinVertex>                     SkinVertexArray;
+
+    struct SkinData
+    {
+      VertexJointWeightArray vertex_joint_weights;
+      VertexWeightArray      vertex_weights;
+      SkinVertexArray        skin_vertices;
+      int                    stream_index;
+    };
 
   private:
-    BufferArray            streams;
-    VertexAttributeArray   attributes;
-    VertexFormatArray      vertex_formats;
-    size_t                 attributes_hash;
-    LowLevelInputLayoutPtr layouts [low_level::InputDataType_Num];
+    BufferArray             streams;
+    VertexAttributeArray    attributes;
+    VertexFormatArray       vertex_formats;
+    size_t                  attributes_hash;
+    size_t                  vertices_count;
+    LowLevelInputLayoutPtr  layouts [low_level::InputDataType_Num];
+    stl::auto_ptr<SkinData> skin_data;
 };
 
 typedef xtl::intrusive_ptr<VertexBuffer> VertexBufferPtr;
