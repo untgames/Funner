@@ -75,6 +75,7 @@ class Settings;
 class ShaderOptionsCache;
 class TextureManager;
 class InstantiatedEffect;
+class EntityJointList;
 struct RendererOperationList;
 struct RendererPrimitive;
 struct RendererPrimitiveGroup;
@@ -100,6 +101,7 @@ typedef xtl::intrusive_ptr<EffectPass>              EffectPassPtr;
 typedef xtl::intrusive_ptr<Effect>                  EffectPtr;
 typedef xtl::intrusive_ptr<EffectManager>           EffectManagerPtr;
 typedef xtl::intrusive_ptr<EffectRenderer>          EffectRendererPtr;
+typedef xtl::intrusive_ptr<EntityJointList>         EntityJointListPtr;
 typedef xtl::intrusive_ptr<EntityImpl>              EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>               FramePtr;
 typedef xtl::intrusive_ptr<InstantiatedEffect>      InstantiatedEffectPtr;
@@ -235,6 +237,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "material.h"
 #include "material_manager.h"
 #include "vertex_buffer.h"
+#include "skin_mesh.h"
 #include "primitive.h"
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
