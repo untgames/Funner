@@ -730,10 +730,12 @@ void export_data (Params& params)
   typedef stl::vector<int>         IndexArray;
   typedef stl::vector<stl::string> StringArray;
 
-  IndexArray  parents (context->layer_count, -1), index_stack;
+  IndexArray  parents (context->layer_count, -1), index_stack, parent_id (context->layer_count, -1);
   StringArray layer_names (context->layer_count);
 
   index_stack.push_back (-1);
+
+  int group_id_counter = 0;
 
   for (int i=0; i<context->layer_count; i++)
   {
@@ -760,6 +762,7 @@ void export_data (Params& params)
     {
       case psd_layer_type_folder:
         index_stack.push_back (index);
+        parent_id [index] = group_id_counter++;
         break;
       default:
         break;
@@ -890,6 +893,9 @@ void export_data (Params& params)
 
       xml_writer.WriteAttribute ("Name", name.c_str ());
 
+      if (layer.layer_type == psd_layer_type_folder)
+        xml_writer.WriteAttribute ("Id", parent_id [i]);
+
       if (need_layers)
       {      
         stl::string dst_image_name = common::format (format.c_str (), image_index);      
@@ -898,7 +904,10 @@ void export_data (Params& params)
       }
 
       if (parents [i] != -1)
+      {
         xml_writer.WriteAttribute ("Parent", layer_names [parents [i]].c_str ());
+        xml_writer.WriteAttribute ("ParentId", parent_id [parents [i]]);
+      }
 
       if (need_bounds)
       {
