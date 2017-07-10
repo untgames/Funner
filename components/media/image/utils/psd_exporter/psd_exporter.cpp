@@ -725,14 +725,57 @@ void export_data (Params& params)
   if (!params.silent && params.need_crop_alpha)
     printf ("Crop layers by alpha...\n");
 
+    //построение дерева связности
+
+  typedef stl::vector<int>         IndexArray;
+  typedef stl::vector<stl::string> StringArray;
+
+  IndexArray  parents (context->layer_count, -1), index_stack;
+  StringArray layer_names (context->layer_count);
+
+  index_stack.push_back (-1);
+
+  for (int i=0; i<context->layer_count; i++)
+  {
+    int               index = context->layer_count - i - 1; //обратный порядок
+    psd_layer_record& layer = context->layer_records [index];
+
+    layer_names [index] = get_layer_name (params, layer);
+    parents [index]     = index_stack.back ();
+
+    if (!strncmp (layer_names [index].c_str (), "</", 2))
+    {
+      if (index_stack.empty ())
+      {
+        printf ("error: Invalid folders structure. Attempt to close root folder");
+        exit (1);
+      }
+
+      index_stack.pop_back ();
+
+      continue;
+    }
+
+    switch (layer.layer_type)
+    {
+      case psd_layer_type_folder:
+        index_stack.push_back (index);
+        break;
+      default:
+        break;
+    }
+  }
+
+    //экспорт слоев
+
   cropped_layers.reserve (context->layer_count);
 
   size_t image_index = 1;       
 
   for (int i=0; i<context->layer_count; i++)
   {
-    psd_layer_record& layer = context->layer_records [i];
-    stl::string       name  = get_layer_name (params, layer);
+    psd_layer_record&  layer = context->layer_records [i];
+    const stl::string& name  = layer_names [i];
 
     if (!strncmp (name.c_str (), "</", 2))
       continue;
@@ -744,7 +787,7 @@ void export_data (Params& params)
       default:
         continue;
     }
-    
+
     //проверка корректности имени слоя
     for (const char* symbol = name.c_str (); *symbol; symbol++)
     {
@@ -753,7 +796,7 @@ void export_data (Params& params)
       if (!isalnum (*symbol) && !strchr (allowed_symbols, *symbol))
         throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
     }
-    
+
     //коррекция z-цвета
     
     if (params.need_replace_zcolor)
@@ -817,44 +860,63 @@ void export_data (Params& params)
 
     for (int i=0; i<context->layer_count; i++)
     {
-      psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = get_layer_name (params, layer);
+      psd_layer_record&  layer = context->layer_records [i];
+      const stl::string& name  = layer_names [i];
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
 
+      const char* tag         = "";
+      bool        need_layers = params.need_layers,
+                  need_bounds = true;
+
       switch (layer.layer_type)
       {
         case psd_layer_type_normal:
+          tag = "Layer";
           break;
+        case psd_layer_type_folder:
+        {
+          tag         = "Folder";
+          need_layers = false;
+          need_bounds = false;
+          break;
+        }
         default:
           continue;
       }
 
-      common::XmlWriter::Scope layer_scope (xml_writer, "Layer");
+      common::XmlWriter::Scope layer_scope (xml_writer, tag);
 
       xml_writer.WriteAttribute ("Name", name.c_str ());
 
-      if (params.need_layers)
+      if (need_layers)
       {      
         stl::string dst_image_name = common::format (format.c_str (), image_index);      
       
         xml_writer.WriteAttribute ("Image",  dst_image_name.c_str ());
       }
-      
-      const Rect& cropped_rect = cropped_layers [image_index - 1];
-      
-      xml_writer.WriteAttribute ("Left",    layer.left + cropped_rect.x);
-      xml_writer.WriteAttribute ("Top",     layer.top + cropped_rect.y);
-      xml_writer.WriteAttribute ("Width",   cropped_rect.width);
-      xml_writer.WriteAttribute ("Height",  cropped_rect.height);
+
+      if (parents [i] != -1)
+        xml_writer.WriteAttribute ("Parent", layer_names [parents [i]].c_str ());
+
+      if (need_bounds)
+      {
+        const Rect& cropped_rect = cropped_layers [image_index - 1];
+
+        xml_writer.WriteAttribute ("Left",    layer.left + cropped_rect.x);
+        xml_writer.WriteAttribute ("Top",     layer.top + cropped_rect.y);
+        xml_writer.WriteAttribute ("Width",   cropped_rect.width);
+        xml_writer.WriteAttribute ("Height",  cropped_rect.height);
+
+        image_index++;
+      }
+
       xml_writer.WriteAttribute ("Opacity", layer.opacity);
-      xml_writer.WriteAttribute ("Visible", layer.visible != 0);
-      
-      image_index++;      
+      xml_writer.WriteAttribute ("Visible", layer.visible != 0);      
     }
   }
-  
+
     //сохранение содержимого слоёв
   
   if (params.need_layers)
@@ -877,8 +939,8 @@ void export_data (Params& params)
 
     for (int i=0; i<context->layer_count; i++)
     {
-      psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = get_layer_name (params, layer);
+      psd_layer_record&  layer = context->layer_records [i];
+      const stl::string& name  = layer_names [i];
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
