@@ -1,13 +1,11 @@
-Results of psd_exporter_test15:
+Results of psd_exporter_test16:
 <?xml version="1.0" encoding="utf-8"?>
 <LayerMap TotalWidth="100" TotalHeight="100">
   <Layer Name="Layer 1" Image="my_layers/my_image_0001.bmp" Left="8" Top="6" Width="25" Height="19" Opacity="255" Visible="1"/>
   <Layer Name="Layer 2" Image="my_layers/my_image_0002.bmp" Parent="Group 1" ParentId="0" Left="0" Top="0" Width="100" Height="100" Opacity="255" Visible="1"/>
   <Layer Name="Layer 3" Image="my_layers/my_image_0003.bmp" Parent="Group 1" ParentId="0" Left="22" Top="71" Width="21" Height="21" Opacity="255" Visible="1"/>
   <Folder Name="Group 1" Id="0" Opacity="255" Visible="1"/>
-  <Layer Name="Layer 4" Image="my_layers/my_image_0004.bmp" Left="59" Top="41" Width="19" Height="17" Opacity="255" Visible="1"/>
 </LayerMap>
-cf8f661475714d905b7d4dad1ab2feba *my_layers/my_image_0001.bmp
-cf8f661475714d905b7d4dad1ab2feba *my_layers/my_image_0002.bmp
-cf8f661475714d905b7d4dad1ab2feba *my_layers/my_image_0003.bmp
-cf8f661475714d905b7d4dad1ab2feba *my_layers/my_image_0004.bmp
+c90fd7bb2552a29e57e1cd747338bf0f *my_layers/my_image_0001.bmp
+a4ca86196f1d07beffc4b153ec3259ae *my_layers/my_image_0002.bmp
+6acde6ab1aa430a7b851f5ea11c8c54d *my_layers/my_image_0003.bmp
