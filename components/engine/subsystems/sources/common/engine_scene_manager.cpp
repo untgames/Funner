@@ -1,5 +1,4 @@
 #include <media/font_library.h>
-#include <media/particles/particle_system_library.h>
 
 #include <sg/scene_manager.h>
 #include <sg/controllers/animation.h>
@@ -227,99 +226,6 @@ class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::IC
     stl::string                                      attachment_name;  //имя менеджера анимаций
 };
 
-///Менеджер систем частиц
-class ParticleSystemManagerSubsystem: public ISceneManagerSubsystem, public media::rms::ICustomServer
-{
-  public:
-///Конструктор
-    ParticleSystemManagerSubsystem (const common::ParseNode& node, const common::Log& in_log)
-      : log (in_log)
-    {
-      try
-      {
-        attachment_name = get<const char*> (node, "AttachmentName", "");
-
-        resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
-
-        if (!attachment_name.empty ())
-          AttachmentRegistry::Register (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (library)));
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("engine::subsystems::ParticleSystemManagerSubsystem");
-        throw;
-      }
-    }
-
-///Деструктор
-    ~ParticleSystemManagerSubsystem ()
-    {
-      if (!attachment_name.empty ())
-        AttachmentRegistry::Unregister (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (library)));
-
-      resource_server = 0;
-    }
-
-///Управление ресурсами
-    void PrefetchResource (const char* resource_name)
-    {
-    }
-
-    void LoadResource (const char* resource_name)
-    {
-      static const char* METHOD_NAME = "engine::subsystems::ParticleSystemManagerSubsystem::LoadResource";
-
-      if (!resource_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
-
-      try
-      {
-        library.Load (resource_name);
-      }
-      catch (xtl::exception& exception)
-      {
-        log.Printf ("Can't load resource '%s', exception: %s", resource_name, exception.what ());
-
-        exception.touch (METHOD_NAME);
-
-        throw;
-      }
-    }
-
-    void UnloadResource (const char* resource_name)
-    {
-      static const char* METHOD_NAME = "engine::subsystems::ParticleSystemManagerSubsystem::UnloadResource";
-
-      if (!resource_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
-
-      try
-      {
-        library.Unload (resource_name);
-      }
-      catch (xtl::exception& exception)
-      {
-        log.Printf ("Can't unload resource '%s', exception: %s", resource_name, exception.what ());
-
-        exception.touch (METHOD_NAME);
-
-        throw;
-      }
-    }
-
-///Регистрация в контексте сцены
-    void OnSceneContextCreated (scene_graph::SceneContext& context)
-    {
-      //нет необходимости регистрировать в контексте сцены
-    }
-
-  private:
-    common::Log                                      log;              //поток протоколирования
-    media::particles::ParticleSystemLibrary          library;          //библиотека систем частиц
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //сервер ресурсов рендеринга
-    stl::string                                      attachment_name;  //имя менеджера анимаций
-};
-
 }
 
 /*
@@ -363,10 +269,6 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
           else if (!strcmp (subsystem_name, "FontLibrary"))
           {
             subsystem = SubsystemPtr (new FontManagerSubsystem (*iter, log), false);
-          }
-          else if (!strcmp (subsystem_name, "ParticleSystemLibrary"))
-          {
-            subsystem = SubsystemPtr (new ParticleSystemManagerSubsystem (*iter, log), false);
           }
 
           if (subsystem)
