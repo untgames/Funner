@@ -7,7 +7,6 @@
 #include <syslib/application.h>
 
 #include <media/font_library.h>
-#include <media/particles/particle_system_library.h>
 
 #include <render/scene_render_client.h>
 
@@ -39,7 +38,7 @@ const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                     
 */
 
 class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Screen>, public IAttachmentRegistryListener<media::FontLibrary>,
-  public IAttachmentRegistryListener<media::particles::ParticleSystemLibrary>, public media::rms::ICustomServer, public xtl::reference_counter
+  public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
 ///Конструктор
@@ -94,24 +93,15 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
           font_libraries.insert (name);
         }
 
-        for (Parser::NamesakeIterator iter=node.First ("ParticleSystemLibrary"); iter; ++iter)
-        {
-          const char* name = get<const char*> (*iter, "Id");
-
-          particle_system_libraries.insert (name);
-        }
-
         try
         {
           AttachmentRegistry::Attach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           AttachmentRegistry::Attach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
-          AttachmentRegistry::Attach<media::particles::ParticleSystemLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
           
           resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
         }
         catch (...)
         {
-          AttachmentRegistry::Detach<media::particles::ParticleSystemLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
           AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
           AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           throw;
@@ -129,7 +119,6 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     {
       resource_server = 0;      
 
-      AttachmentRegistry::Detach<media::particles::ParticleSystemLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
       AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);      
       AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
@@ -174,23 +163,6 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
         return;
 
       client.DetachFontLibrary (library);
-    }
-
-/// События установки/удаления библиотеки систем частиц
-    void OnRegisterAttachment (const char* name, media::particles::ParticleSystemLibrary& library)
-    {
-      if (!particle_system_libraries.count (name))
-        return;
-
-      client.AttachParticleSystemLibrary (library);
-    }
-
-    void OnUnregisterAttachment (const char* name, media::particles::ParticleSystemLibrary& library)
-    {
-      if (!particle_system_libraries.count (name))
-        return;
-
-      client.DetachParticleSystemLibrary (library);
     }
 
 ///Управление ресурсами
@@ -351,7 +323,6 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     };
 
     typedef stl::hash_set<stl::hash_key<const char*> >        FontLibrarySet;
-    typedef stl::hash_set<stl::hash_key<const char*> >        ParticleSystemLibrarySet;
     typedef stl::hash_map<stl::hash_key<const char*>, size_t> ScreenMap;
     typedef xtl::intrusive_ptr<RenderTargetDesc>              RenderTargetPtr;
     typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
@@ -362,7 +333,6 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;           //сервер ресурсов рендеринга
     ScreenMap                                        screen_map;                //соответствие экранов и рендер-таргетов
     FontLibrarySet                                   font_libraries;            //библиотеки шрифтов
-    ParticleSystemLibrarySet                         particle_system_libraries; //библиотеки систем частиц
     xtl::auto_connection                             idle_connection;           //соединение обновления рендер-таргетов
     xtl::auto_connection                             on_app_pause_connection;   //соединение паузы приложения
     xtl::auto_connection                             on_app_resume_connection;  //соединение восстановления приложения
