@@ -60,6 +60,7 @@ class ParticleEmitter: public VisualModel
 ///Constructor
     ParticleEmitter (scene_graph::ParticleEmitter& model, SceneManager& manager)
       : VisualModel (model, manager, interchange::NodeType_ParticleEmitter)
+      , cached_properties_id ()
     {
       manager.Context ().SetParticleEmitterSystemId (Id (), model.ParticleSystemId ());
 
@@ -73,9 +74,6 @@ class ParticleEmitter: public VisualModel
         throw;
       }
     }
-
-///Source node
-    scene_graph::ParticleEmitter& SourceNode () const { return static_cast<scene_graph::ParticleEmitter&> (Node::SourceNode ()); }
 
   protected:
 ///Synchronization implementation
@@ -92,9 +90,29 @@ class ParticleEmitter: public VisualModel
 
         if (current_play_time != last_play_time)
         {
+          common::PropertyMap* properties = Node::SourceNode ().Properties ();
+
+          size_t properties_id = properties ? properties->Id () : 0;
+
+          if (properties_id != cached_properties_id)
+          {
+            ClientImpl& client = Scenes ().Client ();
+
+            if (properties)
+            {
+              synchronizer = client.CreateSynchronizer (*properties);
+            }
+            else
+            {
+              synchronizer = PropertyMapSynchronizer ();
+            }
+
+            cached_properties_id = properties_id;
+          }
+
           object_id_t id = Id ();
 
-          context.SetParticleEmitterSystemTime (id, current_play_time.numerator () / (current_play_time.denominator () / 1000));
+          context.UpdateParticleEmitterSystem (id, current_play_time.numerator () / (current_play_time.denominator () / 1000), cached_properties_id);
 
           last_play_time = current_play_time;
         }
@@ -109,6 +127,8 @@ class ParticleEmitter: public VisualModel
   private:
     ParticleEmitterController::Pointer  emitter_controller;       //emitter controller for tracking play time
     TimeValue                           last_play_time;           //last emitter play time
+    PropertyMapSynchronizer             synchronizer;             //node properties synchronizer
+    size_t                              cached_properties_id;     //cached node properties id
 };
 
 }

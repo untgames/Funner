@@ -934,11 +934,11 @@ void ConnectionState::SetParticleEmitterSystemId(object_id_t id, const char* sys
   }
 }
 
-void ConnectionState::SetParticleEmitterSystemTime(object_id_t id, uint32 new_time)
+void ConnectionState::UpdateParticleEmitterSystem(object_id_t id, uint32 new_time, uint64 properties_id)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().SetParticleSystemTime (new_time);
+    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().UpdateParticleSystem (new_time, properties_id ? GetClientProperties (properties_id) : common::PropertyMap ());
   }
   catch (xtl::exception& e)
   {

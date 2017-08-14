@@ -30,9 +30,9 @@ class ParticleEmitter: public SpriteList
     void SetParticleSystemId (const char* id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Particle system time
+///Update particle system
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetParticleSystemTime (interchange::uint32 new_time);
+    void UpdateParticleSystem (interchange::uint32 new_time, const common::PropertyMap& properties);
 
   private:
     struct Impl;

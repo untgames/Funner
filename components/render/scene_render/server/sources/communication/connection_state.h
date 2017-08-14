@@ -91,7 +91,7 @@ class ConnectionState: public xtl::noncopyable
     void SetPageCurlParams(object_id_t id, const interchange::PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
 
     void SetParticleEmitterSystemId(object_id_t id, const char* system_id);
-    void SetParticleEmitterSystemTime(object_id_t id, uint32 new_time);
+    void UpdateParticleEmitterSystem(object_id_t id, uint32 new_time, object_id_t properties_id);
 
     void ReserveSpriteLists (object_id_t id, uint32 list_subids_count);
     void CreateSpriteList (object_id_t id, uint32 list_subid, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch);

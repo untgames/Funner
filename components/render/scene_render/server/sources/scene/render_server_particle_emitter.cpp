@@ -127,15 +127,15 @@ void ParticleEmitter::SetParticleSystemId (const char* id)
 }
 
 /*
-   Particle system time
+   Update particle system
 */
 
-void ParticleEmitter::SetParticleSystemTime (interchange::uint32 new_time)
+void ParticleEmitter::UpdateParticleSystem (interchange::uint32 new_time, const common::PropertyMap& properties)
 {
   try
   {
     //update particle system
-    impl->particle_system.Update (TimeValue (new_time, 1000));
+    impl->particle_system.Update (TimeValue (new_time, 1000), &properties);
 
     //update particles list
     for (size_t i = 0, count = impl->particle_system.ScenesCount (); i < count; i++)
