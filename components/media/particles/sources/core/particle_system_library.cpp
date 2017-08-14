@@ -282,7 +282,7 @@ void ParticleSystemLibrary::Load (const char* file_name)
 
   try
   {
-    static common::ComponentLoader loader ("media.particles.loaders.*");
+    RegisterDefaultLoaders ();
 
     ParticleSystemLibraryManager::GetLoader (file_name, common::SerializerFindMode_ByName)(file_name, *this);
   }
@@ -307,6 +307,15 @@ void ParticleSystemLibrary::Unload (const char* file_name)
     exception.touch ("media::particles::ParticleSystemLibrary::Unload");
     throw;
   }
+}
+
+/*
+   Register default serializers
+*/
+
+void ParticleSystemLibrary::RegisterDefaultLoaders ()
+{
+  static common::ComponentLoader loader ("media.particles.loaders.*");
 }
 
 /*

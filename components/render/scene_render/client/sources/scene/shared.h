@@ -26,7 +26,6 @@
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
-#include <shared/particle_system_manager.h>
 
 #include "visual_model.h"
 

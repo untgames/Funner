@@ -52,6 +52,8 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
+    case CommandId_SetParticleEmitterSystemId: return "SetParticleEmitterSystemId";
+    case CommandId_SetParticleEmitterSystemTime: return "SetParticleEmitterSystemTime";
     case CommandId_ReserveSpriteLists: return "ReserveSpriteLists";
     case CommandId_CreateSpriteList: return "CreateSpriteList";
     case CommandId_RemoveSpriteList: return "RemoveSpriteList";
@@ -976,6 +978,42 @@ inline void ClientToServerSerializer::SetPageCurlParams(object_id_t id, const Pa
   }
 }
 
+inline void ClientToServerSerializer::SetParticleEmitterSystemId(object_id_t id, const char* system_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetParticleEmitterSystemId);
+    write(*this, id);
+    write(*this, system_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetParticleEmitterSystemTime(object_id_t id, uint32 new_time)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetParticleEmitterSystemTime);
+    write(*this, id);
+    write(*this, new_time);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::ReserveSpriteLists(object_id_t id, uint32 list_subids_count)
 {
   size_t saved_position = Position ();
@@ -1622,6 +1660,24 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg6 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetPageCurlParams(arg1, arg2, arg3, arg4, arg5, arg6);
+
+      return true;
+    }
+    case CommandId_SetParticleEmitterSystemId:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetParticleEmitterSystemId(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetParticleEmitterSystemTime:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+
+      dispatcher.SetParticleEmitterSystemTime(arg1, arg2);
 
       return true;
     }

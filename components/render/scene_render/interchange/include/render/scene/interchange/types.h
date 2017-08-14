@@ -56,18 +56,19 @@ enum TextureDimension
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum NodeType
 {
-  NodeType_Node,        //узел
-  NodeType_Entity,      //сущность
-  NodeType_Scissor,     //область отсечения
-  NodeType_VisualModel, //отображаемая модель
-  NodeType_SpriteModel, //спрайты
-  NodeType_StaticMesh,  //статический меш
-  NodeType_PointLight,  //точечный источник света
-  NodeType_SpotLight,   //конусоидальный источник света
-  NodeType_DirectLight, //направленный источник света
-  NodeType_PageCurl,    //разворот книги
-  NodeType_SpriteList,  //список спрайтов
-  NodeType_LineList,    //список линий
+  NodeType_Node,            //узел
+  NodeType_Entity,          //сущность
+  NodeType_Scissor,         //область отсечения
+  NodeType_VisualModel,     //отображаемая модель
+  NodeType_SpriteModel,     //спрайты
+  NodeType_StaticMesh,      //статический меш
+  NodeType_PointLight,      //точечный источник света
+  NodeType_SpotLight,       //конусоидальный источник света
+  NodeType_DirectLight,     //направленный источник света
+  NodeType_PageCurl,        //разворот книги
+  NodeType_SpriteList,      //список спрайтов
+  NodeType_LineList,        //список линий
+  NodeType_ParticleEmitter, //эмиттер частиц
 
   NodeType_Num
 };

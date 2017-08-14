@@ -177,7 +177,11 @@ void ResourceClient::LoadResource (const char* name)
 
     try
     {
-      impl->library->render_manager.Manager ().LoadResource (name);
+      ///check if resource is supported by particle system manager, load in render manager otherwise
+      if (impl->library->render_manager.ParticleSystemManager ().IsSupportedResource (name))
+        impl->library->render_manager.ParticleSystemManager ().Load (name);
+      else
+        impl->library->render_manager.Manager ().LoadResource (name);
     }
     catch (std::exception& e)
     {
@@ -235,7 +239,7 @@ void ResourceClient::UnloadResource (const char* name)
 
   if (resource->use_count () == 2)
   {
-      //there are no clients which referes to this resource
+      //there are no clients which refers to this resource
 
     impl->library->resources.erase (iter);
 

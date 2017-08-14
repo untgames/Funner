@@ -1,5 +1,8 @@
 #include "shared.h"
 
+const float ANGLE_MULTIPLIER = 0.003f;
+const float RADIUS_MULTIPLIER = 250.f;
+
 struct Test
 {
   RenderTarget&                 target;
@@ -29,54 +32,24 @@ void idle (Test& test)
   {
     static size_t last_fps = 0;
     static size_t frames_count = 0;
-    static int    spawn_enabled = 0;
-    static int    update_enabled = 1;
 
     size_t current_time = common::milliseconds ();
 
     if (current_time - last_fps > 1000)
     {
       printf ("FPS: %.2f\n", float (frames_count)/float (current_time - last_fps)*1000.f);
-      fflush (stdout);
-
-/*      if (!test.emitter.Scissor())
-      {
-        printf ("SET SCISSOR\n");
-
-        scene_graph::Scissor::Pointer scissor = scene_graph::Scissor::Create ();
-
-        scissor->SetScale (math::vec3f (50.f));
-        scissor->SetWorldPosition (math::vec3f (0.f, 2.f, 0.f));
-
-        scissor->BindToScene (*test.emitter.Scene (), scene_graph::NodeBindMode_AddRef);
-
-        test.emitter.SetScissor (scissor.get ());
-      }*/
 
       last_fps = current_time;
       frames_count = 0;
-      spawn_enabled++;
-      update_enabled++;
-
-      common::PropertyMap node_properties;
-
-      node_properties.SetProperty ("particles.ParticleDesigner.EmitCountMultiplier", spawn_enabled % 4 ? 0.f : 1.f);
-
-      test.emitter.SetProperties (&node_properties);
 
       return;
     }
 
-    test.emitter.Scale (1.f, 1.f , 1.f);
+    test.emitter.SetPosition (RADIUS_MULTIPLIER * sin (current_time * ANGLE_MULTIPLIER), RADIUS_MULTIPLIER * cos (current_time * ANGLE_MULTIPLIER), 0.f);
     
     frames_count++;
     
-//    float angle = common::milliseconds () / 100.0f;
-    
-//    test.emitter.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);
-
-    if (update_enabled % 4)
-      test.emitter.Update (scene_graph::TimeValue (current_time, 1000));
+    test.emitter.Update (scene_graph::TimeValue (current_time, 1000));
 
     test.target.Update ();      
   }
@@ -88,7 +61,7 @@ void idle (Test& test)
 
 int main ()
 {
-  printf ("Results of particle_emitter_1_test:\n");
+  printf ("Results of particle_emitter_2_test:\n");
 
   try
   {
@@ -103,6 +76,8 @@ int main ()
     Server server (SERVER_NAME/*, render::scene::server::ServerThreadingModel_SingleThreaded*/);
     Client client (SERVER_NAME);
 
+    client.LoadResource ("data/smoke.plist");
+
     common::PropertyMap window_properties;
     
     window_properties.SetProperty ("ColorBits", 32);
@@ -110,7 +85,6 @@ int main ()
 
     server.AttachWindow ("my_window", window, window_properties);
 
-    client.LoadResource ("data/smoke.plist");
     client.LoadResource ("data/render.rfx");
     client.LoadResource ("data/smoke.png");
     client.LoadResource ("data/smoke.xmtl");
@@ -126,10 +100,10 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (-100.0f);
-    camera->SetRight  (100.0f);
-    camera->SetBottom (-100.0f);
-    camera->SetTop    (100.0f);
+    camera->SetLeft   (-500.0f);
+    camera->SetRight  (500.0f);
+    camera->SetBottom (-500.0f);
+    camera->SetTop    (500.0f);
     camera->SetZNear  (0.0f);
     camera->SetZFar   (100.0f);
 
@@ -143,11 +117,7 @@ int main ()
 
     light->BindToParent (*camera);
 
-    scene_graph::ParticleEmitter::Pointer emitter = scene_graph::ParticleEmitter::Create ("data/smoke.plist");
-    
-/*    emitter->SetPosition (0, 0, 1);
-    emitter->SetScale (math::vec3f (0.8f));
-    emitter->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);*/
+    scene_graph::ParticleEmitter::Pointer emitter = scene_graph::ParticleEmitter::Create ("data/smoke.plist", &scene.Root ());
 
     emitter->BindToScene (scene);
     

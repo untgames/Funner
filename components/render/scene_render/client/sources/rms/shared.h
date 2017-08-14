@@ -21,6 +21,5 @@
 #include <shared/client.h>
 #include <shared/font_manager.h>
 #include <shared/material_manager.h>
-#include <shared/particle_system_manager.h>
 
 #endif

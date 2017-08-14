@@ -226,49 +226,6 @@ void Client::DetachAllFontLibraries ()
 }
 
 /*
-    Присоединение библиотеки систем частиц
-*/
-
-void Client::AttachParticleSystemLibrary (const media::particles::ParticleSystemLibrary& library)
-{
-  try
-  {
-    impl->connection->Client ().ParticleSystemManager ().AttachParticleSystemLibrary (library);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::client::Client::AttachParticleSystemLibrary");
-    throw;
-  }
-}
-
-void Client::DetachParticleSystemLibrary (const media::particles::ParticleSystemLibrary& library)
-{
-  try
-  {
-    impl->connection->Client ().ParticleSystemManager ().DetachParticleSystemLibrary (library);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::client::Client::DetachParticleSystemLibrary");
-    throw;
-  }
-}
-
-void Client::DetachAllParticleSystemLibraries ()
-{
-  try
-  {
-    impl->connection->Client ().ParticleSystemManager ().DetachAllParticleSystemLibraries ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::client::Client::DetachAllParticleSystemLibraries");
-    throw;
-  }
-}
-
-/*
    Ожидание незавершенных операций
 */
 

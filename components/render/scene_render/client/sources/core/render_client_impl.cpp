@@ -19,13 +19,11 @@ struct ManagersHolder
   SceneManager          scene_manager;
   MaterialManager       material_manager;
   FontManager           font_manager;
-  ParticleSystemManager particle_system_manager;  //TODO should we hold this not in managers holder, because it is not depend on context???
 
   ManagersHolder (ClientImpl& client, Context& context)
     : scene_manager (client, context)
     , material_manager (client, context)
     , font_manager (material_manager)
-    , particle_system_manager ()
   {
   }
 };
@@ -289,13 +287,4 @@ FontManager& ClientImpl::FontManager ()
     throw xtl::format_operation_exception ("render::scene::client::ClientImpl::FontManager", "Can't return FontManger: context is null");
 
   return impl->managers->font_manager;
-
-}
-
-ParticleSystemManager& ClientImpl::ParticleSystemManager ()
-{
-  if (!impl->context) //TODO should we do this check, because it is not depend on context???
-    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::ParticleSystemManager", "Can't return ParticleSystemManger: context is null");
-
-  return impl->managers->particle_system_manager;
 }
