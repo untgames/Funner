@@ -2,10 +2,8 @@
 
 const char* IMAGE_NAME = "data/pic1.dds";
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_texture2d_compressed_test:\n");
-  
   try
   {
     Test test ("disable=*");
@@ -26,9 +24,9 @@ int main ()
       throw xtl::format_operation_exception ("", "Unsupported dds texture format '%s'", image_format);
 
     TextureDesc texture_desc;
-    
+
     memset (&texture_desc, 0, sizeof texture_desc);
-    
+
     texture_desc.dimension            = TextureDimension_2D;
     texture_desc.width                = image.Width ();
     texture_desc.height               = image.Height ();
@@ -41,15 +39,15 @@ int main ()
     stl::vector<unsigned int> sizes (image.BlocksCount ());
 
     const media::CompressedImageBlockDesc* blocks = image.Blocks ();
-    
+
     unsigned int mips_count = image.BlocksCount ();
-    
-    printf ("Load %u mips:\n", mips_count);    
+
+    printf ("Load %u mips:\n", mips_count);
 
     for (unsigned int i=0, count=(unsigned int)sizes.size (); i<count; i++)
     {
       sizes [i] = blocks [i].size;
-      
+
       printf ("  level%02u: size=%u\n", i, sizes [i]);
     }
 
@@ -60,25 +58,43 @@ int main ()
     data.data  = image.Data ();
     data.sizes = &sizes [0];
 
-    TexturePtr texture (test.device->CreateTexture (texture_desc, data), false);    
-    
+    TexturePtr texture (test.device->CreateTexture (texture_desc, data), false);
+
     xtl::uninitialized_storage<char> buffer (get_image_size (image.Width (), image.Height (), PixelFormat_RGB8));
-    
+
     unsigned int width = image.Width (), height = image.Height ();
-    
+
     printf ("Set %u mips:\n", mips_count);
-    
+
     for (unsigned int i=0; i<mips_count; i++)
-    {            
+    {
       unsigned int size = get_image_size (width, height, PixelFormat_RGB8);
-      
+
       texture->GetData (0, i, 0, 0, width, height, PixelFormat_RGB8, buffer.data ());
-           
+
       printf ("  level%02u: width=%u, height=%u, hash=%08x\n", i, width, height, common::crc32 (buffer.data (), size));
-      
+
       width  = width > 1 ? width / 2 : width;
-      height = height > 1 ? height / 2 : height;      
+      height = height > 1 ? height / 2 : height;
     }
+  }
+  catch (std::exception& e)
+  {
+    printf ("exception: %s\n", e.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_texture2d_compressed_test:\n");
+  
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& e)
   {

@@ -38,42 +38,40 @@ void print (const char* message)
 {
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_shader_stage_state_block_test:\n");
-  
   try
   {
-    Test test;        
+    Test test;
 
     ShaderDesc shader_descs [] = {
       {"ffp_shader", ~0u, "", "ffp", ""},
-    };    
+    };
 
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));        
+    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
 
     static ProgramParameter shader_parameters [] = {
       {"LightPosition", ProgramParameterType_Float3, 3, 1, 0},
-    };    
-    
+    };
+
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof (shader_parameters) / sizeof (*shader_parameters), shader_parameters};
 
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));        
+    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));
 
     BufferDesc cb_desc;
-    
+
     memset (&cb_desc, 0, sizeof cb_desc);
-    
+
     cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;
 
     BufferPtr buffer (test.device->CreateBuffer (cb_desc), false);
-    
+
     test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
     test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    
+
     for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
       test.device->GetImmediateContext ()->SSSetConstantBuffer (i, buffer.get ());
 
@@ -81,10 +79,10 @@ int main ()
 
     src_state.Init (*test.device);
 
-    StateBlockMask mask;        
+    StateBlockMask mask;
 
     mask.Set (StateBlockGroup_ShaderStage);
-    
+
     for (unsigned int i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
     {
       mask.ss_samplers [i] = false;
@@ -92,28 +90,46 @@ int main ()
     }
 
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
-    
+
     state_block->Capture (test.device->GetImmediateContext ());
 
     test.device->GetImmediateContext ()->SSSetProgram (0);
     test.device->GetImmediateContext ()->SSSetProgramParametersLayout (0);
 
     for (unsigned int i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
-      test.device->GetImmediateContext ()->SSSetConstantBuffer (i, 0);    
+      test.device->GetImmediateContext ()->SSSetConstantBuffer (i, 0);
 
     printf ("after reset\n");
-    
+
     State dst_state;
-    
-    dst_state.Init (*test.device);    
+
+    dst_state.Init (*test.device);
     dst_state.Check (src_state);
 
     state_block->Apply (test.device->GetImmediateContext ());
 
-    printf ("after apply\n");    
+    printf ("after apply\n");
 
     dst_state.Init (*test.device);
     dst_state.Check (src_state);
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_shader_stage_state_block_test:\n");
+  
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {

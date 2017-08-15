@@ -8,14 +8,10 @@ void print (const char* log, const char* message)
     printf ("texture size warning detected\n", log);
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_texture1d_fail_test:\n");
-
   try
   {
-    LogFilter filter ("render.*", &print);
-    
     Test test;
 
     TextureDesc desc;
@@ -32,6 +28,26 @@ int main ()
     desc.access_flags         = AccessFlag_ReadWrite;
 
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_texture1d_fail_test:\n");
+
+  try
+  {
+    LogFilter filter ("render.*", &print);
+    
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {

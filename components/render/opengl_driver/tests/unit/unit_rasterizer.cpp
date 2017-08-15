@@ -28,10 +28,8 @@ inline void dump_desc (IRasterizerState* state)
   printf ("  antialiased_line_enable: %s\n", desc.antialiased_line_enable ? "true" : "false");
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_rasterizer_test:\n");
-  
   try
   {
     Test test;
@@ -53,7 +51,7 @@ int main ()
 
     Rect scissor = {0, 0, 128, 128};
     Viewport viewport;
-    
+
     viewport.x = 0;
     viewport.y = 0;
     viewport.width = 128;
@@ -68,6 +66,24 @@ int main ()
     dump_desc (test.device->GetImmediateContext ()->RSGetState ());
 
     test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_rasterizer_test:\n");
+  
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {
