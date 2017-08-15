@@ -18,7 +18,13 @@ function testASync ()
   client:SwitchToAsyncSending ()
   client:SwitchToAsyncReceiving ()
 
+  local data_received
+
   local function OnDataReceiving (data)
+    if data_received then return end  --at rare occasions callback called more than once, breaking unit testing
+  
+    data_received = true
+  
 --    print (data)
     print ("Response has been received")
     System.Application.Exit (0)
