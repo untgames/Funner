@@ -89,7 +89,8 @@ struct Params
   stl::string   layout_layers_dir_name;    //имя каталога с сохранёнными слоями, используемое в файле разметки
   stl::string   layers_format;             //строка форматирования имён слоёв
   stl::string   crop_exclude;              //необрезаемые слои
-  stl::string   dummy_materials_wildcard;  //маска имён слоев, для которых генерируются материалы-заглушки
+  stl::string   dummy_materials_wildcard;  //маски имён слоев, для которых генерируются материалы-заглушки
+  stl::string   skip_layers_wildcard;      //маски имён слоев, которые нужно выбросить из обработки
   unsigned int  crop_alpha;                //коэффициент обрезания по прозрачности
   unsigned int  zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
   unsigned int  blur_passes_count;         //количество проходов, используемое при блюре
@@ -277,6 +278,12 @@ void command_line_zalpha (const char* value, Params& params)
 void command_line_dummy_materials (const char* string, Params& params)
 {
   params.dummy_materials_wildcard = string;
+}
+
+//установка маски слоев, которые необходимо выбросить из обработки
+void command_line_skip_layers (const char* string, Params& params)
+{
+  params.skip_layers_wildcard = string;
 }
 
 //проверка корректности ввода
@@ -708,6 +715,20 @@ stl::string get_layer_name (const Params& params, const psd_layer_record& layer)
   return params.need_trim_name_spaces ? common::trim (ascii_layer_name.data ()) : ascii_layer_name.data ();
 }
 
+//нужно ли пропустить слой
+bool is_skipped_layer(const char* name, const common::StringArray& wildcards)
+{
+  for (size_t j = 0, count = wildcards.Size (); j < count; j++)
+  {
+    const char* mask = wildcards [j];
+
+    if (common::wcmatch (name, mask))
+      return true;
+  }
+
+  return false;
+}
+
 //экспорт
 void export_data (Params& params)
 {
@@ -725,18 +746,69 @@ void export_data (Params& params)
   if (!params.silent && params.need_crop_alpha)
     printf ("Crop layers by alpha...\n");
 
+  common::StringArray skip_layers_wildcard_list = common::split (params.skip_layers_wildcard.c_str ());
+
+    //построение дерева связности
+
+  typedef stl::vector<int>         IndexArray;
+  typedef stl::vector<stl::string> StringArray;
+
+  IndexArray  parents (context->layer_count, -1), index_stack, parent_id (context->layer_count, -1);
+  StringArray layer_names (context->layer_count);
+
+  index_stack.push_back (-1);
+
+  int group_id_counter = 0;
+
+  for (int i=0; i<context->layer_count; i++)
+  {
+    int               index = context->layer_count - i - 1; //обратный порядок
+    psd_layer_record& layer = context->layer_records [index];
+
+    layer_names [index] = get_layer_name (params, layer);
+    parents [index]     = index_stack.back ();
+
+    if (!strncmp (layer_names [index].c_str (), "</", 2))
+    {
+      if (index_stack.empty ())
+      {
+        printf ("error: Invalid folders structure. Attempt to close root folder");
+        exit (1);
+      }
+
+      index_stack.pop_back ();
+
+      continue;
+    }
+
+    switch (layer.layer_type)
+    {
+      case psd_layer_type_folder:
+        index_stack.push_back (index);
+        parent_id [index] = group_id_counter++;
+        break;
+      default:
+        break;
+    }
+  }
+
+    //экспорт слоев
+
   cropped_layers.reserve (context->layer_count);
 
   size_t image_index = 1;       
 
   for (int i=0; i<context->layer_count; i++)
   {
-    psd_layer_record& layer = context->layer_records [i];
-    stl::string       name  = get_layer_name (params, layer);
+    psd_layer_record&  layer = context->layer_records [i];
+    const stl::string& name  = layer_names [i];
 
     if (!strncmp (name.c_str (), "</", 2))
       continue;
     
+    if (is_skipped_layer (name.c_str (), skip_layers_wildcard_list))
+      continue;
+
     switch (layer.layer_type)
     {
       case psd_layer_type_normal:
@@ -744,16 +816,16 @@ void export_data (Params& params)
       default:
         continue;
     }
-    
+
     //проверка корректности имени слоя
     for (const char* symbol = name.c_str (); *symbol; symbol++)
     {
-      static const char* allowed_symbols = "_.- $%!@#^()[],~";
+      static const char* allowed_symbols = "_.- $%%!@#^()[],~=";
 
       if (!isalnum (*symbol) && !strchr (allowed_symbols, *symbol))
         throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
     }
-    
+
     //коррекция z-цвета
     
     if (params.need_replace_zcolor)
@@ -817,44 +889,72 @@ void export_data (Params& params)
 
     for (int i=0; i<context->layer_count; i++)
     {
-      psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = get_layer_name (params, layer);
+      psd_layer_record&  layer = context->layer_records [i];
+      const stl::string& name  = layer_names [i];
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
 
+      if (is_skipped_layer (name.c_str (), skip_layers_wildcard_list))
+        continue;
+
+      const char* tag         = "";
+      bool        need_layers = params.need_layers,
+                  need_bounds = true;
+
       switch (layer.layer_type)
       {
         case psd_layer_type_normal:
+          tag = "Layer";
           break;
+        case psd_layer_type_folder:
+        {
+          tag         = "Folder";
+          need_layers = false;
+          need_bounds = false;
+          break;
+        }
         default:
           continue;
       }
 
-      common::XmlWriter::Scope layer_scope (xml_writer, "Layer");
+      common::XmlWriter::Scope layer_scope (xml_writer, tag);
 
       xml_writer.WriteAttribute ("Name", name.c_str ());
 
-      if (params.need_layers)
+      if (layer.layer_type == psd_layer_type_folder)
+        xml_writer.WriteAttribute ("Id", parent_id [i]);
+
+      if (need_layers)
       {      
         stl::string dst_image_name = common::format (format.c_str (), image_index);      
       
         xml_writer.WriteAttribute ("Image",  dst_image_name.c_str ());
       }
-      
-      const Rect& cropped_rect = cropped_layers [image_index - 1];
-      
-      xml_writer.WriteAttribute ("Left",    layer.left + cropped_rect.x);
-      xml_writer.WriteAttribute ("Top",     layer.top + cropped_rect.y);
-      xml_writer.WriteAttribute ("Width",   cropped_rect.width);
-      xml_writer.WriteAttribute ("Height",  cropped_rect.height);
+
+      if (parents [i] != -1)
+      {
+        xml_writer.WriteAttribute ("Parent", layer_names [parents [i]].c_str ());
+        xml_writer.WriteAttribute ("ParentId", parent_id [parents [i]]);
+      }
+
+      if (need_bounds)
+      {
+        const Rect& cropped_rect = cropped_layers [image_index - 1];
+
+        xml_writer.WriteAttribute ("Left",    layer.left + cropped_rect.x);
+        xml_writer.WriteAttribute ("Top",     layer.top + cropped_rect.y);
+        xml_writer.WriteAttribute ("Width",   cropped_rect.width);
+        xml_writer.WriteAttribute ("Height",  cropped_rect.height);
+
+        image_index++;
+      }
+
       xml_writer.WriteAttribute ("Opacity", layer.opacity);
-      xml_writer.WriteAttribute ("Visible", layer.visible != 0);
-      
-      image_index++;      
+      xml_writer.WriteAttribute ("Visible", layer.visible != 0);      
     }
   }
-  
+
     //сохранение содержимого слоёв
   
   if (params.need_layers)
@@ -877,10 +977,13 @@ void export_data (Params& params)
 
     for (int i=0; i<context->layer_count; i++)
     {
-      psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = get_layer_name (params, layer);
+      psd_layer_record&  layer = context->layer_records [i];
+      const stl::string& name  = layer_names [i];
 
       if (!strncmp (name.c_str (), "</", 2))
+        continue;
+
+      if (is_skipped_layer (name.c_str (), skip_layers_wildcard_list))
         continue;
       
       switch (layer.layer_type)
@@ -1000,7 +1103,8 @@ int main (int argc, const char* argv [])
       {xtl::bind (&command_line_pot,                      _1, xtl::ref (params)), "pot",               0,           0, "extent layers image size to nearest greater power of two"},
       {xtl::bind (&command_line_crop_alpha,               _1, xtl::ref (params)), "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
       {xtl::bind (&command_line_crop_exclude,             _1, xtl::ref (params)), "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
-      {xtl::bind (&command_line_dummy_materials,          _1, xtl::ref (params)), "dummy-materials",   0, "wildcard", "set wildcard for images which will have dummy materials"},
+      {xtl::bind (&command_line_dummy_materials,          _1, xtl::ref (params)), "dummy-materials",   0, "wildcard", "set wildcards for images which will have dummy materials"},
+      {xtl::bind (&command_line_skip_layers,              _1, xtl::ref (params)), "skip-layers",       0, "wildcard", "set wildcards for layers which have to be removed from processing"},
       {xtl::bind (&command_line_fix_zero_alpha_color,     _1, xtl::ref (params)), "fix-zero-alpha",    0,     "value", "fixup color of pixels with alpha <= value"},
       {xtl::bind (&command_line_blur_passes_count,        _1, xtl::ref (params)), "blur-passes-count", 0,     "value", "number of blur passes (used in zero alpha fixup)"},
       {xtl::bind (&command_line_max_image_size,           _1, xtl::ref (params)), "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
