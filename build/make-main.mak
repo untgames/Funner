@@ -723,7 +723,6 @@ endif
 		@echo Running $$(notdir $$<)...
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteStarted name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$$(notdir $$@)' captureStandardOutput='true']")
-		@$(if $(TEAMCITY_PROJECT_NAME),exec 2>/dev/null)
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR)/$$(dir $$(patsubst $$($2.TMP_DIR)/%.result,%,$$@))),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > "$(CURDIR)/$$@"
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
@@ -735,7 +734,6 @@ endif
 		@echo Running $$(notdir $$<)...
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteStarted name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$$(notdir $$@)' captureStandardOutput='true']")
-		@$(if $(TEAMCITY_PROJECT_NAME),exec 2>/dev/null)
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR)/$$(dir $$(patsubst $$($2.TMP_DIR)/%.result,%,$$@))),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $(CURDIR)/$$@
 		@$(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$$(notdir $$@)']")
 		@$(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/ && TESTS_ABS_DIR=`cd $$($2.SOURCE_DIR) && pwd` && echo "##teamcity[testSuiteFinished name='$$$${TESTS_ABS_DIR/$$$$ROOT_ABS_DIR/}']")
