@@ -664,6 +664,7 @@ define check_test
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$3' captureStandardOutput='true']";) \
 diff --strip-trailing-cr --context=1 $1/$3 $2/$3; \
 RET=$$?; \
+$(if $(TEAMCITY_PROJECT_NAME),if [ $$RET -ne 0 ]; then echo "##teamcity[testFailed name='$3' message='']"; fi;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
 exit $$RET
 endef
