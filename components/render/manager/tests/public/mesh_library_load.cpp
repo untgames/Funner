@@ -1,5 +1,11 @@
 #include "shared.h"
 
+#ifdef LINUX
+const char* LIBRARY_NAME = "data/render_gles2.rfx";
+#else
+const char* LIBRARY_NAME = "data/render.rfx";
+#endif
+
 void on_application_initialized ()
 {
   try
@@ -12,7 +18,7 @@ void on_application_initialized ()
 
     render_manager.LoadResource ("data/test.xmesh");
     render_manager.LoadResource ("data/test.xmtl");
-    render_manager.LoadResource ("data/render.rfx");    
+    render_manager.LoadResource (LIBRARY_NAME);
     render_manager.LoadResource ("data/bottom.jpg");
     render_manager.LoadResource ("data/pic1.dds");    
     

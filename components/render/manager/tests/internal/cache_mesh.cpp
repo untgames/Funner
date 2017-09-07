@@ -2,6 +2,12 @@
 
 using namespace media::geometry;
 
+#ifdef LINUX
+const char* LIBRARY_NAME = "data/render_gles2.rfx";
+#else
+const char* LIBRARY_NAME = "data/render.rfx";
+#endif
+
 typedef Vertex<Position3f, Normalf, Color4ub, TexChannel<0>::Coord2f> CustomVertex;
 
 void on_application_initialized ()
@@ -20,7 +26,7 @@ void on_application_initialized ()
 
     render_manager.LoadResource ("data/test.xmesh");
     render_manager.LoadResource ("data/test.xmtl");
-    render_manager.LoadResource ("data/render.rfx");    
+    render_manager.LoadResource (LIBRARY_NAME);
     render_manager.LoadResource ("data/bottom.jpg");
     render_manager.LoadResource ("data/pic1.dds");
     

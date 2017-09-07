@@ -1,6 +1,10 @@
 #include "shared.h"
 
+#ifdef  LINUX
+const char* LIBRARY_NAME = "data/render_gles2.rfx";
+#else
 const char* LIBRARY_NAME = "data/render.rfx";
+#endif
 
 void on_application_initialized ()
 {
