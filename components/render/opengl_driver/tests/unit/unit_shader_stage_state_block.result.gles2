@@ -1,0 +1,4 @@
+Results of unit_shader_stage_state_block_test:
+exception: Shader profile 'ffp' not supported
+    at render::low_level::opengl::ShaderStage::Impl::CreateProgram
+    at render::low_level::opengl::Device::CreateProgram
