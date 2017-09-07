@@ -659,14 +659,25 @@ define process_tests_source_dir_run_test
 
 endef
 
-#Check one test (directory name with expected result, directory name with actual result, result file name)
+#Check one test (directory name with expected result, directory name with actual result, expected result file name)
 define check_test
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$3' captureStandardOutput='true']";) \
-diff --strip-trailing-cr --context=1 $1/$3 $2/$3; \
+export ACTUAL_RESULT_FILE=$3; \
+diff --strip-trailing-cr --context=1 $1/$3 $2/`if [ "$${ACTUAL_RESULT_FILE##*.}" == "result" ]; then echo $$ACTUAL_RESULT_FILE; else echo $${ACTUAL_RESULT_FILE%.*}; fi`; \
 RET=$$?; \
 $(if $(TEAMCITY_PROJECT_NAME),if [ $$RET -ne 0 ]; then echo "##teamcity[testFailed name='$3' message='']"; fi;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
 exit $$RET
+endef
+
+#Return profile specific result files (source dir, result file)
+define get_profile_specific_result_files
+$(strip $(foreach profile,$(PROFILES),$(patsubst $1/%,%,$(wildcard $1/$2.$(profile)))))
+endef
+
+#Returns result files for testing (source dir, result file)
+define get_profile_specific_result_files_or_default
+$(if $(call get_profile_specific_result_files,$1,$2),$(call get_profile_specific_result_files,$1,$2),$2)
 endef
 
 #Check group of tests (source dir, results dir, files names, ignored files names)
@@ -675,7 +686,7 @@ $(if $(TEAMCITY_PROJECT_NAME),ROOT_ABS_DIR=`cd $(ROOT) && pwd`/;) \
 $(if $(TEAMCITY_PROJECT_NAME),TESTS_ABS_DIR=`cd $1 && pwd`;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteStarted name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 ERROR=0 && \
-$(call for_each_file,file,$3,($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
+$(call for_each_file,file,$(foreach file,$3,$(call get_profile_specific_result_files_or_default,$1,$(file))),($(call check_test,$1,$2,$$file) ); RET=$$?; if [ $$RET -ne 0 ]; then ERROR=$$RET; fi); \
 $(if $(TEAMCITY_PROJECT_NAME),$(call for_each_file,file,$4,echo "##teamcity[testIgnored name='$$file' message='']");) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testSuiteFinished name='$${TESTS_ABS_DIR/$$ROOT_ABS_DIR/}']";) \
 exit $$ERROR
@@ -690,7 +701,7 @@ define process_tests_source_dir
   endif
 
   $2.TEST_EXE_FILES     := $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$(patsubst $$($2.TMP_DIR)/%$(OBJ_SUFFIX),$$($2.TARGET_DIR)/%$(EXE_SUFFIX),$$($2.OBJECT_FILES)))
-  $2.TEST_RESULT_FILES  := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
+  $2.TEST_RESULT_FILES  := $$(addprefix $$($2.TMP_DIR)/,$$(foreach file,$$(patsubst $$($2.SOURCE_DIR)/%,%,$$(wildcard $$($2.SOURCE_DIR)/*.result)),$$(if $$(call get_profile_specific_result_files_or_default,$$($2.SOURCE_DIR),$$(file)),$$(file))))
   $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   $2.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
   $2.RUN_FILES          := $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$($2.TEST_EXE_FILES))
