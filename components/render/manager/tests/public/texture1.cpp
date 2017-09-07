@@ -2,10 +2,8 @@
 
 const char* IMAGE_NAME = "data/bottom.jpg";
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of texture1_test:\n");
-  
   try
   {
     Test test (L"Texture1 test", false);
@@ -27,6 +25,24 @@ int main ()
   catch (std::exception& e)
   {
     printf ("%s\n", e.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of texture1_test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
   }
 
   return 0;

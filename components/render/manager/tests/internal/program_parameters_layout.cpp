@@ -1,9 +1,7 @@
 #include "shared.h"
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of program_parameters_layout_test:\n");
-  
   try
   {
     Test test (L"Program parameters layout");
@@ -31,6 +29,24 @@ int main ()
   catch (std::exception& e)
   {
     printf ("%s\n", e.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of program_parameters_layout_test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
   }
 
   return 0;
