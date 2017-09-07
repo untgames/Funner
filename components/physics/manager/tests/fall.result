@@ -9,7 +9,7 @@ Initial static body state:
   ccd motion threshold = 0.00
   collision group = ''
 Body world transform:
-  position = 0; 0; 0
+  position = 0.00; 0.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 Initial light falling body state:
   mass = 1.00
@@ -17,61 +17,61 @@ Initial light falling body state:
   angular sleeping threshold = 1.00
   ccd motion threshold = 0.00
 Body world transform:
-  position = -5; 0; 0
+  position = -5.00; 0.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 Initial heavy falling body state:
   mass = 5.00
 Body world transform:
-  position = 5; 0; 0
+  position = 5.00; 0.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 static body state:
   mass = 0.00
 Body world transform:
-  position = 0; 0; 0
+  position = 0.00; 0.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 light falling body state:
   mass = 1.00
 Body world transform:
-  position = -6; -4; 0
+  position = -6.40; -4.89; 0.00
   orientation = 0.0; 0.0; 0.0; 0.9
 heavy falling body state:
   mass = 5.00
 Body world transform:
-  position = 5; -4; 0
+  position = 5.00; -4.81; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 ground plane state:
   mass = 0.00
 Body world transform:
-  position = 0; -15; 0
+  position = 0.00; -15.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 ground plane state:
 Body world transform:
-  position = 0; -15; 0
+  position = 0.00; -15.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 light falling body state:
 Body world transform:
-  position = -6; -14; 0
+  position = -6.80; -14.00; 0.00
   orientation = 0.0; 0.0; 0.0; 0.9
 scaled falling body state:
 Body world transform:
-  position = -3; -13; 0
+  position = -3.54; -13.00; 0.00
   orientation = 0.0; 0.0; 0.2; 0.9
 heavy falling body state:
 Body world transform:
-  position = 5; -14; 0
+  position = 5.00; -14.00; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second after deleting ground
 light falling body state:
 Body world transform:
-  position = -7; -18; 0
+  position = -7.00; -18.97; 0.00
   orientation = 0.0; 0.0; 0.0; 0.9
 scaled falling body state:
 Body world transform:
-  position = -3; -17; 0
+  position = -3.89; -17.98; 0.00
   orientation = 0.0; 0.0; 0.3; 0.9
 heavy falling body state:
 Body world transform:
-  position = 5; -18; 0
+  position = 5.00; -18.97; 0.00
   orientation = 0.0; 0.0; 0.0; 1.0
