@@ -182,13 +182,7 @@ struct ParticleSubPool: public xtl::reference_counter
 
       capacity -= desc.capacity;
 
-      BufferList::reverse_iterator next = it;
-
-      ++next;
-
-      buffers.erase (--(it.base ()));
-
-      it = next;
+      it = BufferList::reverse_iterator (buffers.erase (--(it.base ())));
     }
   }
 };
