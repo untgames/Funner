@@ -1,6 +1,5 @@
 #include "shared.h"
 
-using namespace media::particles;
 using namespace render::scene;
 using namespace render::scene::client;
 
@@ -22,7 +21,7 @@ class ParticleEmitterController : public scene_graph::Controller
       return Pointer (new ParticleEmitterController (node), false);
     }
 
-    const TimeValue& PlayTime ()
+    const scene_graph::TimeValue& PlayTime ()
     {
       return play_time;
     }
@@ -47,7 +46,7 @@ class ParticleEmitterController : public scene_graph::Controller
 
   private:
     scene_graph::ParticleEmitter* emitter;    //emitter node
-    TimeValue                     play_time;  //total play time
+    scene_graph::TimeValue        play_time;  //total play time
 };
 
 /*
@@ -84,7 +83,7 @@ class ParticleEmitter: public VisualModel
         //update base class
         VisualModel::UpdateCore (context);
 
-        const TimeValue& current_play_time = emitter_controller->PlayTime ();
+        const scene_graph::TimeValue& current_play_time = emitter_controller->PlayTime ();
 
         //Check if server object should be updated
 
@@ -126,7 +125,7 @@ class ParticleEmitter: public VisualModel
 
   private:
     ParticleEmitterController::Pointer  emitter_controller;       //emitter controller for tracking play time
-    TimeValue                           last_play_time;           //last emitter play time
+    scene_graph::TimeValue              last_play_time;           //last emitter play time
     PropertyMapSynchronizer             synchronizer;             //node properties synchronizer
     size_t                              cached_properties_id;     //cached node properties id
 };

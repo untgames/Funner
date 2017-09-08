@@ -13,7 +13,6 @@
 #include <common/time.h>
 
 #include <media/image.h>
-#include <media/particles/particle_system.h>
 
 #include <sg/light.h>
 #include <sg/line.h>

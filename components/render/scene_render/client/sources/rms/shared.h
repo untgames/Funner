@@ -13,7 +13,6 @@
 
 #include <media/font_library.h>
 #include <media/image.h>
-#include <media/particles/particle_system_library.h>
 #include <media/rasterized_font.h>
 
 #include <render/scene_render_client.h>
