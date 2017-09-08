@@ -46,9 +46,9 @@ void dump_body_position (IRigidBody* body)
   math::vec3f world_position = body_transform.position;
 
   for (unsigned int i = 0; i < 3; i++)
-    convert_float (world_position [i], 1);
+    convert_float (world_position [i], 100);
 
-  printf ("  position = %.0f; %.0f; %.0f\n", world_position.x, world_position.y, world_position.z);
+  printf ("  position = %.2f; %.2f; %.2f\n", world_position.x, world_position.y, world_position.z);
 
   math::quatf world_orientation = body_transform.orientation;
 

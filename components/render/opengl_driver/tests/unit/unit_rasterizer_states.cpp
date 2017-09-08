@@ -49,10 +49,8 @@ void test_state(const RasterizerDesc& desc, IDevice* device)
   }
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_rasterizer_states test:\n");
-
   try
   {
     Test test;
@@ -91,6 +89,24 @@ int main ()
     printf ("Success tests count: %u\n", success_tests);
     printf ("Wrong tests count:   %u\n", wrong_tests);
     printf ("Fail tests count:    %u\n", fail_tests);
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_rasterizer_states test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {

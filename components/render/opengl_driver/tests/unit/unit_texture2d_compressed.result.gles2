@@ -1,0 +1,16 @@
+Results of unit_texture2d_compressed_test:
+Load 11 mips:
+  level00: size=131072
+  level01: size=32768
+  level02: size=8192
+  level03: size=2048
+  level04: size=512
+  level05: size=128
+  level06: size=32
+  level07: size=16
+  level08: size=8
+  level09: size=8
+  level10: size=8
+Set 11 mips:
+exception: Get texture image data not supported
+    at render::low_level::opengl::Texture::GetData

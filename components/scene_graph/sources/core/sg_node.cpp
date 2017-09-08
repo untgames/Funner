@@ -310,6 +310,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
     next_updatable_child      = 0;
     first_controller          = 0;
     last_controller           = 0;
+    has_updatable_controllers = 0;
     first_node_iterator       = 0;
     first_controller_iterator = 0;
 

@@ -157,9 +157,7 @@ class AsyncProcessor
     AsyncProcessor (const char* name)
       : log (name)
       , stop_requested (false)
-      , thread (name, xtl::bind (&AsyncProcessor::Run, this))
-    {
-    }
+      {}
 
 ///Деструктор
     virtual ~AsyncProcessor ()
@@ -173,12 +171,21 @@ class AsyncProcessor
       }
     }
 
+///Запуск обработки
+    void Start ()
+    {
+      if (thread)
+        throw xtl::format_operation_exception ("network::AsyncProcessor::Start", "Can't do start more than once.");
+
+      thread.reset (new syslib::Thread (log.Name (), xtl::bind (&AsyncProcessor::Run, this)));
+    }
+
 ///Остановка обработки
     void Stop ()
     {
       stop_requested = true;
 
-      thread.Join ();
+      thread->Join ();
     }
 
     void StopRequest () { stop_requested = true; }
@@ -213,9 +220,9 @@ class AsyncProcessor
     virtual void DoStep () = 0;
 
   private:    
-    common::Log    log;            //поток отладочного протоколирования
-    volatile bool  stop_requested; //запрошена остановка
-    syslib::Thread thread;         //нить отсылки данных
+    common::Log                   log;            //поток отладочного протоколирования
+    volatile bool                 stop_requested; //запрошена остановка
+    stl::auto_ptr<syslib::Thread> thread;         //нить отсылки данных
 };
 
 ///Асинхронная отсылка данных
@@ -228,6 +235,7 @@ class AsyncSender: public AsyncProcessor
       , socket (in_socket)
       , queue (ASYNC_SENDING_QUEUE_MAX_SIZE)
     {
+      Start ();
     }
 
 ///Деструктор
@@ -303,6 +311,8 @@ class AsyncReceiver: public AsyncProcessor, public common::Lockable
       , handler (in_handler)
     {
       buffer.resize (DEFAULT_ASYNC_RECEIVE_BUFFER_RECEIVE_SIZE);
+
+      Start ();
     }
 
 ///Деструктор

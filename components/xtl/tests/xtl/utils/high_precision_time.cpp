@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#ifdef __APPLE__
+#if defined (__APPLE__) || defined (LINUX)
 #include <sys/time.h>
 #else
 #include <time.h>
@@ -16,7 +16,7 @@ int main ()
 
   high_precision_time_t start_time = high_precision_time ();
 
-#ifdef __APPLE__  //clock is not correct on mac x64
+#if defined (__APPLE__) || defined (LINUX)  //clock is not correct on mac x64 and ubuntu
   timeval start;
 
   gettimeofday (&start, 0);

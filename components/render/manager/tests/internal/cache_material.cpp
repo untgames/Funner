@@ -1,9 +1,13 @@
 #include "shared.h"
 
-int main ()
+#ifdef LINUX
+const char* LIBRARY_NAME = "data/render_gles2.rfx";
+#else
+const char* LIBRARY_NAME = "data/render.rfx";
+#endif
+
+void on_application_initialized ()
 {
-  printf ("Results of cache_material_test:\n");
-  
   try
   {
     printf ("--- Create device ---\n");
@@ -18,7 +22,7 @@ int main ()
 
     render_manager.LoadResource ("data/test.xmesh");
     render_manager.LoadResource ("data/test.xmtl");
-    render_manager.LoadResource ("data/render.rfx");    
+    render_manager.LoadResource (LIBRARY_NAME);
     render_manager.LoadResource ("data/bottom.jpg");
     render_manager.LoadResource ("data/pic1.dds");
     
@@ -110,6 +114,24 @@ int main ()
   catch (std::exception& e)
   {
     printf ("%s\n", e.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of cache_material_test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
   }
 
   return 0;

@@ -45,7 +45,7 @@ enum TouchState
   TouchState_Released
 };
 
-const touch_t MOUSE_TOUCH_ID = touch_t (~0u); //идентификатор тача мыши
+const touch_t MOUSE_TOUCH_ID = touch_t (~0);  //идентификатор тача мыши
 const int     MOUSE_HOVER_ID = -1;            //идентификатор hover
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

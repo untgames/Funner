@@ -99,10 +99,8 @@ void test_blend_state (const BlendDesc& desc, IDevice* device)
   fflush (stdout);
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_blend_states test:\n");
-
   try
   {
     Test test;
@@ -154,6 +152,24 @@ int main ()
     printf ("Success tests count: %u\n", success_tests);
     printf ("Wrong tests count:   %u\n", wrong_tests);
     printf ("Fail tests count:    %u\n", total_tests - success_tests - wrong_tests);
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_blend_states test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {

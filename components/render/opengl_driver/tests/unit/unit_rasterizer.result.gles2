@@ -1,0 +1,13 @@
+Results of unit_rasterizer_test:
+Rasterizer state:
+  fill_mode:               FillMode_Solid
+  cull_mode:               CullMode_None
+  front_counter_clockwise: true
+  depth_bias:              0
+  scissor_enable:          false
+  multisample_enable:      false
+  antialiased_line_enable: false
+exception: desc.fill_mode=FillMode_Wireframe not supported
+    at render::low_level::opengl::RasterizerState::SetDesc
+    at render::low_level::opengl::OutputStage::CreateRasterizerState
+    at render::low_level::opengl::Device::CreateRasterizerState

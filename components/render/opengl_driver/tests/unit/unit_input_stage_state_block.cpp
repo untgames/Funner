@@ -25,10 +25,8 @@ struct State
   }
 };
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of unit_input_stage_state_block_test:\n");
-  
   try
   {
     Test test;
@@ -91,6 +89,24 @@ int main ()
   {
     printf ("exception: %s\n", exception.what ());
   }  
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of unit_input_stage_state_block_test:\n");
+
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
 
   return 0;
 }

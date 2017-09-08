@@ -1,0 +1,32 @@
+Results of program_parameters_layout_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UShort
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=aVertex, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=aNormal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=aTexCoord0, type=float2, slot=0, offset=24, stride=36
+render.manager: ......semantic=aColor, type=ubyte_norm4, slot=0, offset=32, stride=36
+render.manager: ...layout created (hash=82a47d04)
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
+window 800x600 added
+render.manager: Program parameters layout created (id=1)
+render.manager: Updating program parameters layout with 0 parameters (id=1):
+render.manager: ...program parameters layout updated (hash=ffffffff)
+render.manager: Creating low-level layout for program parameters layout (id=1)
+render.manager: Program parameters layout created (id=2)
+render.manager: Updating program parameters layout with 5 parameters (id=2):
+render.manager: ...slot[3]: hash=bf8ce873, parameters_count=5
+render.manager: ......name='A', type=integer, offset=0
+render.manager: ......name='B', type=vector, offset=4
+render.manager: ......name='C', type=matrix, offset=20
+render.manager: ......name='D', type=float, offset=84
+render.manager: ...program parameters layout updated (hash=2243454c)
+render.manager: Creating low-level layout for program parameters layout (id=2)
+render.manager: Program parameters layout destroyed (id=2)
+render.manager: Program parameters layout destroyed (id=1)
+window 800x600 removed
