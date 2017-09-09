@@ -1,0 +1,58 @@
+Results of shapes_test:
+plane body state:
+Body world transform:
+  position = 0.00; -15.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+box body state:
+Body world transform:
+  position = -10.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+sphere body state:
+Body world transform:
+  position = -7.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+capsule body state:
+Body world transform:
+  position = -4.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+convex body state:
+Body world transform:
+  position = -1.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+triangle mesh body state:
+Body world transform:
+  position = 2.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+compound body state:
+Body world transform:
+  position = 5.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating ten seconds
+plane body state:
+Body world transform:
+  position = 0.00; -15.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+box body state:
+Body world transform:
+  position = -9.99; -13.99; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0
+sphere body state:
+Body world transform:
+  position = -7.00; -493.06; 0.00
+  orientation = 0.4; 0.4; 0.4; 0.6
+capsule body state:
+Body world transform:
+  position = -4.04; -13.74; 0.10
+  orientation = 0.0; 0.0; 0.0; 0.9
+convex body state:
+Body world transform:
+  position = -1.00; -13.44; 0.00
+  orientation = 0.0; 0.0; 0.0; 0.9
+triangle mesh body state:
+Body world transform:
+  position = 2.00; -493.47; 0.00
+  orientation = 0.0; 0.0; 0.0; 0.9
+compound body state:
+Body world transform:
+  position = 5.00; -9.99; 0.00
+  orientation = 0.0; 0.0; 0.0; 0.9
