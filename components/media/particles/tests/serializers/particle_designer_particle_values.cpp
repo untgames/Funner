@@ -21,7 +21,9 @@ int main ()
     {
       ParticleSystemLibrary library (LIBRARY_NAMES [current_library]);
 
-      RandomGenerator random;
+      MyRand rand_function;
+
+      RandomGenerator random (rand_function);
 
       for (ParticleSystemLibrary::Iterator iter = library.CreateIterator (); iter; ++iter)
       {

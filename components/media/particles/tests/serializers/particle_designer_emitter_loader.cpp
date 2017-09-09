@@ -43,7 +43,9 @@ int main ()
       printf ("  name: '%s'\n", library.Name ());
       printf ("  size: %u\n", library.Size ());
 
-      RandomGenerator random;
+      MyRand rand_function;
+
+      RandomGenerator random (rand_function);
 
       for (ParticleSystemLibrary::ConstIterator iter = library.CreateIterator (); iter; ++iter)
       {
