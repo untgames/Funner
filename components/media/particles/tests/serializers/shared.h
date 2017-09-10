@@ -17,7 +17,7 @@ using namespace common;
 
 struct MyRand
 {
-  size_t next;
+  uint32_t next;
 
   MyRand () : next (0) {}
 
