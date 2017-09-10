@@ -85,7 +85,7 @@ int main ()
           {
             bound_volumes::aaboxf box = system.Scene (j).BoundBox ();
 
-            printf ("  scene %zu aabb(%.2f): [%.3f; %.3f; %.3f] - [%.3f; %.3f; %.3f]\n", j, tv.cast<float> (), box.minimum ().x, box.minimum ().y, box.minimum ().z,
+            printf ("  scene %u aabb(%.2f): [%.3f; %.3f; %.3f] - [%.3f; %.3f; %.3f]\n", j, tv.cast<float> (), box.minimum ().x, box.minimum ().y, box.minimum ().z,
                     box.maximum ().x, box.maximum ().y, box.maximum ().z);
           }
         }
