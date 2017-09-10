@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <exception>
 
+#include <stdint.h>
+
 #include <stl/string>
 
 #include <xtl/iterator.h>
