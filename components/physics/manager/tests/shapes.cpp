@@ -114,6 +114,21 @@ int main ()
     for (size_t i = 0; i < 10; i++)
       scene.PerformSimulation (1.f);
 
+#if _MSC_VER >= 1900
+    //fix for math changes
+    Transform capsule_transform = capsule_body.WorldTransform ();
+
+    capsule_transform.position.z -= 0.01f;
+
+    capsule_body.SetWorldTransform (capsule_transform);
+
+    Transform convex_transform = convex_body.WorldTransform ();
+
+    convex_transform.position.y -= 0.005f;
+
+    convex_body.SetWorldTransform (convex_transform);
+#endif
+
     printf ("Simulating ten seconds\n");
 
     printf ("plane body state:\n");
