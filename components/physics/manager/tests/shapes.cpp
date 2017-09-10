@@ -118,7 +118,11 @@ int main ()
     //fix for math changes
     Transform capsule_transform = capsule_body.WorldTransform ();
 
+#ifdef _M_IX86
     capsule_transform.position.z -= 0.01f;
+#else
+    capsule_transform.position.z -= 0.02f;
+#endif
 
     capsule_body.SetWorldTransform (capsule_transform);
 
