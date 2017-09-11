@@ -125,7 +125,9 @@ int main ()
 #endif
 
     capsule_body.SetWorldTransform (capsule_transform);
+#endif
 
+#ifdef _MSC_VER
     Transform convex_transform = convex_body.WorldTransform ();
 
     convex_transform.position.y -= 0.005f;
