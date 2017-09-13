@@ -38,16 +38,6 @@ class SpriteList: public VisualModel
 
         if (need_update_params)
         {
-          interchange::SpriteMode mode;
-
-          switch (model.Mode ())
-          {
-            default:
-            case scene_graph::SpriteMode_Billboard:         mode = interchange::SpriteMode_Billboard; break;
-            case scene_graph::SpriteMode_Oriented:          mode = interchange::SpriteMode_Oriented; break;
-            case scene_graph::SpriteMode_OrientedBillboard: mode = interchange::SpriteMode_OrientedBillboard; break;
-          }
-
           interchange::PrimitiveUsage usage;
 
           switch (model.Usage ())
@@ -59,7 +49,7 @@ class SpriteList: public VisualModel
             case scene_graph::SpriteUsage_Batching: usage = interchange::PrimitiveUsage_Batching; break;
           }
 
-          context.CreateSpriteList (Id (), 0, mode, usage, model.OrtUp (), model.Batch ());
+          context.CreateSpriteList (Id (), 0, get_sprite_mode (model.Mode ()), usage, model.OrtUp (), model.Batch ());
 
           need_update_descs  = true;
           need_update_params = false;
@@ -123,6 +113,17 @@ namespace client {
 Node* create_node (scene_graph::SpriteModel& model, SceneManager& scene_manager)
 {
   return new SpriteList (model, scene_manager);
+}
+
+interchange::SpriteMode get_sprite_mode (scene_graph::SpriteMode sprite_mode)
+{
+  switch (sprite_mode)
+  {
+    default:
+    case scene_graph::SpriteMode_Billboard:         return interchange::SpriteMode_Billboard;
+    case scene_graph::SpriteMode_Oriented:          return interchange::SpriteMode_Oriented;
+    case scene_graph::SpriteMode_OrientedBillboard: return interchange::SpriteMode_OrientedBillboard;
+  }
 }
 
 }}}

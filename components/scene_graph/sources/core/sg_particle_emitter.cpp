@@ -10,14 +10,16 @@ typedef xtl::signal<void (ParticleEmitter& sender, ParticleEmitterEvent event)> 
 
 struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 {
-  stl::string           particle_system_id;                   //particle system identifier (as loaded in media::ParticleSystemLibrary)
-  xtl::auto_connection  particles_parent_destroy_connection;  //particles parent node's destroy connection
-  ParticleEmitterSignal signals [ParticleEmitterEvent_Num];   //signals
-  Node*                 particles_parent;                     //particles are emitted in coordinate space of this node
-  bool                  is_playing;                           //is emitter emits particles now
+  stl::string             particle_system_id;                   //particle system identifier (as loaded in media::ParticleSystemLibrary)
+  xtl::auto_connection    particles_parent_destroy_connection;  //particles parent node's destroy connection
+  ParticleEmitterSignal   signals [ParticleEmitterEvent_Num];   //signals
+  Node*                   particles_parent;                     //particles are emitted in coordinate space of this node
+  scene_graph::SpriteMode sprite_mode;                          //sprite mode
+  bool                    is_playing;                           //is emitter emits particles now
 
-  Impl (const char* in_particle_system_id, Node* in_particles_parent)
+  Impl (const char* in_particle_system_id, Node* in_particles_parent, scene_graph::SpriteMode in_sprite_mode)
     : particles_parent (in_particles_parent)
+    , sprite_mode (in_sprite_mode)
     , is_playing (true)
   {
     if (!in_particle_system_id)
@@ -58,8 +60,8 @@ struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
     Constructor / destructor
 */
 
-ParticleEmitter::ParticleEmitter (const char* particle_system_id, Node::Pointer particles_parent)
-  : impl (new Impl (particle_system_id, particles_parent ? particles_parent.get () : this))
+ParticleEmitter::ParticleEmitter (const char* particle_system_id, Node::Pointer particles_parent, scene_graph::SpriteMode sprite_mode)
+  : impl (new Impl (particle_system_id, particles_parent ? particles_parent.get () : this, sprite_mode))
   {}
 
 ParticleEmitter::~ParticleEmitter ()
@@ -71,9 +73,9 @@ ParticleEmitter::~ParticleEmitter ()
     Emitter creation
 */
 
-ParticleEmitter::Pointer ParticleEmitter::Create (const char* particle_system_id, Node::Pointer particles_parent)
+ParticleEmitter::Pointer ParticleEmitter::Create (const char* particle_system_id, Node::Pointer particles_parent, scene_graph::SpriteMode sprite_mode)
 {
-  return Pointer (new ParticleEmitter (particle_system_id, particles_parent), false);
+  return Pointer (new ParticleEmitter (particle_system_id, particles_parent, sprite_mode), false);
 }
 
 /*
@@ -93,6 +95,16 @@ Node::Pointer ParticleEmitter::ParticlesParent () const
 {
   return impl->particles_parent;
 }
+
+/*
+    Sprite mode
+*/
+
+scene_graph::SpriteMode ParticleEmitter::SpriteMode () const
+{
+  return impl->sprite_mode;
+}
+
 
 /*
    Control simualtion process

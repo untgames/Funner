@@ -384,9 +384,9 @@ void bind_static_mesh_library (Environment& environment)
     Работа с эмиттером частиц
 */
 
-ParticleEmitter::Pointer create_particle_emitter (const char* particle_system_id, Node* particles_parent)
+ParticleEmitter::Pointer create_particle_emitter (const char* particle_system_id, Node* particles_parent, SpriteMode sprite_mode)
 {
-  return ParticleEmitter::Create (particle_system_id, particles_parent);
+  return ParticleEmitter::Create (particle_system_id, particles_parent, sprite_mode);
 }
 
 void bind_particle_emitter_library (Environment& environment)
@@ -399,12 +399,19 @@ void bind_particle_emitter_library (Environment& environment)
 
     //регистрация функций создания
 
-  lib.Register ("Create", make_invoker (&create_particle_emitter));
+  lib.Register ("Create", make_invoker (make_invoker (&create_particle_emitter),
+                                        make_invoker<void (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
+                                        make_invoker<void (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
 
     //регистрация операций
 
   lib.Register ("get_ParticleSystemId", make_invoker (&ParticleEmitter::ParticleSystemId));
   lib.Register ("get_ParticlesParent", make_invoker (&ParticleEmitter::ParticlesParent));
+  lib.Register ("get_SpriteMode", make_invoker (&ParticleEmitter::SpriteMode));
+  lib.Register ("get_IsPlaying", make_invoker (&ParticleEmitter::IsPlaying));
+
+  lib.Register ("Pause", make_invoker (&ParticleEmitter::Pause));
+  lib.Register ("Play", make_invoker (&ParticleEmitter::Play));
 
   environment.RegisterType<ParticleEmitter> (SCENE_PARTICLE_EMITTER_LIBRARY);
 }

@@ -59,6 +59,9 @@ Node* create_node (scene_graph::LineModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::TextModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::ParticleEmitter&, SceneManager& scene_manager);
 
+///Получение для scene_graph::SpriteMode соответствующего interchange::SpriteMode
+interchange::SpriteMode get_sprite_mode (scene_graph::SpriteMode sprite_mode);
+
 }
 
 }

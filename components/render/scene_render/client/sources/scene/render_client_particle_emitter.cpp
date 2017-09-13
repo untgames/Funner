@@ -61,7 +61,7 @@ class ParticleEmitter: public VisualModel
       : VisualModel (model, manager, interchange::NodeType_ParticleEmitter)
       , cached_properties_id ()
     {
-      manager.Context ().SetParticleEmitterSystemId (Id (), model.ParticleSystemId ());
+      manager.Context ().SetParticleEmitterSystemId (Id (), model.ParticleSystemId (), get_sprite_mode (model.SpriteMode ()));
 
       try
       {
@@ -111,6 +111,7 @@ class ParticleEmitter: public VisualModel
 
           object_id_t id = Id ();
 
+          //time calculated in milliseconds
           context.UpdateParticleEmitterSystem (id, current_play_time.numerator () / (current_play_time.denominator () / 1000), cached_properties_id);
 
           last_play_time = current_play_time;

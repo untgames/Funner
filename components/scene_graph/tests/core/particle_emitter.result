@@ -2,8 +2,10 @@ Results of particle_emitter_test:
 Particle system id = 'particle_system1'
 Particles parent exist = true
 Particle system playing = true
+Particle system sprite mode = 2
 Particles parent exist = false
 Particle emitter event 1, is playing - false
 Particle system playing after stop = false
 Particle emitter event 0, is playing - true
 Particle system playing after play = true
+Particle system2 sprite mode = 1

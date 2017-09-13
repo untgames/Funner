@@ -65,7 +65,7 @@ void SetLightParams (object_id_t id, const LightParams& params);
 
 void SetPageCurlParams (object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
 
-void SetParticleEmitterSystemId (object_id_t id, const char* system_id);
+void SetParticleEmitterSystemId (object_id_t id, const char* system_id, SpriteMode sprite_mode);
 void UpdateParticleEmitterSystem (object_id_t id, uint32 new_time, uint64 properties_id);
 
 void ReserveSpriteLists (object_id_t id, uint32 list_subids_count);

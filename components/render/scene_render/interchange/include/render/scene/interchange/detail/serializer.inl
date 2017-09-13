@@ -978,7 +978,7 @@ inline void ClientToServerSerializer::SetPageCurlParams(object_id_t id, const Pa
   }
 }
 
-inline void ClientToServerSerializer::SetParticleEmitterSystemId(object_id_t id, const char* system_id)
+inline void ClientToServerSerializer::SetParticleEmitterSystemId(object_id_t id, const char* system_id, SpriteMode sprite_mode)
 {
   size_t saved_position = Position ();
 
@@ -987,6 +987,7 @@ inline void ClientToServerSerializer::SetParticleEmitterSystemId(object_id_t id,
     BeginCommand(CommandId_SetParticleEmitterSystemId);
     write(*this, id);
     write(*this, system_id);
+    write(*this, sprite_mode);
     EndCommand();
   }
   catch (...)
@@ -1668,8 +1669,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     {
       object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
       const char* arg2 = read(*this, xtl::type<const char* > ());
+      SpriteMode arg3 = read(*this, xtl::type<SpriteMode > ());
 
-      dispatcher.SetParticleEmitterSystemId(arg1, arg2);
+      dispatcher.SetParticleEmitterSystemId(arg1, arg2, arg3);
 
       return true;
     }

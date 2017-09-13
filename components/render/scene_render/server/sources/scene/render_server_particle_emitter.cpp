@@ -10,6 +10,7 @@ namespace
 //Constants
 const char*  DEFAULT_BATCH_NAME             = "particles"; //default rendering batch name
 const size_t DEFAULT_RESERVED_SPRITES_COUNT = 64;          //default reserved sprites count
+const size_t DEFAULT_SPRITES_BUFFER_RESERVE = 1024;        //default reserved sprites count in sprites buffer
 
 }
 
@@ -28,6 +29,11 @@ typedef xtl::uninitialized_storage<interchange::SpriteDesc> SpriteBuffer;
 struct ParticleSystemRenderingTempCache
 {
   SpriteBuffer sprites;
+
+  ParticleSystemRenderingTempCache ()
+  {
+    sprites.reserve (DEFAULT_SPRITES_BUFFER_RESERVE, false);
+  }
 };
 
 }
@@ -100,7 +106,7 @@ ParticleEmitter::~ParticleEmitter ()
    Particle system id
 */
 
-void ParticleEmitter::SetParticleSystemId (const char* id)
+void ParticleEmitter::SetParticleSystemId (const char* id, SpriteMode sprite_mode)
 {
   try
   {
@@ -115,7 +121,7 @@ void ParticleEmitter::SetParticleSystemId (const char* id)
 
     for (size_t i = 0, count = impl->particle_system.ScenesCount (); i < count; i++)
     {
-      CreateList (i, interchange::SpriteMode_OrientedBillboard, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.f, 0.f), DEFAULT_BATCH_NAME);
+      CreateList (i, sprite_mode, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.f, 0.f), DEFAULT_BATCH_NAME);
       SetMaterial (i, impl->particle_system.Scene (i).MaterialName ());
     }
   }
@@ -202,15 +208,9 @@ void ParticleEmitter::UpdateParticleSystem (interchange::uint32 new_time, const 
       }
 
       //update list size
-      size_t reserved_sprites_count = Capacity (i);
+      if (particles_count < DEFAULT_RESERVED_SPRITES_COUNT)
+        Reserve (i, DEFAULT_RESERVED_SPRITES_COUNT);
 
-      if (particles_count > reserved_sprites_count)
-        reserved_sprites_count = particles_count;
-
-      if (reserved_sprites_count < DEFAULT_RESERVED_SPRITES_COUNT)
-        reserved_sprites_count = DEFAULT_RESERVED_SPRITES_COUNT;
-
-      Reserve (i, reserved_sprites_count);
       Resize (i, particles_count);
 
       //update sprites list

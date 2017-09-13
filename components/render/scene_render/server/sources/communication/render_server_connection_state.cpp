@@ -921,11 +921,11 @@ void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::Page
   }
 }
 
-void ConnectionState::SetParticleEmitterSystemId(object_id_t id, const char* system_id)
+void ConnectionState::SetParticleEmitterSystemId(object_id_t id, const char* system_id, interchange::SpriteMode sprite_mode)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().SetParticleSystemId (system_id);
+    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().SetParticleSystemId (system_id, sprite_mode);
   }
   catch (xtl::exception& e)
   {
