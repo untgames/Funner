@@ -116,6 +116,10 @@ int main ()
     
     camera->BindToScene (scene);
 
+    scene_graph::DirectLight::Pointer light = scene_graph::DirectLight::Create ();
+
+    light->BindToParent (*camera);
+
     scene_graph::TextLine::Pointer text_line (scene_graph::TextLine::Create (font_library));
 
     media::FontCreationParams creation_params = text_line->FontCreationParams ();

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1643.2618408203125</real>
+				<key>y</key>
+				<real>978.7435302734375</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>sparks name</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1644.34912109375</real>
+				<key>y</key>
+				<real>968.522216796875</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire name</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>952.359375</real>
+				<key>y</key>
+				<real>3.6561591625213623</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire down</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1004.5546875</real>
+				<key>y</key>
+				<real>50.210853576660156</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>sparks down</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>885.08367919921875</real>
+				<key>y</key>
+				<real>760.8817138671875</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire up</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>884.1015625</real>
+				<key>y</key>
+				<real>770.8203125</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>sparks up</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1420.3907470703125</real>
+				<key>y</key>
+				<real>-15.86597728729248</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 2</string>
+				<key>x</key>
+				<real>1848.717529296875</real>
+				<key>y</key>
+				<real>-12.526132583618164</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 3</string>
+				<key>x</key>
+				<real>620.07806396484375</real>
+				<key>y</key>
+				<real>-10.358163833618164</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 4</string>
+				<key>x</key>
+				<real>97.649604797363281</real>
+				<key>y</key>
+				<real>-7.0183191299438477</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 5</string>
+				<key>x</key>
+				<real>1035.3125</real>
+				<key>y</key>
+				<real>-11.881601333618164</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 6</string>
+				<key>x</key>
+				<real>1872.29833984375</real>
+				<key>y</key>
+				<real>762.77349853515625</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 7</string>
+				<key>x</key>
+				<real>1831.920654296875</real>
+				<key>y</key>
+				<real>886.725341796875</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 8</string>
+				<key>x</key>
+				<real>1478.951904296875</real>
+				<key>y</key>
+				<real>875.70965576171875</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 9</string>
+				<key>x</key>
+				<real>1420.3907470703125</real>
+				<key>y</key>
+				<real>779.66802978515625</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 10</string>
+				<key>x</key>
+				<real>327.19390869140625</real>
+				<key>y</key>
+				<real>428.50909423828125</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 11</string>
+				<key>x</key>
+				<real>199.1209716796875</real>
+				<key>y</key>
+				<real>253.39839172363281</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 12</string>
+				<key>x</key>
+				<real>459.83065795898438</real>
+				<key>y</key>
+				<real>632.46746826171875</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 13</string>
+				<key>x</key>
+				<real>1032.9818115234375</real>
+				<key>y</key>
+				<real>736.90106201171875</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 14</string>
+				<key>x</key>
+				<real>702.55853271484375</real>
+				<key>y</key>
+				<real>732.6888427734375</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 15</string>
+				<key>x</key>
+				<real>1563.5352783203125</real>
+				<key>y</key>
+				<real>931.36724853515625</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 16</string>
+				<key>x</key>
+				<real>1722.33740234375</real>
+				<key>y</key>
+				<real>928.8997802734375</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>light_sparks</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>982.109375</real>
+				<key>y</key>
+				<real>-95.468856811523438</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire big</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>71.855323791503906</real>
+				<key>y</key>
+				<real>771.91412353515625</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 2</string>
+				<key>x</key>
+				<real>454.18612670898438</real>
+				<key>y</key>
+				<real>772.2786865234375</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 3</string>
+				<key>x</key>
+				<real>615.56634521484375</real>
+				<key>y</key>
+				<real>810.54693603515625</real>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Emitter 4</string>
+				<key>x</key>
+				<real>779.17315673828125</real>
+				<key>y</key>
+				<real>781.8489990234375</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>smoke</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1243.3333740234375</real>
+				<key>y</key>
+				<real>691.10028076171875</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>light_ball&amp;sell</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>487.31112670898438</real>
+				<key>y</key>
+				<real>885.983154296875</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>light_Drago</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>574.86322021484375</real>
+				<key>y</key>
+				<real>882.213623046875</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire_Вrago</string>
+	</dict>
+	<dict>
+		<key>emitters</key>
+		<array>
+			<dict>
+				<key>name</key>
+				<string>Emitter 1</string>
+				<key>x</key>
+				<real>1442.0704345703125</real>
+				<key>y</key>
+				<real>893.08599853515625</real>
+			</dict>
+		</array>
+		<key>name</key>
+		<string>fire rain</string>
+	</dict>
+</array>
+</plist>

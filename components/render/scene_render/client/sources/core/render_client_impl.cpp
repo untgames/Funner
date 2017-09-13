@@ -13,12 +13,12 @@ namespace
 
 const size_t FENCE_WAITERS_RESERVE_SIZE = 128;
 
-/// Хрнилище менеджеров
+/// Хранилище менеджеров
 struct ManagersHolder
 {
-  SceneManager    scene_manager;
-  MaterialManager material_manager;
-  FontManager     font_manager;
+  SceneManager          scene_manager;
+  MaterialManager       material_manager;
+  FontManager           font_manager;
 
   ManagersHolder (ClientImpl& client, Context& context)
     : scene_manager (client, context)
@@ -284,8 +284,7 @@ MaterialManager& ClientImpl::MaterialManager ()
 FontManager& ClientImpl::FontManager ()
 {
   if (!impl->context)
-    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::MaterialManager", "Can't return FontManger: context is null");
+    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::FontManager", "Can't return FontManger: context is null");
 
   return impl->managers->font_manager;
-
 }

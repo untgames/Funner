@@ -64,16 +64,16 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
 
         size_t render_target_index = 0;
 
-        for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter, ++render_target_index)
+        for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter)
         {
-          const char* attachment        = get<const char*> (*iter, "Screen");
-          const char* target_attachment = get<const char*> (*iter, "Id");
-          const char* init_string       = get<const char*> (*iter, "InitString", "");
-
-          screen_map.insert_pair (attachment, render_target_index);
-
-          if (get<bool> (*iter, "IdleRender", true))
+          if (get<bool> (*iter, "IdleRender", true))  //TODO create render target without IdleRender enabled
           {
+            const char* attachment        = get<const char*> (*iter, "Screen");
+            const char* target_attachment = get<const char*> (*iter, "Id");
+            const char* init_string       = get<const char*> (*iter, "InitString", "");
+
+            screen_map.insert_pair (attachment, render_target_index);
+
             size_t      update_frequency = get<size_t> (*iter, "RenderFrequency", 0);
             stl::string on_after_update  = get<const char*> (*iter, "OnAfterUpdate", "");
             stl::string on_before_update = get<const char*> (*iter, "OnBeforeUpdate", "");
@@ -81,34 +81,28 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
             RenderTargetPtr target (new RenderTargetDesc (client.CreateRenderTarget (target_attachment, init_string), update_frequency, on_before_update, on_after_update, target_attachment), false);
 
             idle_render_targets.push_back (target);
-          }
 
-          for (Parser::NamesakeIterator iter=node.First ("FontLibrary"); iter; ++iter)
-          {
-            const char* name = get<const char*> (*iter, "Id");
-
-            font_libraries.insert (name);
+            render_target_index++;
           }
         }
 
-        AttachmentRegistry::Attach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+        for (Parser::NamesakeIterator iter=node.First ("FontLibrary"); iter; ++iter)
+        {
+          const char* name = get<const char*> (*iter, "Id");
+
+          font_libraries.insert (name);
+        }
 
         try
         {
+          AttachmentRegistry::Attach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           AttachmentRegistry::Attach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
           
-          try
-          {
-            resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
-          }
-          catch (...)
-          {
-            AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
-            throw;
-          }
+          resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
         }
         catch (...)
         {
+          AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
           AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           throw;
         }
@@ -334,15 +328,15 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
 
   private:
-    Log                                              log;                      //лог
-    Client                                           client;                   //клиент рендеринга
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //сервер ресурсов рендеринга
-    ScreenMap                                        screen_map;               //соответствие экранов и рендер-таргетов
-    FontLibrarySet                                   font_libraries;           //библиотеки шрифтов
-    xtl::auto_connection                             idle_connection;          //соединение обновления рендер-таргетов
-    xtl::auto_connection                             on_app_pause_connection;  //соединение паузы приложения
-    xtl::auto_connection                             on_app_resume_connection; //соединение восстановления приложения
-    RenderTargetArray                                idle_render_targets;      //список автоматически обновляемых целей рендеринга
+    Log                                              log;                       //лог
+    Client                                           client;                    //клиент рендеринга
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;           //сервер ресурсов рендеринга
+    ScreenMap                                        screen_map;                //соответствие экранов и рендер-таргетов
+    FontLibrarySet                                   font_libraries;            //библиотеки шрифтов
+    xtl::auto_connection                             idle_connection;           //соединение обновления рендер-таргетов
+    xtl::auto_connection                             on_app_pause_connection;   //соединение паузы приложения
+    xtl::auto_connection                             on_app_resume_connection;  //соединение восстановления приложения
+    RenderTargetArray                                idle_render_targets;       //список автоматически обновляемых целей рендеринга
     SubsystemManager&                                manager;
 };
 

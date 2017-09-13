@@ -6,6 +6,7 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/trackable.h>
 
 #include <common/parser.h>
@@ -14,9 +15,12 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <media/particles/particle_system_library.h>
+
 #include <shared/batching_manager.h>
 #include <shared/camera.h>
 #include <shared/material_manager.h>
+#include <shared/particle_system_manager.h>
 #include <shared/render_manager.h>
 #include <shared/render_target_map.h>
 #include <shared/resource_manager.h>

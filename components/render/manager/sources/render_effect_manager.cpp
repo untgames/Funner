@@ -21,6 +21,7 @@ typedef stl::vector<EffectProxy>      EffectProxyList;
 typedef stl::vector<SamplerProxy>     SamplerProxyList;
 typedef stl::vector<ProgramProxy>     ProgramProxyList;
 typedef stl::vector<TextureDescProxy> TextureDescProxyList;
+typedef stl::vector<BlendStateProxy>  BlendStateProxyList;
 
 struct EffectLibraryEntry: public xtl::reference_counter
 {
@@ -31,6 +32,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
   SamplerProxyList     samplers;           //сэмплеры библиотеки
   TextureDescProxyList texture_descs;      //описатели текстур
   ProgramProxyList     programs;           //программы библиотеки
+  BlendStateProxyList  blend_states;       //режимы блендинга библиотеки
 
 ///Конструктор
   EffectLibraryEntry () {}
@@ -42,6 +44,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
     Clear (samplers);
     Clear (texture_descs);
     Clear (programs);
+    Clear (blend_states);
   }
   
 ///Добавление эффекта
@@ -83,6 +86,16 @@ struct EffectLibraryEntry: public xtl::reference_counter
     
     texture_descs.push_back (proxy);
   }
+
+///Добавление режима блендинга
+  void AddBlendState (const char* id, const LowLevelBlendStatePtr& blend_state, BlendStateProxyManager& proxy_manager)
+  {
+    BlendStateProxy proxy = proxy_manager.GetProxy (id);
+
+    proxy.SetResource (blend_state);
+
+    blend_states.push_back (proxy);
+  }
     
 ///Очистка коллекции
   template <class T> void Clear (stl::vector<ResourceProxy<T> >& items)
@@ -92,7 +105,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
       items.back ().SetResource (T ());
       items.pop_back ();
     }
-  }  
+  }
 };
 
 typedef xtl::intrusive_ptr<EffectLibraryEntry> EffectLibraryEntryPtr;
@@ -110,6 +123,7 @@ struct EffectManager::Impl
   TextureManagerPtr       texture_manager;           //менеджер текстур
   ProgramManagerPtr       program_manager;           //менеджер программ
   EffectProxyManager      proxy_manager;             //менеджер прокси эффектов
+  BlendStateProxyManager  blend_state_proxy_manager; //менеджер прокси режимов блендинга
   EffectLibraryList       loaded_libraries;          //список загруженных библиотек
   common::PropertyMap     settings;                  //настройки
   common::ParseNode       configuration;             //конфигурация рендеринга
@@ -157,6 +171,7 @@ struct EffectManager::Impl
     library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, entry.get (), _1, _2, xtl::ref (program_manager)));
     library.SamplerStates ().ForEach (xtl::bind (&EffectLibraryEntry::AddSampler, entry.get (), _1, _2, xtl::ref (texture_manager)));
     library.TextureDescs ().ForEach  (xtl::bind (&EffectLibraryEntry::AddTextureDesc, entry.get (), _1, _2, xtl::ref (texture_manager)));
+    library.BlendStates ().ForEach   (xtl::bind (&EffectLibraryEntry::AddBlendState, entry.get (), _1, _2, xtl::ref (blend_state_proxy_manager)));
   }  
 };
 
@@ -277,6 +292,15 @@ EffectProxy EffectManager::GetEffectProxy (const char* name)
 EffectPtr EffectManager::FindEffect (const char* name)
 {
   return impl->proxy_manager.FindResource (name);
+}
+
+/*
+   Получение прокси
+*/
+
+BlendStateProxy EffectManager::GetBlendStateProxy (const char* name)
+{
+  return impl->blend_state_proxy_manager.GetProxy (name);
 }
 
 /*

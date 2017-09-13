@@ -10,7 +10,8 @@ namespace
     Константы
 */
 
-const char* DEFAULT_PROGRAM_NAME = ""; //имя программы по умолчанию
+const char* DEFAULT_PROGRAM_NAME     = ""; //имя программы по умолчанию
+const char* DEFAULT_BLEND_STATE_NAME = ""; //имя режима блендинга по умолчанию
 
 /*
     Текстурная карта
@@ -100,9 +101,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   DeviceManagerPtr           device_manager;               //менеджер устройства отрисовки
   TextureManagerPtr          texture_manager;              //менеджер текстур
   ProgramManagerPtr          program_manager;              //менеджер программ
+  EffectManagerPtr           effect_manager;               //менеджер эффектов
   stl::string                name;                         //имя материала
   TagHashArray               tags;                         //тэги материала
   ProgramProxy               program;                      //прокси программы
+  BlendStateProxy            blend_state;                  //прокси режима блендинга
   PropertyBuffer             properties;                   //свойства материала
   ProgramParametersLayoutPtr material_properties_layout;   //расположение свойств материала
   TexmapArray                texmaps;                      //текстурные карты
@@ -110,15 +113,18 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   size_t                     cached_state_block_mask_hash; //хэш закэшированной маски блока состояний материала
   ProgramPtr                 cached_program;               //закэшированная программа
   LowLevelStateBlockPtr      cached_state_block;           //закэшированный блок состояний
+  LowLevelBlendStatePtr      cached_blend_state;           //режим блендинга
   ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы
   Log                        log;                          //протокол отладочных сообщений
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, const char* in_name)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, const EffectManagerPtr& in_effect_manager, const char* in_name)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
     , program_manager (in_program_manager)
+    , effect_manager (in_effect_manager)
     , program (program_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
+    , blend_state (effect_manager->GetBlendStateProxy (DEFAULT_BLEND_STATE_NAME))
     , properties (in_device_manager)
     , has_dynamic_textures (false)
     , cached_state_block_mask_hash (0)
@@ -139,9 +145,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     : device_manager (impl.device_manager)
     , texture_manager (impl.texture_manager)
     , program_manager (impl.program_manager)
+    , effect_manager (impl.effect_manager)
     , name (impl.name)
     , tags (impl.tags)
     , program (impl.program)
+    , blend_state (impl.blend_state)
     , properties (device_manager)
     , material_properties_layout (impl.material_properties_layout)
     , has_dynamic_textures (impl.has_dynamic_textures)
@@ -152,6 +160,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       AttachCacheSource (properties);    
 
       program.AttachCacheHolder (*this);
+      blend_state.AttachCacheHolder (*this);
 
       properties.SetProperties (impl.properties.Properties ());
 
@@ -181,6 +190,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     cached_program               = ProgramPtr ();
     cached_properties_layout     = ProgramParametersLayoutPtr ();
     cached_state_block           = LowLevelStateBlockPtr ();
+    cached_blend_state           = LowLevelBlendStatePtr ();
     cached_state_block_mask_hash = 0;
     
     if (device_manager->Settings ().HasDebugLog ())
@@ -200,6 +210,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     cached_program               = ProgramPtr ();
     cached_state_block           = LowLevelStateBlockPtr ();
     cached_state_block_mask_hash = 0;
+    cached_blend_state           = LowLevelBlendStatePtr ();
   }
   
   void UpdateCacheCore ()
@@ -213,6 +224,13 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       if (has_debug_log)
         log.Printf ("Update material '%s' cache (id=%u)", name.c_str (), Id ());
         
+        //кэширование режима блендинга
+
+      LowLevelBlendStatePtr old_blend_state = cached_blend_state;
+
+      cached_blend_state   = blend_state.Resource ();
+      need_invalidate_deps = need_invalidate_deps || old_blend_state != cached_blend_state;
+
         //кэширование программы рендеринга
 
       ProgramPtr old_program = cached_program;
@@ -265,6 +283,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
       mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
       mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
+
+//TODO: update custom blend mode & mask (if there is custom blend mode)
 
         //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
 
@@ -377,8 +397,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     Конструктор / деструктор
 */
 
-MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, const char* name)
-  : impl (new Impl (device_manager, texture_manager, program_manager, name))
+MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, const EffectManagerPtr& effect_manager, const char* name)
+  : impl (new Impl (device_manager, texture_manager, program_manager, effect_manager, name))
 {
   AttachCacheSource (*impl);
 }
@@ -432,6 +452,17 @@ const size_t* MaterialImpl::Tags ()
     return 0;
     
   return &impl->tags [0];
+}
+
+/*
+   Режим блендинга (0 в случае отсутствия)
+*/
+
+LowLevelBlendStatePtr MaterialImpl::BlendState ()
+{
+  UpdateCache ();
+
+  return impl->cached_blend_state;
 }
 
 /*
@@ -526,8 +557,9 @@ void MaterialImpl::Update (const media::rfx::Material& material)
   {
       //сохранение свойств материала, получение прокси-программы материала
     
-    common::PropertyMap new_properties = material.Properties ();
-    ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
+    common::PropertyMap new_properties  = material.Properties ();
+    ProgramProxy        new_program     = impl->program_manager->GetProgramProxy (material.Program ());
+    BlendStateProxy     new_blend_state = impl->effect_manager->GetBlendStateProxy (material.BlendMode ());
     
       //создание текстурных карт
     
@@ -574,6 +606,15 @@ void MaterialImpl::Update (const media::rfx::Material& material)
       impl->program.DetachCacheHolder (*impl);
       
       impl->program = new_program;      
+    }
+
+    if (new_blend_state != impl->blend_state)
+    {
+      new_blend_state.AttachCacheHolder (*impl);
+
+      impl->blend_state.DetachCacheHolder (*impl);
+
+      impl->blend_state = new_blend_state;
     }
 
     impl->properties.SetProperties (new_properties);

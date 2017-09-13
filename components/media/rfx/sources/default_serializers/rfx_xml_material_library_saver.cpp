@@ -244,6 +244,9 @@ class XmtlSaver
       if (*material.Program ())
         writer.WriteAttribute ("program", material.Program ());
         
+      if (*material.BlendMode ())
+        writer.WriteAttribute ("blend_mode", material.BlendMode ());
+
       if (material.TagsCount ())
       {
         stl::string tags;

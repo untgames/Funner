@@ -215,7 +215,7 @@ MaterialManager& RenderManagerImpl::MaterialManager ()
   try
   {
     if (!impl->materials)
-      impl->materials = MaterialManagerPtr (new render::manager::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
+      impl->materials = MaterialManagerPtr (new render::manager::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), &EffectManager ()), false);
 
     return *impl->materials;
   }
@@ -425,7 +425,7 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
   {
     if (!resource_name)
       throw xtl::make_null_argument_exception ("", "resource_name");
-    
+
     if (render::manager::TextureManager::IsTextureResource (resource_name))
     {
       TextureManager ().LoadTexture (resource_name);

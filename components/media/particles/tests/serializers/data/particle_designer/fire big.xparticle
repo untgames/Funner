@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<particle_system material="particle_fire_big">
+  <animation_frames fps="23.976">
+    <frame tex_offset="0 0" tex_size=".968750000 1.000000000"/>
+    <frame tex_offset="0.2 0.1" tex_size=".3 0.2"/>
+  </animation_frames>
+</particle_system>

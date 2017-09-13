@@ -1,0 +1,3874 @@
+Results of particle_designer_particle_values_test:
+
+Testing library 'data/particle_designer/gravity_test.plist':
+common.ComponentManager: Load components 'media.particles.loaders.*'
+common.ComponentManager: ...load components 'common.licensing.loaders.*'
+common.ComponentManager: ...load component 'common.licensing.loaders.AutoLicenseGenerator'
+common.ComponentManager: ...load components 'common.file_systems.*'
+common.ComponentManager: ...load component 'common.file_systems.StandardFilePathsMount'
+common.ComponentManager: ...load components 'common.parsers.*'
+common.ComponentManager: ...load component 'common.parsers.xml'
+common.ComponentManager: ...load component 'media.particles.loaders.ParticleDesignerPlistLoader'
+common.ComponentManager: ...components loaded successfully
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/gravity_test.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+  time: 0.33
+  aabb: [1018.999; 540.000; 0.000] - [1018.999; 540.000; 0.000]
+  particles 1:
+    particle:
+      position: 1018.999 540.000 0.000
+      rotation: 0.000
+      size: 107.974 107.974
+      color: 1.000 0.608 0.293 1.000
+      lifetime: 1.142
+  time: 0.35
+  aabb: [1019.591; 539.950; 0.000] - [1019.591; 539.950; 0.000]
+  particles 1:
+    particle:
+      position: 1019.591 539.950 0.000
+      rotation: 0.900
+      size: 108.941 108.941
+      color: 0.998 0.601 0.288 0.985
+      lifetime: 1.125
+  time: 0.37
+  aabb: [1020.776; 539.849; 0.000] - [1020.776; 539.849; 0.000]
+  particles 1:
+    particle:
+      position: 1020.776 539.849 0.000
+      rotation: 1.801
+      size: 109.908 109.908
+      color: 0.995 0.595 0.284 0.971
+      lifetime: 1.109
+  time: 0.38
+  aabb: [1022.552; 539.698; 0.000] - [1022.552; 539.698; 0.000]
+  particles 1:
+    particle:
+      position: 1022.552 539.698 0.000
+      rotation: 2.701
+      size: 110.875 110.875
+      color: 0.993 0.589 0.280 0.956
+      lifetime: 1.092
+  time: 0.40
+  aabb: [1024.920; 539.497; 0.000] - [1024.920; 539.497; 0.000]
+  particles 1:
+    particle:
+      position: 1024.920 539.497 0.000
+      rotation: 3.601
+      size: 111.842 111.842
+      color: 0.991 0.583 0.276 0.942
+      lifetime: 1.075
+  time: 0.42
+  aabb: [1027.880; 539.245; 0.000] - [1027.880; 539.245; 0.000]
+  particles 1:
+    particle:
+      position: 1027.880 539.245 0.000
+      rotation: 4.502
+      size: 112.809 112.809
+      color: 0.989 0.577 0.271 0.927
+      lifetime: 1.059
+  time: 0.43
+  aabb: [1031.432; 538.943; 0.000] - [1031.432; 538.943; 0.000]
+  particles 1:
+    particle:
+      position: 1031.432 538.943 0.000
+      rotation: 5.402
+      size: 113.776 113.776
+      color: 0.986 0.571 0.267 0.912
+      lifetime: 1.042
+  time: 0.45
+  aabb: [1035.576; 538.591; 0.000] - [1035.576; 538.591; 0.000]
+  particles 1:
+    particle:
+      position: 1035.576 538.591 0.000
+      rotation: 6.302
+      size: 114.743 114.743
+      color: 0.984 0.565 0.263 0.898
+      lifetime: 1.025
+  time: 0.47
+  aabb: [1040.312; 538.187; 0.000] - [1040.312; 538.187; 0.000]
+  particles 1:
+    particle:
+      position: 1040.312 538.187 0.000
+      rotation: 7.203
+      size: 115.710 115.710
+      color: 0.982 0.559 0.259 0.883
+      lifetime: 1.009
+  time: 0.48
+  aabb: [1045.639; 537.734; 0.000] - [1045.639; 537.734; 0.000]
+  particles 1:
+    particle:
+      position: 1045.639 537.734 0.000
+      rotation: 8.103
+      size: 116.677 116.677
+      color: 0.979 0.553 0.254 0.869
+      lifetime: 0.992
+  time: 0.50
+  aabb: [1051.558; 537.229; 0.000] - [1051.558; 537.229; 0.000]
+  particles 1:
+    particle:
+      position: 1051.558 537.229 0.000
+      rotation: 9.003
+      size: 117.644 117.644
+      color: 0.977 0.547 0.250 0.854
+      lifetime: 0.975
+  time: 0.52
+  aabb: [1058.068; 536.674; 0.000] - [1058.068; 536.674; 0.000]
+  particles 1:
+    particle:
+      position: 1058.068 536.674 0.000
+      rotation: 9.904
+      size: 118.611 118.611
+      color: 0.975 0.541 0.246 0.839
+      lifetime: 0.959
+  time: 0.53
+  aabb: [1065.170; 536.067; 0.000] - [1065.170; 536.067; 0.000]
+  particles 1:
+    particle:
+      position: 1065.170 536.067 0.000
+      rotation: 10.804
+      size: 119.578 119.578
+      color: 0.972 0.534 0.241 0.825
+      lifetime: 0.942
+  time: 0.55
+  aabb: [1072.862; 535.410; 0.000] - [1072.862; 535.410; 0.000]
+  particles 1:
+    particle:
+      position: 1072.862 535.410 0.000
+      rotation: 11.704
+      size: 120.545 120.545
+      color: 0.970 0.528 0.237 0.810
+      lifetime: 0.925
+  time: 0.57
+  aabb: [1081.145; 534.701; 0.000] - [1081.145; 534.701; 0.000]
+  particles 1:
+    particle:
+      position: 1081.145 534.701 0.000
+      rotation: 12.605
+      size: 121.512 121.512
+      color: 0.968 0.522 0.233 0.796
+      lifetime: 0.909
+  time: 0.58
+  aabb: [1090.019; 533.942; 0.000] - [1090.019; 533.942; 0.000]
+  particles 1:
+    particle:
+      position: 1090.019 533.942 0.000
+      rotation: 13.505
+      size: 122.478 122.478
+      color: 0.966 0.516 0.229 0.781
+      lifetime: 0.892
+  time: 0.60
+  aabb: [1099.484; 533.130; 0.000] - [1099.484; 533.130; 0.000]
+  particles 1:
+    particle:
+      position: 1099.484 533.130 0.000
+      rotation: 14.405
+      size: 123.445 123.445
+      color: 0.963 0.510 0.224 0.766
+      lifetime: 0.875
+  time: 0.62
+  aabb: [1109.538; 532.267; 0.000] - [1109.538; 532.267; 0.000]
+  particles 1:
+    particle:
+      position: 1109.538 532.267 0.000
+      rotation: 15.306
+      size: 124.412 124.412
+      color: 0.961 0.504 0.220 0.752
+      lifetime: 0.859
+  time: 0.63
+  aabb: [1120.183; 531.353; 0.000] - [1120.183; 531.353; 0.000]
+  particles 1:
+    particle:
+      position: 1120.183 531.353 0.000
+      rotation: 16.206
+      size: 125.379 125.379
+      color: 0.959 0.498 0.216 0.737
+      lifetime: 0.842
+  time: 0.65
+  aabb: [915.283; 530.386; 0.000] - [1131.418; 540.081; 0.000]
+  particles 2:
+    particle:
+      position: 1131.418 530.386 0.000
+      rotation: 17.106
+      size: 126.346 126.346
+      color: 0.956 0.492 0.212 0.723
+      lifetime: 0.825
+    particle:
+      position: 915.283 540.081 0.000
+      rotation: 0.135
+      size: 2.025 2.025
+      color: 0.998 0.603 0.289 0.988
+      lifetime: 1.417
+  time: 0.67
+  aabb: [916.370; 529.368; 0.000] - [1143.242; 540.242; 0.000]
+  particles 2:
+    particle:
+      position: 1143.242 529.368 0.000
+      rotation: 18.007
+      size: 127.313 127.313
+      color: 0.954 0.486 0.207 0.708
+      lifetime: 0.809
+    particle:
+      position: 916.370 540.242 0.000
+      rotation: 0.269
+      size: 4.050 4.050
+      color: 0.996 0.598 0.286 0.977
+      lifetime: 1.401
+  time: 0.68
+  aabb: [918.000; 528.297; 0.000] - [1155.655; 540.484; 0.000]
+  particles 2:
+    particle:
+      position: 1155.655 528.297 0.000
+      rotation: 18.907
+      size: 128.280 128.280
+      color: 0.952 0.480 0.203 0.693
+      lifetime: 0.792
+    particle:
+      position: 918.000 540.484 0.000
+      rotation: 0.404
+      size: 6.074 6.074
+      color: 0.995 0.593 0.283 0.965
+      lifetime: 1.384
+  time: 0.70
+  aabb: [920.174; 527.174; 0.000] - [1168.658; 540.806; 0.000]
+  particles 2:
+    particle:
+      position: 1168.658 527.174 0.000
+      rotation: 19.807
+      size: 129.247 129.247
+      color: 0.949 0.473 0.199 0.679
+      lifetime: 0.775
+    particle:
+      position: 920.174 540.806 0.000
+      rotation: 0.538
+      size: 8.099 8.099
+      color: 0.993 0.588 0.279 0.954
+      lifetime: 1.367
+  time: 0.72
+  aabb: [922.891; 525.999; 0.000] - [1182.250; 541.210; 0.000]
+  particles 2:
+    particle:
+      position: 1182.250 525.999 0.000
+      rotation: 20.708
+      size: 130.214 130.214
+      color: 0.947 0.467 0.194 0.664
+      lifetime: 0.759
+    particle:
+      position: 922.891 541.210 0.000
+      rotation: 0.673
+      size: 10.124 10.124
+      color: 0.991 0.583 0.276 0.942
+      lifetime: 1.351
+  time: 0.73
+  aabb: [926.152; 524.771; 0.000] - [1196.430; 541.694; 0.000]
+  particles 2:
+    particle:
+      position: 1196.430 524.771 0.000
+      rotation: 21.608
+      size: 131.181 131.181
+      color: 0.945 0.461 0.190 0.650
+      lifetime: 0.742
+    particle:
+      position: 926.152 541.694 0.000
+      rotation: 0.807
+      size: 12.149 12.149
+      color: 0.989 0.578 0.272 0.930
+      lifetime: 1.334
+  time: 0.75
+  aabb: [929.957; 523.490; 0.000] - [1211.198; 542.258; 0.000]
+  particles 2:
+    particle:
+      position: 1211.198 523.490 0.000
+      rotation: 22.508
+      size: 132.148 132.148
+      color: 0.943 0.455 0.186 0.635
+      lifetime: 0.725
+    particle:
+      position: 929.957 542.258 0.000
+      rotation: 0.942
+      size: 14.173 14.173
+      color: 0.987 0.574 0.269 0.919
+      lifetime: 1.317
+  time: 0.77
+  aabb: [934.305; 522.156; 0.000] - [1226.555; 542.903; 0.000]
+  particles 2:
+    particle:
+      position: 1226.555 522.156 0.000
+      rotation: 23.409
+      size: 133.115 133.115
+      color: 0.940 0.449 0.182 0.621
+      lifetime: 0.709
+    particle:
+      position: 934.305 542.903 0.000
+      rotation: 1.076
+      size: 16.198 16.198
+      color: 0.985 0.569 0.266 0.907
+      lifetime: 1.301
+  time: 0.78
+  aabb: [939.197; 520.769; 0.000] - [1242.499; 543.629; 0.000]
+  particles 2:
+    particle:
+      position: 1242.499 520.769 0.000
+      rotation: 24.309
+      size: 134.082 134.082
+      color: 0.938 0.443 0.177 0.606
+      lifetime: 0.692
+    particle:
+      position: 939.197 543.629 0.000
+      rotation: 1.211
+      size: 18.223 18.223
+      color: 0.984 0.564 0.262 0.895
+      lifetime: 1.284
+  time: 0.80
+  aabb: [944.634; 519.328; 0.000] - [1259.030; 544.436; 0.000]
+  particles 2:
+    particle:
+      position: 1259.030 519.328 0.000
+      rotation: 25.209
+      size: 135.049 135.049
+      color: 0.936 0.437 0.173 0.591
+      lifetime: 0.675
+    particle:
+      position: 944.634 544.436 0.000
+      rotation: 1.345
+      size: 20.248 20.248
+      color: 0.982 0.559 0.259 0.884
+      lifetime: 1.267
+  time: 0.82
+  aabb: [950.614; 517.834; 0.000] - [1276.149; 545.324; 0.000]
+  particles 2:
+    particle:
+      position: 1276.149 517.834 0.000
+      rotation: 26.110
+      size: 136.016 136.016
+      color: 0.933 0.431 0.169 0.577
+      lifetime: 0.659
+    particle:
+      position: 950.614 545.324 0.000
+      rotation: 1.480
+      size: 22.273 22.273
+      color: 0.980 0.554 0.255 0.872
+      lifetime: 1.251
+  time: 0.83
+  aabb: [957.139; 516.286; 0.000] - [1293.854; 546.292; 0.000]
+  particles 2:
+    particle:
+      position: 1293.854 516.286 0.000
+      rotation: 27.010
+      size: 136.983 136.983
+      color: 0.931 0.425 0.165 0.562
+      lifetime: 0.642
+    particle:
+      position: 957.139 546.292 0.000
+      rotation: 1.614
+      size: 24.297 24.297
+      color: 0.978 0.549 0.252 0.861
+      lifetime: 1.234
+  time: 0.85
+  aabb: [964.209; 514.684; 0.000] - [1312.146; 547.341; 0.000]
+  particles 2:
+    particle:
+      position: 1312.146 514.684 0.000
+      rotation: 27.910
+      size: 137.950 137.950
+      color: 0.929 0.419 0.160 0.548
+      lifetime: 0.625
+    particle:
+      position: 964.209 547.341 0.000
+      rotation: 1.749
+      size: 26.322 26.322
+      color: 0.976 0.544 0.248 0.849
+      lifetime: 1.217
+  time: 0.87
+  aabb: [971.823; 513.028; 0.000] - [1331.024; 548.471; 0.000]
+  particles 2:
+    particle:
+      position: 1331.024 513.028 0.000
+      rotation: 28.810
+      size: 138.917 138.917
+      color: 0.927 0.413 0.156 0.533
+      lifetime: 0.609
+    particle:
+      position: 971.823 548.471 0.000
+      rotation: 1.883
+      size: 28.347 28.347
+      color: 0.974 0.540 0.245 0.837
+      lifetime: 1.201
+  time: 0.88
+  aabb: [979.982; 511.318; 0.000] - [1350.488; 549.682; 0.000]
+  particles 2:
+    particle:
+      position: 1350.488 511.318 0.000
+      rotation: 29.711
+      size: 139.884 139.884
+      color: 0.924 0.406 0.152 0.518
+      lifetime: 0.592
+    particle:
+      position: 979.982 549.682 0.000
+      rotation: 2.018
+      size: 30.372 30.372
+      color: 0.973 0.535 0.242 0.826
+      lifetime: 1.184
+  time: 0.90
+  aabb: [988.687; 509.553; 0.000] - [1370.538; 550.974; 0.000]
+  particles 2:
+    particle:
+      position: 1370.538 509.553 0.000
+      rotation: 30.611
+      size: 140.851 140.851
+      color: 0.922 0.400 0.147 0.504
+      lifetime: 0.575
+    particle:
+      position: 988.687 550.974 0.000
+      rotation: 2.152
+      size: 32.396 32.396
+      color: 0.971 0.530 0.238 0.814
+      lifetime: 1.167
+  time: 0.92
+  aabb: [997.937; 507.734; 0.000] - [1391.173; 552.346; 0.000]
+  particles 2:
+    particle:
+      position: 1391.173 507.734 0.000
+      rotation: 31.511
+      size: 141.817 141.817
+      color: 0.920 0.394 0.143 0.489
+      lifetime: 0.559
+    particle:
+      position: 997.937 552.346 0.000
+      rotation: 2.287
+      size: 34.421 34.421
+      color: 0.969 0.525 0.235 0.802
+      lifetime: 1.151
+  time: 0.93
+  aabb: [1007.732; 505.860; 0.000] - [1412.392; 553.800; 0.000]
+  particles 2:
+    particle:
+      position: 1412.392 505.860 0.000
+      rotation: 32.412
+      size: 142.784 142.784
+      color: 0.917 0.388 0.139 0.475
+      lifetime: 0.542
+    particle:
+      position: 1007.732 553.800 0.000
+      rotation: 2.421
+      size: 36.446 36.446
+      color: 0.967 0.520 0.231 0.791
+      lifetime: 1.134
+  time: 0.95
+  aabb: [1018.073; 503.930; 0.000] - [1434.197; 555.334; 0.000]
+  particles 2:
+    particle:
+      position: 1434.197 503.930 0.000
+      rotation: 33.312
+      size: 143.751 143.751
+      color: 0.915 0.382 0.135 0.460
+      lifetime: 0.525
+    particle:
+      position: 1018.073 555.334 0.000
+      rotation: 2.556
+      size: 38.471 38.471
+      color: 0.965 0.515 0.228 0.779
+      lifetime: 1.117
+  time: 0.97
+  aabb: [970.106; 501.946; 0.000] - [1456.585; 556.950; 0.000]
+  particles 3:
+    particle:
+      position: 1456.585 501.946 0.000
+      rotation: 34.212
+      size: 144.718 144.718
+      color: 0.913 0.376 0.130 0.445
+      lifetime: 0.509
+    particle:
+      position: 1028.961 556.950 0.000
+      rotation: 2.690
+      size: 40.496 40.496
+      color: 0.963 0.511 0.225 0.768
+      lifetime: 1.101
+    particle:
+      position: 970.106 539.942 0.000
+      rotation: 0.939
+      size: 1.968 1.968
+      color: 0.998 0.603 0.289 0.989
+      lifetime: 1.459
+  time: 0.98
+  aabb: [971.174; 499.906; 0.000] - [1479.557; 558.646; 0.000]
+  particles 3:
+    particle:
+      position: 1479.557 499.906 0.000
+      rotation: 35.113
+      size: 145.685 145.685
+      color: 0.910 0.370 0.126 0.431
+      lifetime: 0.492
+    particle:
+      position: 1040.395 558.646 0.000
+      rotation: 2.825
+      size: 42.520 42.520
+      color: 0.962 0.506 0.221 0.756
+      lifetime: 1.084
+    particle:
+      position: 971.174 539.826 0.000
+      rotation: 1.879
+      size: 3.935 3.935
+      color: 0.996 0.598 0.286 0.977
+      lifetime: 1.442
+  time: 1.00
+  aabb: [972.774; 497.811; 0.000] - [1503.113; 560.424; 0.000]
+  particles 3:
+    particle:
+      position: 1503.113 497.811 0.000
+      rotation: 36.013
+      size: 146.652 146.652
+      color: 0.908 0.364 0.122 0.416
+      lifetime: 0.475
+    particle:
+      position: 1052.375 560.424 0.000
+      rotation: 2.959
+      size: 44.545 44.545
+      color: 0.960 0.501 0.218 0.744
+      lifetime: 1.067
+    particle:
+      position: 972.774 539.653 0.000
+      rotation: 2.818
+      size: 5.903 5.903
+      color: 0.995 0.593 0.283 0.966
+      lifetime: 1.426
+  time: 1.02
+  aabb: [974.908; 495.660; 0.000] - [1527.252; 562.283; 0.000]
+  particles 3:
+    particle:
+      position: 1527.252 495.660 0.000
+      rotation: 36.913
+      size: 147.619 147.619
+      color: 0.906 0.358 0.118 0.402
+      lifetime: 0.459
+    particle:
+      position: 1064.902 562.283 0.000
+      rotation: 3.094
+      size: 46.570 46.570
+      color: 0.958 0.496 0.214 0.733
+      lifetime: 1.051
+    particle:
+      position: 974.908 539.422 0.000
+      rotation: 3.758
+      size: 7.871 7.871
+      color: 0.993 0.589 0.279 0.955
+      lifetime: 1.409
+  time: 1.03
+  aabb: [977.576; 493.454; 0.000] - [1551.974; 564.223; 0.000]
+  particles 3:
+    particle:
+      position: 1551.974 493.454 0.000
+      rotation: 37.814
+      size: 148.586 148.586
+      color: 0.904 0.352 0.113 0.387
+      lifetime: 0.442
+    particle:
+      position: 1077.977 564.223 0.000
+      rotation: 3.228
+      size: 48.595 48.595
+      color: 0.956 0.491 0.211 0.721
+      lifetime: 1.034
+    particle:
+      position: 977.576 539.133 0.000
+      rotation: 4.697
+      size: 9.839 9.839
+      color: 0.991 0.584 0.276 0.944
+      lifetime: 1.392
+  time: 1.05
+  aabb: [980.777; 491.191; 0.000] - [1577.278; 566.244; 0.000]
+  particles 3:
+    particle:
+      position: 1577.278 491.191 0.000
+      rotation: 38.714
+      size: 149.553 149.553
+      color: 0.901 0.346 0.109 0.372
+      lifetime: 0.425
+    particle:
+      position: 1091.599 566.244 0.000
+      rotation: 3.363
+      size: 50.619 50.619
+      color: 0.954 0.486 0.208 0.709
+      lifetime: 1.017
+    particle:
+      position: 980.777 538.786 0.000
+      rotation: 5.637
+      size: 11.806 11.806
+      color: 0.989 0.579 0.273 0.932
+      lifetime: 1.376
+  time: 1.07
+  aabb: [984.511; 488.872; 0.000] - [1603.165; 568.346; 0.000]
+  particles 3:
+    particle:
+      position: 1603.165 488.872 0.000
+      rotation: 39.614
+      size: 150.520 150.520
+      color: 0.899 0.339 0.105 0.358
+      lifetime: 0.409
+    particle:
+      position: 1105.769 568.346 0.000
+      rotation: 3.497
+      size: 52.644 52.644
+      color: 0.952 0.481 0.204 0.698
+      lifetime: 1.001
+    particle:
+      position: 984.511 538.381 0.000
+      rotation: 6.576
+      size: 13.774 13.774
+      color: 0.988 0.575 0.270 0.921
+      lifetime: 1.359
+  time: 1.08
+  aabb: [988.778; 486.497; 0.000] - [1629.634; 570.529; 0.000]
+  particles 3:
+    particle:
+      position: 1629.634 486.497 0.000
+      rotation: 40.515
+      size: 151.487 151.487
+      color: 0.897 0.333 0.100 0.343
+      lifetime: 0.392
+    particle:
+      position: 1120.487 570.529 0.000
+      rotation: 3.632
+      size: 54.669 54.669
+      color: 0.951 0.477 0.201 0.686
+      lifetime: 0.984
+    particle:
+      position: 988.778 537.919 0.000
+      rotation: 7.515
+      size: 15.742 15.742
+      color: 0.986 0.570 0.266 0.910
+      lifetime: 1.342
+  time: 1.10
+  aabb: [993.578; 484.065; 0.000] - [1656.684; 572.794; 0.000]
+  particles 3:
+    particle:
+      position: 1656.684 484.065 0.000
+      rotation: 41.415
+      size: 152.454 152.454
+      color: 0.894 0.327 0.096 0.329
+      lifetime: 0.375
+    particle:
+      position: 1135.754 572.794 0.000
+      rotation: 3.766
+      size: 56.694 56.694
+      color: 0.949 0.472 0.197 0.675
+      lifetime: 0.967
+    particle:
+      position: 993.578 537.399 0.000
+      rotation: 8.455
+      size: 17.710 17.710
+      color: 0.984 0.565 0.263 0.898
+      lifetime: 1.326
+  time: 1.12
+  aabb: [998.911; 481.577; 0.000] - [1684.315; 575.140; 0.000]
+  particles 3:
+    particle:
+      position: 1684.315 481.577 0.000
+      rotation: 42.315
+      size: 153.421 153.421
+      color: 0.892 0.321 0.092 0.314
+      lifetime: 0.359
+    particle:
+      position: 1151.569 575.140 0.000
+      rotation: 3.901
+      size: 58.719 58.719
+      color: 0.947 0.467 0.194 0.663
+      lifetime: 0.951
+    particle:
+      position: 998.911 536.822 0.000
+      rotation: 9.394
+      size: 19.677 19.677
+      color: 0.982 0.560 0.260 0.887
+      lifetime: 1.309
+  time: 1.13
+  aabb: [1004.777; 479.032; 0.000] - [1712.527; 577.567; 0.000]
+  particles 3:
+    particle:
+      position: 1712.527 479.032 0.000
+      rotation: 43.216
+      size: 154.388 154.388
+      color: 0.890 0.315 0.088 0.299
+      lifetime: 0.342
+    particle:
+      position: 1167.933 577.567 0.000
+      rotation: 4.035
+      size: 60.743 60.743
+      color: 0.945 0.462 0.191 0.651
+      lifetime: 0.934
+    particle:
+      position: 1004.777 536.187 0.000
+      rotation: 10.334
+      size: 21.645 21.645
+      color: 0.980 0.556 0.256 0.876
+      lifetime: 1.292
+  time: 1.15
+  aabb: [1011.175; 476.430; 0.000] - [1741.320; 580.076; 0.000]
+  particles 3:
+    particle:
+      position: 1741.320 476.430 0.000
+      rotation: 44.116
+      size: 155.355 155.355
+      color: 0.888 0.309 0.083 0.285
+      lifetime: 0.325
+    particle:
+      position: 1184.847 580.076 0.000
+      rotation: 4.170
+      size: 62.768 62.768
+      color: 0.943 0.457 0.187 0.640
+      lifetime: 0.917
+    particle:
+      position: 1011.175 535.495 0.000
+      rotation: 11.273
+      size: 23.613 23.613
+      color: 0.979 0.551 0.253 0.864
+      lifetime: 1.276
+  time: 1.17
+  aabb: [1018.106; 473.771; 0.000] - [1770.693; 582.666; 0.000]
+  particles 3:
+    particle:
+      position: 1770.693 473.771 0.000
+      rotation: 45.016
+      size: 156.322 156.322
+      color: 0.885 0.303 0.079 0.270
+      lifetime: 0.309
+    particle:
+      position: 1202.310 582.666 0.000
+      rotation: 4.304
+      size: 64.793 64.793
+      color: 0.941 0.452 0.184 0.628
+      lifetime: 0.901
+    particle:
+      position: 1018.106 534.745 0.000
+      rotation: 12.213
+      size: 25.581 25.581
+      color: 0.977 0.546 0.250 0.853
+      lifetime: 1.259
+  time: 1.18
+  aabb: [1025.569; 471.054; 0.000] - [1800.646; 585.337; 0.000]
+  particles 3:
+    particle:
+      position: 1800.646 471.054 0.000
+      rotation: 45.917
+      size: 157.289 157.289
+      color: 0.883 0.297 0.075 0.256
+      lifetime: 0.292
+    particle:
+      position: 1220.323 585.337 0.000
+      rotation: 4.439
+      size: 66.818 66.818
+      color: 0.940 0.447 0.180 0.616
+      lifetime: 0.884
+    particle:
+      position: 1025.569 533.939 0.000
+      rotation: 13.152
+      size: 27.548 27.548
+      color: 0.975 0.542 0.246 0.842
+      lifetime: 1.242
+  time: 1.20
+  aabb: [1033.563; 468.281; 0.000] - [1831.178; 588.090; 0.000]
+  particles 3:
+    particle:
+      position: 1831.178 468.281 0.000
+      rotation: 46.817
+      size: 158.256 158.256
+      color: 0.881 0.291 0.071 0.241
+      lifetime: 0.275
+    particle:
+      position: 1238.887 588.090 0.000
+      rotation: 4.573
+      size: 68.842 68.842
+      color: 0.938 0.443 0.177 0.605
+      lifetime: 0.867
+    particle:
+      position: 1033.563 533.075 0.000
+      rotation: 14.091
+      size: 29.516 29.516
+      color: 0.973 0.537 0.243 0.831
+      lifetime: 1.226
+  time: 1.22
+  aabb: [1042.090; 465.450; 0.000] - [1862.290; 590.924; 0.000]
+  particles 3:
+    particle:
+      position: 1862.290 465.450 0.000
+      rotation: 47.717
+      size: 159.223 159.223
+      color: 0.878 0.285 0.066 0.226
+      lifetime: 0.259
+    particle:
+      position: 1258.002 590.924 0.000
+      rotation: 4.708
+      size: 70.867 70.867
+      color: 0.936 0.438 0.174 0.593
+      lifetime: 0.851
+    particle:
+      position: 1042.090 532.153 0.000
+      rotation: 15.031
+      size: 31.484 31.484
+      color: 0.972 0.532 0.240 0.819
+      lifetime: 1.209
+  time: 1.23
+  aabb: [1051.148; 462.561; 0.000] - [1893.981; 593.839; 0.000]
+  particles 3:
+    particle:
+      position: 1893.981 462.561 0.000
+      rotation: 48.618
+      size: 160.190 160.190
+      color: 0.876 0.278 0.062 0.212
+      lifetime: 0.242
+    particle:
+      position: 1277.667 593.839 0.000
+      rotation: 4.842
+      size: 72.892 72.892
+      color: 0.934 0.433 0.170 0.582
+      lifetime: 0.834
+    particle:
+      position: 1051.148 531.175 0.000
+      rotation: 15.970
+      size: 33.452 33.452
+      color: 0.970 0.527 0.237 0.808
+      lifetime: 1.192
+  time: 1.25
+  aabb: [1060.737; 459.615; 0.000] - [1926.250; 596.836; 0.000]
+  particles 3:
+    particle:
+      position: 1926.250 459.615 0.000
+      rotation: 49.518
+      size: 161.156 161.156
+      color: 0.874 0.272 0.058 0.197
+      lifetime: 0.225
+    particle:
+      position: 1297.884 596.836 0.000
+      rotation: 4.977
+      size: 74.917 74.917
+      color: 0.932 0.428 0.167 0.570
+      lifetime: 0.817
+    particle:
+      position: 1060.737 530.140 0.000
+      rotation: 16.910
+      size: 35.419 35.419
+      color: 0.968 0.523 0.233 0.797
+      lifetime: 1.176
+  time: 1.27
+  aabb: [1070.857; 456.610; 0.000] - [1959.098; 599.914; 0.000]
+  particles 3:
+    particle:
+      position: 1959.098 456.610 0.000
+      rotation: 50.418
+      size: 162.123 162.123
+      color: 0.871 0.266 0.053 0.183
+      lifetime: 0.209
+    particle:
+      position: 1318.652 599.914 0.000
+      rotation: 5.111
+      size: 76.942 76.942
+      color: 0.931 0.423 0.163 0.558
+      lifetime: 0.801
+    particle:
+      position: 1070.857 529.048 0.000
+      rotation: 17.849
+      size: 37.387 37.387
+      color: 0.966 0.518 0.230 0.785
+      lifetime: 1.159
+  time: 1.28
+  aabb: [899.935; 453.548; 0.000] - [1992.524; 603.074; 0.000]
+  particles 4:
+    particle:
+      position: 1992.524 453.548 0.000
+      rotation: 51.319
+      size: 163.090 163.090
+      color: 0.869 0.260 0.049 0.168
+      lifetime: 0.192
+    particle:
+      position: 1339.973 603.074 0.000
+      rotation: 5.246
+      size: 78.966 78.966
+      color: 0.929 0.418 0.160 0.547
+      lifetime: 0.784
+    particle:
+      position: 1081.508 527.900 0.000
+      rotation: 18.789
+      size: 39.355 39.355
+      color: 0.964 0.513 0.227 0.774
+      lifetime: 1.142
+    particle:
+      position: 899.935 539.914 0.000
+      rotation: -0.029
+      size: 33.917 33.917
+      color: 0.998 0.603 0.289 0.989
+      lifetime: 1.444
+  time: 1.30
+  aabb: [901.126; 450.428; 0.000] - [2026.527; 606.316; 0.000]
+  particles 4:
+    particle:
+      position: 2026.527 450.428 0.000
+      rotation: 52.219
+      size: 164.057 164.057
+      color: 0.867 0.254 0.045 0.153
+      lifetime: 0.175
+    particle:
+      position: 1361.846 606.316 0.000
+      rotation: 5.380
+      size: 80.991 80.991
+      color: 0.927 0.413 0.157 0.535
+      lifetime: 0.767
+    particle:
+      position: 1092.690 526.695 0.000
+      rotation: 19.728
+      size: 41.322 41.322
+      color: 0.963 0.509 0.223 0.763
+      lifetime: 1.126
+    particle:
+      position: 901.126 539.743 0.000
+      rotation: -0.059
+      size: 35.536 35.536
+      color: 0.996 0.598 0.286 0.977
+      lifetime: 1.427
+  time: 1.32
+  aabb: [902.912; 447.249; 0.000] - [2061.108; 609.639; 0.000]
+  particles 4:
+    particle:
+      position: 2061.108 447.249 0.000
+      rotation: 53.119
+      size: 165.024 165.024
+      color: 0.865 0.248 0.041 0.139
+      lifetime: 0.159
+    particle:
+      position: 1384.271 609.639 0.000
+      rotation: 5.515
+      size: 83.016 83.016
+      color: 0.925 0.409 0.153 0.524
+      lifetime: 0.751
+    particle:
+      position: 1104.401 525.433 0.000
+      rotation: 20.667
+      size: 43.290 43.290
+      color: 0.961 0.504 0.220 0.752
+      lifetime: 1.109
+    particle:
+      position: 902.912 539.486 0.000
+      rotation: -0.088
+      size: 37.156 37.156
+      color: 0.995 0.593 0.283 0.966
+      lifetime: 1.411
+  time: 1.33
+  aabb: [905.294; 444.013; 0.000] - [2096.267; 613.043; 0.000]
+  particles 4:
+    particle:
+      position: 2096.267 444.013 0.000
+      rotation: 54.020
+      size: 165.991 165.991
+      color: 0.862 0.242 0.036 0.124
+      lifetime: 0.142
+    particle:
+      position: 1407.250 613.043 0.000
+      rotation: 5.649
+      size: 85.041 85.041
+      color: 0.923 0.404 0.150 0.512
+      lifetime: 0.734
+    particle:
+      position: 1116.643 524.115 0.000
+      rotation: 21.607
+      size: 45.258 45.258
+      color: 0.959 0.499 0.217 0.740
+      lifetime: 1.092
+    particle:
+      position: 905.294 539.143 0.000
+      rotation: -0.117
+      size: 38.775 38.775
+      color: 0.993 0.589 0.279 0.954
+      lifetime: 1.394
+  time: 1.35
+  aabb: [908.272; 440.717; 0.000] - [2132.002; 616.529; 0.000]
+  particles 4:
+    particle:
+      position: 2132.002 440.717 0.000
+      rotation: 54.920
+      size: 166.958 166.958
+      color: 0.860 0.236 0.032 0.110
+      lifetime: 0.125
+    particle:
+      position: 1430.781 616.529 0.000
+      rotation: 5.784
+      size: 87.066 87.066
+      color: 0.921 0.399 0.146 0.500
+      lifetime: 0.717
+    particle:
+      position: 1129.414 522.741 0.000
+      rotation: 22.546
+      size: 47.226 47.226
+      color: 0.957 0.494 0.213 0.729
+      lifetime: 1.076
+    particle:
+      position: 908.272 538.714 0.000
+      rotation: -0.147
+      size: 40.394 40.394
+      color: 0.991 0.584 0.276 0.943
+      lifetime: 1.377
+  time: 1.37
+  aabb: [911.844; 437.364; 0.000] - [2168.313; 620.096; 0.000]
+  particles 4:
+    particle:
+      position: 2168.313 437.364 0.000
+      rotation: 55.820
+      size: 167.925 167.925
+      color: 0.858 0.230 0.028 0.095
+      lifetime: 0.109
+    particle:
+      position: 1454.867 620.096 0.000
+      rotation: 5.918
+      size: 89.090 89.090
+      color: 0.920 0.394 0.143 0.489
+      lifetime: 0.701
+    particle:
+      position: 1142.714 521.311 0.000
+      rotation: 23.486
+      size: 49.193 49.193
+      color: 0.956 0.490 0.210 0.718
+      lifetime: 1.059
+    particle:
+      position: 911.844 538.200 0.000
+      rotation: -0.176
+      size: 42.014 42.014
+      color: 0.989 0.579 0.273 0.932
+      lifetime: 1.361
+  time: 1.38
+  aabb: [916.011; 433.952; 0.000] - [2205.201; 623.745; 0.000]
+  particles 4:
+    particle:
+      position: 2205.201 433.952 0.000
+      rotation: 56.721
+      size: 168.892 168.892
+      color: 0.855 0.224 0.024 0.080
+      lifetime: 0.092
+    particle:
+      position: 1479.506 623.745 0.000
+      rotation: 6.053
+      size: 91.115 91.115
+      color: 0.918 0.389 0.140 0.477
+      lifetime: 0.684
+    particle:
+      position: 1156.544 519.825 0.000
+      rotation: 24.425
+      size: 51.161 51.161
+      color: 0.954 0.485 0.207 0.706
+      lifetime: 1.042
+    particle:
+      position: 916.011 537.599 0.000
+      rotation: -0.206
+      size: 43.633 43.633
+      color: 0.987 0.574 0.269 0.920
+      lifetime: 1.344
+  time: 1.40
+  aabb: [920.773; 430.481; 0.000] - [2242.665; 627.476; 0.000]
+  particles 4:
+    particle:
+      position: 2242.665 430.481 0.000
+      rotation: 57.621
+      size: 169.859 169.859
+      color: 0.853 0.218 0.019 0.066
+      lifetime: 0.075
+    particle:
+      position: 1504.700 627.476 0.000
+      rotation: 6.187
+      size: 93.140 93.140
+      color: 0.916 0.384 0.136 0.465
+      lifetime: 0.667
+    particle:
+      position: 1170.902 518.284 0.000
+      rotation: 25.365
+      size: 53.129 53.129
+      color: 0.952 0.480 0.203 0.695
+      lifetime: 1.026
+    particle:
+      position: 920.773 536.912 0.000
+      rotation: -0.235
+      size: 45.253 45.253
+      color: 0.986 0.569 0.266 0.909
+      lifetime: 1.327
+  time: 1.42
+  aabb: [926.129; 426.951; 0.000] - [2280.705; 631.288; 0.000]
+  particles 4:
+    particle:
+      position: 2280.705 426.951 0.000
+      rotation: 58.521
+      size: 170.826 170.826
+      color: 0.851 0.211 0.015 0.051
+      lifetime: 0.059
+    particle:
+      position: 1530.448 631.288 0.000
+      rotation: 6.322
+      size: 95.165 95.165
+      color: 0.914 0.379 0.133 0.454
+      lifetime: 0.651
+    particle:
+      position: 1185.789 516.686 0.000
+      rotation: 26.304
+      size: 55.097 55.097
+      color: 0.950 0.476 0.200 0.684
+      lifetime: 1.009
+    particle:
+      position: 926.129 536.139 0.000
+      rotation: -0.264
+      size: 46.872 46.872
+      color: 0.984 0.565 0.263 0.897
+      lifetime: 1.311
+  time: 1.43
+  aabb: [932.080; 423.362; 0.000] - [2319.320; 635.181; 0.000]
+  particles 4:
+    particle:
+      position: 2319.320 423.362 0.000
+      rotation: 59.422
+      size: 171.793 171.793
+      color: 0.848 0.205 0.011 0.037
+      lifetime: 0.042
+    particle:
+      position: 1556.752 635.181 0.000
+      rotation: 6.456
+      size: 97.189 97.189
+      color: 0.912 0.375 0.129 0.442
+      lifetime: 0.634
+    particle:
+      position: 1201.203 515.034 0.000
+      rotation: 27.243
+      size: 57.064 57.064
+      color: 0.948 0.471 0.197 0.672
+      lifetime: 0.992
+    particle:
+      position: 932.080 535.280 0.000
+      rotation: -0.294
+      size: 48.491 48.491
+      color: 0.982 0.560 0.259 0.886
+      lifetime: 1.294
+  time: 1.45
+  aabb: [938.624; 419.714; 0.000] - [2358.510; 639.156; 0.000]
+  particles 4:
+    particle:
+      position: 2358.510 419.714 0.000
+      rotation: 60.322
+      size: 172.760 172.760
+      color: 0.846 0.199 0.006 0.022
+      lifetime: 0.025
+    particle:
+      position: 1583.610 639.156 0.000
+      rotation: 6.591
+      size: 99.214 99.214
+      color: 0.910 0.370 0.126 0.431
+      lifetime: 0.617
+    particle:
+      position: 1217.146 513.326 0.000
+      rotation: 28.183
+      size: 59.032 59.032
+      color: 0.947 0.466 0.194 0.661
+      lifetime: 0.976
+    particle:
+      position: 938.624 534.334 0.000
+      rotation: -0.323
+      size: 50.111 50.111
+      color: 0.980 0.555 0.256 0.874
+      lifetime: 1.277
+  time: 1.47
+  aabb: [945.762; 416.008; 0.000] - [2398.276; 643.213; 0.000]
+  particles 4:
+    particle:
+      position: 2398.276 416.008 0.000
+      rotation: 61.222
+      size: 173.727 173.727
+      color: 0.844 0.193 0.002 0.008
+      lifetime: 0.009
+    particle:
+      position: 1611.024 643.213 0.000
+      rotation: 6.725
+      size: 101.239 101.239
+      color: 0.909 0.365 0.123 0.419
+      lifetime: 0.601
+    particle:
+      position: 1233.615 511.563 0.000
+      rotation: 29.122
+      size: 61.000 61.000
+      color: 0.945 0.461 0.190 0.650
+      lifetime: 0.959
+    particle:
+      position: 945.762 533.302 0.000
+      rotation: -0.352
+      size: 51.730 51.730
+      color: 0.978 0.550 0.253 0.863
+      lifetime: 1.261
+  time: 1.48
+  aabb: [953.494; 509.745; 0.000] - [1638.994; 647.351; 0.000]
+  particles 3:
+    particle:
+      position: 1638.994 647.351 0.000
+      rotation: 6.860
+      size: 103.264 103.264
+      color: 0.907 0.360 0.119 0.407
+      lifetime: 0.584
+    particle:
+      position: 1250.612 509.745 0.000
+      rotation: 30.062
+      size: 62.968 62.968
+      color: 0.943 0.457 0.187 0.639
+      lifetime: 0.942
+    particle:
+      position: 953.494 532.183 0.000
+      rotation: -0.382
+      size: 53.350 53.350
+      color: 0.977 0.546 0.249 0.852
+      lifetime: 1.244
+  time: 1.50
+  aabb: [961.818; 507.872; 0.000] - [1667.520; 651.571; 0.000]
+  particles 3:
+    particle:
+      position: 1667.520 651.571 0.000
+      rotation: 6.994
+      size: 105.289 105.289
+      color: 0.905 0.355 0.116 0.396
+      lifetime: 0.567
+    particle:
+      position: 1268.136 507.872 0.000
+      rotation: 31.001
+      size: 64.935 64.935
+      color: 0.941 0.452 0.184 0.627
+      lifetime: 0.926
+    particle:
+      position: 961.818 530.977 0.000
+      rotation: -0.411
+      size: 54.969 54.969
+      color: 0.975 0.541 0.246 0.840
+      lifetime: 1.227
+  time: 1.52
+  aabb: [970.734; 505.945; 0.000] - [1696.603; 655.872; 0.000]
+  particles 3:
+    particle:
+      position: 1696.603 655.872 0.000
+      rotation: 7.129
+      size: 107.313 107.313
+      color: 0.903 0.350 0.112 0.384
+      lifetime: 0.551
+    particle:
+      position: 1286.186 505.945 0.000
+      rotation: 31.941
+      size: 66.903 66.903
+      color: 0.940 0.447 0.180 0.616
+      lifetime: 0.909
+    particle:
+      position: 970.734 529.684 0.000
+      rotation: -0.441
+      size: 56.588 56.588
+      color: 0.973 0.536 0.243 0.829
+      lifetime: 1.211
+  time: 1.53
+  aabb: [980.243; 503.963; 0.000] - [1726.242; 660.255; 0.000]
+  particles 3:
+    particle:
+      position: 1726.242 660.255 0.000
+      rotation: 7.263
+      size: 109.338 109.338
+      color: 0.901 0.346 0.109 0.372
+      lifetime: 0.534
+    particle:
+      position: 1304.762 503.963 0.000
+      rotation: 32.880
+      size: 68.871 68.871
+      color: 0.938 0.443 0.177 0.605
+      lifetime: 0.892
+    particle:
+      position: 980.243 528.304 0.000
+      rotation: -0.470
+      size: 58.208 58.208
+      color: 0.971 0.531 0.239 0.817
+      lifetime: 1.194
+  time: 1.55
+  aabb: [990.343; 501.927; 0.000] - [1756.438; 664.720; 0.000]
+  particles 3:
+    particle:
+      position: 1756.438 664.720 0.000
+      rotation: 7.398
+      size: 111.363 111.363
+      color: 0.899 0.341 0.106 0.361
+      lifetime: 0.517
+    particle:
+      position: 1323.864 501.927 0.000
+      rotation: 33.820
+      size: 70.839 70.839
+      color: 0.936 0.438 0.174 0.593
+      lifetime: 0.876
+    particle:
+      position: 990.343 526.836 0.000
+      rotation: -0.499
+      size: 59.827 59.827
+      color: 0.969 0.527 0.236 0.806
+      lifetime: 1.177
+  time: 1.57
+  aabb: [1001.034; 499.837; 0.000] - [1787.192; 669.266; 0.000]
+  particles 3:
+    particle:
+      position: 1787.192 669.266 0.000
+      rotation: 7.532
+      size: 113.388 113.388
+      color: 0.898 0.336 0.102 0.349
+      lifetime: 0.501
+    particle:
+      position: 1343.491 499.837 0.000
+      rotation: 34.759
+      size: 72.806 72.806
+      color: 0.934 0.433 0.170 0.582
+      lifetime: 0.859
+    particle:
+      position: 1001.034 525.281 0.000
+      rotation: -0.529
+      size: 61.447 61.447
+      color: 0.968 0.522 0.233 0.795
+      lifetime: 1.161
+  time: 1.58
+  aabb: [1012.316; 497.693; 0.000] - [1818.503; 673.893; 0.000]
+  particles 3:
+    particle:
+      position: 1818.503 673.893 0.000
+      rotation: 7.667
+      size: 115.412 115.412
+      color: 0.896 0.331 0.099 0.338
+      lifetime: 0.484
+    particle:
+      position: 1363.643 497.693 0.000
+      rotation: 35.698
+      size: 74.774 74.774
+      color: 0.932 0.428 0.167 0.571
+      lifetime: 0.842
+    particle:
+      position: 1012.316 523.637 0.000
+      rotation: -0.558
+      size: 63.066 63.066
+      color: 0.966 0.517 0.229 0.783
+      lifetime: 1.144
+  time: 1.60
+  aabb: [1024.187; 495.496; 0.000] - [1850.372; 678.602; 0.000]
+  particles 3:
+    particle:
+      position: 1850.372 678.602 0.000
+      rotation: 7.802
+      size: 117.437 117.437
+      color: 0.894 0.326 0.095 0.326
+      lifetime: 0.467
+    particle:
+      position: 1384.320 495.496 0.000
+      rotation: 36.638
+      size: 76.742 76.742
+      color: 0.931 0.424 0.164 0.560
+      lifetime: 0.826
+    particle:
+      position: 1024.187 521.906 0.000
+      rotation: -0.587
+      size: 64.686 64.686
+      color: 0.964 0.512 0.226 0.772
+      lifetime: 1.127
+  time: 1.62
+  aabb: [1036.649; 493.245; 0.000] - [1882.799; 683.393; 0.000]
+  particles 3:
+    particle:
+      position: 1882.799 683.393 0.000
+      rotation: 7.936
+      size: 119.462 119.462
+      color: 0.892 0.321 0.092 0.314
+      lifetime: 0.451
+    particle:
+      position: 1405.521 493.245 0.000
+      rotation: 37.577
+      size: 78.709 78.709
+      color: 0.929 0.419 0.160 0.548
+      lifetime: 0.809
+    particle:
+      position: 1036.649 520.087 0.000
+      rotation: -0.617
+      size: 66.305 66.305
+      color: 0.962 0.508 0.223 0.760
+      lifetime: 1.111
+  time: 1.63
+  aabb: [1049.699; 490.941; 0.000] - [1915.785; 688.265; 0.000]
+  particles 3:
+    particle:
+      position: 1915.785 688.265 0.000
+      rotation: 8.071
+      size: 121.487 121.487
+      color: 0.890 0.316 0.089 0.303
+      lifetime: 0.434
+    particle:
+      position: 1427.247 490.941 0.000
+      rotation: 38.517
+      size: 80.677 80.677
+      color: 0.927 0.414 0.157 0.537
+      lifetime: 0.792
+    particle:
+      position: 1049.699 518.179 0.000
+      rotation: -0.646
+      size: 67.924 67.924
+      color: 0.961 0.503 0.219 0.749
+      lifetime: 1.094
+  time: 1.65
+  aabb: [1063.338; 488.584; 0.000] - [1949.329; 693.218; 0.000]
+  particles 3:
+    particle:
+      position: 1949.329 693.218 0.000
+      rotation: 8.205
+      size: 123.512 123.512
+      color: 0.888 0.312 0.085 0.291
+      lifetime: 0.417
+    particle:
+      position: 1449.496 488.584 0.000
+      rotation: 39.456
+      size: 82.645 82.645
+      color: 0.925 0.409 0.154 0.526
+      lifetime: 0.776
+    particle:
+      position: 1063.338 516.182 0.000
+      rotation: -0.676
+      size: 69.544 69.544
+      color: 0.959 0.498 0.216 0.738
+      lifetime: 1.077
+  time: 1.67
+  aabb: [1077.564; 486.174; 0.000] - [1983.432; 698.253; 0.000]
+  particles 3:
+    particle:
+      position: 1983.432 698.253 0.000
+      rotation: 8.340
+      size: 125.536 125.536
+      color: 0.887 0.307 0.082 0.279
+      lifetime: 0.401
+    particle:
+      position: 1472.269 486.174 0.000
+      rotation: 40.396
+      size: 84.613 84.613
+      color: 0.924 0.405 0.151 0.514
+      lifetime: 0.759
+    particle:
+      position: 1077.564 514.096 0.000
+      rotation: -0.705
+      size: 71.163 71.163
+      color: 0.957 0.493 0.213 0.726
+      lifetime: 1.061
+  time: 1.68
+  aabb: [1092.378; 483.711; 0.000] - [2018.095; 703.370; 0.000]
+  particles 3:
+    particle:
+      position: 2018.095 703.370 0.000
+      rotation: 8.474
+      size: 127.561 127.561
+      color: 0.885 0.302 0.078 0.268
+      lifetime: 0.384
+    particle:
+      position: 1495.564 483.711 0.000
+      rotation: 41.335
+      size: 86.580 86.580
+      color: 0.922 0.400 0.147 0.503
+      lifetime: 0.742
+    particle:
+      position: 1092.378 511.922 0.000
+      rotation: -0.734
+      size: 72.783 72.783
+      color: 0.955 0.488 0.209 0.715
+      lifetime: 1.044
+  time: 1.70
+  aabb: [1107.778; 481.196; 0.000] - [2053.317; 708.568; 0.000]
+  particles 3:
+    particle:
+      position: 2053.317 708.568 0.000
+      rotation: 8.609
+      size: 129.586 129.586
+      color: 0.883 0.297 0.075 0.256
+      lifetime: 0.367
+    particle:
+      position: 1519.383 481.196 0.000
+      rotation: 42.274
+      size: 88.548 88.548
+      color: 0.920 0.395 0.144 0.492
+      lifetime: 0.726
+    particle:
+      position: 1107.778 509.658 0.000
+      rotation: -0.764
+      size: 74.402 74.402
+      color: 0.953 0.484 0.206 0.703
+      lifetime: 1.027
+  time: 1.72
+  aabb: [1123.764; 478.628; 0.000] - [2089.098; 713.847; 0.000]
+  particles 3:
+    particle:
+      position: 2089.098 713.847 0.000
+      rotation: 8.743
+      size: 131.611 131.611
+      color: 0.881 0.292 0.072 0.245
+      lifetime: 0.351
+    particle:
+      position: 1543.723 478.628 0.000
+      rotation: 43.214
+      size: 90.516 90.516
+      color: 0.918 0.391 0.141 0.480
+      lifetime: 0.709
+    particle:
+      position: 1123.764 507.304 0.000
+      rotation: -0.793
+      size: 76.021 76.021
+      color: 0.952 0.479 0.203 0.692
+      lifetime: 1.011
+  time: 1.73
+  aabb: [1140.336; 476.009; 0.000] - [2125.440; 719.208; 0.000]
+  particles 3:
+    particle:
+      position: 2125.440 719.208 0.000
+      rotation: 8.878
+      size: 133.635 133.635
+      color: 0.879 0.287 0.068 0.233
+      lifetime: 0.334
+    particle:
+      position: 1568.586 476.009 0.000
+      rotation: 44.153
+      size: 92.484 92.484
+      color: 0.916 0.386 0.137 0.469
+      lifetime: 0.692
+    particle:
+      position: 1140.336 504.861 0.000
+      rotation: -0.822
+      size: 77.641 77.641
+      color: 0.950 0.474 0.199 0.681
+      lifetime: 0.994
+  time: 1.75
+  aabb: [1157.492; 473.337; 0.000] - [2162.342; 724.650; 0.000]
+  particles 3:
+    particle:
+      position: 2162.342 724.650 0.000
+      rotation: 9.012
+      size: 135.660 135.660
+      color: 0.878 0.282 0.065 0.221
+      lifetime: 0.317
+    particle:
+      position: 1593.971 473.337 0.000
+      rotation: 45.093
+      size: 94.451 94.451
+      color: 0.915 0.381 0.134 0.458
+      lifetime: 0.676
+    particle:
+      position: 1157.492 502.327 0.000
+      rotation: -0.852
+      size: 79.260 79.260
+      color: 0.948 0.469 0.196 0.669
+      lifetime: 0.977
+  time: 1.77
+  aabb: [1175.232; 470.614; 0.000] - [2199.804; 730.174; 0.000]
+  particles 3:
+    particle:
+      position: 2199.804 730.174 0.000
+      rotation: 9.147
+      size: 137.685 137.685
+      color: 0.876 0.278 0.061 0.210
+      lifetime: 0.301
+    particle:
+      position: 1619.877 470.614 0.000
+      rotation: 46.032
+      size: 96.419 96.419
+      color: 0.913 0.376 0.131 0.447
+      lifetime: 0.659
+    particle:
+      position: 1175.232 499.704 0.000
+      rotation: -0.881
+      size: 80.880 80.880
+      color: 0.946 0.465 0.193 0.658
+      lifetime: 0.961
+  time: 1.78
+  aabb: [1193.555; 467.840; 0.000] - [2237.827; 735.779; 0.000]
+  particles 3:
+    particle:
+      position: 2237.827 735.779 0.000
+      rotation: 9.281
+      size: 139.710 139.710
+      color: 0.874 0.273 0.058 0.198
+      lifetime: 0.284
+    particle:
+      position: 1646.305 467.840 0.000
+      rotation: 46.972
+      size: 98.387 98.387
+      color: 0.911 0.372 0.127 0.435
+      lifetime: 0.642
+    particle:
+      position: 1193.555 496.990 0.000
+      rotation: -0.910
+      size: 82.499 82.499
+      color: 0.944 0.460 0.189 0.646
+      lifetime: 0.944
+  time: 1.80
+  aabb: [998.057; 465.014; 0.000] - [2276.411; 741.465; 0.000]
+  particles 4:
+    particle:
+      position: 2276.411 741.465 0.000
+      rotation: 9.416
+      size: 141.735 141.735
+      color: 0.872 0.268 0.055 0.186
+      lifetime: 0.267
+    particle:
+      position: 1673.253 465.014 0.000
+      rotation: 47.911
+      size: 100.355 100.355
+      color: 0.909 0.367 0.124 0.424
+      lifetime: 0.626
+    particle:
+      position: 1212.461 494.185 0.000
+      rotation: -0.940
+      size: 84.118 84.118
+      color: 0.943 0.455 0.186 0.635
+      lifetime: 0.927
+    particle:
+      position: 998.057 539.910 0.000
+      rotation: -1.008
+      size: 2.437 2.437
+      color: 0.998 0.602 0.289 0.986
+      lifetime: 1.175
+  time: 1.82
+  aabb: [999.201; 462.137; 0.000] - [2315.556; 747.233; 0.000]
+  particles 4:
+    particle:
+      position: 2315.556 747.233 0.000
+      rotation: 9.550
+      size: 143.759 143.759
+      color: 0.870 0.263 0.051 0.175
+      lifetime: 0.251
+    particle:
+      position: 1700.722 462.137 0.000
+      rotation: 48.850
+      size: 102.322 102.322
+      color: 0.908 0.362 0.121 0.413
+      lifetime: 0.609
+    particle:
+      position: 1231.950 491.290 0.000
+      rotation: -0.969
+      size: 85.738 85.738
+      color: 0.941 0.450 0.183 0.623
+      lifetime: 0.911
+    particle:
+      position: 999.201 539.730 0.000
+      rotation: -2.016
+      size: 4.875 4.875
+      color: 0.996 0.596 0.285 0.972
+      lifetime: 1.158
+  time: 1.83
+  aabb: [1000.917; 459.210; 0.000] - [2355.263; 753.082; 0.000]
+  particles 4:
+    particle:
+      position: 2355.263 753.082 0.000
+      rotation: 9.685
+      size: 145.784 145.784
+      color: 0.868 0.258 0.048 0.163
+      lifetime: 0.234
+    particle:
+      position: 1728.711 459.210 0.000
+      rotation: 49.790
+      size: 104.290 104.290
+      color: 0.906 0.358 0.118 0.401
+      lifetime: 0.592
+    particle:
+      position: 1252.019 488.304 0.000
+      rotation: -0.999
+      size: 87.357 87.357
+      color: 0.939 0.446 0.179 0.612
+      lifetime: 0.894
+    particle:
+      position: 1000.917 539.461 0.000
+      rotation: -3.023
+      size: 7.312 7.312
+      color: 0.993 0.590 0.280 0.958
+      lifetime: 1.141
+  time: 1.85
+  aabb: [1003.205; 456.231; 0.000] - [2395.531; 759.012; 0.000]
+  particles 4:
+    particle:
+      position: 2395.531 759.012 0.000
+      rotation: 9.819
+      size: 147.809 147.809
+      color: 0.867 0.253 0.044 0.152
+      lifetime: 0.217
+    particle:
+      position: 1757.221 456.231 0.000
+      rotation: 50.729
+      size: 106.258 106.258
+      color: 0.904 0.353 0.114 0.390
+      lifetime: 0.576
+    particle:
+      position: 1272.669 485.226 0.000
+      rotation: -1.028
+      size: 88.977 88.977
+      color: 0.937 0.441 0.176 0.601
+      lifetime: 0.877
+    particle:
+      position: 1003.205 539.101 0.000
+      rotation: -4.031
+      size: 9.750 9.750
+      color: 0.991 0.584 0.276 0.944
+      lifetime: 1.125
+  time: 1.87
+  aabb: [1006.065; 453.203; 0.000] - [2436.361; 765.024; 0.000]
+  particles 4:
+    particle:
+      position: 2436.361 765.024 0.000
+      rotation: 9.954
+      size: 149.834 149.834
+      color: 0.865 0.248 0.041 0.140
+      lifetime: 0.201
+    particle:
+      position: 1786.250 453.203 0.000
+      rotation: 51.669
+      size: 108.225 108.225
+      color: 0.902 0.348 0.111 0.379
+      lifetime: 0.559
+    particle:
+      position: 1293.899 482.057 0.000
+      rotation: -1.057
+      size: 90.596 90.596
+      color: 0.935 0.436 0.172 0.589
+      lifetime: 0.861
+    particle:
+      position: 1006.065 538.652 0.000
+      rotation: -5.039
+      size: 12.187 12.187
+      color: 0.989 0.578 0.272 0.930
+      lifetime: 1.108
+  time: 1.88
+  aabb: [1009.497; 450.124; 0.000] - [2477.753; 771.117; 0.000]
+  particles 4:
+    particle:
+      position: 2477.753 771.117 0.000
+      rotation: 10.088
+      size: 151.858 151.858
+      color: 0.863 0.244 0.038 0.128
+      lifetime: 0.184
+    particle:
+      position: 1815.798 450.124 0.000
+      rotation: 52.608
+      size: 110.193 110.193
+      color: 0.901 0.343 0.108 0.368
+      lifetime: 0.542
+    particle:
+      position: 1315.708 478.797 0.000
+      rotation: -1.087
+      size: 92.216 92.216
+      color: 0.934 0.431 0.169 0.578
+      lifetime: 0.844
+    particle:
+      position: 1009.497 538.112 0.000
+      rotation: -6.047
+      size: 14.625 14.625
+      color: 0.987 0.573 0.268 0.916
+      lifetime: 1.091
+  time: 1.90
+  aabb: [1013.499; 446.995; 0.000] - [2519.707; 777.291; 0.000]
+  particles 4:
+    particle:
+      position: 2519.707 777.291 0.000
+      rotation: 10.223
+      size: 153.883 153.883
+      color: 0.861 0.239 0.034 0.117
+      lifetime: 0.167
+    particle:
+      position: 1845.866 446.995 0.000
+      rotation: 53.548
+      size: 112.161 112.161
+      color: 0.899 0.339 0.104 0.356
+      lifetime: 0.526
+    particle:
+      position: 1338.096 475.445 0.000
+      rotation: -1.116
+      size: 93.835 93.835
+      color: 0.932 0.427 0.166 0.566
+      lifetime: 0.827
+    particle:
+      position: 1013.499 537.483 0.000
+      rotation: -7.055
+      size: 17.062 17.062
+      color: 0.985 0.567 0.264 0.902
+      lifetime: 1.075
+  time: 1.92
+  aabb: [1018.074; 443.816; 0.000] - [2562.223; 783.547; 0.000]
+  particles 4:
+    particle:
+      position: 2562.223 783.547 0.000
+      rotation: 10.357
+      size: 155.908 155.908
+      color: 0.859 0.234 0.031 0.105
+      lifetime: 0.151
+    particle:
+      position: 1876.452 443.816 0.000
+      rotation: 54.487
+      size: 114.129 114.129
+      color: 0.897 0.334 0.101 0.345
+      lifetime: 0.509
+    particle:
+      position: 1361.061 472.000 0.000
+      rotation: -1.145
+      size: 95.454 95.454
+      color: 0.930 0.422 0.162 0.555
+      lifetime: 0.811
+    particle:
+      position: 1018.074 536.763 0.000
+      rotation: -8.062
+      size: 19.500 19.500
+      color: 0.982 0.561 0.260 0.888
+      lifetime: 1.058
+  time: 1.93
+  aabb: [1023.219; 440.587; 0.000] - [2605.302; 789.884; 0.000]
+  particles 4:
+    particle:
+      position: 2605.302 789.884 0.000
+      rotation: 10.492
+      size: 157.933 157.933
+      color: 0.857 0.229 0.027 0.094
+      lifetime: 0.134
+    particle:
+      position: 1907.558 440.587 0.000
+      rotation: 55.426
+      size: 116.096 116.096
+      color: 0.895 0.329 0.098 0.334
+      lifetime: 0.492
+    particle:
+      position: 1384.604 468.464 0.000
+      rotation: -1.175
+      size: 97.074 97.074
+      color: 0.928 0.417 0.159 0.544
+      lifetime: 0.794
+    particle:
+      position: 1023.219 535.954 0.000
+      rotation: -9.070
+      size: 21.937 21.937
+      color: 0.980 0.555 0.256 0.874
+      lifetime: 1.041
+  time: 1.95
+  aabb: [1028.935; 437.309; 0.000] - [2648.944; 796.302; 0.000]
+  particles 4:
+    particle:
+      position: 2648.944 796.302 0.000
+      rotation: 10.626
+      size: 159.958 159.958
+      color: 0.856 0.224 0.024 0.082
+      lifetime: 0.117
+    particle:
+      position: 1939.181 437.309 0.000
+      rotation: 56.366
+      size: 118.064 118.064
+      color: 0.893 0.325 0.094 0.322
+      lifetime: 0.476
+    particle:
+      position: 1408.722 464.836 0.000
+      rotation: -1.204
+      size: 98.693 98.693
+      color: 0.926 0.412 0.156 0.532
+      lifetime: 0.777
+    particle:
+      position: 1028.935 535.054 0.000
+      rotation: -10.078
+      size: 24.374 24.374
+      color: 0.978 0.549 0.252 0.860
+      lifetime: 1.025
+  time: 1.97
+  aabb: [1035.221; 433.982; 0.000] - [2693.149; 802.801; 0.000]
+  particles 4:
+    particle:
+      position: 2693.149 802.801 0.000
+      rotation: 10.761
+      size: 161.982 161.982
+      color: 0.854 0.219 0.021 0.070
+      lifetime: 0.101
+    particle:
+      position: 1971.323 433.982 0.000
+      rotation: 57.305
+      size: 120.032 120.032
+      color: 0.892 0.320 0.091 0.311
+      lifetime: 0.459
+    particle:
+      position: 1433.417 461.115 0.000
+      rotation: -1.234
+      size: 100.313 100.313
+      color: 0.925 0.407 0.152 0.521
+      lifetime: 0.761
+    particle:
+      position: 1035.221 534.064 0.000
+      rotation: -11.086
+      size: 26.812 26.812
+      color: 0.976 0.543 0.248 0.846
+      lifetime: 1.008
+  time: 1.98
+  aabb: [1042.078; 430.605; 0.000] - [2737.917; 809.382; 0.000]
+  particles 4:
+    particle:
+      position: 2737.917 809.382 0.000
+      rotation: 10.895
+      size: 164.007 164.007
+      color: 0.852 0.215 0.017 0.059
+      lifetime: 0.084
+    particle:
+      position: 2003.983 430.605 0.000
+      rotation: 58.245
+      size: 122.000 122.000
+      color: 0.890 0.315 0.088 0.300
+      lifetime: 0.442
+    particle:
+      position: 1458.687 457.301 0.000
+      rotation: -1.263
+      size: 101.932 101.932
+      color: 0.923 0.403 0.149 0.509
+      lifetime: 0.744
+    particle:
+      position: 1042.078 532.984 0.000
+      rotation: -12.094
+      size: 29.249 29.249
+      color: 0.974 0.537 0.244 0.832
+      lifetime: 0.991
+
+Testing library 'data/particle_designer/radius_test.plist':
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: There is no support of DTD in this version of parser
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected identifier 'DOCTYPE'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected identifier 'plist'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected identifier 'PUBLIC'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected string '-//Apple//DTD PLIST 1.0//EN'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected string 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'. Tag expected
+media.particles.loaders.ParticleDesignerPlistLoader: data/particle_designer/radius_test.plist(2): error: syntax error. Unexpected '>'. Tag not opened
+  time: 0.33
+  aabb: [0.000; 0.000; 0.000] - [0.000; 0.000; 0.000]
+  particles 1:
+    particle:
+      position: 0.000 0.000 0.000
+      rotation: 360.000
+      size: 1.000 1.000
+      color: 0.000 0.000 0.000 0.000
+      lifetime: 1.000
+  time: 0.35
+  aabb: [-68.151; 82.674; 0.000] - [-68.151; 82.674; 0.000]
+  particles 1:
+    particle:
+      position: -68.151 82.674 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 0.37
+  aabb: [-49.689; 41.321; 0.000] - [-49.689; 41.321; 0.000]
+  particles 1:
+    particle:
+      position: -49.689 41.321 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 0.38
+  aabb: [-99.159; 89.394; 0.000] - [-99.159; 89.394; 0.000]
+  particles 1:
+    particle:
+      position: -99.159 89.394 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 0.40
+  aabb: [-80.618; 42.461; 0.000] - [-80.618; 42.461; 0.000]
+  particles 1:
+    particle:
+      position: -80.618 42.461 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 0.42
+  aabb: [-121.105; 74.829; 0.000] - [-121.105; 74.829; 0.000]
+  particles 1:
+    particle:
+      position: -121.105 74.829 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 0.43
+  aabb: [-105.092; 29.245; 0.000] - [-105.092; 29.245; 0.000]
+  particles 1:
+    particle:
+      position: -105.092 29.245 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 0.45
+  aabb: [-138.667; 51.097; 0.000] - [-138.667; 51.097; 0.000]
+  particles 1:
+    particle:
+      position: -138.667 51.097 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 0.47
+  aabb: [-124.469; 7.827; 0.000] - [-124.469; 7.827; 0.000]
+  particles 1:
+    particle:
+      position: -124.469 7.827 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 0.48
+  aabb: [-151.473; 21.397; 0.000] - [-151.473; 21.397; 0.000]
+  particles 1:
+    particle:
+      position: -151.473 21.397 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850
+  time: 0.50
+  aabb: [-137.814; -19.593; 0.000] - [5.073; 0.548; 0.000]
+  particles 2:
+    particle:
+      position: -137.814 -19.593 0.000
+      rotation: 300.000
+      size: 0.833 0.833
+      color: 0.167 0.167 0.167 0.167
+      lifetime: 0.833
+    particle:
+      position: 5.073 0.548 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 0.52
+  aabb: [-158.210; -12.663; 0.000] - [7.691; 1.934; 0.000]
+  particles 2:
+    particle:
+      position: -158.210 -12.663 0.000
+      rotation: 294.000
+      size: 0.817 0.817
+      color: 0.183 0.183 0.183 0.183
+      lifetime: 0.817
+    particle:
+      position: 7.691 1.934 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 0.53
+  aabb: [-143.881; -51.353; 0.000] - [13.236; 4.223; 0.000]
+  particles 2:
+    particle:
+      position: -143.881 -51.353 0.000
+      rotation: 288.000
+      size: 0.800 0.800
+      color: 0.200 0.200 0.200 0.200
+      lifetime: 0.800
+    particle:
+      position: 13.236 4.223 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 0.55
+  aabb: [-157.608; -49.507; 0.000] - [15.899; 7.450; 0.000]
+  particles 2:
+    particle:
+      position: -157.608 -49.507 0.000
+      rotation: 282.000
+      size: 0.783 0.783
+      color: 0.217 0.217 0.217 0.217
+      lifetime: 0.783
+    particle:
+      position: 15.899 7.450 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 0.57
+  aabb: [-141.632; -85.640; 0.000] - [20.439; 11.540; 0.000]
+  particles 2:
+    particle:
+      position: -141.632 -85.640 0.000
+      rotation: 276.000
+      size: 0.767 0.767
+      color: 0.233 0.233 0.233 0.233
+      lifetime: 0.767
+    particle:
+      position: 20.439 11.540 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 0.58
+  aabb: [-148.728; -87.308; 0.000] - [22.086; 16.434; 0.000]
+  particles 2:
+    particle:
+      position: -148.728 -87.308 0.000
+      rotation: 270.000
+      size: 0.750 0.750
+      color: 0.250 0.250 0.250 0.250
+      lifetime: 0.750
+    particle:
+      position: 22.086 16.434 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 0.60
+  aabb: [-130.419; -120.405; 0.000] - [24.892; 22.000; 0.000]
+  particles 2:
+    particle:
+      position: -130.419 -120.405 0.000
+      rotation: 264.000
+      size: 0.733 0.733
+      color: 0.267 0.267 0.267 0.267
+      lifetime: 0.733
+    particle:
+      position: 24.892 22.000 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 0.62
+  aabb: [-131.092; -124.012; 0.000] - [24.887; 28.125; 0.000]
+  particles 2:
+    particle:
+      position: -131.092 -124.012 0.000
+      rotation: 258.000
+      size: 0.717 0.717
+      color: 0.283 0.283 0.283 0.283
+      lifetime: 0.717
+    particle:
+      position: 24.887 28.125 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 0.63
+  aabb: [-110.080; -153.434; 0.000] - [25.503; 34.644; 0.000]
+  particles 2:
+    particle:
+      position: -110.080 -153.434 0.000
+      rotation: 252.000
+      size: 0.700 0.700
+      color: 0.300 0.300 0.300 0.300
+      lifetime: 0.700
+    particle:
+      position: 25.503 34.644 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850
+  time: 0.65
+  aabb: [-104.741; -157.443; 0.000] - [23.430; 41.408; 0.000]
+  particles 2:
+    particle:
+      position: -104.741 -157.443 0.000
+      rotation: 246.000
+      size: 0.683 0.683
+      color: 0.317 0.317 0.317 0.317
+      lifetime: 0.683
+    particle:
+      position: 23.430 41.408 0.000
+      rotation: 300.000
+      size: 0.833 0.833
+      color: 0.167 0.167 0.167 0.167
+      lifetime: 0.833
+  time: 0.67
+  aabb: [-80.983; -182.460; 0.000] - [21.585; 48.231; 0.000]
+  particles 2:
+    particle:
+      position: -80.983 -182.460 0.000
+      rotation: 240.000
+      size: 0.667 0.667
+      color: 0.333 0.333 0.333 0.333
+      lifetime: 0.667
+    particle:
+      position: 21.585 48.231 0.000
+      rotation: 294.000
+      size: 0.817 0.817
+      color: 0.183 0.183 0.183 0.183
+      lifetime: 0.817
+  time: 0.68
+  aabb: [-70.270; -185.419; 0.000] - [17.226; 54.944; 0.000]
+  particles 2:
+    particle:
+      position: -70.270 -185.419 0.000
+      rotation: 234.000
+      size: 0.650 0.650
+      color: 0.350 0.350 0.350 0.350
+      lifetime: 0.650
+    particle:
+      position: 17.226 54.944 0.000
+      rotation: 288.000
+      size: 0.800 0.800
+      color: 0.200 0.200 0.200 0.200
+      lifetime: 0.800
+  time: 0.70
+  aabb: [-44.045; -205.296; 0.000] - [12.844; 61.353; 0.000]
+  particles 2:
+    particle:
+      position: -44.045 -205.296 0.000
+      rotation: 228.000
+      size: 0.633 0.633
+      color: 0.367 0.367 0.367 0.367
+      lifetime: 0.633
+    particle:
+      position: 12.844 61.353 0.000
+      rotation: 282.000
+      size: 0.783 0.783
+      color: 0.217 0.217 0.217 0.217
+      lifetime: 0.783
+  time: 0.72
+  aabb: [-28.825; -205.899; 0.000] - [6.184; 67.284; 0.000]
+  particles 2:
+    particle:
+      position: -28.825 -205.899 0.000
+      rotation: 222.000
+      size: 0.617 0.617
+      color: 0.383 0.383 0.383 0.383
+      lifetime: 0.617
+    particle:
+      position: 6.184 67.284 0.000
+      rotation: 276.000
+      size: 0.767 0.767
+      color: 0.233 0.233 0.233 0.233
+      lifetime: 0.767
+  time: 0.73
+  aabb: [-0.711; -219.969; 0.000] - [-0.610; 72.543; 0.000]
+  particles 2:
+    particle:
+      position: -0.711 -219.969 0.000
+      rotation: 216.000
+      size: 0.600 0.600
+      color: 0.400 0.400 0.400 0.400
+      lifetime: 0.600
+    particle:
+      position: -0.610 72.543 0.000
+      rotation: 270.000
+      size: 0.750 0.750
+      color: 0.250 0.250 0.250 0.250
+      lifetime: 0.750
+  time: 0.75
+  aabb: [-9.377; -217.109; 0.000] - [17.933; 76.966; 0.000]
+  particles 3:
+    particle:
+      position: 17.933 -217.109 0.000
+      rotation: 210.000
+      size: 0.583 0.583
+      color: 0.417 0.417 0.417 0.417
+      lifetime: 0.583
+    particle:
+      position: -9.377 76.966 0.000
+      rotation: 264.000
+      size: 0.733 0.733
+      color: 0.267 0.267 0.267 0.267
+      lifetime: 0.733
+    particle:
+      position: 5.073 0.548 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 0.77
+  aabb: [-18.256; -224.844; 0.000] - [47.096; 80.378; 0.000]
+  particles 3:
+    particle:
+      position: 47.096 -224.844 0.000
+      rotation: 204.000
+      size: 0.567 0.567
+      color: 0.433 0.433 0.433 0.433
+      lifetime: 0.567
+    particle:
+      position: -18.256 80.378 0.000
+      rotation: 258.000
+      size: 0.717 0.717
+      color: 0.283 0.283 0.283 0.283
+      lifetime: 0.717
+    particle:
+      position: 7.691 1.934 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 0.78
+  aabb: [-28.733; -217.668; 0.000] - [67.900; 82.634; 0.000]
+  particles 3:
+    particle:
+      position: 67.900 -217.668 0.000
+      rotation: 198.000
+      size: 0.550 0.550
+      color: 0.450 0.450 0.450 0.450
+      lifetime: 0.550
+    particle:
+      position: -28.733 82.634 0.000
+      rotation: 252.000
+      size: 0.700 0.700
+      color: 0.300 0.300 0.300 0.300
+      lifetime: 0.700
+    particle:
+      position: 13.236 4.223 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 0.80
+  aabb: [-39.184; -218.746; 0.000] - [97.055; 83.591; 0.000]
+  particles 3:
+    particle:
+      position: 97.055 -218.746 0.000
+      rotation: 192.000
+      size: 0.533 0.533
+      color: 0.467 0.467 0.467 0.467
+      lifetime: 0.533
+    particle:
+      position: -39.184 83.591 0.000
+      rotation: 246.000
+      size: 0.683 0.683
+      color: 0.317 0.317 0.317 0.317
+      lifetime: 0.683
+    particle:
+      position: 15.899 7.450 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 0.82
+  aabb: [-50.794; -206.700; 0.000] - [118.621; 83.138; 0.000]
+  particles 3:
+    particle:
+      position: 118.621 -206.700 0.000
+      rotation: 186.000
+      size: 0.517 0.517
+      color: 0.483 0.483 0.483 0.483
+      lifetime: 0.517
+    particle:
+      position: -50.794 83.138 0.000
+      rotation: 240.000
+      size: 0.667 0.667
+      color: 0.333 0.333 0.333 0.333
+      lifetime: 0.667
+    particle:
+      position: 20.439 11.540 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 0.83
+  aabb: [-62.139; -201.050; 0.000] - [146.560; 81.172; 0.000]
+  particles 3:
+    particle:
+      position: 146.560 -201.050 0.000
+      rotation: 180.000
+      size: 0.500 0.500
+      color: 0.500 0.500 0.500 0.500
+      lifetime: 0.500
+    particle:
+      position: -62.139 81.172 0.000
+      rotation: 234.000
+      size: 0.650 0.650
+      color: 0.350 0.350 0.350 0.350
+      lifetime: 0.650
+    particle:
+      position: 22.086 16.434 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 0.85
+  aabb: [-74.157; -183.909; 0.000] - [167.415; 77.626; 0.000]
+  particles 3:
+    particle:
+      position: 167.415 -183.909 0.000
+      rotation: 174.000
+      size: 0.483 0.483
+      color: 0.517 0.517 0.517 0.517
+      lifetime: 0.483
+    particle:
+      position: -74.157 77.626 0.000
+      rotation: 228.000
+      size: 0.633 0.633
+      color: 0.367 0.367 0.367 0.367
+      lifetime: 0.633
+    particle:
+      position: 24.892 22.000 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 0.87
+  aabb: [-85.596; -171.752; 0.000] - [192.853; 72.450; 0.000]
+  particles 3:
+    particle:
+      position: 192.853 -171.752 0.000
+      rotation: 168.000
+      size: 0.467 0.467
+      color: 0.533 0.533 0.533 0.533
+      lifetime: 0.467
+    particle:
+      position: -85.596 72.450 0.000
+      rotation: 222.000
+      size: 0.617 0.617
+      color: 0.383 0.383 0.383 0.383
+      lifetime: 0.617
+    particle:
+      position: 24.887 28.125 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 0.88
+  aabb: [-97.193; -149.638; 0.000] - [211.517; 65.628; 0.000]
+  particles 3:
+    particle:
+      position: 211.517 -149.638 0.000
+      rotation: 162.000
+      size: 0.450 0.450
+      color: 0.550 0.550 0.550 0.550
+      lifetime: 0.450
+    particle:
+      position: -97.193 65.628 0.000
+      rotation: 216.000
+      size: 0.600 0.600
+      color: 0.400 0.400 0.400 0.400
+      lifetime: 0.600
+    particle:
+      position: 25.503 34.644 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850
+  time: 0.90
+  aabb: [-107.850; -131.502; 0.000] - [233.166; 57.165; 0.000]
+  particles 3:
+    particle:
+      position: 233.166 -131.502 0.000
+      rotation: 156.000
+      size: 0.433 0.433
+      color: 0.567 0.567 0.567 0.567
+      lifetime: 0.433
+    particle:
+      position: -107.850 57.165 0.000
+      rotation: 210.000
+      size: 0.583 0.583
+      color: 0.417 0.417 0.417 0.417
+      lifetime: 0.583
+    particle:
+      position: 23.430 41.408 0.000
+      rotation: 300.000
+      size: 0.833 0.833
+      color: 0.167 0.167 0.167 0.167
+      lifetime: 0.833
+  time: 0.92
+  aabb: [-118.147; -104.888; 0.000] - [248.229; 48.231; 0.000]
+  particles 3:
+    particle:
+      position: 248.229 -104.888 0.000
+      rotation: 150.000
+      size: 0.417 0.417
+      color: 0.583 0.583 0.583 0.583
+      lifetime: 0.417
+    particle:
+      position: -118.147 47.104 0.000
+      rotation: 204.000
+      size: 0.567 0.567
+      color: 0.433 0.433 0.433 0.433
+      lifetime: 0.567
+    particle:
+      position: 21.585 48.231 0.000
+      rotation: 294.000
+      size: 0.817 0.817
+      color: 0.183 0.183 0.183 0.183
+      lifetime: 0.817
+  time: 0.93
+  aabb: [-127.125; -81.606; 0.000] - [264.883; 54.944; 0.000]
+  particles 3:
+    particle:
+      position: 264.883 -81.606 0.000
+      rotation: 144.000
+      size: 0.400 0.400
+      color: 0.600 0.600 0.600 0.600
+      lifetime: 0.400
+    particle:
+      position: -127.125 35.509 0.000
+      rotation: 198.000
+      size: 0.550 0.550
+      color: 0.450 0.450 0.450 0.450
+      lifetime: 0.550
+    particle:
+      position: 17.226 54.944 0.000
+      rotation: 288.000
+      size: 0.800 0.800
+      color: 0.200 0.200 0.200 0.200
+      lifetime: 0.800
+  time: 0.95
+  aabb: [-135.246; -51.297; 0.000] - [275.079; 61.353; 0.000]
+  particles 3:
+    particle:
+      position: 275.079 -51.297 0.000
+      rotation: 138.000
+      size: 0.383 0.383
+      color: 0.617 0.617 0.617 0.617
+      lifetime: 0.383
+    particle:
+      position: -135.246 22.479 0.000
+      rotation: 192.000
+      size: 0.533 0.533
+      color: 0.467 0.467 0.467 0.467
+      lifetime: 0.533
+    particle:
+      position: 12.844 61.353 0.000
+      rotation: 282.000
+      size: 0.783 0.783
+      color: 0.217 0.217 0.217 0.217
+      lifetime: 0.783
+  time: 0.97
+  aabb: [-141.688; -23.989; 0.000] - [285.690; 67.284; 0.000]
+  particles 3:
+    particle:
+      position: 285.690 -23.989 0.000
+      rotation: 132.000
+      size: 0.367 0.367
+      color: 0.633 0.633 0.633 0.633
+      lifetime: 0.367
+    particle:
+      position: -141.688 8.138 0.000
+      rotation: 186.000
+      size: 0.517 0.517
+      color: 0.483 0.483 0.483 0.483
+      lifetime: 0.517
+    particle:
+      position: 6.184 67.284 0.000
+      rotation: 276.000
+      size: 0.767 0.767
+      color: 0.233 0.233 0.233 0.233
+      lifetime: 0.767
+  time: 0.98
+  aabb: [-146.826; -7.360; 0.000] - [289.969; 72.543; 0.000]
+  particles 3:
+    particle:
+      position: 289.969 8.912 0.000
+      rotation: 126.000
+      size: 0.350 0.350
+      color: 0.650 0.650 0.650 0.650
+      lifetime: 0.350
+    particle:
+      position: -146.826 -7.360 0.000
+      rotation: 180.000
+      size: 0.500 0.500
+      color: 0.500 0.500 0.500 0.500
+      lifetime: 0.500
+    particle:
+      position: -0.610 72.543 0.000
+      rotation: 270.000
+      size: 0.750 0.750
+      color: 0.250 0.250 0.250 0.250
+      lifetime: 0.750
+  time: 1.00
+  aabb: [-149.970; -23.838; 0.000] - [293.720; 76.966; 0.000]
+  particles 4:
+    particle:
+      position: 293.720 38.876 0.000
+      rotation: 120.000
+      size: 0.333 0.333
+      color: 0.667 0.667 0.667 0.667
+      lifetime: 0.333
+    particle:
+      position: -149.970 -23.838 0.000
+      rotation: 174.000
+      size: 0.483 0.483
+      color: 0.517 0.517 0.517 0.517
+      lifetime: 0.483
+    particle:
+      position: -9.377 76.966 0.000
+      rotation: 264.000
+      size: 0.733 0.733
+      color: 0.267 0.267 0.267 0.267
+      lifetime: 0.733
+    particle:
+      position: 5.073 0.548 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 1.02
+  aabb: [-151.443; -41.093; 0.000] - [291.315; 80.378; 0.000]
+  particles 4:
+    particle:
+      position: 291.315 73.021 0.000
+      rotation: 114.000
+      size: 0.317 0.317
+      color: 0.683 0.683 0.683 0.683
+      lifetime: 0.317
+    particle:
+      position: -151.443 -41.093 0.000
+      rotation: 168.000
+      size: 0.467 0.467
+      color: 0.533 0.533 0.533 0.533
+      lifetime: 0.467
+    particle:
+      position: -18.256 80.378 0.000
+      rotation: 258.000
+      size: 0.717 0.717
+      color: 0.283 0.283 0.283 0.283
+      lifetime: 0.717
+    particle:
+      position: 7.691 1.934 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 1.03
+  aabb: [-150.681; -58.903; 0.000] - [287.683; 104.080; 0.000]
+  particles 4:
+    particle:
+      position: 287.683 104.080 0.000
+      rotation: 108.000
+      size: 0.300 0.300
+      color: 0.700 0.700 0.700 0.700
+      lifetime: 0.300
+    particle:
+      position: -150.681 -58.903 0.000
+      rotation: 162.000
+      size: 0.450 0.450
+      color: 0.550 0.550 0.550 0.550
+      lifetime: 0.450
+    particle:
+      position: -28.733 82.634 0.000
+      rotation: 252.000
+      size: 0.700 0.700
+      color: 0.300 0.300 0.300 0.300
+      lifetime: 0.700
+    particle:
+      position: 13.236 4.223 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 1.05
+  aabb: [-147.983; -77.024; 0.000] - [278.162; 137.938; 0.000]
+  particles 4:
+    particle:
+      position: 278.162 137.938 0.000
+      rotation: 102.000
+      size: 0.283 0.283
+      color: 0.717 0.717 0.717 0.717
+      lifetime: 0.283
+    particle:
+      position: -147.983 -77.024 0.000
+      rotation: 156.000
+      size: 0.433 0.433
+      color: 0.567 0.567 0.567 0.567
+      lifetime: 0.433
+    particle:
+      position: -39.184 83.591 0.000
+      rotation: 246.000
+      size: 0.683 0.683
+      color: 0.317 0.317 0.317 0.317
+      lifetime: 0.683
+    particle:
+      position: 15.899 7.450 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 1.07
+  aabb: [-142.909; -95.203; 0.000] - [266.967; 168.406; 0.000]
+  particles 4:
+    particle:
+      position: 266.967 168.406 0.000
+      rotation: 96.000
+      size: 0.267 0.267
+      color: 0.733 0.733 0.733 0.733
+      lifetime: 0.267
+    particle:
+      position: -142.909 -95.203 0.000
+      rotation: 150.000
+      size: 0.417 0.417
+      color: 0.583 0.583 0.583 0.583
+      lifetime: 0.417
+    particle:
+      position: -50.794 83.138 0.000
+      rotation: 240.000
+      size: 0.667 0.667
+      color: 0.333 0.333 0.333 0.333
+      lifetime: 0.667
+    particle:
+      position: 20.439 11.540 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 1.08
+  aabb: [-135.754; -113.168; 0.000] - [250.267; 200.348; 0.000]
+  particles 4:
+    particle:
+      position: 250.267 200.348 0.000
+      rotation: 90.000
+      size: 0.250 0.250
+      color: 0.750 0.750 0.750 0.750
+      lifetime: 0.250
+    particle:
+      position: -135.754 -113.168 0.000
+      rotation: 144.000
+      size: 0.400 0.400
+      color: 0.600 0.600 0.600 0.600
+      lifetime: 0.400
+    particle:
+      position: -62.139 81.172 0.000
+      rotation: 234.000
+      size: 0.650 0.650
+      color: 0.350 0.350 0.350 0.350
+      lifetime: 0.650
+    particle:
+      position: 22.086 16.434 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 1.10
+  aabb: [-126.203; -130.645; 0.000] - [231.701; 228.495; 0.000]
+  particles 4:
+    particle:
+      position: 231.701 228.495 0.000
+      rotation: 84.000
+      size: 0.233 0.233
+      color: 0.767 0.767 0.767 0.767
+      lifetime: 0.233
+    particle:
+      position: -126.203 -130.645 0.000
+      rotation: 138.000
+      size: 0.383 0.383
+      color: 0.617 0.617 0.617 0.617
+      lifetime: 0.383
+    particle:
+      position: -74.157 77.626 0.000
+      rotation: 228.000
+      size: 0.633 0.633
+      color: 0.367 0.367 0.367 0.367
+      lifetime: 0.633
+    particle:
+      position: 24.892 22.000 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 1.12
+  aabb: [-114.562; -147.354; 0.000] - [208.154; 256.875; 0.000]
+  particles 4:
+    particle:
+      position: 208.154 256.875 0.000
+      rotation: 78.000
+      size: 0.217 0.217
+      color: 0.783 0.783 0.783 0.783
+      lifetime: 0.217
+    particle:
+      position: -114.562 -147.354 0.000
+      rotation: 132.000
+      size: 0.367 0.367
+      color: 0.633 0.633 0.633 0.633
+      lifetime: 0.367
+    particle:
+      position: -85.596 72.450 0.000
+      rotation: 222.000
+      size: 0.617 0.617
+      color: 0.383 0.383 0.383 0.383
+      lifetime: 0.617
+    particle:
+      position: 24.887 28.125 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 1.13
+  aabb: [-100.633; -163.015; 0.000] - [182.795; 281.015; 0.000]
+  particles 4:
+    particle:
+      position: 182.795 281.015 0.000
+      rotation: 72.000
+      size: 0.200 0.200
+      color: 0.800 0.800 0.800 0.800
+      lifetime: 0.200
+    particle:
+      position: -100.633 -163.015 0.000
+      rotation: 126.000
+      size: 0.350 0.350
+      color: 0.650 0.650 0.650 0.650
+      lifetime: 0.350
+    particle:
+      position: -97.193 65.628 0.000
+      rotation: 216.000
+      size: 0.600 0.600
+      color: 0.400 0.400 0.400 0.400
+      lifetime: 0.600
+    particle:
+      position: 25.503 34.644 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850
+  time: 1.15
+  aabb: [-107.850; -177.352; 0.000] - [153.125; 304.264; 0.000]
+  particles 4:
+    particle:
+      position: 153.125 304.264 0.000
+      rotation: 66.000
+      size: 0.183 0.183
+      color: 0.817 0.817 0.817 0.817
+      lifetime: 0.183
+    particle:
+      position: -84.748 -177.352 0.000
+      rotation: 120.000
+      size: 0.333 0.333
+      color: 0.667 0.667 0.667 0.667
+      lifetime: 0.333
+    particle:
+      position: -107.850 57.165 0.000
+      rotation: 210.000
+      size: 0.583 0.583
+      color: 0.417 0.417 0.417 0.417
+      lifetime: 0.583
+    particle:
+      position: 23.430 41.408 0.000
+      rotation: 300.000
+      size: 0.833 0.833
+      color: 0.167 0.167 0.167 0.167
+      lifetime: 0.833
+  time: 1.17
+  aabb: [-118.147; -190.101; 0.000] - [121.926; 322.842; 0.000]
+  particles 4:
+    particle:
+      position: 121.926 322.842 0.000
+      rotation: 60.000
+      size: 0.167 0.167
+      color: 0.833 0.833 0.833 0.833
+      lifetime: 0.167
+    particle:
+      position: -66.819 -190.101 0.000
+      rotation: 114.000
+      size: 0.317 0.317
+      color: 0.683 0.683 0.683 0.683
+      lifetime: 0.317
+    particle:
+      position: -118.147 47.104 0.000
+      rotation: 204.000
+      size: 0.567 0.567
+      color: 0.433 0.433 0.433 0.433
+      lifetime: 0.567
+    particle:
+      position: 21.585 48.231 0.000
+      rotation: 294.000
+      size: 0.817 0.817
+      color: 0.183 0.183 0.183 0.183
+      lifetime: 0.817
+  time: 1.18
+  aabb: [-127.125; -201.006; 0.000] - [87.226; 339.558; 0.000]
+  particles 4:
+    particle:
+      position: 87.226 339.558 0.000
+      rotation: 54.000
+      size: 0.150 0.150
+      color: 0.850 0.850 0.850 0.850
+      lifetime: 0.150
+    particle:
+      position: -47.208 -201.006 0.000
+      rotation: 108.000
+      size: 0.300 0.300
+      color: 0.700 0.700 0.700 0.700
+      lifetime: 0.300
+    particle:
+      position: -127.125 35.509 0.000
+      rotation: 198.000
+      size: 0.550 0.550
+      color: 0.450 0.450 0.450 0.450
+      lifetime: 0.550
+    particle:
+      position: 17.226 54.944 0.000
+      rotation: 288.000
+      size: 0.800 0.800
+      color: 0.200 0.200 0.200 0.200
+      lifetime: 0.800
+  time: 1.20
+  aabb: [-135.246; -209.832; 0.000] - [51.488; 351.241; 0.000]
+  particles 4:
+    particle:
+      position: 51.488 351.241 0.000
+      rotation: 48.000
+      size: 0.133 0.133
+      color: 0.867 0.867 0.867 0.867
+      lifetime: 0.133
+    particle:
+      position: -25.927 -209.832 0.000
+      rotation: 102.000
+      size: 0.283 0.283
+      color: 0.717 0.717 0.717 0.717
+      lifetime: 0.283
+    particle:
+      position: -135.246 22.479 0.000
+      rotation: 192.000
+      size: 0.533 0.533
+      color: 0.467 0.467 0.467 0.467
+      lifetime: 0.533
+    particle:
+      position: 12.844 61.353 0.000
+      rotation: 282.000
+      size: 0.783 0.783
+      color: 0.217 0.217 0.217 0.217
+      lifetime: 0.783
+  time: 1.22
+  aabb: [-141.688; -216.364; 0.000] - [13.180; 360.272; 0.000]
+  particles 4:
+    particle:
+      position: 13.180 360.272 0.000
+      rotation: 42.000
+      size: 0.117 0.117
+      color: 0.883 0.883 0.883 0.883
+      lifetime: 0.117
+    particle:
+      position: -3.368 -216.364 0.000
+      rotation: 96.000
+      size: 0.267 0.267
+      color: 0.733 0.733 0.733 0.733
+      lifetime: 0.267
+    particle:
+      position: -141.688 8.138 0.000
+      rotation: 186.000
+      size: 0.517 0.517
+      color: 0.483 0.483 0.483 0.483
+      lifetime: 0.517
+    particle:
+      position: 6.184 67.284 0.000
+      rotation: 276.000
+      size: 0.767 0.767
+      color: 0.233 0.233 0.233 0.233
+      lifetime: 0.767
+  time: 1.23
+  aabb: [-146.826; -220.413; 0.000] - [20.368; 364.024; 0.000]
+  particles 4:
+    particle:
+      position: -25.502 364.024 0.000
+      rotation: 36.000
+      size: 0.100 0.100
+      color: 0.900 0.900 0.900 0.900
+      lifetime: 0.100
+    particle:
+      position: 20.368 -220.413 0.000
+      rotation: 90.000
+      size: 0.250 0.250
+      color: 0.750 0.750 0.750 0.750
+      lifetime: 0.250
+    particle:
+      position: -146.826 -7.360 0.000
+      rotation: 180.000
+      size: 0.500 0.500
+      color: 0.500 0.500 0.500 0.500
+      lifetime: 0.500
+    particle:
+      position: -0.610 72.543 0.000
+      rotation: 270.000
+      size: 0.750 0.750
+      color: 0.250 0.250 0.250 0.250
+      lifetime: 0.750
+  time: 1.25
+  aabb: [-149.970; -221.816; 0.000] - [44.864; 364.545; 0.000]
+  particles 4:
+    particle:
+      position: -65.725 364.545 0.000
+      rotation: 30.000
+      size: 0.083 0.083
+      color: 0.917 0.917 0.917 0.917
+      lifetime: 0.083
+    particle:
+      position: 44.864 -221.816 0.000
+      rotation: 84.000
+      size: 0.233 0.233
+      color: 0.767 0.767 0.767 0.767
+      lifetime: 0.233
+    particle:
+      position: -149.970 -23.838 0.000
+      rotation: 174.000
+      size: 0.483 0.483
+      color: 0.517 0.517 0.517 0.517
+      lifetime: 0.483
+    particle:
+      position: -9.377 76.966 0.000
+      rotation: 264.000
+      size: 0.733 0.733
+      color: 0.267 0.267 0.267 0.267
+      lifetime: 0.733
+  time: 1.27
+  aabb: [-151.443; -220.444; 0.000] - [69.946; 359.694; 0.000]
+  particles 4:
+    particle:
+      position: -105.528 359.694 0.000
+      rotation: 24.000
+      size: 0.067 0.067
+      color: 0.933 0.933 0.933 0.933
+      lifetime: 0.067
+    particle:
+      position: 69.946 -220.444 0.000
+      rotation: 78.000
+      size: 0.217 0.217
+      color: 0.783 0.783 0.783 0.783
+      lifetime: 0.217
+    particle:
+      position: -151.443 -41.093 0.000
+      rotation: 168.000
+      size: 0.467 0.467
+      color: 0.533 0.533 0.533 0.533
+      lifetime: 0.467
+    particle:
+      position: -18.256 80.378 0.000
+      rotation: 258.000
+      size: 0.717 0.717
+      color: 0.283 0.283 0.283 0.283
+      lifetime: 0.717
+  time: 1.28
+  aabb: [-150.681; -216.202; 0.000] - [95.179; 351.268; 0.000]
+  particles 4:
+    particle:
+      position: -145.782 351.268 0.000
+      rotation: 18.000
+      size: 0.050 0.050
+      color: 0.950 0.950 0.950 0.950
+      lifetime: 0.050
+    particle:
+      position: 95.179 -216.202 0.000
+      rotation: 72.000
+      size: 0.200 0.200
+      color: 0.800 0.800 0.800 0.800
+      lifetime: 0.200
+    particle:
+      position: -150.681 -58.903 0.000
+      rotation: 162.000
+      size: 0.450 0.450
+      color: 0.550 0.550 0.550 0.550
+      lifetime: 0.450
+    particle:
+      position: -28.733 82.634 0.000
+      rotation: 252.000
+      size: 0.700 0.700
+      color: 0.300 0.300 0.300 0.300
+      lifetime: 0.700
+  time: 1.30
+  aabb: [-184.740; -209.031; 0.000] - [120.339; 337.559; 0.000]
+  particles 4:
+    particle:
+      position: -184.740 337.559 0.000
+      rotation: 12.000
+      size: 0.033 0.033
+      color: 0.967 0.967 0.967 0.967
+      lifetime: 0.033
+    particle:
+      position: 120.339 -209.031 0.000
+      rotation: 66.000
+      size: 0.183 0.183
+      color: 0.817 0.817 0.817 0.817
+      lifetime: 0.183
+    particle:
+      position: -147.983 -77.024 0.000
+      rotation: 156.000
+      size: 0.433 0.433
+      color: 0.567 0.567 0.567 0.567
+      lifetime: 0.433
+    particle:
+      position: -39.184 83.591 0.000
+      rotation: 246.000
+      size: 0.683 0.683
+      color: 0.317 0.317 0.317 0.317
+      lifetime: 0.683
+  time: 1.32
+  aabb: [-223.040; -198.913; 0.000] - [144.985; 320.177; 0.000]
+  particles 4:
+    particle:
+      position: -223.040 320.177 0.000
+      rotation: 6.000
+      size: 0.017 0.017
+      color: 0.983 0.983 0.983 0.983
+      lifetime: 0.017
+    particle:
+      position: 144.985 -198.913 0.000
+      rotation: 60.000
+      size: 0.167 0.167
+      color: 0.833 0.833 0.833 0.833
+      lifetime: 0.167
+    particle:
+      position: -142.909 -95.203 0.000
+      rotation: 150.000
+      size: 0.417 0.417
+      color: 0.583 0.583 0.583 0.583
+      lifetime: 0.417
+    particle:
+      position: -50.794 83.138 0.000
+      rotation: 240.000
+      size: 0.667 0.667
+      color: 0.333 0.333 0.333 0.333
+      lifetime: 0.667
+  time: 1.33
+  aabb: [-259.135; -185.868; 0.000] - [168.859; 297.800; 0.000]
+  particles 4:
+    particle:
+      position: -259.135 297.800 0.000
+      rotation: 0.000
+      size: 0.000 0.000
+      color: 1.000 1.000 1.000 1.000
+      lifetime: 0.000
+    particle:
+      position: 168.859 -185.868 0.000
+      rotation: 54.000
+      size: 0.150 0.150
+      color: 0.850 0.850 0.850 0.850
+      lifetime: 0.150
+    particle:
+      position: -135.754 -113.168 0.000
+      rotation: 144.000
+      size: 0.400 0.400
+      color: 0.600 0.600 0.600 0.600
+      lifetime: 0.400
+    particle:
+      position: -62.139 81.172 0.000
+      rotation: 234.000
+      size: 0.650 0.650
+      color: 0.350 0.350 0.350 0.350
+      lifetime: 0.650
+  time: 1.35
+  aabb: [-126.203; -169.957; 0.000] - [191.529; 77.626; 0.000]
+  particles 3:
+    particle:
+      position: 191.529 -169.957 0.000
+      rotation: 48.000
+      size: 0.133 0.133
+      color: 0.867 0.867 0.867 0.867
+      lifetime: 0.133
+    particle:
+      position: -126.203 -130.645 0.000
+      rotation: 138.000
+      size: 0.383 0.383
+      color: 0.617 0.617 0.617 0.617
+      lifetime: 0.383
+    particle:
+      position: -74.157 77.626 0.000
+      rotation: 228.000
+      size: 0.633 0.633
+      color: 0.367 0.367 0.367 0.367
+      lifetime: 0.633
+  time: 1.37
+  aabb: [-114.562; -151.284; 0.000] - [212.729; 72.450; 0.000]
+  particles 3:
+    particle:
+      position: 212.729 -151.284 0.000
+      rotation: 42.000
+      size: 0.117 0.117
+      color: 0.883 0.883 0.883 0.883
+      lifetime: 0.117
+    particle:
+      position: -114.562 -147.354 0.000
+      rotation: 132.000
+      size: 0.367 0.367
+      color: 0.633 0.633 0.633 0.633
+      lifetime: 0.367
+    particle:
+      position: -85.596 72.450 0.000
+      rotation: 222.000
+      size: 0.617 0.617
+      color: 0.383 0.383 0.383 0.383
+      lifetime: 0.617
+  time: 1.38
+  aabb: [-100.633; -163.015; 0.000] - [232.054; 65.628; 0.000]
+  particles 3:
+    particle:
+      position: 232.054 -129.994 0.000
+      rotation: 36.000
+      size: 0.100 0.100
+      color: 0.900 0.900 0.900 0.900
+      lifetime: 0.100
+    particle:
+      position: -100.633 -163.015 0.000
+      rotation: 126.000
+      size: 0.350 0.350
+      color: 0.650 0.650 0.650 0.650
+      lifetime: 0.350
+    particle:
+      position: -97.193 65.628 0.000
+      rotation: 216.000
+      size: 0.600 0.600
+      color: 0.400 0.400 0.400 0.400
+      lifetime: 0.600
+  time: 1.40
+  aabb: [-107.850; -177.352; 0.000] - [249.248; 57.165; 0.000]
+  particles 3:
+    particle:
+      position: 249.248 -106.271 0.000
+      rotation: 30.000
+      size: 0.083 0.083
+      color: 0.917 0.917 0.917 0.917
+      lifetime: 0.083
+    particle:
+      position: -84.748 -177.352 0.000
+      rotation: 120.000
+      size: 0.333 0.333
+      color: 0.667 0.667 0.667 0.667
+      lifetime: 0.333
+    particle:
+      position: -107.850 57.165 0.000
+      rotation: 210.000
+      size: 0.583 0.583
+      color: 0.417 0.417 0.417 0.417
+      lifetime: 0.583
+  time: 1.42
+  aabb: [-118.147; -190.101; 0.000] - [263.949; 47.104; 0.000]
+  particles 3:
+    particle:
+      position: 263.949 -80.339 0.000
+      rotation: 24.000
+      size: 0.067 0.067
+      color: 0.933 0.933 0.933 0.933
+      lifetime: 0.067
+    particle:
+      position: -66.819 -190.101 0.000
+      rotation: 114.000
+      size: 0.317 0.317
+      color: 0.683 0.683 0.683 0.683
+      lifetime: 0.317
+    particle:
+      position: -118.147 47.104 0.000
+      rotation: 204.000
+      size: 0.567 0.567
+      color: 0.433 0.433 0.433 0.433
+      lifetime: 0.567
+  time: 1.43
+  aabb: [-127.125; -201.006; 0.000] - [275.935; 35.509; 0.000]
+  particles 3:
+    particle:
+      position: 275.935 -52.459 0.000
+      rotation: 18.000
+      size: 0.050 0.050
+      color: 0.950 0.950 0.950 0.950
+      lifetime: 0.050
+    particle:
+      position: -47.208 -201.006 0.000
+      rotation: 108.000
+      size: 0.300 0.300
+      color: 0.700 0.700 0.700 0.700
+      lifetime: 0.300
+    particle:
+      position: -127.125 35.509 0.000
+      rotation: 198.000
+      size: 0.550 0.550
+      color: 0.450 0.450 0.450 0.450
+      lifetime: 0.550
+  time: 1.45
+  aabb: [-135.246; -209.832; 0.000] - [284.905; 22.479; 0.000]
+  particles 3:
+    particle:
+      position: 284.905 -22.925 0.000
+      rotation: 12.000
+      size: 0.033 0.033
+      color: 0.967 0.967 0.967 0.967
+      lifetime: 0.033
+    particle:
+      position: -25.927 -209.832 0.000
+      rotation: 102.000
+      size: 0.283 0.283
+      color: 0.717 0.717 0.717 0.717
+      lifetime: 0.283
+    particle:
+      position: -135.246 22.479 0.000
+      rotation: 192.000
+      size: 0.533 0.533
+      color: 0.467 0.467 0.467 0.467
+      lifetime: 0.533
+  time: 1.47
+  aabb: [-141.688; -216.364; 0.000] - [290.688; 8.138; 0.000]
+  particles 3:
+    particle:
+      position: 290.688 7.936 0.000
+      rotation: 6.000
+      size: 0.017 0.017
+      color: 0.983 0.983 0.983 0.983
+      lifetime: 0.017
+    particle:
+      position: -3.368 -216.364 0.000
+      rotation: 96.000
+      size: 0.267 0.267
+      color: 0.733 0.733 0.733 0.733
+      lifetime: 0.267
+    particle:
+      position: -141.688 8.138 0.000
+      rotation: 186.000
+      size: 0.517 0.517
+      color: 0.483 0.483 0.483 0.483
+      lifetime: 0.517
+  time: 1.48
+  aabb: [-146.826; -220.413; 0.000] - [293.061; 39.770; 0.000]
+  particles 3:
+    particle:
+      position: 293.061 39.770 0.000
+      rotation: 0.000
+      size: 0.000 0.000
+      color: 1.000 1.000 1.000 1.000
+      lifetime: 0.000
+    particle:
+      position: 20.368 -220.413 0.000
+      rotation: 90.000
+      size: 0.250 0.250
+      color: 0.750 0.750 0.750 0.750
+      lifetime: 0.250
+    particle:
+      position: -146.826 -7.360 0.000
+      rotation: 180.000
+      size: 0.500 0.500
+      color: 0.500 0.500 0.500 0.500
+      lifetime: 0.500
+  time: 1.50
+  aabb: [-149.970; -221.816; 0.000] - [44.864; -23.838; 0.000]
+  particles 2:
+    particle:
+      position: 44.864 -221.816 0.000
+      rotation: 84.000
+      size: 0.233 0.233
+      color: 0.767 0.767 0.767 0.767
+      lifetime: 0.233
+    particle:
+      position: -149.970 -23.838 0.000
+      rotation: 174.000
+      size: 0.483 0.483
+      color: 0.517 0.517 0.517 0.517
+      lifetime: 0.483
+  time: 1.52
+  aabb: [-151.443; -220.444; 0.000] - [69.946; -41.093; 0.000]
+  particles 2:
+    particle:
+      position: 69.946 -220.444 0.000
+      rotation: 78.000
+      size: 0.217 0.217
+      color: 0.783 0.783 0.783 0.783
+      lifetime: 0.217
+    particle:
+      position: -151.443 -41.093 0.000
+      rotation: 168.000
+      size: 0.467 0.467
+      color: 0.533 0.533 0.533 0.533
+      lifetime: 0.467
+  time: 1.53
+  aabb: [-150.681; -216.202; 0.000] - [95.179; -58.903; 0.000]
+  particles 2:
+    particle:
+      position: 95.179 -216.202 0.000
+      rotation: 72.000
+      size: 0.200 0.200
+      color: 0.800 0.800 0.800 0.800
+      lifetime: 0.200
+    particle:
+      position: -150.681 -58.903 0.000
+      rotation: 162.000
+      size: 0.450 0.450
+      color: 0.550 0.550 0.550 0.550
+      lifetime: 0.450
+  time: 1.55
+  aabb: [-147.983; -209.031; 0.000] - [120.339; -77.024; 0.000]
+  particles 2:
+    particle:
+      position: 120.339 -209.031 0.000
+      rotation: 66.000
+      size: 0.183 0.183
+      color: 0.817 0.817 0.817 0.817
+      lifetime: 0.183
+    particle:
+      position: -147.983 -77.024 0.000
+      rotation: 156.000
+      size: 0.433 0.433
+      color: 0.567 0.567 0.567 0.567
+      lifetime: 0.433
+  time: 1.57
+  aabb: [-142.909; -198.913; 0.000] - [144.985; -95.203; 0.000]
+  particles 2:
+    particle:
+      position: 144.985 -198.913 0.000
+      rotation: 60.000
+      size: 0.167 0.167
+      color: 0.833 0.833 0.833 0.833
+      lifetime: 0.167
+    particle:
+      position: -142.909 -95.203 0.000
+      rotation: 150.000
+      size: 0.417 0.417
+      color: 0.583 0.583 0.583 0.583
+      lifetime: 0.417
+  time: 1.58
+  aabb: [-135.754; -185.868; 0.000] - [168.859; -113.168; 0.000]
+  particles 2:
+    particle:
+      position: 168.859 -185.868 0.000
+      rotation: 54.000
+      size: 0.150 0.150
+      color: 0.850 0.850 0.850 0.850
+      lifetime: 0.150
+    particle:
+      position: -135.754 -113.168 0.000
+      rotation: 144.000
+      size: 0.400 0.400
+      color: 0.600 0.600 0.600 0.600
+      lifetime: 0.400
+  time: 1.60
+  aabb: [-126.203; -169.957; 0.000] - [191.529; 0.548; 0.000]
+  particles 3:
+    particle:
+      position: 191.529 -169.957 0.000
+      rotation: 48.000
+      size: 0.133 0.133
+      color: 0.867 0.867 0.867 0.867
+      lifetime: 0.133
+    particle:
+      position: -126.203 -130.645 0.000
+      rotation: 138.000
+      size: 0.383 0.383
+      color: 0.617 0.617 0.617 0.617
+      lifetime: 0.383
+    particle:
+      position: 5.073 0.548 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 1.62
+  aabb: [-114.562; -151.284; 0.000] - [212.729; 1.934; 0.000]
+  particles 3:
+    particle:
+      position: 212.729 -151.284 0.000
+      rotation: 42.000
+      size: 0.117 0.117
+      color: 0.883 0.883 0.883 0.883
+      lifetime: 0.117
+    particle:
+      position: -114.562 -147.354 0.000
+      rotation: 132.000
+      size: 0.367 0.367
+      color: 0.633 0.633 0.633 0.633
+      lifetime: 0.367
+    particle:
+      position: 7.691 1.934 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 1.63
+  aabb: [-100.633; -163.015; 0.000] - [232.054; 4.223; 0.000]
+  particles 3:
+    particle:
+      position: 232.054 -129.994 0.000
+      rotation: 36.000
+      size: 0.100 0.100
+      color: 0.900 0.900 0.900 0.900
+      lifetime: 0.100
+    particle:
+      position: -100.633 -163.015 0.000
+      rotation: 126.000
+      size: 0.350 0.350
+      color: 0.650 0.650 0.650 0.650
+      lifetime: 0.350
+    particle:
+      position: 13.236 4.223 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 1.65
+  aabb: [-84.748; -177.352; 0.000] - [249.248; 7.450; 0.000]
+  particles 3:
+    particle:
+      position: 249.248 -106.271 0.000
+      rotation: 30.000
+      size: 0.083 0.083
+      color: 0.917 0.917 0.917 0.917
+      lifetime: 0.083
+    particle:
+      position: -84.748 -177.352 0.000
+      rotation: 120.000
+      size: 0.333 0.333
+      color: 0.667 0.667 0.667 0.667
+      lifetime: 0.333
+    particle:
+      position: 15.899 7.450 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 1.67
+  aabb: [-66.819; -190.101; 0.000] - [263.949; 11.540; 0.000]
+  particles 3:
+    particle:
+      position: 263.949 -80.339 0.000
+      rotation: 24.000
+      size: 0.067 0.067
+      color: 0.933 0.933 0.933 0.933
+      lifetime: 0.067
+    particle:
+      position: -66.819 -190.101 0.000
+      rotation: 114.000
+      size: 0.317 0.317
+      color: 0.683 0.683 0.683 0.683
+      lifetime: 0.317
+    particle:
+      position: 20.439 11.540 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 1.68
+  aabb: [-47.208; -201.006; 0.000] - [275.935; 16.434; 0.000]
+  particles 3:
+    particle:
+      position: 275.935 -52.459 0.000
+      rotation: 18.000
+      size: 0.050 0.050
+      color: 0.950 0.950 0.950 0.950
+      lifetime: 0.050
+    particle:
+      position: -47.208 -201.006 0.000
+      rotation: 108.000
+      size: 0.300 0.300
+      color: 0.700 0.700 0.700 0.700
+      lifetime: 0.300
+    particle:
+      position: 22.086 16.434 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 1.70
+  aabb: [-25.927; -209.832; 0.000] - [284.905; 22.000; 0.000]
+  particles 3:
+    particle:
+      position: 284.905 -22.925 0.000
+      rotation: 12.000
+      size: 0.033 0.033
+      color: 0.967 0.967 0.967 0.967
+      lifetime: 0.033
+    particle:
+      position: -25.927 -209.832 0.000
+      rotation: 102.000
+      size: 0.283 0.283
+      color: 0.717 0.717 0.717 0.717
+      lifetime: 0.283
+    particle:
+      position: 24.892 22.000 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 1.72
+  aabb: [-3.368; -216.364; 0.000] - [290.688; 28.125; 0.000]
+  particles 3:
+    particle:
+      position: 290.688 7.936 0.000
+      rotation: 6.000
+      size: 0.017 0.017
+      color: 0.983 0.983 0.983 0.983
+      lifetime: 0.017
+    particle:
+      position: -3.368 -216.364 0.000
+      rotation: 96.000
+      size: 0.267 0.267
+      color: 0.733 0.733 0.733 0.733
+      lifetime: 0.267
+    particle:
+      position: 24.887 28.125 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 1.73
+  aabb: [20.368; -220.413; 0.000] - [293.061; 39.770; 0.000]
+  particles 3:
+    particle:
+      position: 293.061 39.770 0.000
+      rotation: 0.000
+      size: 0.000 0.000
+      color: 1.000 1.000 1.000 1.000
+      lifetime: 0.000
+    particle:
+      position: 20.368 -220.413 0.000
+      rotation: 90.000
+      size: 0.250 0.250
+      color: 0.750 0.750 0.750 0.750
+      lifetime: 0.250
+    particle:
+      position: 25.503 34.644 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850
+  time: 1.75
+  aabb: [23.430; -221.816; 0.000] - [44.864; 41.408; 0.000]
+  particles 2:
+    particle:
+      position: 44.864 -221.816 0.000
+      rotation: 84.000
+      size: 0.233 0.233
+      color: 0.767 0.767 0.767 0.767
+      lifetime: 0.233
+    particle:
+      position: 23.430 41.408 0.000
+      rotation: 300.000
+      size: 0.833 0.833
+      color: 0.167 0.167 0.167 0.167
+      lifetime: 0.833
+  time: 1.77
+  aabb: [21.585; -220.444; 0.000] - [69.946; 48.231; 0.000]
+  particles 2:
+    particle:
+      position: 69.946 -220.444 0.000
+      rotation: 78.000
+      size: 0.217 0.217
+      color: 0.783 0.783 0.783 0.783
+      lifetime: 0.217
+    particle:
+      position: 21.585 48.231 0.000
+      rotation: 294.000
+      size: 0.817 0.817
+      color: 0.183 0.183 0.183 0.183
+      lifetime: 0.817
+  time: 1.78
+  aabb: [17.226; -216.202; 0.000] - [95.179; 54.944; 0.000]
+  particles 2:
+    particle:
+      position: 95.179 -216.202 0.000
+      rotation: 72.000
+      size: 0.200 0.200
+      color: 0.800 0.800 0.800 0.800
+      lifetime: 0.200
+    particle:
+      position: 17.226 54.944 0.000
+      rotation: 288.000
+      size: 0.800 0.800
+      color: 0.200 0.200 0.200 0.200
+      lifetime: 0.800
+  time: 1.80
+  aabb: [12.844; -209.031; 0.000] - [120.339; 61.353; 0.000]
+  particles 2:
+    particle:
+      position: 120.339 -209.031 0.000
+      rotation: 66.000
+      size: 0.183 0.183
+      color: 0.817 0.817 0.817 0.817
+      lifetime: 0.183
+    particle:
+      position: 12.844 61.353 0.000
+      rotation: 282.000
+      size: 0.783 0.783
+      color: 0.217 0.217 0.217 0.217
+      lifetime: 0.783
+  time: 1.82
+  aabb: [6.184; -198.913; 0.000] - [144.985; 67.284; 0.000]
+  particles 2:
+    particle:
+      position: 144.985 -198.913 0.000
+      rotation: 60.000
+      size: 0.167 0.167
+      color: 0.833 0.833 0.833 0.833
+      lifetime: 0.167
+    particle:
+      position: 6.184 67.284 0.000
+      rotation: 276.000
+      size: 0.767 0.767
+      color: 0.233 0.233 0.233 0.233
+      lifetime: 0.767
+  time: 1.83
+  aabb: [-0.610; -185.868; 0.000] - [168.859; 72.543; 0.000]
+  particles 2:
+    particle:
+      position: 168.859 -185.868 0.000
+      rotation: 54.000
+      size: 0.150 0.150
+      color: 0.850 0.850 0.850 0.850
+      lifetime: 0.150
+    particle:
+      position: -0.610 72.543 0.000
+      rotation: 270.000
+      size: 0.750 0.750
+      color: 0.250 0.250 0.250 0.250
+      lifetime: 0.750
+  time: 1.85
+  aabb: [-9.377; -169.957; 0.000] - [191.529; 76.966; 0.000]
+  particles 3:
+    particle:
+      position: 191.529 -169.957 0.000
+      rotation: 48.000
+      size: 0.133 0.133
+      color: 0.867 0.867 0.867 0.867
+      lifetime: 0.133
+    particle:
+      position: -9.377 76.966 0.000
+      rotation: 264.000
+      size: 0.733 0.733
+      color: 0.267 0.267 0.267 0.267
+      lifetime: 0.733
+    particle:
+      position: 5.073 0.548 0.000
+      rotation: 354.000
+      size: 0.983 0.983
+      color: 0.017 0.017 0.017 0.017
+      lifetime: 0.983
+  time: 1.87
+  aabb: [-18.256; -151.284; 0.000] - [212.729; 80.378; 0.000]
+  particles 3:
+    particle:
+      position: 212.729 -151.284 0.000
+      rotation: 42.000
+      size: 0.117 0.117
+      color: 0.883 0.883 0.883 0.883
+      lifetime: 0.117
+    particle:
+      position: -18.256 80.378 0.000
+      rotation: 258.000
+      size: 0.717 0.717
+      color: 0.283 0.283 0.283 0.283
+      lifetime: 0.717
+    particle:
+      position: 7.691 1.934 0.000
+      rotation: 348.000
+      size: 0.967 0.967
+      color: 0.033 0.033 0.033 0.033
+      lifetime: 0.967
+  time: 1.88
+  aabb: [-28.733; -129.994; 0.000] - [232.054; 82.634; 0.000]
+  particles 3:
+    particle:
+      position: 232.054 -129.994 0.000
+      rotation: 36.000
+      size: 0.100 0.100
+      color: 0.900 0.900 0.900 0.900
+      lifetime: 0.100
+    particle:
+      position: -28.733 82.634 0.000
+      rotation: 252.000
+      size: 0.700 0.700
+      color: 0.300 0.300 0.300 0.300
+      lifetime: 0.700
+    particle:
+      position: 13.236 4.223 0.000
+      rotation: 342.000
+      size: 0.950 0.950
+      color: 0.050 0.050 0.050 0.050
+      lifetime: 0.950
+  time: 1.90
+  aabb: [-39.184; -106.271; 0.000] - [249.248; 83.591; 0.000]
+  particles 3:
+    particle:
+      position: 249.248 -106.271 0.000
+      rotation: 30.000
+      size: 0.083 0.083
+      color: 0.917 0.917 0.917 0.917
+      lifetime: 0.083
+    particle:
+      position: -39.184 83.591 0.000
+      rotation: 246.000
+      size: 0.683 0.683
+      color: 0.317 0.317 0.317 0.317
+      lifetime: 0.683
+    particle:
+      position: 15.899 7.450 0.000
+      rotation: 336.000
+      size: 0.933 0.933
+      color: 0.067 0.067 0.067 0.067
+      lifetime: 0.933
+  time: 1.92
+  aabb: [-50.794; -80.339; 0.000] - [263.949; 83.138; 0.000]
+  particles 3:
+    particle:
+      position: 263.949 -80.339 0.000
+      rotation: 24.000
+      size: 0.067 0.067
+      color: 0.933 0.933 0.933 0.933
+      lifetime: 0.067
+    particle:
+      position: -50.794 83.138 0.000
+      rotation: 240.000
+      size: 0.667 0.667
+      color: 0.333 0.333 0.333 0.333
+      lifetime: 0.667
+    particle:
+      position: 20.439 11.540 0.000
+      rotation: 330.000
+      size: 0.917 0.917
+      color: 0.083 0.083 0.083 0.083
+      lifetime: 0.917
+  time: 1.93
+  aabb: [-62.139; -52.459; 0.000] - [275.935; 81.172; 0.000]
+  particles 3:
+    particle:
+      position: 275.935 -52.459 0.000
+      rotation: 18.000
+      size: 0.050 0.050
+      color: 0.950 0.950 0.950 0.950
+      lifetime: 0.050
+    particle:
+      position: -62.139 81.172 0.000
+      rotation: 234.000
+      size: 0.650 0.650
+      color: 0.350 0.350 0.350 0.350
+      lifetime: 0.650
+    particle:
+      position: 22.086 16.434 0.000
+      rotation: 324.000
+      size: 0.900 0.900
+      color: 0.100 0.100 0.100 0.100
+      lifetime: 0.900
+  time: 1.95
+  aabb: [-74.157; -22.925; 0.000] - [284.905; 77.626; 0.000]
+  particles 3:
+    particle:
+      position: 284.905 -22.925 0.000
+      rotation: 12.000
+      size: 0.033 0.033
+      color: 0.967 0.967 0.967 0.967
+      lifetime: 0.033
+    particle:
+      position: -74.157 77.626 0.000
+      rotation: 228.000
+      size: 0.633 0.633
+      color: 0.367 0.367 0.367 0.367
+      lifetime: 0.633
+    particle:
+      position: 24.892 22.000 0.000
+      rotation: 318.000
+      size: 0.883 0.883
+      color: 0.117 0.117 0.117 0.117
+      lifetime: 0.883
+  time: 1.97
+  aabb: [-85.596; 7.936; 0.000] - [290.688; 72.450; 0.000]
+  particles 3:
+    particle:
+      position: 290.688 7.936 0.000
+      rotation: 6.000
+      size: 0.017 0.017
+      color: 0.983 0.983 0.983 0.983
+      lifetime: 0.017
+    particle:
+      position: -85.596 72.450 0.000
+      rotation: 222.000
+      size: 0.617 0.617
+      color: 0.383 0.383 0.383 0.383
+      lifetime: 0.617
+    particle:
+      position: 24.887 28.125 0.000
+      rotation: 312.000
+      size: 0.867 0.867
+      color: 0.133 0.133 0.133 0.133
+      lifetime: 0.867
+  time: 1.98
+  aabb: [-97.193; 34.644; 0.000] - [293.061; 65.628; 0.000]
+  particles 3:
+    particle:
+      position: 293.061 39.770 0.000
+      rotation: 0.000
+      size: 0.000 0.000
+      color: 1.000 1.000 1.000 1.000
+      lifetime: 0.000
+    particle:
+      position: -97.193 65.628 0.000
+      rotation: 216.000
+      size: 0.600 0.600
+      color: 0.400 0.400 0.400 0.400
+      lifetime: 0.600
+    particle:
+      position: 25.503 34.644 0.000
+      rotation: 306.000
+      size: 0.850 0.850
+      color: 0.150 0.150 0.150 0.150
+      lifetime: 0.850

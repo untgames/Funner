@@ -15,6 +15,7 @@ struct Material::Impl: public xtl::reference_counter
 {
   stl::string         name;       //имя материала
   stl::string         program;    //имя программы
+  stl::string         blend_mode; //имя режима блендинга
   common::StringArray tags;       //тэги материала  
   TagHashArray        tag_hashes; //хэши тэгов
   common::PropertyMap properties; //свойства материала
@@ -28,6 +29,7 @@ struct Material::Impl: public xtl::reference_counter
   Impl (const Impl& impl)
     : name (impl.name)
     , program (impl.program)
+    , blend_mode (impl.blend_mode)
     , tags (impl.tags.Clone ())
     , tag_hashes (impl.tag_hashes)
     , properties (impl.properties.Clone ())
@@ -129,6 +131,23 @@ void Material::SetProgram (const char* name)
 const char* Material::Program () const
 {
   return impl->program.c_str ();
+}
+
+/*
+    Имя режима блендинга
+*/
+
+void Material::SetBlendMode (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::rfx::Material::SetBlendMode", "name");
+
+  impl->blend_mode = name;
+}
+
+const char* Material::BlendMode () const
+{
+  return impl->blend_mode.c_str ();
 }
 
 /*

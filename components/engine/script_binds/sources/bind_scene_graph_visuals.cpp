@@ -2,41 +2,44 @@
 
 using namespace scene_graph;
 
-template class engine::decl_sg_cast<SpriteModel, VisualModel>;
-template class engine::decl_sg_cast<SpriteModel, Entity>;
-template class engine::decl_sg_cast<SpriteModel, Node>;
-template class engine::decl_sg_cast<Sprite,      SpriteModel>;
-template class engine::decl_sg_cast<Sprite,      VisualModel>;
-template class engine::decl_sg_cast<Sprite,      Entity>;
-template class engine::decl_sg_cast<Sprite,      Node>;
-template class engine::decl_sg_cast<SpriteList,  SpriteModel>;
-template class engine::decl_sg_cast<SpriteList,  VisualModel>;
-template class engine::decl_sg_cast<SpriteList,  Entity>;
-template class engine::decl_sg_cast<SpriteList,  Node>;
-template class engine::decl_sg_cast<LineModel,   VisualModel>;
-template class engine::decl_sg_cast<LineModel,   Entity>;
-template class engine::decl_sg_cast<LineModel,   Node>;
-template class engine::decl_sg_cast<Line,        LineModel>;
-template class engine::decl_sg_cast<Line,        VisualModel>;
-template class engine::decl_sg_cast<Line,        Entity>;
-template class engine::decl_sg_cast<Line,        Node>;
-template class engine::decl_sg_cast<LineList,    LineModel>;
-template class engine::decl_sg_cast<LineList,    VisualModel>;
-template class engine::decl_sg_cast<LineList,    Entity>;
-template class engine::decl_sg_cast<LineList,    Node>;
-template class engine::decl_sg_cast<TextModel,   VisualModel>;
-template class engine::decl_sg_cast<TextModel,   Entity>;
-template class engine::decl_sg_cast<TextModel,   Node>;
-template class engine::decl_sg_cast<TextLine,    TextModel>;
-template class engine::decl_sg_cast<TextLine,    VisualModel>;
-template class engine::decl_sg_cast<TextLine,    Entity>;
-template class engine::decl_sg_cast<TextLine,    Node>;
-template class engine::decl_sg_cast<HeightMap,   VisualModel>;
-template class engine::decl_sg_cast<HeightMap,   Entity>;
-template class engine::decl_sg_cast<HeightMap,   Node>;
-template class engine::decl_sg_cast<StaticMesh,  VisualModel>;
-template class engine::decl_sg_cast<StaticMesh,  Entity>;
-template class engine::decl_sg_cast<StaticMesh,  Node>;
+template class engine::decl_sg_cast<SpriteModel,     VisualModel>;
+template class engine::decl_sg_cast<SpriteModel,     Entity>;
+template class engine::decl_sg_cast<SpriteModel,     Node>;
+template class engine::decl_sg_cast<Sprite,          SpriteModel>;
+template class engine::decl_sg_cast<Sprite,          VisualModel>;
+template class engine::decl_sg_cast<Sprite,          Entity>;
+template class engine::decl_sg_cast<Sprite,          Node>;
+template class engine::decl_sg_cast<SpriteList,      SpriteModel>;
+template class engine::decl_sg_cast<SpriteList,      VisualModel>;
+template class engine::decl_sg_cast<SpriteList,      Entity>;
+template class engine::decl_sg_cast<SpriteList,      Node>;
+template class engine::decl_sg_cast<LineModel,       VisualModel>;
+template class engine::decl_sg_cast<LineModel,       Entity>;
+template class engine::decl_sg_cast<LineModel,       Node>;
+template class engine::decl_sg_cast<Line,            LineModel>;
+template class engine::decl_sg_cast<Line,            VisualModel>;
+template class engine::decl_sg_cast<Line,            Entity>;
+template class engine::decl_sg_cast<Line,            Node>;
+template class engine::decl_sg_cast<LineList,        LineModel>;
+template class engine::decl_sg_cast<LineList,        VisualModel>;
+template class engine::decl_sg_cast<LineList,        Entity>;
+template class engine::decl_sg_cast<LineList,        Node>;
+template class engine::decl_sg_cast<TextModel,       VisualModel>;
+template class engine::decl_sg_cast<TextModel,       Entity>;
+template class engine::decl_sg_cast<TextModel,       Node>;
+template class engine::decl_sg_cast<TextLine,        TextModel>;
+template class engine::decl_sg_cast<TextLine,        VisualModel>;
+template class engine::decl_sg_cast<TextLine,        Entity>;
+template class engine::decl_sg_cast<TextLine,        Node>;
+template class engine::decl_sg_cast<HeightMap,       VisualModel>;
+template class engine::decl_sg_cast<HeightMap,       Entity>;
+template class engine::decl_sg_cast<HeightMap,       Node>;
+template class engine::decl_sg_cast<StaticMesh,      VisualModel>;
+template class engine::decl_sg_cast<StaticMesh,      Entity>;
+template class engine::decl_sg_cast<StaticMesh,      Node>;
+template class engine::decl_sg_cast<ParticleEmitter, VisualModel>;
+template class engine::decl_sg_cast<ParticleEmitter, Entity>;
+template class engine::decl_sg_cast<ParticleEmitter, Node>;
 
 namespace engine
 {
@@ -375,6 +378,42 @@ void bind_static_mesh_library (Environment& environment)
   lib.Register ("set_BoundBox", make_invoker (&set_bound_box));
 
   environment.RegisterType<StaticMesh> (SCENE_STATIC_MESH_LIBRARY);
+}
+
+/*
+    Работа с эмиттером частиц
+*/
+
+ParticleEmitter::Pointer create_particle_emitter (const char* particle_system_id, Node* particles_parent, SpriteMode sprite_mode)
+{
+  return ParticleEmitter::Create (particle_system_id, particles_parent, sprite_mode);
+}
+
+void bind_particle_emitter_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_PARTICLE_EMITTER_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (make_invoker (&create_particle_emitter),
+                                        make_invoker<void (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
+                                        make_invoker<void (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
+
+    //регистрация операций
+
+  lib.Register ("get_ParticleSystemId", make_invoker (&ParticleEmitter::ParticleSystemId));
+  lib.Register ("get_ParticlesParent", make_invoker (&ParticleEmitter::ParticlesParent));
+  lib.Register ("get_SpriteMode", make_invoker (&ParticleEmitter::SpriteMode));
+  lib.Register ("get_IsPlaying", make_invoker (&ParticleEmitter::IsPlaying));
+
+  lib.Register ("Pause", make_invoker (&ParticleEmitter::Pause));
+  lib.Register ("Play", make_invoker (&ParticleEmitter::Play));
+
+  environment.RegisterType<ParticleEmitter> (SCENE_PARTICLE_EMITTER_LIBRARY);
 }
 
 /*

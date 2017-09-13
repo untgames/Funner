@@ -80,16 +80,16 @@ render.manager: ...create state block for material
 render.manager: ...material cache updated
 All resources have loaded
 window removed
+render.manager: Material 'canyon.Material__195' has been destroyed (id=5)
+render.manager: Material 'canyon.stn_2' has been destroyed (id=4)
+render.manager: Material 'canyon.stn_1' has been destroyed (id=3)
+render.manager: Material 'canyon.archway_1' has been destroyed (id=1)
 render.manager: Program 'helper' destroyed for options = '' (id=10)
 render.manager: Program 'helper' common data destroyed (id=11)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=8)
 render.manager: Program 'shadow_map' common data destroyed (id=9)
-render.manager: Material 'canyon.Material__195' has been destroyed (id=5)
 render.manager: Program 'phong' destroyed for options = '' (id=6)
 render.manager: Program 'phong' common data destroyed (id=7)
-render.manager: Material 'canyon.stn_2' has been destroyed (id=4)
-render.manager: Material 'canyon.stn_1' has been destroyed (id=3)
-render.manager: Material 'canyon.archway_1' has been destroyed (id=1)
 render.manager: Texture 'data/bottom.jpg' destroyed (id=12)
 render.manager: Texture 'data/pic1.dds' destroyed (id=13)
 render.manager: Program parameters layout destroyed (id=15)

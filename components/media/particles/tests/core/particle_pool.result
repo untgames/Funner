@@ -1,0 +1,7 @@
+Results of particle_pool:
+initial state: 0 / 0
+after adding particles: 4096 / 4096
+after list2.Clear & pool shrink: 4096 / 0
+after list1.Clear & pool shrink: 3072 / 0
+after list3.Clear & pool shrink: 0 / 0
+after reserve: 1024 / 0

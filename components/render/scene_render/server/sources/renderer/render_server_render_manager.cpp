@@ -38,11 +38,12 @@ typedef stl::vector<IRenderManagerListener*> ListenerArray;
 
 struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
 {
-  manager::RenderManager  render_manager;                   //менеджер рендеринга
-  server::BatchingManager batching_manager;                 //менеджер пакетирования
-  TraverseResult          traverse_result_storage;          //хранилище результатов обхода сцены
-  xtl::auto_connection    configuration_changed_connection; //соединение с обработчиком изменения конфигурации
-  ListenerArray           listeners;                        //слушатели событий
+  manager::RenderManager        render_manager;                   //менеджер рендеринга
+  server::BatchingManager       batching_manager;                 //менеджер пакетирования
+  server::ParticleSystemManager particle_system_manager;          //менеджер систем частиц
+  TraverseResult                traverse_result_storage;          //хранилище результатов обхода сцены
+  xtl::auto_connection          configuration_changed_connection; //соединение с обработчиком изменения конфигурации
+  ListenerArray                 listeners;                        //слушатели событий
 
 /// Конструктор
   Impl (const char* name)
@@ -139,6 +140,15 @@ render::manager::RenderManager& RenderManager::Manager ()
 BatchingManager& RenderManager::BatchingManager ()
 {
   return impl->batching_manager;
+}
+
+/*
+   Менеджер систем частиц
+*/
+
+ParticleSystemManager& RenderManager::ParticleSystemManager ()
+{
+  return impl->particle_system_manager;
 }
 
 /*

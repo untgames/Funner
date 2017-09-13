@@ -120,6 +120,7 @@ void process_material (Params& params)
       if (source_material)
       {
         source_material->SetProgram (iter->Program ());
+        source_material->SetBlendMode (iter->BlendMode ());
 
           //merge tags
         StringArray source_tags (source_material->TagsCount (), source_material->Tags ());

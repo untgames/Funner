@@ -313,11 +313,12 @@ class XmtlLoader
 ///Загрузка материала
     void LoadMaterial (Parser::Iterator parse_iter)
     {
-      const char* id      = get<const char*> (*parse_iter, "id");
-      const char* name    = get<const char*> (*parse_iter, "name", id);
-      const char* tags    = get<const char*> (*parse_iter, "tags", "");      
-      const char* program = get<const char*> (*parse_iter, "program", "");
-      const char* layout  = get<const char*> (*parse_iter, "layout", "");
+      const char* id         = get<const char*> (*parse_iter, "id");
+      const char* name       = get<const char*> (*parse_iter, "name", id);
+      const char* tags       = get<const char*> (*parse_iter, "tags", "");
+      const char* program    = get<const char*> (*parse_iter, "program", "");
+      const char* blend_mode = get<const char*> (*parse_iter, "blend_mode", "");
+      const char* layout     = get<const char*> (*parse_iter, "layout", "");
       
       texmap_cache.clear ();
       
@@ -325,6 +326,7 @@ class XmtlLoader
       
       material.SetName (name);
       material.SetProgram (program);
+      material.SetBlendMode (blend_mode);
       material.SetTags (tags);
       
       if (*layout)

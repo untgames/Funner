@@ -113,6 +113,10 @@ int main ()
     
     camera->BindToScene (scene);
 
+    scene_graph::DirectLight::Pointer light = scene_graph::DirectLight::Create ();
+
+    light->BindToParent (*camera);
+
     scene_graph::Sprite::Pointer sprite = scene_graph::Sprite::Create ();
 
     sprite->SetMaterial ("sprite_material");

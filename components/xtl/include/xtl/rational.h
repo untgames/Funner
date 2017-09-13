@@ -112,6 +112,16 @@ template <class I, class II> rational<I> operator * (I value, const rational<II>
 template <class I, class II> rational<I> operator / (I value, const rational<II>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Логические операции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class I, class II> bool operator <  (I value, const rational<II>&);
+template <class I, class II> bool operator >  (I value, const rational<II>&);
+template <class I, class II> bool operator <=  (I value, const rational<II>&);
+template <class I, class II> bool operator >=  (I value, const rational<II>&);
+template <class I, class II> bool operator ==  (I value, const rational<II>&);
+template <class I, class II> bool operator !=  (I value, const rational<II>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение абсолютного значения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class I> rational<I> abs (const rational<I>& r);

@@ -11,6 +11,7 @@ export.link.engine.launcher_shared.android.IMPORTS     := link.media.image.pvr l
                                                           link.push_notifications.google_push_notifications link.push_notifications.amazon_push_notifications
 export.link.engine.launcher_shared.tabletos.IMPORTS    := link.media.image.pvr
 export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
+export.link.engine.launcher_shared.linux.IMPORTS       := link.media.image.ktx
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                 link.media.rms link.media.sound.snddecl link.media.sound.default_decoders \
                                 link.media.font.xfont link.media.font.freetype link.media.players.null \
@@ -34,7 +35,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.subsystems.resource_system link.engine.subsystems.physics_manager \
                                 link.engine.subsystems.scene_manager \
                                 link.media.rfx.default_serializers link.media.geometry.binmesh link.media.geometry.xmesh \
-                                link.media.video.theora link.network link.common.iconv \
+                                link.media.video.theora link.media.particles.particle_designer_serializer link.network link.common.iconv \
                                 link.physics.low_level.bullet_driver link.media.animation.xanim link.media.animation.binanim \
                                 link.scene_graph.xscene link.social.facebook
 

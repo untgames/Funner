@@ -1290,8 +1290,11 @@ float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, 
               break;
             case LayerType_Sprite:
             {
-              AnimationCore&                        animation  = layer.Frames ()[0u].Animation ();
-              AnimationCore::PropertyAnimationList& properties = animation.Properties ();
+              Frame&                                layer_frame = layer.Frames ()[0u];
+              AnimationCore&                        animation   = layer_frame.Animation ();
+              AnimationCore::PropertyAnimationList& properties  = animation.Properties ();
+
+              layer_frame.SetFirstFrame (frame.FirstFrame ());
               
               properties.Add (*alpha_track);
               break;

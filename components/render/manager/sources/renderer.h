@@ -82,6 +82,7 @@ struct RendererOperation
   Program*                        program;                  //программа (с учетом опций шейдера, задаваемых в EntityImpl)
   DynamicPrimitive*               dynamic_primitive;        //динамический примитив, соответствующий операции (может быть 0)
   const BoxAreaImpl*              scissor;                  //область отсечения (может быть null)
+  low_level::IBlendState*         blend_state;              //низкоуровневое состояние режима блендинга объекта (может быть 0)
   size_t                          batching_hash;            //хэш пакета
 };
 
@@ -91,7 +92,9 @@ inline size_t get_batching_hash (const RendererOperation& op)
     return 0;
 
   return common::crc32 (&op.scissor, sizeof (op.scissor), common::crc32 (&op.state_block, sizeof (op.state_block),
-    common::crc32 (&op.entity_parameters_layout, sizeof (op.entity_parameters_layout), common::crc32 (&op.program, sizeof (op.program), op.primitive->batching_hash))));
+    common::crc32 (&op.entity_parameters_layout, sizeof (op.entity_parameters_layout),
+    common::crc32 (&op.program, sizeof (op.program),
+    common::crc32 (&op.blend_state, sizeof (op.blend_state), op.primitive->batching_hash)))));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

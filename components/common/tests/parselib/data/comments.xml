@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding = "utf-8"?>
+<?xml version="1.0" encoding = "UTF-8"?>
 <!-- Соответсвия имен устройств ввода и файлов с обработчиками событий -->
 <TranslationMapRegistry>
   <!-- Profile - имя устройства TranslationMap - имя файла соответсвия событий и обработчиков -->

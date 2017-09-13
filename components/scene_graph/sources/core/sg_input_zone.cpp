@@ -9,9 +9,9 @@ using namespace math;
 
 struct InputZone::Impl: public xtl::instance_counter<InputZone>
 {
-  ZoneDesc zone_desc [NodeOrt_Num];   //описание спрайта
-  size_t   plane_mask;                //маска включеных плоскостей ввода
-  size_t   zones_count;               //количество зон
+  ZoneDesc     zone_desc [NodeOrt_Num];   //описание спрайта
+  unsigned int plane_mask;                //маска включеных плоскостей ввода
+  unsigned int zones_count;               //количество зон
   
   Impl ()
   {
@@ -118,7 +118,7 @@ void InputZone::SetPlaneState (NodeOrt normal, bool state)
       throw xtl::make_argument_exception ("scene_graph::InputZone::SetPlaneState", "normal", normal);
   }
     
-  size_t update_mask = 1 << normal;
+  unsigned int update_mask = 1 << normal;
   
   if (state)
   {

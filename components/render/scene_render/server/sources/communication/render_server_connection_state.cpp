@@ -921,6 +921,32 @@ void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::Page
   }
 }
 
+void ConnectionState::SetParticleEmitterSystemId(object_id_t id, const char* system_id, interchange::SpriteMode sprite_mode)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().SetParticleSystemId (system_id, sprite_mode);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetParticleEmitterSystemId");
+    throw;
+  }
+}
+
+void ConnectionState::UpdateParticleEmitterSystem(object_id_t id, uint32 new_time, uint64 properties_id)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<ParticleEmitter> ().UpdateParticleSystem (new_time, properties_id ? GetClientProperties (properties_id) : common::PropertyMap ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetParticleEmitterSystemId");
+    throw;
+  }
+}
+
 void ConnectionState::CreateSpriteList (object_id_t id, uint32 list_subid, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch)
 {
   try

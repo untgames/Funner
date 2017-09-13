@@ -11,15 +11,16 @@ Node* NodeFactory::CreateNode (RenderManager& render_manager, NodeType type)
   {
     switch (type)
     {
-      case interchange::NodeType_Node:        return new Node; 
-      case interchange::NodeType_Scissor:     return new Scissor;
-      case interchange::NodeType_StaticMesh:  return new StaticMesh (render_manager);
+      case interchange::NodeType_Node:            return new Node;
+      case interchange::NodeType_Scissor:         return new Scissor;
+      case interchange::NodeType_StaticMesh:      return new StaticMesh (render_manager);
       case interchange::NodeType_PointLight:
       case interchange::NodeType_SpotLight:
-      case interchange::NodeType_DirectLight: return new Light (type);
-      case interchange::NodeType_PageCurl:    return new PageCurl (render_manager);
-      case interchange::NodeType_SpriteList:  return new SpriteList (render_manager);
-      case interchange::NodeType_LineList:    return new LineList (render_manager);
+      case interchange::NodeType_DirectLight:     return new Light (type);
+      case interchange::NodeType_PageCurl:        return new PageCurl (render_manager);
+      case interchange::NodeType_SpriteList:      return new SpriteList (render_manager);
+      case interchange::NodeType_LineList:        return new LineList (render_manager);
+      case interchange::NodeType_ParticleEmitter: return new ParticleEmitter (render_manager);
       default:
         throw xtl::make_argument_exception ("", "type", type);
     }
