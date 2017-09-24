@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := EXTERN.LUALIB
 
-ifeq (,$(filter wince,$(PROFILES)))
+ifeq (,$(filter iphone,$(PROFILES))$(filter wince,$(PROFILES)))
 TARGETS += EXTERN.LUA_UTILS EXTERN.LUA_TESTS
 endif
 
