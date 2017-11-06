@@ -102,7 +102,7 @@ struct Test
         unsigned int depth_bits = 16,
         bool fullscreen = false,
         syslib::WindowStyle window_style = syslib::WindowStyle_Overlapped) :
-    window (window_style, 800, 600),
+    window (window_style, 800, 600, "fullscreen=1"),
     redraw (in_redraw)
   {
     TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений

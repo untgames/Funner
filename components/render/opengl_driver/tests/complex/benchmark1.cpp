@@ -1,9 +1,17 @@
 #include "shared.h"
 
-const size_t       MAX_BENCHMARK_DURATION = 5000;
-const size_t       MAX_BENCHMARK_FRAMES   = 5000;
-const unsigned int COLOR_BITS_TO_TEST []  = { 16, 32 };
-const unsigned int DEPTH_BITS_TO_TEST []  = { 16, 24 };
+const size_t       MAX_BENCHMARK_DURATION  = 5000;
+const size_t       MAX_BENCHMARK_FRAMES    = 5000;
+const unsigned int COLOR_BITS_TO_TEST []   = { 32 };
+const unsigned int DEPTH_BITS_TO_TEST []   = { 16, 24 };
+const char*        PIXEL_SHADER_FILE_NAME  = "data/glsl/flat.frag";
+const char*        VERTEX_SHADER_FILE_NAME = "data/glsl/flat.vert";
+
+struct MyShaderParameters
+{
+  math::mat4f transform;
+  int         diffuse_texture_slot;
+};
 
 struct Vec3f
 {
@@ -32,14 +40,14 @@ struct Vec2f
     {}
 };
 
-struct Color4ub
+struct Color4f
 {
-  unsigned char red, green, blue, alpha;
+  float red, green, blue, alpha;
 
-  Color4ub ()
+  Color4f ()
     {}
 
-  Color4ub (unsigned char in_red, unsigned char in_green, unsigned char in_blue, unsigned char in_alpha)
+  Color4f (float in_red, float in_green, float in_blue, float in_alpha)
     : red   (in_red)
     , green (in_green)
     , blue  (in_blue)
@@ -49,21 +57,26 @@ struct Color4ub
 
 struct MyVertex
 {
-  Vec3f    position;
-  Vec3f    normal;
-  Vec2f    tcoord;
-  Color4ub color;
+  Vec3f      position;
+  Vec3f      normal;
+  Vec2f      tcoord;
+  ::Color4f  color;
 
   MyVertex ()
    {}
 
-  MyVertex (const Vec3f& in_position, const Vec3f& in_normal, const Vec2f& in_tcoord, const Color4ub& in_color)
+  MyVertex (const Vec3f& in_position, const Vec3f& in_normal, const Vec2f& in_tcoord, const ::Color4f& in_color)
     : position (in_position)
     , normal   (in_normal)
     , tcoord   (in_tcoord)
     , color    (in_color)
     {}
 };
+
+void print (const char* message)
+{
+  printf ("Shader message: '%s'\n", message);
+}
 
 class IBenchmark
 {
@@ -219,10 +232,10 @@ class SpriteBlendingBenchmark : public BaseBenchmark
     {
       printf ("Create vertex buffer\n");
 
-      verts [0] = MyVertex (Vec3f (-sprite_scale, -sprite_scale, 0), Vec3f (0, 0, 1), Vec2f (0, 0),                       Color4ub (255, 255, 255, 120));
-      verts [1] = MyVertex (Vec3f ( sprite_scale, -sprite_scale, 0), Vec3f (0, 0, 1), Vec2f (sprite_scale, 0),            Color4ub (255, 255, 255, 120));
-      verts [2] = MyVertex (Vec3f ( sprite_scale, sprite_scale, 0),  Vec3f (0, 0, 1), Vec2f (sprite_scale, sprite_scale), Color4ub (255, 255, 255, 120));
-      verts [3] = MyVertex (Vec3f (-sprite_scale, sprite_scale, 0),  Vec3f (0, 0, 1), Vec2f (0, sprite_scale),            Color4ub (255, 255, 255, 120));
+      verts [0] = MyVertex (Vec3f (-sprite_scale, -sprite_scale, 0), Vec3f (0, 0, 1), Vec2f (0, 0),                       ::Color4f (1.f, 1.f, 1.f, 0.4f));
+      verts [1] = MyVertex (Vec3f ( sprite_scale, -sprite_scale, 0), Vec3f (0, 0, 1), Vec2f (sprite_scale, 0),            ::Color4f (1.f, 1.f, 1.f, 0.4f));
+      verts [2] = MyVertex (Vec3f ( sprite_scale, sprite_scale, 0),  Vec3f (0, 0, 1), Vec2f (sprite_scale, sprite_scale), ::Color4f (1.f, 1.f, 1.f, 0.4f));
+      verts [3] = MyVertex (Vec3f (-sprite_scale, sprite_scale, 0),  Vec3f (0, 0, 1), Vec2f (0, sprite_scale),            ::Color4f (1.f, 1.f, 1.f, 0.4f));
 
       BufferDesc vb_desc;
 
@@ -260,7 +273,7 @@ class SpriteBlendingBenchmark : public BaseBenchmark
       VertexAttribute attributes [] = {
         {test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
         {test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-        {test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+        {test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
         {test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_TexCoord0), InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (MyVertex, tcoord), sizeof (MyVertex)},
       };
 
@@ -274,6 +287,48 @@ class SpriteBlendingBenchmark : public BaseBenchmark
       layout_desc.index_buffer_offset     = 0;
 
       layout = InputLayoutPtr (test->device->CreateInputLayout (layout_desc), false);
+
+      printf ("Set shader stage\n");
+
+      stl::string pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME),
+                  vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
+
+      ShaderDesc shader_descs [] = {
+        {"p_shader", (unsigned int)-1, pixel_shader_source.c_str (), "glsl.ps", ""},
+        {"v_shader", (unsigned int)-1, vertex_shader_source.c_str (), "glsl.vs", ""}
+      };
+
+      static ProgramParameter shader_parameters[] = {
+        {"DiffuseTexture", ProgramParameterType_Int, 0, 1, TEST_OFFSETOF (MyShaderParameters, diffuse_texture_slot)},
+        {"ModelViewProjectionMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, transform)}
+      };
+
+      ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+
+      shader = ProgramPtr (test->device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
+      program_parameters_layout = ProgramParametersLayoutPtr (test->device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
+
+      BufferDesc cb_desc;
+
+      memset (&cb_desc, 0, sizeof cb_desc);
+
+      cb_desc.size         = sizeof (MyShaderParameters);
+      cb_desc.usage_mode   = UsageMode_Default;
+      cb_desc.bind_flags   = BindFlag_ConstantBuffer;
+      cb_desc.access_flags = AccessFlag_ReadWrite;
+
+      cb = BufferPtr (test->device->CreateBuffer (cb_desc), false);
+
+      MyShaderParameters my_shader_parameters = {
+        1,
+        0
+      };
+
+      cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+      test->device->GetImmediateContext ()->SSSetProgram (shader.get ());
+      test->device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+      test->device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
 
       printf ("Load textures\n");
 
@@ -358,7 +413,7 @@ class SpriteBlendingBenchmark : public BaseBenchmark
 
     void Redraw ()
     {
-      Color4f clear_color;
+      render::low_level::Color4f clear_color;
 
       clear_color.red   = 0;
       clear_color.green = 0.7f;
@@ -401,20 +456,23 @@ class SpriteBlendingBenchmark : public BaseBenchmark
     }
 
   private:
-    MyVertex                verts [4];
-    unsigned short          indices [6];
-    BufferPtr               vb;
-    BufferPtr               ib;
-    InputLayoutPtr          layout;
-    stl::vector<TexturePtr> textures;
-    SamplerStatePtr         sampler;
-    BlendStatePtr           blend_state;
-    DepthStencilStatePtr    depth_stencil_state;
-    unsigned int            sprites_count;
-    unsigned int            texture_resolution;
-    bool                    use_compressed_texture;
-    unsigned int            textures_count;
-    unsigned int            current_texture;
+    MyVertex                   verts [4];
+    unsigned short             indices [6];
+    BufferPtr                  vb;
+    BufferPtr                  ib;
+    BufferPtr                  cb;
+    InputLayoutPtr             layout;
+    stl::vector<TexturePtr>    textures;
+    SamplerStatePtr            sampler;
+    BlendStatePtr              blend_state;
+    DepthStencilStatePtr       depth_stencil_state;
+    ProgramPtr                 shader;
+    ProgramParametersLayoutPtr program_parameters_layout;
+    unsigned int               sprites_count;
+    unsigned int               texture_resolution;
+    bool                       use_compressed_texture;
+    unsigned int               textures_count;
+    unsigned int               current_texture;
 };
 
 IBenchmark* clear_start (unsigned int color_bits, unsigned int depth_bits)
@@ -451,32 +509,32 @@ int main ()
   {
     frames_times.reserve (MAX_BENCHMARK_FRAMES);
 
-//    benchmarks.push_back (Benchmark ("Clear", &clear_start));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 1024, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 1024, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 1024, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 2048, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 2048, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 2048, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 4096, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 4096, true, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 1024, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 1024, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 1024, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 2048, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 2048, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 2048, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 4096, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 4096, false, 1, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending low vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 2, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending medium vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 5, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending high vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 10, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 2, 1.f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 8, 4096, false, 2, 0.5f)));
-//    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 32, 4096, false, 2, 0.25f)));
-//    benchmarks.push_back (Benchmark ("Draw calls", xtl::bind (&sprite_blending_start, _1, _2, 1000, 4, false, 2, 0.0001f)));
+    benchmarks.push_back (Benchmark ("Clear", &clear_start));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 1024, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 1024, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 1024, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 2048, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 2048, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 2048, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 4096, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res compressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 4096, true, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 1024, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 1024, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen low res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 1024, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 2048, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 2048, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen medium res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 2048, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 20, 4096, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen high res uncompressed texture", xtl::bind (&sprite_blending_start, _1, _2, 40, 4096, false, 1, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending low vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 2, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending medium vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 5, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending high vm usage", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 10, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 2, 4096, false, 2, 1.f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 8, 4096, false, 2, 0.5f)));
+    benchmarks.push_back (Benchmark ("Sprite blending full screen vs non fullscreen", xtl::bind (&sprite_blending_start, _1, _2, 32, 4096, false, 2, 0.25f)));
+    benchmarks.push_back (Benchmark ("Draw calls", xtl::bind (&sprite_blending_start, _1, _2, 1000, 4, false, 2, 0.0001f)));
 
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle));
 
