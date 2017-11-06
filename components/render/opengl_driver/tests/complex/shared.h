@@ -94,8 +94,15 @@ struct Test
   DevicePtr          device;
   CallbackFn         redraw;
 
-  Test (const wchar_t* title, const CallbackFn& in_redraw, const char* adapter_mask="*", const char* init_string="") :
-    window (syslib::WindowStyle_Overlapped, 800, 600),
+  Test (const wchar_t* title,
+        const CallbackFn& in_redraw,
+        const char* adapter_mask="*",
+        const char* init_string="",
+        unsigned int color_bits = 16,
+        unsigned int depth_bits = 16,
+        bool fullscreen = false,
+        syslib::WindowStyle window_style = syslib::WindowStyle_Overlapped) :
+    window (window_style, 800, 600),
     redraw (in_redraw)
   {
     TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
@@ -108,8 +115,8 @@ struct Test
 
     memset (&desc, 0, sizeof (desc));
 
-    desc.frame_buffer.color_bits   = 16;
-    desc.frame_buffer.depth_bits   = 16;
+    desc.frame_buffer.color_bits   = color_bits;
+    desc.frame_buffer.depth_bits   = depth_bits;
     desc.buffers_count             = 2;
 //    desc.frame_buffer.alpha_bits   = 8;
 //    desc.frame_buffer.stencil_bits = 8;
@@ -117,11 +124,10 @@ struct Test
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
     desc.window_handle             = window.Handle ();
+    desc.fullscreen                = fullscreen;
 
     DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);
     
-//    swap_chain->SetFullscreenState (true);
-
     OnResize ();
 
     window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
