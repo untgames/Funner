@@ -489,11 +489,11 @@ unsigned int get_image_size (unsigned int width, unsigned int height, unsigned i
     case PixelFormat_D24S8:
     case PixelFormat_D32:          return width * height * depth * get_texel_size (format);
     case PixelFormat_ATC_RGB_AMD:
-    case PixelFormat_DXT1:         return width * height * depth * 8 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT1:         return stl::max (width * height * depth * 8 / DXT_BLOCK_SIZE, DXT_BLOCK_SIZE);
     case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
     case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:         return width * height * depth * 16 / DXT_BLOCK_SIZE;     
+    case PixelFormat_DXT5:         return stl::max (width * height * depth * 16 / DXT_BLOCK_SIZE, DXT_BLOCK_SIZE);
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGBA_PVRTC2:
       if (width < 16) width  = 16;

@@ -490,6 +490,8 @@ void Texture::SetData
         }
         else
         {
+          LogPrintf ("Warning: set compressed texture data without compressed format support, data will be uncompressed (format %s)", get_name (source_format));
+
           xtl::uninitialized_storage<char> unpacked_buffer (get_uncompressed_image_size (unclamped_width, unclamped_height, source_format));
 
           unpack_dxt (source_format, unclamped_width, unclamped_height, buffer, unpacked_buffer.data ());

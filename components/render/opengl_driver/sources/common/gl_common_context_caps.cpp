@@ -265,12 +265,15 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    IMG_texture_compression_pvrtc    = "GL_IMG_texture_compression_pvrtc",
                    AMD_compressed_ATC_texture       = "GL_AMD_compressed_ATC_texture",
                    ATI_texture_compression_atitc    = "GL_ATI_texture_compression_atitc",
-                   OES_compressed_ETC1_RGB8_texture = "GL_OES_compressed_ETC1_RGB8_texture";
+                   OES_compressed_ETC1_RGB8_texture = "GL_OES_compressed_ETC1_RGB8_texture",
+                   EXT_texture_compression_dxt1     = "GL_EXT_texture_compression_dxt1",
+                   ANGLE_texture_compression_dxt3   = "GL_ANGLE_texture_compression_dxt3",
+                   ANGLE_texture_compression_dxt5   = "GL_ANGLE_texture_compression_dxt5";
 
   has_arb_multitexture               = true;
   has_arb_vertex_buffer_object       = true;
   has_ext_packed_depth_stencil       = ext.Get (OES_packed_depth_stencil);
-  has_ext_texture_compression_s3tc   = ext.Get (EXT_texture_compression_s3tc);
+  has_ext_texture_compression_s3tc   = ext.Get (EXT_texture_compression_s3tc) || (ext.Get (EXT_texture_compression_dxt1) && ext.Get (ANGLE_texture_compression_dxt3) && ext.Get (ANGLE_texture_compression_dxt5));
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);

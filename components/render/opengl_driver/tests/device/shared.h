@@ -11,6 +11,7 @@
 
 #include <math/matrix.h>
 
+#include <syslib/application.h>
 #include <syslib/window.h>
 
 #include <render/low_level/driver.h>

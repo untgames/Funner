@@ -10,14 +10,12 @@ void log_print (const char* stream, const char* message)
   printf ("%s: %s\n", stream, message);
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of device_info_test:\n");
-  
   try
   {
     common::LogFilter filter ("*", &log_print);
-  
+
     Test test (L"OpenGL device test window (device_info)");
 
     printf ("Device: '%s'\n", test.device->GetName ());
@@ -26,14 +24,14 @@ int main ()
 
     for (size_t j=0; j<properties->GetSize (); j++)
       printf ("  %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));
-      
-    printf ("Device capabilities:\n");      
+
+    printf ("Device capabilities:\n");
     printf ("  shader_profiles: '%s'\n", test.device->GetCapString (DeviceCapString_ShaderProfiles));
-    
+
     DeviceCaps caps;
-    
+
     test.device->GetCaps (caps);
-    
+
     printf ("  max_texture_1d_size:            %u\n", caps.max_texture_1d_size);
     printf ("  max_texture_2d_size:            %u\n", caps.max_texture_2d_size);
     printf ("  max_texture_3d_size:            %u\n", caps.max_texture_3d_size);
@@ -46,13 +44,31 @@ int main ()
     printf ("  has_occlusion_queries:          %s\n", tostring (caps.has_occlusion_queries));
     printf ("  has_shadow_maps:                %s\n", tostring (caps.has_shadow_maps));
     printf ("  has_texture_anisotropic_filter: %s\n", tostring (caps.has_texture_anisotropic_filter));
-    printf ("  has_texture_cube_map:           %s\n", tostring (caps.has_texture_cube_map));    
+    printf ("  has_texture_cube_map:           %s\n", tostring (caps.has_texture_cube_map));
     printf ("  has_texture_lod_bias:           %s\n", tostring (caps.has_texture_lod_bias));
     printf ("  has_texture_mirrored_repeat:    %s\n", tostring (caps.has_texture_mirrored_repeat));
     printf ("  has_texture_non_power_of_two:   %s\n", tostring (caps.has_texture_non_power_of_two));
     printf ("  has_texture1d:                  %s\n", tostring (caps.has_texture1d));
     printf ("  has_texture3d:                  %s\n", tostring (caps.has_texture3d));
     printf ("  has_two_side_stencil:           %s\n", tostring (caps.has_two_side_stencil));
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+
+  syslib::Application::Exit (0);
+}
+
+int main ()
+{
+  printf ("Results of device_info_test:\n");
+  
+  try
+  {
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, &on_application_initialized);
+
+    syslib::Application::Run ();
   }
   catch (std::exception& exception)
   {
