@@ -20,6 +20,7 @@
 
 #include <stl/string>
 #include <stl/hash_map>
+#include <stl/auto_ptr.h>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
@@ -200,6 +201,8 @@ struct Test
     syslib::Application::Exit (0);
   }
 };
+
+typedef stl::auto_ptr<Test> TestPtr;
 
 //чтение ихсодного текста шейдера в строку
 stl::string read_shader (const char* file_name)
