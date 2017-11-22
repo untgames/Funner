@@ -22,11 +22,6 @@ struct MyShaderParameters2
   math::mat4f  transform;
 };
 
-void redraw (Test& test)
-{
-  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
-}
-
 ViewPtr create_depth_stencil_view (IDevice* device, ISwapChain* swap_chain)
 {
   TexturePtr depth_stencil_texture (device->CreateDepthStencilTexture (swap_chain), false);
@@ -54,83 +49,193 @@ void print (const char* message)
   printf ("Shader message: '%s'\n", message);
 }
 
-int main ()
+class WindowResizeApplication
 {
-  printf ("Results of draw2_test:\n");
-  
-  try
+  TestPtr              test;
+  InputLayoutPtr       layout;
+  BufferPtr            vb;
+  DepthStencilStatePtr depth_stencil_state;
+
+  static void Redraw (Test& test)
   {
-    Test test (L"OpenGL device test window (window_resize)", &redraw);
-    
-    test.window.Show ();
-   
-    printf ("Create vertex buffer\n");
-    
-    static const MyVertex verts [] = {
-      {{-1, -1, 0}, {0, 0, 1}, {255, 0, 0, 0}},
-      {{ 1, -1, 0}, {0, 0, 1}, {0, 255, 0, 0}},
-      {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 255, 0}},
-    };    
-    
-    static const size_t VERTICES_COUNT = sizeof verts / sizeof *verts;
+    test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
+  }
 
-    BufferDesc vb_desc;
+  void OnInitialize ()
+  {
+    try
+    {
+      test = new Test(L"OpenGL device test window (window_resize)", &Redraw);
 
-    memset (&vb_desc, 0, sizeof vb_desc);
+      test->window.Show ();
 
-    vb_desc.size         = sizeof (MyVertex)* VERTICES_COUNT;
-    vb_desc.usage_mode   = UsageMode_Default;
-    vb_desc.bind_flags   = BindFlag_VertexBuffer;
-    vb_desc.access_flags = AccessFlag_ReadWrite;
+      CreateVertexBuffer ();
+      SetInputStage ();
+      SetOutputStage ();
+    }
+    catch (const xtl::exception& e)
+    {
+      printf("%s failed: %s\n", __FUNCTION__, e.what());
+      syslib::Application::Exit (1);
+    }
+  }
 
-    BufferPtr vb (test.device->CreateBuffer (vb_desc), false);    
+  void OnExit ()
+  {
+    // Test object should be destroyed
+    // BEFORE application exit.
+    test.reset ();
+  }
 
-    vb->SetData (0, vb_desc.size, verts);
+  void CreateVertexBuffer ()
+  {
+    try
+    {
+      printf ("Create vertex buffer\n");
+      
+      static const MyVertex verts [] = {
+        {{-1, -1, 0}, {0, 0, 1}, {255, 0, 0, 0}},
+        {{ 1, -1, 0}, {0, 0, 1}, {0, 255, 0, 0}},
+        {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 255, 0}},
+      };    
+      
+      static const size_t VERTICES_COUNT = sizeof verts / sizeof *verts;
 
-    printf ("Set input-stage\n");
+      BufferDesc vb_desc;
 
-    VertexAttribute attributes [] = {
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
-    };
-    
-    InputLayoutDesc layout_desc;
-    
-    memset (&layout_desc, 0, sizeof layout_desc);
-    
-    layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
-    layout_desc.vertex_attributes       = attributes;
-    layout_desc.index_type              = InputDataType_UInt;
-    layout_desc.index_buffer_offset     = 0;
-    
-    InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
+      memset (&vb_desc, 0, sizeof vb_desc);
 
-    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
-    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
+      vb_desc.size         = sizeof (MyVertex)* VERTICES_COUNT;
+      vb_desc.usage_mode   = UsageMode_Default;
+      vb_desc.bind_flags   = BindFlag_VertexBuffer;
+      vb_desc.access_flags = AccessFlag_ReadWrite;
 
-    printf ("Set output stage\n");
-   
-    DepthStencilDesc depth_stencil_desc;
+      vb = BufferPtr (test->device->CreateBuffer (vb_desc), false);    
 
-    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+      vb->SetData (0, vb_desc.size, verts);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
 
-    depth_stencil_desc.depth_test_enable   = true;
-    depth_stencil_desc.stencil_test_enable = false;
-    depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
-    depth_stencil_desc.depth_write_enable  = false;
+  void SetInputStage ()
+  {
+    try
+    {
+      printf ("Set input-stage\n");
 
-    DepthStencilStatePtr depth_stencil_state (test.device->CreateDepthStencilState (depth_stencil_desc), false);
+      VertexAttribute attributes [] = {
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal)
+          , InputDataFormat_Vector3
+          , InputDataType_Float
+          , 0
+          , offsetof (MyVertex, normal)
+          , sizeof (MyVertex)
+        },
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position)
+          , InputDataFormat_Vector3
+          , InputDataType_Float
+          , 0
+          , offsetof (MyVertex, position)
+          , sizeof (MyVertex)
+        },
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color)
+          , InputDataFormat_Vector4
+          , InputDataType_Float
+          , 0, offsetof (MyVertex, color)
+          , sizeof (MyVertex)
+        },
+      };
+      
+      InputLayoutDesc layout_desc;
+      
+      memset (&layout_desc, 0, sizeof layout_desc);
+      
+      layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
+      layout_desc.vertex_attributes       = attributes;
+      layout_desc.index_type              = InputDataType_UInt;
+      layout_desc.index_buffer_offset     = 0;
+      
+      layout = InputLayoutPtr (test->device->CreateInputLayout (layout_desc), false);
 
-    test.device->GetImmediateContext ()->OSSetDepthStencilState (depth_stencil_state.get ());
+      test->device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+      test->device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
 
+  void SetOutputStage()
+  {
+    try
+    {
+      printf ("Set output stage\n");
+     
+      DepthStencilDesc depth_stencil_desc;
+
+      memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+      depth_stencil_desc.depth_test_enable   = true;
+      depth_stencil_desc.stencil_test_enable = false;
+      depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
+      depth_stencil_desc.depth_write_enable  = false;
+
+      depth_stencil_state = DepthStencilStatePtr (test->device->CreateDepthStencilState (depth_stencil_desc), false);
+
+      test->device->GetImmediateContext ()->OSSetDepthStencilState (depth_stencil_state.get ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+public:
+  WindowResizeApplication ()
+  {
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnInitialize
+      , xtl::bind(&WindowResizeApplication::OnInitialize, this)
+    );
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnExit
+      , xtl::bind(&WindowResizeApplication::OnExit, this)
+    );
+  }
+
+  void Run ()
+  {
     printf ("Main loop\n");
 
     syslib::Application::Run ();
   }
+};
+
+int main ()
+{
+  printf ("Results of window_resize_test:\n");
+  
+  try
+  {
+    WindowResizeApplication app;
+
+    app.Run ();
+  }
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
+    return 1;
   }
 
   return 0;

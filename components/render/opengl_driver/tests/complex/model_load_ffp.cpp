@@ -414,12 +414,20 @@ class ModelLoadApplication
 
   void OnInitialize ()
   {
-    test = new Test (L"OpenGL device test window (model_load)", xtl::bind(&ModelLoadApplication::OnRedraw, this, _1));
+    try
+    {
+      test = new Test (L"OpenGL device test window (model_load)", xtl::bind(&ModelLoadApplication::OnRedraw, this, _1));
 
-    test->window.Show ();
+      test->window.Show ();
 
-    LoadModel (MODEL_NAME);
-    SetShaderStage ();
+      LoadModel (MODEL_NAME);
+      SetShaderStage ();
+    }
+    catch (const xtl::exception& e)
+    {
+      printf("%s failed: %s\n", __FUNCTION__, e.what());
+      syslib::Application::Exit (1);
+    }
   }
 
   void OnExit ()
@@ -500,9 +508,17 @@ class ModelLoadApplication
 
   void LoadModel (const char* file_name)
   {
-    printf ("Load model '%s':\n", file_name);
+    try
+    {
+      printf ("Load model '%s':\n", file_name);
   
-    model = ModelPtr (new Model (test->device, file_name));
+      model = ModelPtr (new Model (test->device, file_name));
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
   }
 
   void SetShaderStage()
@@ -552,10 +568,10 @@ class ModelLoadApplication
       test->device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
       test->device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
     }
-    catch (const std::exception& ex)
+    catch (xtl::exception& e)
     {
-      printf("%s failed: %s\n", __FUNCTION__, ex.what());
-      syslib::Application::Exit (0);
+      e.touch (__FUNCTION__);
+      throw;
     }
   }
 
