@@ -36,48 +36,271 @@ struct MyShaderParameters2
   math::mat4f  transform;
 };
 
-void redraw (Test& test)
+class DrawApplication
 {
-  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
-}
+  TestPtr                    test;
+  BufferPtr                  vb;
+  BufferPtr                  cb;
+  BufferPtr                  cb2;
+  InputLayoutPtr             layout;
+  ProgramPtr                 shader;
+  ProgramParametersLayoutPtr program_parameters_layout;
 
-void idle (Test& test)
-{
-  if (test.window.IsClosed ())
-    return;
-
-  static float angle;
-
-/*  if (clock () - last < CLK_TCK / 30)
+  static void print (const char* message)
   {
-    last = clock ();
-    return;
-  }*/
-
-  MyShaderParameters2 my_shader_parameters2;
-
-  IBuffer* cb = test.device->GetImmediateContext ()->SSGetConstantBuffer (1);
-
-  if (!cb)
-  {
-    printf ("Null constant buffer #1\n");
-    return;
+    printf ("Shader message: '%s'\n", message);
   }
 
-  cb->GetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
+  static void Redraw (Test& test)
+  {
+    test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
+  }
 
-  my_shader_parameters2.transform = math::rotate (math::degree (angle+=1.f), math::vec3f (0, 0, 1));
+  void OnInitialize ()
+  {
+    try
+    {
+      test = new Test(L"OpenGL device test window (draw2)", &Redraw);
+
+      test->window.Show ();
+
+      CreateVertexBuffer ();
+      SetInputStage ();
+      SetShaderStage ();
+    }
+    catch (const xtl::exception& e)
+    {
+      printf("%s failed: %s\n", __FUNCTION__, e.what());
+      syslib::Application::Exit (1);
+    }
+  }
+
+  void OnExit ()
+  {
+    // Test object should be destroyed
+    // BEFORE application exit.
+    test.reset ();
+  }
+
+  void OnIdle ()
+  {
+    if (!test)
+      return;
+
+    if (test->window.IsClosed ())
+      return;
+
+    static float angle;
+
+    /*if (clock () - last < CLK_TCK / 30)
+    {
+      last = clock ();
+      return;
+    }*/
+
+    MyShaderParameters2 my_shader_parameters2;
+
+    IBuffer* cb = test->device->GetImmediateContext ()->SSGetConstantBuffer (1);
+
+    if (!cb)
+    {
+      printf ("Null constant buffer #1\n");
+      return;
+    }
+
+    cb->GetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
+
+    my_shader_parameters2.transform = math::rotate (math::degree (angle+=1.f), math::vec3f (0, 0, 1));
 //  my_shader_parameters.transform *= math::rotatef (math::deg2rad (.3f), 0, 0, 1);
 
-  cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
+    cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
-  test.window.Invalidate ();
-}
+    test->window.Invalidate ();
+  }
 
-void print (const char* message)
-{
-  printf ("Shader message: '%s'\n", message);
-}
+  void CreateVertexBuffer ()
+  {
+    try
+    {
+      printf ("Create vertex buffer\n");
+
+      static const size_t VERTICES_COUNT = 3;
+
+      BufferDesc vb_desc;
+
+      memset (&vb_desc, 0, sizeof vb_desc);
+
+      vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
+      vb_desc.usage_mode   = UsageMode_Default;
+      vb_desc.bind_flags   = BindFlag_VertexBuffer;
+      vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
+
+      vb = BufferPtr (test->device->CreateBuffer (vb_desc), false);
+
+      static const MyVertex verts [] = {
+        {{-1, -1, 0}, {0, 0, 1}, {255, 0, 0, 0}},
+        {{ 1, -1, 0}, {0, 0, 1}, {0, 255, 0, 0}},
+        {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 255, 0}},
+      };
+
+      vb->SetData (0, vb_desc.size, verts);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+  void SetInputStage ()
+  {
+    try
+    {
+      printf ("Set input-stage\n");
+
+      VertexAttribute attributes [] = {
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal)
+          , InputDataFormat_Vector3
+          , InputDataType_Float
+          , 0
+          , offsetof (MyVertex, normal)
+          , sizeof (MyVertex)
+        },
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position)
+          , InputDataFormat_Vector3
+          , InputDataType_Float
+          , 0
+          , offsetof (MyVertex, position)
+          , sizeof (MyVertex)
+        },
+        {
+            test->device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color)
+          , InputDataFormat_Vector4
+          , InputDataType_Float
+          , 0
+          , offsetof (MyVertex, color)
+          , sizeof (MyVertex)
+        },
+      };
+
+      InputLayoutDesc layout_desc;
+
+      memset (&layout_desc, 0, sizeof layout_desc);
+
+      layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
+      layout_desc.vertex_attributes       = attributes;
+      layout_desc.index_type              = InputDataType_UInt;
+      layout_desc.index_buffer_offset     = 0;
+
+      layout = InputLayoutPtr (test->device->CreateInputLayout (layout_desc), false);
+
+      test->device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+      test->device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+  void SetShaderStage ()
+  {
+    try
+    {
+      printf ("Set shader stage\n");
+
+      stl::string pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME),
+                  vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
+
+      ShaderDesc shader_descs [] = {
+        {"v_shader", (unsigned int)-1, vertex_shader_source.c_str (), "glsl.vs", ""},
+        {"p_shader", (unsigned int)-1, pixel_shader_source.c_str (), "glsl.ps", ""},
+      };
+
+      static ProgramParameter shader_parameters[] = {
+        {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, grain_size_recip)},
+        {"DarkColor", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, dark_color)},
+        {"colorSpread", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, color_spread)},
+        {"LightPosition", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_position)},
+        {"Scale", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, scale)},
+        {"Transform", ProgramParameterType_Float4x4, 1, 1, TEST_OFFSETOF (MyShaderParameters2, transform)}
+      };
+
+      ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+
+      shader = ProgramPtr (test->device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &DrawApplication::print));
+      program_parameters_layout = ProgramParametersLayoutPtr (test->device->CreateProgramParametersLayout (program_parameters_layout_desc));
+
+      BufferDesc cb_desc;
+
+      memset (&cb_desc, 0, sizeof cb_desc);
+
+      cb_desc.size         = sizeof (MyShaderParameters);
+      cb_desc.usage_mode   = UsageMode_Default;
+      cb_desc.bind_flags   = BindFlag_ConstantBuffer;
+      cb_desc.access_flags = AccessFlag_ReadWrite;
+
+      BufferDesc cb_desc2 (cb_desc);
+
+      cb_desc2.size = sizeof (MyShaderParameters2);
+
+      cb  = BufferPtr (test->device->CreateBuffer (cb_desc), false);
+      cb2 = BufferPtr (test->device->CreateBuffer (cb_desc2), false);
+
+      MyShaderParameters my_shader_parameters = {
+        1.0f,
+        math::vec3f (0.6f, 0.3f, 0.1f),
+        math::vec3f (0.15f, 0.15f / 2.0f, 0),
+        math::vec3f (0.0f, 0.0f, 4.0f),
+        1.f
+      };
+
+      MyShaderParameters2 my_shader_parameters2 = {1.0f};
+
+      cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+      cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
+
+      test->device->GetImmediateContext ()->SSSetProgram (shader.get ());
+      test->device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+      test->device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
+      test->device->GetImmediateContext ()->SSSetConstantBuffer (1, cb2.get ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+public:
+  DrawApplication ()
+  {
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnInitialize
+      , xtl::bind(&DrawApplication::OnInitialize, this)
+    );
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnExit
+      , xtl::bind(&DrawApplication::OnExit, this)
+    );
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnIdle
+      , xtl::bind(&DrawApplication::OnIdle, this)
+    );
+  }
+
+  void Run ()
+  {
+    printf ("Main loop\n");
+
+    syslib::Application::Run ();
+  }
+};
 
 int main ()
 {
@@ -85,119 +308,9 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (draw2)", &redraw);
+    DrawApplication app;
 
-    test.window.Show ();
-
-    printf ("Create vertex buffer\n");
-
-    static const size_t VERTICES_COUNT = 3;
-
-    BufferDesc vb_desc;
-
-    memset (&vb_desc, 0, sizeof vb_desc);
-
-    vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
-    vb_desc.usage_mode   = UsageMode_Default;
-    vb_desc.bind_flags   = BindFlag_VertexBuffer;
-    vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
-
-    BufferPtr vb (test.device->CreateBuffer (vb_desc), false);
-
-    static const MyVertex verts [] = {
-      {{-1, -1, 0}, {0, 0, 1}, {255, 0, 0, 0}},
-      {{ 1, -1, 0}, {0, 0, 1}, {0, 255, 0, 0}},
-      {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 255, 0}},
-    };
-
-    vb->SetData (0, vb_desc.size, verts);
-
-    printf ("Set input-stage\n");
-
-    VertexAttribute attributes [] = {
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
-    };
-
-    InputLayoutDesc layout_desc;
-
-    memset (&layout_desc, 0, sizeof layout_desc);
-
-    layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
-    layout_desc.vertex_attributes       = attributes;
-    layout_desc.index_type              = InputDataType_UInt;
-    layout_desc.index_buffer_offset     = 0;
-
-    InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
-
-    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
-    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
-
-    printf ("Set shader stage\n");
-
-    stl::string pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME),
-                vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME);
-
-    ShaderDesc shader_descs [] = {
-      {"v_shader", (unsigned int)-1, vertex_shader_source.c_str (), "glsl.vs", ""},
-      {"p_shader", (unsigned int)-1, pixel_shader_source.c_str (), "glsl.ps", ""},
-    };
-
-    static ProgramParameter shader_parameters[] = {
-      {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, grain_size_recip)},
-      {"DarkColor", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, dark_color)},
-      {"colorSpread", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, color_spread)},
-      {"LightPosition", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_position)},
-      {"Scale", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, scale)},
-      {"Transform", ProgramParameterType_Float4x4, 1, 1, TEST_OFFSETOF (MyShaderParameters2, transform)}
-    };
-
-    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
-
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));
-
-    BufferDesc cb_desc;
-
-    memset (&cb_desc, 0, sizeof cb_desc);
-
-    cb_desc.size         = sizeof (MyShaderParameters);
-    cb_desc.usage_mode   = UsageMode_Default;
-    cb_desc.bind_flags   = BindFlag_ConstantBuffer;
-    cb_desc.access_flags = AccessFlag_ReadWrite;
-
-    BufferDesc cb_desc2 (cb_desc);
-
-    cb_desc2.size = sizeof (MyShaderParameters2);
-
-    BufferPtr cb (test.device->CreateBuffer (cb_desc), false), cb2 (test.device->CreateBuffer (cb_desc2), false);
-
-    MyShaderParameters my_shader_parameters = {
-      1.0f,
-      math::vec3f (0.6f, 0.3f, 0.1f),
-      math::vec3f (0.15f, 0.15f / 2.0f, 0),
-      math::vec3f (0.0f, 0.0f, 4.0f),
-      1.f
-    };
-
-    MyShaderParameters2 my_shader_parameters2 = {1.0f};
-
-    cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-    cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
-
-    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
-    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
-    test.device->GetImmediateContext ()->SSSetConstantBuffer (1, cb2.get ());
-
-    printf ("Register callbacks\n");
-
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
-
-    printf ("Main loop\n");
-
-    syslib::Application::Run ();
+    app.Run();
   }
   catch (std::exception& e)
   {
