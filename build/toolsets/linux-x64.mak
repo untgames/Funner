@@ -10,6 +10,7 @@ DLL_SUFFIX        := .so
 DLL_PREFIX        := lib
 DLL_PATH          := LD_LIBRARY_PATH
 COMMON_CFLAGS     += -DLINUX -fPIC
+COMMON_CFLAGS     += -fno-strict-aliasing
 COMMON_LINK_FLAGS += -Wl,-rpath -Wl,'$$ORIGIN'
 LIB_GCC           := ar
 SHELL             := /bin/bash
