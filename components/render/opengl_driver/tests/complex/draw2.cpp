@@ -46,7 +46,7 @@ class DrawApplication
   ProgramPtr                 shader;
   ProgramParametersLayoutPtr program_parameters_layout;
 
-  static void print (const char* message)
+  static void Print (const char* message)
   {
     printf ("Shader message: '%s'\n", message);
   }
@@ -60,7 +60,7 @@ class DrawApplication
   {
     try
     {
-      test = new Test(L"OpenGL device test window (draw2)", &Redraw);
+      test = new Test (L"OpenGL device test window (draw2)", &Redraw);
 
       test->window.Show ();
 
@@ -231,7 +231,7 @@ class DrawApplication
 
       ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
-      shader = ProgramPtr (test->device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &DrawApplication::print));
+      shader = ProgramPtr (test->device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &DrawApplication::Print));
       program_parameters_layout = ProgramParametersLayoutPtr (test->device->CreateProgramParametersLayout (program_parameters_layout_desc));
 
       BufferDesc cb_desc;
