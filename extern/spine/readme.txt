@@ -1,0 +1,2 @@
+Spine commit 54c20904fda6d352277ac703ddb7c81d275eaaa6 from repository https://github.com/EsotericSoftware/spine-runtimes.git should be patched with patch file funner.patch.
+Folder spine-c/spine-c/include should be copied to 3.6/include and folder spine-c/spine-c/src/ should be copied to 3.6/sources 
