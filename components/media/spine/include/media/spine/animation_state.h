@@ -31,11 +31,11 @@ class AnimationState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with tracks
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TrackEntry* SetAnimation          (unsigned int track, const char* animation, bool looped);
-    TrackEntry* SetEmptyAnimation     (unsigned int track, float mix_duration);
-    TrackEntry* SetEmptyAnimations    (float mix_duration);
-    TrackEntry* EnqueueAnimation      (unsigned int track, const char* animation, bool looped, float delay);
-    TrackEntry* EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay);
+    TrackEntry  SetAnimation          (unsigned int track, const char* animation, bool looped);
+    TrackEntry  SetEmptyAnimation     (unsigned int track, float mix_duration);
+    TrackEntry  SetEmptyAnimations    (float mix_duration);
+    TrackEntry  EnqueueAnimation      (unsigned int track, const char* animation, bool looped, float delay);
+    TrackEntry  EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay);
     void        ClearTracks           ();
     void        ClearTrack            (unsigned int track);
     TrackEntry* CurrentTrackEntry     (unsigned int track);

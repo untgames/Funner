@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_SPINE_SKELETON_DATA_HEADER
 #define MEDIALIB_SPINE_SKELETON_DATA_HEADER
 
+#include <xtl/functional_fwd>
+
 namespace media
 {
 
@@ -11,14 +13,12 @@ namespace spine
 class AnimationStateData;
 class ISkeletonData;
 class Skeleton;
-class Wrappers;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Spine skeleton data
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class SkeletonData
 {
-  friend class Wrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructors / destructor / assignment
@@ -81,16 +81,17 @@ void swap (SkeletonData&, SkeletonData&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Class which loads skeleton data
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SpineSerializerManager
+class SerializerManager
 {
   public:
-    typedef xtl::function<SkeletonDataImpl* (const char* skeleton_file_name, const char* atlas_file_name)> SkeletonDataLoader;
+    typedef xtl::function<ISkeletonData* (const char* skeleton_file_name, const char* atlas_file_name)> SkeletonDataLoader;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Serializers registration
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader       (const char* skeleton_file_type, const char* spine_version, const SkeletonDataLoader& loader);
-    static void UnregisterLoader     (const char* skeleton_file_type, const char* spine_version);
+    static void RegisterLoader       (const char* skeleton_file_extension, const char* spine_version, const SkeletonDataLoader& loader);
+    static void UnregisterLoader     (const char* skeleton_file_extension, const char* spine_version);
+    static void UnregisterAllLoaders (const char* skeleton_file_extension);
     static void UnregisterAllLoaders ();
 };
 

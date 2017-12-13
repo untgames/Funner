@@ -58,11 +58,11 @@ class Skeleton
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with slots
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int SlotsCount () const;
-          Slot&  Slot       (unsigned int index);         //slots are sorted in draw order
-    const Slot&  Slot       (unsigned int index) const;   //slots are sorted in draw order
-          Slot*  FindSlot   (const char* name);
-    const Slot*  FindSlot   (const char* name) const;
+    unsigned int               SlotsCount () const;
+          media::spine::Slot&  Slot       (unsigned int index);         //slots are sorted in draw order
+    const media::spine::Slot&  Slot       (unsigned int index) const;   //slots are sorted in draw order
+          media::spine::Slot*  FindSlot   (const char* name);
+    const media::spine::Slot*  FindSlot   (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Rendering
