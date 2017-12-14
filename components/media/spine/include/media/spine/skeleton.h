@@ -74,7 +74,7 @@ class Skeleton
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* CurrentSkin   () const;  //may be 0
+    const char* Skin          () const;  //may be 0
     void        SetSkin       (const char* skin_name = 0);
     bool        SetAttachment (const char* slot_name, const char* attachment_name = 0);
 

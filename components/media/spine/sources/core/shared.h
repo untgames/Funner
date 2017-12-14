@@ -5,18 +5,26 @@
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 
 #include <common/component.h>
 #include <common/singleton.h>
 
+#include <media/geometry/mesh.h>
+
+#include <media/spine/animation_state.h>
 #include <media/spine/animation_state_data.h>
+#include <media/spine/material.h>
 #include <media/spine/skeleton.h>
 #include <media/spine/skeleton_data.h>
 
+#include <animation_state.h>
 #include <animation_state_data.h>
+#include <material.h>
 #include <skeleton.h>
 #include <skeleton_data.h>
+#include <track_entry.h>
 
 namespace media
 {

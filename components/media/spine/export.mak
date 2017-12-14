@@ -4,7 +4,7 @@ export.compile.media.spine.IMPORTS      := compile.math.vecmath compile.xtl
 
 # Link exports
 export.link.media.spine.LIBS    := funner.media.spine.core
-export.link.media.spine.IMPORTS := link.common
+export.link.media.spine.IMPORTS := link.media.geometry
 
 # Snddecl link exports
 export.link.media.spine.loader_3.6.LIBS          := funner.media.spine.loader_3.6

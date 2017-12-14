@@ -13,6 +13,7 @@ namespace spine
 
 //forward declarations
 class IBone;
+class IMaterial;
 class ISlot;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,12 +47,12 @@ class ISkeleton : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual unsigned int    MeshesCount () = 0;
     virtual geometry::Mesh  Mesh        (unsigned int mesh_index) = 0;
-    virtual Material        Material    (const char* name) = 0;
+    virtual IMaterial*      Material    (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* CurrentSkin   () = 0;
+    virtual const char* Skin          () = 0;
     virtual void        SetSkin       (const char* skin_name) = 0;
     virtual bool        SetAttachment (const char* slot_name, const char* attachment_name) = 0;
 

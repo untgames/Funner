@@ -38,8 +38,8 @@ class AnimationStateData
     float DefaultMix    () const;
     void  SetDefaultMix (float default_mix);
 
-    float GetMix (const char* animation_form, const char* animation_to) const;
-    void  SetMix (const char* animation_form, const char* animation_to, float mix);
+    float GetMix (const char* animation_from, const char* animation_to) const;
+    void  SetMix (const char* animation_from, const char* animation_to, float mix);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap

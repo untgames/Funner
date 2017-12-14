@@ -5,7 +5,7 @@ MEDIA.SPINE.CORE.TYPE         := static-lib
 MEDIA.SPINE.CORE.NAME         := funner.media.spine.core
 MEDIA.SPINE.CORE.INCLUDE_DIRS := sources/shared
 MEDIA.SPINE.CORE.SOURCE_DIRS  := sources/core
-MEDIA.SPINE.CORE.IMPORTS      := compile.media.spine compile.common
+MEDIA.SPINE.CORE.IMPORTS      := compile.media.spine compile.common compile.media.geometry
 
 #Impl for spine 3.6 sources
 MEDIA.SPINE.LOADER_3_6.TYPE         := static-lib

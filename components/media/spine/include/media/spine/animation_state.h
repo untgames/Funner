@@ -38,7 +38,8 @@ class AnimationState
     TrackEntry  EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay);
     void        ClearTracks           ();
     void        ClearTrack            (unsigned int track);
-    TrackEntry* CurrentTrackEntry     (unsigned int track);
+    bool        HasTrackEntry         (unsigned int track) const;
+    TrackEntry  TrackEntry            (unsigned int track) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Register for animation events
