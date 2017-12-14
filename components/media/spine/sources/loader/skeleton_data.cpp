@@ -1,18 +1,17 @@
 #include "shared.h"
 
-using namespace media::spine;
 using namespace media::SPINE_NAMESPACE_NAME;
 
 /*
    Create object instances
 */
 
-media::spine::ISkeleton* SkeletonDataImpl::CreateSkeleton ()
+media::spine::SkeletonImpl* SkeletonDataImpl::CreateSkeleton ()
 {
 
 }
 
-media::spine::IAnimationStateData* SkeletonDataImpl::CreateAnimationStateData ()
+media::spine::AnimationStateDataImpl* SkeletonDataImpl::CreateAnimationStateData ()
 {
 
 }

@@ -9,7 +9,7 @@ namespace spine
 
 //forward declarations
 class AnimationState;
-class IAnimationStateData;
+class AnimationStateDataImpl;
 class Wrappers;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ class AnimationStateData
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Animation mixing
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    float DefaultMix    () const;
+    float DefaultMix    () const;                //The mix duration to use when no mix duration has been defined between two animations.
     void  SetDefaultMix (float default_mix);
 
     float GetMix (const char* animation_from, const char* animation_to) const;
@@ -47,10 +47,10 @@ class AnimationStateData
     void Swap (AnimationStateData&);
 
   private:
-    AnimationStateData (IAnimationStateData*);
+    AnimationStateData (AnimationStateDataImpl*);
 
   private:
-    IAnimationStateData* impl;
+    AnimationStateDataImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

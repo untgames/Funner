@@ -19,12 +19,12 @@
 #include <media/spine/skeleton.h>
 #include <media/spine/skeleton_data.h>
 
-#include <animation_state.h>
-#include <animation_state_data.h>
-#include <material.h>
-#include <skeleton.h>
-#include <skeleton_data.h>
-#include <track_entry.h>
+#include <animation_state_data_impl.h>
+#include <animation_state_impl.h>
+#include <material_impl.h>
+#include <skeleton_data_impl.h>
+#include <skeleton_impl.h>
+#include <track_entry_impl.h>
 
 namespace media
 {

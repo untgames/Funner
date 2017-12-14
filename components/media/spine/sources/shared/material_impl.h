@@ -1,7 +1,7 @@
-#ifndef MEDIALIB_SPINE_SHARED_ANIMATION_STATE_DATA_HEADER
-#define MEDIALIB_SPINE_SHARED_ANIMATION_STATE_DATA_HEADER
+#ifndef MEDIALIB_SPINE_SHARED_MATERIAL_HEADER
+#define MEDIALIB_SPINE_SHARED_MATERIAL_HEADER
 
-#include <media/spine/animation_state_data.h>
+#include <media/spine/material.h>
 
 #include <object.h>
 
@@ -11,28 +11,23 @@ namespace media
 namespace spine
 {
 
-//forward declarations
-class IAnimationState;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Spine animation state data
+///Mesh material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IAnimationStateData : virtual public IObject
+class MaterialImpl : virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Create object instance
+///Name
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IAnimationState* CreateAnimationState () = 0;
+    virtual const char* Name () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Animation mixing
+///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual float DefaultMix    () = 0;
-    virtual void  SetDefaultMix (float default_mix) = 0;
-
-    virtual float GetMix (const char* animation_form, const char* animation_to) = 0;
-    virtual void  SetMix (const char* animation_form, const char* animation_to, float mix) = 0;
+    virtual BlendMode    BlendMode    () = 0;
+    virtual TexcoordWrap TexcoordWrap () = 0;
+    virtual const char*  TexturePath  () = 0;
 };
 
 }

@@ -8,7 +8,7 @@ namespace spine
 {
 
 //forward declarations
-class IMaterial;
+class MaterialImpl;
 class Wrappers;
 
 //Possible blend modes
@@ -61,10 +61,10 @@ class Material
     void Swap (Material&);
 
   protected:
-    Material (IMaterial*);
+    Material (MaterialImpl*);
 
   private:
-    IMaterial* impl;
+    MaterialImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

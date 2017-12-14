@@ -13,7 +13,7 @@ TrackEntry::TrackEntry (const TrackEntry& source)
     impl->AddRef ();
 }
 
-TrackEntry::TrackEntry (ITrackEntry* in_impl)
+TrackEntry::TrackEntry (TrackEntryImpl* in_impl)
   : impl (in_impl)
 {
   if (!impl)
@@ -44,16 +44,6 @@ const char* TrackEntry::Animation () const
 float TrackEntry::Duration () const
 {
   return impl->Duration ();
-}
-
-float TrackEntry::Tell () const
-{
-  return impl->Tell ();
-}
-
-void TrackEntry::Seek (float seek_to)
-{
-  impl->Seek (seek_to);
 }
 
 float TrackEntry::Alpha () const

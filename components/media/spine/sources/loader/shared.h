@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_SPINE_LOADER_SHARED_HEADER
 #define MEDIALIB_SPINE_LOADER_SHARED_HEADER
 
-#include <skeleton_data.h>
+#include "../shared/skeleton_data_impl.h"
 
 namespace media
 {
@@ -9,14 +9,14 @@ namespace media
 namespace SPINE_NAMESPACE_NAME
 {
 
-class SkeletonDataImpl : public media::spine::ISkeletonData
+class SkeletonDataImpl : public media::spine::SkeletonDataImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Create object instances
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    media::spine::ISkeleton*           CreateSkeleton           ();
-    media::spine::IAnimationStateData* CreateAnimationStateData ();
+    media::spine::SkeletonImpl*           CreateSkeleton           ();
+    media::spine::AnimationStateDataImpl* CreateAnimationStateData ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Params

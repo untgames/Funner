@@ -10,7 +10,7 @@ namespace spine
 {
 
 //forward declarations
-class IAnimationState;
+class AnimationStateImpl;
 class Wrappers;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,10 +58,10 @@ class AnimationState
     void Swap (AnimationState&);
 
   protected:
-    AnimationState (IAnimationState*);
+    AnimationState (AnimationStateImpl*);
 
   private:
-    IAnimationState* impl;
+    AnimationStateImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

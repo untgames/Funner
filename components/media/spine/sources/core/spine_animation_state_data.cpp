@@ -13,7 +13,7 @@ AnimationStateData::AnimationStateData (const AnimationStateData& source)
     impl->AddRef ();
 }
 
-AnimationStateData::AnimationStateData (IAnimationStateData* in_impl)
+AnimationStateData::AnimationStateData (AnimationStateDataImpl* in_impl)
   : impl (in_impl)
 {
   if (!impl)
@@ -38,7 +38,7 @@ AnimationStateData& AnimationStateData::operator = (const AnimationStateData& so
 
 AnimationState AnimationStateData::CreateAnimationState () const
 {
-  return Wrappers::Wrap<AnimationState, IAnimationState> (impl->CreateAnimationState ());
+  return Wrappers::Wrap<AnimationState, AnimationStateImpl> (impl->CreateAnimationState ());
 }
 
 /*

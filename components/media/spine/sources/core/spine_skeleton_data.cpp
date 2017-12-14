@@ -10,7 +10,7 @@ SkeletonData::SkeletonData ()
   : impl (0)
   {}
 
-SkeletonData::SkeletonData (ISkeletonData* in_impl)
+SkeletonData::SkeletonData (SkeletonDataImpl* in_impl)
   : impl (in_impl)
   {}
 
@@ -91,7 +91,7 @@ Skeleton SkeletonData::CreateSkeleton () const
   if (!impl)
     throw xtl::format_operation_exception ("media::spine::SkeletonData::CreateSkeleton", "Skeleton data not loaded.");
 
-  return Wrappers::Wrap<Skeleton, ISkeleton> (impl->CreateSkeleton ());
+  return Wrappers::Wrap<Skeleton, SkeletonImpl> (impl->CreateSkeleton ());
 }
 
 AnimationStateData SkeletonData::CreateAnimationStateData () const
@@ -99,7 +99,7 @@ AnimationStateData SkeletonData::CreateAnimationStateData () const
   if (!impl)
     throw xtl::format_operation_exception ("media::spine::SkeletonData::CreateSkeleton", "Skeleton data not loaded.");
 
-  return Wrappers::Wrap<AnimationStateData, IAnimationStateData> (impl->CreateAnimationStateData ());
+  return Wrappers::Wrap<AnimationStateData, AnimationStateDataImpl> (impl->CreateAnimationStateData ());
 }
 
 /*

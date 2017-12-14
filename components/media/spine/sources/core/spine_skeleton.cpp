@@ -13,7 +13,7 @@ Skeleton::Skeleton (const Skeleton& source)
     impl->AddRef ();
 }
 
-Skeleton::Skeleton (ISkeleton* in_impl)
+Skeleton::Skeleton (SkeletonImpl* in_impl)
   : impl (in_impl)
 {
   if (!impl)
@@ -41,7 +41,7 @@ void Skeleton::SetToSetupPose ()
   impl->SetToSetupPose ();
 }
 
-void Skeleton::ApplyAnimationState (const AnimationState& animation)
+void Skeleton::Apply (const AnimationState& animation)
 {
   impl->ApplyAnimationState (animation);
 }
@@ -123,7 +123,7 @@ media::geometry::Mesh Skeleton::Mesh (unsigned int mesh_index) const
 
 Material Skeleton::Material (const char* name) const
 {
-  return Wrappers::Wrap<media::spine::Material, IMaterial> (impl->Material (name));
+  return Wrappers::Wrap<media::spine::Material, MaterialImpl> (impl->Material (name));
 }
 
 /*

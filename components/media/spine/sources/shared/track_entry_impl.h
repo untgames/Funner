@@ -14,7 +14,7 @@ namespace spine
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Spine animation track entry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ITrackEntry : virtual public IObject
+class TrackEntryImpl : virtual public IObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,12 +45,12 @@ class ITrackEntry : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Mixing parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual float       MixDuration    () = 0;
-    virtual void        SetMixDuration (float mix_duration) = 0;
-    virtual float       MixTime        () = 0;
-    virtual void        SetMixTime     (float mix_time) = 0;
-    virtual TrackEntry* MixingFrom     () = 0;
-    virtual TrackEntry* Next           () = 0;
+    virtual float           MixDuration    () = 0;
+    virtual void            SetMixDuration (float mix_duration) = 0;
+    virtual float           MixTime        () = 0;
+    virtual void            SetMixTime     (float mix_time) = 0;
+    virtual TrackEntryImpl* MixingFrom     () = 0;
+    virtual TrackEntryImpl* Next           () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Check if track is already disposed (if track disposed, all other read calls returns default values and set calls are ignored)

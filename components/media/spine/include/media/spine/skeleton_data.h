@@ -11,8 +11,8 @@ namespace spine
 
 //forward declarations
 class AnimationStateData;
-class ISkeletonData;
 class Skeleton;
+class SkeletonDataImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Spine skeleton data
@@ -67,10 +67,10 @@ class SkeletonData
     void Swap (SkeletonData&);
 
   protected:
-    SkeletonData (ISkeletonData*);
+    SkeletonData (SkeletonDataImpl*);
 
   private:
-    ISkeletonData* impl;
+    SkeletonDataImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ void swap (SkeletonData&, SkeletonData&);
 class SerializerManager
 {
   public:
-    typedef xtl::function<ISkeletonData* (const char* skeleton_file_name, const char* atlas_file_name)> SkeletonDataLoader;
+    typedef xtl::function<SkeletonDataImpl* (const char* skeleton_file_name, const char* atlas_file_name)> SkeletonDataLoader;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Serializers registration

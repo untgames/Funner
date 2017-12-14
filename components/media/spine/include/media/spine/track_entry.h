@@ -10,8 +10,8 @@ namespace spine
 {
 
 //forward declarations
-class ITrackEntry;
 class TrackEntry;
+class TrackEntryImpl;
 class Wrappers;
 
 //Possible animation event types
@@ -49,8 +49,6 @@ class TrackEntry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Animation         () const;
     float       Duration          () const;
-    float       Tell              () const;
-    void        Seek              (float seek_to);
 
     float       Alpha             () const;
     void        SetAlpha          (float alpha);
@@ -101,10 +99,10 @@ class TrackEntry
     void Swap (TrackEntry&);
 
   protected:
-    TrackEntry (ITrackEntry*);
+    TrackEntry (TrackEntryImpl*);
 
   private:
-    ITrackEntry* impl;
+    TrackEntryImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

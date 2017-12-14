@@ -13,7 +13,7 @@ Material::Material (const Material& source)
     impl->AddRef ();
 }
 
-Material::Material (IMaterial* in_impl)
+Material::Material (MaterialImpl* in_impl)
   : impl (in_impl)
 {
   if (!impl)
