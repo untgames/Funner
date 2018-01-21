@@ -24,10 +24,6 @@ class IObject
 
   protected:
     virtual ~IObject () {}
-
-  private:
-    IObject (const IObject&); //no impl
-    IObject& operator = (const IObject&); //no impl
 };
 
 }

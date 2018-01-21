@@ -10,16 +10,24 @@ namespace
 struct LoaderKey
 {
   LoaderKey (const char* extension, const char* in_spine_version)
-    : spine_version (strtol (in_spine_version, 0, 10))
-    , extension_hash (common::strihash (extension))
+    : extension_hash (common::strihash (extension))
     , hash (common::strihash (in_spine_version, extension_hash))
-    {}
+  {
+    char* major_version_end_ptr;
+
+    spine_major_version = strtol (in_spine_version, &major_version_end_ptr, 10);
+
+    for (;*major_version_end_ptr == '.'; major_version_end_ptr++);
+
+    spine_minor_version = *major_version_end_ptr ? strtol (major_version_end_ptr, 0, 10) : 0;
+  }
 
   bool operator == (const LoaderKey& key) const { return hash == key.hash; }
 
-  int    spine_version;   //major version of spine loader
-  size_t extension_hash;  //extension hash
-  size_t hash;            //full hash
+  int    spine_major_version; //major version of spine loader
+  int    spine_minor_version; //minor version of spine loader
+  size_t extension_hash;      //extension hash
+  size_t hash;                //full hash
 };
 
 //hash function used by stl::hash_map
@@ -92,17 +100,19 @@ const SerializerManager::SkeletonDataLoader* SerializerManagerImpl::FindLoaderLa
   if (!extension)
     return 0;
 
-  const SerializerManager::SkeletonDataLoader* return_value   = 0;
-  int                                          latest_version = 0;
+  const SerializerManager::SkeletonDataLoader* return_value = 0;
+  int                                          latest_major_version = 0, latest_minor_version = 0;
   size_t                                       extension_hash = common::strihash (extension);
 
   for (LoadersMap::iterator iter = impl->loaders.begin (), end = impl->loaders.end (); iter != end; ++iter)
   {
     if (iter->first.extension_hash == extension_hash)
     {
-      if (iter->first.spine_version > latest_version)
+      if ((iter->first.spine_major_version > latest_major_version) ||
+          (iter->first.spine_major_version == latest_major_version && iter->first.spine_minor_version > latest_minor_version))
       {
-        latest_version = iter->first.spine_version;
+        latest_major_version = iter->first.spine_major_version;
+        latest_minor_version = iter->first.spine_minor_version;
         return_value   = &iter->second;
       }
     }

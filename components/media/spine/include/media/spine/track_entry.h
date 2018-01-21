@@ -26,8 +26,8 @@ enum AnimationEvent
   AnimationEvent_Num
 };
 
-typedef xtl::function<void (AnimationEvent event, TrackEntry track)> AnimationEventHandler;
-typedef xtl::function<void (TrackEntry track, const char* event_name, int int_value, float float_value, const char* string_value)> UserEventHandler;
+typedef xtl::function<void (const TrackEntry& track, AnimationEvent event)> AnimationEventHandler;
+typedef xtl::function<void (const TrackEntry& track, const char* event_name, int int_value, float float_value, const char* string_value)> UserEventHandler;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Spine animation track entry
@@ -47,8 +47,9 @@ class TrackEntry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Animation parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Animation         () const;
-    float       Duration          () const;
+    const char*  Animation  () const;
+    float        Duration   () const;
+    unsigned int TrackIndex () const;
 
     float       Alpha             () const;
     void        SetAlpha          (float alpha);
@@ -61,14 +62,14 @@ class TrackEntry
     float       Delay             () const;
     void        SetDelay          (float delay);
     bool        IsLooping         () const;
-    void        SetLooping        (bool delay);
+    void        SetLooping        (bool is_looping);
     float       TimeScale         () const;
     void        SetTimeScale      (float time_scale);
     float       TrackTime         () const;
     void        SetTrackTime      (float track_time);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Mixing parameters
+///Mixing parameters, returned object is owned by callee.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float       MixDuration    () const;
     void        SetMixDuration (float mix_duration);
@@ -87,11 +88,6 @@ class TrackEntry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterEventHandler (AnimationEvent event, const AnimationEventHandler& handler) const;
     xtl::connection RegisterEventHandler (const UserEventHandler& handler) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Update (only positive dt allowed)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Update (float dt);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap

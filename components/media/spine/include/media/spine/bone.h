@@ -57,13 +57,13 @@ class Bone
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     math::vec2f WorldToLocal (const math::vec2f& position) const;
     math::vec2f WorldToLocal (float position_x, float position_y) const;
-    float       WorldToWorld (float rotation) const;
+    float       WorldToLocal (float rotation) const;
     math::vec2f LocalToWorld (const math::vec2f& position) const;
     math::vec2f LocalToWorld (float position_x, float position_y) const;
     float       LocalToWorld (float rotation) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Linked bones
+///Linked bones, returned object is owned by callee.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           Bone* Parent ();
     const Bone* Parent () const;

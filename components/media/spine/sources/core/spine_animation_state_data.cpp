@@ -57,11 +57,27 @@ void AnimationStateData::SetDefaultMix (float default_mix)
 
 float AnimationStateData::GetMix (const char* animation_from, const char* animation_to) const
 {
+  static const char* METHOD_NAME = "media::spine::AnimationStateData::GetMix";
+
+  if (!animation_from)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "animation_from");
+
+  if (!animation_to)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "animation_to");
+
   return impl->GetMix (animation_from, animation_to);
 }
 
 void AnimationStateData::SetMix (const char* animation_from, const char* animation_to, float mix)
 {
+  static const char* METHOD_NAME = "media::spine::AnimationStateData::SetMix";
+
+  if (!animation_from)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "animation_from");
+
+  if (!animation_to)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "animation_to");
+
   impl->SetMix (animation_from, animation_to, mix);
 }
 

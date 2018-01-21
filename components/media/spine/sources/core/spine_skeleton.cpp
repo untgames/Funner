@@ -43,7 +43,7 @@ void Skeleton::SetToSetupPose ()
 
 void Skeleton::Apply (const AnimationState& animation)
 {
-  impl->ApplyAnimationState (animation);
+  impl->ApplyAnimationState (Wrappers::Unwrap<AnimationStateImpl, AnimationState> (animation));
 }
 
 /*
@@ -52,26 +52,27 @@ void Skeleton::Apply (const AnimationState& animation)
 
 Bone& Skeleton::RootBone ()
 {
-  //TODO
-  throw xtl::make_not_implemented_exception ("Skeleton::RootBone");
-}
+  return const_cast<media::spine::Bone&> (const_cast<const Skeleton&> (*this).RootBone ());
+ }
 
 const Bone& Skeleton::RootBone () const
 {
-  //TODO
-  throw xtl::make_not_implemented_exception ("Skeleton::RootBone");
+  return impl->RootBone ();
 }
 
 Bone* Skeleton::FindBone (const char* name)
 {
-  //TODO
-  return 0;
+  return const_cast<media::spine::Bone*> (const_cast<const Skeleton&> (*this).FindBone (name));
 }
 
 const Bone* Skeleton::FindBone (const char* name) const
 {
-  //TODO
-  return 0;
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::spine::Skeleton::FindBone", "name");
+
+  int bone_index = impl->FindBoneIndex (name);
+
+  return bone_index < 0 ? 0 : &impl->Bone (bone_index);
 }
 
 /*
@@ -85,26 +86,27 @@ unsigned int Skeleton::SlotsCount () const
 
 media::spine::Slot& Skeleton::Slot (unsigned int index)
 {
-  //TODO
-  throw xtl::make_not_implemented_exception ("Skeleton::RootBone");
+  return const_cast<media::spine::Slot&> (const_cast<const Skeleton&> (*this).Slot (index));
 }
 
 const media::spine::Slot& Skeleton::Slot (unsigned int index) const
 {
-  //TODO
-  throw xtl::make_not_implemented_exception ("Skeleton::RootBone");
+  return impl->Slot (index);
 }
 
 media::spine::Slot* Skeleton::FindSlot (const char* name)
 {
-  //TODO
-  return 0;
+  return const_cast<media::spine::Slot*> (const_cast<const Skeleton&> (*this).FindSlot (name));
 }
 
 const media::spine::Slot* Skeleton::FindSlot (const char* name) const
 {
-  //TODO
-  return 0;
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::spine::Skeleton::FindSlot", "name");
+
+  int slot_index = impl->FindSlotIndex (name);
+
+  return slot_index < 0 ? 0 : &impl->Slot (slot_index);
 }
 
 /*
@@ -135,13 +137,20 @@ const char* Skeleton::Skin () const
   return impl->Skin ();
 }
 
-void Skeleton::SetSkin (const char* skin_name)
+bool Skeleton::SetSkin (const char* skin_name)
 {
-  impl->SetSkin (skin_name);
+  //skin name may be null
+
+  return impl->SetSkin (skin_name);
 }
 
 bool Skeleton::SetAttachment (const char* slot_name, const char* attachment_name)
 {
+  if (!slot_name)
+    throw xtl::make_null_argument_exception ("media::spine::Skeleton::SetAttachment", "slot_name");
+
+  //attachment name may be null
+
   return impl->SetAttachment (slot_name, attachment_name);
 }
 

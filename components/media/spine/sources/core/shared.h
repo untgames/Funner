@@ -9,22 +9,32 @@
 #include <xtl/function.h>
 
 #include <common/component.h>
+#include <common/file.h>
+#include <common/log.h>
 #include <common/singleton.h>
+#include <common/strlib.h>
 
 #include <media/geometry/mesh.h>
 
 #include <media/spine/animation_state.h>
 #include <media/spine/animation_state_data.h>
+#include <media/spine/attachment.h>
+#include <media/spine/bone.h>
 #include <media/spine/material.h>
 #include <media/spine/skeleton.h>
 #include <media/spine/skeleton_data.h>
+#include <media/spine/slot.h>
 
 #include <animation_state_data_impl.h>
 #include <animation_state_impl.h>
+#include <attachment_impl.h>
+#include <bone_impl.h>
 #include <material_impl.h>
 #include <skeleton_data_impl.h>
 #include <skeleton_impl.h>
+#include <slot_impl.h>
 #include <track_entry_impl.h>
+#include <wrappers.h>
 
 namespace media
 {
@@ -68,22 +78,6 @@ class SerializerManagerImpl
 };
 
 typedef common::Singleton<SerializerManagerImpl> SerializerManagerSingleton;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Wrappers for objects creation
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class Wrappers
-{
-  public:
-    template <class Ret, class T>
-    static Ret Wrap (T* ptr)
-    {
-      if (!ptr)
-        throw xtl::format_operation_exception ("media::spine::Wrappers::Wrap", "Attempt to wrap null internal object of type '%s'", typeid (T).name ());
-
-      return Ret (ptr);
-    }
-};
 
 }
 

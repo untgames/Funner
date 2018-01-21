@@ -59,13 +59,13 @@ class Skeleton
 ///Work with slots
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int               SlotsCount () const;
-          media::spine::Slot&  Slot       (unsigned int index);         //slots are sorted in draw order
-    const media::spine::Slot&  Slot       (unsigned int index) const;   //slots are sorted in draw order
+          media::spine::Slot&  Slot       (unsigned int index);
+    const media::spine::Slot&  Slot       (unsigned int index) const;
           media::spine::Slot*  FindSlot   (const char* name);
     const media::spine::Slot*  FindSlot   (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Rendering
+///Rendering. Meshes are sorted in draw order
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int    MeshesCount () const;
     geometry::Mesh  Mesh        (unsigned int mesh_index) const;
@@ -75,8 +75,8 @@ class Skeleton
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Skin          () const;  //may be 0
-    void        SetSkin       (const char* skin_name = 0);
-    bool        SetAttachment (const char* slot_name, const char* attachment_name = 0);
+    bool        SetSkin       (const char* skin_name = 0);
+    bool        SetAttachment (const char* slot_name, const char* attachment_name = 0); //Returns false if the slot or attachment was not found.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Update transform after animation/bones manipulation

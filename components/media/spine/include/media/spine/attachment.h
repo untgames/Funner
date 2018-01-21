@@ -17,12 +17,13 @@ class Wrappers;
 //Possible attachment types (some types can be casted to inherited classes)
 enum AttachmentType
 {
+  AttachmentType_Unknown,
   AttachmentType_Region,
   AttachmentType_BoundingBox,
   AttachmentType_Mesh,
   AttachmentType_LinkedMesh,
   AttachmentType_Path,
-  AttachmentType_Point,       //attachment of this type can be casted to PointAttachment class
+  AttachmentType_Point,       //data specific for attachment of this type can be fetched via AttachmentData method
   AttachmentType_Clipping
 };
 
@@ -31,6 +32,7 @@ enum AttachmentType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class PointAttachmentData
 {
+  friend class Wrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructors / destructor / assignment
@@ -85,18 +87,24 @@ class Attachment
     const char* Name () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Get Type and type-specific data.
+///Get Type and type-specific data. Returned object is owned by callee.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     AttachmentType Type () const;
 
-    template <class T> const T* AttachmentData () const;
-    template <class T>       T* AttachmentData ();
-    template <class T>       T  AttachmentData () const;   //throws exception in case of type mismatch
+    template <class T> const T* AttachmentData    () const;
+    template <class T>       T* AttachmentData    ();
+    template <class T>       T  GetAttachmentData () const;   //throws exception in case of type mismatch
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (Attachment&);
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Helper method for AttachmentData method implementation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const void* TypeSpecificData () const;
 
   protected:
     Attachment (AttachmentImpl*);
@@ -109,6 +117,8 @@ class Attachment
 ///Swap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Attachment&, Attachment&);
+
+#include <media/spine/detail/attachment.inl>
 
 }
 

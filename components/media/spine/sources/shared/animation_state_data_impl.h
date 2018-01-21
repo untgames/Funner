@@ -31,8 +31,8 @@ class AnimationStateDataImpl : virtual public IObject
     virtual float DefaultMix    () = 0;
     virtual void  SetDefaultMix (float default_mix) = 0;
 
-    virtual float GetMix (const char* animation_form, const char* animation_to) = 0;
-    virtual void  SetMix (const char* animation_form, const char* animation_to, float mix) = 0;
+    virtual float GetMix (const char* animation_from, const char* animation_to) = 0;
+    virtual void  SetMix (const char* animation_from, const char* animation_to, float mix) = 0;
 };
 
 }

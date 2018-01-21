@@ -46,6 +46,11 @@ float TrackEntry::Duration () const
   return impl->Duration ();
 }
 
+unsigned int TrackEntry::TrackIndex () const
+{
+  return impl->TrackIndex ();
+}
+
 float TrackEntry::Alpha () const
 {
   return impl->Alpha ();
@@ -101,9 +106,9 @@ bool TrackEntry::IsLooping () const
   return impl->IsLooping ();
 }
 
-void TrackEntry::SetLooping (bool delay)
+void TrackEntry::SetLooping (bool is_looping)
 {
-  impl->SetLooping (delay);
+  impl->SetLooping (is_looping);
 }
 
 float TrackEntry::TimeScale () const
@@ -152,16 +157,12 @@ void TrackEntry::SetMixTime (float mix_time)
 
 TrackEntry* TrackEntry::MixingFrom () const
 {
-  //TODO
-
-  return 0;
+  return impl->MixingFrom ();
 }
 
 TrackEntry* TrackEntry::Next () const
 {
-  //TODO
-
-  return 0;
+  return impl->Next ();
 }
 
 /*
@@ -185,15 +186,6 @@ xtl::connection TrackEntry::RegisterEventHandler (AnimationEvent event, const An
 xtl::connection TrackEntry::RegisterEventHandler (const UserEventHandler& handler) const
 {
   return impl->RegisterEventHandler (handler);
-}
-
-/*
-   Update (only positive dt allowed)
-*/
-
-void TrackEntry::Update (float dt)
-{
-  impl->Update (dt);
 }
 
 /*

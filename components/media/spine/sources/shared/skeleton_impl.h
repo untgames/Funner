@@ -1,6 +1,10 @@
 #ifndef MEDIALIB_SPINE_SHARED_SKELETON_HEADER
 #define MEDIALIB_SPINE_SHARED_SKELETON_HEADER
 
+#include <stl/vector>
+
+#include <xtl/shared_ptr.h>
+
 #include <media/spine/skeleton.h>
 
 #include <object.h>
@@ -12,6 +16,7 @@ namespace spine
 {
 
 //forward declarations
+class AnimationStateImpl;
 class BoneImpl;
 class MaterialImpl;
 class SlotImpl;
@@ -26,21 +31,25 @@ class SkeletonImpl : virtual public IObject
 ///Animating
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void SetToSetupPose      () = 0;
-    virtual void ApplyAnimationState (const AnimationState& animation) = 0;
+    virtual void ApplyAnimationState (AnimationStateImpl* animation) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with bones
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual BoneImpl* RootBone () = 0;
-
-    virtual BoneImpl* FindBone (const char* name) = 0;
+            Bone&        RootBone       ();
+            Bone&        Bone           (unsigned int index);
+    virtual unsigned int BonesCount     () = 0;
+    virtual BoneImpl*    CreateBoneImpl (unsigned int index) = 0;
+    virtual int          RootBoneIndex  () = 0;
+    virtual int          FindBoneIndex  (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with slots
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual unsigned int SlotsCount () = 0;
-    virtual SlotImpl*    Slot       (unsigned int index) = 0;
-    virtual SlotImpl*    FindSlot   (const char* name) = 0;
+    virtual unsigned int        SlotsCount     () = 0;
+            media::spine::Slot& Slot           (unsigned int index);
+    virtual SlotImpl*           CreateSlotImpl (unsigned int index) = 0;
+    virtual int                 FindSlotIndex  (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Rendering
@@ -53,13 +62,30 @@ class SkeletonImpl : virtual public IObject
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const char* Skin          () = 0;
-    virtual void        SetSkin       (const char* skin_name) = 0;
+    virtual bool        SetSkin       (const char* skin_name) = 0;
     virtual bool        SetAttachment (const char* slot_name, const char* attachment_name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Update transform after animation/bones manipulation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void UpdateWorldTransform () = 0;
+
+  protected:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Setup methods
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ResizeSlots (unsigned int size);
+    void ResizeBones (unsigned int size);
+
+  private:
+    typedef xtl::shared_ptr<media::spine::Slot> SlotPtr;
+    typedef xtl::shared_ptr<media::spine::Bone> BonePtr;
+    typedef stl::vector<SlotPtr>                SlotsArray;
+    typedef stl::vector<BonePtr>                BonesArray;
+
+  private:
+    BonesArray bones;
+    SlotsArray slots;
 };
 
 }

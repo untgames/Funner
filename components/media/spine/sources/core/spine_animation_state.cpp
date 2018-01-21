@@ -38,6 +38,9 @@ AnimationState& AnimationState::operator = (const AnimationState& source)
 
 TrackEntry AnimationState::SetAnimation (unsigned int track, const char* animation, bool looped)
 {
+  if (!animation)
+    throw xtl::make_null_argument_exception ("media::spine::AnimationState::SetAnimation", "animation");
+
   return Wrappers::Wrap<media::spine::TrackEntry, TrackEntryImpl> (impl->SetAnimation (track, animation, looped));
 }
 
@@ -46,19 +49,27 @@ TrackEntry AnimationState::SetEmptyAnimation (unsigned int track, float mix_dura
   return Wrappers::Wrap<media::spine::TrackEntry, TrackEntryImpl> (impl->SetEmptyAnimation (track, mix_duration));
 }
 
-TrackEntry AnimationState::SetEmptyAnimations (float mix_duration)
+void AnimationState::SetEmptyAnimations (float mix_duration)
 {
-  return Wrappers::Wrap<media::spine::TrackEntry, TrackEntryImpl> (impl->SetEmptyAnimations (mix_duration));
+  impl->SetEmptyAnimations (mix_duration);
 }
 
 TrackEntry AnimationState::EnqueueAnimation (unsigned int track, const char* animation, bool looped, float delay)
 {
+  if (!animation)
+    throw xtl::make_null_argument_exception ("media::spine::AnimationState::EnqueueAnimation", "animation");
+
   return Wrappers::Wrap<media::spine::TrackEntry, TrackEntryImpl> (impl->EnqueueAnimation (track, animation, looped, delay));
 }
 
 TrackEntry AnimationState::EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay)
 {
   return Wrappers::Wrap<media::spine::TrackEntry, TrackEntryImpl> (impl->EnqueueEmptyAnimation (track, mix_duration, delay));
+}
+
+unsigned int AnimationState::TracksCount () const
+{
+  return impl->TracksCount ();
 }
 
 void AnimationState::ClearTracks ()
