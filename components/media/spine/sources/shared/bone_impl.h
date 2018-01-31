@@ -65,11 +65,11 @@ class BoneImpl : virtual public IObject
             Bone&        Child            (unsigned int index);
     virtual BoneImpl*    CreateChildImpl  (unsigned int index) = 0;
 
-  protected: //TODO private
+  private:
     typedef xtl::shared_ptr<media::spine::Bone> BonePtr;
     typedef stl::vector<BonePtr>                BonesArray;
 
-  protected: //TODO private
+  private:
     BonePtr    parent;
     BonesArray children;
 };

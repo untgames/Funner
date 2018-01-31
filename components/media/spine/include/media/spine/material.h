@@ -24,7 +24,7 @@ enum BlendMode
 enum TexcoordWrap
 {
   TexcoordWrap_MirroredRepeat,
-  TexcoordWrap_ClampToEdfe,
+  TexcoordWrap_ClampToEdge,
   TexcoordWrap_Repeat
 };
 
@@ -51,9 +51,10 @@ class Material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BlendMode    BlendMode    () const;
-    TexcoordWrap TexcoordWrap () const;
-    const char*  TexturePath  () const;
+    BlendMode    BlendMode     () const;
+    TexcoordWrap TexcoordWrapU () const;
+    TexcoordWrap TexcoordWrapV () const;
+    const char*  TexturePath   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Swap

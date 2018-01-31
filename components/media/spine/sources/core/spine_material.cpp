@@ -50,9 +50,14 @@ BlendMode Material::BlendMode () const
   return impl->BlendMode ();
 }
 
-TexcoordWrap Material::TexcoordWrap () const
+TexcoordWrap Material::TexcoordWrapU () const
 {
-  return impl->TexcoordWrap ();
+  return impl->TexcoordWrapU ();
+}
+
+TexcoordWrap Material::TexcoordWrapV () const
+{
+  return impl->TexcoordWrapV ();
 }
 
 const char* Material::TexturePath () const

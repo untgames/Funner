@@ -29,6 +29,8 @@ void SkeletonSpineImpl::ApplyAnimationState (media::spine::AnimationStateImpl* a
 {
   //we do not need return value, it indicate if animation state was applied or not (because of track not started yet for example)
   spAnimationState_apply (((AnimationStateSpineImpl*)animation)->NativeHandle (), skeleton->NativeHandle ());
+
+  //do not need to invalidate mesh, because geometry will be modified only after updating world transform
 }
 
 /*
@@ -72,6 +74,11 @@ unsigned int SkeletonSpineImpl::SlotsCount ()
   return skeleton->NativeHandle ()->slotsCount;
 }
 
+media::spine::SlotImpl* SkeletonSpineImpl::CreateSlotForDrawOrder (unsigned int index)
+{
+  return new SlotSpineImpl (atlas, skeleton_data, skeleton, skeleton->NativeHandle ()->drawOrder [index]);
+}
+
 media::spine::SlotImpl* SkeletonSpineImpl::CreateSlotImpl (unsigned int index)
 {
   return new SlotSpineImpl (atlas, skeleton_data, skeleton, skeleton->NativeHandle ()->slots [index]);
@@ -86,23 +93,6 @@ int SkeletonSpineImpl::FindSlotIndex (const char* name)
    Rendering
 */
 
-unsigned int SkeletonSpineImpl::MeshesCount ()
-{
-  //TODO
-  return 0;
-}
-
-media::geometry::Mesh SkeletonSpineImpl::Mesh (unsigned int mesh_index)
-{
-  //TODO
-  throw xtl::make_not_implemented_exception ("");
-}
-
-media::spine::MaterialImpl* SkeletonSpineImpl::Material (const char* name)
-{
-  //TODO
-  return 0;
-}
 
 /*
    Change skin (use 0 to set default skin)
@@ -115,11 +105,15 @@ const char* SkeletonSpineImpl::Skin ()
 
 bool SkeletonSpineImpl::SetSkin (const char* skin_name)
 {
+  InvalidateMeshes ();
+
   return spSkeleton_setSkinByName (skeleton->NativeHandle (), skin_name);
 }
 
 bool SkeletonSpineImpl::SetAttachment (const char* slot_name, const char* attachment_name)
 {
+  InvalidateMeshes ();
+
   return spSkeleton_setAttachment (skeleton->NativeHandle (), slot_name, attachment_name);
 }
 
@@ -130,4 +124,15 @@ bool SkeletonSpineImpl::SetAttachment (const char* slot_name, const char* attach
 void SkeletonSpineImpl::UpdateWorldTransform ()
 {
   spSkeleton_updateWorldTransform (skeleton->NativeHandle ());
+
+  InvalidateMeshes ();
+}
+
+/*
+   Helper methods
+*/
+
+media::spine::MaterialImpl* SkeletonSpineImpl::CreateMaterialImpl (const char* material_name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v)
+{
+  return new MaterialSpineImpl (material_name, texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v);
 }

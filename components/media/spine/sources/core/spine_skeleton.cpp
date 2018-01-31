@@ -123,9 +123,9 @@ media::geometry::Mesh Skeleton::Mesh (unsigned int mesh_index) const
   return impl->Mesh (mesh_index);
 }
 
-Material Skeleton::Material (const char* name) const
+const Material& Skeleton::Material (const char* name) const
 {
-  return Wrappers::Wrap<media::spine::Material, MaterialImpl> (impl->Material (name));
+  return impl->Material (name);
 }
 
 /*

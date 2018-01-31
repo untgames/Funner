@@ -30,11 +30,15 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path)
 {
   //According to documentation this function should load a texture and store it and its size in the void* rendererObject, width and height fields of an spAtlasPage struct.
   //But texture size is loaded from atlas json by spline, so no need to load it here
+
+  //store texture path in rendering object
+  self->rendererObject = new stl::string (path);
 }
 
 void _spAtlasPage_disposeTexture (spAtlasPage* self)
 {
-  //do nothing
+  //delete texture path stored in rendererObject field
+  delete (stl::string*)self->rendererObject;
 }
 
 }

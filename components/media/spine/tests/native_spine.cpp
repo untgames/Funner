@@ -242,14 +242,14 @@ void print (spSlot* slot)
 
         printf ("positions:\n");
 
-        for (int i = 0; i < vertices_count; i++)
+        for (int i = 0; i < vertices_count; i += 2)
           printf (" %.2f x %.2f,", vertices_data [i], vertices_data [i + 1]);
 
         printf ("\n");
 
         printf ("uvs:\n");
 
-        for (int i = 0; i < vertices_count; i++)
+        for (int i = 0; i < vertices_count; i += 2)
           printf (" %.2f x %.2f,", mesh_attachment->uvs [i], mesh_attachment->uvs [i + 1]);
 
         printf ("\n");
@@ -311,6 +311,8 @@ int main ()
     print (skeleton_data);
 
     spSkeleton* skeleton = spSkeleton_create (skeleton_data);
+
+    spSkeleton_updateWorldTransform (skeleton);
 
     print (skeleton);
 

@@ -6,7 +6,9 @@
 #include <spine/Atlas.h>
 #include <spine/Attachment.h>
 #include <spine/Bone.h>
+#include <spine/MeshAttachment.h>
 #include <spine/PointAttachment.h>
+#include <spine/RegionAttachment.h>
 #include <spine/Skeleton.h>
 #include <spine/SkeletonBinary.h>
 #include <spine/SkeletonJson.h>
@@ -29,6 +31,7 @@
 #include "../shared/animation_state_impl.h"
 #include "../shared/attachment_impl.h"
 #include "../shared/bone_impl.h"
+#include "../shared/material_impl.h"
 #include "../shared/skeleton_data_impl.h"
 #include "../shared/skeleton_impl.h"
 #include "../shared/slot_impl.h"
@@ -183,16 +186,14 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with slots
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int            SlotsCount     ();
-    media::spine::SlotImpl* CreateSlotImpl (unsigned int index);
-    int                     FindSlotIndex  (const char* name);
+    unsigned int            SlotsCount             ();
+    media::spine::SlotImpl* CreateSlotForDrawOrder (unsigned int index);
+    media::spine::SlotImpl* CreateSlotImpl         (unsigned int index);
+    int                     FindSlotIndex          (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Rendering
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int                MeshesCount ();
-    media::geometry::Mesh       Mesh        (unsigned int mesh_index);
-    media::spine::MaterialImpl* Material    (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
@@ -205,6 +206,12 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
 ///Update transform after animation/bones manipulation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateWorldTransform ();
+
+  protected:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Helper methods
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    media::spine::MaterialImpl* CreateMaterialImpl (const char* material_name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v);
 
   private:
     SpineAtlasPtr        atlas;          //skeleton should hold atlas object
@@ -234,6 +241,7 @@ class SlotSpineImpl : public Object, public media::spine::SlotImpl
 ///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     math::vec4f             Color          ();
+    media::spine::BlendMode BlendMode      ();
     bool                    HasBone        ();
     media::spine::BoneImpl* CreateBoneImpl ();
 
@@ -243,6 +251,11 @@ class SlotSpineImpl : public Object, public media::spine::SlotImpl
     bool                          HasAttachment        ();
     const char*                   AttachmentName       ();
     media::spine::AttachmentImpl* CreateAttachmentImpl ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Native spine handle
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ::SPINE_NAMESPACE_NAME::spSlot* NativeHandle () { return slot; }
 
   private:
     SpineAtlasPtr                   atlas;          //slot should hold atlas object
@@ -268,11 +281,24 @@ class AttachmentSpineImpl : public Object, public media::spine::AttachmentImpl
     const char* Name ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Params
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char*                TexturePath   ();
+    media::spine::TexcoordWrap TexcoordWrapU ();
+    media::spine::TexcoordWrap TexcoordWrapV ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Get Type and type-specific data.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     media::spine::AttachmentType Type ();
 
     media::spine::PointAttachmentDataImpl* CreatePointAttachmentDataImpl ();
+    math::vec4f                            Color                         ();
+    unsigned int                           VerticesCount                 ();
+    unsigned int                           TrianglesCount                ();
+    void                                   ComputeWorldVertices          (media::spine::SlotImpl* slot, float* vertices, int offset, int stride);
+    const float*                           Texcoords                     ();
+    const uint16_t*                        Indices                       ();
 
   private:
     SpineAtlasPtr                         atlas;          //attachment should hold atlas object
@@ -542,6 +568,20 @@ class AnimationStateSpineImpl : public Object, public media::spine::AnimationSta
     SpineAnimationStateDataPtr animation_state_data;   //animation state should hold animation state data object
     SpineAnimationStatePtr     animation_state;
     TrackEntryList             active_tracks;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Material implementation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MaterialSpineImpl : public Object, public media::spine::MaterialImpl
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Constructor
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    MaterialSpineImpl (const char* name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v)
+      : media::spine::MaterialImpl (name, texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v)
+      {}
 };
 
 }

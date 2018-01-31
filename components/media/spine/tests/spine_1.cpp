@@ -171,17 +171,57 @@ void print (const Skeleton& skeleton)
       const media::geometry::Primitive& primitive = mesh.Primitive (j);
 
       printf ("          type '%s'\n", get_type_name (primitive.type));
+      printf ("          first %u\n", primitive.first);
       printf ("          count %u\n", primitive.count);
+      printf ("          base vertex %u\n", primitive.base_vertex);
       printf ("          material '%s':\n", primitive.material);
 
-      Material material = skeleton.Material (primitive.material);
+      const Material& material = skeleton.Material (primitive.material);
 
       printf ("            blend mode %d\n", material.BlendMode ());
-      printf ("            texcoord wrap %d\n", material.TexcoordWrap ());
+      printf ("            texcoord wrap u %d\n", material.TexcoordWrapU ());
+      printf ("            texcoord wrap v %d\n", material.TexcoordWrapV ());
       printf ("            texture path '%s'\n", material.TexturePath ());
     }
 
-    //TODO print other mesh params
+    const media::geometry::IndexBuffer& index_buffer = mesh.IndexBuffer ();
+
+    if (index_buffer.DataType () != media::geometry::IndexType_UInt16)
+    {
+      printf ("Can't print index buffer, unsupported data type %d\n", index_buffer.DataType ());
+      continue;
+    }
+
+    printf ("      index buffer (count %u):", index_buffer.Size ());
+
+//    const uint16_t* indices = (const uint16_t*)index_buffer.Data ();
+    const uint16_t* indices = index_buffer.Data<uint16_t> ();         ///TODO ??????????
+
+    for (unsigned int k = 0, indices_count = index_buffer.Size (); k < indices_count; k++)
+      printf (" %d", (int)indices [k]);
+
+    printf ("\n");
+
+    const media::geometry::VertexBuffer& vertex_buffer = mesh.VertexBuffer (0);
+
+    printf ("      vertex buffer (streams count %u):\n", vertex_buffer.StreamsCount ());
+
+    for (unsigned int j = 0, streams_count = vertex_buffer.StreamsCount (); j < streams_count; j++)
+    {
+      const media::geometry::VertexStream& vertex_stream = vertex_buffer.Stream (j);
+
+      printf ("        vertex stream %u - vertex size %u, vertices count %u:", j, vertex_stream.VertexSize (), vertex_stream.Size ());
+
+      unsigned int vertex_elements = vertex_stream.VertexSize () / sizeof (float);
+      float*       elements        = (float*)vertex_stream.Data ();
+
+      for (unsigned int k = 0, elements_count = vertex_stream.Size () * vertex_elements; k < elements_count; k++)
+      {
+        printf (" %.2f", elements [k]);
+      }
+
+      printf ("\n");
+    }
   }
 
   printf ("  skin '%s'\n", skeleton.Skin () ? skeleton.Skin () : "null");

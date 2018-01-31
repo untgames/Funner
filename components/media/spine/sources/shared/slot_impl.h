@@ -5,6 +5,7 @@
 
 #include <media/spine/attachment.h>
 #include <media/spine/bone.h>
+#include <media/spine/material.h>
 #include <media/spine/slot.h>
 
 #include <object.h>
@@ -33,6 +34,7 @@ class SlotImpl : virtual public IObject
 ///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual math::vec4f             Color          () = 0;
+    virtual BlendMode               BlendMode      () = 0;
             media::spine::Bone*     Bone           ();
     virtual bool                    HasBone        () = 0;
     virtual media::spine::BoneImpl* CreateBoneImpl () = 0;

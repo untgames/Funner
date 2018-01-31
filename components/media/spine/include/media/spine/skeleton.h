@@ -69,7 +69,7 @@ class Skeleton
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned int    MeshesCount () const;
     geometry::Mesh  Mesh        (unsigned int mesh_index) const;
-    Material        Material    (const char* name) const;
+    const Material& Material    (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)

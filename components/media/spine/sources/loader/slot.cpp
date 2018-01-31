@@ -32,6 +32,23 @@ math::vec4f SlotSpineImpl::Color ()
   return math::vec4f (slot->color.r, slot->color.g, slot->color.b, slot->color.a);
 }
 
+media::spine::BlendMode SlotSpineImpl::BlendMode ()
+{
+  switch (slot->data->blendMode)
+  {
+    case SP_BLEND_MODE_NORMAL:
+      return media::spine::BlendMode_Normal;
+    case SP_BLEND_MODE_ADDITIVE:
+      return media::spine::BlendMode_Additive;
+    case SP_BLEND_MODE_MULTIPLY:
+      return media::spine::BlendMode_Multiply;
+    case SP_BLEND_MODE_SCREEN:
+      return media::spine::BlendMode_Screen;
+    default:
+      throw xtl::format_operation_exception ("media::spine::SlotSpineImpl::BlendMode", "Unknown blend mode %d", slot->data->blendMode);
+  }
+}
+
 bool SlotSpineImpl::HasBone ()
 {
   return slot->bone;
