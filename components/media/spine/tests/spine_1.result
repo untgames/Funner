@@ -1,0 +1,331 @@
+Results of spine_1 test:
+Testing spine file 'data/vine/vine.skel':
+common.ComponentManager: Load components 'media.spine.loaders.*'
+common.ComponentManager: ...load components 'common.licensing.loaders.*'
+common.ComponentManager: ...load component 'common.licensing.loaders.AutoLicenseGenerator'
+common.ComponentManager: ...load components 'common.file_systems.*'
+common.ComponentManager: ...load component 'common.file_systems.StandardFilePathsMount'
+common.ComponentManager: ...load components 'common.parsers.*'
+common.ComponentManager: ...load component 'common.parsers.xml'
+common.ComponentManager: ...load component 'media.spine.loaders.SpineLoader_3_6'
+common.ComponentManager: ...components loaded successfully
+Exception while testing spine file 'data/vine/vine.skel': 'Couldn't find spine loader for binary format version '3.4'
+    at media::spine::SkeletonData::Load
+    at media::spine::SkeletonData::SkeletonData (const char*, const char*)'
+Testing spine file 'data/vine/vine.json':
+media.spine.SpineSkeletonData: Couldn't find spine loader for version '3.4', try to load with latest available
+Skeleton Data:
+  Size 227.32 x 841.06
+  Animations (count 1):
+    animation 'animation' duration 11.43
+  Default skin 'default'
+  Skins (count 1):
+    'default'
+Skeleton:
+  slots (count 2):
+    slot 'vine-path':
+      color 1.00 1.00 1.00 1.00
+      bone name 'root'
+      attachment type 5
+      no attachment specific data
+    slot 'vine':
+      color 1.00 1.00 1.00 1.00
+      bone name 'vine1'
+      attachment type 3
+      no attachment specific data
+  bones:    bone 'root':
+      has parent n
+      transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 0.00 x 0.00
+      world transform: rotation 0.00 x 90.00, scale 1.00 x 1.00, translation 0.00 x 0.00
+      children bones (count 2):
+        bone 'vine1':
+          has parent y
+          transform: rotation 90.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 339.09 x -467.15
+          world transform: rotation 86.29 x 176.29, scale 0.92 x 1.00, translation 4.01 x -0.32
+          children bones (count 12):
+            bone 'vine2':
+              has parent y
+              transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 74.00 x 0.00
+              world transform: rotation 125.23 x -144.77, scale 1.02 x 1.00, translation 8.41 x 67.54
+            bone 'vine3':
+              has parent y
+              transform: rotation 38.94, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 137.97 x 47.51
+              world transform: rotation 102.95 x -167.05, scale 0.99 x 1.00, translation -35.20 x 129.28
+            bone 'vine4':
+              has parent y
+              transform: rotation 16.67, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 214.29 x 68.52
+              world transform: rotation 64.55 x 154.55, scale 1.01 x 1.00, translation -51.61 x 200.63
+            bone 'vine5':
+              has parent y
+              transform: rotation -21.73, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 289.61 x 40.92
+              world transform: rotation 36.24 x 126.24, scale 1.00 x 1.00, translation -19.59 x 267.92
+            bone 'vine6':
+              has parent y
+              transform: rotation -50.04, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 341.12 x -15.58
+              world transform: rotation 47.05 x 137.05, scale 0.99 x 1.00, translation 39.87 x 311.50
+            bone 'vine7':
+              has parent y
+              transform: rotation -39.25, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 402.70 x -61.82
+              world transform: rotation 80.11 x 170.11, scale 1.01 x 1.00, translation 89.66 x 364.98
+            bone 'vine8':
+              has parent y
+              transform: rotation -6.18, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 483.27 x -69.84
+              world transform: rotation 113.41 x -156.59, scale 0.99 x 1.00, translation 102.45 x 438.35
+            bone 'vine9':
+              has parent y
+              transform: rotation 27.11, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 554.25 x -36.44
+              world transform: rotation 134.29 x -135.71, scale 1.01 x 1.00, translation 73.33 x 505.60
+            bone 'vine10':
+              has parent y
+              transform: rotation 48.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 608.62 x 19.05
+              world transform: rotation 125.98 x -144.02, scale 1.00 x 1.00, translation 21.18 x 559.05
+            bone 'vine11':
+              has parent y
+              transform: rotation 39.70, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 670.66 x 66.39
+              world transform: rotation 97.00 x -173.00, scale 1.00 x 1.00, translation -22.36 x 619.02
+            bone 'vine12':
+              has parent y
+              transform: rotation 10.72, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 750.09 x 80.23
+              world transform: rotation 67.83 x 157.83, scale 0.99 x 1.00, translation -31.41 x 692.76
+            bone 'vine13':
+              has parent y
+              transform: rotation -18.44, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 826.06 x 56.95
+              world transform: rotation 64.03 x 154.03, scale 0.98 x 1.00, translation -3.64 x 760.91
+        bone 'vine-control1':
+          has parent y
+          transform: rotation 88.64, scale 1.00 x 1.00, shear 0.00 x 0.00, translation -2.50 x 2.55
+          world transform: rotation 88.64 x 178.64, scale 1.00 x 1.00, translation -2.50 x 2.55
+          children bones (count 1):
+            bone 'vine-control2':
+              has parent y
+              transform: rotation 0.96, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 296.68 x 0.00
+              world transform: rotation 89.60 x 179.60, scale 1.00 x 1.00, translation 4.54 x 299.15
+              children bones (count 1):
+                bone 'vine-control3':
+                  has parent y
+                  transform: rotation 0.16, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 292.59 x 0.00
+                  world transform: rotation 89.76 x 179.76, scale 1.00 x 1.00, translation 6.58 x 591.73
+                  children bones (count 1):
+                    bone 'vine-control4':
+                      has parent y
+                      transform: rotation 0.50, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 247.50 x 0.00
+                      world transform: rotation 90.26 x -179.74, scale 1.00 x 1.00, translation 7.62 x 839.23
+  meshes (count 1):
+    mesh 0:
+      primitives (count 1):
+        primitive 0:
+          type 'triangle_list'
+          first 0
+          count 104
+          base vertex 0
+          material 'spine_data/vine/vine.png_0_1_1':
+            blend mode 0
+            texcoord wrap u 1
+            texcoord wrap v 1
+            texture path 'data/vine/vine.png'
+      index buffer (count 312): 55 0 1 56 1 2 55 1 56 56 2 3 54 55 56 57 56 3 57 3 4 53 54 57 58 57 4 53 57 58 58 4 5 52 53 58 59 58 5 54 56 57 52 58 59 59 5 6 51 52 59 60 59 6 51 59 60 60 6 7 50 51 60 61 60 7 50 60 61 61 7 8 49 50 61 62 61 8 49 61 62 62 8 9 48 49 62 63 62 9 48 62 63 63 9 10 47 48 63 64 63 10 47 63 64 64 10 11 46 47 64 65 64 11 46 64 65 65 11 12 45 46 65 66 65 12 45 65 66 66 12 13 44 45 66 67 66 13 44 66 67 67 13 14 43 44 67 68 67 14 43 67 68 68 14 15 42 43 68 69 68 15 42 68 69 69 15 16 41 42 69 70 69 16 41 69 70 70 16 17 40 41 70 71 70 17 40 70 71 71 17 18 39 40 71 72 71 18 39 71 72 72 18 19 38 39 72 73 72 19 38 72 73 73 19 20 37 38 73 74 73 20 37 73 74 74 20 21 36 37 74 75 74 21 36 74 75 75 21 22 35 36 75 76 75 22 35 75 76 76 22 23 34 35 76 77 76 23 34 76 77 77 23 24 33 77 78 78 24 25 32 33 78 79 78 25 32 78 79 33 34 77 78 77 24 31 32 79 80 79 26 31 79 80 80 26 27 30 31 80 29 80 27 30 80 29 29 27 28 79 25 26
+      vertex buffer (streams count 2):
+        vertex stream 0 - vertex size 8, vertices count 81: -5.57 839.34 26.17 825.00 56.06 811.11 38.94 779.39 20.80 748.78 4.56 718.87 -5.05 689.15 -4.97 659.05 5.25 630.83 25.24 604.53 52.00 578.89 81.97 551.16 110.10 517.82 130.86 477.93 140.39 432.83 136.20 387.22 118.95 346.27 91.67 314.11 59.09 290.01 26.67 270.75 -0.37 250.64 -18.62 226.21 -24.95 199.19 -18.07 170.03 -0.42 140.02 22.04 107.91 38.85 72.25 43.87 34.78 42.52 -1.34 7.57 -1.70 -24.01 -1.67 -21.40 29.87 -24.02 58.44 -38.78 86.02 -61.11 117.20 -79.97 155.02 -86.93 197.98 -78.14 242.13 -55.25 281.53 -23.04 312.42 11.33 335.57 41.74 356.41 64.45 379.18 76.71 405.58 78.46 434.98 69.70 463.52 51.83 490.19 27.05 514.54 -1.69 539.33 -30.02 568.18 -53.23 603.05 -66.96 644.27 -68.84 688.36 -59.13 731.37 -42.05 770.33 -23.09 805.84 9.08 792.47 -8.98 759.55 -25.86 725.38 -35.63 689.22 -34.72 651.82 -23.34 616.87 -2.05 586.24 24.56 558.83 53.54 532.83 79.35 504.21 98.49 471.02 107.70 434.42 104.88 396.58 90.93 362.61 66.36 335.04 35.95 312.32 2.91 291.59 -26.18 266.29 -46.86 234.05 -55.08 198.43 -48.56 162.22 -31.14 128.31 -7.96 97.01 8.02 65.50 10.55 32.29
+        vertex stream 1 - vertex size 24, vertices count 81: 1.00 1.00 1.00 1.00 0.02 0.00 1.00 1.00 1.00 1.00 0.28 0.00 1.00 1.00 1.00 1.00 0.55 0.00 1.00 1.00 1.00 1.00 0.55 0.04 1.00 1.00 1.00 1.00 0.55 0.07 1.00 1.00 1.00 1.00 0.55 0.11 1.00 1.00 1.00 1.00 0.55 0.15 1.00 1.00 1.00 1.00 0.55 0.18 1.00 1.00 1.00 1.00 0.55 0.22 1.00 1.00 1.00 1.00 0.55 0.25 1.00 1.00 1.00 1.00 0.55 0.29 1.00 1.00 1.00 1.00 0.55 0.33 1.00 1.00 1.00 1.00 0.55 0.36 1.00 1.00 1.00 1.00 0.55 0.40 1.00 1.00 1.00 1.00 0.55 0.44 1.00 1.00 1.00 1.00 0.55 0.47 1.00 1.00 1.00 1.00 0.55 0.51 1.00 1.00 1.00 1.00 0.55 0.54 1.00 1.00 1.00 1.00 0.55 0.58 1.00 1.00 1.00 1.00 0.55 0.62 1.00 1.00 1.00 1.00 0.55 0.65 1.00 1.00 1.00 1.00 0.55 0.69 1.00 1.00 1.00 1.00 0.55 0.72 1.00 1.00 1.00 1.00 0.55 0.76 1.00 1.00 1.00 1.00 0.55 0.80 1.00 1.00 1.00 1.00 0.55 0.83 1.00 1.00 1.00 1.00 0.55 0.87 1.00 1.00 1.00 1.00 0.55 0.91 1.00 1.00 1.00 1.00 0.55 0.94 1.00 1.00 1.00 1.00 0.28 0.94 1.00 1.00 1.00 1.00 0.02 0.94 1.00 1.00 1.00 1.00 0.02 0.91 1.00 1.00 1.00 1.00 0.02 0.87 1.00 1.00 1.00 1.00 0.02 0.83 1.00 1.00 1.00 1.00 0.02 0.80 1.00 1.00 1.00 1.00 0.02 0.76 1.00 1.00 1.00 1.00 0.02 0.72 1.00 1.00 1.00 1.00 0.02 0.69 1.00 1.00 1.00 1.00 0.02 0.65 1.00 1.00 1.00 1.00 0.02 0.62 1.00 1.00 1.00 1.00 0.02 0.58 1.00 1.00 1.00 1.00 0.02 0.54 1.00 1.00 1.00 1.00 0.02 0.51 1.00 1.00 1.00 1.00 0.02 0.47 1.00 1.00 1.00 1.00 0.02 0.44 1.00 1.00 1.00 1.00 0.02 0.40 1.00 1.00 1.00 1.00 0.02 0.36 1.00 1.00 1.00 1.00 0.02 0.33 1.00 1.00 1.00 1.00 0.02 0.29 1.00 1.00 1.00 1.00 0.02 0.25 1.00 1.00 1.00 1.00 0.02 0.22 1.00 1.00 1.00 1.00 0.02 0.18 1.00 1.00 1.00 1.00 0.02 0.15 1.00 1.00 1.00 1.00 0.02 0.11 1.00 1.00 1.00 1.00 0.02 0.07 1.00 1.00 1.00 1.00 0.02 0.04 1.00 1.00 1.00 1.00 0.28 0.04 1.00 1.00 1.00 1.00 0.28 0.07 1.00 1.00 1.00 1.00 0.28 0.11 1.00 1.00 1.00 1.00 0.28 0.15 1.00 1.00 1.00 1.00 0.28 0.18 1.00 1.00 1.00 1.00 0.28 0.22 1.00 1.00 1.00 1.00 0.28 0.25 1.00 1.00 1.00 1.00 0.28 0.29 1.00 1.00 1.00 1.00 0.28 0.33 1.00 1.00 1.00 1.00 0.28 0.36 1.00 1.00 1.00 1.00 0.28 0.40 1.00 1.00 1.00 1.00 0.28 0.44 1.00 1.00 1.00 1.00 0.28 0.47 1.00 1.00 1.00 1.00 0.28 0.51 1.00 1.00 1.00 1.00 0.28 0.54 1.00 1.00 1.00 1.00 0.28 0.58 1.00 1.00 1.00 1.00 0.28 0.62 1.00 1.00 1.00 1.00 0.28 0.65 1.00 1.00 1.00 1.00 0.28 0.69 1.00 1.00 1.00 1.00 0.28 0.72 1.00 1.00 1.00 1.00 0.28 0.76 1.00 1.00 1.00 1.00 0.28 0.80 1.00 1.00 1.00 1.00 0.28 0.83 1.00 1.00 1.00 1.00 0.28 0.87 1.00 1.00 1.00 1.00 0.28 0.91
+  skin 'null'
+Animation state data default mix time: 0.000000
+Animation event from source 'animation_state', event '0'
+Track entries before update:
+  is disposed n
+  animation      'animation'
+  duration        11.43
+  alpha           1.00
+  animation end   11.43
+  animation last  -1.00
+  animation start 0.00
+  delay           0.00
+  is looping      n
+  time scale      1.00
+  track time      0.00
+  mix duration    0.00
+  mix time        0.00
+  has mixing from n
+  has next        y
+  is disposed n
+  animation      '<empty>'
+  duration        0.00
+  alpha           1.00
+  animation end   0.00
+  animation last  -1.00
+  animation start 0.00
+  delay           11.33
+  is looping      n
+  time scale      1.00
+  track time      0.00
+  mix duration    0.10
+  mix time        0.00
+  has mixing from n
+  has next        n
+Track entries after update:
+  is disposed n
+  animation      'animation'
+  duration        11.43
+  alpha           1.00
+  animation end   11.43
+  animation last  -1.00
+  animation start 0.00
+  delay           0.00
+  is looping      n
+  time scale      1.00
+  track time      0.50
+  mix duration    0.00
+  mix time        0.00
+  has mixing from n
+  has next        y
+  is disposed n
+  animation      '<empty>'
+  duration        0.00
+  alpha           1.00
+  animation end   0.00
+  animation last  -1.00
+  animation start 0.00
+  delay           11.33
+  is looping      n
+  time scale      1.00
+  track time      0.00
+  mix duration    0.10
+  mix time        0.00
+  has mixing from n
+  has next        n
+After animation:
+Skeleton:
+  slots (count 2):
+    slot 'vine-path':
+      color 1.00 1.00 1.00 1.00
+      bone name 'root'
+      attachment type 5
+      no attachment specific data
+    slot 'vine':
+      color 1.00 0.80 0.46 1.00
+      bone name 'vine1'
+      attachment type 3
+      no attachment specific data
+  bones:    bone 'root':
+      has parent n
+      transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 0.00 x 0.00
+      world transform: rotation 0.00 x 90.00, scale 1.00 x 1.00, translation 0.00 x 0.00
+      children bones (count 2):
+        bone 'vine1':
+          has parent y
+          transform: rotation 90.00, scale 0.33 x 0.43, shear 0.00 x 0.00, translation 339.09 x -467.15
+          world transform: rotation 79.43 x 169.43, scale 0.33 x 0.43, translation 4.55 x 2.62
+          children bones (count 12):
+            bone 'vine2':
+              has parent y
+              transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 74.00 x 0.00
+              world transform: rotation 113.01 x -156.99, scale 0.33 x 0.43, translation 9.08 x 26.92
+            bone 'vine3':
+              has parent y
+              transform: rotation 38.94, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 137.97 x 47.51
+              world transform: rotation 139.25 x -145.74, scale 0.38 x 0.39, translation -0.36 x 49.15
+            bone 'vine4':
+              has parent y
+              transform: rotation 16.67, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 214.29 x 68.52
+              world transform: rotation 149.17 x -129.39, scale 0.34 x 0.42, translation -21.60 x 67.45
+            bone 'vine5':
+              has parent y
+              transform: rotation -21.73, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 289.61 x 40.92
+              world transform: rotation 150.92 x -108.42, scale 0.35 x 0.42, translation -43.52 x 80.53
+            bone 'vine6':
+              has parent y
+              transform: rotation -50.04, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 341.12 x -15.58
+              world transform: rotation 147.57 x -107.34, scale 0.40 x 0.37, translation -66.18 x 93.13
+            bone 'vine7':
+              has parent y
+              transform: rotation -39.25, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 402.70 x -61.82
+              world transform: rotation 137.97 x -117.01, scale 0.38 x 0.39, translation -91.09 x 108.96
+            bone 'vine8':
+              has parent y
+              transform: rotation -6.18, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 483.27 x -69.84
+              world transform: rotation 121.92 x -144.73, scale 0.33 x 0.43, translation -111.88 x 127.71
+            bone 'vine9':
+              has parent y
+              transform: rotation 27.11, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 554.25 x -36.44
+              world transform: rotation 101.83 x 179.31, scale 0.37 x 0.41, translation -124.85 x 148.53
+            bone 'vine10':
+              has parent y
+              transform: rotation 48.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 608.62 x 19.05
+              world transform: rotation 92.01 x 166.78, scale 0.38 x 0.38, translation -130.53 x 175.61
+            bone 'vine11':
+              has parent y
+              transform: rotation 39.70, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 670.66 x 66.39
+              world transform: rotation 81.38 x 156.31, scale 0.38 x 0.39, translation -131.52 x 203.77
+            bone 'vine12':
+              has parent y
+              transform: rotation 10.72, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 750.09 x 80.23
+              world transform: rotation 63.91 x 148.19, scale 0.33 x 0.43, translation -127.36 x 231.22
+            bone 'vine13':
+              has parent y
+              transform: rotation -18.44, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 826.06 x 56.95
+              world transform: rotation 44.14 x 143.48, scale 0.34 x 0.42, translation -116.54 x 253.31
+        bone 'vine-control1':
+          has parent y
+          transform: rotation 113.20, scale 1.00 x 0.99, shear 0.00 x 0.00, translation -2.50 x 2.55
+          world transform: rotation 113.20 x -156.80, scale 1.00 x 0.99, translation -2.50 x 2.55
+          children bones (count 1):
+            bone 'vine-control2':
+              has parent y
+              transform: rotation -31.28, scale 1.00 x 0.99, shear 0.00 x 0.00, translation 296.68 x 0.00
+              world transform: rotation 82.21 x 171.62, scale 1.00 x 0.98, translation -119.36 x 275.25
+              children bones (count 1):
+                bone 'vine-control3':
+                  has parent y
+                  transform: rotation 10.83, scale 1.00 x 0.99, shear 0.00 x 0.00, translation 292.59 x 0.00
+                  world transform: rotation 92.84 x -177.35, scale 1.00 x 0.97, translation -79.81 x 564.24
+                  children bones (count 1):
+                    bone 'vine-control4':
+                      has parent y
+                      transform: rotation -1.44, scale 1.00 x 0.99, shear 0.00 x 0.00, translation 247.50 x 0.00
+                      world transform: rotation 91.44 x -178.84, scale 1.00 x 0.96, translation -92.03 x 810.99
+  meshes (count 1):
+    mesh 0:
+      primitives (count 1):
+        primitive 0:
+          type 'triangle_list'
+          first 0
+          count 104
+          base vertex 0
+          material 'spine_data/vine/vine.png_0_1_1':
+            blend mode 0
+            texcoord wrap u 1
+            texcoord wrap v 1
+            texture path 'data/vine/vine.png'
+      index buffer (count 312): 55 0 1 56 1 2 55 1 56 56 2 3 54 55 56 57 56 3 57 3 4 53 54 57 58 57 4 53 57 58 58 4 5 52 53 58 59 58 5 54 56 57 52 58 59 59 5 6 51 52 59 60 59 6 51 59 60 60 6 7 50 51 60 61 60 7 50 60 61 61 7 8 49 50 61 62 61 8 49 61 62 62 8 9 48 49 62 63 62 9 48 62 63 63 9 10 47 48 63 64 63 10 47 63 64 64 10 11 46 47 64 65 64 11 46 64 65 65 11 12 45 46 65 66 65 12 45 65 66 66 12 13 44 45 66 67 66 13 44 66 67 67 13 14 43 44 67 68 67 14 43 67 68 68 14 15 42 43 68 69 68 15 42 68 69 69 15 16 41 42 69 70 69 16 41 69 70 70 16 17 40 41 70 71 70 17 40 70 71 71 17 18 39 40 71 72 71 18 39 71 72 72 18 19 38 39 72 73 72 19 38 72 73 73 19 20 37 38 73 74 73 20 37 73 74 74 20 21 36 37 74 75 74 21 36 74 75 75 21 22 35 36 75 76 75 22 35 75 76 76 22 23 34 35 76 77 76 23 34 76 77 77 23 24 33 77 78 78 24 25 32 33 78 79 78 25 32 78 79 33 34 77 78 77 24 31 32 79 80 79 26 31 79 80 80 26 27 30 31 80 29 80 27 30 80 29 29 27 28 79 25 26
+      vertex buffer (streams count 2):
+        vertex stream 0 - vertex size 8, vertices count 81: -112.52 279.77 -100.32 271.15 -89.14 263.22 -97.99 254.71 -105.96 245.96 -112.13 236.14 -116.47 225.00 -119.05 212.58 -120.15 199.59 -119.99 186.52 -118.90 174.00 -117.09 162.68 -114.39 153.21 -110.29 144.81 -104.39 136.65 -96.00 128.25 -85.45 119.97 -73.30 112.29 -60.54 105.40 -47.71 98.91 -34.67 92.23 -21.61 84.87 -8.40 76.22 4.14 66.15 14.42 54.59 20.95 41.65 23.60 27.67 22.71 13.62 20.37 0.46 5.54 2.12 -8.16 3.97 -5.57 15.24 -4.08 25.35 -5.73 34.64 -10.78 43.65 -19.05 51.94 -29.40 59.11 -40.03 64.77 -50.15 69.60 -60.05 74.46 -70.71 80.28 -82.66 87.49 -95.56 95.92 -108.40 105.46 -120.23 116.12 -130.26 128.14 -137.70 141.77 -142.50 157.40 -144.96 173.87 -145.71 190.34 -145.31 206.37 -143.80 221.95 -140.99 236.63 -136.47 249.79 -129.99 261.11 -121.61 270.84 -109.49 262.55 -117.69 253.35 -123.95 242.81 -128.37 230.72 -131.03 217.16 -132.34 202.99 -132.42 188.54 -131.48 174.14 -129.35 160.19 -125.64 147.62 -119.91 136.71 -112.06 126.64 -102.00 117.07 -90.42 108.10 -77.88 99.97 -65.58 92.82 -53.94 86.62 -42.63 80.75 -31.20 74.68 -19.46 67.51 -7.90 58.86 1.41 48.96 7.23 38.00 9.54 26.42 8.17 14.34
+        vertex stream 1 - vertex size 24, vertices count 81: 1.00 0.80 0.46 1.00 0.02 0.00 1.00 0.80 0.46 1.00 0.28 0.00 1.00 0.80 0.46 1.00 0.55 0.00 1.00 0.80 0.46 1.00 0.55 0.04 1.00 0.80 0.46 1.00 0.55 0.07 1.00 0.80 0.46 1.00 0.55 0.11 1.00 0.80 0.46 1.00 0.55 0.15 1.00 0.80 0.46 1.00 0.55 0.18 1.00 0.80 0.46 1.00 0.55 0.22 1.00 0.80 0.46 1.00 0.55 0.25 1.00 0.80 0.46 1.00 0.55 0.29 1.00 0.80 0.46 1.00 0.55 0.33 1.00 0.80 0.46 1.00 0.55 0.36 1.00 0.80 0.46 1.00 0.55 0.40 1.00 0.80 0.46 1.00 0.55 0.44 1.00 0.80 0.46 1.00 0.55 0.47 1.00 0.80 0.46 1.00 0.55 0.51 1.00 0.80 0.46 1.00 0.55 0.54 1.00 0.80 0.46 1.00 0.55 0.58 1.00 0.80 0.46 1.00 0.55 0.62 1.00 0.80 0.46 1.00 0.55 0.65 1.00 0.80 0.46 1.00 0.55 0.69 1.00 0.80 0.46 1.00 0.55 0.72 1.00 0.80 0.46 1.00 0.55 0.76 1.00 0.80 0.46 1.00 0.55 0.80 1.00 0.80 0.46 1.00 0.55 0.83 1.00 0.80 0.46 1.00 0.55 0.87 1.00 0.80 0.46 1.00 0.55 0.91 1.00 0.80 0.46 1.00 0.55 0.94 1.00 0.80 0.46 1.00 0.28 0.94 1.00 0.80 0.46 1.00 0.02 0.94 1.00 0.80 0.46 1.00 0.02 0.91 1.00 0.80 0.46 1.00 0.02 0.87 1.00 0.80 0.46 1.00 0.02 0.83 1.00 0.80 0.46 1.00 0.02 0.80 1.00 0.80 0.46 1.00 0.02 0.76 1.00 0.80 0.46 1.00 0.02 0.72 1.00 0.80 0.46 1.00 0.02 0.69 1.00 0.80 0.46 1.00 0.02 0.65 1.00 0.80 0.46 1.00 0.02 0.62 1.00 0.80 0.46 1.00 0.02 0.58 1.00 0.80 0.46 1.00 0.02 0.54 1.00 0.80 0.46 1.00 0.02 0.51 1.00 0.80 0.46 1.00 0.02 0.47 1.00 0.80 0.46 1.00 0.02 0.44 1.00 0.80 0.46 1.00 0.02 0.40 1.00 0.80 0.46 1.00 0.02 0.36 1.00 0.80 0.46 1.00 0.02 0.33 1.00 0.80 0.46 1.00 0.02 0.29 1.00 0.80 0.46 1.00 0.02 0.25 1.00 0.80 0.46 1.00 0.02 0.22 1.00 0.80 0.46 1.00 0.02 0.18 1.00 0.80 0.46 1.00 0.02 0.15 1.00 0.80 0.46 1.00 0.02 0.11 1.00 0.80 0.46 1.00 0.02 0.07 1.00 0.80 0.46 1.00 0.02 0.04 1.00 0.80 0.46 1.00 0.28 0.04 1.00 0.80 0.46 1.00 0.28 0.07 1.00 0.80 0.46 1.00 0.28 0.11 1.00 0.80 0.46 1.00 0.28 0.15 1.00 0.80 0.46 1.00 0.28 0.18 1.00 0.80 0.46 1.00 0.28 0.22 1.00 0.80 0.46 1.00 0.28 0.25 1.00 0.80 0.46 1.00 0.28 0.29 1.00 0.80 0.46 1.00 0.28 0.33 1.00 0.80 0.46 1.00 0.28 0.36 1.00 0.80 0.46 1.00 0.28 0.40 1.00 0.80 0.46 1.00 0.28 0.44 1.00 0.80 0.46 1.00 0.28 0.47 1.00 0.80 0.46 1.00 0.28 0.51 1.00 0.80 0.46 1.00 0.28 0.54 1.00 0.80 0.46 1.00 0.28 0.58 1.00 0.80 0.46 1.00 0.28 0.62 1.00 0.80 0.46 1.00 0.28 0.65 1.00 0.80 0.46 1.00 0.28 0.69 1.00 0.80 0.46 1.00 0.28 0.72 1.00 0.80 0.46 1.00 0.28 0.76 1.00 0.80 0.46 1.00 0.28 0.80 1.00 0.80 0.46 1.00 0.28 0.83 1.00 0.80 0.46 1.00 0.28 0.87 1.00 0.80 0.46 1.00 0.28 0.91
+  skin 'null'
+Animation event from source 'track_entry', event '3'
+Animation event from source 'animation_state', event '3'
+Animation event from source 'track_entry', event '1'
+Animation event from source 'animation_state', event '1'
+Animation event from source 'empty_animation_entry', event '0'
+Animation event from source 'animation_state', event '0'
+Animation event from source 'empty_animation_entry', event '3'
+Animation event from source 'animation_state', event '3'
+Animation event from source 'track_entry', event '2'
+Animation event from source 'animation_state', event '2'
+Animation event from source 'track_entry', event '4'
+Animation event from source 'animation_state', event '4'
+Track entries after dispose:
+  is disposed y
+  is disposed n
+  animation      '<empty>'
+  duration        0.00
+  alpha           1.00
+  animation end   0.00
+  animation last  0.00
+  animation start 0.00
+  delay           0.00
+  is looping      n
+  time scale      1.00
+  track time      23.47
+  mix duration    0.10
+  mix time        11.43
+  has mixing from n
+  has next        n

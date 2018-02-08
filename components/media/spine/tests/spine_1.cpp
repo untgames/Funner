@@ -28,9 +28,7 @@ struct TestDesc
   const char* atlas_file_name;
 };
 
-TestDesc TEST_DESCS [] = { { "data/bgSkeleton/mg_skeleton.json", "data/bgSkeleton/mg_skeleton.atlas" },
-                           { "data/bigwin #3/bigwin_transition.json", "data/bigwin #3/bigwin_transition.atlas" },
-                           { "data/vine/vine.skel", "data/vine/vine.atlas" },
+TestDesc TEST_DESCS [] = { { "data/vine/vine.skel", "data/vine/vine.atlas" },
                            { "data/vine/vine.json", "data/vine/vine.atlas" } };
 
 void print_log (const char* log, const char* message)
@@ -194,8 +192,7 @@ void print (const Skeleton& skeleton)
 
     printf ("      index buffer (count %u):", index_buffer.Size ());
 
-//    const uint16_t* indices = (const uint16_t*)index_buffer.Data ();
-    const uint16_t* indices = index_buffer.Data<uint16_t> ();         ///TODO ??????????
+    const uint16_t* indices = index_buffer.Data<uint16_t> ();
 
     for (unsigned int k = 0, indices_count = index_buffer.Size (); k < indices_count; k++)
       printf (" %d", (int)indices [k]);
