@@ -35,9 +35,12 @@
 #include <bv/axis_aligned_box.h>
 
 #include <media/font_library.h>
+#include <media/geometry/mesh.h>
+#include <media/spine/skeleton.h>
 
 #include <sg/camera.h>
 #include <sg/controller.h>
+#include <sg/dynamic_mesh.h>
 #include <sg/height_map.h>
 #include <sg/helper.h>
 #include <sg/input.h>
@@ -52,6 +55,7 @@
 #include <sg/scene.h>
 #include <sg/scissor.h>
 #include <sg/sound_emitter.h>
+#include <sg/spine_skeleton.h>
 #include <sg/sprite.h>
 #include <sg/text.h>
 #include <sg/visual_model.h>

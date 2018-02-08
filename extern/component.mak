@@ -17,7 +17,7 @@ ifeq (,$(filter tabletos,$(PROFILES)))
 FUNNER_EXTERN_LIBS.COMPONENTS += jpeg libpng freetype
 endif
 
-FUNNER_EXTERN_LIBS.COMPONENTS += devil ogg vorbis vorbisfile lua libpsd theora shiny flac
+FUNNER_EXTERN_LIBS.COMPONENTS += devil ogg vorbis vorbisfile lua libpsd theora shiny flac spine
 
 ifeq (,$(filter tabletos,$(PROFILES)))
 FUNNER_EXTERN_LIBS.COMPONENTS += openssl

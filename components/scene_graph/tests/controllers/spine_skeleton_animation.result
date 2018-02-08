@@ -1,0 +1,17 @@
+Results of spine_skeleton_animation_test:
+Is model1 visual structure dirty: 1
+Is model2 visual structure dirty: 1
+Is model1 visual structure dirty: 0
+Is model2 visual structure dirty: 0
+Update with animation
+Is model1 visual structure dirty: 1
+Is model2 visual structure dirty: 1
+Update with animation2
+Is model1 visual structure dirty: 1
+Is model2 visual structure dirty: 0
+Update with animation3
+Is model1 visual structure dirty: 1
+Is model2 visual structure dirty: 1
+Update with animation and builders
+Is model1 visual structure dirty: 0
+Is model2 visual structure dirty: 0
