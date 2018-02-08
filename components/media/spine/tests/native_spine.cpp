@@ -33,7 +33,13 @@ char* _spUtil_readFile (const char* path, int* length)
 
 }
 
-const char* SPINE_FILE_NAMES [] = { "data/bgSkeleton/mg_skeleton", "data/bigwin #3/bigwin_transition", "data/vine/vine" };
+struct TestDesc
+{
+  const char* spine_file_name;
+  const char* atlas_file_name;
+};
+
+TestDesc TEST_DESCS [] = { { "data/vine/export/vine-pro.json", "data/vine/export/vine.atlas" } };
 
 void print (spAtlasPage* page)
 {
@@ -290,13 +296,13 @@ int main ()
 {
   printf ("Results of native spine test:\n");
 
-  for (size_t i = 0, count = sizeof (SPINE_FILE_NAMES) / sizeof (*SPINE_FILE_NAMES); i < count; i++)
+  for (size_t i = 0, count = sizeof (TEST_DESCS) / sizeof (*TEST_DESCS); i < count; i++)
   {
-    const char* file_name = SPINE_FILE_NAMES[i];
+    const TestDesc& test_desc = TEST_DESCS[i];
 
-    printf ("Testing spine file '%s':\n", file_name);
+    printf ("Testing spine file '%s':\n", test_desc.spine_file_name);
 
-    spAtlas* atlas = spAtlas_createFromFile (common::format ("%s.atlas", file_name).c_str (), (void*)15);
+    spAtlas* atlas = spAtlas_createFromFile (test_desc.atlas_file_name, (void*)15);
 
     print (atlas);
 
@@ -304,7 +310,7 @@ int main ()
 
     spSkeletonJson* skeleton_json = spSkeletonJson_create (atlas);
 
-    spSkeletonData* skeleton_data = spSkeletonJson_readSkeletonDataFile (skeleton_json, common::format ("%s.json", file_name).c_str ());
+    spSkeletonData* skeleton_data = spSkeletonJson_readSkeletonDataFile (skeleton_json, test_desc.spine_file_name);
 
     spSkeletonJson_dispose (skeleton_json);
 

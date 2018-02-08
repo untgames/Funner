@@ -28,8 +28,8 @@ struct TestDesc
   const char* atlas_file_name;
 };
 
-TestDesc TEST_DESCS [] = { { "data/vine/vine.skel", "data/vine/vine.atlas" },
-                           { "data/vine/vine.json", "data/vine/vine.atlas" } };
+TestDesc TEST_DESCS [] = { { "data/vine/export/vine-pro.skel", "data/vine/export/vine.atlas" },
+                           { "data/vine/export/vine-pro.json", "data/vine/export/vine.atlas" } };
 
 void print_log (const char* log, const char* message)
 {

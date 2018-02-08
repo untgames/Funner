@@ -160,8 +160,6 @@ class Component
 
     static SkeletonDataImpl* LoadBinarySkeletonData (const char* skeleton_file_name, const char* atlas_file_name)
     {
-      //TODO test this with valid file
-
       try
       {
         if (!skeleton_file_name)
