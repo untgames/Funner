@@ -29,7 +29,13 @@ struct TestDesc
 };
 
 TestDesc TEST_DESCS [] = { { "data/vine/export/vine-pro.skel", "data/vine/export/vine.atlas" },
-                           { "data/vine/export/vine-pro.json", "data/vine/export/vine.atlas" } };
+                           { "data/vine/export/vine-pro.json", "data/vine/export/vine.atlas" },
+                           { "data/alien/export/alien-ess.skel", "data/alien/export/alien.atlas" },
+                           { "data/alien/export/alien-ess.json", "data/alien/export/alien.atlas" },
+                           { "data/alien/export/alien-pro.skel", "data/alien/export/alien.atlas" },
+                           { "data/alien/export/alien-pro.json", "data/alien/export/alien.atlas" },
+                           { "data/coin/export/coin-pro.skel", "data/coin/export/coin.atlas" },
+                           { "data/coin/export/coin-pro.json", "data/coin/export/coin.atlas" } };
 
 void print_log (const char* log, const char* message)
 {

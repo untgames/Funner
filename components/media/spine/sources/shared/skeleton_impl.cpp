@@ -284,7 +284,7 @@ void SkeletonImpl::BuildMeshes ()
           current_vertex_color_texcoord [2] = color.z;
           current_vertex_color_texcoord [3] = color.w;
           current_vertex_color_texcoord [4] = attachment_texcoords [0];
-          current_vertex_color_texcoord [5] = attachment_texcoords [1];
+          current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
         }
 
         //TODO invalidate position vertex stream
@@ -302,7 +302,7 @@ void SkeletonImpl::BuildMeshes ()
           current_mesh = 0;
         }
 
-        if (next_triangle_list_mesh_to_use >= sprites_meshes.size ())
+        if (next_triangle_list_mesh_to_use >= triangle_list_meshes.size ())
         {
           media::geometry::Mesh mesh = CreateMesh ();
 
@@ -390,7 +390,7 @@ void SkeletonImpl::BuildMeshes ()
             current_vertex_color_texcoord [2] = color.z;
             current_vertex_color_texcoord [3] = color.w;
             current_vertex_color_texcoord [4] = attachment_texcoords [0];
-            current_vertex_color_texcoord [5] = attachment_texcoords [1];
+            current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
           }
 
           mesh_desc->color          = color;
