@@ -21,6 +21,7 @@ namespace spine
 //forward declarations
 class AnimationStateImpl;
 class BoneImpl;
+class SkeletonClippingImpl;
 class SlotImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,8 @@ class SkeletonImpl : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Helper methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual MaterialImpl* CreateMaterialImpl (const char* material_name, const char* texture_path, BlendMode blend_mode, TexcoordWrap texcoord_wrap_u, TexcoordWrap texcoord_wrap_v) = 0;
+    virtual MaterialImpl*         CreateMaterialImpl (const char* material_name, const char* texture_path, BlendMode blend_mode, TexcoordWrap texcoord_wrap_u, TexcoordWrap texcoord_wrap_v) = 0;
+    virtual SkeletonClippingImpl* Clipper            () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Setup methods
@@ -96,7 +98,10 @@ class SkeletonImpl : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Helper methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    geometry::Mesh CreateMesh  ();
+    geometry::Mesh CreateMesh         ();
+    float*         AddMeshToDrawOrder (unsigned int next_triangle_list_mesh_to_use, SlotImpl* slot, AttachmentImpl* attachment,
+                                       unsigned int triangles_count, unsigned int vertices_count, const uint16_t* source_indices,
+                                       const float* attachment_texcoords);  //returns pointer to position vertices
 
   private:
     struct MeshDesc

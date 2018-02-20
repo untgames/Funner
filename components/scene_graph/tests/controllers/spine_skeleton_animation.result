@@ -15,3 +15,8 @@ Is model2 visual structure dirty: 1
 Update with animation and builders
 Is model1 visual structure dirty: 0
 Is model2 visual structure dirty: 0
+model1 children positions:
+  position = 0.00 0.00 0.00
+  position = 0.00 0.00 1.00
+model2 children positions:
+  position = 0.00 0.00 2.00

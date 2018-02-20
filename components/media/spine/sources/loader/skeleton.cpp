@@ -7,8 +7,9 @@ using namespace media::SPINE_NAMESPACE_NAME;
    Constructor
 */
 
-SkeletonSpineImpl::SkeletonSpineImpl (SpineAtlasPtr in_atlas, SpineSkeletonDataPtr in_skeleton_data, SpineSkeletonPtr in_skeleton)
+SkeletonSpineImpl::SkeletonSpineImpl (SpineAtlasPtr in_atlas, SkeletonClippingSpineImplPtr in_clipper, SpineSkeletonDataPtr in_skeleton_data, SpineSkeletonPtr in_skeleton)
   : atlas (in_atlas)
+  , clipper (in_clipper)
   , skeleton_data (in_skeleton_data)
   , skeleton (in_skeleton)
 {
@@ -135,4 +136,9 @@ void SkeletonSpineImpl::UpdateWorldTransform ()
 media::spine::MaterialImpl* SkeletonSpineImpl::CreateMaterialImpl (const char* material_name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v)
 {
   return new MaterialSpineImpl (material_name, texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v);
+}
+
+media::spine::SkeletonClippingImpl* SkeletonSpineImpl::Clipper ()
+{
+  return clipper.get ();
 }

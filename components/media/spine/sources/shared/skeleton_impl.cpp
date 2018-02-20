@@ -9,6 +9,7 @@
 
 #include "attachment_impl.h"
 #include "bone_impl.h"
+#include "skeleton_clipping_impl.h"
 #include "skeleton_impl.h"
 #include "slot_impl.h"
 #include "wrappers.h"
@@ -64,301 +65,210 @@ void SkeletonImpl::BuildMeshes ()
   if (!draw_order.empty ())
     return;
 
-  //build array of slots and attachments used for drawing
+  unsigned int slots_count = SlotsCount ();
+
+  //build arrays of slots and attachments used for drawing
   stl::vector<xtl::com_ptr<SlotImpl> >       slots_draw_order;
   stl::vector<xtl::com_ptr<AttachmentImpl> > attachments_draw_order;
 
-  slots_draw_order.reserve (SlotsCount ());
-  attachments_draw_order.reserve (SlotsCount ());
+  slots_draw_order.reserve (slots_count);
+  attachments_draw_order.reserve (slots_count);
 
-  for (unsigned int i = 0, count = SlotsCount (); i < count; i++)
+  for (unsigned int i = 0; i < slots_count; i++)
   {
     //we create new SlotImpl and AttachmentImpl here instead of referencing one from slots array, because it's faster to create new rather than searching for index
     xtl::com_ptr<SlotImpl> slot (CreateSlotForDrawOrder (i), false);
+    xtl::com_ptr<AttachmentImpl> attachment (slot->HasAttachment () ? slot->CreateAttachmentImpl () : 0, false);
 
-    if (slot->HasAttachment ())
-    {
-      xtl::com_ptr<AttachmentImpl> attachment (slot->CreateAttachmentImpl (), false);
-
-      switch (attachment->Type ())
-      {
-        case AttachmentType_Region:
-        case AttachmentType_Mesh:
-          //attachment should be rendered
-          slots_draw_order.push_back (slot);
-          attachments_draw_order.push_back (attachment);
-          break;
-        default:
-          break;
-      }
-    }
+    slots_draw_order.push_back (slot);
+    attachments_draw_order.push_back (attachment);
   }
 
   //build meshes
-  unsigned int           next_sprite_mesh_to_use = 0,
-                         next_triangle_list_mesh_to_use = 0;
-  bool                   current_mesh_is_sprite;
-  media::geometry::Mesh* current_mesh = 0;
-  float*                 current_vertex_position = 0;
-  float*                 current_vertex_color_texcoord = 0;
+  unsigned int next_sprite_mesh_to_use = 0,
+               next_triangle_list_mesh_to_use = 0;
 
-  for (unsigned int i = 0, count = slots_draw_order.size (); i < count; i++)
+  SkeletonClippingImpl* clipper = Clipper ();
+
+  xtl::uninitialized_storage<float> vertices_to_clip_buffer;
+
+  for (unsigned int i = 0; i < slots_count; i++)
   {
     SlotImpl*       slot       = slots_draw_order [i].get ();
     AttachmentImpl* attachment = attachments_draw_order [i].get ();
+
+    if (!attachment)
+    {
+      clipper->ClipEnd (slot);
+
+      continue;
+    }
+
+    //clipping
+    if (clipper->IsClipping () && (attachment->Type () == AttachmentType_Region || attachment->Type () == AttachmentType_Mesh))
+    {
+      //fill clip data
+      vertices_to_clip_buffer.resize (attachment->VerticesCount () * 2);
+
+      attachment->ComputeWorldVertices (slot, vertices_to_clip_buffer.data (), 0, 2);
+
+      clipper->ClipTriangles (vertices_to_clip_buffer.data (), vertices_to_clip_buffer.size (), (unsigned short*)attachment->Indices (), attachment->TrianglesCount () * 3, (float*)attachment->Texcoords (), 2);
+
+      if (clipper->ClippedTrianglesCount ())
+      {
+        //TODO invalidate position vertex stream
+        unsigned int vertices_count = clipper->ClippedVerticesCount ();
+
+        float* position_vertices = AddMeshToDrawOrder (next_triangle_list_mesh_to_use++, slot, attachment, clipper->ClippedTrianglesCount (),
+                                                       vertices_count, clipper->ClippedIndices (), clipper->ClippedTexcoords ());
+
+        memcpy (position_vertices, clipper->ClippedVertices (), vertices_count * sizeof (float) * 2);
+      }
+
+      clipper->ClipEnd (slot);
+
+      continue;
+    }
 
     switch (attachment->Type ())
     {
       case AttachmentType_Region:
       {
-        //check if we needs to start new mesh
-        if (current_mesh && !current_mesh_is_sprite)
+        //Currently we group into batch all consecutive region attachments. We stops batch if slot has null attachment or non-region attachment type.
+        //Batching can be improved if we'll skip null attachments and non-mesh attachments when clipping is not active.
+
+        if (next_sprite_mesh_to_use >= sprites_meshes.size ())
         {
-          draw_order.push_back (*current_mesh);
-          current_mesh = 0;
+          media::geometry::Mesh mesh = CreateMesh ();
+
+          mesh.Rename (common::format ("spine_skeleton_%p_sprites_%u", this, sprites_meshes.size ()).c_str ());
+
+          sprites_meshes.push_back (mesh);
         }
 
-        if (!current_mesh)
+        media::geometry::Mesh* current_sprites_mesh = &sprites_meshes [next_sprite_mesh_to_use++];
+
+        current_sprites_mesh->RemoveAllPrimitives ();
+
+        //calculate how many sprites mesh will contain and what will be the max batch size
+        unsigned int sprites_count       = 0,
+                     current_batch_size  = 0,
+                     max_batch_size      = 0,
+                     current_base_sprite = 0;
+
+        BlendMode    current_batch_blend_mode      = (BlendMode)-1;
+        TexcoordWrap current_batch_texcoord_wrap_u = (TexcoordWrap)-1,
+                     current_batch_texcoord_wrap_v = (TexcoordWrap)-1;
+        const char*  current_batch_texture_path    = "";
+        stl::string  current_material;
+
+        for (unsigned int j = i; j < slots_count; j++)
         {
-          current_mesh_is_sprite = true;
+          AttachmentImpl* current_attachment = attachments_draw_order [j].get ();
 
-          if (next_sprite_mesh_to_use >= sprites_meshes.size ())
+          bool         batch_ended = false;
+          BlendMode    slot_blend_mode;
+          TexcoordWrap attachment_texcoord_wrap_u, attachment_texcoord_wrap_v;
+          const char*  attachment_texture_path = 0;
+
+          if (!current_attachment || current_attachment->Type () != AttachmentType_Region)
           {
-            media::geometry::Mesh mesh = CreateMesh ();
-
-            mesh.Rename (common::format ("spine_skeleton_%p_sprites_%u", this, sprites_meshes.size ()).c_str ());
-
-            sprites_meshes.push_back (mesh);
+            batch_ended = true;
           }
-
-          current_mesh = &sprites_meshes [next_sprite_mesh_to_use++];
-
-          current_mesh->RemoveAllPrimitives ();
-
-          //calculate how many sprites mesh will contain and what will be the max batch size
-          unsigned int sprites_count       = 0,
-                       current_batch_size  = 0,
-                       max_batch_size      = 0,
-                       current_base_sprite = 0;
-
-          BlendMode    current_batch_blend_mode      = (BlendMode)-1;
-          TexcoordWrap current_batch_texcoord_wrap_u = (TexcoordWrap)-1,
-                       current_batch_texcoord_wrap_v = (TexcoordWrap)-1;
-          const char*  current_batch_texture_path    = "";
-          stl::string  current_material;
-
-          for (unsigned int j = i; j < count; j++)
+          else
           {
-            AttachmentImpl* current_attachment = attachments_draw_order [j].get ();
+            sprites_count++;
 
-            bool         batch_ended = false;
-            BlendMode    slot_blend_mode;
-            TexcoordWrap attachment_texcoord_wrap_u, attachment_texcoord_wrap_v;
-            const char*  attachment_texture_path = 0;
+            SlotImpl* current_slot = slots_draw_order [j].get ();
 
-            if (current_attachment->Type () != AttachmentType_Region)
+            slot_blend_mode            = current_slot->BlendMode ();
+            attachment_texcoord_wrap_u = current_attachment->TexcoordWrapU ();
+            attachment_texcoord_wrap_v = current_attachment->TexcoordWrapV ();
+            attachment_texture_path    = current_attachment->TexturePath ();
+
+            //check if we should end batch due to material change or max batch size reached
+            if (current_batch_blend_mode != slot_blend_mode || current_batch_texcoord_wrap_u != attachment_texcoord_wrap_u ||
+                current_batch_texcoord_wrap_v != attachment_texcoord_wrap_v || xtl::xstrcmp (current_batch_texture_path, attachment_texture_path) ||
+                current_batch_size == MAX_BATCH_SIZE)
             {
               batch_ended = true;
             }
-            else
-            {
-              sprites_count++;
-
-              SlotImpl* current_slot = slots_draw_order [j].get ();
-
-              slot_blend_mode            = current_slot->BlendMode ();
-              attachment_texcoord_wrap_u = current_attachment->TexcoordWrapU ();
-              attachment_texcoord_wrap_v = current_attachment->TexcoordWrapV ();
-              attachment_texture_path    = current_attachment->TexturePath ();
-
-              //check if we should end batch due to material change or max batch size reached
-              if (current_batch_blend_mode != slot_blend_mode || current_batch_texcoord_wrap_u != attachment_texcoord_wrap_u ||
-                  current_batch_texcoord_wrap_v != attachment_texcoord_wrap_v || xtl::xstrcmp (current_batch_texture_path, attachment_texture_path) ||
-                  current_batch_size == MAX_BATCH_SIZE)
-              {
-                batch_ended = true;
-              }
-            }
-
-            if (batch_ended)
-            {
-              if (current_batch_size > max_batch_size)
-                max_batch_size = current_batch_size;
-
-              if (current_batch_size)
-              {
-                //we had non-empty batch, add primitive to mesh
-                current_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, current_batch_size * 2, current_base_sprite * 2, current_material.c_str ());
-
-                current_base_sprite += current_batch_size;
-              }
-
-              current_batch_size = 0;
-
-              if (attachment_texture_path)
-              {
-                current_batch_blend_mode      = slot_blend_mode;
-                current_batch_texcoord_wrap_u = attachment_texcoord_wrap_u;
-                current_batch_texcoord_wrap_v = attachment_texcoord_wrap_v;
-                current_batch_texture_path    = attachment_texture_path;
-
-                current_material = common::format ("spine_%s_%d_%d_%d", current_batch_texture_path, current_batch_blend_mode, current_batch_texcoord_wrap_u, current_batch_texcoord_wrap_v);
-
-                //add material if it was not added yet
-                MaterialsMap::iterator material_iter = materials.find (current_material.c_str ());
-
-                if (material_iter == materials.end ())
-                  materials.insert_pair (current_material.c_str (), Wrappers::Wrap<media::spine::Material, media::spine::MaterialImpl> (CreateMaterialImpl (current_material.c_str (), current_batch_texture_path, current_batch_blend_mode, current_batch_texcoord_wrap_u, current_batch_texcoord_wrap_v)));
-              }
-            }
-
-            if (current_attachment->Type () != AttachmentType_Region)
-              break;
-
-            current_batch_size++;
           }
 
-          if (current_batch_size)
+          if (batch_ended)
           {
             if (current_batch_size > max_batch_size)
               max_batch_size = current_batch_size;
 
-            //we have non-empty batch after loop, add primitive to mesh
-            current_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, current_batch_size * 2, current_base_sprite * 2, current_material.c_str ());
-          }
-
-          //add new data to index buffer, if required
-          media::geometry::IndexBuffer& index_buffer = current_mesh->IndexBuffer ();
-
-          unsigned int vertices_count     = sprites_count * 4,
-                       indices_count      = max_batch_size * 6,  //6 indices per sprite
-                       prev_indices_count = index_buffer.Size ();
-
-          if (prev_indices_count < indices_count)
-          {
-            index_buffer.Resize (indices_count);
-
-            uint16_t* indices = index_buffer.Data<uint16_t> ();
-
-            for (unsigned int sprite_index = prev_indices_count / 6, base_index = prev_indices_count, base_vertex = sprite_index * 4;
-                sprite_index < max_batch_size;
-                sprite_index++, base_index += 6, base_vertex += 4)
+            if (current_batch_size)
             {
-              indices[base_index]     = base_vertex;
-              indices[base_index + 1] = base_vertex + 1;
-              indices[base_index + 2] = base_vertex + 2;
-              indices[base_index + 3] = base_vertex + 2;
-              indices[base_index + 4] = base_vertex + 3;
-              indices[base_index + 5] = base_vertex;
+              //we had non-empty batch, add primitive to mesh
+              current_sprites_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, current_batch_size * 2, current_base_sprite * 4, current_material.c_str ());
+
+              current_base_sprite += current_batch_size;
+            }
+
+            current_batch_size = 0;
+
+            if (attachment_texture_path)
+            {
+              current_batch_blend_mode      = slot_blend_mode;
+              current_batch_texcoord_wrap_u = attachment_texcoord_wrap_u;
+              current_batch_texcoord_wrap_v = attachment_texcoord_wrap_v;
+              current_batch_texture_path    = attachment_texture_path;
+
+              current_material = common::format ("spine_%s_%d_%d_%d", current_batch_texture_path, current_batch_blend_mode, current_batch_texcoord_wrap_u, current_batch_texcoord_wrap_v);
+
+              //add material if it was not added yet
+              MaterialsMap::iterator material_iter = materials.find (current_material.c_str ());
+
+              if (material_iter == materials.end ())
+                materials.insert_pair (current_material.c_str (), Wrappers::Wrap<media::spine::Material, media::spine::MaterialImpl> (CreateMaterialImpl (current_material.c_str (), current_batch_texture_path, current_batch_blend_mode, current_batch_texcoord_wrap_u, current_batch_texcoord_wrap_v)));
             }
           }
 
-          media::geometry::VertexBuffer& vertex_buffer                = current_mesh->VertexBuffer (0);
-          media::geometry::VertexStream& position_vertex_stream       = vertex_buffer.Stream (0),
-                                         color_texcoord_vertex_stream = vertex_buffer.Stream (1);
+          if (!current_attachment || current_attachment->Type () != AttachmentType_Region)
+            break;
 
-          if (position_vertex_stream.Size () < vertices_count)
-          {
-            position_vertex_stream.Resize (vertices_count);
-            color_texcoord_vertex_stream.Resize (vertices_count);
-          }
-
-          current_vertex_position       = (float*)position_vertex_stream.Data ();
-          current_vertex_color_texcoord = (float*)color_texcoord_vertex_stream.Data ();
+          current_batch_size++;
         }
 
-        //fill vertices position
-        attachment->ComputeWorldVertices (slot, current_vertex_position, 0, 2);
-
-        //offset pointer by 4 vertices
-        current_vertex_position += 8;   //4 vertices is 8 floats (x, y)
-
-        //fill texcoords and color
-        math::vec4f  color                = slot->Color () * attachment->Color ();
-        const float* attachment_texcoords = attachment->Texcoords ();
-
-        for (unsigned int i = 0; i < 4; i++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
+        if (current_batch_size)
         {
-          current_vertex_color_texcoord [0] = color.x;
-          current_vertex_color_texcoord [1] = color.y;
-          current_vertex_color_texcoord [2] = color.z;
-          current_vertex_color_texcoord [3] = color.w;
-          current_vertex_color_texcoord [4] = attachment_texcoords [0];
-          current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
+          if (current_batch_size > max_batch_size)
+            max_batch_size = current_batch_size;
+
+          //we have non-empty batch after loop, add primitive to mesh
+          current_sprites_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, current_batch_size * 2, current_base_sprite * 4, current_material.c_str ());
         }
 
-        //TODO invalidate position vertex stream
-        //TODO invalidate color-uv vertex stream in case of data change
+        //add new data to index buffer, if required
+        media::geometry::IndexBuffer& index_buffer = current_sprites_mesh->IndexBuffer ();
 
-        break;
-      }
-      case AttachmentType_Mesh:
-      {
-        //check if we needs to start new mesh
-        if (current_mesh)
-        {
-          draw_order.push_back (*current_mesh);
-          current_mesh_is_sprite = false;
-          current_mesh = 0;
-        }
-
-        if (next_triangle_list_mesh_to_use >= triangle_list_meshes.size ())
-        {
-          media::geometry::Mesh mesh = CreateMesh ();
-
-          mesh.Rename (common::format ("spine_skeleton_%p_triangle_list_%u", this, triangle_list_meshes.size ()).c_str ());
-
-          triangle_list_meshes.push_back (MeshDesc (mesh));
-        }
-
-        MeshDesc* mesh_desc = &triangle_list_meshes [next_triangle_list_mesh_to_use++];;
-
-        current_mesh = &mesh_desc->mesh;
-
-        current_mesh->RemoveAllPrimitives ();
-
-        const char*  texture_path    = attachment->TexturePath ();
-        BlendMode    blend_mode      = slot->BlendMode ();
-        TexcoordWrap texcoord_wrap_u = attachment->TexcoordWrapU (),
-                     texcoord_wrap_v = attachment->TexcoordWrapV ();
-
-        stl::string mesh_material = common::format ("spine_%s_%d_%d_%d", texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v);
-
-        //add material if it was not added yet
-        MaterialsMap::iterator material_iter = materials.find (mesh_material.c_str ());
-
-        if (material_iter == materials.end ())
-          materials.insert_pair (mesh_material.c_str (), Wrappers::Wrap<media::spine::Material, media::spine::MaterialImpl> (CreateMaterialImpl (mesh_material.c_str (), texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v)));
-
-        unsigned int triangles_count = attachment->TrianglesCount ();
-
-        current_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, triangles_count, mesh_material.c_str ());
-
-        //replace data in index buffer, if required
-        media::geometry::IndexBuffer& index_buffer = current_mesh->IndexBuffer ();
-
-        unsigned int indices_count      = triangles_count * 3,  //3 indices per triangle
-                     prev_indices_count = index_buffer.Size (),
-                     vertices_count     = attachment->VerticesCount ();
+        unsigned int vertices_count     = sprites_count * 4,
+                     indices_count      = max_batch_size * 6,  //6 indices per sprite
+                     prev_indices_count = index_buffer.Size ();
 
         if (prev_indices_count < indices_count)
+        {
           index_buffer.Resize (indices_count);
 
-        size_t indices_hash = common::crc32 (attachment->Indices (), indices_count * sizeof (uint16_t));
-
-        if (indices_hash != mesh_desc->index_buffer_hash)
-        {
           uint16_t* indices = index_buffer.Data<uint16_t> ();
 
-          memcpy (indices, attachment->Indices (), indices_count * sizeof (uint16_t));
-
-          mesh_desc->index_buffer_hash = indices_hash;
-
-          //TODO invalidate index buffer
+          for (unsigned int sprite_index = prev_indices_count / 6, base_index = prev_indices_count, base_vertex = sprite_index * 4;
+              sprite_index < max_batch_size;
+              sprite_index++, base_index += 6, base_vertex += 4)
+          {
+            indices[base_index]     = base_vertex;
+            indices[base_index + 1] = base_vertex + 1;
+            indices[base_index + 2] = base_vertex + 2;
+            indices[base_index + 3] = base_vertex + 2;
+            indices[base_index + 4] = base_vertex + 3;
+            indices[base_index + 5] = base_vertex;
+          }
         }
 
-        //replace data in vertex streams, if required
-        media::geometry::VertexBuffer& vertex_buffer                = current_mesh->VertexBuffer (0);
+        media::geometry::VertexBuffer& vertex_buffer                = current_sprites_mesh->VertexBuffer (0);
         media::geometry::VertexStream& position_vertex_stream       = vertex_buffer.Stream (0),
                                        color_texcoord_vertex_stream = vertex_buffer.Stream (1);
 
@@ -368,22 +278,30 @@ void SkeletonImpl::BuildMeshes ()
           color_texcoord_vertex_stream.Resize (vertices_count);
         }
 
-        float* position_vertices             = (float*)position_vertex_stream.Data ();
+        float* current_vertex_position       = (float*)position_vertex_stream.Data ();
         float* current_vertex_color_texcoord = (float*)color_texcoord_vertex_stream.Data ();
 
-        //fill vertices position
-        attachment->ComputeWorldVertices (slot, position_vertices, 0, 2);
-
-        //TODO invalidate position vertex stream
-
-        //fill texcoords and color
-        math::vec4f  color                = slot->Color () * attachment->Color ();
-        const float* attachment_texcoords = attachment->Texcoords ();
-        size_t       texcoords_hash       = common::crc32 (attachment_texcoords, vertices_count * 2 * sizeof (float));
-
-        if (color != mesh_desc->color || texcoords_hash != mesh_desc->texcoords_hash)
+        for (unsigned int j = i; j < slots_count; j++)
         {
-          for (unsigned int i = 0; i < vertices_count; i++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
+          SlotImpl*       current_slot       = slots_draw_order [j].get ();
+          AttachmentImpl* current_attachment = attachments_draw_order [j].get ();
+
+          if (!current_attachment || current_attachment->Type () != AttachmentType_Region)
+            break;
+
+          i = j;  //slot is consumed, advance i
+
+          //fill vertices position
+          current_attachment->ComputeWorldVertices (current_slot, current_vertex_position, 0, 2);
+
+          //offset pointer by 4 vertices
+          current_vertex_position += 8;   //4 vertices is 8 floats (x, y)
+
+          //fill texcoords and color
+          math::vec4f  color                = current_slot->Color () * current_attachment->Color ();
+          const float* attachment_texcoords = current_attachment->Texcoords ();
+
+          for (unsigned int k = 0; k < 4; k++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
           {
             current_vertex_color_texcoord [0] = color.x;
             current_vertex_color_texcoord [1] = color.y;
@@ -392,24 +310,38 @@ void SkeletonImpl::BuildMeshes ()
             current_vertex_color_texcoord [4] = attachment_texcoords [0];
             current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
           }
-
-          mesh_desc->color          = color;
-          mesh_desc->texcoords_hash = texcoords_hash;
-
-          //TODO invalidate color-uv vertex stream
         }
+
+        draw_order.push_back (*current_sprites_mesh);
+
+        //TODO invalidate position vertex stream
+        //TODO invalidate color-uv vertex stream in case of data change
 
         break;
       }
+      case AttachmentType_Mesh:
+      {
+        //TODO invalidate position vertex stream
+        unsigned int vertices_count = attachment->VerticesCount ();
+
+        float* position_vertices = AddMeshToDrawOrder (next_triangle_list_mesh_to_use++, slot, attachment, attachment->TrianglesCount (),
+                                                       vertices_count, attachment->Indices (), attachment->Texcoords ());
+
+        attachment->ComputeWorldVertices (slot, position_vertices, 0, 2);
+
+        break;
+      }
+      case AttachmentType_Clipping:
+        clipper->ClipStart (slot, attachment);
+        clipper->ClipEnd (slot);                 //for some reason cocos-2dx doing this (https://github.com/cocos2d/cocos2d-x/blob/8f1459b8efcbc8184f0859e54c4766f858deb692/cocos/editor-support/spine/SkeletonRenderer.cpp)
+        break;
       default:
-        //ignore all other types
+        //ignore other attachment types
         break;
     }
   }
 
-  //push last mesh to draw order list
-  if (current_mesh)
-    draw_order.push_back (*current_mesh);
+  clipper->ClipEnd ();
 
   //do not erase extra meshes to free memory, to save time on memory allocation/deallocation
 }
@@ -518,3 +450,98 @@ media::geometry::Mesh SkeletonImpl::CreateMesh ()
   return mesh;
 }
 
+float* SkeletonImpl::AddMeshToDrawOrder (unsigned int next_triangle_list_mesh_to_use, SlotImpl* slot, AttachmentImpl* attachment,
+                                         unsigned int triangles_count, unsigned int vertices_count, const uint16_t* source_indices,
+                                         const float* attachment_texcoords)
+{
+  if (next_triangle_list_mesh_to_use >= triangle_list_meshes.size ())
+  {
+    media::geometry::Mesh mesh = CreateMesh ();
+
+    mesh.Rename (common::format ("spine_skeleton_%p_triangle_list_%u", this, triangle_list_meshes.size ()).c_str ());
+
+    triangle_list_meshes.push_back (MeshDesc (mesh));
+  }
+
+  MeshDesc* mesh_desc = &triangle_list_meshes [next_triangle_list_mesh_to_use++];;
+
+  geometry::Mesh* current_mesh = &mesh_desc->mesh;
+
+  current_mesh->RemoveAllPrimitives ();
+
+  const char*  texture_path    = attachment->TexturePath ();
+  BlendMode    blend_mode      = slot->BlendMode ();
+  TexcoordWrap texcoord_wrap_u = attachment->TexcoordWrapU (),
+               texcoord_wrap_v = attachment->TexcoordWrapV ();
+
+  stl::string mesh_material = common::format ("spine_%s_%d_%d_%d", texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v);
+
+  //add material if it was not added yet
+  MaterialsMap::iterator material_iter = materials.find (mesh_material.c_str ());
+
+  if (material_iter == materials.end ())
+    materials.insert_pair (mesh_material.c_str (), Wrappers::Wrap<media::spine::Material, media::spine::MaterialImpl> (CreateMaterialImpl (mesh_material.c_str (), texture_path, blend_mode, texcoord_wrap_u, texcoord_wrap_v)));
+
+  current_mesh->AddPrimitive (media::geometry::PrimitiveType_TriangleList, 0, 0, triangles_count, mesh_material.c_str ());
+
+  //replace data in index buffer, if required
+  media::geometry::IndexBuffer& index_buffer = current_mesh->IndexBuffer ();
+
+  unsigned int indices_count      = triangles_count * 3,  //3 indices per triangle
+               prev_indices_count = index_buffer.Size ();
+
+  if (prev_indices_count < indices_count)
+    index_buffer.Resize (indices_count);
+
+  size_t indices_hash = common::crc32 (source_indices, indices_count * sizeof (uint16_t));
+
+  if (indices_hash != mesh_desc->index_buffer_hash)
+  {
+    uint16_t* indices = index_buffer.Data<uint16_t> ();
+
+    memcpy (indices, source_indices, indices_count * sizeof (uint16_t));
+
+    mesh_desc->index_buffer_hash = indices_hash;
+
+    //TODO invalidate index buffer
+  }
+
+  //replace data in vertex streams, if required
+  media::geometry::VertexBuffer& vertex_buffer                = current_mesh->VertexBuffer (0);
+  media::geometry::VertexStream& position_vertex_stream       = vertex_buffer.Stream (0),
+                                 color_texcoord_vertex_stream = vertex_buffer.Stream (1);
+
+  if (position_vertex_stream.Size () < vertices_count)
+  {
+    position_vertex_stream.Resize (vertices_count);
+    color_texcoord_vertex_stream.Resize (vertices_count);
+  }
+
+  //fill texcoords and color
+  math::vec4f  color          = slot->Color () * attachment->Color ();
+  size_t       texcoords_hash = common::crc32 (attachment_texcoords, vertices_count * 2 * sizeof (float));
+
+  if (color != mesh_desc->color || texcoords_hash != mesh_desc->texcoords_hash)
+  {
+    float* current_vertex_color_texcoord = (float*)color_texcoord_vertex_stream.Data ();
+
+    for (unsigned int i = 0; i < vertices_count; i++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
+    {
+      current_vertex_color_texcoord [0] = color.x;
+      current_vertex_color_texcoord [1] = color.y;
+      current_vertex_color_texcoord [2] = color.z;
+      current_vertex_color_texcoord [3] = color.w;
+      current_vertex_color_texcoord [4] = attachment_texcoords [0];
+      current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
+    }
+
+    mesh_desc->color          = color;
+    mesh_desc->texcoords_hash = texcoords_hash;
+
+    //TODO invalidate color-uv vertex stream
+  }
+
+  draw_order.push_back (*current_mesh);
+
+  return (float*)position_vertex_stream.Data ();
+}

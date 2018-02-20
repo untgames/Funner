@@ -8,11 +8,15 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 {
   typedef stl::hash_map<size_t, DynamicMesh::Pointer> MeshesMap;
 
-  SpineSkeleton* skeleton;
-  MeshesMap      meshes;
+  SpineSkeleton* skeleton;               //skeleton scene graph object to build meshes for
+  float          meshes_min_z_including; //z coordinate used for first mesh
+  float          meshes_z_range;         //z coordinate used for last mesh
+  MeshesMap      meshes;                 //child meshes scene graph objects
 
-  Impl (SpineSkeleton& in_skeleton)
+  Impl (SpineSkeleton& in_skeleton, float in_meshes_min_z_including, float in_meshes_max_z_excluding)
     : skeleton (&in_skeleton)
+    , meshes_min_z_including (in_meshes_min_z_including)
+    , meshes_z_range (in_meshes_max_z_excluding - in_meshes_min_z_including)
     {}
 
   void Update ()
@@ -24,7 +28,10 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 
     stl::hash_set<size_t> visible_meshes;
 
-    for (unsigned int i = 0, count = spine_skeleton.MeshesCount (); i < count; i++)
+    float current_z = meshes_min_z_including,
+          z_step    = meshes_z_range / spine_skeleton.MeshesCount ();
+
+    for (unsigned int i = 0, count = spine_skeleton.MeshesCount (); i < count; i++, current_z += z_step)
     {
       const media::geometry::Mesh& mesh = spine_skeleton.Mesh (i);
 
@@ -45,6 +52,8 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
         if (!iter->second->IsVisible ())
           iter->second->SetVisible (true);
       }
+
+      iter->second->SetPosition (0, 0, current_z);
     }
 
     if (visible_meshes.size () != meshes.size ())  //current skeleton state has fewer meshes count than total meshes count, some meshes should be set to invisible state
@@ -64,9 +73,9 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 };
 
 ///Constructor / destructor
-SpineSkeletonVisualStructureBuilder::SpineSkeletonVisualStructureBuilder (SpineSkeleton& skeleton)
+SpineSkeletonVisualStructureBuilder::SpineSkeletonVisualStructureBuilder (SpineSkeleton& skeleton, float meshes_min_z_including, float meshes_max_z_excluding)
   : Controller (skeleton, ControllerTimeMode_Absolute)
-  , impl (new Impl (skeleton))
+  , impl (new Impl (skeleton, meshes_min_z_including, meshes_max_z_excluding))
   {}
 
 SpineSkeletonVisualStructureBuilder::~SpineSkeletonVisualStructureBuilder ()
@@ -77,9 +86,9 @@ SpineSkeletonVisualStructureBuilder::~SpineSkeletonVisualStructureBuilder ()
    Create controller
 */
 
-SpineSkeletonVisualStructureBuilder::Pointer SpineSkeletonVisualStructureBuilder::Create (SpineSkeleton& skeleton)
+SpineSkeletonVisualStructureBuilder::Pointer SpineSkeletonVisualStructureBuilder::Create (SpineSkeleton& skeleton, float meshes_min_z_including, float meshes_max_z_excluding)
 {
-  return Pointer (new SpineSkeletonVisualStructureBuilder (skeleton), false);
+  return Pointer (new SpineSkeletonVisualStructureBuilder (skeleton, meshes_min_z_including, meshes_max_z_excluding), false);
 }
 
 /*

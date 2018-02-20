@@ -7,8 +7,9 @@ using namespace media::SPINE_NAMESPACE_NAME;
    Constructor
 */
 
-SkeletonDataSpineImpl::SkeletonDataSpineImpl (SpineAtlasPtr in_atlas, SpineSkeletonDataPtr in_skeleton_data)
+SkeletonDataSpineImpl::SkeletonDataSpineImpl (SpineAtlasPtr in_atlas, SkeletonClippingSpineImplPtr in_clipper, SpineSkeletonDataPtr in_skeleton_data)
   : atlas (in_atlas)
+  , clipper (in_clipper)
   , skeleton_data (in_skeleton_data)
   {}
 
@@ -24,7 +25,7 @@ media::spine::SkeletonImpl* SkeletonDataSpineImpl::CreateSkeleton ()
   if (!skeleton->NativeHandle ())
     throw xtl::format_operation_exception ("media::spine::SkeletonDataSpineImpl::CreateSkeleton", "Can't create skeleton");
 
-  return new SkeletonSpineImpl (atlas, skeleton_data, skeleton);
+  return new SkeletonSpineImpl (atlas, clipper, skeleton_data, skeleton);
 }
 
 media::spine::AnimationStateDataImpl* SkeletonDataSpineImpl::CreateAnimationStateData ()

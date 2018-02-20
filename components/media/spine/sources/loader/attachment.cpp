@@ -259,11 +259,20 @@ const float* AttachmentSpineImpl::Texcoords ()
 
 const uint16_t* AttachmentSpineImpl::Indices ()
 {
-  if (attachment->type == SP_ATTACHMENT_MESH)
+  switch (attachment->type)
   {
+    case SP_ATTACHMENT_REGION:
+    {
+      static uint16_t indices [] = { 0, 1, 2, 2, 3, 0 };
+
+      return indices;
+    }
+    case SP_ATTACHMENT_MESH:
+    {
       spMeshAttachment* mesh_attachment = (spMeshAttachment*)attachment;
 
       return mesh_attachment->triangles;
+    }
   }
 
   throw xtl::format_operation_exception ("media::spine::AttachmentSpineImpl::Indices", "Attachment type %d doesn't have vertices", attachment->type);

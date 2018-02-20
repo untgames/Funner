@@ -149,7 +149,7 @@ class Component
 
         spSkeletonJson_dispose (skeleton_json);
 
-        return new SkeletonDataSpineImpl (atlas, skeleton_data);
+        return new SkeletonDataSpineImpl (atlas, Clipper (), skeleton_data);
       }
       catch (xtl::exception& e)
       {
@@ -188,7 +188,7 @@ class Component
 
         spSkeletonBinary_dispose (skeleton_binary);
 
-        return new SkeletonDataSpineImpl (atlas, skeleton_data);
+        return new SkeletonDataSpineImpl (atlas, Clipper (), skeleton_data);
       }
       catch (xtl::exception& e)
       {
@@ -196,7 +196,24 @@ class Component
         throw;
       }
     }
+
+    static SkeletonClippingSpineImplPtr Clipper ()
+    {
+      if (!clipper)
+      {
+        SpineSkeletonClippingPtr spine_clipper (new SpineHandleHolder<spSkeletonClipping> (spSkeletonClipping_create (), spSkeletonClipping_dispose), false);
+
+        clipper = SkeletonClippingSpineImplPtr (new SkeletonClippingSpineImpl (spine_clipper), false);
+      }
+
+      return clipper;
+    }
+
+  private:
+    static SkeletonClippingSpineImplPtr clipper;
 };
+
+SkeletonClippingSpineImplPtr Component::clipper;
 
 extern "C"
 {

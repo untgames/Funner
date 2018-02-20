@@ -66,8 +66,8 @@ int main ()
     printf ("Is model1 visual structure dirty: %d\n", model1->IsVisualStructureDirty ());
     printf ("Is model2 visual structure dirty: %d\n", model2->IsVisualStructureDirty ());
 
-    SpineSkeletonVisualStructureBuilder::Pointer visual_structure_builder1 = SpineSkeletonVisualStructureBuilder::Create (*model1);
-    SpineSkeletonVisualStructureBuilder::Pointer visual_structure_builder2 = SpineSkeletonVisualStructureBuilder::Create (*model2);
+    SpineSkeletonVisualStructureBuilder::Pointer visual_structure_builder1 = SpineSkeletonVisualStructureBuilder::Create (*model1, 1.f, 2.f);
+    SpineSkeletonVisualStructureBuilder::Pointer visual_structure_builder2 = SpineSkeletonVisualStructureBuilder::Create (*model2, 2.f, 3.f);
 
     printf ("Update with animation and builders\n");
 
@@ -75,6 +75,16 @@ int main ()
 
     printf ("Is model1 visual structure dirty: %d\n", model1->IsVisualStructureDirty ());
     printf ("Is model2 visual structure dirty: %d\n", model2->IsVisualStructureDirty ());
+
+    printf ("model1 children positions:\n");
+
+    for (Node::Pointer child = model1->FirstChild (); child; child = child->NextChild ())
+      printf ("  position = %.2f %.2f %.2f\n", child->Position ().x, child->Position ().y, child->Position ().z);
+
+    printf ("model2 children positions:\n");
+
+    for (Node::Pointer child = model2->FirstChild (); child; child = child->NextChild ())
+      printf ("  position = %.2f %.2f %.2f\n", child->Position ().x, child->Position ().y, child->Position ().z);
   }
   catch (xtl::exception& e)
   {

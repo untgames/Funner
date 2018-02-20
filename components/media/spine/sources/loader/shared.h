@@ -11,6 +11,7 @@
 #include <spine/RegionAttachment.h>
 #include <spine/Skeleton.h>
 #include <spine/SkeletonBinary.h>
+#include <spine/SkeletonClipping.h>
 #include <spine/SkeletonJson.h>
 #include <spine/Slot.h>
 
@@ -32,6 +33,7 @@
 #include "../shared/attachment_impl.h"
 #include "../shared/bone_impl.h"
 #include "../shared/material_impl.h"
+#include "../shared/skeleton_clipping_impl.h"
 #include "../shared/skeleton_data_impl.h"
 #include "../shared/skeleton_impl.h"
 #include "../shared/slot_impl.h"
@@ -107,7 +109,40 @@ typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spAnimationState
 typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spAnimationStateData> > SpineAnimationStateDataPtr;
 typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spAtlas> >              SpineAtlasPtr;
 typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spSkeleton> >           SpineSkeletonPtr;
+typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spSkeletonClipping> >   SpineSkeletonClippingPtr;
 typedef xtl::com_ptr<SpineHandleHolder< ::SPINE_NAMESPACE_NAME::spSkeletonData> >       SpineSkeletonDataPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Skeleton clipper implementation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SkeletonClippingSpineImpl : public Object, public media::spine::SkeletonClippingImpl
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Constructor
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SkeletonClippingSpineImpl (SpineSkeletonClippingPtr clipper);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Clipping
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsClipping ();
+    void ClipStart  (media::spine::SlotImpl* slot, media::spine::AttachmentImpl* clip_attachment);
+    void ClipEnd    (media::spine::SlotImpl* slot);                                                //ends clipping if this slot is a final clipping slot
+    void ClipEnd    ();                                                                            //force ends clipping
+
+    void            ClipTriangles         (float* vertices, int vertices_count, unsigned short* triangles, int triangles_count, float* uvs, int stride);
+    unsigned int    ClippedVerticesCount  ();
+    unsigned int    ClippedTrianglesCount ();
+    const float*    ClippedVertices       ();
+    const float*    ClippedTexcoords      ();
+    const uint16_t* ClippedIndices        ();
+
+  private:
+    SpineSkeletonClippingPtr clipper; //clipper spine object
+};
+
+typedef xtl::com_ptr<SkeletonClippingSpineImpl> SkeletonClippingSpineImplPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Skeleton data implementation
@@ -118,7 +153,7 @@ class SkeletonDataSpineImpl : public Object, public media::spine::SkeletonDataIm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SkeletonDataSpineImpl (SpineAtlasPtr atlas, SpineSkeletonDataPtr skeleton_data);
+    SkeletonDataSpineImpl (SpineAtlasPtr atlas, SkeletonClippingSpineImplPtr clipper, SpineSkeletonDataPtr skeleton_data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Create object instances
@@ -152,8 +187,9 @@ class SkeletonDataSpineImpl : public Object, public media::spine::SkeletonDataIm
     ::SPINE_NAMESPACE_NAME::spSkeletonData* NativeHandle ();
 
   private:
-    SpineAtlasPtr        atlas;          //skeleton data should hold atlas object
-    SpineSkeletonDataPtr skeleton_data;
+    SpineAtlasPtr                atlas;          //skeleton data should hold atlas object
+    SkeletonClippingSpineImplPtr clipper;        //clipper object shared between all spine objects
+    SpineSkeletonDataPtr         skeleton_data;
 };
 
 typedef xtl::com_ptr<SkeletonDataSpineImpl> SkeletonDataSpineImplPtr;
@@ -167,7 +203,7 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SkeletonSpineImpl (SpineAtlasPtr atlas, SpineSkeletonDataPtr skeleton_data, SpineSkeletonPtr skeleton);
+    SkeletonSpineImpl (SpineAtlasPtr atlas, SkeletonClippingSpineImplPtr clipper, SpineSkeletonDataPtr skeleton_data, SpineSkeletonPtr skeleton);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Animating
@@ -192,10 +228,6 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
     int                     FindSlotIndex          (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Rendering
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Skin          ();
@@ -211,12 +243,14 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Helper methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    media::spine::MaterialImpl* CreateMaterialImpl (const char* material_name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v);
+    media::spine::MaterialImpl*         CreateMaterialImpl (const char* material_name, const char* texture_path, media::spine::BlendMode blend_mode, media::spine::TexcoordWrap texcoord_wrap_u, media::spine::TexcoordWrap texcoord_wrap_v);
+    media::spine::SkeletonClippingImpl* Clipper            ();
 
   private:
-    SpineAtlasPtr        atlas;          //skeleton should hold atlas object
-    SpineSkeletonDataPtr skeleton_data;  //skeleton should hold skeleton data object
-    SpineSkeletonPtr     skeleton;
+    SpineAtlasPtr                atlas;          //skeleton should hold atlas object
+    SkeletonClippingSpineImplPtr clipper;        //clipper object shared between all spine objects
+    SpineSkeletonDataPtr         skeleton_data;  //skeleton should hold skeleton data object
+    SpineSkeletonPtr             skeleton;
 };
 
 typedef xtl::com_ptr<SkeletonSpineImpl> SkeletonSpineImplPtr;
@@ -299,6 +333,11 @@ class AttachmentSpineImpl : public Object, public media::spine::AttachmentImpl
     void                                   ComputeWorldVertices          (media::spine::SlotImpl* slot, float* vertices, int offset, int stride);
     const float*                           Texcoords                     ();
     const uint16_t*                        Indices                       ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Native spine handle
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ::SPINE_NAMESPACE_NAME::spAttachment* NativeHandle () { return attachment; }
 
   private:
     SpineAtlasPtr                         atlas;          //attachment should hold atlas object

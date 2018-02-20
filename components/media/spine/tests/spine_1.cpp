@@ -35,7 +35,13 @@ TestDesc TEST_DESCS [] = { { "data/vine/export/vine-pro.skel", "data/vine/export
                            { "data/alien/export/alien-pro.skel", "data/alien/export/alien.atlas" },
                            { "data/alien/export/alien-pro.json", "data/alien/export/alien.atlas" },
                            { "data/coin/export/coin-pro.skel", "data/coin/export/coin.atlas" },
-                           { "data/coin/export/coin-pro.json", "data/coin/export/coin.atlas" } };
+                           { "data/coin/export/coin-pro.json", "data/coin/export/coin.atlas" },
+                           { "data/dragon/export/dragon-ess.skel", "data/dragon/export/dragon.atlas" },
+                           { "data/dragon/export/dragon-ess.json", "data/dragon/export/dragon.atlas" },
+                           { "data/goblins/export/goblins-ess.skel", "data/goblins/export/goblins.atlas" },
+                           { "data/goblins/export/goblins-ess.json", "data/goblins/export/goblins.atlas" },
+                           { "data/tank/export/tank-pro.skel", "data/tank/export/tank.atlas" },
+                           { "data/tank/export/tank-pro.json", "data/tank/export/tank.atlas" }};
 
 void print_log (const char* log, const char* message)
 {
@@ -272,6 +278,11 @@ int main ()
       print (skeleton_data);
 
       Skeleton skeleton = skeleton_data.CreateSkeleton ();
+
+      if (skeleton_data.SkinsCount () > 1)
+      {
+        skeleton.SetSkin (skeleton_data.SkinName (1));
+      }
 
       skeleton.UpdateWorldTransform ();
 
