@@ -59,6 +59,8 @@ void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
 void SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properties_id);
 void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id);
 
+void UpdateDynamicMesh (object_id_t id, media::geometry::Mesh mesh);
+
 void SetStaticMeshName (object_id_t id, const char* mesh_name);
 
 void SetLightParams (object_id_t id, const LightParams& params);

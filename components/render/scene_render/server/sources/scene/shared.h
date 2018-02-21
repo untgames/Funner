@@ -11,6 +11,7 @@
 
 #include <math/utility.h>
 
+#include <media/geometry/mesh.h>
 #include <media/particles/particle_system.h>
 
 #include <render/manager.h>
@@ -22,6 +23,7 @@
 #include <shared/scene_manager.h>
 
 #include <shared/sg/collection_visitor.h>
+#include <shared/sg/dynamic_mesh.h>
 #include <shared/sg/light.h>
 #include <shared/sg/line_list.h>
 #include <shared/sg/page_curl.h>

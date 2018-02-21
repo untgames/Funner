@@ -880,6 +880,19 @@ void ConnectionState::SetVisualModelStaticShaderProperties (object_id_t id, obje
   }
 }
 
+void ConnectionState::UpdateDynamicMesh (object_id_t id, const media::geometry::Mesh& mesh)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<DynamicMesh> ().UpdateMesh (mesh);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateDynamicMesh");
+    throw;
+  }
+}
+
 void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
 {
   try

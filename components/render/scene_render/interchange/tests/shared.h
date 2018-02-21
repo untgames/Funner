@@ -6,6 +6,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <media/geometry/mesh.h>
 #include <media/image.h>
 
 #include <render/scene/interchange/context.h>

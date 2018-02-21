@@ -18,6 +18,10 @@
 
 #include <media/font_library.h>
 #include <media/particles/particle_system_library.h>
+#include <media/spine/animation_state.h>
+#include <media/spine/animation_state_data.h>
+#include <media/spine/skeleton.h>
+#include <media/spine/skeleton_data.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>
@@ -30,8 +34,12 @@
 #include <sg/particle_emitter.h>
 #include <sg/scissor.h>
 #include <sg/scene.h>
+#include <sg/spine_skeleton.h>
 #include <sg/sprite.h>
 #include <sg/text.h>
+
+#include <sg/controllers/spine_animation.h>
+#include <sg/controllers/spine_skeleton_visual_structure_builder.h>
 
 #include <render/scene_render_client.h>
 #include <render/scene_render_server.h>

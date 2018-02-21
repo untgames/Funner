@@ -59,4 +59,59 @@ media::Image read (InputStream& s, xtl::type<media::Image>)
   }
 }
 
+void write (OutputStream& s, const media::geometry::Mesh& mesh)
+{
+  if (s.InprocessOwnerId ())
+  {
+    object_id_t object_id = InprocessExchangeStorage::Attach (s.InprocessOwnerId (), mesh);
+
+    write (s, object_id);
+  }
+/*  else
+  {
+    object_id_t object_id = 0;
+
+    write (s, object_id);
+
+    uint32 width = image.Width (), height = image.Height (), depth = image.Depth (), format = (uint32)image.Format ();
+
+    write (s, width);
+    write (s, height);
+    write (s, depth);
+    write (s, format);
+
+    size_t layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
+
+    for (unsigned int i=0; i<depth; i++)
+      s.WriteData (image.Bitmap (i), layer_size);
+  }*/
+}
+
+media::geometry::Mesh read (InputStream& s, xtl::type<media::geometry::Mesh>)
+{
+  object_id_t object_id = read (s, xtl::type<object_id_t> ());
+
+  if (object_id)
+  {
+    media::geometry::Mesh mesh = InprocessExchangeStorage::Attachment<media::geometry::Mesh> (object_id);
+
+    InprocessExchangeStorage::Detach (object_id);
+
+    return mesh;
+  }
+/*  else
+  {
+    uint32 width = read (s, xtl::type<uint32> ()), height = read (s, xtl::type<uint32> ()), depth = read (s, xtl::type<uint32> ()), format = read (s, xtl::type<uint32> ());
+
+    media::Image image (width, height, depth, (media::PixelFormat)format);
+
+    unsigned int layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
+
+    for (unsigned int i=0; i<depth; i++)
+      s.ReadData (image.Bitmap (i), layer_size);
+
+    return image;
+  }*/
+}
+
 }}}

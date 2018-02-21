@@ -12,8 +12,10 @@
 #include <common/strlib.h>
 #include <common/time.h>
 
+#include <media/geometry/mesh.h>
 #include <media/image.h>
 
+#include <sg/dynamic_mesh.h>
 #include <sg/light.h>
 #include <sg/line.h>
 #include <sg/mesh.h>
@@ -49,6 +51,7 @@ class SceneFactory
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание различных типов объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+Node* create_node (scene_graph::DynamicMesh&, SceneManager& scene_manager);
 Node* create_node (scene_graph::StaticMesh&, SceneManager& scene_manager);
 Node* create_node (scene_graph::PointLight&, SceneManager& scene_manager);
 Node* create_node (scene_graph::DirectLight&, SceneManager& scene_manager);

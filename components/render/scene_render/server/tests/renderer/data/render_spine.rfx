@@ -1,0 +1,106 @@
+library "data/shaders/*"
+
+//blend stage state for rendering tranparent geometry
+blend "transparent"
+{
+  blend_enable      true                        //blending is enabled
+  alpha_to_coverage false                       //alpha to coverage is enabled
+  blend_color       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  blend_alpha       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  color_write_mask  rgba                        //write color to all color planes
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "no_z_test"
+{
+  depth_test   false     //z-test is disabled
+  depth_write  false     //write to z-buffer is disabled
+  stencil_test false    //stencil test is disabled
+}
+
+//default rasterizer stage settings
+rasterizer "default"
+{
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  true   //front faces is described as clockwise
+  cull_mode                none   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//texture sampler description
+sampler "default"
+{
+  min_filter      linear_mip_linear //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//program instance for flat program, specified by (material, entity, frame)
+program "flat"
+{
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse"  "DiffuseTexture"
+}
+
+//description of effects rendering
+effect "main"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  effect_group "clearing"        //clear frame
+
+  //child effects for rendering geometry in selected light
+  effect_group "lighting" //use only effects with tag 'lighting'
+}
+
+effect "lighting"
+{
+  tags "lighting"
+
+  //render transparent geometry
+  pass
+  {
+    tags                  "transparent"             //render only transparent geometry
+    sort                  back_to_front             //sort geometry in back-to-front order for correct transaparent rendering
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "transparent"             //use blend stage settings for transaparent geometry
+    depth_stencil_state   "no_z_test"                   //use depth stencil stage settings for transaparent geometry
+    rasterizer_state      "default"                 //use default rasterizer
+  }
+}
+
+effect "clearing"
+{
+  tags "clearing"
+
+  pass
+  {
+    tags                  ""
+    clear                 all
+    color_targets         "default_color"
+    depth_stencil_target  "default_depth_stencil"
+  }
+}
+
+technique "default"
+{
+  effect  "main"                    //name of the root effect for this technique
+
+  program "draw_without_lights" //name of the builtin program for scene enumeration
+  {
+    effect "lighting"
+  }
+}
+
+batch '*'
