@@ -16,6 +16,7 @@ struct VertexStream::Impl: public xtl::reference_counter
   uint32_t     vertices_count; //количество вершин
   
   Impl ();
+  Impl (const Impl& impl);           //used for clone
   Impl (const VertexDeclaration&);
 };
 
@@ -25,6 +26,13 @@ struct VertexStream::Impl: public xtl::reference_counter
 
 VertexStream::Impl::Impl ()
   : vertex_size (0), vertices_count (0)
+  {}
+
+VertexStream::Impl::Impl (const Impl& source)
+  : format (source.format.Clone ())
+  , vertex_size (source.vertex_size)
+  , data_buffer (source.data_buffer)
+  , vertices_count (source.vertices_count)
   {}
 
 VertexStream::Impl::Impl (const VertexDeclaration& declaration)

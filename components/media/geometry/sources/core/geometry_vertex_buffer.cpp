@@ -18,6 +18,7 @@ struct VertexBuffer::Impl: public xtl::reference_counter
   VertexWeightStream weights;   //массив весов
 
   Impl ();
+  Impl (const Impl&); //used for clone
 };
 
 /*
@@ -29,6 +30,15 @@ VertexBuffer::Impl::Impl ()
   streams.reserve (DEFAULT_VERTEX_ARRAY_RESERVE);
 }
   
+VertexBuffer::Impl::Impl (const Impl& impl)
+  : weights (impl.weights.Clone ())
+{
+  streams.reserve (impl.streams.size ());
+
+  for (VertexStreamArray::const_iterator iter = impl.streams.begin (), end = impl.streams.end (); iter != end; ++iter)
+    streams.push_back (iter->Clone ());
+}
+
 /*
     Конструкторы / деструктор
 */

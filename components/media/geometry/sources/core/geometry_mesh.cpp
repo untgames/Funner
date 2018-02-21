@@ -34,7 +34,7 @@ struct Mesh::Impl: public xtl::reference_counter
   bool                         need_material_names_update; //необходимо обновить имена материалов
   
   Impl (); 
-  Impl (const Impl&);
+  Impl (const Impl&); //used for clone
 };
 
 /*
@@ -51,12 +51,15 @@ Mesh::Impl::Impl ()
 
 Mesh::Impl::Impl (const Impl& impl)
   : name (impl.name),
-    vertex_buffers (impl.vertex_buffers),
-    index_buffer (impl.index_buffer),
+    index_buffer (impl.index_buffer.Clone ()),
     primitives (impl.primitives),
     material_names (impl.material_names),
     need_material_names_update (true)
 {
+  vertex_buffers.reserve (impl.vertex_buffers.size ());
+
+  for (VertexBufferArray::const_iterator iter = impl.vertex_buffers.begin (), end = impl.vertex_buffers.end (); iter != end; ++iter)
+    vertex_buffers.push_back (iter->Clone ());
 }
 
 /*
