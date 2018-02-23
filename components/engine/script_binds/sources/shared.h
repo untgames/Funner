@@ -32,10 +32,19 @@
 #include <media/charset_manager.h>
 #include <media/image.h>
 #include <media/font_library.h>
+#include <media/spine/animation_state.h>
+#include <media/spine/animation_state_data.h>
+#include <media/spine/attachment.h>
+#include <media/spine/bone.h>
+#include <media/spine/skeleton.h>
+#include <media/spine/skeleton_data.h>
+#include <media/spine/slot.h>
 
 #include <sg/scene_manager.h>
-#include <sg/controllers/sync_physics_to_node.h>
 #include <sg/controllers/animation.h>
+#include <sg/controllers/spine_animation.h>
+#include <sg/controllers/spine_skeleton_visual_structure_builder.h>
+#include <sg/controllers/sync_physics_to_node.h>
 
 #include <input/scene_input.h>
 

@@ -51,6 +51,7 @@ const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
 const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
 const char* SCENE_PARTICLE_EMITTER_LIBRARY                = "Scene.ParticleEmitter";
+const char* SCENE_SPINE_SKELETON_LIBRARY                  = "Scene.SpineSkeleton";
 const char* BINDER_NAME                                   = "SceneGraph";
 const char* COMPONENT_NAME                                = "script.binds.SceneGraph";
 
@@ -70,43 +71,57 @@ namespace scene_graph_script_bind
 
 void bind_scene_graph_library (Environment& environment)
 {
-  bind_scene_library                           (environment);
-  bind_node_library                            (environment);
-  bind_node_array_library                      (environment);
-  bind_controller_owner_mode_library           (environment);
-  bind_controller_library                      (environment);
-  bind_entity_library                          (environment);
-  bind_visual_model_library                    (environment);
-  bind_scissor_library                         (environment);
-  bind_perspective_camera_library              (environment);
-  bind_ortho_camera_library                    (environment);
-  bind_light_library                           (environment);
-  bind_direct_light_library                    (environment);
-  bind_spot_light_library                      (environment);
-  bind_point_light_library                     (environment);
-  bind_box_helper_library                      (environment);
-  bind_listener_library                        (environment);
-  bind_page_curl_library                       (environment);
-  bind_sound_emitter_library                   (environment);
-  bind_sprite_model_library                    (environment);
-  bind_sprite_library                          (environment);
-  bind_line_model_library                      (environment);
-  bind_line_library                            (environment);
-  bind_text_model_library                      (environment);
-  bind_text_line_library                       (environment);
-  bind_static_mesh_library                     (environment);
-  bind_particle_emitter_library                (environment);
-  bind_height_map_library                      (environment);
-  bind_controller_water_library                (environment);
-  bind_controller_move_to_node_point_library   (environment);
-  bind_controller_look_to_node_point_library   (environment);
-  bind_controller_align_with_node_library      (environment);
-  bind_linear_acceleration_evaluator_library   (environment);
-  bind_controller_sync_physics_to_node_library (environment);
-  bind_controller_animation_library            (environment);
-  bind_scene_manager_library                   (environment);
-  bind_screen_viewport_library                 (environment);
-  bind_input_library                           (environment);
+  //bind visuals
+  bind_node_library             (environment);
+  bind_node_array_library       (environment);
+  bind_entity_library           (environment);
+  bind_visual_model_library     (environment);
+  bind_box_helper_library       (environment);
+  bind_height_map_library       (environment);
+  bind_line_model_library       (environment);
+  bind_line_library             (environment);
+  bind_page_curl_library        (environment);
+  bind_particle_emitter_library (environment);
+  bind_spine_skeleton_library   (environment);
+  bind_sprite_model_library     (environment);
+  bind_sprite_library           (environment);
+  bind_static_mesh_library      (environment);
+  bind_text_model_library       (environment);
+  bind_text_line_library        (environment);
+
+  //bind cameras
+  bind_ortho_camera_library       (environment);
+  bind_perspective_camera_library (environment);
+
+  //bind lights
+  bind_light_library        (environment);
+  bind_direct_light_library (environment);
+  bind_point_light_library  (environment);
+  bind_spot_light_library   (environment);
+
+  //bind sound
+  bind_listener_library      (environment);
+  bind_sound_emitter_library (environment);
+
+  //bind controllers
+  bind_controller_library                                         (environment);
+  bind_controller_align_with_node_library                         (environment);
+  bind_controller_animation_library                               (environment);
+  bind_controller_look_to_node_point_library                      (environment);
+  bind_controller_move_to_node_point_library                      (environment);
+  bind_controller_owner_mode_library                              (environment);
+  bind_controller_spine_animation_library                         (environment);
+  bind_controller_spine_skeleton_visual_structure_builder_library (environment);
+  bind_controller_sync_physics_to_node_library                    (environment);
+  bind_controller_water_library                                   (environment);
+
+  //bind other libraries
+  bind_input_library                         (environment);
+  bind_linear_acceleration_evaluator_library (environment);
+  bind_scene_library                         (environment);
+  bind_scene_manager_library                 (environment);
+  bind_scissor_library                       (environment);
+  bind_screen_viewport_library               (environment);
 }
 
 /*

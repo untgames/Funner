@@ -27,7 +27,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.social link.engine.script_binds.debug \
                                 link.engine.script_binds.scene_input link.engine.script_binds.store \
                                 link.engine.script_binds.analytics.flurry link.engine.script_binds.media.font \
-                                link.engine.script_binds.push_notifications \
+                                link.engine.script_binds.push_notifications link.engine.script_binds.media.spine \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \
@@ -37,7 +37,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.media.rfx.default_serializers link.media.geometry.binmesh link.media.geometry.xmesh \
                                 link.media.video.theora link.media.particles.particle_designer_serializer link.network link.common.iconv \
                                 link.physics.low_level.bullet_driver link.media.animation.xanim link.media.animation.binanim \
-                                link.scene_graph.xscene link.social.facebook
+                                link.scene_graph.xscene link.social.facebook link.media.spine.loader_3.6
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain

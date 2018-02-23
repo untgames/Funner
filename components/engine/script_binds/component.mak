@@ -13,7 +13,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_gr
                                             compile.engine.core compile.media.rms compile.media.players compile.media.font \
                                             compile.math.curves compile.network compile.physics.scene_physics \
                                             compile.social.core compile.input.scene_input compile.store.core \
-                                            compile.media.image compile.analytics.flurry \
+                                            compile.media.image compile.media.spine compile.analytics.flurry \
                                             compile.push_notifications.core
 
 #Цель №2 - SCRIPT_BINDS tests
@@ -29,4 +29,5 @@ ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath
                                          link.engine.script_binds.physics link.engine.script_binds.math.spline_loader \
                                          link.engine.script_binds.social link.scene_graph.xscene link.media.animation.xanim \
                                          link.engine.script_binds.debug link.engine.script_binds.scene_input link.common.aes \
-                                         link.engine.script_binds.media.image link.engine.script_binds.media.font
+                                         link.engine.script_binds.media.image link.engine.script_binds.media.font \
+                                         link.engine.script_binds.media.spine link.media.spine.loader_3.6

@@ -5,19 +5,23 @@ using namespace scene_graph;
 namespace
 {
 
-const char* SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY      = "Scene.Controllers.AlignWithNode";
-const char* SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY   = "Scene.Controllers.LookToNodePoint";
-const char* SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY   = "Scene.Controllers.MoveToNodePoint";
-const char* SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY = "Scene.Controllers.SyncPhysicsToNode";
-const char* SCENE_CONTROLLER_WATER_LIBRARY                = "Scene.Controllers.Water";
+const char* SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY                         = "Scene.Controllers.AlignWithNode";
+const char* SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY                      = "Scene.Controllers.LookToNodePoint";
+const char* SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY                      = "Scene.Controllers.MoveToNodePoint";
+const char* SCENE_CONTROLLER_SPINE_ANIMATION_LIBRARY                         = "Scene.Controllers.SpineAnimation";
+const char* SCENE_CONTROLLER_SPINE_SKELETON_VISUAL_STRUCTURE_BUILDER_LIBRARY = "Scene.Controllers.SpineSkeletonVisualStructureBuilder";
+const char* SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY                    = "Scene.Controllers.SyncPhysicsToNode";
+const char* SCENE_CONTROLLER_WATER_LIBRARY                                   = "Scene.Controllers.Water";
 
 }
 
-template class engine::decl_sg_cast<controllers::AlignWithNode,     Controller>;
-template class engine::decl_sg_cast<controllers::LookToNodePoint,   Controller>;
-template class engine::decl_sg_cast<controllers::MoveToNodePoint,   Controller>;
-template class engine::decl_sg_cast<controllers::SyncPhysicsToNode, Controller>;
-template class engine::decl_sg_cast<controllers::Water,             Controller>;
+template class engine::decl_sg_cast<controllers::AlignWithNode,                       Controller>;
+template class engine::decl_sg_cast<controllers::LookToNodePoint,                     Controller>;
+template class engine::decl_sg_cast<controllers::MoveToNodePoint,                     Controller>;
+template class engine::decl_sg_cast<controllers::SpineAnimation,                      Controller>;
+template class engine::decl_sg_cast<controllers::SpineSkeletonVisualStructureBuilder, Controller>;
+template class engine::decl_sg_cast<controllers::SyncPhysicsToNode,                   Controller>;
+template class engine::decl_sg_cast<controllers::Water,                               Controller>;
 
 namespace engine
 {
@@ -156,6 +160,33 @@ void bind_controller_sync_physics_to_node_library (Environment& environment)
   lib.Register ("get_AttachedBody", make_invoker (&SyncPhysicsToNode::AttachedBody));
 
   environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
+}
+
+void bind_controller_spine_animation_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_SPINE_ANIMATION_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+  lib.Register ("Create",             make_invoker (&SpineAnimation::Create));
+  lib.Register ("get_AnimationState", make_invoker (&SpineAnimation::AnimationState));
+
+  environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_SPINE_ANIMATION_LIBRARY);
+}
+
+void bind_controller_spine_skeleton_visual_structure_builder_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_SPINE_SKELETON_VISUAL_STRUCTURE_BUILDER_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+  lib.Register ("Create", make_invoker (&SpineSkeletonVisualStructureBuilder::Create));
+
+  environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_SPINE_SKELETON_VISUAL_STRUCTURE_BUILDER_LIBRARY);
 }
 
 }
