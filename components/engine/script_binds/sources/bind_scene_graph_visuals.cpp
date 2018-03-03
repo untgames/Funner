@@ -403,8 +403,8 @@ void bind_particle_emitter_library (Environment& environment)
     //регистрация функций создания
 
   lib.Register ("Create", make_invoker (make_invoker (&create_particle_emitter),
-                                        make_invoker<void (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
-                                        make_invoker<void (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
+                                        make_invoker<ParticleEmitter::Pointer (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
+                                        make_invoker<ParticleEmitter::Pointer (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
 
     //регистрация операций
 
