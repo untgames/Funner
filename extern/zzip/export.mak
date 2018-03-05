@@ -2,6 +2,7 @@
 export.compile.extern.zzip.INCLUDE_DIRS                   := include
 export.compile.extern.zzip.nds.g++.COMPILER_DEFINES       := ZZIP_1_H
 export.compile.extern.zzip.macosx.COMPILER_DEFINES        := ZZIP_1_H
+export.compile.extern.zzip.linux.COMPILER_DEFINES         := ZZIP_1_H
 export.compile.extern.zzip.iphone.COMPILER_DEFINES        := ZZIP_1_H
 export.compile.extern.zzip.mingw.COMPILER_DEFINES         := ZZIP_2_H
 export.compile.extern.zzip.bada.COMPILER_DEFINES          := ZZIP_3_H

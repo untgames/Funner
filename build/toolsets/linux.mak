@@ -9,7 +9,7 @@ EXE_SUFFIX    :=
 DLL_SUFFIX    := .so
 DLL_PREFIX    := lib
 DLL_PATH      := LD_LIBRARY_PATH
-COMMON_CFLAGS += -DLINUX
+COMMON_CFLAGS += -DLINUX -fvisibility=hidden
 LIB_GCC       := ar
 SHELL         := /bin/bash
 
