@@ -16,7 +16,7 @@ SHELL         := /bin/bash
 PROFILES += linux unistd x11 glx haswchar pthread_static_library has_windows x86
 
 COMMON_CFLAGS     += -m32
-COMMON_LINK_FLAGS += -m32
+COMMON_LINK_FLAGS += -m32 -Wl,--gc-sections
 
 ADDITIONAL_PATHS=$$(pwd)/$(BUILD_DIR)tools/linux
 

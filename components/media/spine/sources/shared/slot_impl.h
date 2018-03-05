@@ -34,7 +34,7 @@ class SlotImpl : virtual public IObject
 ///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual math::vec4f             Color          () = 0;
-    virtual BlendMode               BlendMode      () = 0;
+    virtual media::spine::BlendMode BlendMode      () = 0;
             media::spine::Bone*     Bone           ();
     virtual bool                    HasBone        () = 0;
     virtual media::spine::BoneImpl* CreateBoneImpl () = 0;

@@ -140,7 +140,7 @@ void SkeletonData::Load (const char* skeleton_file_name, const char* atlas_file_
             spine_version_start++;  //now spine_version_start should point to first digit of spine version
 
             //find closing symbol of version string
-            char* spine_version_end = strchr (spine_version_start, '\"');
+            char* spine_version_end = const_cast<char*> (strchr (spine_version_start, '\"'));
 
             if (spine_version_end)
             {

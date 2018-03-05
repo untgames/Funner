@@ -31,16 +31,16 @@ class AnimationState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with tracks
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TrackEntry   SetAnimation          (unsigned int track, const char* animation, bool looped);
-    TrackEntry   SetEmptyAnimation     (unsigned int track, float mix_duration);
-    void         SetEmptyAnimations    (float mix_duration);
-    TrackEntry   EnqueueAnimation      (unsigned int track, const char* animation, bool looped, float delay);
-    TrackEntry   EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay);
-    unsigned int TracksCount           () const;
-    void         ClearTrack            (unsigned int track);
-    void         ClearTracks           ();
-    bool         HasTrackEntry         (unsigned int track) const;
-    TrackEntry   TrackEntry            (unsigned int track) const;
+    media::spine::TrackEntry SetAnimation          (unsigned int track, const char* animation, bool looped);
+    media::spine::TrackEntry SetEmptyAnimation     (unsigned int track, float mix_duration);
+    void                     SetEmptyAnimations    (float mix_duration);
+    media::spine::TrackEntry EnqueueAnimation      (unsigned int track, const char* animation, bool looped, float delay);
+    media::spine::TrackEntry EnqueueEmptyAnimation (unsigned int track, float mix_duration, float delay);
+    unsigned int             TracksCount           () const;
+    void                     ClearTrack            (unsigned int track);
+    void                     ClearTracks           ();
+    bool                     HasTrackEntry         (unsigned int track) const;
+    media::spine::TrackEntry TrackEntry            (unsigned int track) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Register for animation events

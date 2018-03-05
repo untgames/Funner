@@ -67,9 +67,9 @@ class Skeleton
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Rendering. Meshes are sorted in draw order
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int    MeshesCount () const;
-    geometry::Mesh  Mesh        (unsigned int mesh_index) const;
-    const Material& Material    (const char* name) const;
+    unsigned int                  MeshesCount () const;
+    geometry::Mesh                Mesh        (unsigned int mesh_index) const;
+    const media::spine::Material& Material    (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)

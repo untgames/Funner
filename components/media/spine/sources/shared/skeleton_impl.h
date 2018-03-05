@@ -44,12 +44,12 @@ class SkeletonImpl : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with bones
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-            Bone&        RootBone       ();
-            Bone&        Bone           (unsigned int index);
-    virtual unsigned int BonesCount     () = 0;
-    virtual BoneImpl*    CreateBoneImpl (unsigned int index) = 0;
-    virtual int          RootBoneIndex  () = 0;
-    virtual int          FindBoneIndex  (const char* name) = 0;
+            media::spine::Bone& RootBone       ();
+            media::spine::Bone& Bone           (unsigned int index);
+    virtual unsigned int        BonesCount     () = 0;
+    virtual BoneImpl*           CreateBoneImpl (unsigned int index) = 0;
+    virtual int                 RootBoneIndex  () = 0;
+    virtual int                 FindBoneIndex  (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Work with slots

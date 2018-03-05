@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_SPINE_SHARED_ATTACHMENT_HEADER
 #define MEDIALIB_SPINE_SHARED_ATTACHMENT_HEADER
 
+#include <stdint.h>
+
 #include <xtl/shared_ptr.h>
 
 #include <media/spine/attachment.h>
