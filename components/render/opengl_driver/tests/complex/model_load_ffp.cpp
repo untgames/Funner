@@ -379,84 +379,9 @@ struct MyShaderParameters
   math::vec3f light_dir;
 };
 
-ModelPtr load_model (const DevicePtr& device, const char* file_name)
-{
-  printf ("Load model '%s':\n", file_name);
-
-  return ModelPtr (new Model (device, file_name));
-}
-
 void print (const char* message)
 {
   printf ("Shader message: '%s'\n", message);
-}
-
-Model* model_ptr = 0;
-
-size_t frames_count = 0;
-
-void redraw (Test& test)
-{
-  Model& model = *model_ptr;
-  
-  model.Draw ();
-
-  frames_count++;
-}
-
-void idle (Test& test)
-{
-  if (test.window.IsClosed ())
-    return;
-    
-  static size_t last = 0;
-  static float angle;
-
-  static size_t last_fps = 0;  
-  
-  if (common::milliseconds () - last > 25)
-  {
-    float dt = (common::milliseconds () - last) / 1000.0f;
-    
-    MyShaderParameters my_shader_parameters;
-
-    IBuffer* cb = test.device->GetImmediateContext ()->SSGetConstantBuffer (0);
-
-    if (!cb)
-    {
-      printf ("Null constant buffer #0\n");
-      return;
-    }
-
-    cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
-    angle += 0.5f * dt;
-
-    my_shader_parameters.object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-                                     math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0));
-
-    my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
-    my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
-
-    cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);    
-    
-    last = common::milliseconds ();
-    
-    return;
-  }  
-
-  if (common::milliseconds () - last_fps > 1000)
-  {
-    printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
-    fflush (stdout);
-
-    last_fps = common::milliseconds ();
-    frames_count = 0;
-    return;
-  }
-
-//  test.window.Invalidate ();
-  test.OnRedraw ();
 }
 
 //получение ортографической матрицы проекции
@@ -478,74 +403,222 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
+class ModelLoadApplication
+{
+  TestPtr                    test;
+  ModelPtr                   model;
+  BufferPtr                  cb;
+  ProgramPtr                 shader;
+  ProgramParametersLayoutPtr program_parameters_layout;
+  size_t                     frames_count;
+
+  void OnInitialize ()
+  {
+    try
+    {
+      test = new Test (L"OpenGL device test window (model_load)", xtl::bind(&ModelLoadApplication::OnRedraw, this, _1));
+
+      test->window.Show ();
+
+      LoadModel (MODEL_NAME);
+      SetShaderStage ();
+    }
+    catch (const xtl::exception& e)
+    {
+      printf("%s failed: %s\n", __FUNCTION__, e.what());
+      syslib::Application::Exit (1);
+    }
+  }
+
+  void OnExit ()
+  {
+    // Test object should be destroyed
+    // BEFORE application exit.
+    model.reset ();
+    test.reset ();
+  }
+
+  void OnIdle ()
+  {
+    if (!test)
+      return;
+
+    if (test->window.IsClosed ())
+      return;
+      
+    static size_t last = 0;
+    static float angle;
+
+    static size_t last_fps = 0;  
+    
+    if (common::milliseconds () - last > 25)
+    {
+      float dt = (common::milliseconds () - last) / 1000.0f;
+      
+      MyShaderParameters my_shader_parameters;
+
+      IBuffer* constant_buffer = test->device->GetImmediateContext ()->SSGetConstantBuffer (0);
+
+      if (!constant_buffer)
+      {
+        printf ("Null constant buffer #0\n");
+        return;
+      }
+
+      constant_buffer->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+      angle += 0.5f * dt;
+
+      my_shader_parameters.object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+                                       math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0));
+
+      my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+      my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
+
+      constant_buffer->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+      
+      last = common::milliseconds ();
+      
+      return;
+    }  
+
+    if (common::milliseconds () - last_fps > 1000)
+    {
+      printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+      fflush (stdout);
+
+      last_fps = common::milliseconds ();
+      frames_count = 0;
+      return;
+    }
+
+//    testwindow->Invalidate ();
+    test->OnRedraw ();
+  }
+
+  void OnRedraw (Test& test)
+  {
+    if (!model)
+      return;
+
+    model->Draw ();
+
+    frames_count++;
+  }
+
+  void LoadModel (const char* file_name)
+  {
+    try
+    {
+      printf ("Load model '%s':\n", file_name);
+  
+      model = ModelPtr (new Model (test->device, file_name));
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+  void SetShaderStage()
+  {
+    try
+    {
+      printf ("Set shader stage\n");
+
+      stl::string shader_source = read_shader (SHADER_FILE_NAME);
+
+      ShaderDesc shader_descs [] = {
+        {"ffp_shader", (unsigned int)-1, shader_source.c_str (), "ffp", ""},
+      };
+
+      static ProgramParameter shader_parameters[] = {
+        {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, proj_tm)},
+        {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, view_tm)},
+        {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, object_tm)},
+        {"lightPos", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_pos)},
+        {"lightDir", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_dir)},
+      };
+
+      ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+
+      shader = ProgramPtr (test->device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
+      program_parameters_layout = ProgramParametersLayoutPtr (test->device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
+
+      BufferDesc cb_desc;
+
+      memset (&cb_desc, 0, sizeof cb_desc);
+
+      cb_desc.size         = sizeof (MyShaderParameters);
+      cb_desc.usage_mode   = UsageMode_Default;
+      cb_desc.bind_flags   = BindFlag_ConstantBuffer;
+      cb_desc.access_flags = AccessFlag_ReadWrite;
+
+      cb = BufferPtr (test->device->CreateBuffer (cb_desc), false);
+
+      MyShaderParameters my_shader_parameters;
+
+      my_shader_parameters.proj_tm   = get_ortho_proj (-100, 100, -100, 100, -1000, 1000);
+      my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
+
+      cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+      test->device->GetImmediateContext ()->SSSetProgram (shader.get ());
+      test->device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+      test->device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (__FUNCTION__);
+      throw;
+    }
+  }
+
+public:
+  ModelLoadApplication ()
+    : frames_count()
+  {
+    printf ("Register callbacks\n");
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnInitialize
+      , xtl::bind(&ModelLoadApplication::OnInitialize, this)
+    );
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnExit
+      , xtl::bind(&ModelLoadApplication::OnExit, this)
+    );
+
+    syslib::Application::RegisterEventHandler (
+        syslib::ApplicationEvent_OnIdle
+      , xtl::bind(&ModelLoadApplication::OnIdle, this)
+    );
+  }
+
+  void Run ()
+  {
+    printf ("Main loop\n");
+
+    syslib::Application::Run ();
+  }
+};
+
 int main ()
 {
   printf ("Results of model_load_test:\n");
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw);
+    ModelLoadApplication app;
 
-    test.window.Show ();
-
-    ModelPtr model = load_model (test.device, MODEL_NAME);
-
-    model_ptr = model.get ();
-
-    printf ("Set shader stage\n");
-
-    stl::string shader_source  = read_shader (SHADER_FILE_NAME);
-
-    ShaderDesc shader_descs [] = {
-      {"ffp_shader", (unsigned int)-1, shader_source.c_str (), "ffp", ""},
-    };
-
-    static ProgramParameter shader_parameters[] = {
-      {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, proj_tm)},
-      {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, view_tm)},
-      {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, object_tm)},
-      {"lightPos", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_pos)},
-      {"lightDir", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_dir)},
-    };
-
-    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
-
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
-
-    BufferDesc cb_desc;
-
-    memset (&cb_desc, 0, sizeof cb_desc);
-
-    cb_desc.size         = sizeof (MyShaderParameters);
-    cb_desc.usage_mode   = UsageMode_Default;
-    cb_desc.bind_flags   = BindFlag_ConstantBuffer;
-    cb_desc.access_flags = AccessFlag_ReadWrite;
-
-    BufferPtr cb (test.device->CreateBuffer (cb_desc), false);
-
-    MyShaderParameters my_shader_parameters;
-
-    my_shader_parameters.proj_tm   = get_ortho_proj (-100, 100, -100, 100, -1000, 1000);
-    my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
-
-    cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
-    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
-    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
-
-    printf ("Register callbacks\n");
-
-    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
-
-    printf ("Main loop\n");
-
-    syslib::Application::Run ();
+    app.Run ();
   }
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
+    return 1;
   }
 
   return 0;
