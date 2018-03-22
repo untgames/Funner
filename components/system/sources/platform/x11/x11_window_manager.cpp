@@ -659,13 +659,14 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
         window_rect.right  = (size_t)event.xconfigure.x + event.xconfigure.width;
         window_rect.bottom = (size_t)event.xconfigure.y + event.xconfigure.height;
         
+        //this event is sent on window creation, so do not send change event in this case
         if (window_rect_init)
         {
           if (is_moved)   Notify (WindowEvent_OnMove, message);
           if (is_resized) Notify (WindowEvent_OnSize, message);
         }
         else
-        {        
+        {
           window_rect_init = true;
         }
         
@@ -1133,6 +1134,15 @@ void XlibWindowManager::GetWindowRect (window_t handle, Rect& rect)
     rect.top    = (size_t)y_return;
     rect.right  = rect.left + width_return;
     rect.bottom = rect.top + height_return;
+
+    //Window may change it's size more than once during creation before sending first ConfigureNotify.
+    //In this case other code may request window rect before ConfigureNotify was sent and if we do not save rect and init flag here,
+    //ConfigureNotify handler will not send resize notification
+    if (!handle->window_rect_init)
+    {
+      handle->window_rect      = rect;
+      handle->window_rect_init = true;
+    }
   }  
   catch (xtl::exception& e)
   {
