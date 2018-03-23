@@ -437,6 +437,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   XWindow              window;                //дескриптор окна
   bool                 is_destroyed;          //удалено ли окно
   bool                 background_state;      //ложное свойство - состояние фона
+  Point                last_cursor_position;  //последнее положение курсора, для которого было отправлено оповещение, для фильтрации дублирующих оповещений
   Rect                 window_rect;           //область окна
   bool                 window_rect_init;      //инициализирована ли область окна
   Cursor               invisible_cursor;      //невидимый курсор
@@ -528,7 +529,16 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       delete &sender;
     }
   };
-  
+
+  void NotifyMouseMove (const xtl::intrusive_ptr<Message>& message)
+  {
+    if (last_cursor_position.x == message->context.cursor_position.x && last_cursor_position.y == message->context.cursor_position.y)
+      return;
+
+    last_cursor_position = message->context.cursor_position;
+
+    Notify (WindowEvent_OnMouseMove, message);
+  }
   
 ///Обработчик события
   void ProcessEvent (const XEvent& event)
@@ -570,10 +580,12 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       }
       case ButtonPress:
       {
-        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-        
+        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);
+
         GetKeysState (event.xbutton.state, context);
         
+        NotifyMouseMove (message);
+
         switch (event.xbutton.button)
         {
           case Button1: Notify (WindowEvent_OnLeftButtonDown, message); break;
@@ -589,8 +601,10 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       case ButtonRelease:
       {
         context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-        
+
         GetKeysState (event.xbutton.state, context);
+        
+        NotifyMouseMove (message);
         
         switch (event.xbutton.button)
         {
@@ -607,10 +621,10 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       case MotionNotify:
       {
         context.cursor_position = Point (event.xmotion.x, event.xmotion.y);
-        
+
         GetKeysState (event.xmotion.state, context);
         
-        Notify (WindowEvent_OnMouseMove, message);
+        NotifyMouseMove (message);
         
         break;
       }
