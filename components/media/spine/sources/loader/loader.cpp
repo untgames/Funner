@@ -41,6 +41,17 @@ void _spAtlasPage_disposeTexture (spAtlasPage* self)
   delete (stl::string*)self->rendererObject;
 }
 
+#ifdef _MSC_VER
+
+char* _spUtil_readFile (const char* path, int* length)
+{
+  //this function is not used, but MSVC can't link exes without it
+  printf ("ERROR: _spUtil_readFile was called, but it shouldn't\n");
+  return 0;
+}
+
+#endif
+
 }
 
 namespace components

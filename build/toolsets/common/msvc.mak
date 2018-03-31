@@ -19,7 +19,7 @@ endif
   MSVS_COMMON_PATH  ?= $(VS140COMNTOOLS)../../Common7/Ide
   PROFILES          += vc14 haswchar  
   COMMON_CFLAGS     += -wd4005
-  INCLUDE           := $(UCRT_PATH)Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
 endif
 
 ifneq (,$(VS130COMNTOOLS))

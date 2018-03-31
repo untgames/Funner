@@ -70,17 +70,6 @@ namespace media
 namespace spine
 {
 
-//template specialization
-
-template <>
-const PointAttachmentData* Attachment::AttachmentData<PointAttachmentData> () const
-{
-  if (Type () == AttachmentType_Point)
-    return static_cast<const PointAttachmentData*> (TypeSpecificData ());
-
-  return 0;
-}
-
 /*
    Swap
 */

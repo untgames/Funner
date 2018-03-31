@@ -3,20 +3,29 @@
 */
 
 template <class T>
-const T* Attachment::AttachmentData () const
+inline const T* Attachment::AttachmentData () const
 {
   //we specialize implementation for known types, for all other types just return 0
   return 0;
 }
 
+template <>
+inline const PointAttachmentData* Attachment::AttachmentData<PointAttachmentData> () const
+{
+  if (Type () == AttachmentType_Point)
+    return static_cast<const PointAttachmentData*> (TypeSpecificData ());
+
+  return 0;
+}
+
 template <class T>
-T* Attachment::AttachmentData ()
+inline T* Attachment::AttachmentData ()
 {
   return const_cast<T*> (const_cast<const Attachment&> (*this).AttachmentData<T> ());
 }
 
 template <class T>
-T Attachment::GetAttachmentData () const
+inline T Attachment::GetAttachmentData () const
 {
   const T* data = AttachmentData<T> ();
 
