@@ -789,7 +789,7 @@
 #define NTLM_WB_FILE "/usr/bin/ntlm_auth"
 
 /* cpu-machine-OS */
-#define OS "linux_x86_64"
+#define OS "linux_i386"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -870,7 +870,7 @@
 #define SIZEOF_INT 4
 
 /* The size of `long', as computed by sizeof. */
-#define SIZEOF_LONG 8
+#define SIZEOF_LONG 4
 
 /* The size of `long long', as computed by sizeof. */
 /* #undef SIZEOF_LONG_LONG */
@@ -882,13 +882,13 @@
 #define SIZEOF_SHORT 2
 
 /* The size of `size_t', as computed by sizeof. */
-#define SIZEOF_SIZE_T 8
+#define SIZEOF_SIZE_T 4
 
 /* The size of `time_t', as computed by sizeof. */
-#define SIZEOF_TIME_T 8
+#define SIZEOF_TIME_T 4
 
 /* The size of `void*', as computed by sizeof. */
-#define SIZEOF_VOIDP 8
+#define SIZEOF_VOIDP 4
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -988,11 +988,6 @@
 /* Define to 1 if OS is AIX. */
 #ifndef _ALL_SOURCE
 /* #  undef _ALL_SOURCE */
-#endif
-
-/* Enable large inode numbers on Mac OS X 10.5.  */
-#ifndef _DARWIN_USE_64_BIT_INODE
-# define _DARWIN_USE_64_BIT_INODE 1
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */

@@ -105,6 +105,7 @@ Skeleton:
                       has parent y
                       transform: rotation 0.50, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 247.50 x 0.00
                       world transform: rotation 90.27 x -179.73, scale 1.00 x 1.00, translation 7.51 x 839.24
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
   meshes (count 1):
     mesh 0:
       primitives (count 1):
@@ -421,6 +422,7 @@ Skeleton:
                       has parent y
                       transform: rotation 0.50, scale 1.00 x 1.00, shear 0.00 x 0.00, translation 247.50 x 0.00
                       world transform: rotation 90.27 x -179.73, scale 1.00 x 1.00, translation 7.46 x 839.24
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
   meshes (count 1):
     mesh 0:
       primitives (count 1):
@@ -2049,6 +2051,7 @@ Skeleton:
           has parent y
           transform: rotation -0.00, scale 0.62 x 0.62, shear 0.00 x 0.00, translation -11.45 x 318.24
           world transform: rotation -0.00 x 90.00, scale 0.62 x 0.62, translation -11.45 x 318.24
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
   meshes (count 7):
     mesh 0:
       primitives (count 1):
@@ -2864,6 +2867,7 @@ Skeleton:
           has parent y
           transform: rotation 0.00, scale 0.62 x 0.62, shear 0.00 x 0.00, translation -11.45 x 318.24
           world transform: rotation 0.00 x 90.00, scale 0.62 x 0.62, translation -11.45 x 318.24
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
   meshes (count 7):
     mesh 0:
       primitives (count 1):
@@ -3476,6 +3480,8 @@ Skeleton:
               has parent y
               transform: rotation -24.17, scale 1.00 x 1.48, shear 0.00 x 0.00, translation 0.00 x 0.00
               world transform: rotation -24.17 x 65.83, scale 1.00 x 1.48, translation 0.00 x 300.00
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
+media.spine.SkeletonImpl: Warning: skeleton contains clipping, this feature may work slow.
   meshes (count 2):
     mesh 0:
       primitives (count 1):
@@ -3710,6 +3716,8 @@ Skeleton:
               has parent y
               transform: rotation -24.17, scale 1.00 x 1.48, shear 0.00 x 0.00, translation 0.00 x 0.00
               world transform: rotation -24.17 x 65.83, scale 1.00 x 1.48, translation -0.00 x 300.00
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
+media.spine.SkeletonImpl: Warning: skeleton contains clipping, this feature may work slow.
   meshes (count 2):
     mesh 0:
       primitives (count 1):
@@ -8509,6 +8517,8 @@ Skeleton:
           has parent y
           transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation -1925.20 x 33.17
           world transform: rotation 0.00 x 90.00, scale 1.00 x 1.00, translation -1925.20 x 33.17
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
+media.spine.SkeletonImpl: Warning: skeleton contains clipping, this feature may work slow.
   meshes (count 4):
     mesh 0:
       primitives (count 2):
@@ -11636,6 +11646,8 @@ Skeleton:
           has parent y
           transform: rotation 0.00, scale 1.00 x 1.00, shear 0.00 x 0.00, translation -1925.20 x 33.17
           world transform: rotation 0.00 x 90.00, scale 1.00 x 1.00, translation -1925.20 x 33.17
+media.spine.SkeletonImpl: Warning: skeleton contains meshes, this feature may work slow.
+media.spine.SkeletonImpl: Warning: skeleton contains clipping, this feature may work slow.
   meshes (count 4):
     mesh 0:
       primitives (count 2):

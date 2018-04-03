@@ -128,12 +128,14 @@ class SkeletonImpl : virtual public IObject
     typedef stl::hash_map<stl::hash_key<const char*>, media::spine::Material> MaterialsMap;
 
   private:
-    BonesArray     bones;                //array of bones for returning media objects
-    SlotsArray     slots;                //array of slots for returning media objects
-    MeshesArray    sprites_meshes;       //array of meshes used for sprites attachments
-    MeshDescsArray triangle_list_meshes; //array of meshes used for mesh attachments
-    MeshesArray    draw_order;           //meshes array in draw order
-    MaterialsMap   materials;            //materials
+    bool           clipping_warning_reported; //we have sent message to log that skeleton contains clipping and it may work slow
+    bool           meshes_warning_reported;   //we have sent message to log that skeleton contains meshes and it may work slow
+    BonesArray     bones;                     //array of bones for returning media objects
+    SlotsArray     slots;                     //array of slots for returning media objects
+    MeshesArray    sprites_meshes;            //array of meshes used for sprites attachments
+    MeshDescsArray triangle_list_meshes;      //array of meshes used for mesh attachments
+    MeshesArray    draw_order;                //meshes array in draw order
+    MaterialsMap   materials;                 //materials
 };
 
 }

@@ -274,7 +274,7 @@ unsigned int SkeletonData::AnimationsCount () const
 const char* SkeletonData::AnimationName (unsigned int index) const
 {
   if (index >= AnimationsCount ())
-    throw xtl::make_range_exception ("media::spine::SkeletonData::AnimationName", "index", index, 0, AnimationsCount ());
+    throw xtl::make_range_exception ("media::spine::SkeletonData::AnimationName", "index", index, (size_t)0, AnimationsCount ());
 
   return impl->AnimationName (index);
 }
@@ -282,7 +282,7 @@ const char* SkeletonData::AnimationName (unsigned int index) const
 float SkeletonData::AnimationDuration (unsigned int index) const
 {
   if (index >= AnimationsCount ())
-    throw xtl::make_range_exception ("media::spine::SkeletonData::AnimationDuration", "index", index, 0, AnimationsCount ());
+    throw xtl::make_range_exception ("media::spine::SkeletonData::AnimationDuration", "index", index, (size_t)0, AnimationsCount ());
 
   return impl->AnimationDuration (index);
 }
@@ -302,7 +302,7 @@ unsigned int SkeletonData::SkinsCount () const
 const char* SkeletonData::SkinName (unsigned int index) const
 {
   if (index >= SkinsCount ())
-    throw xtl::make_range_exception ("media::spine::SkeletonData::SkinName", "index", index, 0, SkinsCount ());
+    throw xtl::make_range_exception ("media::spine::SkeletonData::SkinName", "index", index, (size_t)0, SkinsCount ());
 
   return impl->SkinName (index);
 }

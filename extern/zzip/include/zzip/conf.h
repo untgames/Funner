@@ -10,12 +10,7 @@
  * Author:
  *      Guido Draheim <guidod@gmx.de>
  *
- *      Copyright (c) 2001,2002,2003,2004 Guido Draheim
- *          All rights reserved,
- *          use under the restrictions of the
- *          Lesser GNU General Public License
- *          or alternatively the restrictions
- *          of the Mozilla Public License 1.1
+ * Copyright: (c) Guido Draheim, use under copyleft (LGPL,MPL)
  */
 
 #ifndef _ZZIP_CONF_H
@@ -163,19 +158,7 @@
 #include <io.h>
 #endif
 
-#ifdef _WIN32_WCE
-# if !__STDC__
-#  ifndef _zzip_lseek
-#  define _zzip_lseek lseek
-#  endif
-#  ifndef _zzip_read
-#  define _zzip_read read
-#  endif
-#  ifndef _zzip_write
-#  define _zzip_write write
-#  endif
-# endif /* !__STDC__ */
-#elif defined(_MSC_VER)
+#ifdef _MSC_VER
 # if !__STDC__
 #  ifndef _zzip_lseek
 #  define _zzip_lseek _lseek

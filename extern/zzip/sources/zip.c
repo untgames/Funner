@@ -1,15 +1,9 @@
-
 /*
  * Author:
  *      Guido Draheim <guidod@gmx.de>
  *      Tomi Ollila <too@iki.fi>
  *
- * Copyright (c) 1999,2000,2001,2002,2003 Guido Draheim
- *          All rights reserved,
- *          use under the restrictions of the
- *          Lesser GNU General Public License
- *          or alternatively the restrictions
- *          of the Mozilla Public License 1.1
+ * Copyright (c) Guido Draheim, use under copyleft (LGPL,MPL)
  */
 
 #include <zzip/lib.h>           /* archive handling */
@@ -31,8 +25,10 @@
 
 #define __sizeof(X) ((zzip_ssize_t)(sizeof(X)))
 
+#ifndef ZZIP_EASY
 /* per default, we use a little hack to correct bad z_rootseek parts */
 #define ZZIP_CORRECT_ROOTSEEK 1
+#endif
 
 #if (__GNUC__ == 3 && __GNUC_MINOR__ >= 3) || (__GNUC__ >= 4)
 # ifdef DEBUG
@@ -86,15 +82,16 @@ int __zzip_fetch_disk_trailer(int fd, zzip_off_t filesize,
 int __zzip_parse_root_directory(int fd,
                                 struct _disk_trailer *trailer,
                                 struct zzip_dir_hdr **hdr_return,
-                                zzip_plugin_io_t io);
+                                zzip_plugin_io_t io,
+				zzip_off_t filesize);
 
-_zzip_inline char *__zzip_aligned4(char *p);
+_zzip_inline static char *__zzip_aligned4(char *p);
 
 /* ------------------------  harden routines ------------------------------ */
 
 #ifdef ZZIP_HARDEN
 
-/*
+/* internal.
  * check for inconsistent values in trailer and prefer lower seek value
  * - we fix values assuming the root directory was written at the end
  * and it is just before the zip trailer. Therefore, ...
@@ -171,7 +168,7 @@ __debug_dir_hdr(struct zzip_dir_hdr *hdr)
 /* #define ZZIP_BUFSIZ 64  / * for testing */
 #endif
 
-/**
+/** internal.
  * This function is used by => zzip_file_open. It tries to find
  * the zip's central directory info that is usually a few
  * bytes off the end of the file.
@@ -321,8 +318,16 @@ __zzip_fetch_disk_trailer(int fd, zzip_off_t filesize,
                     trailer->zz_rootseek = zzip_disk_trailer_rootseek(orig);
                     trailer->zz_rootsize = zzip_disk_trailer_rootsize(orig);
 #                  endif
+                    if (trailer->zz_rootseek < 0 || trailer->zz_rootsize < 0)
+                       return(ZZIP_CORRUPTED); // forged value
 
                     __fixup_rootseek(offset + tail - mapped, trailer);
+		    /*
+		     * "extract data from files archived in a single zip file."
+		     * So the file offsets must be within the current ZIP archive!
+		     */
+		    if (trailer->zz_rootseek >= filesize || (trailer->zz_rootseek + trailer->zz_rootsize) >= filesize)
+		        return(ZZIP_CORRUPTED);
                     { return(0); }
                 } else if ((*tail == 'P') &&
                            end - tail >=
@@ -341,6 +346,14 @@ __zzip_fetch_disk_trailer(int fd, zzip_off_t filesize,
                         zzip_disk64_trailer_finalentries(orig);
                     trailer->zz_rootseek = zzip_disk64_trailer_rootseek(orig);
                     trailer->zz_rootsize = zzip_disk64_trailer_rootsize(orig);
+                    if (trailer->zz_rootseek < 0 || trailer->zz_rootsize < 0)
+                       return(ZZIP_CORRUPTED); // forged value
+		    /*
+		     * "extract data from files archived in a single zip file."
+		     * So the file offsets must be within the current ZIP archive!
+		     */
+		    if (trailer->zz_rootseek >= filesize || (trailer->zz_rootseek + trailer->zz_rootsize) >= filesize)
+		        return(ZZIP_CORRUPTED);
                     { return(0); }
 #                  endif
                 }
@@ -375,16 +388,16 @@ __zzip_fetch_disk_trailer(int fd, zzip_off_t filesize,
  * to pointer types but we do need only the lower bits in this implementation,
  * so we can just cast the value to a long value.
  */
-_zzip_inline char *
+_zzip_inline static char *
 __zzip_aligned4(char *p)
 {
 #define aligned4   __zzip_aligned4
-    p += ((long) p) & 1;        /* warnings about truncation of a "pointer" */
-    p += ((long) p) & 2;        /* to a "long int" may be safely ignored :) */
+    p += ((intptr_t) p) & 1;
+    p += ((intptr_t) p) & 2;
     return p;
 }
 
-/**
+/** internal.
  * This function is used by => zzip_file_open, it is usually called after
  * => __zzip_find_disk_trailer. It will parse the zip's central directory
  * information and create a zziplib private directory table in
@@ -394,7 +407,8 @@ int
 __zzip_parse_root_directory(int fd,
                             struct _disk_trailer *trailer,
                             struct zzip_dir_hdr **hdr_return,
-                            zzip_plugin_io_t io)
+                            zzip_plugin_io_t io,
+                            zzip_off_t filesize)
 {
     auto struct zzip_disk_entry dirent;
     struct zzip_dir_hdr *hdr;
@@ -408,6 +422,10 @@ __zzip_parse_root_directory(int fd,
     zzip_off64_t zz_rootsize = _disk_trailer_rootsize(trailer);
     zzip_off64_t zz_rootseek = _disk_trailer_rootseek(trailer);
     __correct_rootseek(zz_rootseek, zz_rootsize, trailer);
+
+    if (zz_entries <= 0 || zz_rootsize < 0 ||
+        zz_rootseek < 0 || zz_rootseek >= filesize)
+        return ZZIP_CORRUPTED;
 
     hdr0 = (struct zzip_dir_hdr *) malloc(zz_rootsize);
     if (! hdr0)
@@ -452,14 +470,23 @@ __zzip_parse_root_directory(int fd,
 #     endif
 
         if (fd_map)
-            { d = (void*)(fd_map+zz_fd_gap+zz_offset); } /* fd_map+fd_gap==u_rootseek */
-        else
+        {
+            d = (void*)(fd_map+zz_fd_gap+zz_offset); /* fd_map+fd_gap==u_rootseek */
+        } else
         {
             if (io->fd.seeks(fd, zz_rootseek + zz_offset, SEEK_SET) < 0)
                 return ZZIP_DIR_SEEK;
             if (io->fd.read(fd, &dirent, sizeof(dirent)) < __sizeof(dirent))
                 return ZZIP_DIR_READ;
             d = &dirent;
+        }
+
+        if ((zzip_off64_t) (zz_offset + sizeof(*d)) > zz_rootsize ||
+            (zzip_off64_t) (zz_offset + sizeof(*d)) < 0)
+        {
+            FAIL4("%li's entry stretches beyond root directory (O:%li R:%li)",
+                  (long) entries, (long) (zz_offset), (long) zz_rootsize);
+            break;
         }
 
         if (! zzip_disk_entry_check_magic(d)) {
@@ -470,13 +497,6 @@ __zzip_parse_root_directory(int fd,
             break;
         }
 
-        if ((zzip_off64_t) (zz_offset + sizeof(*d)) > zz_rootsize ||
-            (zzip_off64_t) (zz_offset + sizeof(*d)) < 0)
-        {
-            FAIL4("%li's entry stretches beyond root directory (O:%li R:%li)",
-                  (long) entries, (long) (zz_offset), (long) zz_rootsize);
-            break;
-        }
 #       if 0 && defined DEBUG
         zzip_debug_xbuf((unsigned char *) d, sizeof(*d) + 8);
 #       endif
@@ -561,7 +581,7 @@ __zzip_parse_root_directory(int fd,
 #  ifndef ZZIP_ALLOW_MODULO_ENTRIES
     return (entries != zz_entries ? ZZIP_CORRUPTED : 0);
 #  else
-    return (entries & (unsigned)0xFFFF) != zz_entries ? ZZIP_CORRUPTED : 0);
+    return ((entries & (unsigned)0xFFFF) != zz_entries ? ZZIP_CORRUPTED : 0);
 #  endif
 }
 
@@ -588,8 +608,8 @@ zzip_get_default_ext(void)
     return ext;
 }
 
-/**
- * allocate a new ZZIP_DIR handle and do basic
+/** start usage. also: zzip_dir_free
+ * This function allocates a new ZZIP_DIR handle and do basic
  * initializations before usage by => zzip_dir_fdopen
  * => zzip_dir_open => zzip_file_open or through
  * => zzip_open
@@ -610,7 +630,7 @@ zzip_dir_alloc_ext_io(zzip_strings_t * ext, const zzip_plugin_io_t io)
 }
 
 /** => zzip_dir_alloc_ext_io
- * this function is obsolete - it was generally used for implementation
+ * This function is obsolete - it was generally used for implementation
  * and exported to let other code build on it. It is now advised to
  * use => zzip_dir_alloc_ext_io now on explicitly, just set that second
  * argument to zero to achieve the same functionality as the old style.
@@ -621,14 +641,14 @@ zzip_dir_alloc(zzip_strings_t * fileext)
     return zzip_dir_alloc_ext_io(fileext, 0);
 }
 
-/**
- * will free the zzip_dir handle unless there are still
+/** => zzip_dir_alloc_ext_io
+ * This function will free the zzip_dir handle unless there are still
  * zzip_files attached (that may use its cache buffer).
  * This is the inverse of => zzip_dir_alloc , and both
  * are helper functions used implicitly in other zzipcalls
  * e.g. => zzip_dir_close = zzip_close
  *
- * returns zero on sucess
+ * returns zero on success
  * returns the refcount when files are attached.
  */
 int
@@ -663,9 +683,9 @@ zzip_dir_close(ZZIP_DIR * dir)
     return zzip_dir_free(dir);
 }
 
-/**
- * used by the => zzip_dir_open and zzip_opendir(2) call. Opens the
- * zip-archive as specified with the fd which points to an
+/** fd reopen.
+ * This function is used by the => zzip_dir_open and zzip_opendir(2) call. 
+ * Opens the zip-archive as specified with the fd which points to an
  * already openend file. This function then search and parse
  * the zip's central directory.
  *
@@ -738,13 +758,13 @@ __zzip_dir_parse(ZZIP_DIR * dir)
           (long) _disk_trailer_rootseek(&trailer));
 
     if ((rv = __zzip_parse_root_directory(dir->fd, &trailer, &dir->hdr0,
-                                          dir->io)) != 0)
+                                          dir->io, filesize)) != 0)
         { goto error; }
   error:
     return rv;
 }
 
-/**
+/** internal.
  * This function will attach any of the .zip extensions then
  * trying to open it the with => open(2). This is a helper
  * function for => zzip_dir_open, => zzip_opendir and => zzip_open.
@@ -773,16 +793,16 @@ __zzip_try_open(zzip_char_t * filename, int filemode,
     for (; *ext; ++ext)
     {
         strcpy(file + len, *ext);
-        fd = io->fd.open(file, filemode);
+        fd = (io->fd.open)(file, filemode);
         if (fd != -1)
             return fd;
     }
     return -1;
 }
 
-/**
- * Opens the zip-archive (if available).
- * the two ext_io arguments will default to use posix io and
+/** open zip-archive.
+ * This function opens the given zip-archive (if available).
+ * The two ext_io arguments will default to use posix io and
  * a set of default fileext that can atleast add .zip ext itself.
  */
 ZZIP_DIR *
@@ -794,6 +814,8 @@ zzip_dir_open(zzip_char_t * filename, zzip_error_t * e)
 /** => zzip_dir_open
  * this function uses explicit ext and io instead of the internal
  * defaults. Setting these to zero is equivalent to => zzip_dir_open
+ * Note that the referenced ext_io plugin handlers structure must be 
+ * static as it is not copied to the returned ZZIP_DIR structure.
  */
 ZZIP_DIR *
 zzip_dir_open_ext_io(zzip_char_t * filename, zzip_error_t * e,
@@ -806,7 +828,7 @@ zzip_dir_open_ext_io(zzip_char_t * filename, zzip_error_t * e,
     if (! ext)
         ext = zzip_get_default_ext();
 
-    fd = io->fd.open(filename, O_RDONLY | O_BINARY);
+    fd = (io->fd.open)(filename, O_RDONLY | O_BINARY);
     if (fd != -1)
     {
         return zzip_dir_fdopen_ext_io(fd, e, ext, io);

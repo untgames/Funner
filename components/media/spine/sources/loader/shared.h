@@ -40,6 +40,10 @@
 #include "../shared/track_entry_impl.h"
 #include "../shared/wrappers.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4250)
+#endif
+
 namespace media
 {
 

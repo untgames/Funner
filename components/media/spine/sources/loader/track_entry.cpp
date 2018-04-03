@@ -174,7 +174,7 @@ bool TrackEntrySpineImpl::IsLooping ()
 {
   CheckDisposed ("media::spine::TrackEntrySpineImpl::IsLooping");
 
-  return track_entry->loop;
+  return track_entry->loop != 0;
 }
 
 void TrackEntrySpineImpl::SetLooping (bool is_looping)

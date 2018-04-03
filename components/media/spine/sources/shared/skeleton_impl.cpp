@@ -20,10 +20,11 @@ namespace
 {
 
 //constants
-const unsigned int SPRITES_MESHES_RESERVE_COUNT       = 4;         //reserve count for sprites meshes array
-const unsigned int TRIANGLE_LIST_MESHES_RESERVE_COUNT = 4;         //reserve count for triangle list meshes array
-const unsigned int DRAW_ORDER_MESHES_RESERVE_COUNT    = 4;         //reserve count for draw order meshes array
-const unsigned int MAX_BATCH_SIZE                     = 65536 / 4; //max batch size to fit in index value range
+const char*        LOG_NAME                           = "media.spine.SkeletonImpl"; //log stream name
+const unsigned int SPRITES_MESHES_RESERVE_COUNT       = 4;                          //reserve count for sprites meshes array
+const unsigned int TRIANGLE_LIST_MESHES_RESERVE_COUNT = 4;                          //reserve count for triangle list meshes array
+const unsigned int DRAW_ORDER_MESHES_RESERVE_COUNT    = 4;                          //reserve count for draw order meshes array
+const unsigned int MAX_BATCH_SIZE                     = 65536 / 4;                  //max batch size to fit in index value range
 
 }
 
@@ -32,6 +33,8 @@ const unsigned int MAX_BATCH_SIZE                     = 65536 / 4; //max batch s
 */
 
 SkeletonImpl::SkeletonImpl ()
+  : clipping_warning_reported (false)
+  , meshes_warning_reported (false)
 {
   sprites_meshes.reserve (SPRITES_MESHES_RESERVE_COUNT);
   triangle_list_meshes.reserve (TRIANGLE_LIST_MESHES_RESERVE_COUNT);
@@ -321,6 +324,12 @@ void SkeletonImpl::BuildMeshes ()
       }
       case AttachmentType_Mesh:
       {
+        if (!meshes_warning_reported)
+        {
+          common::Log (LOG_NAME).Printf ("Warning: skeleton contains meshes, this feature may work slow.");
+          meshes_warning_reported = true;
+        }
+
         //TODO invalidate position vertex stream
         unsigned int vertices_count = attachment->VerticesCount ();
 
@@ -332,6 +341,12 @@ void SkeletonImpl::BuildMeshes ()
         break;
       }
       case AttachmentType_Clipping:
+        if (!clipping_warning_reported)
+        {
+          common::Log (LOG_NAME).Printf ("Warning: skeleton contains clipping, this feature may work slow.");
+          clipping_warning_reported = true;
+        }
+
         clipper->ClipStart (slot, attachment);
         clipper->ClipEnd (slot);                 //for some reason cocos-2dx doing this (https://github.com/cocos2d/cocos2d-x/blob/8f1459b8efcbc8184f0859e54c4766f858deb692/cocos/editor-support/spine/SkeletonRenderer.cpp)
         break;
@@ -398,7 +413,7 @@ unsigned int SkeletonImpl::MeshesCount ()
 media::geometry::Mesh SkeletonImpl::Mesh (unsigned int mesh_index)
 {
   if (mesh_index >= MeshesCount ())
-    throw xtl::make_range_exception ("media::spine::SkeletonImpl::Mesh", "mesh_index", mesh_index, 0, MeshesCount ());
+    throw xtl::make_range_exception ("media::spine::SkeletonImpl::Mesh", "mesh_index", mesh_index, (size_t)0, MeshesCount ());
 
   return draw_order [mesh_index];
 }

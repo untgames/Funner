@@ -300,7 +300,7 @@ int main ()
         animation_state.RegisterEventHandler ((AnimationEvent)i, xtl::bind (animation_event_handler, "animation_state", _1, _2));
 
       TrackEntry track_entry           = animation_state.SetAnimation (0, skeleton_data.AnimationName (0), false);
-      TrackEntry empty_animation_entry = animation_state.EnqueueEmptyAnimation (0, 0.1, 0);
+      TrackEntry empty_animation_entry = animation_state.EnqueueEmptyAnimation (0, 0.1f, 0);
 
       track_entry.RegisterEventHandler (xtl::bind (user_event_handler, "track_entry", _1, _2, _3, _4, _5));
       empty_animation_entry.RegisterEventHandler (xtl::bind (user_event_handler, "empty_animation_entry", _1, _2, _3, _4, _5));
