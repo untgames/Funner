@@ -116,9 +116,14 @@ AnimationStateSpineImpl::TrackEntryList::iterator AnimationStateSpineImpl::GetAc
    Work with tracks
 */
 
-media::spine::TrackEntryImpl* AnimationStateSpineImpl::SetAnimation (unsigned int track, const char* animation, bool looped)
+media::spine::TrackEntryImpl* AnimationStateSpineImpl::SetAnimation (unsigned int track, const char* animation_name, bool looped)
 {
-  spTrackEntry* track_entry = spAnimationState_setAnimationByName (animation_state->NativeHandle (), track, animation, looped);
+  spAnimation* animation = spSkeletonData_findAnimation (skeleton_data->NativeHandle (), animation_name);
+
+  if (!animation)
+    throw xtl::format_operation_exception ("media::spine::AnimationStateSpineImpl::SetAnimation", "Can't set animation '%s', can't find such animation", animation_name);
+
+  spTrackEntry* track_entry = spAnimationState_setAnimation (animation_state->NativeHandle (), track, animation, looped);
 
   return GetActiveTrackEntryImplAddRef (track_entry);
 }
@@ -135,9 +140,14 @@ void AnimationStateSpineImpl::SetEmptyAnimations (float mix_duration)
   spAnimationState_setEmptyAnimations (animation_state->NativeHandle (), mix_duration);
 }
 
-media::spine::TrackEntryImpl* AnimationStateSpineImpl::EnqueueAnimation (unsigned int track, const char* animation, bool looped, float delay)
+media::spine::TrackEntryImpl* AnimationStateSpineImpl::EnqueueAnimation (unsigned int track, const char* animation_name, bool looped, float delay)
 {
-  spTrackEntry* track_entry = spAnimationState_addAnimationByName (animation_state->NativeHandle (), track, animation, looped, delay);
+  spAnimation* animation = spSkeletonData_findAnimation (skeleton_data->NativeHandle (), animation_name);
+
+  if (!animation)
+    throw xtl::format_operation_exception ("media::spine::AnimationStateSpineImpl::EnqueueAnimation", "Can't enqueue animation '%s', can't find such animation", animation_name);
+
+  spTrackEntry* track_entry = spAnimationState_addAnimation (animation_state->NativeHandle (), track, animation, looped, delay);
 
   return GetActiveTrackEntryImplAddRef (track_entry);
 }

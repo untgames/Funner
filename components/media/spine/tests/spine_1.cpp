@@ -339,6 +339,25 @@ int main ()
       printf ("Track entries after dispose:\n");
       print (track_entry);
       print (empty_animation_entry);
+
+      //test invalid animations
+      try
+      {
+        animation_state.SetAnimation (0, "SOME_INVALID_ANIMATION", false);
+      }
+      catch (xtl::exception& e)
+      {
+        printf ("Exception: '%s'\n", e.what ());
+      }
+
+      try
+      {
+        animation_state.EnqueueAnimation (0, "SOME_INVALID_ANIMATION", false, 0);
+      }
+      catch (xtl::exception& e)
+      {
+        printf ("Exception: '%s'\n", e.what ());
+      }
     }
     catch (xtl::exception& e)
     {

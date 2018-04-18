@@ -325,6 +325,10 @@ Track entries after dispose:
   mix time        11.43
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/vine/export/vine-pro.json':
 Skeleton Data:
   Size 227.33 x 841.07
@@ -642,6 +646,10 @@ Track entries after dispose:
   mix time        11.43
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/alien/export/alien-ess.skel':
 Skeleton Data:
   Size 365.79 x 391.51
@@ -1221,6 +1229,10 @@ Track entries after dispose:
   mix time        2.40
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/alien/export/alien-ess.json':
 Skeleton Data:
   Size 365.79 x 391.51
@@ -1800,6 +1812,10 @@ Track entries after dispose:
   mix time        2.40
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/alien/export/alien-pro.skel':
 Skeleton Data:
   Size 368.26 x 384.69
@@ -2616,6 +2632,10 @@ Track entries after dispose:
   mix time        2.17
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/alien/export/alien-pro.json':
 Skeleton Data:
   Size 368.26 x 384.69
@@ -3432,6 +3452,10 @@ Track entries after dispose:
   mix time        2.17
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/coin/export/coin-pro.skel':
 Skeleton Data:
   Size 260.00 x 359.92
@@ -3668,6 +3692,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/coin/export/coin-pro.json':
 Skeleton Data:
   Size 260.00 x 359.92
@@ -3904,6 +3932,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/dragon/export/dragon-ess.skel':
 Skeleton Data:
   Size 660.39 x 604.09
@@ -4896,6 +4928,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/dragon/export/dragon-ess.json':
 Skeleton Data:
   Size 660.39 x 604.09
@@ -5888,6 +5924,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/goblins/export/goblins-ess.skel':
 Skeleton Data:
   Size 234.03 x 354.91
@@ -6480,6 +6520,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/goblins/export/goblins-ess.json':
 Skeleton Data:
   Size 234.03 x 354.91
@@ -7072,6 +7116,10 @@ Track entries after dispose:
   mix time        1.00
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/tank/export/tank-pro.skel':
 Skeleton Data:
   Size 7202.61 x 1298.88
@@ -10201,6 +10249,10 @@ Track entries after dispose:
   mix time        5.70
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
 Testing spine file 'data/tank/export/tank-pro.json':
 Skeleton Data:
   Size 7202.61 x 1298.88
@@ -13330,3 +13382,7 @@ Track entries after dispose:
   mix time        5.70
   has mixing from n
   has next        n
+Exception: 'Can't set animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::SetAnimation'
+Exception: 'Can't enqueue animation 'SOME_INVALID_ANIMATION', can't find such animation
+    at media::spine::AnimationStateSpineImpl::EnqueueAnimation'
