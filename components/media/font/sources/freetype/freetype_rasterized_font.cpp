@@ -8,44 +8,6 @@ namespace
 
 const char* LOG_NAME = "media.freetype.FreetypeRasterizedFont";
 
-//Обводчик глифов
-class FreetypeStroker
-{
-  public:
-    //Конструктор/деструктор
-    FreetypeStroker (const FreetypeLibrary& in_library, unsigned int stroke_size)
-      : library (in_library)
-      , stroker (0)
-    {
-      if (!stroke_size)
-        return;
-
-      library.FT_Stroker_New (&stroker);
-
-      library.FT_Stroker_Set (stroker, (FT_Fixed)(stroke_size / 1000.f * 64.f), FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
-    }
-
-    ~FreetypeStroker ()
-    {
-      if (stroker)
-        library.FT_Stroker_Done (stroker);
-    }
-
-    //Получение обводичка
-    FT_Stroker Stroker ()
-    {
-      return stroker;
-    }
-
-  private:
-    FreetypeStroker (const FreetypeStroker&);             //no impl
-    FreetypeStroker& operator = (const FreetypeStroker&); //no impl
-
-  private:
-    FreetypeLibrary library;  //библиотека
-    FT_Stroker      stroker;  //обводчик
-};
-
 //Растеризатор глифа
 class FreetypeGlyphRasterizer
 {

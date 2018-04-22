@@ -215,6 +215,13 @@ void FreetypeLibrary::FT_Stroker_Set (FT_Stroker stroker, FT_Fixed radius, FT_St
   ::FT_Stroker_Set (stroker, radius, line_cap, line_join, miter_limit);
 }
 
+void FreetypeLibrary::FT_Glyph_Get_CBox (FT_Glyph glyph, FT_UInt bbox_mode, FT_BBox *acbox)
+{
+  common::Lock lock (*impl);
+
+  ::FT_Glyph_Get_CBox (glyph, bbox_mode, acbox);
+}
+
 /*
    Обмен
 */
