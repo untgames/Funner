@@ -1022,16 +1022,27 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
       if (!count)
         return;
 
-      size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
-             base_index  = first * INDICES_PER_PRIMITIVE,
-             verts_count = count * VERTICES_PER_PRIMITIVE,
-             inds_count  = count * INDICES_PER_PRIMITIVE;
+      size_t verts_to_move_count     = (current_items_count - first - count) * VERTICES_PER_PRIMITIVE,
+             indices_to_move_count   = (current_items_count - first - count) * INDICES_PER_PRIMITIVE,
+             verts_to_remove_count   = count * VERTICES_PER_PRIMITIVE,
+             indices_to_remove_count = count * INDICES_PER_PRIMITIVE;
 
-      memmove (vb.Data () + base_vertex, vb.Data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
-      memmove (ib.Data () + base_index, ib.Data () + base_index + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
+      if (verts_to_move_count)
+      {
+        size_t base_vertex = first * VERTICES_PER_PRIMITIVE;
 
-      vb.Resize ((unsigned int)(vb.Size () - verts_count));
-      ib.Resize ((unsigned int)(ib.Size () - inds_count));
+        memmove (vb.Data () + base_vertex, vb.Data () + base_vertex + verts_to_remove_count, sizeof (DynamicPrimitiveVertex) * verts_to_move_count);
+      }
+
+      if (indices_to_move_count)
+      {
+        size_t base_index = first * INDICES_PER_PRIMITIVE;
+
+        memmove (ib.Data () + base_index, ib.Data () + base_index + indices_to_remove_count, sizeof (DynamicPrimitiveIndex) * indices_to_move_count);
+      }
+
+      vb.Resize ((unsigned int)(vb.Size () - verts_to_remove_count));
+      ib.Resize ((unsigned int)(ib.Size () - indices_to_remove_count));
 
       need_update_buffers = true;
 
@@ -1280,12 +1291,17 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
       if (!count)
         return;
 
-      size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
-             verts_count = count * VERTICES_PER_PRIMITIVE;
+      size_t verts_to_move_count   = (current_items_count - first - count) * VERTICES_PER_PRIMITIVE,
+             verts_to_remove_count = count * VERTICES_PER_PRIMITIVE;
 
-      memmove (vertices.data () + base_vertex, vertices.data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
+      if (verts_to_move_count)
+      {
+        size_t base_vertex = first * VERTICES_PER_PRIMITIVE;
 
-      vertices.resize (vertices.size () - verts_count);
+        memmove (vertices.data () + base_vertex, vertices.data () + base_vertex + verts_to_remove_count, sizeof (DynamicPrimitiveVertex) * verts_to_move_count);
+      }
+
+      vertices.resize (vertices.size () - verts_to_remove_count);
     }
 
     void Clear ()
