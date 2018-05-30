@@ -79,9 +79,8 @@ void SkeletonImpl::BuildMeshes ()
 
   for (unsigned int i = 0; i < slots_count; i++)
   {
-    //we create new SlotImpl and AttachmentImpl here instead of referencing one from slots array, because it's faster to create new rather than searching for index
-    xtl::com_ptr<SlotImpl> slot (CreateSlotForDrawOrder (i), false);
-    xtl::com_ptr<AttachmentImpl> attachment (slot->HasAttachment () ? slot->CreateAttachmentImpl () : 0, false);
+    xtl::com_ptr<SlotImpl>       slot       (Wrappers::Unwrap<media::spine::SlotImpl, media::spine::Slot> (Slot (SlotForDrawOrder (i))));
+    xtl::com_ptr<AttachmentImpl> attachment (slot->HasAttachment () ? Wrappers::Unwrap<media::spine::AttachmentImpl, media::spine::Attachment> (*slot->Attachment ()) : 0);
 
     slots_draw_order.push_back (slot);
     attachments_draw_order.push_back (attachment);

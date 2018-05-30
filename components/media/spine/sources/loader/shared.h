@@ -230,6 +230,7 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
     media::spine::SlotImpl* CreateSlotForDrawOrder (unsigned int index);
     media::spine::SlotImpl* CreateSlotImpl         (unsigned int index);
     int                     FindSlotIndex          (const char* name);
+    int                     SlotForDrawOrder       (unsigned int index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
@@ -251,10 +252,14 @@ class SkeletonSpineImpl : public Object, public media::spine::SkeletonImpl
     media::spine::SkeletonClippingImpl* Clipper            ();
 
   private:
-    SpineAtlasPtr                atlas;          //skeleton should hold atlas object
-    SkeletonClippingSpineImplPtr clipper;        //clipper object shared between all spine objects
-    SpineSkeletonDataPtr         skeleton_data;  //skeleton should hold skeleton data object
-    SpineSkeletonPtr             skeleton;
+    typedef stl::hash_map< ::SPINE_NAMESPACE_NAME::spSlot*, int> SlotToIndexMap;
+
+  private:
+    SpineAtlasPtr                atlas;           //skeleton should hold atlas object
+    SkeletonClippingSpineImplPtr clipper;         //clipper object shared between all spine objects
+    SpineSkeletonDataPtr         skeleton_data;   //skeleton should hold skeleton data object
+    SpineSkeletonPtr             skeleton;        //native skeleton object
+    SlotToIndexMap               slots_index_map; //hash map for fast search of slot index by slot pointer
 };
 
 typedef xtl::com_ptr<SkeletonSpineImpl> SkeletonSpineImplPtr;

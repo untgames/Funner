@@ -59,6 +59,7 @@ class SkeletonImpl : virtual public IObject
             media::spine::Slot& Slot                   (unsigned int index);
     virtual SlotImpl*           CreateSlotImpl         (unsigned int index) = 0;
     virtual int                 FindSlotIndex          (const char* name) = 0;
+    virtual int                 SlotForDrawOrder       (unsigned int index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Rendering

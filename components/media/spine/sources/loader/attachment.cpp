@@ -273,7 +273,7 @@ const uint16_t* AttachmentSpineImpl::Indices ()
 
       return mesh_attachment->triangles;
     }
+    default:
+      throw xtl::format_operation_exception ("media::spine::AttachmentSpineImpl::Indices", "Attachment type %d doesn't have vertices", attachment->type);
   }
-
-  throw xtl::format_operation_exception ("media::spine::AttachmentSpineImpl::Indices", "Attachment type %d doesn't have vertices", attachment->type);
 }

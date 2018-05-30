@@ -3,6 +3,14 @@
 using namespace SPINE_NAMESPACE_NAME;
 using namespace media::SPINE_NAMESPACE_NAME;
 
+namespace
+{
+
+//Constants
+const char* LOG_NAME = "media.spine.SkeletonSpineImpl"; //log stream name
+
+}
+
 /*
    Constructor
 */
@@ -15,6 +23,11 @@ SkeletonSpineImpl::SkeletonSpineImpl (SpineAtlasPtr in_atlas, SkeletonClippingSp
 {
   ResizeSlots (SlotsCount ());
   ResizeBones (BonesCount ());
+
+  spSkeleton* native_handle = skeleton->NativeHandle ();
+
+  for (unsigned int i = 0; i < native_handle->slotsCount; ++i)
+    slots_index_map.insert_pair (native_handle->slots [i], i);
 }
 
 /*
@@ -88,6 +101,21 @@ media::spine::SlotImpl* SkeletonSpineImpl::CreateSlotImpl (unsigned int index)
 int SkeletonSpineImpl::FindSlotIndex (const char* name)
 {
   return spSkeleton_findSlotIndex (skeleton->NativeHandle (), name);
+}
+
+int SkeletonSpineImpl::SlotForDrawOrder (unsigned int index)
+{
+  spSlot* slot = skeleton->NativeHandle ()->drawOrder [index];
+
+  SlotToIndexMap::iterator iter = slots_index_map.find (slot);
+
+  if (iter == slots_index_map.end ())
+  {
+    common::Log (LOG_NAME).Printf ("Couldn't find spine slot for draw index %u", index);
+    return -1;
+  }
+
+  return iter->second;
 }
 
 /*

@@ -179,7 +179,7 @@ void AnimationStateSpineImpl::ClearTrack (unsigned int track)
 
 bool AnimationStateSpineImpl::HasTrackEntry (unsigned int track)
 {
-  return spAnimationState_getCurrent (animation_state->NativeHandle (), track);
+  return spAnimationState_getCurrent (animation_state->NativeHandle (), track) != 0;
 }
 
 media::spine::TrackEntryImpl* AnimationStateSpineImpl::TrackEntry (unsigned int track)
