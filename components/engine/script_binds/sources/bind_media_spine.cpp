@@ -37,9 +37,9 @@ void bind_animation_state_data_library (Environment& environment)
     //Register operations
 
   lib.Register ("get_DefaultMix", make_invoker (&AnimationStateData::DefaultMix));
+  lib.Register ("set_DefaultMix", make_invoker (&AnimationStateData::SetDefaultMix));
 
   lib.Register ("CreateAnimationState", make_invoker (&AnimationStateData::CreateAnimationState));
-  lib.Register ("SetDefaultMix",        make_invoker (&AnimationStateData::SetDefaultMix));
   lib.Register ("GetMix",               make_invoker (&AnimationStateData::GetMix));
   lib.Register ("SetMix",               make_invoker (&AnimationStateData::SetMix));
 

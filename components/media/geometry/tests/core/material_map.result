@@ -1,0 +1,62 @@
+Results of material_map_test:
+Material map 'map1':
+Set 'material1' 0
+Set 'material2' 1
+Set 'material4' 3
+Find material id 'material2' = 1
+map2 = map1
+Material map 'map2':
+  0 ('material1')
+  1 ('material2')
+  2 ('material3')
+  3 ('material4')
+clear map2
+Material map 'map1':
+Material map 'map2':
+Before remove
+Set 'material1' 4
+Set 'material2' 5
+Set 'material4' 6
+Set 'material5' 7
+Set 'material6' 8
+Set 'material7' 9
+Material map 'map1':
+  6 ('material4')
+  2 ('material3')
+  5 ('material2')
+  4 ('material1')
+  7 ('material5')
+  8 ('material6')
+  9 ('material7')
+  4294967229 ('big_index_material')
+Big index material is 4294967229
+After remove
+Material map 'map1':
+  4 ('material1')
+  7 ('material5')
+  8 ('material6')
+  9 ('material7')
+  4294967229 ('big_index_material')
+clone map1
+Material map 'map1':
+  4 ('material1')
+  7 ('material5')
+  8 ('material6')
+  9 ('material7')
+  4294967229 ('big_index_material')
+Material map 'map2':
+  4294967229 ('big_index_material')
+  9 ('material7')
+  8 ('material6')
+  7 ('material5')
+  4 ('material1')
+Clear map2
+Material map 'map1':
+  4 ('material1')
+  7 ('material5')
+  8 ('material6')
+  9 ('material7')
+  4294967229 ('big_index_material')
+Material map 'map2':
+Exception: Invalid argument <id>=4294967295. This id is reserved for internal use
+    at media::geometry::MaterialMap::SetMaterial (uint32_t, const char*)

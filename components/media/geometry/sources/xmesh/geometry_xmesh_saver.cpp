@@ -235,12 +235,12 @@ class XmlMeshLibrarySaver
     }
     
       //сохранение примитива
-    void SavePrimitive (const Primitive& primitive)
+    void SavePrimitive (const MaterialMap& material_map, const Primitive& primitive)
     {
       XmlWriter::Scope scope (writer, "primitive");
       
       writer.WriteAttribute ("type", get_type_name (primitive.type));      
-      writer.WriteAttribute ("material", primitive.material);
+      writer.WriteAttribute ("material", material_map.MaterialName (primitive.material_id));
       writer.WriteAttribute ("vertex_buffer", primitive.vertex_buffer);
       writer.WriteAttribute ("first", primitive.first);
       writer.WriteAttribute ("count", primitive.count);
@@ -268,8 +268,10 @@ class XmlMeshLibrarySaver
     {
       XmlWriter::Scope scope (writer, "primitives");
       
+      const MaterialMap& material_map = mesh.MaterialMap ();
+
       for (uint32_t i=0; i<mesh.PrimitivesCount (); i++)
-        SavePrimitive (mesh.Primitive (i));      
+        SavePrimitive (material_map, mesh.Primitive (i));
     }
     
       //сохранение меша

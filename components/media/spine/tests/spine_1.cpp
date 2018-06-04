@@ -169,7 +169,8 @@ void print (const Skeleton& skeleton)
 
   for (unsigned int i = 0, count = skeleton.MeshesCount (); i < count; i++)
   {
-    media::geometry::Mesh mesh = skeleton.Mesh (i);
+    media::geometry::Mesh               mesh         = skeleton.Mesh (i);
+    const media::geometry::MaterialMap& material_map = mesh.MaterialMap ();
 
     printf ("    mesh %u:\n", i);
     printf ("      primitives (count %u):\n", mesh.PrimitivesCount ());
@@ -178,15 +179,16 @@ void print (const Skeleton& skeleton)
     {
       printf ("        primitive %u:\n", j);
 
-      const media::geometry::Primitive& primitive = mesh.Primitive (j);
+      const media::geometry::Primitive& primitive     = mesh.Primitive (j);
+      const char*                       material_name = material_map.MaterialName (primitive.material_id);
 
       printf ("          type '%s'\n", get_type_name (primitive.type));
       printf ("          first %u\n", primitive.first);
       printf ("          count %u\n", primitive.count);
       printf ("          base vertex %u\n", primitive.base_vertex);
-      printf ("          material '%s':\n", primitive.material);
+      printf ("          material '%s':\n", material_name);
 
-      const Material& material = skeleton.Material (primitive.material);
+      const Material& material = skeleton.Material (material_name);
 
       printf ("            blend mode %d\n", material.BlendMode ());
       printf ("            texcoord wrap u %d\n", material.TexcoordWrapU ());

@@ -3,22 +3,23 @@
 
 #include <cmath>
 
-#include <string.h>
 #include <float.h>
+#include <string.h>
 
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
-#include <xtl/common_exceptions.h>
 
 #include <math/vector.h>
 
+#include <common/component.h>
+#include <common/hash.h>
 #include <common/string.h>
 #include <common/strlib.h>
-#include <common/hash.h>
-#include <common/component.h>
 
 #include <media/geometry/mesh_library.h>
 #include <media/resource_library.h>

@@ -65,7 +65,7 @@ int main ()
     mesh.Attach (vb);
     mesh.Attach (ib);
 
-    mesh.AddPrimitive (PrimitiveType_LineList, 0, 6, 3, 0);
+    mesh.AddPrimitive (PrimitiveType_LineList, 0, 6, 3, (const char*)0);
     mesh.AddPrimitive (PrimitiveType_TriangleList, 0, 0, 2, "");
     mesh.AddPrimitive (PrimitiveType_TriangleStrip, 0, 0, 3, "");
     mesh.AddPrimitive (PrimitiveType_TriangleList, 1, 0, 2, "");

@@ -12,12 +12,14 @@ void dump (const Mesh& mesh)
     printf ("  vb#%u: vertices_count=%u, weights_count=%u\n", i, vb.VerticesCount (), vb.Weights ().Size ());
   }
 
+  const MaterialMap& material_map = mesh.MaterialMap ();
+
   for (uint32_t i=0; i<mesh.PrimitivesCount (); i++)
   {
     const Primitive& p = mesh.Primitive (i);
     
-    printf ("  primitive #%u: type='%s' vertex_buffer=%u first=%u count=%u material='%s'\n", i, get_type_name (p.type),
-            p.vertex_buffer, p.first, p.count, p.material);
+    printf ("  primitive #%u: type='%s' vertex_buffer=%u first=%u count=%u material=%u ('%s')\n", i, get_type_name (p.type),
+            p.vertex_buffer, p.first, p.count, p.material_id, material_map.MaterialName (p.material_id));
   }
 }
 

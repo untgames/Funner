@@ -238,14 +238,16 @@ class BinMeshLibrarySaver
     }
 
       //сохранение примитива
-    void SavePrimitive (const Primitive& primitive)
+    void SavePrimitive (const MaterialMap& material_map, const Primitive& primitive)
     {
       file_write (result_file, &primitive.type, sizeof (primitive.type));
 
-      uint32_t material_name_length = (uint32_t)xtl::xstrlen (primitive.material);
+      const char* material_name = material_map.MaterialName (primitive.material_id);
+
+      uint32_t material_name_length = (uint32_t)xtl::xstrlen (material_name);
 
       file_write (result_file, &material_name_length, sizeof (material_name_length));
-      file_write (result_file, primitive.material,    sizeof (char) * material_name_length);
+      file_write (result_file, material_name, sizeof (char) * material_name_length);
 
       file_write (result_file, &primitive.vertex_buffer, sizeof (primitive.vertex_buffer));
       file_write (result_file, &primitive.first, sizeof (primitive.first));
@@ -260,8 +262,10 @@ class BinMeshLibrarySaver
 
       file_write (result_file, &primitives_count, sizeof (primitives_count));
 
+      const MaterialMap& material_map = mesh.MaterialMap ();
+
       for (uint32_t i = 0; i < primitives_count; i++)
-        SavePrimitive (mesh.Primitive (i));
+        SavePrimitive (material_map, mesh.Primitive (i));
     }
 
       //сохранение меша

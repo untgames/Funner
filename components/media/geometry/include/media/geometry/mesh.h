@@ -1,8 +1,9 @@
 #ifndef MEDIALIB_GEOMETRY_MESH_HEADER
 #define MEDIALIB_GEOMETRY_MESH_HEADER
 
-#include <media/geometry/vertex_buffer.h>
 #include <media/geometry/index_buffer.h>
+#include <media/geometry/material_map.h>
+#include <media/geometry/vertex_buffer.h>
 #include <xtl/functional_fwd>
 
 namespace media
@@ -45,7 +46,7 @@ struct Primitive
   uint32_t      first;         //индекс первой вершины/индекса
   uint32_t      count;         //количество примитивов
   uint32_t      base_vertex;   //индекс базовой вершины
-  const char*   material;      //имя материала
+  uint32_t      material_id;   //идентификатор материала
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +92,14 @@ class Mesh
     uint32_t VertexBuffersCount () const; //количество вершинных буферов
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Карта материалов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                         AttachMaterialMap (const geometry::MaterialMap&);
+    void                         DetachMaterialMap ();
+    const geometry::MaterialMap& MaterialMap       () const;
+          geometry::MaterialMap& MaterialMap       ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Индексный буфер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const geometry::IndexBuffer& IndexBuffer () const;
@@ -99,8 +108,8 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение/отсоединение буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    uint32_t Attach (geometry::VertexBuffer&);
-    void     Attach (geometry::IndexBuffer&);
+    uint32_t Attach (const geometry::VertexBuffer&);
+    void     Attach (const geometry::IndexBuffer&);
 
     void DetachVertexBuffer     (uint32_t index);
     void DetachIndexBuffer      ();
@@ -117,7 +126,9 @@ class Mesh
 ///Добавление/удаление примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, const char* material); //return: индекс примитива
+    uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, uint32_t material_id); //return: индекс примитива
     uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, const char* material); //return: индекс примитива
+    uint32_t AddPrimitive        (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t material_id); //return: индекс примитива
     void     RemovePrimitive     (uint32_t primitive_index);
     void     RemoveAllPrimitives ();
 
@@ -130,7 +141,7 @@ class Mesh
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (Mesh&);
-    
+
   private:
     struct Impl;
 

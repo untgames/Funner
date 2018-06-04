@@ -465,11 +465,13 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     
     mesh->primitives.reserve (source.PrimitivesCount ());
     
+    const media::geometry::MaterialMap& material_map = source.MaterialMap ();
+
     for (unsigned int i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
       
-      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, i, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, i, impl->material_manager->GetMaterialProxy (material_map.MaterialName (src_primitive.material_id)), *mesh), false);
 
       switch (src_primitive.type)
       {
