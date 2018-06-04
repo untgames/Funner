@@ -56,7 +56,7 @@ class AttachmentImpl : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual AttachmentType Type () = 0;
 
-            void*                                  TypeSpecificData              ();
+            PointAttachmentData*                   TypeSpecificData              (xtl::type<PointAttachmentData>);
     virtual media::spine::PointAttachmentDataImpl* CreatePointAttachmentDataImpl () = 0;
     virtual math::vec4f                            Color                         () = 0;
     virtual unsigned int                           VerticesCount                 () = 0;

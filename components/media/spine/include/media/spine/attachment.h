@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_SPINE_ATTACHMENT_HEADER
 #define MEDIALIB_SPINE_ATTACHMENT_HEADER
 
+#include <xtl/type.h>
+
 #include <math/vector.h>
 
 namespace media
@@ -104,7 +106,7 @@ class Attachment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Helper method for AttachmentData method implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* TypeSpecificData () const;
+    const PointAttachmentData* TypeSpecificData (xtl::type<PointAttachmentData>) const;
 
   protected:
     Attachment (AttachmentImpl*);

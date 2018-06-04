@@ -71,6 +71,8 @@ class Skeleton
     geometry::Mesh                Mesh        (unsigned int mesh_index) const;
     const media::spine::Material& Material    (const char* name) const;
 
+    //TODO draw list with type (mesh or point attachment), mesh, and point attachment. So we will move z coordinate calculation from scene graph to this class. Question - Z or Z range??? (Z range may change during animation)
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Change skin (use 0 to set default skin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////

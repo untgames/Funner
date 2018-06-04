@@ -5,17 +5,7 @@
 template <class T>
 inline const T* Attachment::AttachmentData () const
 {
-  //we specialize implementation for known types, for all other types just return 0
-  return 0;
-}
-
-template <>
-inline const PointAttachmentData* Attachment::AttachmentData<PointAttachmentData> () const
-{
-  if (Type () == AttachmentType_Point)
-    return static_cast<const PointAttachmentData*> (TypeSpecificData ());
-
-  return 0;
+  return TypeSpecificData (xtl::type<T> ());
 }
 
 template <class T>

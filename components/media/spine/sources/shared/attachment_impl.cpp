@@ -9,7 +9,7 @@ using namespace media::spine;
    Attachment
 */
 
-void* AttachmentImpl::TypeSpecificData ()
+PointAttachmentData* AttachmentImpl::TypeSpecificData (xtl::type<PointAttachmentData>)
 {
   if (Type () != AttachmentType_Point)
     return 0;

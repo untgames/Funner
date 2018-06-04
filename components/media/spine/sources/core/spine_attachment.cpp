@@ -50,9 +50,9 @@ AttachmentType Attachment::Type () const
   return impl->Type ();
 }
 
-const void* Attachment::TypeSpecificData () const
+const PointAttachmentData* Attachment::TypeSpecificData (xtl::type<PointAttachmentData> type) const
 {
-  return impl->TypeSpecificData ();
+  return impl->TypeSpecificData (type);
 }
 
 /*
