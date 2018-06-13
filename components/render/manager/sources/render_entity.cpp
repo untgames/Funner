@@ -598,6 +598,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
   PrimitiveManagerPtr primitive_manager; //менеджер примитивов
   math::vec3f         lod_point;         //точка расчёта lod-уровня
   void*               user_data;         //пользовательские данные
+  EntityJointListPtr  joints;            //список соединений объекта  
 
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
@@ -635,6 +636,17 @@ struct EntityImpl::Impl: public EntityLodCommonData
     
     return index != -1 ? lods [index] : EntityLodPtr ();
   }  
+
+///Получение списка соединений объекта
+  EntityJointList& Joints ()
+  {
+    if (joints)
+      return *joints;
+
+    joints = EntityJointListPtr (new EntityJointList, false);
+
+    return *joints;
+  }
     
   using CacheHolder::UpdateCache;
 };
@@ -756,22 +768,53 @@ void* EntityImpl::UserData ()
 
 void EntityImpl::SetJointsCount (size_t count)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::SetJointsCount");
+  try
+  {
+    EntityJointList& joints = impl->Joints ();
+
+    joints.Resize (count);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::EntityImpl::SetJointsCount");
+    throw;
+  }
 }
 
 size_t EntityImpl::JointsCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::JointsCount");
+  if (!impl->joints)
+    return 0;
+
+  return impl->joints->Size ();
 }
 
-void EntityImpl::SetJointTransformation (size_t joint_index, const math::mat4f&)
+void EntityImpl::SetJointTransformation (size_t joint_index, const math::mat4f& tm)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::SetJointTransformation");
+  try
+  {
+    EntityJointList& joints = impl->Joints ();
+
+    joints.SetTransformation (joint_index, tm);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::EntityImpl::SetJointTransformation");
+    throw;
+  }
 }
 
 const math::mat4f& EntityImpl::JointTransformation (size_t joint_index)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::JointTransformation");
+  try
+  {
+    return impl->Joints ().Transformation (joint_index);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::EntityImpl::JointTransformation");
+    throw;
+  }
 }
 
 /*
