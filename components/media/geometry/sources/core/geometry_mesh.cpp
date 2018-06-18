@@ -15,13 +15,15 @@ const size_t DEFAULT_VB_ARRAY_RESERVE         = 4; //количество рез
 typedef stl::vector<Primitive>    PrimitiveArray;
 typedef stl::vector<VertexBuffer> VertexBufferArray;
 
-struct Mesh::Impl: public xtl::reference_counter
+struct Mesh::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  string                       name;           //имя меша
-  media::geometry::MaterialMap material_map;   //карта материалов
-  VertexBufferArray            vertex_buffers; //вершинные буферы
-  media::geometry::IndexBuffer index_buffer;   //индексный буфер
-  PrimitiveArray               primitives;     //примитивы
+  string                       name;                         //имя меша
+  media::geometry::MaterialMap material_map;                 //карта материалов
+  VertexBufferArray            vertex_buffers;               //вершинные буферы
+  media::geometry::IndexBuffer index_buffer;                 //индексный буфер
+  PrimitiveArray               primitives;                   //примитивы
+  unsigned int                 structure_update_index;       //индекс обновления структуры меша (индекс буфер был заменен, либо вершинный буфер был добавлен или удален)
+  unsigned int                 primitives_data_update_index; //индекс обновления данных примитивов
   
   Impl (); 
   Impl (const Impl&); //used for clone
@@ -32,16 +34,20 @@ struct Mesh::Impl: public xtl::reference_counter
 */
 
 Mesh::Impl::Impl ()
+  : structure_update_index (0)
+  , primitives_data_update_index (0)
 {
   primitives.reserve (DEFAULT_PRIMITIVES_ARRAY_RESERVE);
   vertex_buffers.reserve (DEFAULT_VB_ARRAY_RESERVE);
 }
 
 Mesh::Impl::Impl (const Impl& impl)
-  : name (impl.name),
-    material_map (impl.material_map.Clone ()),
-    index_buffer (impl.index_buffer.Clone ()),
-    primitives (impl.primitives)
+  : name (impl.name)
+  , material_map (impl.material_map.Clone ())
+  , index_buffer (impl.index_buffer.Clone ())
+  , primitives (impl.primitives)
+  , structure_update_index (0)
+  , primitives_data_update_index (0)
 {
   vertex_buffers.reserve (impl.vertex_buffers.size ());
 
@@ -54,7 +60,7 @@ Mesh::Impl::Impl (const Impl& impl)
 */
 
 Mesh::Mesh ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
   
 Mesh::Mesh (Impl* in_impl)
@@ -119,7 +125,7 @@ void Mesh::Rename (const char* name)
    Карта материалов
 */
 
-void Mesh::AttachMaterialMap (const geometry::MaterialMap& map)
+void Mesh::Attach (const geometry::MaterialMap& map)
 {
   impl->material_map = map;
 }
@@ -184,30 +190,40 @@ uint32_t Mesh::Attach (const media::geometry::VertexBuffer& vb)
 
   impl->vertex_buffers.push_back (vb);
 
+  impl->structure_update_index++;
+
   return (uint32_t)impl->vertex_buffers.size () - 1;
 }
 
 void Mesh::Attach (const media::geometry::IndexBuffer& ib)
 {
   impl->index_buffer = ib;
+
+  impl->structure_update_index++;
 }
-    
+
 void Mesh::DetachVertexBuffer (uint32_t index)
 {
   if (index >= impl->vertex_buffers.size ())
     return;
 
   impl->vertex_buffers.erase (impl->vertex_buffers.begin () + index);
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachIndexBuffer ()
 {
   impl->index_buffer = media::geometry::IndexBuffer ();
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachAllVertexBuffers ()
 {
   impl->vertex_buffers.clear ();
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachAllBuffers ()
@@ -271,6 +287,8 @@ uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_
 
   impl->primitives.push_back (primitive);
 
+  impl->primitives_data_update_index++;
+
   return (uint32_t)impl->primitives.size () - 1;
 }
 
@@ -290,11 +308,15 @@ void Mesh::RemovePrimitive (uint32_t primitive_index)
     return;
 
   impl->primitives.erase (impl->primitives.begin () + primitive_index);
+
+  impl->primitives_data_update_index++;
 }
 
 void Mesh::RemoveAllPrimitives ()
 {
   impl->primitives.clear ();
+
+  impl->primitives_data_update_index++;
 }
 
 /*
@@ -305,6 +327,29 @@ void Mesh::Clear ()
 {
   RemoveAllPrimitives ();
   DetachAllBuffers ();
+}
+
+/*
+   Текущий индекс обновления
+*/
+
+unsigned int Mesh::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+unsigned int Mesh::CurrentPrimitivesDataUpdateIndex () const
+{
+  return impl->primitives_data_update_index;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& Mesh::Trackable () const
+{
+  return *impl;
 }
 
 /*
@@ -322,10 +367,11 @@ namespace media
 namespace geometry
 {
 
-/*
-    Обмен
-*/
-    
+xtl::trackable& get_trackable (const Mesh& mesh)
+{
+  return mesh.Trackable ();
+}
+
 void swap (Mesh& mesh1, Mesh& mesh2)
 {
   mesh1.Swap (mesh2);

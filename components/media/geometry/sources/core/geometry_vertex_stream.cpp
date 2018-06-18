@@ -8,12 +8,14 @@ using namespace common;
     Описание реализации вершинного массива
 */
 
-struct VertexStream::Impl: public xtl::reference_counter
+struct VertexStream::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  VertexFormat format;         //формат вершин
-  uint32_t     vertex_size;    //размер вершины
-  Buffer       data_buffer;    //буфер с данными
-  uint32_t     vertices_count; //количество вершин
+  VertexFormat format;                 //формат вершин
+  uint32_t     vertex_size;            //размер вершины
+  Buffer       data_buffer;            //буфер с данными
+  uint32_t     vertices_count;         //количество вершин
+  unsigned int structure_update_index; //индекс обновления структуры потока (изменение размер)
+  unsigned int data_update_index;      //индекс обновления данных потока
   
   Impl ();
   Impl (const Impl& impl);           //used for clone
@@ -25,7 +27,10 @@ struct VertexStream::Impl: public xtl::reference_counter
 */
 
 VertexStream::Impl::Impl ()
-  : vertex_size (0), vertices_count (0)
+  : vertex_size (0)
+  , vertices_count (0)
+  , structure_update_index (0)
+  , data_update_index (0)
   {}
 
 VertexStream::Impl::Impl (const Impl& source)
@@ -33,10 +38,16 @@ VertexStream::Impl::Impl (const Impl& source)
   , vertex_size (source.vertex_size)
   , data_buffer (source.data_buffer)
   , vertices_count (source.vertices_count)
+  , structure_update_index (0)
+  , data_update_index (0)
   {}
 
 VertexStream::Impl::Impl (const VertexDeclaration& declaration)
-  : format (declaration.Format ()), vertex_size (declaration.VertexSize ()), vertices_count (0)
+  : format (declaration.Format ())
+  , vertex_size (declaration.VertexSize ())
+  , vertices_count (0)
+  , structure_update_index (0)
+  , data_update_index (0)
   {}  
 
 /*
@@ -183,6 +194,8 @@ void VertexStream::Resize (uint32_t vertices_count)
   impl->data_buffer.Resize (vertices_count * impl->vertex_size);
   
   impl->vertices_count = vertices_count;
+
+  impl->structure_update_index++;
 }
 
 /*
@@ -209,6 +222,34 @@ void VertexStream::Reserve (uint32_t vertices_count)
 }
 
 /*
+   Увеличение индекса обновления / Текущий индекс обновления
+*/
+
+void VertexStream::InvalidateData ()
+{
+  impl->data_update_index++;
+}
+
+unsigned int VertexStream::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+unsigned int VertexStream::CurrentDataUpdateIndex () const
+{
+  return impl->data_update_index;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& VertexStream::Trackable () const
+{
+  return *impl;
+}
+
+/*
     Обмен
 */
 
@@ -222,6 +263,11 @@ namespace media
 
 namespace geometry
 {
+
+xtl::trackable& get_trackable (const VertexStream& vs)
+{
+  return vs.Trackable ();
+}
 
 void swap (VertexStream& vs1, VertexStream& vs2)
 {

@@ -2,6 +2,7 @@
 #define MEDIALIB_GEOMETRY_DEFINES_HEADER
 
 #include <cstddef>
+#include <stdint.h>
 
 namespace media
 {

@@ -1,0 +1,35 @@
+Initial notify for mesh1:
+OnMeshStructureChanged, new update index = 0
+OnIndexBufferStructureChanged, new update index = 0
+OnMaterialMapDataChanged, new update index = 0
+Second initial notify for mesh1:
+Initial notify for mesh2:
+OnMeshStructureChanged, new update index = 0
+OnIndexBufferStructureChanged, new update index = 0
+Initial notify for cloned mesh2:
+OnMeshStructureChanged, new update index = 0
+OnIndexBufferStructureChanged, new update index = 0
+OnMaterialMapDataChanged, new update index = 0
+Notify after detaching all buffers:
+OnMeshStructureChanged, new update index = 2
+OnIndexBufferStructureChanged, new update index = 0
+Notify after attaching buffers:
+OnMeshStructureChanged, new update index = 3
+OnIndexBufferStructureChanged, new update index = 1
+OnVertexBufferStructureChanged, new update index = 1
+OnVertexWeightStreamStructureChanged, new update index = 0
+OnVertexStreamStructureChanged, new update index = 0
+OnMaterialMapDataChanged, new update index = 1
+Second notify after attaching buffers:
+Notify after updating buffers:
+OnIndexBufferDataChanged, new update index = 1
+OnVertexStreamDataChanged, new update index = 1
+OnVertexWeightStreamDataChanged, new update index = 1
+OnMaterialMapDataChanged, new update index = 2
+Notify after changing structure and data:
+OnMeshStructureChanged, new update index = 5
+OnIndexBufferStructureChanged, new update index = 0
+OnVertexWeightStreamStructureChanged, new update index = 1
+OnVertexStreamStructureChanged, new update index = 1
+OnVertexBufferStructureChanged, new update index = 1
+OnVertexWeightStreamStructureChanged, new update index = 0

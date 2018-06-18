@@ -13,6 +13,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
 
 #include <math/vector.h>
 
@@ -22,6 +23,7 @@
 #include <common/strlib.h>
 
 #include <media/geometry/mesh_library.h>
+#include <media/geometry/mesh_observer.h>
 #include <media/resource_library.h>
 
 namespace media

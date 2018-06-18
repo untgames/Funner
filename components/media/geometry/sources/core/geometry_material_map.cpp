@@ -20,13 +20,15 @@ struct MaterialHashMapSelector
     MaterialMap implementation
 */
 
-struct MaterialMap::Impl: public xtl::reference_counter
+struct MaterialMap::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  MaterialHashMap map;              //map holding materials
-  uint32_t        next_material_id; //material id for next material to add
+  MaterialHashMap map;               //map holding materials
+  uint32_t        next_material_id;  //material id for next material to add
+  unsigned int    data_update_index; //current data update index
 
   Impl ()
     : next_material_id (0)
+    , data_update_index (0)
     {}
 };
 
@@ -132,6 +134,8 @@ uint32_t MaterialMap::SetMaterial (const char* name)
 
   impl->next_material_id = material_id + 1;
 
+  impl->data_update_index++;
+
   return material_id;
 }
 
@@ -146,6 +150,8 @@ void MaterialMap::SetMaterial (uint32_t id, const char* name)
     throw xtl::make_argument_exception (METHOD_NAME, "id", (size_t)id, "This id is reserved for internal use");
 
   impl->map [id] = name;
+
+  impl->data_update_index++;
 }
 
 /*
@@ -164,7 +170,10 @@ void MaterialMap::RemoveMaterial (const char* name)
     ++next;
 
     if (iter->second == name)
+    {
       impl->map.erase (iter);
+      impl->data_update_index++;
+    }
 
     iter = next;
   }
@@ -172,21 +181,42 @@ void MaterialMap::RemoveMaterial (const char* name)
 
 void MaterialMap::RemoveMaterial (uint32_t id)
 {
-  impl->map.erase (id);
+  if (impl->map.erase (id))
+    impl->data_update_index++;
 }
 
 void MaterialMap::RemoveMaterial (MaterialMap::Iterator iter)
 {
   impl->map.erase (*iter.target<MaterialHashMap::iterator> ());
+  impl->data_update_index++;
 }
 
 void MaterialMap::Clear ()
 {
   impl->map.clear ();
+  impl->data_update_index++;
 }
 
 /*
-    Обмен
+   Current update index
+*/
+
+unsigned int MaterialMap::CurrentDataUpdateIndex () const
+{
+  return impl->data_update_index;
+}
+
+/*
+   Destroy notifier object
+*/
+
+xtl::trackable& MaterialMap::Trackable () const
+{
+  return *impl;
+}
+
+/*
+    Swap
 */
 
 void MaterialMap::Swap (MaterialMap& map)
@@ -199,7 +229,12 @@ namespace media
 
 namespace geometry
 {
-    
+
+xtl::trackable& get_trackable (const MaterialMap& map)
+{
+  return map.Trackable ();
+}
+
 void swap (MaterialMap& map1, MaterialMap& map2)
 {
   map1.Swap (map2);

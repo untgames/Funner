@@ -47,15 +47,19 @@ template <class SrcT> void convert_dispatch (const SrcT* src, void* dst, size_t 
     Описание реализации индексного буфера
 */
 
-struct IndexBuffer::Impl: public xtl::reference_counter
+struct IndexBuffer::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  IndexType data_type;     //тип данных
-  uint32_t  indices_count; //количество индексов
-  Buffer    indices;       //массив индексов
+  IndexType    data_type;              //тип данных
+  uint32_t     indices_count;          //количество индексов
+  Buffer       indices;                //массив индексов
+  unsigned int structure_update_index; //индекс обновления структуры буфера (тип или размер)
+  unsigned int data_update_index;      //индекс обновления данных буфера
   
   Impl (IndexType in_data_type)
     : data_type (in_data_type)
     , indices_count (0)
+    , structure_update_index (0)
+    , data_update_index (0)
   {
     switch (data_type)
     {
@@ -166,6 +170,8 @@ void IndexBuffer::SetDataType (IndexType type)
     new_indices.Swap (impl->indices);
 
     impl->data_type = type;
+
+    impl->structure_update_index++;
   }
   catch (xtl::exception& e)
   {
@@ -202,6 +208,8 @@ void IndexBuffer::Resize (uint32_t indices_count)
   impl->indices.Resize (indices_count * get_index_type_size (impl->data_type));
   
   impl->indices_count = indices_count;
+
+  impl->structure_update_index++;
 }
 
 /*
@@ -213,6 +221,8 @@ void IndexBuffer::Clear ()
   impl->indices.Resize (0);
   
   impl->indices_count = 0;
+
+  impl->structure_update_index++;
 }
 
 /*
@@ -230,6 +240,35 @@ void IndexBuffer::Reserve (uint32_t indices_count)
 }
 
 /*
+   Увеличение индекса обновления / Текущий индекс обновления
+*/
+
+void IndexBuffer::InvalidateData ()
+{
+  impl->data_update_index++;
+}
+
+unsigned int IndexBuffer::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+unsigned int IndexBuffer::CurrentDataUpdateIndex () const
+{
+  return impl->data_update_index;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& IndexBuffer::Trackable () const
+{
+  return *impl;
+}
+
+
+/*
     Обмен
 */
 
@@ -243,7 +282,12 @@ namespace media
 
 namespace geometry
 {
-    
+
+xtl::trackable& get_trackable (const IndexBuffer& ib)
+{
+  return ib.Trackable ();
+}
+
 void swap (IndexBuffer& ib1, IndexBuffer& ib2)
 {
   ib1.Swap (ib2);

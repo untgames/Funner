@@ -7,6 +7,7 @@
 #include <common/strlib.h>
 
 #include <media/mesh.h>
+#include <media/geometry/mesh_observer.h>
 
 #include <xtl/function.h>
 #include <xtl/iterator.h>

@@ -12,10 +12,11 @@ const size_t DEFAULT_VERTEX_ARRAY_RESERVE = 4; //резервируемый ра
 
 typedef stl::vector<VertexStream> VertexStreamArray;
 
-struct VertexBuffer::Impl: public xtl::reference_counter
+struct VertexBuffer::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  VertexStreamArray  streams;   //вершинные массивы
-  VertexWeightStream weights;   //массив весов
+  VertexStreamArray  streams;                //вершинные массивы
+  VertexWeightStream weights;                //массив весов
+  unsigned int       structure_update_index; //индекс обновления структуры буфера (вершинные потоки или веса изменились)
 
   Impl ();
   Impl (const Impl&); //used for clone
@@ -26,12 +27,14 @@ struct VertexBuffer::Impl: public xtl::reference_counter
 */
 
 VertexBuffer::Impl::Impl ()
+  : structure_update_index (0)
 {
   streams.reserve (DEFAULT_VERTEX_ARRAY_RESERVE);
 }
   
 VertexBuffer::Impl::Impl (const Impl& impl)
   : weights (impl.weights.Clone ())
+  , structure_update_index (0)
 {
   streams.reserve (impl.streams.size ());
 
@@ -44,7 +47,7 @@ VertexBuffer::Impl::Impl (const Impl& impl)
 */
 
 VertexBuffer::VertexBuffer ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
 
 VertexBuffer::VertexBuffer (Impl* in_impl)
@@ -147,6 +150,8 @@ uint32_t VertexBuffer::Attach (VertexStream& vs)
 
   impl->streams.push_back (vs);
 
+  impl->structure_update_index++;
+
   return (uint32_t)impl->streams.size () - 1;
 }
 
@@ -156,21 +161,28 @@ void VertexBuffer::Detach (uint32_t index)
     return;
     
   impl->streams.erase (impl->streams.begin () + index);
+
+  impl->structure_update_index++;
 }
 
 void VertexBuffer::AttachWeights (VertexWeightStream& vws)
 {
   impl->weights = vws;
+
+  impl->structure_update_index++;
 }
 
 void VertexBuffer::DetachWeights ()
 {
   impl->weights = VertexWeightStream ();
+
+  impl->structure_update_index++;
 }
 
 void VertexBuffer::Clear ()
 {
   impl->streams.clear ();
+
   DetachWeights ();
 }
 
@@ -209,7 +221,25 @@ uint32_t VertexBuffer::VertexSize () const
 
   return vertex_size;
 }
-    
+
+/*
+   Текущий индекс обновления
+*/
+
+unsigned int VertexBuffer::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& VertexBuffer::Trackable () const
+{
+  return *impl;
+}
+
 /*
     Обмен
 */
@@ -224,6 +254,11 @@ namespace media
 
 namespace geometry
 {
+
+xtl::trackable& get_trackable (const VertexBuffer& vb)
+{
+  return vb.Trackable ();
+}
 
 void swap (VertexBuffer& vb1, VertexBuffer& vb2)
 {

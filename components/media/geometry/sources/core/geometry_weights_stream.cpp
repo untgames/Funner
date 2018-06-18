@@ -8,9 +8,16 @@ using namespace common;
     Описание реализации массива весов
 */
 
-struct VertexWeightStream::Impl: public xtl::reference_counter
+struct VertexWeightStream::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  Buffer data_buffer; //буфер данных
+  Buffer       data_buffer;            //буфер данных
+  unsigned int structure_update_index; //текущий индекс обновления структуры потока (изменение размера)
+  unsigned int data_update_index;      //текущий индекс обновления данных потока
+
+  Impl ()
+    : structure_update_index (0)
+    , data_update_index (0)
+    {}
 };
 
 /*
@@ -94,6 +101,8 @@ uint32_t VertexWeightStream::Size () const
 void VertexWeightStream::Resize (uint32_t weights_count)
 {
   impl->data_buffer.Resize (weights_count * sizeof (VertexWeight));
+
+  impl->structure_update_index++;
 }
 
 /*
@@ -103,6 +112,8 @@ void VertexWeightStream::Resize (uint32_t weights_count)
 void VertexWeightStream::Clear ()
 {
   impl->data_buffer.Resize (0);
+
+  impl->structure_update_index++;
 }
 
 /*
@@ -120,6 +131,35 @@ void VertexWeightStream::Reserve (uint32_t weights_count)
 }
 
 /*
+   Увеличение индекса обновления / Текущий индекс обновления
+*/
+
+void VertexWeightStream::InvalidateData ()
+{
+  impl->data_update_index++;
+}
+
+unsigned int VertexWeightStream::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+unsigned int VertexWeightStream::CurrentDataUpdateIndex () const
+{
+  return impl->data_update_index;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& VertexWeightStream::Trackable () const
+{
+  return *impl;
+}
+
+
+/*
     Обмен
 */
 
@@ -133,6 +173,11 @@ namespace media
 
 namespace geometry
 {
+
+xtl::trackable& get_trackable (const VertexWeightStream& vws)
+{
+  return vws.Trackable ();
+}
 
 void swap (VertexWeightStream& vws1, VertexWeightStream& vws2)
 {
