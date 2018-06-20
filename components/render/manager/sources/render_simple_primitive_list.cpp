@@ -585,7 +585,7 @@ class BatchingStateBlockHolder: public MaterialHolder
 };
 
 /*
-    Хранилище элементов списка днамических примитивов
+    Хранилище элементов списка простых примитивов
 */
 
 template <class T, class Base> class PrimitiveListStorage: public Base, public SimplePrimitiveListImpl<T>
@@ -911,9 +911,9 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return &StandalonePrimitiveHolder::Primitive (); }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
     {
-      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
+      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstance", "Dynamic primitives are not supported for this list");
     }
 
 ///Количество примитивов
@@ -1187,7 +1187,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
     {
       try
       {
@@ -1195,7 +1195,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstance");
         throw;
       }
     }
@@ -1373,7 +1373,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
     {
       try
       {
@@ -1382,7 +1382,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneBillboardSpriteList::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::StandaloneBillboardSpriteList::CreateDynamicPrimitiveInstance");
         throw;
       }
     }
@@ -1535,7 +1535,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
     {
       try
       {
@@ -1544,7 +1544,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingBillboardSpriteList::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::BatchingBillboardSpriteList::CreateDynamicPrimitiveInstance");
         throw;
       }
     }
@@ -1561,7 +1561,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 }
 
 /*
-    Создание групп динамических примитивов
+    Создание групп простых примитивов
 */
 
 namespace render

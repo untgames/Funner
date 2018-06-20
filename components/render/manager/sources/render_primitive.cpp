@@ -305,25 +305,26 @@ struct SimplePrimitiveListDesc
   }
 };
 
-
-typedef stl::vector<SimplePrimitiveListDesc> SimplePrimitiveListArray;
+typedef stl::vector<DynamicPrimitivePrototypePtr>     DynamicPrimitivePrototypeArray;
+typedef stl::vector<SimplePrimitiveListDesc>          SimplePrimitiveListArray;
 
 }
 
 struct PrimitiveImpl::Impl: public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;                               //менеджер устройства
-  MaterialManagerPtr         material_manager;                             //менеджер материалов
-  BuffersPtr                 buffers;                                      //буферы примитива
-  MeshArray                  meshes;                                       //меши
-  SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
-  SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
-  RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не зависящие от объекта
-  unsigned int               line_lists_count;                             //количество списков с линиями
-  unsigned int               sprite_lists_count;                           //количество списков со спрайтами
-  stl::string                name;                                         //имя примитива
-  RenderPrimitiveGroupsArray render_groups;                                //группы
-  Log                        log;                                          //поток протоколирования
+  DeviceManagerPtr               device_manager;                  //менеджер устройства
+  MaterialManagerPtr             material_manager;                //менеджер материалов
+  BuffersPtr                     buffers;                         //буферы примитива
+  MeshArray                      meshes;                          //меши
+  SimplePrimitiveListArray       simple_primitives;               //список простых примитивов
+  DynamicPrimitivePrototypeArray dynamic_primitive_prototypes;    //список прототипов динамических примитивов (entity dependent)
+  RendererPrimitiveArray         cached_static_simple_primitives; //закэшированные статические простые примитивы
+  unsigned int                   line_lists_count;                //количество списков с линиями
+  unsigned int                   sprite_lists_count;              //количество списков со спрайтами
+  unsigned int                   static_simple_primitives_count;  //количество статических простых примитивов
+  stl::string                    name;                            //имя примитива
+  RenderPrimitiveGroupsArray     render_groups;                   //группы
+  Log                            log;                             //поток протоколирования
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
@@ -332,6 +333,7 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
     , buffers (in_buffers)
     , line_lists_count ()
     , sprite_lists_count ()
+    , static_simple_primitives_count ()
   {
     static const char* METHOD_NAME = "render::manager::PrimitiveImpl::Impl::Impl";
     
@@ -411,6 +413,38 @@ void PrimitiveImpl::SetName (const char* name)
 const PrimitiveImpl::BuffersPtr& PrimitiveImpl::Buffers ()
 {
   return impl->buffers;
+}
+
+/*
+    Работа с динамическими примитивами
+*/
+
+void PrimitiveImpl::AddDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr& prototype)
+{
+  try
+  {
+    if (!prototype)
+      throw xtl::make_null_argument_exception ("", "prototype");
+
+    for (DynamicPrimitivePrototypeArray::iterator iter=impl->dynamic_primitive_prototypes.begin (), end=impl->dynamic_primitive_prototypes.end (); iter!=end; ++iter)
+      if (*iter == prototype)
+        throw xtl::format_operation_exception ("", "DynamicPrimitivePrototype has been already added");
+
+    impl->dynamic_primitive_prototypes.push_back (prototype);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddDynamicPrimitivePrototype");
+    throw;
+  }
+}
+
+void PrimitiveImpl::RemoveDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr& prototype)
+{
+  if (!prototype)
+    return;
+
+  impl->dynamic_primitive_prototypes.erase (stl::remove (impl->dynamic_primitive_prototypes.begin (), impl->dynamic_primitive_prototypes.end (), prototype), impl->dynamic_primitive_prototypes.end ());  
 }
 
 /*
@@ -738,21 +772,21 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
 {
   try
   {
-    for (SimplePrimitiveListArray::iterator iter=impl->entity_dependent_dynamic_primitive_lists.begin (), end=impl->entity_dependent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    for (DynamicPrimitivePrototypeArray::iterator iter=impl->dynamic_primitive_prototypes.begin (), end=impl->dynamic_primitive_prototypes.end (); iter!=end; ++iter)
     {
-      SimplePrimitiveListImplBase& list = *iter->list;
+      DynamicPrimitivePrototype& prototype = **iter;
 
-      if (DynamicPrimitivePtr primitive = storage.FindPrimitive (&list, true))
+      if (DynamicPrimitivePtr primitive = storage.FindPrimitive (&prototype, true))
       {
         primitive->UpdateCache ();
         continue;
       }
 
-      DynamicPrimitivePtr primitive (list.CreateDynamicPrimitiveInstanceCore (), false);
+      DynamicPrimitivePtr primitive (prototype.CreateDynamicPrimitiveInstance (), false);
 
       primitive->UpdateCache ();
 
-      storage.AddPrimitive (primitive, &list);
+      storage.AddPrimitive (primitive, &prototype);
     }
   }
   catch (xtl::exception& e)
@@ -770,21 +804,37 @@ void PrimitiveImpl::AddSimplePrimitiveList (SimplePrimitiveListImplBase* list, i
 {
   RendererPrimitive* primitive = list->StandaloneRendererPrimitive ();
 
-  if (primitive) impl->entity_independent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
-  else           impl->entity_dependent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
+  impl->simple_primitives.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
 
-  AttachCacheSource (*list);
-
-  switch (type)
+  try
   {
-    case SimplePrimitiveListType_Sprite:
-      impl->sprite_lists_count++;
-      break;
-    case SimplePrimitiveListType_Line:
-      impl->line_lists_count++;
-      break;
-    default:
-      break;
+    AttachCacheSource (*list);
+
+    if (primitive)
+    {
+      impl->static_simple_primitives_count++;
+    }
+    else
+    {  
+      AddDynamicPrimitivePrototype (list);
+    }
+
+    switch (type)
+    {
+      case SimplePrimitiveListType_Sprite:
+        impl->sprite_lists_count++;
+        break;
+      case SimplePrimitiveListType_Line:
+        impl->line_lists_count++;
+        break;
+      default:
+        break;
+    }
+  }
+  catch (...)
+  {
+    impl->simple_primitives.pop_back ();
+    throw;
   }
 }
 
@@ -793,34 +843,32 @@ void PrimitiveImpl::RemoveSimplePrimitiveList (SimplePrimitiveListImplBase* list
   if (!list)
     return;
 
-  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+  RemoveDynamicPrimitivePrototype (list);
 
-  for (unsigned int i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
-  {
-    SimplePrimitiveListArray& lists = *arrays [i];
-
-    for (SimplePrimitiveListArray::iterator iter=lists.begin (), end=lists.end (); iter!=end; ++iter)
-      if (iter->list == list)
+  for (SimplePrimitiveListArray::iterator iter=impl->simple_primitives.begin (), end=impl->simple_primitives.end (); iter!=end; ++iter)
+    if (iter->list == list)
+    {
+      switch (iter->type)
       {
-        switch (iter->type)
-        {
-          case SimplePrimitiveListType_Sprite:
-            impl->sprite_lists_count--;
-            break;
-          case SimplePrimitiveListType_Line:
-            impl->line_lists_count--;
-            break;
-          default:
-            break;
-        }
-
-        DetachCacheSource (*list);
-
-        lists.erase (iter);
-
-        return;
+        case SimplePrimitiveListType_Sprite:
+          impl->sprite_lists_count--;
+          break;
+        case SimplePrimitiveListType_Line:
+          impl->line_lists_count--;
+          break;
+        default:
+          break;
       }
-  }
+
+      if (iter->primitive)
+        impl->static_simple_primitives_count--;
+
+      DetachCacheSource (*list);
+
+      impl->simple_primitives.erase (iter);
+
+      return;
+    }
 }
 
 void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
@@ -828,27 +876,32 @@ void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
   switch (type)
   {
     case SimplePrimitiveListType_Sprite:
+      impl->sprite_lists_count = 0;
+      break;
     case SimplePrimitiveListType_Line:
+      impl->line_lists_count = 0;
       break;
     default:
       return;
   }
 
-  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+  for (SimplePrimitiveListArray::iterator iter=impl->simple_primitives.begin (); iter!=impl->simple_primitives.end ();)
+    if (iter->type == type)
+    {
+      DetachCacheSource (*iter->list);
 
-  for (unsigned int i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
-  {
-    SimplePrimitiveListArray& lists = *arrays [i];
-
-    for (SimplePrimitiveListArray::iterator iter=lists.begin (); iter!=lists.end ();)
-      if (iter->type == type)
+      if (iter->primitive)
       {
-        DetachCacheSource (*iter->list);
-
-        lists.erase (iter);
+        impl->static_simple_primitives_count--;
       }
-      else ++iter;
-  }  
+      else
+      {
+        RemoveDynamicPrimitivePrototype (iter->list);
+      }
+
+      impl->simple_primitives.erase (iter);
+    }
+    else ++iter;
 }
 
 /*
@@ -867,8 +920,8 @@ void PrimitiveImpl::UpdateCacheCore ()
     impl->render_groups.clear ();
     impl->render_groups.reserve (impl->meshes.size () + 1);
 
-    impl->cached_entity_independent_dynamic_primitives.clear ();
-    impl->cached_entity_independent_dynamic_primitives.reserve (impl->entity_independent_dynamic_primitive_lists.size ());
+    impl->cached_static_simple_primitives.clear ();
+    impl->cached_static_simple_primitives.reserve (impl->static_simple_primitives_count);
     
     for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
     {
@@ -880,25 +933,27 @@ void PrimitiveImpl::UpdateCacheCore ()
       impl->render_groups.push_back (mesh.cached_group);
     }
 
-    for (SimplePrimitiveListArray::iterator iter=impl->entity_independent_dynamic_primitive_lists.begin (), end=impl->entity_independent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    if (impl->static_simple_primitives_count)
     {
-      SimplePrimitiveListImplBase& list             = *iter->list;
-      RendererPrimitive*           cached_primitive = iter->primitive;
+      for (SimplePrimitiveListArray::iterator iter=impl->simple_primitives.begin (), end=impl->simple_primitives.end (); iter!=end; ++iter)
+      {
+        RendererPrimitive* cached_primitive = iter->primitive;
 
-      if (!cached_primitive)
-        continue;
+        if (!cached_primitive)
+          continue;
 
-      impl->cached_entity_independent_dynamic_primitives.push_back (*cached_primitive);
-    }
+        impl->cached_static_simple_primitives.push_back (*cached_primitive);
+      }
 
-    if (!impl->cached_entity_independent_dynamic_primitives.empty ())
-    {
-      RendererPrimitiveGroup group;
+      if (!impl->cached_static_simple_primitives.empty ())
+      {
+        RendererPrimitiveGroup group;
 
-      group.primitives_count = (unsigned int)impl->cached_entity_independent_dynamic_primitives.size ();
-      group.primitives       = &impl->cached_entity_independent_dynamic_primitives [0];
+        group.primitives_count = (unsigned int)impl->cached_static_simple_primitives.size ();
+        group.primitives       = &impl->cached_static_simple_primitives [0];
 
-      impl->render_groups.push_back (group);
+        impl->render_groups.push_back (group);
+      }
     }
     
     InvalidateCacheDependencies ();

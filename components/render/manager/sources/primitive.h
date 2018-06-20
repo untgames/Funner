@@ -74,6 +74,9 @@ class PrimitiveImpl: public Object, public CacheSource
     void AddSimplePrimitiveList        (SimplePrimitiveListImplBase*, int type);
     void RemoveSimplePrimitiveList     (SimplePrimitiveListImplBase*);
     void RemoveAllSimplePrimitiveLists (int type);
+
+    void AddDynamicPrimitivePrototype    (const DynamicPrimitivePrototypePtr&);
+    void RemoveDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr&);
       
   private:
     void UpdateCacheCore ();
