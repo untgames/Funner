@@ -36,6 +36,11 @@ class EntityImpl: public Object
     ~EntityImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер устройства отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const DeviceManagerPtr& DeviceManager ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хранилище динамических текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     DynamicTextureEntityStorage& DynamicTextureStorage ();
@@ -69,10 +74,11 @@ class EntityImpl: public Object
 ///Работа с костями (для скиннинга)
 ///  преобразования умножаются на матрицу Entity::Transformation в случае если она не единична
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetJointsCount         (size_t count);
-    size_t             JointsCount            ();
-    void               SetJointTransformation (size_t joint_index, const math::mat4f&);
-    const math::mat4f& JointTransformation    (size_t joint_index);
+    void                      SetJointsCount         (size_t count);
+    size_t                    JointsCount            ();
+    void                      SetJointTransformation (size_t joint_index, const math::mat4f&);
+    const math::mat4f&        JointTransformation    (size_t joint_index);
+    const EntityJointListPtr& Joints                 ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с уровнями детализации

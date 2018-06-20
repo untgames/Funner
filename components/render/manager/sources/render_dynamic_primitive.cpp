@@ -204,7 +204,12 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
     impl->groups.reserve (impl->primitives.size ());
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), iter->primitive.get ()));
+    {
+      const RendererPrimitiveGroup* group = iter->primitive->RendererPrimitiveGroup ();
+
+      if (group)
+        impl->groups.push_back (RendererDynamicPrimitiveGroup (*group, iter->primitive.get ()));
+    }
 
       //обновление зависимостей
 
@@ -226,7 +231,7 @@ void DynamicPrimitiveEntityStorage::ResetCacheCore ()
     DynamicPrimitive
 */
 
-DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGroup& in_group, size_t flags)
+DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGroup* in_group, size_t flags)
   : group (in_group)
   , frame_dependent ((flags & DynamicPrimitiveFlag_FrameDependent) != 0)
   , entity_dependent ((flags & DynamicPrimitiveFlag_EntityDependent) != 0)

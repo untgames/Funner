@@ -67,18 +67,18 @@ const math::mat4f& EntityJointList::Transformation (size_t joint_index)
     Конструктор / деструктор
 */
 
-SkinVertexBuffer::SkinVertexBuffer (low_level::IDevice& device, const VertexBufferPtr& in_vertex_buffer, const EntityJointListPtr& in_joints)
+SkinVertexBuffer::SkinVertexBuffer (const DeviceManagerPtr& device_manager, const VertexBufferPtr& in_vertex_buffer)
   : vertex_buffer (in_vertex_buffer)
-  , joints (in_joints)
-  , cached_update_revision_id (~0u)
 {
   try
   {
     if (!vertex_buffer)
       throw xtl::make_null_argument_exception ("", "vertex_buffer");
 
-    if (joints)
-      throw xtl::make_null_argument_exception ("", "joints");
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+
+    low_level::IDevice& device = device_manager->Device ();
 
     vertices_count       = vertex_buffer->VerticesCount ();
     vertex_cache         = vertex_buffer->SkinVertices ();
@@ -110,15 +110,12 @@ SkinVertexBuffer::SkinVertexBuffer (low_level::IDevice& device, const VertexBuff
     Обновление буфера
 */
 
-void SkinVertexBuffer::Update ()
+void SkinVertexBuffer::Update (EntityJointList& joints)
 {
-  if (cached_update_revision_id == joints->UpdateRevisionId ())
-    return;
-
     //расчет вершин скин меша
 
-  size_t              joints_count     = joints->Size ();
-  const math::mat4f*  transformations  = joints->Transformations ();
+  size_t              joints_count     = joints.Size ();
+  const math::mat4f*  transformations  = joints.Transformations ();
   const VertexWeight* src_vertex       = vertex_weights;
   SkinVertex*         dst_vertex       = vertex_cache;
 
@@ -149,8 +146,64 @@ void SkinVertexBuffer::Update ()
     //обновление данных
 
   vertex_stream->SetData (0, sizeof (SkinVertex) * vertices_count, vertex_cache);
+}
 
-    //обновление кэш метки
+/*
+===================================================================================================
+    SkinDynamicPrimitive
+===================================================================================================
+*/
 
-  cached_update_revision_id = joints->UpdateRevisionId ();
+/*
+    Конструктор
+*/
+
+SkinDynamicPrimitive::SkinDynamicPrimitive (const VertexBufferPtr& vertex_buffer, EntityImpl& in_entity)
+try
+  : DynamicPrimitive (0, DynamicPrimitiveFlag_EntityDependent)
+  , entity (in_entity)
+  , skin_vertex_buffer (new SkinVertexBuffer (in_entity.DeviceManager (), vertex_buffer), false)
+  , cached_update_revision_id (~0u)
+{
+}
+catch (xtl::exception& e)
+{
+  e.touch ("render::manager::SkinDynamicPrimitive::SkinDynamicPrimitive");
+  throw;
+}
+
+/*
+    Обновление
+*/
+
+void SkinDynamicPrimitive::UpdateOnPrerenderCore (EntityImpl& in_entity)
+{
+  try
+  {
+      //проверка корректности аргументов
+
+    if (&in_entity != &entity)
+      throw xtl::format_operation_exception ("", "Entity for SkinDynamicPrimitive::UpdateOnPrerenderCore should be same as in constructor");
+
+    EntityJointListPtr joints = entity.Joints ();
+
+    if (!joints)
+      return;
+
+    if (cached_update_revision_id == joints->UpdateRevisionId ())
+      return;
+
+      //обновление вершинного буфера
+
+    skin_vertex_buffer->Update (*joints);
+
+      //обновление кэш метки
+
+    cached_update_revision_id = joints->UpdateRevisionId ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::SkinDynamicPrimitive::UpdateOnPrerenderCore");
+    throw;
+  }
 }

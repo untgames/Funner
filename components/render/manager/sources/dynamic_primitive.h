@@ -32,7 +32,7 @@ class DynamicPrimitive: public Object, public CacheSource, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группа примитивов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const manager::RendererPrimitiveGroup& RendererPrimitiveGroup ();
+    const manager::RendererPrimitiveGroup* RendererPrimitiveGroup ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Является ли примитив зависимым от кадра / является ли примитив зависимым от EntityDrawParams
@@ -50,7 +50,7 @@ class DynamicPrimitive: public Object, public CacheSource, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitive (const manager::RendererPrimitiveGroup& group, size_t flags = DynamicPrimitiveFlag_Default);
+    DynamicPrimitive (const manager::RendererPrimitiveGroup* group, size_t flags = DynamicPrimitiveFlag_Default);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ class DynamicPrimitive: public Object, public CacheSource, public xtl::trackable
     virtual void UpdateOnRenderCore    (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix) = 0;
 
   private:
-    const manager::RendererPrimitiveGroup& group;
+    const manager::RendererPrimitiveGroup* group;
     bool                                   frame_dependent;
     bool                                   entity_dependent;
     FrameId                                cached_frame_id;
@@ -131,7 +131,7 @@ class DynamicPrimitiveEntityStorage: public CacheSource
 ///Реализация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline const RendererPrimitiveGroup& DynamicPrimitive::RendererPrimitiveGroup ()
+inline const RendererPrimitiveGroup* DynamicPrimitive::RendererPrimitiveGroup ()
 {
   return group;
 }

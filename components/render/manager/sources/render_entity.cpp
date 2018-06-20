@@ -64,7 +64,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     EntityImpl& Entity () { return entity; }
     
 ///Менеджер устройства отрисовки
-    DeviceManagerPtr DeviceManager () { return device_manager; }
+    const DeviceManagerPtr& DeviceManager () { return device_manager; }
     
 ///Менеджер текстур
     TextureManagerPtr& TextureManager () { return texture_manager; }
@@ -191,6 +191,17 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       need_update_inv_world_tm = false;
 
       return inv_world_tm;
+    }
+
+///Список костей объекта
+    const EntityJointListPtr& Joints (bool create = false)
+    {
+      if (joints || !create)
+        return joints;
+
+      joints = EntityJointListPtr (new EntityJointList, false);
+
+      return joints;
     }
 
 ///Управление кэшированием
@@ -371,6 +382,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     math::mat4f                          world_tm;                 //мировая матрица преобразований
     math::mat4f                          inv_world_tm;             //инверсная матрица преобразований
     bool                                 need_update_inv_world_tm; //необходимо обновить инверсную матрицу преобразований
+    EntityJointListPtr                   joints;                   //список костей объекта  
 };
 
 /*
@@ -598,7 +610,6 @@ struct EntityImpl::Impl: public EntityLodCommonData
   PrimitiveManagerPtr primitive_manager; //менеджер примитивов
   math::vec3f         lod_point;         //точка расчёта lod-уровня
   void*               user_data;         //пользовательские данные
-  EntityJointListPtr  joints;            //список соединений объекта  
 
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
@@ -635,17 +646,6 @@ struct EntityImpl::Impl: public EntityLodCommonData
     int index = FindLodIndex (level_of_detail, find_nearest);
     
     return index != -1 ? lods [index] : EntityLodPtr ();
-  }  
-
-///Получение списка соединений объекта
-  EntityJointList& Joints ()
-  {
-    if (joints)
-      return *joints;
-
-    joints = EntityJointListPtr (new EntityJointList, false);
-
-    return *joints;
   }
     
   using CacheHolder::UpdateCache;
@@ -679,6 +679,15 @@ EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const TextureMan
 
 EntityImpl::~EntityImpl ()
 {
+}
+
+/*
+    Менеджер устройства отрисовки
+*/
+
+const DeviceManagerPtr& EntityImpl::DeviceManager ()
+{
+  return impl->DeviceManager ();
 }
 
 /*
@@ -766,11 +775,16 @@ void* EntityImpl::UserData ()
       преобразования умножаются на матрицу EntityImpl::Transformation в случае если она не единична
 */
 
+const EntityJointListPtr& EntityImpl::Joints ()
+{
+  return impl->Joints ();
+}
+
 void EntityImpl::SetJointsCount (size_t count)
 {
   try
   {
-    EntityJointList& joints = impl->Joints ();
+    EntityJointList& joints = *impl->Joints (true);
 
     joints.Resize (count);
   }
@@ -783,17 +797,19 @@ void EntityImpl::SetJointsCount (size_t count)
 
 size_t EntityImpl::JointsCount ()
 {
-  if (!impl->joints)
+  const EntityJointListPtr& joints = impl->Joints ();
+
+  if (!joints)
     return 0;
 
-  return impl->joints->Size ();
+  return joints->Size ();
 }
 
 void EntityImpl::SetJointTransformation (size_t joint_index, const math::mat4f& tm)
 {
   try
   {
-    EntityJointList& joints = impl->Joints ();
+    EntityJointList& joints = *impl->Joints (true);
 
     joints.SetTransformation (joint_index, tm);
   }
@@ -808,7 +824,7 @@ const math::mat4f& EntityImpl::JointTransformation (size_t joint_index)
 {
   try
   {
-    return impl->Joints ().Transformation (joint_index);
+    return impl->Joints (true)->Transformation (joint_index);
   }
   catch (xtl::exception& e)
   {

@@ -779,7 +779,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 
 /// Конструктор
     BatchingInstance (const PrototypePtr& in_prototype, render::low_level::PrimitiveType primitive_type, size_t flags = 0)
-      : DynamicPrimitive (*this, flags)
+      : DynamicPrimitive (static_cast<render::manager::RendererPrimitiveGroup*> (this), flags)
       , prototype (in_prototype)
       , batching_manager (&prototype->BatchingManager ()) 
     {
@@ -1300,8 +1300,6 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     {
       try
       {
-        const size_t current_capacity = vertices.capacity () / VERTICES_PER_PRIMITIVE;
-
         vertices.reserve (count * VERTICES_PER_PRIMITIVE);
       }
       catch (xtl::exception& e)
@@ -1343,7 +1341,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
 
 /// Конструктор
         Instance (const PrototypePtr& in_prototype)
-          : DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
+          : DynamicPrimitive (static_cast<render::manager::RendererPrimitiveGroup*> (this), DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
           , prototype (in_prototype)
         {
           primitives_count = 1;
