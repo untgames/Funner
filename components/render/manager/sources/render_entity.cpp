@@ -478,7 +478,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       {
         DynamicPrimitiveEntityStorage::UpdateScope scope (dynamic_primitives);
 
-        cached_primitive->FillDynamicPrimitiveStorage (dynamic_primitives);
+        cached_primitive->FillDynamicPrimitiveStorage (dynamic_primitives, common_data.Entity ());
       }
         
         //получение групп

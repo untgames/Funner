@@ -1,6 +1,7 @@
 ///forward declarations
 class PrimitiveBuffersImpl;
 class SimplePrimitiveListImplBase;
+struct SkinVertexBufferPrototypeHolder;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
@@ -62,7 +63,7 @@ class PrimitiveImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage&);
+    void FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage&, EntityImpl& entity); //entity should not be retained
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
@@ -77,7 +78,10 @@ class PrimitiveImpl: public Object, public CacheSource
 
     void AddDynamicPrimitivePrototype    (const DynamicPrimitivePrototypePtr&);
     void RemoveDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr&);
-      
+
+    xtl::intrusive_ptr<SkinVertexBufferPrototypeHolder> AddSkinVertexBuffer (VertexBuffer& vertex_buffer);
+    void RemoveSkinVertexBuffer (VertexBuffer& vertex_buffer);
+
   private:
     void UpdateCacheCore ();
     void ResetCacheCore ();

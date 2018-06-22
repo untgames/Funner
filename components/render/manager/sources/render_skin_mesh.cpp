@@ -207,3 +207,28 @@ void SkinDynamicPrimitive::UpdateOnPrerenderCore (EntityImpl& in_entity)
     throw;
   }
 }
+
+/*
+    SkinVertexBufferPrototype
+*/
+
+///Конструктор
+SkinVertexBufferPrototype::SkinVertexBufferPrototype (render::manager::VertexBuffer& in_vertex_buffer, const DeviceManagerPtr& in_device_manager)
+  : vertex_buffer (in_vertex_buffer)
+  , device_manager (in_device_manager)
+{
+}
+
+///Создание экземпляра
+DynamicPrimitive* SkinVertexBufferPrototype::CreateDynamicPrimitiveInstance (EntityImpl& entity)
+{
+  try
+  {
+    return new SkinDynamicPrimitive (&vertex_buffer, entity);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::SkinVertexBufferPrototype::CreateDynamicPrimitiveInstance");
+    throw;
+  }
+}

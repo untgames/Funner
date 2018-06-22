@@ -911,7 +911,7 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return &StandalonePrimitiveHolder::Primitive (); }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
     {
       throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstance", "Dynamic primitives are not supported for this list");
     }
@@ -1187,7 +1187,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
     {
       try
       {
@@ -1373,7 +1373,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
     {
       try
       {
@@ -1535,7 +1535,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance ()
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
     {
       try
       {
