@@ -123,9 +123,9 @@ void SkinVertexBuffer::Update (EntityJointList& joints)
 
   for (size_t i=0; i<vertices_count; i++, src_vertex++, dst_vertex++)
   {
-    math::vec4f dst_position, dst_normal;
+    math::vec3f dst_position, dst_normal;
 
-    const math::vec4f        &src_position = src_vertex->position,
+    const math::vec3f        &src_position = src_vertex->position,
                              &src_normal   = src_vertex->normal;
     const VertexJointWeight* src_weight    = src_vertex->first_weight;
 

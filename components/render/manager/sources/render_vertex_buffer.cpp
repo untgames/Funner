@@ -3,6 +3,13 @@
 using namespace render::manager;
 using namespace render::low_level;
 
+#if defined (_MSC_VER) || defined (__APPLE_CC__)
+  #define GEOMETRY_OFFSETOF(X,Y) offsetof(X,Y)
+#else
+  #define GEOMETRY_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+#endif
+
+
 /*
     Конструкторы / деструктор
 */
@@ -149,17 +156,17 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
       va [0].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Position);
       va [0].type     = InputDataType_Float;
-      va [0].format   = InputDataFormat_Vector4;
+      va [0].format   = InputDataFormat_Vector3;
       va [0].stride   = sizeof (SkinVertex);
       va [0].slot     = skin_data->stream_index;
       va [0].offset   = 0;
 
       va [1].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal);
       va [1].type     = InputDataType_Float;
-      va [1].format   = InputDataFormat_Vector4;
+      va [1].format   = InputDataFormat_Vector3;
       va [1].stride   = sizeof (SkinVertex);
       va [1].slot     = skin_data->stream_index;
-      va [1].offset   = sizeof (math::vec4f);
+      va [1].offset   = GEOMETRY_OFFSETOF (SkinVertex, normal);
 
       attributes.push_back (va [0]);
       attributes.push_back (va [1]);
