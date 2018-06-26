@@ -145,6 +145,7 @@ void SkinVertexBuffer::Update (EntityJointList& joints)
 
     dst_vertex->position = dst_position;
     dst_vertex->normal   = dst_normal;
+printf ("!!! #%d: %.3f %.3f %.3f\n", i, dst_position.x, dst_position.y, dst_position.z);
   }
 
     //обновление данных
@@ -171,7 +172,7 @@ SkinDynamicPrimitive::SkinDynamicPrimitive
   EntityImpl&                         in_entity,
   const FillRendererPrimitiveHandler& fill_renderer_primitive_fn)
 try
-  : DynamicPrimitive (static_cast<manager::RendererPrimitiveGroup*> (0), DynamicPrimitiveFlag_EntityDependent)
+  : DynamicPrimitive (static_cast<manager::RendererPrimitiveGroup*> (this), DynamicPrimitiveFlag_EntityDependent)
   , entity (in_entity)
   , skin_vertex_buffer (in_skin_vertex_buffer)
   , fill_renderer_primitive_handler(fill_renderer_primitive_fn)
@@ -228,8 +229,8 @@ void SkinDynamicPrimitive::UpdateCacheCore ()
 
       //обновление блока состояний
 
-    render::low_level::IDevice&        device        = entity.DeviceManager ()->Device ();
-    render::low_level::IDeviceContext& context       = entity.DeviceManager ()->ImmediateContext ();
+    render::low_level::IDevice&        device  = entity.DeviceManager ()->Device ();
+    render::low_level::IDeviceContext& context = entity.DeviceManager ()->ImmediateContext ();
 
     low_level::StateBlockMask mask;
     size_t                    mask_hash = mask.Hash ();
@@ -247,7 +248,7 @@ void SkinDynamicPrimitive::UpdateCacheCore ()
       cached_state_block_mask_hash = mask_hash;
     }
 
-    cached_state_block->Apply (&context);
+    cached_primitive.state_block->Apply (&context);
 
     context.ISSetVertexBuffer (vertex_buffer_index, vertex_buffer.get ());
 

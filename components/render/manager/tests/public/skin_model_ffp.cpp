@@ -100,6 +100,7 @@ int main ()
     Entity entity = render_manager.CreateEntity ();
     
     entity.SetPrimitive ("_snowguy.controller#0");
+    entity.SetJointsCount (128);
     
     Frame frame = render_manager.CreateFrame ();
 
@@ -112,9 +113,9 @@ int main ()
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();
     
-    frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-100, 100, -100, 100, -1000, 1000));
-    frame_properties.SetProperty ("myViewMatrix", inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1))));
-    entity_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));        
+    frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-2, 2, -2, 2, -10, 10));
+    frame_properties.SetProperty ("myViewMatrix", inverse (math::lookat (math::vec3f (0, 4, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1))));
+    entity_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));
     
     frame.AddEntity (entity); 
     
