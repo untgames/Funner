@@ -57,6 +57,10 @@ void idle (Test& test, Entity& entity, Frame& frame)
     
     entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
       math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+
+    math::mat4f joint_tm = math::rotate (math::radian (angle), math::vec3f (1, 0, 0));
+
+    entity.SetJointTransformation (13, joint_tm);
       
     math::vec3f light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
       

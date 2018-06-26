@@ -145,7 +145,6 @@ void SkinVertexBuffer::Update (EntityJointList& joints)
 
     dst_vertex->position = dst_position;
     dst_vertex->normal   = dst_normal;
-printf ("!!! #%d: %.3f %.3f %.3f\n", i, dst_position.x, dst_position.y, dst_position.z);
   }
 
     //обновление данных
