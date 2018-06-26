@@ -6,31 +6,6 @@ using namespace render::low_level;
 //TODO: расчет вершинного буфера для спрайтов для каждого кадра
 //TODO: реакция отдельных спрайтов на события материала
 
-namespace render
-{
-
-namespace manager
-{
-
-/*
-    Хранилище для прототипа skin вершинного буфера
-*/
-
-typedef xtl::intrusive_ptr<SkinVertexBufferPrototype> SkinVertexBufferPrototypePtr;
-
-struct SkinVertexBufferPrototypeHolder: public xtl::reference_counter, public xtl::trackable
-{
-  SkinVertexBufferPrototypePtr prototype;
-
-  SkinVertexBufferPrototypeHolder (const SkinVertexBufferPrototypePtr& in_prototype) : prototype (in_prototype) {}
-};
-
-typedef xtl::intrusive_ptr<SkinVertexBufferPrototypeHolder> SkinVertexBufferPrototypeHolderPtr;
-
-}
-
-}
-
 namespace
 {
 
@@ -54,24 +29,46 @@ struct MeshCommonData
 };
 
 ///Примитив меша
-struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
+struct MeshPrimitive: public xtl::reference_counter, public xtl::trackable, public CacheHolder, public DebugIdHolder
 {
-  MeshCommonData&                    common_data;                  //общие данные для примитива
-  unsigned int                       primitive_index;              //индекс примитива в меше
-  render::low_level::PrimitiveType   type;                         //тип примитива
-  VertexBufferPtr                    vertex_buffer;                //вершинный буфер
-  SkinVertexBufferPrototypeHolderPtr skin_vertex_buffer_prototype; //прототип скин вершинного буфера
-  LowLevelInputLayoutPtr             layout;                       //лэйаут примитива
-  unsigned int                       first;                        //индекс первой вершины/индекса
-  unsigned int                       count;                        //количество примитивов
-  unsigned int                       base_vertex;                  //индекс базовой вершины
-  MaterialProxy                      material;                     //материал
-  Log                                log;                          //поток протоколирования
-  MaterialPtr                        cached_material;              //закэшированный материал
-  RendererPrimitive                  cached_primitive;             //примитив закэшированный для рендеринга
-  size_t                             cached_state_block_mask_hash; //хэш маски закэшированного блока состояний
-  LowLevelStateBlockPtr              cached_state_block;           //закэшированный блок состояний  
-  
+  MeshCommonData&                    common_data;                      //общие данные для примитива
+  unsigned int                       primitive_index;                  //индекс примитива в меше
+  render::low_level::PrimitiveType   type;                             //тип примитива
+  VertexBufferPtr                    vertex_buffer;                    //вершинный буфер
+  SkinDynamicPrimitivePrototypePtr   skin_dynamic_primitive_prototype; //прототип скин вершинного буфера
+  LowLevelInputLayoutPtr             layout;                           //лэйаут примитива
+  unsigned int                       first;                            //индекс первой вершины/индекса
+  unsigned int                       count;                            //количество примитивов
+  unsigned int                       base_vertex;                      //индекс базовой вершины
+  MaterialProxy                      material;                         //материал
+  bool                               skip_in_rendering_group;          //примитив следует пропустить при заполнении группы рендеринга (для skin мешей)
+  Log                                log;                              //поток протоколирования
+  MaterialPtr                        cached_material;                  //закэшированный материал
+  RendererPrimitive                  cached_primitive;                 //примитив закэшированный для рендеринга
+  size_t                             cached_state_block_mask_hash;     //хэш маски закэшированного блока состояний
+  LowLevelStateBlockPtr              cached_state_block;               //закэшированный блок состояний  
+
+///Адаптер заполнения примитива для скин-меша
+  struct SkinMeshRendererPrimitiveFiller
+  {
+    xtl::trackable_ptr<MeshPrimitive> mesh_primitive;
+    
+    SkinMeshRendererPrimitiveFiller (MeshPrimitive* in_mesh_primitive)
+      : mesh_primitive (in_mesh_primitive)
+    {
+    }
+
+    void operator () (RendererPrimitive& primitive) const
+    {
+      if (!mesh_primitive)
+        return;
+
+      mesh_primitive->UpdateCache ();
+
+      primitive = mesh_primitive->cached_primitive;
+    }
+  };
+
 ///Конструктор
   MeshPrimitive (CacheHolder& parent_holder, unsigned int in_primitive_index, const MaterialProxy& in_material, MeshCommonData& in_common_data)
     : common_data (in_common_data)
@@ -81,6 +78,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     , count (0)    
     , base_vertex (0)
     , material (in_material)
+    , skip_in_rendering_group (false)
     , cached_state_block_mask_hash (0)
   {
     parent_holder.AttachCacheSource (*this);
@@ -276,7 +274,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       {
         MeshPrimitive& src_primitive = **iter;
 
-        if (!src_primitive.IsValid ())
+        if (!src_primitive.IsValid () || src_primitive.skip_in_rendering_group)
           continue;        
 
         cached_primitives.push_back (src_primitive.cached_primitive);
@@ -332,9 +330,8 @@ struct SimplePrimitiveListDesc
   }
 };
 
-typedef stl::vector<DynamicPrimitivePrototypePtr>      DynamicPrimitivePrototypeArray;
-typedef stl::vector<SimplePrimitiveListDesc>           SimplePrimitiveListArray;
-typedef stl::vector<SkinVertexBufferPrototypeHolder*>  SkinVertexBufferArray;
+typedef stl::vector<DynamicPrimitivePrototype*> DynamicPrimitivePrototypeArray;
+typedef stl::vector<SimplePrimitiveListDesc>    SimplePrimitiveListArray;
 
 }
 
@@ -352,7 +349,6 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   unsigned int                   static_simple_primitives_count;  //количество статических простых примитивов
   stl::string                    name;                            //имя примитива
   RenderPrimitiveGroupsArray     render_groups;                   //группы
-  SkinVertexBufferArray          skin_vertex_buffers;             //вершинные skin буферы
   Log                            log;                             //поток протоколирования
 
 ///Конструктор
@@ -386,9 +382,9 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   {
       //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
     
-    skin_vertex_buffers.clear ();
     meshes.clear ();
     render_groups.clear ();
+    dynamic_primitive_prototypes.clear ();
     
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Primitive '%s' destroyed (id=%u)", name.c_str (), Id ());
@@ -440,7 +436,7 @@ void PrimitiveImpl::SetName (const char* name)
     Работа с динамическими примитивами
 */
 
-void PrimitiveImpl::AddDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr& prototype)
+void PrimitiveImpl::AddDynamicPrimitivePrototype (DynamicPrimitivePrototype* prototype)
 {
   try
   {
@@ -452,6 +448,16 @@ void PrimitiveImpl::AddDynamicPrimitivePrototype (const DynamicPrimitivePrototyp
         throw xtl::format_operation_exception ("", "DynamicPrimitivePrototype has been already added");
 
     impl->dynamic_primitive_prototypes.push_back (prototype);
+
+    try
+    {
+      prototype->connect_tracker (xtl::bind (&PrimitiveImpl::RemoveDynamicPrimitivePrototype, this, prototype)); //prototype will be removed always before PrimitiveImpl
+    }
+    catch (...)
+    {
+      impl->dynamic_primitive_prototypes.pop_back ();
+      throw;
+    }
   }
   catch (xtl::exception& e)
   {
@@ -460,7 +466,7 @@ void PrimitiveImpl::AddDynamicPrimitivePrototype (const DynamicPrimitivePrototyp
   }
 }
 
-void PrimitiveImpl::RemoveDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr& prototype)
+void PrimitiveImpl::RemoveDynamicPrimitivePrototype (DynamicPrimitivePrototype* prototype)
 {
   if (!prototype)
     return;
@@ -472,53 +478,23 @@ void PrimitiveImpl::RemoveDynamicPrimitivePrototype (const DynamicPrimitiveProto
     Работа со skin вершинными буферами
 */
 
-xtl::intrusive_ptr<SkinVertexBufferPrototypeHolder> PrimitiveImpl::AddSkinVertexBuffer (VertexBuffer& vertex_buffer)
+SkinDynamicPrimitivePrototypePtr PrimitiveImpl::CreateSkinDynamicPrimitivePrototype
+ (VertexBuffer&                                                      vertex_buffer,
+  const SkinDynamicPrimitivePrototype::FillRendererPrimitiveHandler& fill_handler)
 {
-  for (SkinVertexBufferArray::iterator it=impl->skin_vertex_buffers.begin (), end=impl->skin_vertex_buffers.end (); it!=end; ++it)
-    if (&(*it)->prototype->VertexBuffer () == &vertex_buffer)
-      return *it;
-
-  SkinVertexBufferPrototypePtr       prototype (new SkinVertexBufferPrototype (vertex_buffer, impl->device_manager), false);
-  SkinVertexBufferPrototypeHolderPtr skin_vertex_buffer_prototype (new SkinVertexBufferPrototypeHolder (prototype), false);
-
-  impl->skin_vertex_buffers.push_back (skin_vertex_buffer_prototype.get ());
-
   try
   {
-    AddDynamicPrimitivePrototype (skin_vertex_buffer_prototype->prototype);
+    SkinDynamicPrimitivePrototypePtr prototype (new SkinDynamicPrimitivePrototype (vertex_buffer, fill_handler), false);
 
-    try
-    {
-      skin_vertex_buffer_prototype->connect_tracker (xtl::bind (&PrimitiveImpl::RemoveSkinVertexBuffer, this, xtl::ref (vertex_buffer)));
+    AddDynamicPrimitivePrototype (prototype.get ());
 
-      return skin_vertex_buffer_prototype;
-    }
-    catch (...)
-    {
-      RemoveDynamicPrimitivePrototype (skin_vertex_buffer_prototype->prototype);
-      throw;
-    }
+    return prototype;
   }
-  catch (...)
+  catch (xtl::exception& e)
   {
-    impl->skin_vertex_buffers.pop_back ();
+    e.touch ("render::manager::PrimitiveImpl::CreateSkinDynamicPrimitivePrototype");
     throw;
   }
-}
-
-void PrimitiveImpl::RemoveSkinVertexBuffer (VertexBuffer& vertex_buffer)
-{
-  for (SkinVertexBufferArray::iterator it=impl->skin_vertex_buffers.begin (), end=impl->skin_vertex_buffers.end (); it!=end; ++it)
-    if (&(*it)->prototype->VertexBuffer () == &vertex_buffer)
-    {
-      SkinVertexBufferPrototypePtr skin_vertex_buffer_prototype = (*it)->prototype;
-
-      RemoveDynamicPrimitivePrototype (skin_vertex_buffer_prototype);
-
-      impl->skin_vertex_buffers.erase (it);
-
-      return;
-    }
 }
 
 /*
@@ -625,7 +601,11 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       dst_primitive->layout        = dst_primitive->vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), index_type);
 
       if (dst_primitive->vertex_buffer->VertexWeights ())
-        dst_primitive->skin_vertex_buffer_prototype = AddSkinVertexBuffer (*dst_primitive->vertex_buffer);
+      {
+        dst_primitive->skip_in_rendering_group          = true;
+        dst_primitive->skin_dynamic_primitive_prototype = CreateSkinDynamicPrimitivePrototype (*dst_primitive->vertex_buffer,
+          MeshPrimitive::SkinMeshRendererPrimitiveFiller (dst_primitive.get ()));
+      }
       
       mesh->primitives.push_back (dst_primitive);
     }
@@ -862,13 +842,15 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
     {
       DynamicPrimitivePrototype& prototype = **iter;
 
+      prototype.TouchCacheValues (storage);
+
       if (DynamicPrimitivePtr primitive = storage.FindPrimitive (&prototype, true))
       {
         primitive->UpdateCache ();
         continue;
       }
 
-      DynamicPrimitivePtr primitive (prototype.CreateDynamicPrimitiveInstance (entity), false);
+      DynamicPrimitivePtr primitive (prototype.CreateDynamicPrimitiveInstance (entity, storage), false);
 
       primitive->UpdateCache ();
 
@@ -982,7 +964,7 @@ void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
       }
       else
       {
-        RemoveDynamicPrimitivePrototype (iter->list);
+        RemoveDynamicPrimitivePrototype (iter->list.get ());
       }
 
       impl->simple_primitives.erase (iter);

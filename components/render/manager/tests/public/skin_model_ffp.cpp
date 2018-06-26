@@ -48,23 +48,6 @@ void idle (Test& test, Entity& entity, Frame& frame)
       return;
     }
     
-    static size_t last_settings_change = 0;
-    
-    if (common::milliseconds () - last_settings_change > 5000)
-    {
-      static bool state = false;
-      
-      common::PropertyMap settings;
-      
-      settings.SetProperty ("FrontCounterClockwise", state ? "true" : "false");
-      
-      test.RenderManager ().ChangeSettings (settings);    
-      
-      state = !state;
-      
-      last_settings_change = common::milliseconds ();
-    }    
-    
     frames_count++;
     
     common::PropertyMap frame_properties = frame.Properties ();

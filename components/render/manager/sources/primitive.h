@@ -76,11 +76,10 @@ class PrimitiveImpl: public Object, public CacheSource
     void RemoveSimplePrimitiveList     (SimplePrimitiveListImplBase*);
     void RemoveAllSimplePrimitiveLists (int type);
 
-    void AddDynamicPrimitivePrototype    (const DynamicPrimitivePrototypePtr&);
-    void RemoveDynamicPrimitivePrototype (const DynamicPrimitivePrototypePtr&);
+    void AddDynamicPrimitivePrototype    (DynamicPrimitivePrototype*);
+    void RemoveDynamicPrimitivePrototype (DynamicPrimitivePrototype*);
 
-    xtl::intrusive_ptr<SkinVertexBufferPrototypeHolder> AddSkinVertexBuffer (VertexBuffer& vertex_buffer);
-    void RemoveSkinVertexBuffer (VertexBuffer& vertex_buffer);
+    SkinDynamicPrimitivePrototypePtr CreateSkinDynamicPrimitivePrototype (VertexBuffer& vertex_buffer, const SkinDynamicPrimitivePrototype::FillRendererPrimitiveHandler& fill_handler);
 
   private:
     void UpdateCacheCore ();

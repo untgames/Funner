@@ -911,10 +911,13 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return &StandalonePrimitiveHolder::Primitive (); }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&, DynamicPrimitiveEntityStorage&)
     {
       throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstance", "Dynamic primitives are not supported for this list");
     }
+
+///Обновление кэш значений
+    void TouchCacheValues (DynamicPrimitiveEntityStorage&) {}
 
 ///Количество примитивов
     size_t Size () { return VertexBuffer ().Size () / VERTICES_PER_PRIMITIVE; }
@@ -1187,7 +1190,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&, DynamicPrimitiveEntityStorage&)
     {
       try
       {
@@ -1199,6 +1202,9 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         throw;
       }
     }
+
+///Обновление кэш значений
+    void TouchCacheValues (DynamicPrimitiveEntityStorage&) {}
 
 ///Количество примитивов
     size_t Size () { return vertices.size () / VERTICES_PER_PRIMITIVE; }
@@ -1373,7 +1379,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&, DynamicPrimitiveEntityStorage&)
     {
       try
       {
@@ -1386,6 +1392,9 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
         throw;
       }
     }
+
+///Обновление кэш значений
+    void TouchCacheValues (DynamicPrimitiveEntityStorage&) {}
 
   private:
 /// Синхронизация буферов
@@ -1535,7 +1544,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
     render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&)
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl&, DynamicPrimitiveEntityStorage&)
     {
       try
       {
@@ -1548,6 +1557,9 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
         throw;
       }
     }
+
+///Обновление кэш значений
+    void TouchCacheValues (DynamicPrimitiveEntityStorage&) {}
 
   private:
 /// Обновление буферов

@@ -64,18 +64,26 @@ class SkinVertexBuffer: public Object
     SkinVertex*         vertex_cache;
     const VertexWeight* vertex_weights;
     int                 vertex_stream_index;
+    size_t              cached_update_revision_id;
 };
+
+typedef xtl::intrusive_ptr<SkinVertexBuffer> SkinVertexBufferPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Динамический примитив для скин-меша
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SkinDynamicPrimitive: public DynamicPrimitive
+class SkinDynamicPrimitive: public DynamicPrimitive, public DebugIdHolder, private RendererPrimitiveGroup
 {
   public:
+    typedef xtl::function<void (RendererPrimitive&)> FillRendererPrimitiveHandler;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SkinDynamicPrimitive (const VertexBufferPtr& vertex_buffer, EntityImpl& entity); //без захвата владения entity
+    SkinDynamicPrimitive (const SkinVertexBufferPtr&          skin_vertex_buffer,
+                          EntityImpl&                         entity, //без захвата владения entity
+                          const FillRendererPrimitiveHandler& fill_renderer_primitive_fn);
+    ~SkinDynamicPrimitive ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,25 +92,37 @@ class SkinDynamicPrimitive: public DynamicPrimitive
     void UpdateOnPrerenderCore (EntityImpl& in_entity);
     void UpdateOnRenderCore    (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix) {}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Кэшируемый источник требует обновления кэша
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    void UpdateCacheCore ();
+    void ResetCacheCore  ();
+
   private:
     typedef xtl::intrusive_ptr<SkinVertexBuffer> SkinVertexBufferPtr;
 
   private:
-    EntityImpl&         entity; //should not be retained
-    SkinVertexBufferPtr skin_vertex_buffer;
-    size_t              cached_update_revision_id;
+    EntityImpl&                  entity; //should not be retained
+    Log                          log;
+    SkinVertexBufferPtr          skin_vertex_buffer;
+    FillRendererPrimitiveHandler fill_renderer_primitive_handler;
+    LowLevelStateBlockPtr        cached_state_block;
+    size_t                       cached_state_block_mask_hash;
+    RendererPrimitive            cached_primitive;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Прототип skin меша
+///Прототип примитива skin меша
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SkinVertexBufferPrototype: public DynamicPrimitivePrototype
+class SkinDynamicPrimitivePrototype: public DynamicPrimitivePrototype
 {
   public:
+    typedef SkinDynamicPrimitive::FillRendererPrimitiveHandler FillRendererPrimitiveHandler;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SkinVertexBufferPrototype (VertexBuffer& in_vertex_buffer, const DeviceManagerPtr& in_device_manager);
+    SkinDynamicPrimitivePrototype (VertexBuffer& vertex_buffer, const FillRendererPrimitiveHandler& fill_renderer_primitive_fn);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершинный буфер
@@ -112,9 +132,16 @@ class SkinVertexBufferPrototype: public DynamicPrimitivePrototype
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание экземпляра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl& entity);
+    DynamicPrimitive* CreateDynamicPrimitiveInstance (EntityImpl& entity, DynamicPrimitiveEntityStorage& dynamic_storage);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление кэш значений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void TouchCacheValues (DynamicPrimitiveEntityStorage& storage);
 
   private:
-    manager::VertexBuffer&  vertex_buffer;  //ссылка на вершинный буфер (without ownership)
-    DeviceManagerPtr        device_manager; //менеджер устройства отрисовки
+    manager::VertexBuffer&       vertex_buffer;                    //ссылка на вершинный буфер (without ownership)
+    FillRendererPrimitiveHandler fill_renderer_primitive_handler;  //функтор заполнения параметров примитива рендеринга
 };
+
+typedef xtl::intrusive_ptr<SkinDynamicPrimitivePrototype> SkinDynamicPrimitivePrototypePtr;

@@ -69,6 +69,7 @@ const math::mat4f& EntityJointList::Transformation (size_t joint_index)
 
 SkinVertexBuffer::SkinVertexBuffer (const DeviceManagerPtr& device_manager, const VertexBufferPtr& in_vertex_buffer)
   : vertex_buffer (in_vertex_buffer)
+  , cached_update_revision_id (~0u)
 {
   try
   {
@@ -112,6 +113,9 @@ SkinVertexBuffer::SkinVertexBuffer (const DeviceManagerPtr& device_manager, cons
 
 void SkinVertexBuffer::Update (EntityJointList& joints)
 {
+  if (cached_update_revision_id == joints.UpdateRevisionId ())
+    return;
+
     //расчет вершин скин меша
 
   size_t              joints_count     = joints.Size ();
@@ -146,6 +150,10 @@ void SkinVertexBuffer::Update (EntityJointList& joints)
     //обновление данных
 
   vertex_stream->SetData (0, sizeof (SkinVertex) * vertices_count, vertex_cache);
+
+    //обновление кэш метки
+
+  cached_update_revision_id = joints.UpdateRevisionId ();
 }
 
 /*
@@ -158,18 +166,134 @@ void SkinVertexBuffer::Update (EntityJointList& joints)
     Конструктор
 */
 
-SkinDynamicPrimitive::SkinDynamicPrimitive (const VertexBufferPtr& vertex_buffer, EntityImpl& in_entity)
+SkinDynamicPrimitive::SkinDynamicPrimitive
+ (const SkinVertexBufferPtr&          in_skin_vertex_buffer,
+  EntityImpl&                         in_entity,
+  const FillRendererPrimitiveHandler& fill_renderer_primitive_fn)
 try
-  : DynamicPrimitive (0, DynamicPrimitiveFlag_EntityDependent)
+  : DynamicPrimitive (static_cast<manager::RendererPrimitiveGroup*> (0), DynamicPrimitiveFlag_EntityDependent)
   , entity (in_entity)
-  , skin_vertex_buffer (new SkinVertexBuffer (in_entity.DeviceManager (), vertex_buffer), false)
-  , cached_update_revision_id (~0u)
+  , skin_vertex_buffer (in_skin_vertex_buffer)
+  , fill_renderer_primitive_handler(fill_renderer_primitive_fn)
+  , cached_state_block_mask_hash (0)
 {
 }
 catch (xtl::exception& e)
 {
   e.touch ("render::manager::SkinDynamicPrimitive::SkinDynamicPrimitive");
   throw;
+}
+
+SkinDynamicPrimitive::~SkinDynamicPrimitive ()
+{
+  SkinDynamicPrimitive::ResetCacheCore ();
+}
+
+
+/*
+    Обновление кэша
+*/
+
+void SkinDynamicPrimitive::UpdateCacheCore ()
+{
+  try
+  {
+    bool has_debug_log = entity.DeviceManager ()->Settings ().HasDebugLog ();
+
+    if (has_debug_log)
+      log.Printf ("Update skin dynamic primitive (id=%u)", Id ());
+
+      //получение данных примитива
+
+    memset (&cached_primitive, 0, sizeof cached_primitive);
+
+    fill_renderer_primitive_handler (cached_primitive);
+
+    if (!cached_primitive.state_block)
+    {
+      SkinDynamicPrimitive::ResetCacheCore ();
+      return;
+    }
+
+      //получение вершинного буфера
+
+    int                      vertex_buffer_index = skin_vertex_buffer->VertexStreamIndex ();
+    const LowLevelBufferPtr& vertex_buffer       = skin_vertex_buffer->VertexStream ();
+
+    if (!vertex_buffer || vertex_buffer_index < 0 || vertex_buffer_index >= low_level::DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+    {
+      SkinDynamicPrimitive::ResetCacheCore ();
+      return;
+    }
+
+      //обновление блока состояний
+
+    render::low_level::IDevice&        device        = entity.DeviceManager ()->Device ();
+    render::low_level::IDeviceContext& context       = entity.DeviceManager ()->ImmediateContext ();
+
+    low_level::StateBlockMask mask;
+    size_t                    mask_hash = mask.Hash ();
+      
+    if (cached_state_block_mask_hash != mask_hash || !cached_state_block)
+    {
+      cached_primitive.state_block->GetMask (mask);
+
+      mask.is_vertex_buffers [vertex_buffer_index] = true;
+
+      if (has_debug_log)
+        log.Printf ("...create state block for skin dynamic mesh primitive");
+        
+      cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+      cached_state_block_mask_hash = mask_hash;
+    }
+
+    cached_state_block->Apply (&context);
+
+    context.ISSetVertexBuffer (vertex_buffer_index, vertex_buffer.get ());
+
+    cached_state_block->Capture (&context);
+
+      //обновление примитива
+  
+    cached_primitive.state_block = cached_state_block.get ();
+
+      //обновление группы примитивов
+
+    manager::RendererPrimitiveGroup& group = *this;
+
+    group.primitives_count = 1;
+    group.primitives       = &cached_primitive;
+
+      //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+        
+    InvalidateCacheDependencies ();
+      
+    if (has_debug_log)
+      log.Printf ("...skin dynamic mesh cache updated");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::SkinDynamicPrimitive::UpdateCacheCore");
+    SkinDynamicPrimitive::ResetCacheCore ();
+    throw;
+  }
+}
+
+void SkinDynamicPrimitive::ResetCacheCore ()
+{
+  if (entity.DeviceManager ()->Settings ().HasDebugLog ())
+    log.Printf ("Reset skin dynamic primtive (id=%u)", Id ());        
+ 
+  memset (&cached_primitive, 0, sizeof cached_primitive);
+
+  manager::RendererPrimitiveGroup& group = *this;
+
+  group.primitives_count = 0;
+  group.primitives       = 0;
+
+  cached_state_block = LowLevelStateBlockPtr ();
+
+  cached_state_block_mask_hash = 0;
 }
 
 /*
@@ -190,16 +314,9 @@ void SkinDynamicPrimitive::UpdateOnPrerenderCore (EntityImpl& in_entity)
     if (!joints)
       return;
 
-    if (cached_update_revision_id == joints->UpdateRevisionId ())
-      return;
-
       //обновление вершинного буфера
 
     skin_vertex_buffer->Update (*joints);
-
-      //обновление кэш метки
-
-    cached_update_revision_id = joints->UpdateRevisionId ();
   }
   catch (xtl::exception& e)
   {
@@ -209,26 +326,45 @@ void SkinDynamicPrimitive::UpdateOnPrerenderCore (EntityImpl& in_entity)
 }
 
 /*
-    SkinVertexBufferPrototype
+    SkinDynamicPrimitivePrototype
 */
 
 ///Конструктор
-SkinVertexBufferPrototype::SkinVertexBufferPrototype (render::manager::VertexBuffer& in_vertex_buffer, const DeviceManagerPtr& in_device_manager)
+SkinDynamicPrimitivePrototype::SkinDynamicPrimitivePrototype (render::manager::VertexBuffer& in_vertex_buffer, const FillRendererPrimitiveHandler& fill_renderer_primitive_fn)
   : vertex_buffer (in_vertex_buffer)
-  , device_manager (in_device_manager)
+  , fill_renderer_primitive_handler (fill_renderer_primitive_fn)
 {
 }
 
 ///Создание экземпляра
-DynamicPrimitive* SkinVertexBufferPrototype::CreateDynamicPrimitiveInstance (EntityImpl& entity)
+DynamicPrimitive* SkinDynamicPrimitivePrototype::CreateDynamicPrimitiveInstance (EntityImpl& entity, DynamicPrimitiveEntityStorage& dynamic_primitive_storage)
 {
   try
   {
-    return new SkinDynamicPrimitive (&vertex_buffer, entity);
+    SkinVertexBufferPtr skin_vertex_buffer;
+
+    if (SkinVertexBufferPtr* skin_vertex_buffer_ptr = dynamic_primitive_storage.FindCacheValue<SkinVertexBufferPtr> (&vertex_buffer, true))
+    {
+      skin_vertex_buffer = *skin_vertex_buffer_ptr;
+    }
+    else
+    {
+      skin_vertex_buffer = SkinVertexBufferPtr (new SkinVertexBuffer (entity.DeviceManager (), &vertex_buffer), false);
+
+      dynamic_primitive_storage.SetCacheValue<SkinVertexBufferPtr> (skin_vertex_buffer, &vertex_buffer);
+    }
+
+    return new SkinDynamicPrimitive (skin_vertex_buffer, entity, fill_renderer_primitive_handler);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::SkinVertexBufferPrototype::CreateDynamicPrimitiveInstance");
+    e.touch ("render::manager::SkinDynamicPrimitivePrototype::CreateDynamicPrimitiveInstance");
     throw;
   }
+}
+
+///Обновление кэш значений
+void SkinDynamicPrimitivePrototype::TouchCacheValues (DynamicPrimitiveEntityStorage& storage)
+{
+  storage.FindCacheValue<SkinVertexBufferPtr> (&vertex_buffer, true);
 }

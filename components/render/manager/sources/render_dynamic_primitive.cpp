@@ -6,6 +6,8 @@ using namespace render::manager;
     DynamicPrimitiveEntityStorage
 */
 
+const size_t CACHE_VALUE_RESERVE_SIZE = 8;
+
 /*
     Описание реализации хранилища динамических примитивов
 */
@@ -34,10 +36,27 @@ typedef stl::vector<RendererDynamicPrimitiveGroup> GroupArray;
 
 struct DynamicPrimitiveEntityStorage::Impl
 {
-  EntityImpl&           entity;     //ссылка на объект
-  DynamicPrimitiveArray primitives; //список динамических примитивов
-  GroupArray            groups;     //группы примитивов рендеринга
-  size_t                update_id;  //идентификатор транзакции обновления
+  struct CacheValueDesc
+  {
+    void*           source_tag;
+    size_t          update_id;
+    CacheValueBase* value;
+
+    CacheValueDesc (CacheValueBase* in_value, void* in_source_tag, size_t in_update_id)
+      : source_tag (in_source_tag)
+      , update_id (in_update_id)
+      , value (in_value)
+    {
+    }
+  };
+
+  typedef stl::vector<CacheValueDesc> CacheValueArray;
+
+  EntityImpl&            entity;       //ссылка на объект
+  DynamicPrimitiveArray  primitives;   //список динамических примитивов
+  GroupArray             groups;       //группы примитивов рендеринга
+  CacheValueArray        cache_values; //кэш временных значений
+  size_t                 update_id;    //идентификатор транзакции обновления
 
 /// Конструктор
   Impl (EntityImpl& in_entity)
@@ -59,6 +78,7 @@ DynamicPrimitiveEntityStorage::DynamicPrimitiveEntityStorage (EntityImpl& entity
 DynamicPrimitiveEntityStorage::~DynamicPrimitiveEntityStorage ()
 {
   RemoveAllPrimitives ();
+  RemoveAllCacheValues ();
 }
 
 /*
@@ -161,7 +181,16 @@ void DynamicPrimitiveEntityStorage::EndUpdate ()
       need_invalidate = true;
     }
     else ++iter;
-  
+
+  for (Impl::CacheValueArray::iterator iter=impl->cache_values.begin (), end=impl->cache_values.end (); iter!=end;)
+    if (iter->update_id != impl->update_id)
+    {
+      delete iter->value;
+
+      impl->cache_values.erase (iter);
+    }
+    else ++iter;
+ 
   if (need_invalidate)
     InvalidateCacheDependencies ();
 }
@@ -225,6 +254,53 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
 void DynamicPrimitiveEntityStorage::ResetCacheCore ()
 {
   impl->groups.clear ();
+}
+
+/*
+    Работа с кэшем временных значений
+*/
+
+DynamicPrimitiveEntityStorage::CacheValueBase* DynamicPrimitiveEntityStorage::FindCacheValueCore (const std::type_info& type, void* source_tag, bool touch)
+{
+  for (Impl::CacheValueArray::iterator it=impl->cache_values.begin (), end=impl->cache_values.end (); it!=end; ++it)
+    if (it->source_tag == source_tag && it->value->type == &type)
+    {
+      if (touch)
+        it->update_id = impl->update_id;
+
+      return it->value;
+    }
+
+  return 0;
+}
+
+void DynamicPrimitiveEntityStorage::AddCacheValueCore (CacheValueBase* cache_value, void* source_tag)
+{
+  if (impl->cache_values.empty ())
+    impl->cache_values.reserve (CACHE_VALUE_RESERVE_SIZE);
+
+  impl->cache_values.push_back (Impl::CacheValueDesc (cache_value, source_tag, impl->update_id));
+}
+
+void DynamicPrimitiveEntityStorage::RemoveCacheValueCore (const std::type_info& type, void* source_tag)
+{
+  for (Impl::CacheValueArray::iterator it=impl->cache_values.begin (), end=impl->cache_values.end (); it!=end; ++it)
+    if (it->value->type == &type && it->source_tag == source_tag)
+    {
+      delete it->value;
+
+      impl->cache_values.erase (it);
+
+      break;
+    }
+}
+
+void DynamicPrimitiveEntityStorage::RemoveAllCacheValues ()
+{
+  for (Impl::CacheValueArray::iterator it=impl->cache_values.begin (), end=impl->cache_values.end (); it!=end; ++it)
+    delete it->value;
+
+  impl->cache_values.clear ();
 }
 
 /*

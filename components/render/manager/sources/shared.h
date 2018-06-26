@@ -20,6 +20,7 @@
 #include <xtl/signal.h>
 #include <xtl/rect.h>
 #include <xtl/trackable.h>
+#include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
 
 #include <math/utility.h>
@@ -74,6 +75,7 @@ class RenderingContext;
 class RenderTargetMapImpl;
 class Settings;
 class ShaderOptionsCache;
+class SkinDynamicPrimitivePrototype;
 class TextureManager;
 class InstantiatedEffect;
 class EntityJointList;
