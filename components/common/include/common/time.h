@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <xtl/functional_fwd>
+#include <xtl/rational.h>
 
 namespace common
 {
@@ -20,15 +21,15 @@ size_t milliseconds ();
 class Timer
 {
   public:
-    typedef size_t                      timeint_t;
-    typedef double                      time_t;
+    typedef long long int               timeint_t;
+    typedef xtl::rational<timeint_t>    time_t;
     typedef xtl::function<timeint_t ()> TimeSource;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Timer  (bool is_auto_update = true);
-    Timer  (const TimeSource& source, time_t precision, bool is_auto_update = true);
+    Timer  (const TimeSource& source, timeint_t precision, bool is_auto_update);
     Timer  (const Timer& source, bool is_auto_update);
     Timer  (const Timer&);
     ~Timer ();
@@ -38,8 +39,8 @@ class Timer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка значения таймера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetTime (time_t time);
-    time_t Time    () const;
+    void          SetTime (const time_t& time);
+    const time_t& Time    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление значения времени

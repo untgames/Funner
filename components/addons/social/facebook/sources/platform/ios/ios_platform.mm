@@ -17,7 +17,7 @@ namespace
 //Constants
 const char* LOG_NAME = "social.facebook.FacebookSession.IOsPlatform";
 
-const float WAIT_FOR_URL_AFTER_ACTIVATE_DELAY = 0.1f; //Duration for waiting for opened from with URL notification after activation
+const common::ActionQueue::time_t WAIT_FOR_URL_AFTER_ACTIVATE_DELAY (100, 1000); //Duration for waiting for opened from with URL notification after activation
 
 //Interface of login results events
 class ILoginResultListener

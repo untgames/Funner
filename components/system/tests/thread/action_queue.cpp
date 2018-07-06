@@ -47,8 +47,8 @@ int main ()
 //  LogFilter filter ("system.*", &log_message);
   
   ActionQueue::PushAction (&action_handler<1>, &callback_handler<1>, ActionThread_Background);
-  ActionQueue::PushAction (&action_handler<2>, ActionThread_Background, 2.0);
-  ActionQueue::PushAction (&action_handler<3>, ActionThread_Background, 2.0, 0.5);
+  ActionQueue::PushAction (&action_handler<2>, ActionThread_Background, common::ActionQueue::time_t (2));
+  ActionQueue::PushAction (&action_handler<3>, ActionThread_Background, common::ActionQueue::time_t (2), common::ActionQueue::time_t (5, 10));
 
   size_t end_time = common::milliseconds () + TEST_TIME;
 

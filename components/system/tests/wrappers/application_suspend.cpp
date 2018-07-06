@@ -24,8 +24,8 @@ int main ()
 
   try
   {
-    common::ActionQueue::PushAction (&on_do_events, common::ActionThread_Current, 0, 0);    
-    common::ActionQueue::PushAction (&on_exit_action, common::ActionThread_Background, 2.0);
+    common::ActionQueue::PushAction (&on_do_events, common::ActionThread_Current, common::ActionQueue::time_t (), common::ActionQueue::time_t ());
+    common::ActionQueue::PushAction (&on_exit_action, common::ActionThread_Background, common::ActionQueue::time_t (2));
 
     Application::Run ();            
   }  

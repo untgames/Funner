@@ -22,6 +22,7 @@ int main ()
     env.BindLibraries ("Engine");
     env.BindLibraries ("Math");
     env.BindLibraries ("SceneGraph");
+    env.BindLibraries ("Xtl.Rational");
     env.BindLibraries ("Physics");
 
     load_script (*script, SCRIPT_FILE_NAME);

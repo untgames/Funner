@@ -17,6 +17,7 @@ int main ()
     env.BindLibraries ("BoundVolumes");
     env.BindLibraries ("Common");
     env.BindLibraries ("Math");
+    env.BindLibraries ("Xtl.Rational");
     env.BindLibraries ("SceneGraph");
   
     load_script (*script, SCRIPT_FILE_NAME);

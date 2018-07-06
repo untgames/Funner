@@ -1,0 +1,56 @@
+Results of xtl_test:
+Test library:
+half:
+numerator = 1
+denominator = 2
+to number = 0.5
+zero:
+numerator = 0
+denominator = 1
+to number = 0
+one:
+numerator = 1
+denominator = 1
+to number = 1
+two:
+numerator = 2
+denominator = 1
+to number = 2
+half + half
+numerator = 2
+denominator = 2
+to number = 1
+one - half
+numerator = 1
+denominator = 2
+to number = 0.5
+two * half
+numerator = 2
+denominator = 2
+to number = 1
+one / half
+numerator = 2
+denominator = 1
+to number = 2
+half + half == one: true
+one - half == half: true
+two * half == one: true
+one / half == two: true
+1 + one == two: true
+1 - half == half: true
+2 * half == one: true
+1 / half == two: true
+one + 1 == two: true
+two - 1 == one: true
+half * 2 == one: true
+one / 2 == half: true
+half < one: true
+one > half: true
+half > one : false
+one < half: false
+minus half:
+numerator = -1
+denominator = 2
+to number = -0.5
+-half == minus_half: true
+minus_half.Abs () == half: true

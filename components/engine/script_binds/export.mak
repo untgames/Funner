@@ -91,3 +91,7 @@ export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.sc
 # Link push notifications exports
 export.link.engine.script_binds.push_notifications.LINK_INCLUDES := PushNotificationsScriptBind
 export.link.engine.script_binds.push_notifications.IMPORTS       := link.engine.script_binds link.push_notifications.core
+
+# Link xtl rational exports
+export.link.engine.script_binds.xtl.rational.LINK_INCLUDES := XtlRationalScriptBind
+export.link.engine.script_binds.xtl.rational.IMPORTS       := link.engine.script_binds

@@ -48,11 +48,11 @@ function test ()
   local animation_controller        = Scene.Controllers.SpineAnimation.Create (sg_skeleton, animation_state)
   local visual_structure_controller = Scene.Controllers.SpineSkeletonVisualStructureBuilder.Create (sg_skeleton, 1, 2)
   
-  sg_skeleton:Update (1)
+  sg_skeleton:Update (Xtl.Rational.LongLong.Create (1))
   
   print ("Is SG skeleton visual structure dirty = " .. tostring (sg_skeleton.IsVisualStructureDirty))
   
-  sg_skeleton:Update (100)
+  sg_skeleton:Update (Xtl.Rational.LongLong.Create (100))
   
   --TODO add a lot of tests
 end

@@ -9,7 +9,7 @@ using namespace common;
 
 void dump (const Timer& timer)
 {
-  printf ("time=%.3f auto_update=%s started=%s", timer.Time (), timer.IsAutoUpdate () ? "true" : "false", 
+  printf ("time=%.3f auto_update=%s started=%s", timer.Time ().cast<float> (), timer.IsAutoUpdate () ? "true" : "false",
     timer.IsStarted () ? "true" : "false");
 }
 
@@ -38,7 +38,7 @@ int main ()
     
     dump ("default timer", timer1);
     
-    Timer timer2 (&get_current_time, 10.0, true);
+    Timer timer2 (&get_current_time, 10, true);
     
     timer2.Start ();
     
@@ -99,6 +99,38 @@ int main ()
     timer2.Reset ();
     
     dump ("child timer (after parent timer reset)", timer3);    
+
+    dump ("timer with source (after reset)", timer2);
+
+    timer2.Start ();
+
+    dump ("timer with source (after start)", timer2);
+
+    current_time = 38;
+
+    dump ("timer with source (after time change)", timer2);
+
+    timer2.SetTime (common::Timer::time_t (2, 10));
+
+    dump ("timer with source (after set time back)", timer2);
+
+    current_time = 39;
+
+    dump ("timer with source (after time change)", timer2);
+
+    timer2.SetTime (common::Timer::time_t (100));
+
+    dump ("timer with source (after set time forward)", timer2);
+
+    current_time = 40;
+
+    dump ("timer with source (after time change)", timer2);
+
+    timer2.SetAutoUpdate (false);
+    timer2.SetTime (common::Timer::time_t (100));
+
+    dump ("timer with source (after time change without autoupdate)", timer2);
+
   }
   catch (std::exception& exception)
   {

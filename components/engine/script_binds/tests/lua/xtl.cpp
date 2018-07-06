@@ -1,36 +1,23 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/sg_spine.lua";
-
-void log_handler (const char* log_name, const char* event)
-{
-  printf ("%s: %s\n", log_name, event);
-}
+const char* SCRIPT_FILE_NAME = "data/xtl.lua";
 
 int main ()
 {
-  printf ("Results of sg_spine_test:\n");
-
-#if defined (_MSC_VER) && _MSC_VER < 1900
-   _set_output_format (_TWO_DIGIT_EXPONENT);
-#endif
-
+  printf ("Results of xtl_test:\n");
+  
   try
   {
-    common::LogFilter filter ("scene_graph.*", &log_handler);
-
     Environment env;
-    
+
     Shell shell ("lua", env);
 
-    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-    
-    env.BindLibraries ("SceneGraph");
-    env.BindLibraries ("MediaSpine");
+    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
+
     env.BindLibraries ("Xtl.Rational");
   
     load_script (*script, SCRIPT_FILE_NAME);
-    
+
     printf ("Test library:\n");
 
     invoke<void> (*script, "test");

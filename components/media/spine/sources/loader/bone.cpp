@@ -159,7 +159,7 @@ float BoneSpineImpl::LocalToWorld (float rotation)
 
 bool BoneSpineImpl::HasParent ()
 {
-  return bone->parent;
+  return bone->parent != 0;
 }
 
 media::spine::BoneImpl* BoneSpineImpl::CreateParentImpl ()

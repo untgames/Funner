@@ -112,7 +112,6 @@ DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
 PROFILES                += msvc has_windows
-COMMON_LINK_FLAGS       += -stack:128000
 SOURCE_PROCESS_MACROSES += process_idl process_rc
 SOURCE_FILES_SUFFIXES   += asm
 IGNORE_PVS_ERROR        += V126 V122 V201

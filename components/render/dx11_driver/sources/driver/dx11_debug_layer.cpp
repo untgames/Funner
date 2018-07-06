@@ -11,7 +11,8 @@ namespace
 {
 
 const size_t MESSAGE_BUFFER_RESERVE_SIZE = 16384;
-const float  UPDATE_PERIOD               = 1.0f;
+
+const common::ActionQueue::time_t UPDATE_PERIOD (1);
 
 }
 
@@ -39,7 +40,7 @@ DeviceDebugLayer::DeviceDebugLayer (const DxDevicePtr& in_device)
 
     message_buffer.resize (MESSAGE_BUFFER_RESERVE_SIZE);
 
-    update_action = common::ActionQueue::PushAction (xtl::bind (&DeviceDebugLayer::UpdateMessages, this), common::ActionThread_Background, 0.0, UPDATE_PERIOD);
+    update_action = common::ActionQueue::PushAction (xtl::bind (&DeviceDebugLayer::UpdateMessages, this), common::ActionThread_Background, common::ActionQueue::time_t (0), UPDATE_PERIOD);
   }
   catch (xtl::exception& e)
   {

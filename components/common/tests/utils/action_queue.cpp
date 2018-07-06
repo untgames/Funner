@@ -79,13 +79,13 @@ int main ()
     
     printf ("-- perform test --\n");
     
-    Timer timer (my_timer, 1.0);
+    Timer timer (my_timer, 1, true);
     
     timer.Start ();
     
-    ActionQueue::PushAction (&action_handler<1>, &callback_handler<1>, ActionThread_Current, 0.0, timer);
-    ActionQueue::PushAction (&action_handler<2>, ActionThread_Current, 2.0, timer);
-    ActionQueue::PushAction (&action_handler<3>, ActionThread_Current, 2.0, 3.0, timer);
+    ActionQueue::PushAction (&action_handler<1>, &callback_handler<1>, ActionThread_Current, ActionQueue::time_t (0), timer);
+    ActionQueue::PushAction (&action_handler<2>, ActionThread_Current, ActionQueue::time_t (2), timer);
+    ActionQueue::PushAction (&action_handler<3>, ActionThread_Current, ActionQueue::time_t (2), ActionQueue::time_t (3), timer);
 
     for (;timer_value < 10; timer_value++)
     {

@@ -63,7 +63,7 @@ class AsyncOperationManager
       {
         if (action.IsEmpty ())
         {
-          action = common::ActionQueue::PushAction (action_handler, common::ActionThread_Current, 0, MAX_OPERATION_STEP_DURATION / 1000.0);
+          action = common::ActionQueue::PushAction (action_handler, common::ActionThread_Current, common::ActionQueue::time_t (0), common::ActionQueue::time_t (MAX_OPERATION_STEP_DURATION, 1000));
         }
       }
       catch (...)

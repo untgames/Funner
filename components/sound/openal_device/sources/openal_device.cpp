@@ -23,8 +23,8 @@ const unsigned char  MAX_SOUND_BYTES_PER_SAMPLE = 2;      //максимальн
 //время обновления буферов источника в миллисекундах
 const unsigned int SOURCE_BUFFERS_UPDATE_MILLISECONDS = (unsigned int)(1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
 
-const float  DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD = 0.03f;
-const float  DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD = 0.03f;
+const common::ActionQueue::time_t DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD (30, 1000);
+const common::ActionQueue::time_t DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD (30, 1000);
 
 const char*  DEVICE_PARAMS_NAMES        = "al_debug_log buffer_update_frequency AL_DISTANCE_MODEL listener_update_frequency source_update_frequency";
 const char*  DEVICE_INT_PARAMS_NAMES    = "al_debug_log buffer_update_frequency listener_update_frequency source_update_frequency";
@@ -82,15 +82,15 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   gain                                 = 1.f;
   is_muted                             = false;
   buffer_update_frequency              = SOURCE_BUFFERS_UPDATE_FREQUENCY;
-  source_properties_update_frequency   = (unsigned int)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
-  listener_properties_update_frequency = (unsigned int)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
+  source_properties_update_frequency   = (unsigned int)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD.cast<float> ());
+  listener_properties_update_frequency = (unsigned int)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD.cast<float> ());
   first_active_source                  = 0;
   al_buffers_pool_size                 = 0;  
   
   try
   {
-    listener_action = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
-    source_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
+    listener_action = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, common::ActionQueue::time_t (), DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
+    source_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, common::ActionQueue::time_t (), DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
     
     buffers_update_thread.reset (new syslib::Thread ("OpenAL buffers update thread", xtl::bind (&OpenALDevice::BufferUpdateLoop, this)));
 
@@ -690,12 +690,12 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
   else if (!xstrcmp (name, "source_update_frequency"))
   {
     source_properties_update_frequency = (unsigned int)value;
-    source_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, 1.0f / source_properties_update_frequency);
+    source_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, common::ActionQueue::time_t (), common::ActionQueue::time_t (1, source_properties_update_frequency));
   }
   else if (!xstrcmp (name, "listener_update_frequency"))
   {
     listener_properties_update_frequency = (unsigned int)value;
-    listener_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, 1.0f / listener_properties_update_frequency);
+    listener_action                      = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, common::ActionQueue::time_t (), common::ActionQueue::time_t (1, listener_properties_update_frequency));
   }
   else
   {

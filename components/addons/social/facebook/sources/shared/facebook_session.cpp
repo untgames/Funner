@@ -6,8 +6,8 @@ using namespace social::facebook;
 namespace
 {
 
-const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY     = 5;  //Задержка удаления web-view после скрытия
-const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Задержка показа web-view логина (для логина без показа окна в случае автопродления токена)
+const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY (5);     //Задержка удаления web-view после скрытия
+const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY (3); //Задержка показа web-view логина (для логина без показа окна в случае автопродления токена)
 
 const char*  LOG_NAME              = "social.facebook.FacebookSession";
 const char*  SESSION_DESCRIPTION   = "Facebook";

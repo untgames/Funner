@@ -29,20 +29,20 @@ struct TimerImpl: public xtl::reference_counter
   typedef Timer::time_t     time_t;
   typedef Timer::timeint_t  timeint_t;
 
-  TimeSource source;       //источник получения времени
-  bool       auto_update;  //обновляется ли время автоматически
-  time_t     time;         //текущее время  
-  time_t     precision;    //точность работы исходного таймера
-  timeint_t  start_time;   //стартовое время
-  timeint_t  current_time; //текущее время
-  bool       started;      //включен ли таймер
+  TimeSource source;          //источник получения времени
+  bool       auto_update;     //обновляется ли время автоматически
+  time_t     time;            //текущее время
+  timeint_t  additional_time; //время, прибавляемое к текущему времени, для реализации SetTime
+  timeint_t  start_time;      //стартовое время
+  timeint_t  current_time;    //текущее время
+  bool       started;         //включен ли таймер
   
 ///Конструктор
-  TimerImpl (const TimeSource& in_source, time_t in_precision, bool in_auto_update)
+  TimerImpl (const TimeSource& in_source, timeint_t precision, bool in_auto_update)
     : source (in_source)
     , auto_update (in_auto_update)
-    , time (0)    
-    , precision (in_precision)
+    , time (0, precision)
+    , additional_time (0)
     , start_time (0)
     , current_time (0)
     , started (false)
@@ -56,7 +56,8 @@ struct TimerImpl: public xtl::reference_counter
       return;
       
     current_time = ComputeTimeInteger ();
-    time         = static_cast<long> (current_time) / precision;    
+
+    time.assign (current_time + additional_time, time.denominator ());
   }
   
 ///Получение целочисленного времени
@@ -65,7 +66,7 @@ struct TimerImpl: public xtl::reference_counter
     if (auto_update)
       Update ();
       
-    return current_time;
+    return current_time + additional_time;
   }
   
 ///Расчёт интервала времени
@@ -119,17 +120,17 @@ struct ParentTimeSource
 */
 
 Timer::Timer (bool is_auto_update)
-  : impl (new TimerImpl (DefaultTimeSource::Instance (), 1000.0, is_auto_update))
+  : impl (new TimerImpl (DefaultTimeSource::Instance (), 1000, is_auto_update))
 {
 }
 
-Timer::Timer (const TimeSource& source, time_t precision, bool is_auto_update)
+Timer::Timer (const TimeSource& source, timeint_t precision, bool is_auto_update)
   : impl (new TimerImpl (source, precision, is_auto_update))
 {
 }
 
 Timer::Timer (const Timer& source, bool is_auto_update)
-  : impl (new TimerImpl (ParentTimeSource (source.impl), source.impl->precision, is_auto_update))
+  : impl (new TimerImpl (ParentTimeSource (source.impl), source.impl->time.denominator (), is_auto_update))
 {
 }
 
@@ -155,13 +156,16 @@ Timer& Timer::operator = (const Timer& source)
     Установка значения таймера
 */
 
-void Timer::SetTime (time_t time)
+void Timer::SetTime (const time_t& time)
 {
-  impl->current_time = time * impl->precision;  //according to formula used in Impl::Update
-  impl->time         = time;
+  impl->current_time    = impl->started ? impl->source () : 0;
+  impl->start_time      = impl->current_time;
+  impl->additional_time = time.numerator () * impl->time.denominator () / time.denominator ();
+
+  impl->time.assign (impl->additional_time, impl->time.denominator ());
 }
 
-Timer::time_t Timer::Time () const
+const Timer::time_t& Timer::Time () const
 {
   if (impl->auto_update)
     impl->Update ();
@@ -218,10 +222,11 @@ void Timer::Stop ()
 
 void Timer::Reset ()
 {
-  impl->started      = false;
-  impl->time         = 0;
-  impl->start_time   = 0;
-  impl->current_time = 0;
+  impl->started         = false;
+  impl->time            = time_t (0, impl->time.denominator ());
+  impl->additional_time = 0;
+  impl->start_time      = 0;
+  impl->current_time    = 0;
 }
 
 bool Timer::IsStarted () const

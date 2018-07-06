@@ -58,10 +58,10 @@ int main ()
     
     printf ("-- perform test --\n");
     
-    ActionQueue::PushAction (&action_handler<1>, &callback_handler<1>, ActionThread_Current, 0.0);
-    ActionQueue::PushAction (&action_handler<2>, ActionThread_Current, 2.0);
-    ActionQueue::PushAction (&action_handler<3>, ActionThread_Current, 2.0, 3.0);
-    ActionQueue::PushAction (&action_handler<4>, ActionThread_Current, 0.5, 1.5); 
+    ActionQueue::PushAction (&action_handler<1>, &callback_handler<1>, ActionThread_Current, common::ActionQueue::time_t ());
+    ActionQueue::PushAction (&action_handler<2>, ActionThread_Current, common::ActionQueue::time_t (2));
+    ActionQueue::PushAction (&action_handler<3>, ActionThread_Current, common::ActionQueue::time_t (2), common::ActionQueue::time_t (3));
+    ActionQueue::PushAction (&action_handler<4>, ActionThread_Current, common::ActionQueue::time_t (5, 10), common::ActionQueue::time_t (15, 10));
 
     syslib::Application::Run ();
   }

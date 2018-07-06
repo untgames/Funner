@@ -30,4 +30,5 @@ ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath
                                          link.engine.script_binds.social link.scene_graph.xscene link.media.animation.xanim \
                                          link.engine.script_binds.debug link.engine.script_binds.scene_input link.common.aes \
                                          link.engine.script_binds.media.image link.engine.script_binds.media.font \
-                                         link.engine.script_binds.media.spine link.media.spine.loader_3.6
+                                         link.engine.script_binds.media.spine link.media.spine.loader_3.6 \
+                                         link.engine.script_binds.xtl.rational
