@@ -20,3 +20,4 @@ EXTERN.ZZIP.g++.COMPILER_CFLAGS        := --no-warn
 EXTERN.ZZIP.wince.IMPORTS              := link.extern.wcecompat
 EXTERN.ZZIP.wince.COMPILER_CFLAGS      := -FIdirect.h
 EXTERN.ZZIP.clang.COMPILER_CFLAGS      := -w
+EXTERN.ZZIP.msvc_debug.LINK_FLAGS      := -DEBUG
