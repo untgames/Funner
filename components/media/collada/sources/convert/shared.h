@@ -3,6 +3,7 @@
 
 #include <math/basic_spline.h>
 #include <math/matrix.h>
+#include <math/utility.h>
 
 #include <stl/hash_map>
 #include <stl/vector>

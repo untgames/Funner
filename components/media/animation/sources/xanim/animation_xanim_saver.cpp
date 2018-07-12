@@ -197,6 +197,12 @@ class XmlAnimationLibrarySaver
 
         SaveSpline (channel.Track<math::step_spline_mat4f> ());
       }
+      else if (track_type == typeid (math::step_spline_quatf))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<quatf>>");
+
+        SaveSpline (channel.Track<math::step_spline_quatf> ());
+      }
       else
         throw xtl::format_operation_exception ("media::animation::XmlAnimationLibrarySaver::SaveAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type.name ());

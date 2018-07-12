@@ -170,6 +170,8 @@ class BinAnimationLibrarySaver
         SaveSpline ("basic_spline<spline_step_key<vec4f>>", channel.Track<math::step_spline4f> ());
       else if (track_type == typeid (math::step_spline_mat4f))
         SaveSpline ("basic_spline<spline_step_key<mat4f>>", channel.Track<math::step_spline_mat4f> ());
+      else if (track_type == typeid (math::step_spline_quatf))
+        SaveSpline ("basic_spline<spline_step_key<quatf>>", channel.Track<math::step_spline_quatf> ());
       else
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibrarySaver::SaveAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type.name ());

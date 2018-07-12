@@ -16,21 +16,31 @@ class Converter
   private:
     void ConvertAnimationChannel (const AnimationChannel& collada_channel, media::animation::Animation& parent_animation)
     {
-      media::animation::Channel channel;
-
-      channel.SetParameterName (collada_channel.ParameterName ());
-
       switch (collada_channel.Semantic ())
       {
         case AnimationChannelSemantic_Transform:
         {
-          math::linear_spline_mat4f      spline;
+          //we do not support setting transform directly to node, it should be decomposed to position, rotation and scale in order to use
+          media::animation::Channel position_channel, orientation_channel, scale_channel;
+
+          position_channel.SetParameterName    ("position");
+          orientation_channel.SetParameterName ("orientation");
+          scale_channel.SetParameterName       ("scale");
+
+          math::linear_spline3f          position_spline, scale_spline;
+          math::step_spline_quatf        orientation_spline;
           const AnimationSampleTransform *current_sample = collada_channel.Samples<AnimationSampleTransform> (),
                                          *previous_sample = 0;
+          size_t                         samples_count = collada_channel.SamplesCount ();
 
-          spline.reserve (collada_channel.SamplesCount ());
+          position_spline.reserve    (samples_count);
+          scale_spline.reserve       (samples_count);
+          orientation_spline.reserve (samples_count);
 
-          for (size_t i = 0, samples_count = collada_channel.SamplesCount (); i < samples_count; i++, current_sample++)
+          math::vec3f current_position, current_scale;
+          math::quatf current_orientation;
+
+          for (size_t i = 0; i < samples_count; i++, current_sample++)
           {
             const AnimationSampleTransform *next_sample = i < samples_count - 1 ? current_sample + 1 : 0;
 
@@ -38,19 +48,28 @@ class Converter
                 math::equal (next_sample->value, current_sample->value, TRANSFORM_EQUAL_EPSILON))
               continue;
 
-            spline.add_key (current_sample->time, current_sample->value);
+            math::affine_decompose (current_sample->value, current_position, current_orientation, current_scale);
+
+            position_spline.add_key    (current_sample->time, current_position);
+            orientation_spline.add_key (current_sample->time, current_orientation);
+            scale_spline.add_key       (current_sample->time, current_scale);
 
             previous_sample = current_sample;
           }
 
-          channel.SetTrack (spline);
+          position_channel.SetTrack    (position_spline);
+          scale_channel.SetTrack       (scale_spline);
+          orientation_channel.SetTrack (orientation_spline);
+
+          parent_animation.AddChannel (collada_channel.TargetName (), position_channel);
+          parent_animation.AddChannel (collada_channel.TargetName (), scale_channel);
+          parent_animation.AddChannel (collada_channel.TargetName (), orientation_channel);
+
           break;
         }
         default:
           throw xtl::format_operation_exception ("::convert_animation_channel", "Unsupported collada animation channel semantic");
       }
-
-      parent_animation.AddChannel (collada_channel.TargetName (), channel);
     }
 
     void ConvertAnimation (const Animation& collada_animation, media::animation::Animation& animation, bool sub_animation)

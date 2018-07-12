@@ -1336,12 +1336,16 @@ void XmlSceneParser::Parse (const ParseNode& decl, StaticMesh& node, Node& paren
 
     node.SetMeshName (node_decl->source.c_str ());
 
-    bound_volumes::aaboxf box;
+    //set bound box only if either min or max value is present, otherwise leave infinite bound box
+    if (node_decl->min_bound.state || node_decl->max_bound.state)
+    {
+      bound_volumes::aaboxf box;
     
-    if (node_decl->min_bound.state) box.set_minimum (node_decl->min_bound.value);
-    if (node_decl->max_bound.state) box.set_maximum (node_decl->max_bound.value);
+      if (node_decl->min_bound.state) box.set_minimum (node_decl->min_bound.value);
+      if (node_decl->max_bound.state) box.set_maximum (node_decl->max_bound.value);
 
-    node.SetBoundBox (box);
+      node.SetBoundBox (box);
+    }
 
       //разбор родительских параметров
     
