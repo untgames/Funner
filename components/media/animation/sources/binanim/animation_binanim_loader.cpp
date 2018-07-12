@@ -176,6 +176,8 @@ class BinAnimationLibraryLoader
         ReadSpline<math::step_spline4f> (channel);
       else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<mat4f>>"))
         ReadSpline<math::step_spline_mat4f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<quatf>>"))
+        ReadSpline<math::step_spline_quatf> (channel);
       else
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibraryLoader::ReadAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type.data ());

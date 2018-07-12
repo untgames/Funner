@@ -10,6 +10,7 @@
 
 #include <math/basic_spline.h>
 #include <math/matrix.h>
+#include <math/quat.h>
 #include <math/vector.h>
 
 #include <media/animation/animation_library.h>

@@ -260,6 +260,7 @@ typedef basic_spline<spline_step_key<vector<float, 2> > >   step_spline2f;
 typedef basic_spline<spline_step_key<vector<float, 3> > >   step_spline3f;
 typedef basic_spline<spline_step_key<vector<float, 4> > >   step_spline4f;
 typedef basic_spline<spline_step_key<matrix<float, 4> > >   step_spline_mat4f;
+typedef basic_spline<spline_step_key<quat<float> > >        step_spline_quatf;
 typedef basic_spline<spline_linear_key<float> >             linear_splinef;
 typedef basic_spline<spline_linear_key<vector<float, 2> > > linear_spline2f;
 typedef basic_spline<spline_linear_key<vector<float, 3> > > linear_spline3f;

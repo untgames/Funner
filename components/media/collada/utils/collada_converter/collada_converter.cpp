@@ -667,7 +667,14 @@ void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volume
   if (xtl::xstrlen (node.Name ()))
     writer.WriteAttribute ("name", node.Name ());
 
-  writer.WriteAttribute ("transform", node.Transform ());
+  math::vec3f position, scale;
+  math::quatf orientation;
+
+  math::affine_decompose (node.Transform (), position, orientation, scale);
+
+  writer.WriteAttribute ("position", common::format ("%f;%f;%f", position.x, position.y, position.z));
+  writer.WriteAttribute ("orientation", common::format ("%f;%f;%f;%f", orientation.x, orientation.y, orientation.z, orientation.w));
+  writer.WriteAttribute ("scale", common::format ("%f;%f;%f", scale.x, scale.y, scale.z));
   
   if (!math::equal (node.RotationPivot (), math::vec3f (0.0f), EPSILON))
     writer.WriteAttribute ("rotation_pivot", node.RotationPivot ());
@@ -700,9 +707,13 @@ void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volume
 
     XmlWriter::Scope scope (writer, "mesh");
 
-    writer.WriteAttribute ("name", mesh_name.c_str ());
-    writer.WriteAttribute ("bound_box_min", mesh_bound_volume_iter->second.minimum ());
-    writer.WriteAttribute ("bound_box_max", mesh_bound_volume_iter->second.maximum ());
+    writer.WriteAttribute ("source", mesh_name.c_str ());
+
+    const math::vec3f& min_bound = mesh_bound_volume_iter->second.minimum ();
+    const math::vec3f& max_bound = mesh_bound_volume_iter->second.maximum ();
+
+    writer.WriteAttribute ("min_bound", common::format ("%f;%f;%f", min_bound.x, min_bound.y, min_bound.z));
+    writer.WriteAttribute ("max_bound", common::format ("%f;%f;%f", max_bound.x, max_bound.y, max_bound.z));
   }
 
   size_t light_index = 0;
@@ -758,7 +769,11 @@ void save_scene (const Params& params, const Model& model)
     
   XmlWriter writer (params.output_scene_file_name.c_str ());
 
-  XmlWriter::Scope scope (writer, "scene");
+  XmlWriter::Scope xscene_scope (writer, "xscene");
+  XmlWriter::Scope scene_scope (writer, "scene");
+
+  writer.WriteAttribute ("id", common::notdir (common::basename (params.output_scene_file_name.c_str ())).c_str ());
+  writer.WriteAttribute ("version", "1.0");
 
     //построение ограничивающих объемов для мешей
   BoundVolumesMap meshes_bound_volumes;

@@ -27,6 +27,17 @@ void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& v
     value [i] = (float)atof (components [i]);
 }
 
+void read (Parser::Iterator iter, const char* str, math::quatf& value)
+{
+  StringArray components = common::split (str);
+
+  if (components.Size () != 4)
+    raise_parser_exception (*iter, "Invalid quaternion format");
+
+  for (unsigned int i = 0; i < 4; i++)
+    value [i] = (float)atof (components [i]);
+}
+
 template <unsigned int Size>
 void read (Parser::Iterator iter, const char* str, math::matrix <float, Size>& value)
 {
@@ -167,6 +178,8 @@ class XmlAnimationLibraryLoader
         ParseSpline<math::step_spline4f> (channel_iter, channel);
       else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<mat4f>>"))
         ParseSpline<math::step_spline_mat4f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<quatf>>"))
+        ParseSpline<math::step_spline_quatf> (channel_iter, channel);
       else
         throw xtl::format_operation_exception ("media::animation::XmlAnimationLibraryLoader::ParseAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type);
