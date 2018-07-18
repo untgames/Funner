@@ -62,6 +62,7 @@ enum NodeType
   NodeType_VisualModel,     //отображаемая модель
   NodeType_SpriteModel,     //спрайты
   NodeType_StaticMesh,      //статический меш
+  NodeType_SkinMesh,        //скин меш
   NodeType_PointLight,      //точечный источник света
   NodeType_SpotLight,       //конусоидальный источник света
   NodeType_DirectLight,     //направленный источник света

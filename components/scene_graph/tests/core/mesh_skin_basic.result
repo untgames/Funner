@@ -1,36 +1,37 @@
 Results of mesh_skin_basic_test:
-   joints are updated
-   joints are updated
-   joints are updated
-   joints are updated
+   joint nodes are updated
+   joint matrixes are updated
+   joint nodes are updated
+   joint nodes are updated
+   joint nodes are updated
 initial:
   #1: null
   #2: null
   #3: null
-   joints are updated
-   joints are updated
-   joints are updated
+   joint nodes are updated
+   joint nodes are updated
+   joint nodes are updated
 linear structure:
   #1: node1
   #2: node2
   #3: node3
-   joints are updated
-   joints are updated
+   joint nodes are updated
+   joint nodes are updated
 rebind with hierarchy:
   #1: node1
   #2: node2
   #3: node3
-   joints are updated
+   joint nodes are updated
 unbind:
   #1: node1
   #2: null
   #3: node3
-   joints are updated
+   joint nodes are updated
 rename:
   #1: node1
   #2: node2
   #3: null
-   joints are updated
+   joint matrixes are updated
 check inv matrix: [+2.00 +2.00 +2.00]
-   joints are updated
-   joints are updated
+   joint nodes are updated
+   joint nodes are updated

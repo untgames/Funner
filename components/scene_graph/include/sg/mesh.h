@@ -60,7 +60,8 @@ class StaticMesh: public VisualModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SkinMeshEvent
 {
-  SkinMeshEvent_AfterJointsUpdate, //срабатывает после обновления соединений
+  SkinMeshEvent_AfterJointNodesUpdate,    //срабатывает после обновления узлов соединений
+  SkinMeshEvent_AfterJointMatricesUpdate, //срабатывает после обновления матриц соединений
 
   SkinMeshEvent_Num
 };
@@ -90,6 +91,10 @@ class SkinMesh: public StaticMesh
     Node::ConstPointer Joint             (size_t index) const;
     const char*        JointName         (size_t index) const;
     const math::mat4f& JointInvMatrix    (unsigned int index) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события скин меша

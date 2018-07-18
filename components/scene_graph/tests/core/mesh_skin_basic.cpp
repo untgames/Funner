@@ -12,9 +12,14 @@ void dump_joints (SkinMesh& model, const char* title)
   }
 }
 
-void update_notifier ()
+void update_node_notifier ()
 {
-  printf ("   joints are updated\n");
+  printf ("   joint nodes are updated\n");
+}
+
+void update_matrix_notifier ()
+{
+  printf ("   joint matrixes are updated\n");
 }
 
 int main ()
@@ -23,7 +28,8 @@ int main ()
   
   SkinMesh::Pointer model (SkinMesh::Create ());
 
-  xtl::auto_connection c1 = model->RegisterEventHandler (SkinMeshEvent_AfterJointsUpdate, xtl::bind (&update_notifier));
+  xtl::auto_connection c1 = model->RegisterEventHandler (SkinMeshEvent_AfterJointNodesUpdate, xtl::bind (&update_node_notifier)),
+                       c2 = model->RegisterEventHandler (SkinMeshEvent_AfterJointMatricesUpdate, xtl::bind (&update_matrix_notifier));
 
   model->SetJointsCount (3);
 

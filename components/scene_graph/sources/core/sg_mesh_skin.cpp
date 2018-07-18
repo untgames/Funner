@@ -20,7 +20,8 @@ class IJointOwner
 {
   public:
 ///Оповещение об обновлении соединений
-    virtual void OnJointUpdate (Joint& joint) = 0;
+    virtual void OnJointNodeUpdate (Joint& joint) = 0;
+    virtual void OnJointMatrixUpdate (Joint& joint) = 0;
 
   protected:
     virtual ~IJointOwner () {}
@@ -51,7 +52,7 @@ struct Joint: public xtl::reference_counter
     name_hash = strhash (name.c_str ());
     node      = 0;
     
-    owner.OnJointUpdate (*this);
+    owner.OnJointNodeUpdate (*this);
 
     on_before_unbind_connection.disconnect ();
     on_update_connection.disconnect ();
@@ -62,7 +63,7 @@ struct Joint: public xtl::reference_counter
   {
     inv_tm = tm;
 
-    owner.OnJointUpdate (*this);
+    owner.OnJointMatrixUpdate (*this);
   }
 
 ///Обновление узла
@@ -111,7 +112,7 @@ struct Joint: public xtl::reference_counter
     on_before_unbind_connection.disconnect ();
     on_update_connection.disconnect ();
     
-    owner.OnJointUpdate (*this);
+    owner.OnJointNodeUpdate (*this);
   }
 
 ///Обработчик оповещения об изменении узла
@@ -126,7 +127,7 @@ struct Joint: public xtl::reference_counter
     on_before_unbind_connection.disconnect ();
     on_update_connection.disconnect ();
     
-    owner.OnJointUpdate (*this);
+    owner.OnJointNodeUpdate (*this);
   }
 
 ///Получение узла
@@ -187,9 +188,14 @@ struct SkinMesh::Impl: public xtl::instance_counter<StaticMesh>, public IJointOw
   }
 
 ///Оповещение об обновлении соединений
-  void OnJointUpdate (::Joint&)
+  void OnJointNodeUpdate (::Joint&)
   {
-    Notify (owner, SkinMeshEvent_AfterJointsUpdate);
+    Notify (owner, SkinMeshEvent_AfterJointNodesUpdate);
+  }
+
+  void OnJointMatrixUpdate (::Joint&)
+  {
+    Notify (owner, SkinMeshEvent_AfterJointMatricesUpdate);
   }
 
 ///Оповещение о событии
@@ -201,6 +207,16 @@ struct SkinMesh::Impl: public xtl::instance_counter<StaticMesh>, public IJointOw
         return;
 
       signals [event_id] (sender, event_id);
+
+      switch (event_id)
+      {
+        case SkinMeshEvent_AfterJointNodesUpdate:
+        case SkinMeshEvent_AfterJointMatricesUpdate:
+          owner.UpdateNotify ();
+          break;
+        default:
+          break;
+      }
     }
     catch (...)
     {
@@ -251,7 +267,8 @@ void SkinMesh::SetJointsCount (size_t count)
         *it = JointPtr (new ::Joint (*impl), false);
     }
 
-    impl->Notify (*this, SkinMeshEvent_AfterJointsUpdate);
+    impl->Notify (*this, SkinMeshEvent_AfterJointNodesUpdate);
+    impl->Notify (*this, SkinMeshEvent_AfterJointMatricesUpdate);
   }
   catch (...)
   {
@@ -348,7 +365,7 @@ void SkinMesh::OnChildNodeBind (Node&)
 {
   impl->joints_need_update = true;
 
-  impl->Notify (*this, SkinMeshEvent_AfterJointsUpdate);
+  impl->Notify (*this, SkinMeshEvent_AfterJointNodesUpdate);
 }
 
 /*
@@ -359,7 +376,8 @@ xtl::connection SkinMesh::RegisterEventHandler (SkinMeshEvent event, const Event
 {
   switch (event)
   {
-    case SkinMeshEvent_AfterJointsUpdate:
+    case SkinMeshEvent_AfterJointNodesUpdate:
+    case SkinMeshEvent_AfterJointMatricesUpdate:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::SkinMesh::RegisterEventHandler", "event", event);
