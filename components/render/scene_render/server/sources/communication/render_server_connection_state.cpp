@@ -893,6 +893,45 @@ void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
   }
 }
 
+void ConnectionState::SetSkinMeshJointsCount(object_id_t id, uint32 count)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSkinMeshJointsCount");
+    throw;
+  }
+}
+
+void ConnectionState::SetSkinMeshJointNodes(object_id_t id, const interchange::RawArray<object_id_t>& nodes)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSkinMeshJointNodes");
+    throw;
+  }
+}
+
+void ConnectionState::SetSkinMeshJointMatrices(object_id_t id, const interchange::RawArray<math::mat4f>& matrices)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSkinMeshJointMatrices");
+    throw;
+  }
+}
+
 void ConnectionState::SetLightParams (object_id_t id, const interchange::LightParams& params)
 {
   try

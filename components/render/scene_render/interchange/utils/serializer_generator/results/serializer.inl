@@ -50,6 +50,9 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetVisualModelDynamicShaderProperties: return "SetVisualModelDynamicShaderProperties";
     case CommandId_SetVisualModelStaticShaderProperties: return "SetVisualModelStaticShaderProperties";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
+    case CommandId_SetSkinMeshJointsCount: return "SetSkinMeshJointsCount";
+    case CommandId_SetSkinMeshJointNodes: return "SetSkinMeshJointNodes";
+    case CommandId_SetSkinMeshJointMatrices: return "SetSkinMeshJointMatrices";
     case CommandId_SetLightParams: return "SetLightParams";
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
     case CommandId_SetParticleEmitterSystemId: return "SetParticleEmitterSystemId";
@@ -938,6 +941,60 @@ inline void ClientToServerSerializer::SetStaticMeshName(object_id_t id, const ch
   }
 }
 
+inline void ClientToServerSerializer::SetSkinMeshJointsCount(object_id_t id, uint32 count)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSkinMeshJointsCount);
+    write(*this, id);
+    write(*this, count);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSkinMeshJointNodes(object_id_t id, RawArray<object_id_t> nodes)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSkinMeshJointNodes);
+    write(*this, id);
+    write(*this, nodes);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSkinMeshJointMatrices(object_id_t id, RawArray<math::mat4f> matrices)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSkinMeshJointMatrices);
+    write(*this, id);
+    write(*this, matrices);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::SetLightParams(object_id_t id, const LightParams& params)
 {
   size_t saved_position = Position ();
@@ -1640,6 +1697,33 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetStaticMeshName(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetSkinMeshJointsCount:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+
+      dispatcher.SetSkinMeshJointsCount(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetSkinMeshJointNodes:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      RawArray<object_id_t> arg2 = read(*this, xtl::type<RawArray<object_id_t> > ());
+
+      dispatcher.SetSkinMeshJointNodes(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetSkinMeshJointMatrices:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      RawArray<math::mat4f> arg2 = read(*this, xtl::type<RawArray<math::mat4f> > ());
+
+      dispatcher.SetSkinMeshJointMatrices(arg1, arg2);
 
       return true;
     }

@@ -61,6 +61,10 @@ void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t propertie
 
 void SetStaticMeshName (object_id_t id, const char* mesh_name);
 
+void SetSkinMeshJointsCount(object_id_t id, uint32 count);
+void SetSkinMeshJointNodes(object_id_t id, RawArray<object_id_t> nodes);
+void SetSkinMeshJointMatrices(object_id_t id, RawArray<math::mat4f> matrices);
+
 void SetLightParams (object_id_t id, const LightParams& params);
 
 void SetPageCurlParams (object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
