@@ -893,11 +893,11 @@ void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
   }
 }
 
-void ConnectionState::SetSkinMeshJointsCount(object_id_t id, uint32 count)
+void ConnectionState::SetSkinMeshJointsCount (object_id_t id, uint32 count)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<SkinMesh> ().SetJointsCount (count);
   }
   catch (xtl::exception& e)
   {
@@ -906,11 +906,21 @@ void ConnectionState::SetSkinMeshJointsCount(object_id_t id, uint32 count)
   }
 }
 
-void ConnectionState::SetSkinMeshJointNodes(object_id_t id, const interchange::RawArray<object_id_t>& nodes)
+void ConnectionState::SetSkinMeshJointNodes (object_id_t id, const interchange::RawArray<object_id_t>& nodes)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    SceneManager& scene_manager = impl->server.SceneManager ();
+    SkinMesh&     skin_mesh     = scene_manager.GetNode (id).Cast<SkinMesh> ();
+
+    const object_id_t* node_id = nodes.data;
+
+    for (size_t i=0, count=nodes.size; i<count; i++, node_id++)
+    {
+      Node* node = *node_id ? &scene_manager.GetNode (*node_id) : static_cast<Node*> (0);
+      
+      skin_mesh.SetJointNode (i, node);
+    }
   }
   catch (xtl::exception& e)
   {
@@ -919,11 +929,17 @@ void ConnectionState::SetSkinMeshJointNodes(object_id_t id, const interchange::R
   }
 }
 
-void ConnectionState::SetSkinMeshJointMatrices(object_id_t id, const interchange::RawArray<math::mat4f>& matrices)
+void ConnectionState::SetSkinMeshJointMatrices (object_id_t id, const interchange::RawArray<math::mat4f>& matrices)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    SkinMesh&          skin_mesh = impl->server.SceneManager ().GetNode (id).Cast<SkinMesh> ();
+    const math::mat4f* tm        = matrices.data;
+
+    for (size_t i=0, count=matrices.size; i<count; i++, tm++)
+    {     
+      skin_mesh.SetJointInvMatrix (i, *tm);
+    }
   }
   catch (xtl::exception& e)
   {

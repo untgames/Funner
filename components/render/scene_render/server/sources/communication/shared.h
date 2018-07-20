@@ -40,7 +40,7 @@
 #include <shared/sg/particle_emitter.h>
 #include <shared/sg/scissor.h>
 #include <shared/sg/sprite_list.h>
-#include <shared/sg/static_mesh.h>
+#include <shared/sg/skin_mesh.h>
 
 namespace render
 {
