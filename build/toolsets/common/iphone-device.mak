@@ -6,14 +6,16 @@ IPHONEOS_DEPLOYMENT_TARGET ?= 7.0
 
 export IPHONEOS_DEPLOYMENT_TARGET
 
+XCODE_PATH ?= /Applications/Xcode.app
+
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
 PROFILES          += arm clang
 COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -fstrict-aliasing -fno-common #-gdwarf-2 #flag gdwarf-2 - needed for profiling
 COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
-COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
-LINKER_GCC        := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
-IPHONE_SDK_PATH   := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
+COMPILER_GCC      := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+LINKER_GCC        := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+IPHONE_SDK_PATH   := $(XCODE_PATH)/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
 
 include $(TOOLSETS_DIR)/common/iphone.mak
 

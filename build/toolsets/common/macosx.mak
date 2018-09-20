@@ -23,13 +23,15 @@ export MACOSX_DEPLOYMENT_TARGET
 
 ADDITIONAL_PATHS=$$(pwd)/$(BUILD_DIR)tools/macos
 
-MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+XCODE_PATH ?= /Applications/Xcode.app
 
-COMMON_CFLAGS               += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -fvisibility=hidden -Wno-unused-function
-COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
+MACOSX_SDK_PATH := $(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+
+COMMON_CFLAGS               += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -fvisibility=hidden -Wno-unused-function -stdlib=libc++
+COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -stdlib=libc++
 MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
-COMPILER_GCC                := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
-LINKER_GCC                  := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+COMPILER_GCC                := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+LINKER_GCC                  := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 
 include $(TOOLSETS_DIR)/g++.mak
 
