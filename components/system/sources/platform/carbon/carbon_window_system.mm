@@ -2,14 +2,6 @@
 #import <AppKit/NSImage.h>
 #import <Foundation/NSData.h>
 
-#if ! defined (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) || (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1040)
-  #error "__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ not defined or less then 1040"
-#endif
-
-#if (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050)
-  #define MACOSX_10_5_SUPPORTED
-#endif
-
 #include "shared.h"
 
 using namespace syslib;
@@ -440,16 +432,12 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
             break;
-#ifdef MACOSX_10_5_SUPPORTED
           case kEventWindowFocusRestored:
-#endif
           case kEventWindowFocusAcquired: //окно получило фокус
             window_impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
             break;
           case kEventWindowFocusRelinquish:
-#ifdef MACOSX_10_5_SUPPORTED
           case kEventWindowFocusLost:       //окно потеряло фокус
-#endif
             window_impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
             break;
           default:
@@ -844,10 +832,8 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
         { kEventClassWindow,    kEventWindowFocusRelinquish },
         { kEventClassWindow,    kEventWindowClickCollapseRgn },
         { kEventClassWindow,    kEventWindowExpanded },
-#ifdef MACOSX_10_5_SUPPORTED
         { kEventClassWindow,    kEventWindowFocusLost },
         { kEventClassWindow,    kEventWindowFocusRestored },
-#endif
         { kEventClassKeyboard,  kEventRawKeyDown },
         { kEventClassKeyboard,  kEventRawKeyRepeat },
         { kEventClassKeyboard,  kEventRawKeyUp },

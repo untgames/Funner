@@ -1,9 +1,5 @@
 #include <sys/xattr.h>
 
-#if !defined IPHONE && __MAC_OS_X_VERSION_MIN_REQUIRED < 1050
-  #include <sys/statvfs.h>
-#endif
-
 #import <Foundation/NSArray.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSDate.h>
@@ -77,11 +73,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSError* error = nil;
 
-#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       if (![file_manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error])
-#else
-      if (![file_manager createDirectoryAtPath:path attributes:nil])
-#endif
       {
         if (error)
           error_string = [[error localizedDescription] UTF8String];
@@ -137,11 +129,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSString* path = [file_manager stringWithFileSystemRepresentation:file_name length:xtl::xstrlen (file_name)];
 
-#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSDictionary* file_attributes = [file_manager attributesOfItemAtPath:path error:nil];
-#else
-      NSDictionary* file_attributes = [file_manager fileAttributesAtPath:path traverseLink:NO];
-#endif
 
       if (!file_attributes)
       {
@@ -166,7 +154,6 @@ class CocoaFileSystem: public StdioFileSystem
 ///Информация о файловой системе
     filesize_t GetFreeSpace (const char* path)
     {
-#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
       NSString* ns_path = [file_manager stringWithFileSystemRepresentation:path length:xtl::xstrlen (path)];
@@ -185,19 +172,10 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
 
       return return_value;
-#else
-      struct statvfs result;
-
-      if (statvfs (path, &result))
-        return (filesize_t)-1;
-
-      return (filesize_t)result.f_frsize * result.f_bavail;
-#endif
     }
 
     filesize_t GetTotalSpace (const char* path)
     {
-#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
       NSString* ns_path = [file_manager stringWithFileSystemRepresentation:path length:xtl::xstrlen (path)];
@@ -216,14 +194,6 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
 
       return return_value;
-#else
-      struct statvfs result;
-
-      if (statvfs (path, &result))
-        return (filesize_t)-1;
-
-      return (filesize_t)result.f_frsize * result.f_blocks;
-#endif
     }
 
 ///Файловые атрибуты
@@ -288,7 +258,6 @@ class CocoaFileSystem: public StdioFileSystem
       if (dir_name == "./")
         dir_name = "";
 
-#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSError* error = nil;
 
       NSArray* subpathes = [file_manager contentsOfDirectoryAtPath:path error:&error];
@@ -301,9 +270,6 @@ class CocoaFileSystem: public StdioFileSystem
 
         throw xtl::format_operation_exception ("common::CocoaFileSystem::Search", "Can't enumerate directory '%s' contents: error '%s'", dir_name.c_str (), error_string.c_str ());
       }
-#else
-      NSArray* subpathes = [file_manager directoryContentsAtPath:path];
-#endif
 
       common::FileInfo info;
 
