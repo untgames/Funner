@@ -663,7 +663,7 @@ endef
 define check_test
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testStarted name='$3' captureStandardOutput='true']";) \
 export ACTUAL_RESULT_FILE=$3; \
-diff --strip-trailing-cr --context=1 $1/$3 $2/`if [ "$${ACTUAL_RESULT_FILE##*.}" == "result" ]; then echo $$ACTUAL_RESULT_FILE; else echo $${ACTUAL_RESULT_FILE%.*}; fi`; \
+diff --strip-trailing-cr --context=1 $1/$3 $2/`if [ "$${ACTUAL_RESULT_FILE##*.}" = "result" ]; then echo $$ACTUAL_RESULT_FILE; else echo $${ACTUAL_RESULT_FILE%.*}; fi`; \
 RET=$$?; \
 $(if $(TEAMCITY_PROJECT_NAME),if [ $$RET -ne 0 ]; then echo "##teamcity[testFailed name='$3' message='']"; fi;) \
 $(if $(TEAMCITY_PROJECT_NAME),echo "##teamcity[testFinished name='$3']";) \
