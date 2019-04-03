@@ -40,8 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.http.client.CookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 ///Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity

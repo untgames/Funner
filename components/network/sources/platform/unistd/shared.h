@@ -13,6 +13,7 @@
 #endif
 
 #ifdef ANDROID
+#include <arpa/inet.h>
 #include <linux/in.h>
 #include <linux/in6.h>
 #endif

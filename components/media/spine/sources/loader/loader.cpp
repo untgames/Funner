@@ -41,7 +41,7 @@ void _spAtlasPage_disposeTexture (spAtlasPage* self)
   delete (stl::string*)self->rendererObject;
 }
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) || defined (ANDROID)
 
 char* _spUtil_readFile (const char* path, int* length)
 {

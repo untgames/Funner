@@ -22,30 +22,34 @@ endif
 endif
 
 ifeq ($(strip $(JAVA_SDK)),)
-  $(error "Please set JAVA_SDK variable in your environment")
+  $(error "Please set JAVA_SDK variable in your environment. Java 1.8 should be used (i.e. JAVA_SDK=/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/)")
 endif
 
 ###################################################################################################
 #Constants
 ###################################################################################################
-PROFILES                   += android no_dll unistd egl gles2 has_windows
+PROFILES                   += android no_dll unistd egl gles2 has_windows clang
 SDCARD_DIR                 := //mnt/sdcard
 REMOTE_DEBUG_DIR           ?= $(SDCARD_DIR)/funner
 EXE_SUFFIX                 :=
 DLL_SUFFIX                 := .so
 DLL_PREFIX                 := lib
-ANDROID_NDK_PLATFORM       := android-9
-ANDROID_SDK_PLATFORM       := android-21
+ANDROID_NDK_PLATFORM       := 16
+ANDROID_SDK_PLATFORM       := android-28
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_ROOT                  := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
-PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
+PLATFORM_DIR               := $(NDK_ROOT)/platforms/android-$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
-ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/22.0.1
+ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/28.0.3
 ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
+ANDROID_LLVM_DIR           := $(NDK_ROOT)/toolchains/llvm/prebuilt/$(ANDROID_NDK_HOST)
+ANDROID_SYS_ROOT           := $(ANDROID_LLVM_DIR)/sysroot
+ANDROID_STL_DIR            := $(NDK_ROOT)/sources/cxx-stl/llvm-libc++
+ANDROID_STL_LIB_DIR        := $(ANDROID_STL_DIR)/libs/$(ANDROID_ABI)
 GCC_TOOLS_DIR              := $(ABI_DIR)/bin
-COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-gcc
-LINKER_GCC                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-g++
+COMPILER_GCC               := $(ANDROID_LLVM_DIR)/bin/clang
+LINKER_GCC                 := $(ANDROID_LLVM_DIR)/bin/clang
 LIB_GCC                    := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-ar
 ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
@@ -58,35 +62,26 @@ JAVA_CC                    := "$(JAVA_ROOT)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_BUILD_TOOLS_DIR)/aapt
 JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_BUILD_TOOLS_DIR)/zipalign
-BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
+BUILD_PATHS                := $(GCC_TOOLS_DIR)
 
 COMMON_JAVA_FLAGS          += -g -Xlint:deprecation
-COMMON_CPPFLAGS            += -fexceptions -frtti
+COMMON_CPPFLAGS            += -fexceptions -frtti -stdlib=libc++ -std=c++03
+COMMON_CPPFLAGS            += -D'va_copy(dest, src)=__builtin_va_copy(dest, src)'    #pass define copied from toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/8.0.2/include/stdarg.h via command line, because we use c++03, and va_copy is available only in c++11
+COMMON_CFLAGS              += --target=$(ANDROID_CLANG_TARGET)$(ANDROID_NDK_PLATFORM)
 #COMMON_CFLAGS              += -g
-COMMON_CFLAGS              += -Os -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
-COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
+COMMON_CFLAGS              += --gcc-toolchain=$(ANDROID_LLVM_DIR)
+COMMON_CFLAGS              += -Os -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -fPIC -fomit-frame-pointer -fno-strict-aliasing #-gdwarf-2
+COMMON_CFLAGS              += -Wa,--noexecstack -no-canonical-prefixes
 COMMON_CFLAGS              += -fvisibility=hidden
-COMMON_CFLAGS              += -DANDROID -UDEBUG
-COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
-COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
-COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
-COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/thumb
+COMMON_CFLAGS              += -DANDROID -UDEBUG -DNDEBUG
+COMMON_CFLAGS              += --sysroot=$(ANDROID_SYS_ROOT)
+COMMON_LINK_FLAGS          += --target=$(ANDROID_CLANG_TARGET)$(ANDROID_NDK_PLATFORM) --sysroot=$(ANDROID_SYS_ROOT)
+COMMON_LINK_FLAGS          += --gcc-toolchain=$(ANDROID_LLVM_DIR)
 COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
-COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
-COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
-COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
-COMMON_LINK_FLAGS          += -Wl,--no-undefined
-COMMON_LINK_FLAGS          += -s
-
-ifneq (,$(wildcard $(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include))
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
-COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)
-else
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/include
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/libs/$(ANDROID_ABI)/include
-COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/libs/$(ANDROID_ABI)
-endif
+COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR) -dead_strip
+COMMON_LINK_FLAGS          += -fPIC -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -std=c++03 -Wall -Oz -DNDEBUG -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a -nostdlib++ -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--exclude-libs,libunwind.a 
+COMMON_LINK_FLAGS          += -L$(ANDROID_STL_LIB_DIR) -Qunused-arguments -Wl,-z,relro -Wl,-z,now
+COMMON_LINK_FLAGS          += -landroid -llog -latomic -lm -ldl -lc $(ANDROID_STL_LIB_DIR)/libc++_static.a $(ANDROID_STL_LIB_DIR)/libc++abi.a $(ANDROID_STL_LIB_DIR)/libandroid_support.a $(ANDROID_STL_LIB_DIR)/libunwind.a
 
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
@@ -94,7 +89,7 @@ ANDROID_AIDL               := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/f
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS           := android
 ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/android.jar
-ANDROID_SDKLIB_JAR         := $(ANDROID_SDK)/tools/lib/sdklib.jar
+ANDROID_SDKLIB_JAR         := $(ANDROID_SDK)/tools/lib/sdklib-26.0.0-dev.jar
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ABI_DIR)/../gdbserver
@@ -124,6 +119,8 @@ PATH_SEPARATOR             := :
 endif
 
 include $(TOOLSETS_DIR)/g++.mak
+
+PROFILES := $(filter-out g++,$(PROFILES))
 
 ifeq (,$(ROOTED))
 
