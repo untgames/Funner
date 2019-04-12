@@ -8,16 +8,20 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 {
   typedef stl::hash_map<size_t, DynamicMesh::Pointer> MeshesMap;
 
-  SpineSkeleton* skeleton;               //skeleton scene graph object to build meshes for
-  float          meshes_min_z_including; //z coordinate used for first mesh
-  float          meshes_z_range;         //z coordinate used for last mesh
-  MeshesMap      meshes;                 //child meshes scene graph objects
+  SpineSkeleton*       skeleton;                //skeleton scene graph object to build meshes for
+  float                meshes_min_z_including;  //z coordinate used for first mesh
+  float                meshes_z_range;          //z coordinate used for last mesh
+  MeshesMap            meshes;                  //child meshes scene graph objects
+  xtl::auto_connection on_after_scissor_update; //connection for VisualModelEvent_AfterScissorUpdate event
+
 
   Impl (SpineSkeleton& in_skeleton, float in_meshes_min_z_including, float in_meshes_max_z_excluding)
     : skeleton (&in_skeleton)
     , meshes_min_z_including (in_meshes_min_z_including)
     , meshes_z_range (in_meshes_max_z_excluding - in_meshes_min_z_including)
-    {}
+  {
+    on_after_scissor_update = skeleton->RegisterEventHandler (VisualModelEvent_AfterScissorUpdate, xtl::bind (&Impl::OnAfterScissorUpdate, this));
+  }
 
   void Update ()
   {
@@ -45,6 +49,8 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 
         dynamic_mesh->BindToParent (*skeleton);
 
+        dynamic_mesh->SetScissor (skeleton->Scissor ());
+
         iter = meshes.insert_pair (mesh.Id (), dynamic_mesh).first;
       }
       else
@@ -69,6 +75,15 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
     }
 
     skeleton->SetVisualStructureDirty (false);
+  }
+
+  //handle scissor update
+  void OnAfterScissorUpdate ()
+  {
+    for (MeshesMap::iterator iter = meshes.begin (), end = meshes.end (); iter != end; ++iter)
+    {
+      iter->second->SetScissor (skeleton->Scissor ());
+    }
   }
 };
 
