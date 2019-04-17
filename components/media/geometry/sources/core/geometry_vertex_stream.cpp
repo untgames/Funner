@@ -10,6 +10,8 @@ using namespace common;
 
 struct VertexStream::Impl: public xtl::reference_counter, public xtl::trackable
 {
+  object_id_t  id;                     //идентификатор потока
+  object_id_t  source_id;              //идентификатор потока из которого был клонирован / десериализован данный поток
   VertexFormat format;                 //формат вершин
   uint32_t     vertex_size;            //размер вершины
   Buffer       data_buffer;            //буфер с данными
@@ -27,14 +29,18 @@ struct VertexStream::Impl: public xtl::reference_counter, public xtl::trackable
 */
 
 VertexStream::Impl::Impl ()
-  : vertex_size (0)
+  : id (IdPool::AllocateId (ObjectType_VertexStream))
+  , source_id (id)
+  , vertex_size (0)
   , vertices_count (0)
   , structure_update_index (0)
   , data_update_index (0)
   {}
 
 VertexStream::Impl::Impl (const Impl& source)
-  : format (source.format.Clone ())
+  : id (IdPool::AllocateId (ObjectType_VertexStream))
+  , source_id (source.source_id)
+  , format (source.format.Clone ())
   , vertex_size (source.vertex_size)
   , data_buffer (source.data_buffer)
   , vertices_count (source.vertices_count)
@@ -43,7 +49,9 @@ VertexStream::Impl::Impl (const Impl& source)
   {}
 
 VertexStream::Impl::Impl (const VertexDeclaration& declaration)
-  : format (declaration.Format ())
+  : id (IdPool::AllocateId (ObjectType_VertexStream))
+  , source_id (id)
+  , format (declaration.Format ())
   , vertex_size (declaration.VertexSize ())
   , vertices_count (0)
   , structure_update_index (0)
@@ -143,9 +151,18 @@ VertexStream VertexStream::Clone () const
     Идентификатор потока
 */
 
-size_t VertexStream::Id () const
+object_id_t VertexStream::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return impl->id;
+}
+
+/*
+   Идентификатор потока из которого был клонирован / десериализован данный поток
+*/
+
+object_id_t VertexStream::SourceId () const
+{
+  return impl->source_id;
 }
 
 /*
@@ -238,6 +255,151 @@ unsigned int VertexStream::CurrentStructureUpdateIndex () const
 unsigned int VertexStream::CurrentDataUpdateIndex () const
 {
   return impl->data_update_index;
+}
+
+/*
+   Сериализация / десериализация
+*/
+
+size_t VertexStream::SerializationSize () const
+{
+  return sizeof (impl->source_id) + impl->format.SerializationSize () + sizeof (impl->vertex_size) + sizeof (impl->vertices_count) + SerializationDataSize ();
+}
+
+size_t VertexStream::SerializationDataSize () const
+{
+  return impl->data_buffer.Size ();
+}
+
+size_t VertexStream::Write (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::VertexStream::Write";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_written = 0;
+
+  if (sizeof (impl->source_id) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing source id");
+
+  memcpy (buffer, &impl->source_id, sizeof (impl->source_id));
+
+  bytes_written += sizeof (impl->source_id);
+
+  bytes_written += impl->format.Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+
+  if (sizeof (impl->vertex_size) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing vertex size");
+
+  memcpy ((char*)buffer + bytes_written, &impl->vertex_size, sizeof (impl->vertex_size));
+
+  bytes_written += sizeof (impl->vertex_size);
+
+  if (sizeof (impl->vertices_count) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing vertices count");
+
+  memcpy ((char*)buffer + bytes_written, &impl->vertices_count, sizeof (impl->vertices_count));
+
+  bytes_written += sizeof (impl->vertices_count);
+
+  return bytes_written + WriteData ((char*)buffer + bytes_written, buffer_size - bytes_written);
+}
+
+size_t VertexStream::WriteData (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::VertexStream::WriteData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t data_size = SerializationDataSize ();
+
+  if (buffer_size < data_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing data");
+
+  memcpy (buffer, impl->data_buffer.Data (), data_size);
+
+  return data_size;
+}
+
+size_t VertexStream::Read (void* buffer, size_t buffer_size)
+{
+  size_t bytes_read = 0;
+
+  VertexStream::CreateFromSerializedData (buffer, buffer_size, bytes_read).Swap (*this);
+
+  return bytes_read;
+}
+
+size_t VertexStream::ReadData (void* buffer, size_t buffer_size)
+{
+  static const char* METHOD_NAME = "media::geometry::VertexStream::ReadData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t data_size = SerializationDataSize ();
+
+  if (buffer_size < data_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading data");
+
+  memcpy (impl->data_buffer.Data (), buffer, data_size);
+
+  InvalidateData ();
+
+  return data_size;
+}
+
+VertexStream VertexStream::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+{
+  static const char* METHOD_NAME = "media::geometry::VertexStream::CreateFromSerializedData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  object_id_t source_id;
+
+  if (sizeof (source_id) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading source id");
+
+  memcpy (&source_id, buffer, sizeof (source_id));
+
+  bytes_read += sizeof (source_id);
+
+  VertexFormat vertex_format;
+
+  bytes_read += vertex_format.Read ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  uint32_t vertex_size;
+
+  if (sizeof (vertex_size) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading vertex size");
+
+  memcpy (&vertex_size, (char*)buffer + bytes_read, sizeof (vertex_size));
+
+  bytes_read += sizeof (vertex_size);
+
+  uint32_t vertices_count;
+
+  if (sizeof (vertices_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading vertices count");
+
+  memcpy (&vertices_count, (char*)buffer + bytes_read, sizeof (vertices_count));
+
+  bytes_read += sizeof (vertices_count);
+
+  VertexStream new_vs (vertices_count, VertexDeclaration (vertex_format, vertex_size));
+
+  bytes_read += new_vs.ReadData ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  new_vs.impl->source_id = source_id;
+
+  out_bytes_read = bytes_read;
+
+  return new_vs;
 }
 
 /*

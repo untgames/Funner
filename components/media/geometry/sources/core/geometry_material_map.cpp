@@ -22,12 +22,24 @@ struct MaterialHashMapSelector
 
 struct MaterialMap::Impl: public xtl::reference_counter, public xtl::trackable
 {
+  object_id_t     id;                //identifier of map
+  object_id_t     source_id;         //identifier of map from which this map was cloned / deserialized
   MaterialHashMap map;               //map holding materials
   uint32_t        next_material_id;  //material id for next material to add
   unsigned int    data_update_index; //current data update index
 
   Impl ()
-    : next_material_id (0)
+    : id (IdPool::AllocateId (ObjectType_MaterialMap))
+    , source_id (id)
+    , next_material_id (0)
+    , data_update_index (0)
+    {}
+
+  Impl (const Impl& source)
+    : id (IdPool::AllocateId (ObjectType_MaterialMap))
+    , source_id (source.source_id)
+    , map (source.map)
+    , next_material_id (source.next_material_id)
     , data_update_index (0)
     {}
 };
@@ -64,7 +76,7 @@ MaterialMap& MaterialMap::operator = (const MaterialMap& map)
 }
 
 /*
-    Создание копии
+    Clone
 */
 
 MaterialMap MaterialMap::Clone () const
@@ -73,12 +85,21 @@ MaterialMap MaterialMap::Clone () const
 }
 
 /*
-    Идентификатор буфера
+    Map id (unique)
 */
 
-size_t MaterialMap::Id () const
+object_id_t MaterialMap::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return impl->id;
+}
+
+/*
+   Identifier of map from which this map was cloned / deserialized
+*/
+
+object_id_t MaterialMap::SourceId () const
+{
+  return impl->source_id;
 }
 
 /*
@@ -204,6 +225,139 @@ void MaterialMap::Clear ()
 unsigned int MaterialMap::CurrentDataUpdateIndex () const
 {
   return impl->data_update_index;
+}
+
+/*
+   Serialization / deserialization
+*/
+
+size_t MaterialMap::SerializationSize () const
+{
+  uint32_t materials_data_size = impl->map.size () * sizeof (uint32_t) * 2; //materials data size will contain for each material: material id (uint32_t), size of material name (uint32_t), material name
+
+  for (MaterialHashMap::iterator iter = impl->map.begin (), end = impl->map.end (); iter != end; ++iter)
+  {
+    materials_data_size += iter->second.size ();
+  }
+
+  return sizeof (impl->source_id) + sizeof (uint32_t) + materials_data_size;
+}
+
+size_t MaterialMap::Write (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::MaterialMap::Write";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  if (buffer_size < SerializationSize ())
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing data");
+
+  size_t bytes_written = 0;
+
+  memcpy (buffer, &impl->source_id, sizeof (impl->source_id));
+
+  bytes_written += sizeof (impl->source_id);
+
+  uint32_t materials_count = impl->map.size ();
+
+  memcpy ((char*)buffer + bytes_written, &materials_count, sizeof (materials_count));
+
+  bytes_written += sizeof (materials_count);
+
+  for (MaterialHashMap::iterator iter = impl->map.begin (), end = impl->map.end (); iter != end; ++iter)
+  {
+    memcpy ((char*)buffer + bytes_written, &iter->first, sizeof (iter->first));
+
+    bytes_written += sizeof (iter->first);
+
+    uint32_t material_name_size = iter->second.size ();
+
+    memcpy ((char*)buffer + bytes_written, &material_name_size, sizeof (material_name_size));
+
+    bytes_written += sizeof (material_name_size);
+
+    memcpy ((char*)buffer + bytes_written, iter->second.data (), material_name_size);
+
+    bytes_written += material_name_size;
+  }
+
+  return bytes_written;
+}
+
+size_t MaterialMap::Read (void* buffer, size_t buffer_size)
+{
+  size_t bytes_read;
+
+  CreateFromSerializedData (buffer, buffer_size, bytes_read).Swap (*this);
+
+  return bytes_read;
+}
+
+MaterialMap MaterialMap::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+{
+  static const char* METHOD_NAME = "media::geometry::MaterialMap::CreateFromSerializedData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  MaterialMap new_material_map;
+
+  if (sizeof (new_material_map.impl->source_id) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading source id");
+
+  memcpy (&new_material_map.impl->source_id, buffer, sizeof (new_material_map.impl->source_id));
+
+  bytes_read += sizeof (new_material_map.impl->source_id);
+
+  uint32_t materials_count;
+
+  if (sizeof (materials_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading materials count");
+
+  memcpy (&materials_count, (char*)buffer + bytes_read, sizeof (materials_count));
+
+  bytes_read += sizeof (materials_count);
+
+  for (uint32_t i = 0; i < materials_count; i++)
+  {
+    uint32_t material_id;
+
+    if (sizeof (material_id) + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading materials id");
+
+    memcpy (&material_id, (char*)buffer + bytes_read, sizeof (material_id));
+
+    bytes_read += sizeof (material_id);
+
+    uint32_t material_name_size;
+
+    if (sizeof (material_name_size) + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading materials name size");
+
+    memcpy (&material_name_size, (char*)buffer + bytes_read, sizeof (material_name_size));
+
+    bytes_read += sizeof (material_name_size);
+
+    stl::string material_name;
+
+    if (material_name_size + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading materials name");
+
+    material_name.fast_resize (material_name_size);
+
+    memcpy (&material_name [0], (char*)buffer + bytes_read, material_name_size);
+
+    bytes_read += material_name_size;
+
+    new_material_map.impl->map [material_id] = material_name;
+  }
+
+  out_bytes_read = bytes_read;
+
+  return new_material_map;
 }
 
 /*

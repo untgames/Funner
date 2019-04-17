@@ -2,7 +2,8 @@
 
 void dump (VertexBuffer& vb)
 {
-  printf ("Vertex buffer (%u streams, %u vertices, %u weights, vertex_size=%u)\n", vb.StreamsCount (),
+  printf ("Vertex buffer id=%llu, source_id=%llu (%u streams, %u vertices, %u weights, vertex_size=%u)\n",
+          vb.Id (), vb.SourceId (), vb.StreamsCount (),
           vb.VerticesCount (), vb.Weights ().Size (), vb.VertexSize ());
           
   for (uint32_t i=0; i<vb.StreamsCount (); i++)
@@ -24,6 +25,9 @@ int main ()
   vb1.Attach (vs1);
 
   VertexStream vs3 = vs2.Clone ();
+
+  if (vs3.SourceId () == vs2.Id ())
+    printf ("source id is correct after clone\n");
 
   vb1.Attach (vs3);
   vb1.AttachWeights (weights);
@@ -54,6 +58,24 @@ int main ()
   printf ("Dump vb2\n");
   
   dump (vb2);
+
+  printf ("vb1 serialization size is %u\n", vb1.SerializationSize ());
+
+  xtl::uninitialized_storage<char> serialization_buffer (vb1.SerializationSize ());
+
+  size_t written_bytes = vb1.Write (serialization_buffer.data (), serialization_buffer.size ());
+
+  printf ("Bytes written during serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+  size_t bytes_read;
+
+  VertexBuffer vb3 = VertexBuffer::CreateFromSerializedData (serialization_buffer.data (), serialization_buffer.size (), bytes_read);
+
+  printf ("Bytes read during deserialization = %u\n", bytes_read);
+
+  printf ("deserialized vb:");
+
+  dump (vb3);
   
   printf ("detach stream from vb1\n");
   

@@ -163,6 +163,10 @@ int main ()
 
   listener.stop_processing_on_ib_structrure_change = false;
 
+  mesh2.DetachIndexBuffer ();
+  vs.InvalidateData ();
+  vb.Weights ().InvalidateData ();
+
   printf ("Second notify after changing structure and data and without stopping on ib structure change:\n");
 
   observer.NotifyUpdates (mesh2, listener);

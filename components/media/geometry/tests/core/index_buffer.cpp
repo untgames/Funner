@@ -2,7 +2,7 @@
 
 void dump (const IndexBuffer& ib)
 {
-  printf ("Index buffer (%u indices):\n", ib.Size ());
+  printf ("Index buffer id=%llu, source_id=%llu (%u indices):\n", ib.Id (), ib.SourceId(), ib.Size ());
   
   switch (ib.DataType ())
   {
@@ -70,6 +70,40 @@ int main ()
     ib2.Resize (4);
 
     dump (ib1);
+
+    if (ib1.SourceId () == ib2.Id ())
+      printf ("source id is correct after clone\n");
+
+    printf ("ib1 serialization size is %u\n", ib1.SerializationSize ());
+    printf ("ib1 serialization data size is %u\n", ib1.SerializationDataSize ());
+
+    xtl::uninitialized_storage<char> serialization_buffer (ib1.SerializationSize ());
+
+    size_t written_bytes = ib1.Write (serialization_buffer.data (), serialization_buffer.size ());
+
+    printf ("Bytes written during serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+    size_t bytes_read;
+
+    IndexBuffer ib3 = IndexBuffer::CreateFromSerializedData(serialization_buffer.data (), serialization_buffer.size (), bytes_read);
+
+    printf ("Bytes read during deserialization = %u\n", bytes_read);
+
+    printf ("deserialized buffer:");
+
+    dump (ib3);
+
+    memset (ib3.Data (), 0, ib3.SerializationDataSize ());
+
+    written_bytes = ib1.WriteData (serialization_buffer.data (), serialization_buffer.size ());
+
+    printf ("Bytes written during data serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+    printf ("Bytes read during data deserialization = %u\n", ib3.ReadData (serialization_buffer.data (), serialization_buffer.size ()));
+
+    printf ("deserialized buffer data:");
+
+    dump (ib3);
   }
   catch (std::exception& exception)
   {

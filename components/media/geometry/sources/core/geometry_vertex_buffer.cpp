@@ -14,6 +14,8 @@ typedef stl::vector<VertexStream> VertexStreamArray;
 
 struct VertexBuffer::Impl: public xtl::reference_counter, public xtl::trackable
 {
+  object_id_t        id;                     //идентификатор буфера
+  object_id_t        source_id;              //идентификатор буфера из которого был клонирован / десериализован данный буфер
   VertexStreamArray  streams;                //вершинные массивы
   VertexWeightStream weights;                //массив весов
   unsigned int       structure_update_index; //индекс обновления структуры буфера (вершинные потоки или веса изменились)
@@ -27,13 +29,17 @@ struct VertexBuffer::Impl: public xtl::reference_counter, public xtl::trackable
 */
 
 VertexBuffer::Impl::Impl ()
-  : structure_update_index (0)
+  : id (IdPool::AllocateId (ObjectType_VertexBuffer))
+  , source_id (id)
+  , structure_update_index (0)
 {
   streams.reserve (DEFAULT_VERTEX_ARRAY_RESERVE);
 }
   
 VertexBuffer::Impl::Impl (const Impl& impl)
-  : weights (impl.weights.Clone ())
+  : id (IdPool::AllocateId (ObjectType_VertexBuffer))
+  , source_id (impl.source_id)
+  , weights (impl.weights.Clone ())
   , structure_update_index (0)
 {
   streams.reserve (impl.streams.size ());
@@ -86,9 +92,18 @@ VertexBuffer VertexBuffer::Clone () const
     Идентификатор буфера
 */
 
-size_t VertexBuffer::Id () const
+object_id_t VertexBuffer::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return impl->id;
+}
+
+/*
+   Идентификатор буфера из которого был клонирован / десериализован данный буфер
+*/
+
+object_id_t VertexBuffer::SourceId () const
+{
+  return impl->source_id;
 }
 
 /*
@@ -139,7 +154,7 @@ uint32_t VertexBuffer::Attach (VertexStream& vs)
 {
     //проверка зарегистрирован ли канал
     
-  size_t id = vs.Id ();
+  object_id_t id = vs.Id ();
     
   for (VertexStreamArray::iterator i=impl->streams.begin (), end=impl->streams.end (); i!=end; ++i)
     if (i->Id () == id)
@@ -229,6 +244,109 @@ uint32_t VertexBuffer::VertexSize () const
 unsigned int VertexBuffer::CurrentStructureUpdateIndex () const
 {
   return impl->structure_update_index;
+}
+
+/*
+   Сериализация / десериализация
+*/
+
+size_t VertexBuffer::SerializationSize () const
+{
+  uint32_t vertex_streams_size = 0;
+
+  for (VertexStreamArray::iterator iter = impl->streams.begin (), end = impl->streams.end (); iter != end; ++iter)
+    vertex_streams_size += iter->SerializationSize ();
+
+  return sizeof (impl->source_id) + sizeof (uint32_t) + vertex_streams_size + impl->weights.SerializationSize ();
+}
+
+size_t VertexBuffer::Write (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::VertexBuffer::Write";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_written = 0;
+
+  if (sizeof (impl->source_id) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing source id");
+
+  memcpy (buffer, &impl->source_id, sizeof (impl->source_id));
+
+  bytes_written += sizeof (impl->source_id);
+
+  uint32_t streams_count = impl->streams.size ();
+
+  if (sizeof (streams_count) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing streams count");
+
+  memcpy ((char*)buffer + bytes_written, &streams_count, sizeof (streams_count));
+
+  bytes_written += sizeof (streams_count);
+
+  for (VertexStreamArray::iterator iter = impl->streams.begin (), end = impl->streams.end (); iter != end; ++iter)
+    bytes_written += iter->Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+
+  return bytes_written + impl->weights.Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+}
+
+size_t VertexBuffer::Read (void* buffer, size_t buffer_size)
+{
+  size_t bytes_read = 0;
+
+  VertexBuffer::CreateFromSerializedData (buffer, buffer_size, bytes_read).Swap (*this);
+
+  return bytes_read;
+}
+
+VertexBuffer VertexBuffer::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+{
+  static const char* METHOD_NAME = "media::geometry::VertexBuffer::CreateFromSerializedData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  object_id_t source_id;
+
+  if (sizeof (source_id) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading source id");
+
+  memcpy (&source_id, buffer, sizeof (source_id));
+
+  bytes_read += sizeof (source_id);
+
+  uint32_t streams_count;
+
+  if (sizeof (streams_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading streams count");
+
+  memcpy (&streams_count, (char*)buffer + bytes_read, sizeof (streams_count));
+
+  bytes_read += sizeof (streams_count);
+
+  VertexBuffer new_vb;
+
+  new_vb.impl->streams.reserve (streams_count);
+
+  for (uint32_t i = 0; i < streams_count; i++)
+  {
+    size_t vs_read;
+
+    new_vb.impl->streams.push_back (VertexStream::CreateFromSerializedData ((char*)buffer + bytes_read, buffer_size - bytes_read, vs_read));
+
+    bytes_read += vs_read;
+  }
+
+  bytes_read += new_vb.impl->weights.Read ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  new_vb.impl->source_id = source_id;
+
+  out_bytes_read = bytes_read;
+
+  return new_vb;
 }
 
 /*

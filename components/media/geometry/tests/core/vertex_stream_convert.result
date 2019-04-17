@@ -1,5 +1,5 @@
 Results of vertex_stream_convert_test:
-vertex stream (10 vertices):
+vertex stream id=3, source_id=3 (10 vertices):
   xyz=[0 0 0] normal=[0 1 0] rgba=[0 0 0 0] st=[0 -0]
   xyz=[1 2 3] normal=[0 1 0] rgba=[0 0 0 0] st=[1 -1]
   xyz=[2 4 6] normal=[0 1 0] rgba=[0 0 0 0] st=[2 -2]

@@ -2,7 +2,7 @@
 
 void dump (const char* name, const MaterialMap& map)
 {
-  printf ("Material map '%s':\n", name);
+  printf ("Material map id=%llu, source_id = %llu, name='%s':\n", map.Id (), map.SourceId (), name);
   
   for (MaterialMap::Iterator iter = map.CreateIterator (); iter; ++iter)
   {
@@ -77,12 +77,33 @@ int main ()
     dump ("map1", map1);
     dump ("map2", map2);
 
+    if (map2.SourceId () == map1.Id ())
+      printf ("source id is correct after clone\n");
+
     printf ("Clear map2\n");
 
     map2.Clear ();
 
     dump ("map1", map1);
     dump ("map2", map2);
+
+    printf ("map1 serialization size is %u\n", map1.SerializationSize ());
+
+    xtl::uninitialized_storage<char> serialization_buffer (map1.SerializationSize ());
+
+    size_t written_bytes = map1.Write (serialization_buffer.data (), serialization_buffer.size ());
+
+    printf ("Bytes written during serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+    size_t bytes_read;
+
+    MaterialMap map3 = MaterialMap::CreateFromSerializedData (serialization_buffer.data (), serialization_buffer.size (), bytes_read);
+
+    printf ("Bytes read during deserialization = %u\n", bytes_read);
+
+    printf ("deserialized map:");
+
+    dump ("map3", map3);
 
     map1.SetMaterial (uint32_t (-1), "invalid_index_material");
   }

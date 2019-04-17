@@ -60,7 +60,7 @@ void file_write (OutputFile& file, const char* string)
 class BinMeshLibrarySaver
 {
   private:
-    typedef stl::hash_map<size_t, uint32_t> ResourceMap;
+    typedef stl::hash_map<object_id_t, uint32_t> ResourceMap;
 
       //сохранение вершинного потока
     void SaveVertexStream (const VertexStream& vs)

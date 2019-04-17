@@ -22,6 +22,7 @@ OnVertexStreamStructureChanged, new update index = 0
 OnMaterialMapDataChanged, new update index = 1
 Second notify after attaching buffers:
 Notify after updating buffers:
+OnMeshPrimitivesChanged, new update index = 1
 OnIndexBufferDataChanged, new update index = 1
 OnVertexStreamDataChanged, new update index = 1
 OnVertexWeightStreamDataChanged, new update index = 1
@@ -33,3 +34,11 @@ OnVertexWeightStreamStructureChanged, new update index = 1
 OnVertexStreamStructureChanged, new update index = 1
 OnVertexBufferStructureChanged, new update index = 1
 OnVertexWeightStreamStructureChanged, new update index = 0
+Notify after changing structure and data and stopping on ib structure change:
+OnMeshStructureChanged, new update index = 6
+OnIndexBufferStructureChanged, new update index = 0
+Second notify after changing structure and data and without stopping on ib structure change:
+OnMeshStructureChanged, new update index = 7
+OnIndexBufferStructureChanged, new update index = 0
+OnVertexStreamDataChanged, new update index = 4
+OnVertexWeightStreamDataChanged, new update index = 4

@@ -55,7 +55,7 @@ namespace xmesh_saver
 class XmlMeshLibrarySaver
 {
   private:
-    typedef stl::hash_map<size_t, size_t> ResourceMap;
+    typedef stl::hash_map<object_id_t, size_t> ResourceMap;
     
       //создание интервала с данными канала
     template <class T> static xtl::iterator_range<xtl::stride_ptr<const T> > MakeRange (const VertexStream& vs, size_t offset)

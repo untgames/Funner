@@ -1,22 +1,23 @@
 Results of vertex_stream_test:
 Dump vs1
-vertex stream (5 vertices):
+vertex stream id=1, source_id=1 (5 vertices):
   xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
   xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
   xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
   xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
   xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
 copy vs1 to vs2
-vertex stream (5 vertices):
+vertex stream id=3, source_id=1 (5 vertices):
   xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
   xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
   xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
   xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
   xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+source id is correct after clone
 reserve vs1 (current capacity=5)
 after vs1 reserve capacity=14
 resize vs1
-vertex stream (6 vertices):
+vertex stream id=1, source_id=1 (6 vertices):
   xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
   xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
   xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
@@ -24,7 +25,27 @@ vertex stream (6 vertices):
   xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
   xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
 instance vs2
-vertex stream (6 vertices):
+vertex stream id=1, source_id=1 (6 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+  xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
+vs1 serialization size is 312
+vs1 serialization data size is 216
+Bytes written during serialization = 312, data hash = b9c6e943
+Bytes read during deserialization = 312
+deserialized buffer:vertex stream id=4, source_id=1 (6 vertices):
+  xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
+  xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
+  xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
+  xyz=[3 3 3] normal=[1 0 0] rgba=[3 6 9 12] st=[3 -3]
+  xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
+  xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
+Bytes written during data serialization = 216, data hash = 2aa7f304
+Bytes read during data deserialization = 216
+deserialized buffer data:vertex stream id=4, source_id=1 (6 vertices):
   xyz=[0 0 0] normal=[1 0 0] rgba=[0 0 0 0] st=[0 -0]
   xyz=[1 1 1] normal=[1 0 0] rgba=[1 2 3 4] st=[1 -1]
   xyz=[2 2 2] normal=[1 0 0] rgba=[2 4 6 8] st=[2 -2]
@@ -32,7 +53,7 @@ vertex stream (6 vertices):
   xyz=[4 4 4] normal=[1 0 0] rgba=[4 8 12 16] st=[4 -4]
   xyz=[0 0 0] normal=[0 0 0] rgba=[0 0 0 0] st=[0 0]
 clear vs1 (dump vs2)
-vertex stream (0 vertices):
+vertex stream id=1, source_id=1 (0 vertices):
 dump vs2 format
 vertex format (4 attributes, min_vertex_size=36, vertex_size=36):
   attribute: semantic='position' type='float3' offset=0

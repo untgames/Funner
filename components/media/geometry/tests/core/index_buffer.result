@@ -1,6 +1,6 @@
 Results of index_buffer_test:
 Dump ib1
-Index buffer (12 indices):
+Index buffer id=1, source_id=1 (12 indices):
   0
   1
   2
@@ -14,10 +14,10 @@ Index buffer (12 indices):
   10
   11
 Dump ib2
-Index buffer (0 indices):
+Index buffer id=2, source_id=2 (0 indices):
 ib2 capacity: 14
 ib2 = ib1
-Index buffer (12 indices):
+Index buffer id=1, source_id=1 (12 indices):
   0
   1
   2
@@ -31,16 +31,35 @@ Index buffer (12 indices):
   10
   11
 clear ib2
-Index buffer (0 indices):
+Index buffer id=1, source_id=1 (0 indices):
 instance ib2
-Index buffer (5 indices):
+Index buffer id=1, source_id=1 (5 indices):
   0
   1
   2
   3
   4
 copy ib2
-Index buffer (5 indices):
+Index buffer id=3, source_id=1 (5 indices):
+  0
+  1
+  2
+  3
+  4
+source id is correct after clone
+ib1 serialization size is 36
+ib1 serialization data size is 20
+Bytes written during serialization = 36, data hash = 5e3454c1
+Bytes read during deserialization = 36
+deserialized buffer:Index buffer id=4, source_id=1 (5 indices):
+  0
+  1
+  2
+  3
+  4
+Bytes written during data serialization = 20, data hash = 73b3bac5
+Bytes read during data deserialization = 20
+deserialized buffer data:Index buffer id=4, source_id=1 (5 indices):
   0
   1
   2

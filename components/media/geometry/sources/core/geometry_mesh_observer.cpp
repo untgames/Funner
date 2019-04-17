@@ -26,42 +26,59 @@ struct UpdateDataCacheEntry
     {}
 };
 
-typedef stl::hash_map<size_t, UpdateDataCacheEntry> UpdateDataCache;
-typedef stl::vector<const VertexStream*>            VertexStreamPtrArray;
-typedef stl::vector<const VertexWeightStream*>      VertexWeightStreamPtrArray;
+typedef stl::hash_map<object_id_t, UpdateDataCacheEntry> UpdateDataCache;
+typedef stl::vector<const VertexStream*>                 VertexStreamPtrArray;
+typedef stl::vector<const VertexWeightStream*>           VertexWeightStreamPtrArray;
+typedef xtl::array<UpdateDataCache, ObjectType_Num>      UpdateDataCacheArray;
 
 }
 
 struct MeshObserver::Impl: public xtl::reference_counter
 {
-  UpdateDataCache            update_data_cache;                  //cache holding last reported update indices
+  UpdateDataCacheArray       update_data_cache;                  //cache holding last reported update indices
   VertexStreamPtrArray       changed_data_vertex_streams;        //array holding pointers to vertex streams whose data was changed and should be reported after structure change reports
   VertexWeightStreamPtrArray changed_data_vertex_weight_streams; //array holding pointers to vertex weight streams whose data was changed and should be reported after structure change reports
 
   ~Impl ()
   {
-    for (UpdateDataCache::iterator iter = update_data_cache.begin (), end = update_data_cache.end (); iter != end; ++iter)
+    for (unsigned int i = 0, count = update_data_cache.size (); i < count; i++)
     {
-      iter->second.object_destroy_connection.disconnect ();
+      for (UpdateDataCache::iterator iter = update_data_cache [i].begin (), end = update_data_cache [i].end (); iter != end; ++iter)
+      {
+        iter->second.object_destroy_connection.disconnect ();
+      }
     }
   }
 
-  void RemoveCacheEntry (size_t id)
+  void RemoveCacheEntry (unsigned int object_type, object_id_t id)
   {
-    update_data_cache.erase (id);
+    update_data_cache [object_type].erase (id);
   }
+
+  template<class T>
+  unsigned int GetObjectType (xtl::type<T>);
+
+  unsigned int GetObjectType (xtl::type<Mesh>)               { return ObjectType_Mesh;               }
+  unsigned int GetObjectType (xtl::type<MaterialMap>)        { return ObjectType_MaterialMap;        }
+  unsigned int GetObjectType (xtl::type<IndexBuffer>)        { return ObjectType_IndexBuffer;        }
+  unsigned int GetObjectType (xtl::type<VertexBuffer>)       { return ObjectType_VertexBuffer;       }
+  unsigned int GetObjectType (xtl::type<VertexStream>)       { return ObjectType_VertexStream;       }
+  unsigned int GetObjectType (xtl::type<VertexWeightStream>) { return ObjectType_VertexWeightStream; }
 
   template<class T>
   void CheckObjectChanged (const T& object, unsigned int structure_update_index, unsigned int data_update_index, bool& structure_changed, bool& data_changed)
   {
-    UpdateDataCache::iterator iter = update_data_cache.find (object.Id ());
+    unsigned int object_type = GetObjectType (xtl::type<T>());
 
-    if (iter == update_data_cache.end ())
+    UpdateDataCache&          object_type_cache = update_data_cache [object_type];
+    UpdateDataCache::iterator iter              = object_type_cache.find (object.Id ());
+
+    if (iter == object_type_cache.end ())
     {
       structure_changed = true;
       data_changed      = false;
 
-      update_data_cache.insert_pair (object.Id (), UpdateDataCacheEntry (structure_update_index, data_update_index, object.Trackable ().connect_tracker (xtl::bind (&Impl::RemoveCacheEntry, this, object.Id ()))));
+      object_type_cache.insert_pair (object.Id (), UpdateDataCacheEntry (structure_update_index, data_update_index, object.Trackable ().connect_tracker (xtl::bind (&Impl::RemoveCacheEntry, this, object_type, object.Id ()))));
     }
     else
     {
