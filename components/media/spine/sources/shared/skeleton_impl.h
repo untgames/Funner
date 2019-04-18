@@ -105,17 +105,66 @@ class SkeletonImpl : virtual public IObject
                                        const float* attachment_texcoords);  //returns pointer to position vertices
 
   private:
-    struct MeshDesc
+    struct MeshDesc : public xtl::reference_counter
     {
       geometry::Mesh mesh;
+      stl::string    material;
+      unsigned int   triangles_count;
       math::vec4f    color;
       size_t         index_buffer_hash;
       size_t         texcoords_hash;
 
       MeshDesc (const geometry::Mesh& in_mesh)
         : mesh (in_mesh)
+        , triangles_count ()
         , index_buffer_hash ()
         , texcoords_hash ()
+        {}
+    };
+
+    struct PrimitiveDesc : public xtl::reference_counter
+    {
+      uint32_t     count;
+      uint32_t     base_vertex;
+      BlendMode    blend_mode;
+      TexcoordWrap texcoord_wrap_u;
+      TexcoordWrap texcoord_wrap_v;
+      stl::string  texture_path;
+
+      PrimitiveDesc (uint32_t in_count, uint32_t in_base_vertex, BlendMode in_blend_mode, TexcoordWrap in_texcoord_wrap_u, TexcoordWrap in_texcoord_wrap_v, const char* in_texture_path)
+        : count (in_count)
+        , base_vertex (in_base_vertex)
+        , blend_mode (in_blend_mode)
+        , texcoord_wrap_u (in_texcoord_wrap_u)
+        , texcoord_wrap_v (in_texcoord_wrap_v)
+        , texture_path (in_texture_path)
+        {}
+
+      bool operator == (const PrimitiveDesc& right) const
+      {
+        return count == right.count && base_vertex == right.base_vertex && blend_mode == right.blend_mode && texcoord_wrap_u == right.texcoord_wrap_u &&
+               texcoord_wrap_v == right.texcoord_wrap_v && texture_path == right.texture_path;
+      }
+
+      bool operator != (const PrimitiveDesc& right) const
+      {
+        return !(*this == right);
+      }
+
+    };
+
+    typedef xtl::intrusive_ptr<PrimitiveDesc> PrimitiveDescPtr;
+    typedef stl::vector<PrimitiveDescPtr>     PrimitiveDescsArray;
+
+    struct SpritesMeshDesc : public xtl::reference_counter
+    {
+      geometry::Mesh      mesh;
+      size_t              color_texcoords_hash;
+      PrimitiveDescsArray primitive_descs;
+
+      SpritesMeshDesc (const geometry::Mesh& in_mesh)
+        : mesh (in_mesh)
+        , color_texcoords_hash ()
         {}
     };
 
@@ -124,19 +173,22 @@ class SkeletonImpl : virtual public IObject
     typedef xtl::com_ptr<MaterialImpl>                                        MaterialImplPtr;
     typedef stl::vector<SlotPtr>                                              SlotsArray;
     typedef stl::vector<BonePtr>                                              BonesArray;
-    typedef stl::vector<geometry::Mesh>                                       MeshesArray;
-    typedef stl::vector<MeshDesc>                                             MeshDescsArray;
+    typedef stl::vector<media::geometry::Mesh>                                MeshesArray;
+    typedef xtl::intrusive_ptr<SpritesMeshDesc>                               SpritesMeshDescPtr;
+    typedef stl::vector<SpritesMeshDescPtr>                                   SpritesMeshDescsArray;
+    typedef xtl::intrusive_ptr<MeshDesc>                                      MeshDescPtr;
+    typedef stl::vector<MeshDescPtr>                                          MeshDescsArray;
     typedef stl::hash_map<stl::hash_key<const char*>, media::spine::Material> MaterialsMap;
 
   private:
-    bool           clipping_warning_reported; //we have sent message to log that skeleton contains clipping and it may work slow
-    bool           meshes_warning_reported;   //we have sent message to log that skeleton contains meshes and it may work slow
-    BonesArray     bones;                     //array of bones for returning media objects
-    SlotsArray     slots;                     //array of slots for returning media objects
-    MeshesArray    sprites_meshes;            //array of meshes used for sprites attachments
-    MeshDescsArray triangle_list_meshes;      //array of meshes used for mesh attachments
-    MeshesArray    draw_order;                //meshes array in draw order
-    MaterialsMap   materials;                 //materials
+    bool                  clipping_warning_reported; //we have sent message to log that skeleton contains clipping and it may work slow
+    bool                  meshes_warning_reported;   //we have sent message to log that skeleton contains meshes and it may work slow
+    BonesArray            bones;                     //array of bones for returning media objects
+    SlotsArray            slots;                     //array of slots for returning media objects
+    SpritesMeshDescsArray sprites_meshes;            //array of meshes used for sprites attachments
+    MeshDescsArray        triangle_list_meshes;      //array of meshes used for mesh attachments
+    MeshesArray           draw_order;                //meshes array in draw order
+    MaterialsMap          materials;                 //materials
 };
 
 }

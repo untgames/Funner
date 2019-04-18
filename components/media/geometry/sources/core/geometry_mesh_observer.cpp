@@ -71,14 +71,14 @@ struct MeshObserver::Impl: public xtl::reference_counter
     unsigned int object_type = GetObjectType (xtl::type<T>());
 
     UpdateDataCache&          object_type_cache = update_data_cache [object_type];
-    UpdateDataCache::iterator iter              = object_type_cache.find (object.Id ());
+    UpdateDataCache::iterator iter              = object_type_cache.find (object.SourceId ());
 
     if (iter == object_type_cache.end ())
     {
       structure_changed = true;
       data_changed      = false;
 
-      object_type_cache.insert_pair (object.Id (), UpdateDataCacheEntry (structure_update_index, data_update_index, object.Trackable ().connect_tracker (xtl::bind (&Impl::RemoveCacheEntry, this, object_type, object.Id ()))));
+      object_type_cache.insert_pair (object.SourceId (), UpdateDataCacheEntry (structure_update_index, data_update_index, object.Trackable ().connect_tracker (xtl::bind (&Impl::RemoveCacheEntry, this, object_type, object.SourceId ()))));
     }
     else
     {
