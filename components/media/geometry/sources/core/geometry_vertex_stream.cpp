@@ -323,7 +323,7 @@ size_t VertexStream::WriteData (void* buffer, size_t buffer_size) const
   return data_size;
 }
 
-size_t VertexStream::Read (void* buffer, size_t buffer_size)
+size_t VertexStream::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read = 0;
 
@@ -332,7 +332,7 @@ size_t VertexStream::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-size_t VertexStream::ReadData (void* buffer, size_t buffer_size)
+size_t VertexStream::ReadData (const void* buffer, size_t buffer_size)
 {
   static const char* METHOD_NAME = "media::geometry::VertexStream::ReadData";
 
@@ -351,7 +351,7 @@ size_t VertexStream::ReadData (void* buffer, size_t buffer_size)
   return data_size;
 }
 
-VertexStream VertexStream::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+VertexStream VertexStream::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::VertexStream::CreateFromSerializedData";
 

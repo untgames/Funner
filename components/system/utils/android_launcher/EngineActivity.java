@@ -340,14 +340,14 @@ public class EngineActivity extends Activity
   }
   
 /// Создание окна
-  public EngineViewController createSurfaceViewController (String initString, final long windowRef)
+  public EngineViewController createSurfaceViewController (final long windowRef, final float contentScaleFactor)
   {
     final EngineActivity activity = this;            
     
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef, contentScaleFactor);
         
         addView (controller.getView ());
         

@@ -115,10 +115,10 @@ class IndexBuffer
 
     size_t Write     (void* buffer, size_t buffer_size) const;
     size_t WriteData (void* buffer, size_t buffer_size) const;
-    size_t Read      (void* buffer, size_t buffer_size);
-    size_t ReadData  (void* buffer, size_t buffer_size);
+    size_t Read      (const void* buffer, size_t buffer_size);
+    size_t ReadData  (const void* buffer, size_t buffer_size);
 
-    static IndexBuffer CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& bytes_read);
+    static IndexBuffer CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& bytes_read);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект оповещения об удалении

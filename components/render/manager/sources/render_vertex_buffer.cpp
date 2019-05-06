@@ -7,7 +7,7 @@ using namespace render::low_level;
     Конструкторы / деструктор
 */
 
-VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, PrimitiveBuffersImpl& buffers, const DeviceManagerPtr& device_manager, MeshBufferUsage usage)
+VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, PrimitiveBuffersImpl& buffers, const DeviceManagerPtr& device_manager, MeshBufferUsage usage, bool updatable)
 {
   try
   {
@@ -36,7 +36,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
     {
       const media::geometry::VertexStream& vs = source.Stream (i);
       
-      LowLevelBufferPtr vs_buffer = buffers.CreateVertexStream (vs, usage);
+      LowLevelBufferPtr vs_buffer = buffers.CreateVertexStream (vs, usage, updatable);
 
       media::geometry::VertexFormat vertex_format = Clone (layout_manager, vs.Format ());      
 

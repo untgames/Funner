@@ -93,9 +93,9 @@ class VertexBuffer
     size_t SerializationSize () const;
 
     size_t Write (void* buffer, size_t buffer_size) const;
-    size_t Read  (void* buffer, size_t buffer_size);
+    size_t Read  (const void* buffer, size_t buffer_size);
 
-    static VertexBuffer CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& bytes_read);
+    static VertexBuffer CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& bytes_read);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект оповещения об удалении

@@ -28,6 +28,8 @@ class DynamicMesh: public VisualModel
 ///Updating mesh data
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateMesh (const media::geometry::Mesh& mesh);
+    void UpdateIndexBufferData (media::geometry::object_id_t source_id, const void* buffer, size_t buffer_size);
+    void UpdateVertexStreamData (media::geometry::object_id_t source_id, const void* buffer, size_t buffer_size);
 
   private:
     struct Impl;

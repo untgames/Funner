@@ -893,6 +893,40 @@ void ConnectionState::UpdateDynamicMesh (object_id_t id, const media::geometry::
   }
 }
 
+void ConnectionState::UpdateIndexBufferData (interchange::InputStream& s)
+{
+  try
+  {
+    object_id_t id        = s.Read<object_id_t> ();
+    uint64      source_id = s.Read<uint64> ();
+    uint32      data_size = s.Read<uint32> ();
+
+    impl->server.SceneManager ().GetNode (id).Cast<DynamicMesh> ().UpdateIndexBufferData (source_id, s.ReadData (data_size), data_size);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateIndexBufferData");
+    throw;
+  }
+}
+
+void ConnectionState::UpdateVertexStreamData (interchange::InputStream& s)
+{
+  try
+  {
+    object_id_t id        = s.Read<object_id_t> ();
+    uint64      source_id = s.Read<uint64> ();
+    uint32      data_size = s.Read<uint32> ();
+
+    impl->server.SceneManager ().GetNode (id).Cast<DynamicMesh> ().UpdateVertexStreamData (source_id, s.ReadData (data_size), data_size);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateVertexStreamData");
+    throw;
+  }
+}
+
 void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
 {
   try

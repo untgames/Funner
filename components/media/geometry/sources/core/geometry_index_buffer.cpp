@@ -339,7 +339,7 @@ size_t IndexBuffer::WriteData (void* buffer, size_t buffer_size) const
   return data_size;
 }
 
-size_t IndexBuffer::Read (void* buffer, size_t buffer_size)
+size_t IndexBuffer::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read = 0;
 
@@ -348,7 +348,7 @@ size_t IndexBuffer::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-size_t IndexBuffer::ReadData (void* buffer, size_t buffer_size)
+size_t IndexBuffer::ReadData (const void* buffer, size_t buffer_size)
 {
   static const char* METHOD_NAME = "media::geometry::IndexBuffer::ReadData";
 
@@ -367,7 +367,7 @@ size_t IndexBuffer::ReadData (void* buffer, size_t buffer_size)
   return data_size;
 }
 
-IndexBuffer IndexBuffer::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+IndexBuffer IndexBuffer::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::IndexBuffer::CreateFromSerializedData";
 

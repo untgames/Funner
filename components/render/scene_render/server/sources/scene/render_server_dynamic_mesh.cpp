@@ -48,8 +48,23 @@ void DynamicMesh::UpdateMesh (const media::geometry::Mesh& mesh)
 
   manager::Primitive primitive = impl->entity.Primitive ();
 
-  primitive.RemoveAllMeshes ();
+  primitive.RemoveAllMeshes (render::manager::PrimitiveBufferType_IndexBuffer | render::manager::PrimitiveBufferType_VertexStream);
 
-  //TODO do this without wrapping into media::Mesh (add method for primitives adding to manager::Primitive)
-  primitive.AddMesh (mesh);
+  primitive.Buffers ();
+
+  primitive.AddMesh (mesh, render::manager::MeshBufferUsage_Stream, render::manager::MeshBufferUsage_Dynamic, render::manager::PrimitiveBufferType_IndexBuffer | render::manager::PrimitiveBufferType_VertexStream);
+}
+
+void DynamicMesh::UpdateIndexBufferData (media::geometry::object_id_t source_id, const void* buffer, size_t buffer_size)
+{
+  manager::Primitive primitive = impl->entity.Primitive ();
+
+  primitive.Buffers ().UpdateIndexBuffer (source_id, buffer, buffer_size);
+}
+
+void DynamicMesh::UpdateVertexStreamData (media::geometry::object_id_t source_id, const void* buffer, size_t buffer_size)
+{
+  manager::Primitive primitive = impl->entity.Primitive ();
+
+  primitive.Buffers ().UpdateVertexStream (source_id, buffer, buffer_size);
 }

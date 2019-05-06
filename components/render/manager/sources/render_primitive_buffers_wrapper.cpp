@@ -58,9 +58,19 @@ void PrimitiveBuffers::Update (const media::geometry::VertexStream& buffer)
   impl->Update (buffer);
 }
 
+void PrimitiveBuffers::UpdateVertexStream (object_id_t id, const void* buffer, size_t buffer_size)
+{
+  impl->UpdateVertexStream (id, buffer, buffer_size);
+}
+
 void PrimitiveBuffers::Update (const media::geometry::IndexBuffer& buffer)
 {
   impl->Update (buffer);
+}
+
+void PrimitiveBuffers::UpdateIndexBuffer (object_id_t id, const void* buffer, size_t buffer_size)
+{
+  impl->UpdateIndexBuffer (id, buffer, buffer_size);
 }
 
 /*

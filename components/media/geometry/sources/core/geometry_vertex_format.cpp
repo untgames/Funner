@@ -529,7 +529,7 @@ size_t VertexFormat::Write (void* buffer, size_t buffer_size) const
   return bytes_written;
 }
 
-size_t VertexFormat::Read (void* buffer, size_t buffer_size)
+size_t VertexFormat::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read = 0;
 
@@ -538,7 +538,7 @@ size_t VertexFormat::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-VertexFormat VertexFormat::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+VertexFormat VertexFormat::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::VertexFormat::CreateFromSerializedData";
 

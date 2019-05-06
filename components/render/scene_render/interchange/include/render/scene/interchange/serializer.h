@@ -67,6 +67,8 @@ enum CommandId
   CommandId_SetVisualModelDynamicShaderProperties,
   CommandId_SetVisualModelStaticShaderProperties,
   CommandId_UpdateDynamicMesh,
+  CommandId_UpdateIndexBufferData,
+  CommandId_UpdateVertexStreamData,
   CommandId_SetStaticMeshName,
   CommandId_SetLightParams,
   CommandId_SetPageCurlParams,
@@ -146,6 +148,8 @@ class ClientToServerSerializer: public OutputStream
     void SetVisualModelDynamicShaderProperties(object_id_t id, object_id_t properties_id);
     void SetVisualModelStaticShaderProperties(object_id_t id, object_id_t properties_id);
     void UpdateDynamicMesh(object_id_t id, media::geometry::Mesh mesh);
+    OutputStream& UpdateIndexBufferData();
+    OutputStream& UpdateVertexStreamData();
     void SetStaticMeshName(object_id_t id, const char* mesh_name);
     void SetLightParams(object_id_t id, const LightParams& params);
     void SetPageCurlParams(object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);

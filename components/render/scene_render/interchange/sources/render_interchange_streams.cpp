@@ -67,24 +67,20 @@ void write (OutputStream& s, const media::geometry::Mesh& mesh)
 
     write (s, object_id);
   }
-/*  else
+  else
   {
+    //TODO test this
+
     object_id_t object_id = 0;
 
     write (s, object_id);
 
-    uint32 width = image.Width (), height = image.Height (), depth = image.Depth (), format = (uint32)image.Format ();
+    uint32 mesh_serialization_size = mesh.SerializationSize ();
 
-    write (s, width);
-    write (s, height);
-    write (s, depth);
-    write (s, format);
+    write (s, mesh_serialization_size);
 
-    size_t layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
-
-    for (unsigned int i=0; i<depth; i++)
-      s.WriteData (image.Bitmap (i), layer_size);
-  }*/
+    mesh.Write (s.WriteData (mesh_serialization_size), mesh_serialization_size);
+  }
 }
 
 media::geometry::Mesh read (InputStream& s, xtl::type<media::geometry::Mesh>)
@@ -99,19 +95,16 @@ media::geometry::Mesh read (InputStream& s, xtl::type<media::geometry::Mesh>)
 
     return mesh;
   }
-/*  else
+  else
   {
-    uint32 width = read (s, xtl::type<uint32> ()), height = read (s, xtl::type<uint32> ()), depth = read (s, xtl::type<uint32> ()), format = read (s, xtl::type<uint32> ());
+    //TODO test this
 
-    media::Image image (width, height, depth, (media::PixelFormat)format);
+    uint32 mesh_serialization_size = read (s, xtl::type<uint32> ());
 
-    unsigned int layer_size = width * height * media::get_bytes_per_pixel (image.Format ());
+    size_t dummy;
 
-    for (unsigned int i=0; i<depth; i++)
-      s.ReadData (image.Bitmap (i), layer_size);
-
-    return image;
-  }*/
+    return media::geometry::Mesh::CreateFromSerializedData (s.ReadData (mesh_serialization_size), mesh_serialization_size, dummy);
+  }
 }
 
 }}}

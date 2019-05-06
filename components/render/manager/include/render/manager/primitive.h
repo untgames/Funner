@@ -60,6 +60,12 @@ enum SpriteMode
   SpriteMode_OrientedBillboard = SpriteMode_Billboard | SpriteMode_Oriented, //up vector is view up,  normal & rotation is used
 };
 
+enum PrimitiveBufferType
+{
+  PrimitiveBufferType_IndexBuffer  = 1,
+  PrimitiveBufferType_VertexStream = 1 << 1,
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +108,8 @@ class PrimitiveBuffers
 {
   friend class Wrappers;
   public:
+    typedef unsigned long long object_id_t;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,8 +128,10 @@ class PrimitiveBuffers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    void Update (const media::geometry::VertexStream& buffer);
-    void Update (const media::geometry::IndexBuffer& buffer);
+    void Update             (const media::geometry::VertexStream& buffer);
+    void UpdateVertexStream (object_id_t id, const void* buffer, size_t buffer_size);
+    void Update             (const media::geometry::IndexBuffer& buffer);
+    void UpdateIndexBuffer  (object_id_t id, const void* buffer, size_t buffer_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление буферов
@@ -185,9 +195,12 @@ class Primitive
 ///Работа с мешами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t MeshesCount     () const;
-    size_t AddMesh         (const media::geometry::Mesh&, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    size_t AddMesh         (const media::geometry::Mesh&,
+                            MeshBufferUsage vb_usage = MeshBufferUsage_Default,
+                            MeshBufferUsage ib_usage = MeshBufferUsage_Default,
+                            unsigned int updatable_primitive_buffer_types = 0);
     void   RemoveMeshes    (size_t first_mesh, size_t meshes_count);
-    void   RemoveAllMeshes ();
+    void   RemoveAllMeshes (unsigned int updatable_primitive_buffer_types = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами

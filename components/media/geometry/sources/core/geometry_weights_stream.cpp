@@ -226,7 +226,7 @@ size_t VertexWeightStream::WriteData (void* buffer, size_t buffer_size) const
   return data_size;
 }
 
-size_t VertexWeightStream::Read (void* buffer, size_t buffer_size)
+size_t VertexWeightStream::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read;
 
@@ -235,7 +235,7 @@ size_t VertexWeightStream::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-size_t VertexWeightStream::ReadData (void* buffer, size_t buffer_size)
+size_t VertexWeightStream::ReadData (const void* buffer, size_t buffer_size)
 {
   static const char* METHOD_NAME = "media::geometry::VertexWeightStream::ReadData";
 
@@ -254,7 +254,7 @@ size_t VertexWeightStream::ReadData (void* buffer, size_t buffer_size)
   return data_size;
 }
 
-VertexWeightStream VertexWeightStream::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+VertexWeightStream VertexWeightStream::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::VertexWeightStream::CreateFromSerializedData";
 

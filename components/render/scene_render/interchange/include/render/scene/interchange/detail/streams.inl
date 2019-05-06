@@ -155,6 +155,19 @@ inline void OutputStream::WriteDataUnsafe (const void* data, size_t size)
   pos += size;
 }
 
+inline void* OutputStream::WriteData (size_t size)
+{
+  const size_t aligned_size = detail::aligned_size (size);
+
+  EnsureSpaceAvailable (aligned_size);
+
+  void* return_value = pos;
+
+  pos += aligned_size;
+
+  return return_value;
+}
+
 template <class T> inline void OutputStream::Write (const T& value)
 {
   static const size_t aligned_size = detail::aligned_size<sizeof (T)> ();

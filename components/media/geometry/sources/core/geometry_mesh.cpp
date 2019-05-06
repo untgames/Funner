@@ -454,7 +454,7 @@ size_t Mesh::WritePrimitivesData (void* buffer, size_t buffer_size) const
   return data_size;
 }
 
-size_t Mesh::Read (void* buffer, size_t buffer_size)
+size_t Mesh::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read = 0;
 
@@ -463,7 +463,7 @@ size_t Mesh::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-size_t Mesh::ReadPrimitivesData (void* buffer, size_t buffer_size)
+size_t Mesh::ReadPrimitivesData (const void* buffer, size_t buffer_size)
 {
   static const char* METHOD_NAME = "media::geometry::Mesh::ReadPrimitivesData";
 
@@ -498,7 +498,7 @@ size_t Mesh::ReadPrimitivesData (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-Mesh Mesh::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+Mesh Mesh::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::Mesh::CreateFromSerializedData";
 

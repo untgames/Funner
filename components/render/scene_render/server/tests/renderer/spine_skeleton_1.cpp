@@ -2,8 +2,8 @@
 
 //const char* SPINE_FILE_NAME  = "data/alien/export/alien-ess.skel";
 //const char* SPINE_ATLAS_NAME = "data/alien/export/alien.atlas";
-//const char* SPINE_FILE_NAME  = "data/alien/export/alien-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/alien/export/alien.atlas";
+const char* SPINE_FILE_NAME  = "data/alien/export/alien-pro.skel";
+const char* SPINE_ATLAS_NAME = "data/alien/export/alien.atlas";
 //const char* SPINE_FILE_NAME  = "data/coin/export/coin-pro.skel";
 //const char* SPINE_ATLAS_NAME = "data/coin/export/coin.atlas";
 //const char* SPINE_FILE_NAME  = "data/dragon/export/dragon-ess.skel";
@@ -30,8 +30,8 @@
 //const char* SPINE_ATLAS_NAME = "data/spineboy/export/spineboy.atlas";
 //const char* SPINE_FILE_NAME  = "data/stretchyman/export/stretchyman-pro.skel";
 //const char* SPINE_ATLAS_NAME = "data/stretchyman/export/stretchyman.atlas";
-const char* SPINE_FILE_NAME  = "data/tank/export/tank-pro.skel";
-const char* SPINE_ATLAS_NAME = "data/tank/export/tank.atlas";
+//const char* SPINE_FILE_NAME  = "data/tank/export/tank-pro.skel";
+//const char* SPINE_ATLAS_NAME = "data/tank/export/tank.atlas";
 //const char* SPINE_FILE_NAME  = "data/vine/export/vine-pro.json";
 //const char* SPINE_ATLAS_NAME = "data/vine/export/vine.atlas";
 

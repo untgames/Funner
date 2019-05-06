@@ -13,6 +13,7 @@
 #include <common/time.h>
 
 #include <media/geometry/mesh.h>
+#include <media/geometry/mesh_observer.h>
 #include <media/image.h>
 
 #include <sg/dynamic_mesh.h>

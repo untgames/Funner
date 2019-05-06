@@ -291,7 +291,7 @@ size_t VertexBuffer::Write (void* buffer, size_t buffer_size) const
   return bytes_written + impl->weights.Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
 }
 
-size_t VertexBuffer::Read (void* buffer, size_t buffer_size)
+size_t VertexBuffer::Read (const void* buffer, size_t buffer_size)
 {
   size_t bytes_read = 0;
 
@@ -300,7 +300,7 @@ size_t VertexBuffer::Read (void* buffer, size_t buffer_size)
   return bytes_read;
 }
 
-VertexBuffer VertexBuffer::CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& out_bytes_read)
+VertexBuffer VertexBuffer::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
 {
   static const char* METHOD_NAME = "media::geometry::VertexBuffer::CreateFromSerializedData";
 

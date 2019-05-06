@@ -60,6 +60,8 @@ void SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properti
 void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id);
 
 void UpdateDynamicMesh (object_id_t id, media::geometry::Mesh mesh);
+void UpdateIndexBufferData (...);
+void UpdateVertexStreamData (...);
 
 void SetStaticMeshName (object_id_t id, const char* mesh_name);
 

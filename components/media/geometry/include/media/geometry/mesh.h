@@ -156,10 +156,10 @@ class Mesh
 
     size_t Write               (void* buffer, size_t buffer_size) const;
     size_t WritePrimitivesData (void* buffer, size_t buffer_size) const;
-    size_t Read                (void* buffer, size_t buffer_size);
-    size_t ReadPrimitivesData  (void* buffer, size_t buffer_size);
+    size_t Read                (const void* buffer, size_t buffer_size);
+    size_t ReadPrimitivesData  (const void* buffer, size_t buffer_size);
 
-    static Mesh CreateFromSerializedData (void* buffer, size_t buffer_size, size_t& bytes_read);
+    static Mesh CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& bytes_read);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект оповещения об удалении
