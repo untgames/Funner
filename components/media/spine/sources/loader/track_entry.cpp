@@ -64,6 +64,7 @@ TrackEntrySpineImpl::TrackEntrySpineImpl (AnimationStateSpineImpl* in_animation_
   : animation_state_impl (in_animation_state_impl)
   , this_track_entry (0)
   , track_entry (in_track_entry)
+  , is_disposed (false)
 {
   //we create no more than one TrackEntrySpineImpl per spTrackEntry, so we can use pointer to this object as user data (no conflicts).
   track_entry->userData = this;
@@ -270,17 +271,17 @@ media::spine::TrackEntry* TrackEntrySpineImpl::Next ()
 
 bool TrackEntrySpineImpl::IsDisposed ()
 {
-  return !track_entry;
+  return is_disposed;
 }
 
 void TrackEntrySpineImpl::Dispose ()
 {
-  if (!track_entry)
+  if (is_disposed)
     return;
 
-  track_entry->userData = 0;
   track_entry->listener = 0;
-  track_entry = 0;
+
+  is_disposed = true;
 }
 
 /*
@@ -310,6 +311,6 @@ media::spine::TrackEntry& TrackEntrySpineImpl::ThisTrack ()
 
 void TrackEntrySpineImpl::CheckDisposed (const char* method_name)
 {
-  if (!track_entry)
+  if (is_disposed)
     throw xtl::format_operation_exception (method_name, "Track is disposed");
 }

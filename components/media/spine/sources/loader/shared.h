@@ -545,6 +545,7 @@ class TrackEntrySpineImpl : public Object, public media::spine::TrackEntryImpl
     AnimationStateSpineImpl*              animation_state_impl;  //parent animation state impl
     media::spine::TrackEntry*             this_track_entry;      //pointer to TrackEntry object which is hold in animation_state_impl
     ::SPINE_NAMESPACE_NAME::spTrackEntry* track_entry;           //track entry
+    bool                                  is_disposed;           //is this track disposed
 };
 
 typedef xtl::com_ptr<TrackEntrySpineImpl> TrackEntrySpineImplPtr;

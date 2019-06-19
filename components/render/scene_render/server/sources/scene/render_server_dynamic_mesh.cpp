@@ -50,8 +50,6 @@ void DynamicMesh::UpdateMesh (const media::geometry::Mesh& mesh)
 
   primitive.RemoveAllMeshes (render::manager::PrimitiveBufferType_IndexBuffer | render::manager::PrimitiveBufferType_VertexStream);
 
-  primitive.Buffers ();
-
   primitive.AddMesh (mesh, render::manager::MeshBufferUsage_Stream, render::manager::MeshBufferUsage_Dynamic, render::manager::PrimitiveBufferType_IndexBuffer | render::manager::PrimitiveBufferType_VertexStream);
 }
 
