@@ -122,7 +122,7 @@ IGNORE_PVS_ERROR        += V126 V122 V201
 INCLUDE := $(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
 
 ifeq (,$(PLATFORM_SDK_PATH))
-  $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH)')  
+  $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH, default is c:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\)')  
 endif
 
 INCLUDE := $(PLATFORM_SDK_PATH)/include;$(INCLUDE)

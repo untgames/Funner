@@ -16,10 +16,6 @@
 
 #include <syslib/application.h>
 
-#ifdef LoadLibrary
-#undef LoadLibrary
-#endif
-
 #include <shared/windows.h>
 
 #include <process.h>
@@ -44,6 +40,10 @@
 
 WINGDIAPI  HGDIOBJ   WINAPI SelectObject(HDC,HGDIOBJ);
 
+#endif
+
+#ifdef LoadLibrary
+#undef LoadLibrary
 #endif
 
 namespace syslib
