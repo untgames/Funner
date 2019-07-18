@@ -13,7 +13,7 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
   float                meshes_z_range;          //z coordinate used for last mesh
   MeshesMap            meshes;                  //child meshes scene graph objects
   xtl::auto_connection on_after_scissor_update; //connection for VisualModelEvent_AfterScissorUpdate event
-
+  xtl::auto_connection on_after_update;         //connection for NodeEvent_AfterUpdate event
 
   Impl (SpineSkeleton& in_skeleton, float in_meshes_min_z_including, float in_meshes_max_z_excluding)
     : skeleton (&in_skeleton)
@@ -21,6 +21,7 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
     , meshes_z_range (in_meshes_max_z_excluding - in_meshes_min_z_including)
   {
     on_after_scissor_update = skeleton->RegisterEventHandler (VisualModelEvent_AfterScissorUpdate, xtl::bind (&Impl::OnAfterScissorUpdate, this));
+    on_after_update         = skeleton->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Impl::OnAfterUpdate, this));
   }
 
   void Update ()
@@ -50,6 +51,8 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
         dynamic_mesh->BindToParent (*skeleton);
 
         dynamic_mesh->SetScissor (skeleton->Scissor ());
+        dynamic_mesh->SetDynamicShaderProperties (skeleton->DynamicShaderProperties ());
+        dynamic_mesh->SetStaticShaderProperties (skeleton->StaticShaderProperties ());
 
         iter = meshes.insert_pair (mesh.Id (), dynamic_mesh).first;
       }
@@ -80,9 +83,24 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
   //handle scissor update
   void OnAfterScissorUpdate ()
   {
+    Scissor* scissor = skeleton->Scissor ();
+
     for (MeshesMap::iterator iter = meshes.begin (), end = meshes.end (); iter != end; ++iter)
     {
-      iter->second->SetScissor (skeleton->Scissor ());
+      iter->second->SetScissor (scissor);
+    }
+  }
+
+  //handle node update
+  void OnAfterUpdate ()
+  {
+    common::PropertyMap* dynamic_shader_properties = skeleton->DynamicShaderProperties ();
+    common::PropertyMap* static_shader_properties  = skeleton->StaticShaderProperties ();
+
+    for (MeshesMap::iterator iter = meshes.begin (), end = meshes.end (); iter != end; ++iter)
+    {
+      iter->second->SetDynamicShaderProperties (dynamic_shader_properties);
+      iter->second->SetStaticShaderProperties (static_shader_properties);
     }
   }
 };

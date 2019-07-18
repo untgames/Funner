@@ -98,6 +98,7 @@ void idle (Test& test)
 
 //    test.skeleton->Update (scene_graph::TimeValue (manual_time, 1000));
     test.skeleton->Update (scene_graph::TimeValue (common::milliseconds (), 1000));
+    test.skeleton->DynamicShaderProperties ()->SetProperty ("dynamicParam", test.skeleton->DynamicShaderProperties ()->GetFloat("dynamicParam") + 0.005f);
 
     test.target.Update ();
   }
@@ -196,6 +197,12 @@ int main ()
     skeleton->SetPosition (math::vec3f (0.0f, -5.f, 1.f));
     skeleton->SetScale (math::vec3f (0.002f));
     //skeleton->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
+
+    common::PropertyMap properties;
+
+    properties.SetProperty ("dynamicParam", 0.f);
+
+    skeleton->SetDynamicShaderProperties (&properties);
 
     skeleton->BindToScene (scene);
 

@@ -105,8 +105,12 @@ void bind_visual_model_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Scissor", make_invoker (&set_entity_scissor));
-  lib.Register ("get_Scissor", make_invoker (implicit_cast<Scissor* (VisualModel::*)()> (&VisualModel::Scissor)));
+  lib.Register ("set_Scissor",                 make_invoker (&set_entity_scissor));
+  lib.Register ("set_DynamicShaderProperties", make_invoker (implicit_cast<void (VisualModel::*)(common::PropertyMap*)> (&VisualModel::SetDynamicShaderProperties)));
+  lib.Register ("set_StaticShaderProperties",  make_invoker (implicit_cast<void (VisualModel::*)(common::PropertyMap*)> (&VisualModel::SetStaticShaderProperties)));
+  lib.Register ("get_Scissor",                 make_invoker (implicit_cast<Scissor* (VisualModel::*)()> (&VisualModel::Scissor)));
+  lib.Register ("get_DynamicShaderProperties", make_invoker (implicit_cast<common::PropertyMap* (VisualModel::*)()> (&VisualModel::DynamicShaderProperties)));
+  lib.Register ("get_StaticShaderProperties",  make_invoker (implicit_cast<common::PropertyMap* (VisualModel::*)()> (&VisualModel::StaticShaderProperties)));
 
     //регистрация типов данных
 
