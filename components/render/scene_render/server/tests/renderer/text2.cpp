@@ -29,6 +29,7 @@ void idle (Test& test)
   {
     static size_t last_fps = 0;
     static size_t frames_count = 0;
+    static size_t action_counter = 0;
 
     if (common::milliseconds () - last_fps > 1000)
     {
@@ -41,6 +42,7 @@ void idle (Test& test)
     }
     
     frames_count++;
+    action_counter++;
     
 //    float angle = common::milliseconds () / 100.0f;
     
@@ -48,7 +50,17 @@ void idle (Test& test)
 
     test.target.Update ();      
 
-    test.text_line.SetTextUtf8 ("Hello world!");
+    if (action_counter == 100)
+    {
+      printf ("Change text\n");
+      test.text_line.SetTextUtf8 ("Hello world!");
+    }
+
+    if (action_counter == 300)
+    {
+      printf ("Change font\n");
+      test.text_line.SetFont ("Times New Roman2");
+    }
   }
   catch (std::exception& e)
   {
@@ -58,7 +70,7 @@ void idle (Test& test)
 
 int main ()
 {
-  printf ("Results of sprite1_test:\n");
+  printf ("Results of text2_test:\n");
 
   try
   {
@@ -71,6 +83,7 @@ int main ()
     media::FontLibrary font_library;
 
     font_library.LoadFont ("data/fonts/times.xfont");
+    font_library.LoadFont ("data/fonts/times2.xfont");
 
     const char* SERVER_NAME = "MyServer";
 

@@ -56,7 +56,7 @@ void idle (Test& test)
 
 int main ()
 {
-  printf ("Results of sprite1_test:\n");
+  printf ("Results of text1_test:\n");
 
   try
   {

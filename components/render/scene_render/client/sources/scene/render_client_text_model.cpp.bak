@@ -26,7 +26,7 @@ struct CharDescRef
 {
   const scene_graph::CharDesc* desc;             //дескриптор символа
   const RasterizedGlyphInfo*   rasterized_glyph; //растеризованный глиф
-  size_t                       image_index; //индекс текстового блока
+  size_t                       image_index;      //индекс текстового блока
 
   CharDescRef (const scene_graph::CharDesc& in_desc) : desc (&in_desc), rasterized_glyph (), image_index (INVALID_INDEX) {}
 
@@ -157,6 +157,7 @@ class TextModel: public VisualModel
     struct FontTextBlock: public xtl::reference_counter
     {
       size_t          font_id;                //идентификатор шрифта
+      uint32          spritelist_subid;       //идентификатор списка спрайтов
       bool            used;                   //флаг используемости блока (обновляется во время изменения шрифтов)
       FontMaterialPtr font_material;          //материал шрифта
       size_t          reserved_sprites_count; //резервируемое количество спрайтов в блоке
@@ -264,6 +265,7 @@ class TextModel: public VisualModel
             FontTextBlockPtr font_text_block (new FontTextBlock, false);
 
             font_text_block->font_id                = font.Id ();
+            font_text_block->spritelist_subid       = //TODO;
             font_text_block->used                   = true;
             font_text_block->font_material          = font_material;
             font_text_block->reserved_sprites_count = 0;
@@ -277,6 +279,8 @@ class TextModel: public VisualModel
 
           for (uint32 i=0; i<derived_materials_count; i++)
           {
+            printf ("CREATE TEXT BLOCK %d\n", (int)(base_index + i));
+
             context.CreateSpriteList      (id, base_index + i, interchange::SpriteMode_Oriented, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.0f, 0), DEFAULT_BATCH_NAME);
             context.SetSpriteListMaterial (id, base_index + i, font_material->MaterialName (i));
           }
@@ -303,9 +307,11 @@ class TextModel: public VisualModel
     {
       interchange::object_id_t id = Id ();
 
+      printf ("REMOVE ALL TEXT BLOCKS\n");
+
       for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++iter)
         if (*iter)
-          context.RemoveSpriteList (id, (uint32)(iter - font_text_blocks.begin ()));
+          context.RemoveSpriteList (id, (*iter)->spritelist_subid);
 
       font_text_blocks.clear ();
     }
@@ -356,13 +362,15 @@ class TextModel: public VisualModel
 
           //сброс кэша
 
-        for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++ iter)
+        for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end ();)
           if (*iter && !(*iter)->used)
           {
-            context.RemoveSpriteList (Id (), (uint32)(iter - font_text_blocks.begin ()));
+            printf ("REMOVE UNUSED TEXT BLOCK %d\n", (int)(iter - font_text_blocks.begin ()));
+            context.RemoveSpriteList (Id (), (*iter)->spritelist_subid);
 
-            *iter = FontTextBlockPtr ();
+            font_text_blocks.erase (iter);
           }
+          else ++iter;
       }
       catch (xtl::exception& e)
       {
@@ -410,7 +418,7 @@ class TextModel: public VisualModel
 
             const RasterizedGlyphInfo* glyphs = font.RasterizedGlyphs ();
 
-            for (CharDescRef* i=first_desc; i!=char_desc; ++i)
+            for (CharDescRef* i = first_desc; i != char_desc; ++i)
             {
               size_t glyph_index = i->desc->code - first_glyph;
 
@@ -432,7 +440,7 @@ class TextModel: public VisualModel
             }
             else
             {
-              UpdateSpriteList (context, first_desc, char_desc, font_text_block_index, text_block);
+              UpdateSpriteList (context, first_desc, char_desc, text_block);
             }
           }
         }
@@ -444,7 +452,8 @@ class TextModel: public VisualModel
           if (!*iter || (*iter)->used)
             continue;
 
-          context.SetSpriteListBuffer (Id (), (uint32)(iter - font_text_blocks.begin ()), 0, (uint32)(*iter)->reserved_sprites_count);
+          printf ("SET SPRITE LIST BUFFER %d / %d /%d\n", (int)(*iter)->spritelist_subid, (int)0, (int)(*iter)->reserved_sprites_count);
+          context.SetSpriteListBuffer (Id (), (*iter)->spritelist_subid, 0, (uint32)(*iter)->reserved_sprites_count);
         }
       }
       catch (xtl::exception& e)
@@ -473,17 +482,16 @@ class TextModel: public VisualModel
 
         if (image_index != INVALID_INDEX)
         {
-          size_t         subid      = text_block_index + image_index;
-          FontTextBlock& text_block = *font_text_blocks [subid];
+          FontTextBlock& text_block = *font_text_blocks [text_block_index + image_index];
 
-          UpdateSpriteList (context, first, i, subid, text_block);
+          UpdateSpriteList (context, first, i, text_block);
         }
 
         first = i;
       }
     }
 
-    void UpdateSpriteList (client::Context& context, const CharDescRef* first, const CharDescRef* last, size_t subid, FontTextBlock& text_block)
+    void UpdateSpriteList (client::Context& context, const CharDescRef* first, const CharDescRef* last, FontTextBlock& text_block)
     {
         //генерация спрайтов
 
@@ -524,12 +532,13 @@ class TextModel: public VisualModel
 
       interchange::object_id_t id = Id ();
 
-      context.SetSpriteListBuffer (id, uint32 (subid), (uint32)count, (uint32)text_block.reserved_sprites_count);
+      printf ("SET SPRITE LIST BUFFER2 %d / %d /%d\n", int (text_block.spritelist_subid), (int)count, (int)text_block.reserved_sprites_count);
+      context.SetSpriteListBuffer (id, text_block.spritelist_subid, (uint32)count, (uint32)text_block.reserved_sprites_count);
 
         //обновление списка спрайтов
 
       if (count)
-        context.SetSpriteListDescs (id, uint32 (subid), 0, interchange::RawArray<interchange::SpriteDesc> (sprites.data (), (uint32)count));
+        context.SetSpriteListDescs (id, text_block.spritelist_subid, 0, interchange::RawArray<interchange::SpriteDesc> (sprites.data (), (uint32)count));
 
       text_block.used = true;
     }

@@ -6,7 +6,7 @@ using namespace scene_graph::controllers;
 ///Spine skeleton visual structure builder controller
 struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<SpineSkeletonVisualStructureBuilder>
 {
-  typedef stl::hash_map<size_t, DynamicMesh::Pointer> MeshesMap;
+  typedef stl::hash_map<media::geometry::object_id_t, DynamicMesh::Pointer> MeshesMap;
 
   SpineSkeleton*       skeleton;                //skeleton scene graph object to build meshes for
   float                meshes_min_z_including;  //z coordinate used for first mesh
@@ -31,7 +31,7 @@ struct SpineSkeletonVisualStructureBuilder::Impl : public xtl::instance_counter<
 
     const media::spine::Skeleton& spine_skeleton = skeleton->Skeleton ();
 
-    stl::hash_set<size_t> visible_meshes;
+    stl::hash_set<media::geometry::object_id_t> visible_meshes;
 
     float current_z = meshes_min_z_including,
           z_step    = meshes_z_range / spine_skeleton.MeshesCount ();
