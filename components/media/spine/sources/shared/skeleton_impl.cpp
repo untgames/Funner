@@ -390,10 +390,10 @@ void SkeletonImpl::BuildMeshes ()
         }
 
         clipper->ClipStart (slot, attachment);
-        clipper->ClipEnd (slot);                 //for some reason cocos-2dx doing this (https://github.com/cocos2d/cocos2d-x/blob/8f1459b8efcbc8184f0859e54c4766f858deb692/cocos/editor-support/spine/SkeletonRenderer.cpp)
         break;
       default:
         //ignore other attachment types
+        clipper->ClipEnd (slot);
         break;
     }
   }
