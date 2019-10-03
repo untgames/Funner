@@ -15,7 +15,7 @@
 #include <media/compressed_image.h>
 #include <media/image.h>
 
-#if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
+#if defined (QUALCOMM_TEXTURE_CONVERTER_ENABLED)
   #include <TextureConverter.h>
 #endif
 
@@ -49,6 +49,8 @@ const unsigned long DDSCAPS_MIPMAP          = 0x00400000l;
 typedef unsigned int  uint32;
 typedef unsigned char uint8;
 
+#if defined (QUALCOMM_TEXTURE_CONVERTER_ENABLED)
+
 #if !defined(MAKEFOURCC)
 # define MAKEFOURCC(ch0, ch1, ch2, ch3) \
     (uint32(uint8(ch0)) | (uint32(uint8(ch1)) << 8) | \
@@ -58,6 +60,8 @@ typedef unsigned char uint8;
 const uint32 FOURCC_ATC_RGB_AMD                     = MAKEFOURCC ('A', 'T', 'C', ' ');
 const uint32 FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD     = MAKEFOURCC ('A', 'T', 'C', 'I');
 const uint32 FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD = MAKEFOURCC ('A', 'T', 'C', 'A');
+
+#endif
 
 ///Формат пикселей DDS файла
 struct DdsPixelFormat
@@ -264,7 +268,7 @@ void save_compressed_dds (const char* file_name, unsigned int width, unsigned in
     file.Write (mips_data [i], mips_data_sizes [i]);
 }
 
-#if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
+#if defined (QUALCOMM_TEXTURE_CONVERTER_ENABLED)
 
 const char* get_qualcomm_error_name (unsigned int error)
 {
@@ -533,7 +537,7 @@ int main (int argc, const char* argv [])
     static const size_t options_count = sizeof (options) / sizeof (*options);
 
     static ConversionDesc converters [] = {
-  #if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
+  #if defined (QUALCOMM_TEXTURE_CONVERTER_ENABLED)
       { "", ATC_RGB_AMD,                     xtl::bind (&qualcomm_texture_compress, _1) },
       { "", ATC_RGBA_EXPLICIT_ALPHA_AMD,     xtl::bind (&qualcomm_texture_compress, _1) },
       { "", ATC_RGBA_INTERPOLATED_ALPHA_AMD, xtl::bind (&qualcomm_texture_compress, _1) },
