@@ -137,6 +137,7 @@ struct PropertyMapAutoWriter::MapDesc: public xtl::reference_counter
     if (list.last)
     {
       list.last->next = this;
+      list.last = this;
       return;
     }
 
