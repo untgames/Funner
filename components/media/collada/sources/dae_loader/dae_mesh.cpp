@@ -326,10 +326,10 @@ class VertexStreamReader
 ///Чтение массива индексов вершин
     void ReadVertexIndices (unsigned int* buffer)
     {
-      const MeshInput* input = inputs.FindChannel ("VERTEX");
+      const MeshInput* input = inputs.FindChannel ("POSITION");
 
       if (!input)
-        raise_parser_exception (surface_node, "No input channel with semantic='VERTEX'");
+        raise_parser_exception (surface_node, "No input channel with semantic='POSITION'");
 
       unsigned int offset         = input->offset,
                    max_count      = input->source->count,
@@ -526,7 +526,7 @@ void DaeParser::ParseSurface
 
     //загрузка каналов данных поверхности
 
-  for_each_child (*iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, mesh_iter, ref (sources), ref (surface_info.inputs)));
+  for_each_child (*iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, -1, mesh_iter, ref (sources), ref (surface_info.inputs)));
   
     //загрузка буферов поверхности
 
@@ -539,6 +539,7 @@ void DaeParser::ParseSurface
 
 void DaeParser::ParseSurfaceInput
  (Parser::Iterator  iter,
+  unsigned int      in_offset,
   Parser::Iterator  mesh_iter,
   MeshSourceMap&    sources,
   MeshInputBuilder& inputs)
@@ -546,7 +547,10 @@ void DaeParser::ParseSurfaceInput
   const char *semantic    = get<const char*> (*iter, "semantic"),
              *source_name = get<const char*> (*iter, "source");
 
-  unsigned int offset = get<unsigned int> (*iter, "offset");
+  unsigned int offset = get<unsigned int> (*iter, "offset", in_offset);
+
+  if (offset == (unsigned int)-1)
+    raise_parser_exception (*iter, "Missing 'offset' attribute");
 
   source_name++; //избавляемся от префиксного '#'
 
@@ -561,24 +565,14 @@ void DaeParser::ParseSurfaceInput
   }
   else //добавление канала вершин
   {
-    for (Parser::NamesakeIterator verts_iter=mesh_iter->First ("vertices"); verts_iter; ++verts_iter)
+    for (Parser::NamesakeIterator verts_iter = mesh_iter->First ("vertices"); verts_iter; ++verts_iter)
     {
       const char* id = get<const char*> (*verts_iter, "id", "");
       
       if (!::strcmp (id, source_name))
       {
-        const char *semantic    = get<const char*> (*verts_iter, "input.semantic"),
-                   *source_name = get<const char*> (*verts_iter, "input.source");
-
-        if (::strcmp (semantic, "POSITION"))
-          raise_parser_exception (*verts_iter, "Wrong semantic '%s' in vertices input node. Must be 'POSITION'", semantic);
-
-        source_name++; //избавляемся от префиксного '#'
-        
-        source = sources.Find (source_name);
-
-        if (!source)
-          raise_parser_exception (*verts_iter, "No 'input.source' tag with id='%s' referenced in vertices input node", source_name);
+        for_each_child (*verts_iter, "input", bind (&DaeParser::ParseSurfaceInput, this, _1, offset, mesh_iter, ref (sources), ref (inputs)));
+        return;
       }
     }
 
@@ -678,7 +672,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     
   Vertex* vertices = surface.Vertices ();
   
-  stream_reader.Read ("VERTEX", 0, "XYZ", vertices, &Vertex::coord);
+  stream_reader.Read ("POSITION", 0, "XYZ", vertices, &Vertex::coord);
   stream_reader.Read ("NORMAL", 0, "XYZ", vertices, &Vertex::normal);
 
     //построение каналов текстурных координат
@@ -699,8 +693,14 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
       TexVertex* tex_vertices = surface.TexVertexChannels ().Data (channel);      
 
       stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord);
-      stream_reader.Read ("TEXTANGENT", channel_set, "XYZ", tex_vertices, &TexVertex::tangent);
-      stream_reader.Read ("TEXBINORMAL", channel_set, "XYZ", tex_vertices, &TexVertex::binormal);
+
+      if (!surface_info.inputs.FindChannel ("TEXTANGENT", channel_set))
+        surface_iter->Log ().Warning (*surface_iter, "No texture tangents/bitangents information.");
+      else
+      {
+        stream_reader.Read ("TEXTANGENT", channel_set, "XYZ", tex_vertices, &TexVertex::tangent);
+        stream_reader.Read ("TEXBINORMAL", channel_set, "XYZ", tex_vertices, &TexVertex::binormal);
+      }
     }
 
     if (surface_info.inputs.FindChannel ("COLOR", set))

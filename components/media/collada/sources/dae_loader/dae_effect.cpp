@@ -160,22 +160,29 @@ void DaeParser::ParseTexture (Parser::Iterator iter, Parser::Iterator profile_it
       break;
     }
 
-  if (!param_iter)
-    raise_parser_exception (*profile_iter, "There is no sampler2D with sid '%s'", sampler_name);
-
-  param_iter = profile_iter->First ("newparam");    
-  
   const char* image_name = 0;
   
-  for (; param_iter; ++param_iter)
-    if (!strcmp (get<const char*> (*param_iter, "sid", ""), surface_name))
-    {
-      image_name = get<const char*> (*param_iter, "surface.init_from.#text", (const char*)0);
-      break;
-    }  
+  if (param_iter)
+  {
+    param_iter = profile_iter->First ("newparam");
 
-  if (!image_name)
-    raise_parser_exception (*profile_iter, "There is no surface with sid '%s'", surface_name);
+    for (; param_iter; ++param_iter)
+      if (!strcmp (get<const char*> (*param_iter, "sid", ""), surface_name))
+      {
+        image_name = get<const char*> (*param_iter, "surface.init_from.#text", (const char*)0);
+        break;
+      }
+
+    if (!image_name)
+      raise_parser_exception (*profile_iter, "There is no surface with sid '%s'", surface_name);
+  }
+  else
+  {
+    //DAE FBX Maya/Max exporters do not writes samplers in DAE file
+    image_name = sampler_name;
+
+    profile_iter->Log ().Warning (*profile_iter, "There is no sampler2D with sid '%s'. Using sampler name as image name.", sampler_name);
+  }
 
   texture.SetImage (image_name);
              
