@@ -44,14 +44,17 @@ int main ()
     AtlasBuilder atlas_builder;
 
     printf ("Atlas margin is %d\n", atlas_builder.Margin ());
+    printf ("Atlas alignment is %d\n", atlas_builder.Alignment ());
     printf ("Atlas max image size is %d\n", atlas_builder.MaxImageSize ());
     printf ("Atlas pack flags is %d\n", atlas_builder.PackFlags ());
 
     atlas_builder.SetMargin (0);
+    atlas_builder.SetAlignment (1);
     atlas_builder.SetMaxImageSize (4096);
     atlas_builder.SetPackFlags (AtlasPackFlag_PowerOfTwoEdges);
 
     printf ("Atlas margin is %d\n", atlas_builder.Margin ());
+    printf ("Atlas alignment is %d\n", atlas_builder.Alignment ());
     printf ("Atlas max image size is %d\n", atlas_builder.MaxImageSize ());
     printf ("Atlas pack flags is %d\n", atlas_builder.PackFlags ());
 

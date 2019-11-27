@@ -75,6 +75,7 @@ struct Params
   stl::string   isolated_images_wildcard; //маска имён изолированных изображений не входящих в общий атлас
   unsigned int  max_image_size;           //максимальный размер одного изображения
   unsigned int  margin;                   //отступ между картинками в атласе
+  unsigned int  alignment;                //выравнивание картинок в атласе
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
   bool          need_layout;              //нужно генерировать файл разметки
@@ -142,6 +143,12 @@ void command_line_max_image_size (const char* size, Params& params)
 void command_line_margin (const char* size, Params& params)
 {
   params.margin = atoi (size);
+}
+
+//установка выравнивания картинок
+void command_line_alignment (const char* size, Params& params)
+{
+  params.alignment = atoi (size);
 }
 
 //установка флага генерации файла разметки
@@ -344,6 +351,7 @@ void build (Params& params)
     media::AtlasBuilder builder;
 
     builder.SetMargin (params.margin);
+    builder.SetAlignment (params.alignment);
     builder.SetMaxImageSize (params.max_image_size);
     builder.SetPackFlags (pack_flags);
 
@@ -419,6 +427,7 @@ int main (int argc, const char* argv [])
       {xtl::bind (&command_line_result_layout,         _1, xtl::ref (params)), "layout",                'l',   "file", "set output layout file"},
       {xtl::bind (&command_line_max_image_size,        _1, xtl::ref (params)), "max-image-size",        0,     "size", "set maximum atlas image side size"},
       {xtl::bind (&command_line_margin,                _1, xtl::ref (params)), "margin",                0,     "size", "set margin beetween images in atlas"},
+      {xtl::bind (&command_line_alignment,             _1, xtl::ref (params)), "alignment",             0,     "size", "tiles alignment"},
       {xtl::bind (&command_line_no_layout,             _1, xtl::ref (params)), "no-layout",             0,          0, "don't generate layout file"},
       {xtl::bind (&command_line_pot,                   _1, xtl::ref (params)), "pot",                   0,          0, "resize atlas texture to nearest greater power of two sizes"},
       {xtl::bind (&command_line_invert_x,              _1, xtl::ref (params)), "invert-x",              0,          0, "invert X coordinate in layout of tiles"},
@@ -439,6 +448,7 @@ int main (int argc, const char* argv [])
     params.atlas_file_format     = DEFAULT_ATLAS_FILE_NAME;
     params.max_image_size        = -1;
     params.margin                = 0;
+    params.alignment             = 1;
     params.print_help            = false;
     params.silent                = false;
     params.need_layout           = true;

@@ -21,6 +21,17 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
+unsigned int next_aligned_int (unsigned int value, unsigned int alignment)
+{
+  if (alignment < 2)
+    return value;
+
+  // cast quotent to integer to find floor value of a number
+  int quotient = value / alignment;
+
+  return quotient * alignment == value ? value : (quotient + 1) * alignment;
+}
+
 media::PixelFormat max_image_format (media::PixelFormat format_1, media::PixelFormat format_2)
 {
   static const char* METHOD_NAME = "media::max_image_format";
@@ -391,6 +402,7 @@ struct AtlasBuilder::Impl
   PackResultsArray pack_results;      //результаты упаковки
   unsigned int     max_image_size;    //максимальный размер одного атласа
   unsigned int     margin;            //размер поля
+  unsigned int     alignment;         //выравнивание картинок
   unsigned int     pack_flags;        //флаги сжатия
   bool             needs_rebuild;     //необходимо ли перестроить атлас
   
@@ -399,6 +411,7 @@ struct AtlasBuilder::Impl
     : pack_handler (in_pack_handler)
     , max_image_size (-1)
     , margin (0)
+    , alignment (1)
     , pack_flags (0)
     , needs_rebuild (true)
     {}
@@ -539,8 +552,9 @@ struct AtlasBuilder::Impl
 
           ImageHolderPtr image_holder = images [image_index]->image_holder;
 
-          sizes.data () [i].x = image_holder->ImageWidth ();
-          sizes.data () [i].y = image_holder->ImageHeight ();
+          //it's enough to ensure that image size + margin is aligned to have all images aligned
+          sizes.data () [i].x = next_aligned_int (image_holder->ImageWidth () + margin, alignment) - margin;
+          sizes.data () [i].y = next_aligned_int (image_holder->ImageHeight () + margin, alignment) - margin;
         }
 
         PackHandlerParams pack_params;
@@ -790,6 +804,24 @@ void AtlasBuilder::SetMaxImageSize (unsigned int max_image_size)
 unsigned int AtlasBuilder::MaxImageSize () const
 {
   return impl->max_image_size;
+}
+
+/*
+   Установка/получение выравнивания картинок
+*/
+
+void AtlasBuilder::SetAlignment (unsigned int alignment)
+{
+  if (!alignment)
+    throw xtl::make_argument_exception ("media::AtlasBuilder::SetAlignment", "alignment", (int)alignment, "Alignment must be greater than 0");
+
+  impl->alignment     = alignment;
+  impl->needs_rebuild = true;
+}
+
+unsigned int AtlasBuilder::Alignment () const
+{
+  return impl->alignment;
 }
 
 /*
