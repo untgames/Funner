@@ -85,6 +85,7 @@ struct Params
   bool          swap_axises;              //обмен осей местами
   bool          square_axises;            //квадратные текстуры
   bool          top_right_edge_margin;    //использовать ли отступ от правого и верхнего краев картинки
+  bool          bottom_left_edge_margin;  //использовать ли отступ от левого и нижнего краев картинки
   bool          dont_store_images;        //не хранить все картинки в памяти
 };
 
@@ -197,6 +198,12 @@ void command_line_square_axises (const char*, Params& params)
 void command_line_top_right_edge_margin (const char*, Params& params)
 {
   params.top_right_edge_margin = true;
+}
+
+//установка использования отступа от нижнего и левого краев
+void command_line_bottom_left_edge_margin (const char*, Params& params)
+{
+  params.bottom_left_edge_margin = true;
 }
 
 //установка параметра хранения картинок в памяти
@@ -341,12 +348,13 @@ void build (Params& params)
 
     unsigned int pack_flags = 0;
 
-    if (params.need_pot_rescale)      pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
-    if (params.invert_x)              pack_flags |= media::AtlasPackFlag_InvertTilesX;
-    if (params.invert_y)              pack_flags |= media::AtlasPackFlag_InvertTilesY;
-    if (params.swap_axises)           pack_flags |= media::AtlasPackFlag_SwapAxises;
-    if (params.square_axises)         pack_flags |= media::AtlasPackFlag_SquareAxises;
-    if (params.top_right_edge_margin) pack_flags |= media::AtlasPackFlag_TopRightEdgeMargin;
+    if (params.need_pot_rescale)        pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
+    if (params.invert_x)                pack_flags |= media::AtlasPackFlag_InvertTilesX;
+    if (params.invert_y)                pack_flags |= media::AtlasPackFlag_InvertTilesY;
+    if (params.swap_axises)             pack_flags |= media::AtlasPackFlag_SwapAxises;
+    if (params.square_axises)           pack_flags |= media::AtlasPackFlag_SquareAxises;
+    if (params.top_right_edge_margin)   pack_flags |= media::AtlasPackFlag_TopRightEdgeMargin;
+    if (params.bottom_left_edge_margin) pack_flags |= media::AtlasPackFlag_BottomLeftEdgeMargin;
       
     media::AtlasBuilder builder;
 
@@ -420,45 +428,47 @@ int main (int argc, const char* argv [])
     Params params;
 
     static Option options [] = {
-      {xtl::bind (&command_line_help,                  _1, xtl::ref (params)), "help",                  '?',        0, "print help message"},
-      {xtl::bind (&command_line_silent,                _1, xtl::ref (params)), "silent",                's',        0, "quiet mode"},
-      {xtl::bind (&command_line_result_atlas,          _1, xtl::ref (params)), "atlas",                 'o',   "file", "set output atlas file format"},
-      {xtl::bind (&command_line_result_layout_atlas,   _1, xtl::ref (params)), "layout-atlas",          0,     "file", "set output atlas file format that used in layout"},
-      {xtl::bind (&command_line_result_layout,         _1, xtl::ref (params)), "layout",                'l',   "file", "set output layout file"},
-      {xtl::bind (&command_line_max_image_size,        _1, xtl::ref (params)), "max-image-size",        0,     "size", "set maximum atlas image side size"},
-      {xtl::bind (&command_line_margin,                _1, xtl::ref (params)), "margin",                0,     "size", "set margin beetween images in atlas"},
-      {xtl::bind (&command_line_alignment,             _1, xtl::ref (params)), "alignment",             0,     "size", "tiles alignment"},
-      {xtl::bind (&command_line_no_layout,             _1, xtl::ref (params)), "no-layout",             0,          0, "don't generate layout file"},
-      {xtl::bind (&command_line_pot,                   _1, xtl::ref (params)), "pot",                   0,          0, "resize atlas texture to nearest greater power of two sizes"},
-      {xtl::bind (&command_line_invert_x,              _1, xtl::ref (params)), "invert-x",              0,          0, "invert X coordinate in layout of tiles"},
-      {xtl::bind (&command_line_invert_y,              _1, xtl::ref (params)), "invert-y",              0,          0, "invert Y coordinate in layout of tiles"},
-      {xtl::bind (&command_line_swap_axises,           _1, xtl::ref (params)), "swap-axises",           0,          0, "swap axises at layout tiles"},
-      {xtl::bind (&command_line_top_right_edge_margin, _1, xtl::ref (params)), "top-right-edge-margin", 0,          0, "use margin for top and right edges"},
-      {xtl::bind (&command_line_isolated_images,       _1, xtl::ref (params)), "isolated-images",       0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
-      {xtl::bind (&command_line_square_axises,         _1, xtl::ref (params)), "square",                0,          0, "square axises"},
-      {xtl::bind (&command_line_dont_store_images,     _1, xtl::ref (params)), "dont-store-images",     0,          0, "dont store all images in memory"},
+      {xtl::bind (&command_line_help,                    _1, xtl::ref (params)), "help",                  '?',          0, "print help message"},
+      {xtl::bind (&command_line_silent,                  _1, xtl::ref (params)), "silent",                's',          0, "quiet mode"},
+      {xtl::bind (&command_line_result_atlas,            _1, xtl::ref (params)), "atlas",                 'o',     "file", "set output atlas file format"},
+      {xtl::bind (&command_line_result_layout_atlas,     _1, xtl::ref (params)), "layout-atlas",            0,     "file", "set output atlas file format that used in layout"},
+      {xtl::bind (&command_line_result_layout,           _1, xtl::ref (params)), "layout",                'l',     "file", "set output layout file"},
+      {xtl::bind (&command_line_max_image_size,          _1, xtl::ref (params)), "max-image-size",          0,     "size", "set maximum atlas image side size"},
+      {xtl::bind (&command_line_margin,                  _1, xtl::ref (params)), "margin",                  0,     "size", "set margin beetween images in atlas"},
+      {xtl::bind (&command_line_alignment,               _1, xtl::ref (params)), "alignment",               0,     "size", "tiles alignment"},
+      {xtl::bind (&command_line_no_layout,               _1, xtl::ref (params)), "no-layout",               0,          0, "don't generate layout file"},
+      {xtl::bind (&command_line_pot,                     _1, xtl::ref (params)), "pot",                     0,          0, "resize atlas texture to nearest greater power of two sizes"},
+      {xtl::bind (&command_line_invert_x,                _1, xtl::ref (params)), "invert-x",                0,          0, "invert X coordinate in layout of tiles"},
+      {xtl::bind (&command_line_invert_y,                _1, xtl::ref (params)), "invert-y",                0,          0, "invert Y coordinate in layout of tiles"},
+      {xtl::bind (&command_line_swap_axises,             _1, xtl::ref (params)), "swap-axises",             0,          0, "swap axises at layout tiles"},
+      {xtl::bind (&command_line_top_right_edge_margin,   _1, xtl::ref (params)), "top-right-edge-margin",   0,          0, "use margin for top and right edges"},
+      {xtl::bind (&command_line_bottom_left_edge_margin, _1, xtl::ref (params)), "bottom-left-edge-margin", 0,          0, "use margin for bottom and left edges"},
+      {xtl::bind (&command_line_isolated_images,         _1, xtl::ref (params)), "isolated-images",         0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
+      {xtl::bind (&command_line_square_axises,           _1, xtl::ref (params)), "square",                  0,          0, "square axises"},
+      {xtl::bind (&command_line_dont_store_images,       _1, xtl::ref (params)), "dont-store-images",       0,          0, "dont store all images in memory"},
     };
 
     static const size_t options_count = sizeof (options) / sizeof (*options);
 
       //инициализация
 
-    params.options               = options;
-    params.options_count         = options_count;
-    params.atlas_file_format     = DEFAULT_ATLAS_FILE_NAME;
-    params.max_image_size        = -1;
-    params.margin                = 0;
-    params.alignment             = 1;
-    params.print_help            = false;
-    params.silent                = false;
-    params.need_layout           = true;
-    params.need_pot_rescale      = false;
-    params.invert_x              = false;
-    params.invert_y              = false;
-    params.swap_axises           = false;
-    params.square_axises         = false;
-    params.top_right_edge_margin = false;
-    params.dont_store_images     = false;
+    params.options                 = options;
+    params.options_count           = options_count;
+    params.atlas_file_format       = DEFAULT_ATLAS_FILE_NAME;
+    params.max_image_size          = -1;
+    params.margin                  = 0;
+    params.alignment               = 1;
+    params.print_help              = false;
+    params.silent                  = false;
+    params.need_layout             = true;
+    params.need_pot_rescale        = false;
+    params.invert_x                = false;
+    params.invert_y                = false;
+    params.swap_axises             = false;
+    params.square_axises           = false;
+    params.top_right_edge_margin   = false;
+    params.bottom_left_edge_margin = false;
+    params.dont_store_images       = false;
 
     CommandLine command_line;
 
