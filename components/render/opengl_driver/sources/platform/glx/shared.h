@@ -81,7 +81,6 @@ struct PixelFormatDesc
   const GlxExtensionsEntries* glx_extensions_entries;  //GLX-extensions table (must be copied inside method recieving PixelFormatDesc, may be 0)
   GLXFBConfig                 config;                  //GLX-framebuffer configuration
   int                         pixel_format_index;      //GLX-framebuffer config number
-  int                         visual_id;               //
   size_t                      color_bits;              //color bits count
   size_t                      alpha_bits;              //alpha bits count
   size_t                      depth_bits;              //depth bits count

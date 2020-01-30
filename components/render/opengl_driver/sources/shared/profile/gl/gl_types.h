@@ -7,18 +7,29 @@
 #define GL_VERSION_1_1 1
 
 #if defined(__APPLE__)
-typedef unsigned long GLenum;
-typedef unsigned long GLbitfield;
-typedef unsigned long GLuint;
-typedef long GLint;
-typedef long GLsizei;
+#include <stdint.h>
+
+typedef uint32_t GLbitfield;
+typedef uint8_t  GLboolean;
+typedef int8_t   GLbyte;
+typedef float    GLclampf;
+typedef uint32_t GLenum;
+typedef float    GLfloat;
+typedef int32_t  GLint;
+typedef int16_t  GLshort;
+typedef int32_t  GLsizei;
+typedef uint8_t  GLubyte;
+typedef uint32_t GLuint;
+typedef uint16_t GLushort;
+typedef void     GLvoid;
+typedef double   GLdouble;
+typedef double   GLclampd;
 #else
 typedef unsigned int GLenum;
 typedef unsigned int GLbitfield;
 typedef unsigned int GLuint;
 typedef int GLint;
 typedef int GLsizei;
-#endif
 typedef unsigned char GLboolean;
 typedef signed char GLbyte;
 typedef short GLshort;
@@ -26,9 +37,10 @@ typedef unsigned char GLubyte;
 typedef unsigned short GLushort;
 typedef float GLfloat;
 typedef float GLclampf;
+typedef void GLvoid;
 typedef double GLdouble;
 typedef double GLclampd;
-typedef void GLvoid;
+#endif
 
 #define GL_ACCUM 0x0100
 #define GL_LOAD 0x0101
