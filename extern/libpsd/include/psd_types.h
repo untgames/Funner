@@ -14,7 +14,7 @@ typedef unsigned char			psd_uchar;
 typedef short					psd_short;
 typedef unsigned short			psd_ushort;
 typedef int						psd_int;
-typedef unsigned int			psd_uint;
+typedef unsigned long long			psd_uint;
 typedef float					psd_float;
 typedef double					psd_double;
 
