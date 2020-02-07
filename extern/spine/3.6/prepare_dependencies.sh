@@ -1,4 +1,7 @@
 #!/bin/sh
+set -x
+set -e
+
 rm -rf dependencies
 mkdir dependencies
 git clone https://github.com/EsotericSoftware/spine-runtimes.git dependencies
