@@ -17,7 +17,6 @@ struct PrimarySwapChain::Impl
   AdapterPtr           adapter;                 //адаптер, которому принадлежит устройство
   AdapterLibraryPtr    library;                 //библиотека адаптера
   GlxExtensionsEntries glx_extensions_entries;  //таблица WGL-расширений
-  int                  pixel_format_index;      //индекс формата пикселей устройства вывода
   SwapChainDesc        desc;                    //дескриптор цепочки обмена
   Display*             display;                 //соединение с дисплеем
   Window               window;                  //окно
@@ -28,7 +27,6 @@ struct PrimarySwapChain::Impl
   Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
     : adapter (pixel_format.adapter)
     , library (&adapter->GetLibrary ())
-    , pixel_format_index (pixel_format.pixel_format_index)
     , display ((Display*)DisplayManager::DisplayHandle ())
     , window  ((Window)in_desc.window_handle)
   {

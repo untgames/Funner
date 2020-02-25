@@ -153,7 +153,7 @@ class PlatformManagerImpl
 
           //choose best match pixel format
 
-        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc);
+        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, get_window_depth ((Window)desc.window_handle));
         
           //log choosen pixel format
           
@@ -239,8 +239,18 @@ class PlatformManagerImpl
     }
     
 ///Compare two formats (0 - first format matches better, 1 - second format matches better)
-    static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
+    static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc, int color_depth)
     {
+        //choose matching color depth
+      if (fmt0.color_bits != fmt1.color_bits)
+      {
+        if ((int)fmt0.color_bits == color_depth && (int)fmt1.color_bits != color_depth)
+          return 0;
+
+        if ((int)fmt0.color_bits != color_depth && (int)fmt1.color_bits == color_depth)
+          return 1;
+      }
+
         //sort by existing of double buffering
         
       if (fmt0.buffers_count != fmt1.buffers_count)
@@ -323,7 +333,7 @@ class PlatformManagerImpl
     }
     
 ///Choose pixel format
-    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc)
+    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int color_depth)
     {
         //if suitable pixel format not found - we can't create swap chain
 
@@ -336,7 +346,7 @@ class PlatformManagerImpl
       
       for (Adapter::PixelFormatArray::const_iterator iter=pixel_formats.begin ()+1, end=pixel_formats.end (); iter!=end; ++iter)
       {
-        if (CompareFormats (*best, *iter, swap_chain_desc))
+        if (CompareFormats (*best, *iter, swap_chain_desc, color_depth))
           best = &*iter;      }
 
       return *best;
