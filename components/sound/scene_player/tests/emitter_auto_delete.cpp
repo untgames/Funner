@@ -37,6 +37,13 @@ SoundEmitterPtr play_sound (const char* declaration_name, scene_graph::Scene& sc
   return sound_emitter;
 }
 
+void on_destroy ()
+{
+  printf ("exit\n");
+
+  Application::Exit (0);
+}
+
 int main ()
 {
   printf ("EmitterAutoDelete test.\n");
@@ -57,7 +64,7 @@ int main ()
 
     scene_player.SetManager (&manager);
 
-    ((Node*)play_sound ("declaration2", scene).get ())->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Application::Exit, 0));
+    ((Node*)play_sound ("declaration2", scene).get ())->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&on_destroy));
 
     Application::Run ();
   }
@@ -69,8 +76,6 @@ int main ()
   {
     printf ("unknown exception\n");
   }
-
-  printf ("exit\n");
 
   return Application::GetExitCode ();
 }

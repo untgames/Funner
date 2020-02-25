@@ -1,5 +1,11 @@
 #include "shared.h"
 
+typedef xtl::shared_ptr<Window> WindowPtr;
+typedef xtl::shared_ptr<WebView> WebViewPtr;
+
+WindowPtr window_holder;
+WebViewPtr web_view_holder;
+
 void event_handler (WebView& view, WebViewEvent event)
 {
   switch (event)
@@ -39,14 +45,13 @@ void destroy (Window&, WindowEvent, const WindowEventContext&)
   Application::Exit (0);
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of web_view_load_data_test:\n");
-  fflush (stdout);
-  
   try
   {
-    Window parent_window (WindowStyle_Overlapped);
+    window_holder.reset (new Window (WindowStyle_Overlapped));
+
+    Window& parent_window = *window_holder;
     
 //    parent_window.SetSize (800, 600);
 //    parent_window.SetPosition (100, 100);
@@ -57,7 +62,9 @@ int main ()
     
     parent_window.RegisterEventHandler (WindowEvent_OnClose, &destroy);    
     
-    WebView view;
+    web_view_holder.reset (new WebView ());
+
+    WebView& view = *web_view_holder;
     
     view.RegisterEventHandler (WebViewEvent_OnLoadStart, &event_handler);
     view.RegisterEventHandler (WebViewEvent_OnLoadFinish, &event_handler);
@@ -77,6 +84,21 @@ int main ()
     stl::string data = "<html><body>Hello world!</body></html>";
 
     view.LoadData (data.c_str (), data.size (), "", "", "");
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+}
+
+int main ()
+{
+  printf ("Results of web_view_load_data_test:\n");
+  fflush (stdout);
+
+  try
+  {
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
 
     Application::Run ();
     
