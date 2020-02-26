@@ -1209,8 +1209,8 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
         break; //TODO
       case WindowFlag_Focus: //фокус ввода
       {
-//        if (!XSetInputFocus (handle->display, handle->window, RevertToNone, CurrentTime))
-//          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+        if (!XSetInputFocus (handle->display, state ? handle->window : None, RevertToNone, CurrentTime))
+          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
 
         break;
       }

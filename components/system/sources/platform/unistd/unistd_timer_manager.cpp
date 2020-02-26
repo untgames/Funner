@@ -40,6 +40,8 @@ struct syslib::timer_handle
 namespace
 {
 
+static bool timer_manager_initialized = false;
+
 /*
     Константы
 */
@@ -64,11 +66,9 @@ class TimerManager: public MessageQueue::Handler
       , new_timers_count (0)
       , thread (xtl::bind (&TimerManager::TimersRoutine, this))
     {
-      static bool initialized = false;
-      
-      if (!initialized)
+      if (!timer_manager_initialized)
       {
-        initialized = true;
+        timer_manager_initialized = true;
       }
       else
       {
@@ -97,7 +97,9 @@ class TimerManager: public MessageQueue::Handler
         
         message_queue.UnregisterHandler (*this);        
         
-        UnregisterAllTimers ();        
+        UnregisterAllTimers ();
+
+        timer_manager_initialized = false;
       }
       catch (...)
       {
