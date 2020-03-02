@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.FREETYPE MEDIA.FONT.XFONT MEDIA.FONT.TESTS #MEDIA.FONT.FONT_CONVERTER \
-           MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
+TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.FREETYPE MEDIA.FONT.XFONT MEDIA.FONT.TESTS \
+           MEDIA.FONT.FREETYPE.TESTS #MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
 
 #Цель - MediaLib sources
 MEDIA.FONT.SOURCES.TYPE        := static-lib
@@ -54,4 +54,10 @@ MEDIA.FONT.TTF2XFONT.TESTS.TYPE              := test-suite
 MEDIA.FONT.TTF2XFONT.TESTS.SOURCE_DIRS       := tests/ttf2xfont
 MEDIA.FONT.TTF2XFONT.TESTS.USED_APPLICATIONS := ttf2xfont
 
-                                         
+
+#Цель - ttf2xfont tests
+MEDIA.FONT.FREETYPE.TESTS.TYPE        := test-suite
+MEDIA.FONT.FREETYPE.TESTS.SOURCE_DIRS := tests/freetype
+MEDIA.FONT.FREETYPE.TESTS.IMPORTS     := compile.media.font link.media.font compile.media.image link.media.image \
+                                         link.media.image.left_bottom_packer link.media.font.freetype link.media.font.xfont \
+                                         compile.extern.freetype

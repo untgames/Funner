@@ -5,10 +5,12 @@ using namespace common;
 
 const char* SOURCE_IMAGE_NAME                  = "data/pic1.jpg";
 const char* RESULTS_DIR                        = "results";
-const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "/io/stdout/power_of_two_atlas.xatlas";
+const char* RESULT_FAST_ATLAS_NAME             = "/io/stdout/fast.xatlas";
 const char* RESULT_NON_POWER_OF_TWO_ATLAS_NAME = "/io/stdout/non_power_of_two_atlas.xatlas";
-const char* RESULT_POWER_OF_TWO_IMAGE_NAME     = "results/power_of_two_image.bmp";
+const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "/io/stdout/power_of_two_atlas.xatlas";
+const char* RESULT_FAST_IMAGE_NAME             = "results/fast_image.bmp";
 const char* RESULT_NON_POWER_OF_TWO_IMAGE_NAME = "results/non_power_of_two_image.bmp";
+const char* RESULT_POWER_OF_TWO_IMAGE_NAME     = "results/power_of_two_image.bmp";
 
 const size_t SOURCE_IMAGE_WIDTH  = 123;
 const size_t SOURCE_IMAGE_HEIGHT = 61;
@@ -16,6 +18,30 @@ const size_t SOURCE_IMAGE_HEIGHT = 61;
 struct ImagePixel
 {
   unsigned char color[3];
+};
+
+struct FastImageTestDesc
+{
+  unsigned int  width, height;
+  unsigned char color;
+};
+
+const FastImageTestDesc FAST_IMAGE_TEST_DESCS [] = {
+  { 23, 35, 1}, { 16, 35, 2}, { 24, 35, 3}, { 21, 35, 4}, { 24, 35, 5},
+  { 20, 35, 6}, { 23, 35, 7}, { 25, 35, 8}, { 21, 35, 9}, { 23, 35, 10},
+  { 19, 37, 11}, { 19, 37, 12}, { 19, 37, 13}, { 19, 37, 14}, { 19, 37, 15},
+  { 19, 37, 14}, { 19, 37, 15}, { 38, 36, 14}, { 32, 35, 15}, { 31, 37, 14},
+  { 36, 35, 15}, { 32, 35, 14}, { 27, 35, 15}, { 37, 37, 15}, { 38, 35, 14},
+  { 17, 35, 15}, { 20, 36, 15}, { 37, 35, 14}, { 32, 35, 15}, { 46, 35, 15},
+  { 39, 36, 14}, { 34, 37, 15}, { 28, 35, 15}, { 34, 45, 14}, { 37, 35, 15},
+  { 23, 37, 15}, { 29, 35, 14}, { 38, 36, 15}, { 38, 36, 15}, { 50, 36, 14},
+  { 39, 35, 15}, { 38, 35, 15}, { 31, 35, 14}, { 19, 37, 15}, { 19, 37, 15},
+  { 19, 37, 14}, { 19, 37, 15}, { 19, 37, 15}, { 19, 37, 14}, { 22, 26, 15},
+  { 25, 38, 14}, { 22, 26, 15}, { 26, 38, 15}, { 22, 26, 14}, { 22, 37, 15},
+  { 25, 36, 14}, { 26, 37, 15}, { 13, 37, 15}, { 14, 48, 14}, { 27, 37, 15},
+  { 13, 37, 14}, { 39, 25, 15}, { 26, 25, 15}, { 24, 26, 14}, { 25, 36, 15},
+  { 24, 36, 14}, { 19, 25, 15}, { 17, 26, 15}, { 16, 32, 14}, { 27, 25, 15},
+  { 28, 25, 14}, { 39, 25, 15}, { 26, 24, 15}, { 27, 35, 14}, { 22, 24, 15},
 };
 
 void dump_hash (const char* file_name)
@@ -108,6 +134,41 @@ int main ()
 
     dump_hash (RESULT_POWER_OF_TWO_IMAGE_NAME);
     dump_hash (RESULT_NON_POWER_OF_TWO_IMAGE_NAME);
+
+    atlas_builder.Reset ();
+
+    //test fast pack
+    for (unsigned int i = 0, count = sizeof (FAST_IMAGE_TEST_DESCS) / sizeof (*FAST_IMAGE_TEST_DESCS); i < count; i++)
+    {
+      const FastImageTestDesc& desc = FAST_IMAGE_TEST_DESCS [i];
+
+      Image fast_image (desc.width, desc.height, 1, PixelFormat_RGB8);
+
+      ImagePixel *fast_image_pixel = (ImagePixel*)fast_image.Bitmap (), fast_image_color = {{desc.color, desc.color, desc.color}};
+
+      for (size_t i = 0; i < desc.width * desc.height; i++, fast_image_pixel++)
+      {
+        *fast_image_pixel = fast_image_color;
+      }
+
+      atlas_builder.Insert (fast_image, AtlasBuilderInsertMode_Default, 1);
+    }
+
+    atlas_builder.SetMargin (15);
+    atlas_builder.SetMaxImageSize (256);
+    atlas_builder.SetPackFlags (AtlasPackFlag_Fast | AtlasPackFlag_PowerOfTwoEdges);
+
+    for (unsigned int i = 0, count = atlas_builder.AtlasesCount (); i < count; i++)
+    {
+      printf ("Saving fast atlas %u\n", i);
+      atlas_builder.BuildAtlas (i, RESULT_FAST_IMAGE_NAME, result_atlas);
+      atlas_builder.BuildAtlasImage (i, result_image);
+
+      result_atlas.Save (RESULT_FAST_ATLAS_NAME);
+      result_image.Save (RESULT_FAST_IMAGE_NAME);
+
+      dump_hash (RESULT_FAST_IMAGE_NAME);
+    }
 
     common::FileSystem::Remove (RESULTS_DIR);
   }
