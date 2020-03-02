@@ -1209,8 +1209,25 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
         break; //TODO
       case WindowFlag_Focus: //фокус ввода
       {
-        if (!XSetInputFocus (handle->display, state ? handle->window : None, RevertToNone, CurrentTime))
-          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+        if (state)
+        {
+          XWindowAttributes window_attributes_return;
+
+          if (!XGetWindowAttributes (handle->display, handle->window, &window_attributes_return))
+            throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
+
+          //window focus can be set only if it is viewable
+          if (window_attributes_return.map_state == IsViewable)
+          {
+            if (!XSetInputFocus (handle->display, state ? handle->window : None, RevertToNone, CurrentTime))
+              throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+          }
+        }
+        else
+        {
+          if (!XSetInputFocus (handle->display, None, RevertToNone, CurrentTime))
+            throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+        }
 
         break;
       }
