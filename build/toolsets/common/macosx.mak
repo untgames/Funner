@@ -14,7 +14,7 @@ DLL_PREFIX     := lib
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += macosx unistd carbon cocoa cocoa_desktop has_windows haswchar pthread_static_library clang
+PROFILES += x86-64 g++x86-64 macosx unistd cocoa cocoa_desktop has_windows haswchar pthread_static_library clang
 DLL_PATH := DYLD_LIBRARY_PATH
 
 MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
@@ -27,8 +27,8 @@ XCODE_PATH ?= /Applications/Xcode.app
 
 MACOSX_SDK_PATH := $(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
-COMMON_CFLAGS               += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -fvisibility=hidden -Wno-unused-function -stdlib=libc++
-COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -dead_strip -stdlib=libc++
+COMMON_CFLAGS               += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -fvisibility=hidden -Wno-unused-function -stdlib=libc++ -arch x86_64
+COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -dead_strip -stdlib=libc++ -arch x86_64
 MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 COMPILER_GCC                := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
 LINKER_GCC                  := $(XCODE_PATH)/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++

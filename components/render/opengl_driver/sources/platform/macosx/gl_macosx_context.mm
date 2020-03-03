@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::macosx;
 
 /*
-    Описание реализации контекста OpenGL
+    OpenGL context implementation
 */
 
 typedef xtl::com_ptr<Library>          LibraryPtr;
@@ -13,9 +13,9 @@ typedef stl::vector<IContextListener*> ListenerArray;
 
 struct Context::Impl
 {
-  Log                         log;                   //протокол
-  AGLContext                  context;               //контекст OpenGL
-  AGLPixelFormat              pixel_format;          //формат пикселей
+  Log                         log;                   //log
+  NSOpenGLContext*            context;               //cocoa OpenGL context
+  NSOpenGLPixelFormat*        pixel_format;          //pixel format
   ISwapChain*                 swap_chain;            //текущая цепочка обмена
   xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
   ListenerArray               listeners;             //слушатели событий контекста
@@ -92,12 +92,12 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
 
       //создание контекста
 
-    impl->context = aglCreateContext (impl->pixel_format, 0);
+    impl->context = [[NSOpenGLContext alloc] initWithFormat:impl->pixel_format shareContext:nil];
 
     impl->log.Printf ("Create context (id=%u)...", GetId ());
 
     if (!impl->context)
-      raise_agl_error ("::aglCreateContext");
+      throw xtl::format_operation_exception ("", "Can't create NSOpenGLContext");
 
     impl->log.Printf ("...context created successfull (handle=%08X)", impl->context);
   }
@@ -126,8 +126,7 @@ Context::~Context ()
 
     impl->log.Printf ("...delete context (handle=%08X)", impl->context);
 
-    if (!aglDestroyContext (impl->context))
-      raise_agl_error ("::aglDestroyContext");
+    [impl->context release];
 
     impl->log.Printf ("...context successfully destroyed");
   }
@@ -170,8 +169,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       //установка текущего контекста
 
-    if (!aglSetCurrentContext (impl->context))
-      raise_agl_error ("::aglSetCurrentContext");
+    [impl->context makeCurrentContext];
 
     Impl::current_context = impl.get ();
 
@@ -232,10 +230,10 @@ void Context::DetachListener (IContextListener* listener)
 }
 
 /*
-   Получение AGL контекста
+   Returns NSOpenGLContext
 */
 
-AGLContext Context::GetAGLContext ()
+NSOpenGLContext* Context::GetNSOpenGLContext ()
 {
   return impl->context;
 }

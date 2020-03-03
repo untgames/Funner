@@ -55,7 +55,7 @@ bool wait_semaphore (syslib::semaphore_t handle, Duration duration, bool waitabl
 }
 
 //создание семафора
-syslib::semaphore_t MacOsThreadManager::CreateSemaphore (size_t initial_value)
+syslib::semaphore_t MacOsXThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {
@@ -68,13 +68,13 @@ syslib::semaphore_t MacOsThreadManager::CreateSemaphore (size_t initial_value)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::MacOsThreadManager::CreateSemaphore");
+    exception.touch ("syslib::MacOsXThreadManager::CreateSemaphore");
     throw;
   }
 }
 
 //уничтожение семафора
-void MacOsThreadManager::DestroySemaphore (semaphore_t handle)
+void MacOsXThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle || !handle->semaphore)
     return;
@@ -85,7 +85,7 @@ void MacOsThreadManager::DestroySemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи
-void MacOsThreadManager::WaitSemaphore (semaphore_t handle)
+void MacOsXThreadManager::WaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -93,13 +93,13 @@ void MacOsThreadManager::WaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::MacOsThreadManager::WaitSemaphore (semaphore_t)");
+    exception.touch ("syslib::MacOsXThreadManager::WaitSemaphore (semaphore_t)");
     throw;
   }
 }
 
 //ожидание следующей задачи с таймаутом
-bool MacOsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool MacOsXThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -107,13 +107,13 @@ bool MacOsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milli
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::MacOsThreadManager::WaitSemaphore (semaphore_t, size_t)");
+    exception.touch ("syslib::MacOsXThreadManager::WaitSemaphore (semaphore_t, size_t)");
     throw;
   }
 }
 
 //попытка ожидания следующей задачи
-bool MacOsThreadManager::TryWaitSemaphore (semaphore_t handle)
+bool MacOsXThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -133,13 +133,13 @@ bool MacOsThreadManager::TryWaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::MacOsThreadManager::TryLockSemaphore");
+    exception.touch ("syslib::MacOsXThreadManager::TryLockSemaphore");
     throw;
   }
 }
 
 //посылка следующей задачи
-void MacOsThreadManager::PostSemaphore (semaphore_t handle)
+void MacOsXThreadManager::PostSemaphore (semaphore_t handle)
 {
   try
   {
@@ -150,7 +150,7 @@ void MacOsThreadManager::PostSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::MacOsThreadManager::PostSemaphore");
+    exception.touch ("syslib::MacOsXThreadManager::PostSemaphore");
     throw;
   }
 }

@@ -1,3 +1,6 @@
+#import <AppKit/NSScreen.h>
+#import <AppKit/NSWindow.h>
+
 #include "shared.h"
 
 using namespace syslib;
@@ -76,7 +79,7 @@ class ScreenManagerImpl
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::MacOsScreenManager::GetScreensCount");
+        e.touch ("syslib::MacOsXScreenManager::GetScreensCount");
         throw;
       }
     }
@@ -116,7 +119,7 @@ class ScreenManagerImpl
     {
       try
       {
-        ScreenMap::iterator iter = screens.find ((CGDirectDisplayID)screen);
+        ScreenMap::iterator iter = screens.find ((CGDirectDisplayID)(size_t)screen);
 
         if (iter == screens.end ())
           throw xtl::format_operation_exception ("", "Can't find screen %u", screen);
@@ -138,50 +141,17 @@ class ScreenManagerImpl
     ///Поиск экрана вмещающего окно
     screen_t FindContainingScreen (const void* window)
     {
-        //получение границ окна
-      ::Rect window_rect;
+      NSScreen* screen = ((NSWindow*)window).screen;
 
-      if (GetWindowBounds ((WindowRef)window, kWindowStructureRgn, &window_rect) != noErr)
-        return 0;
+      if (!screen)
+        screen = NSScreen.mainScreen;  //return main screen for minimized windows
 
-        //поиск максимального перекрытия
-      size_t            max_intersection_size = 0;
-      CGDirectDisplayID best_output           = 0;
+      NSNumber* display_id = screen.deviceDescription [@"NSScreenNumber"];
 
-      for (ScreenMap::iterator iter = screens.begin (), end = screens.end (); iter != end; ++iter)
-      {
-        CGDirectDisplayID display = iter->second.GetDisplayID ();
+      if ([display_id isKindOfClass:[NSNumber class]])
+        return (screen_t)display_id.unsignedLongValue;
 
-        CGRect output_bounds = CGDisplayBounds (display);
-
-        short output_left   = (short)output_bounds.origin.x,
-              output_top    = (short)output_bounds.origin.y,
-              output_right  = (short)(output_bounds.origin.x + output_bounds.size.width),
-              output_bottom = (short)(output_bounds.origin.y + output_bounds.size.height);
-
-        ::Rect intersection_rect;
-
-        intersection_rect.left   = stl::max (output_left,   window_rect.left);
-        intersection_rect.top    = stl::max (output_top,    window_rect.top);
-        intersection_rect.right  = stl::min (output_right,  window_rect.right);
-        intersection_rect.bottom = stl::min (output_bottom, window_rect.bottom);
-
-        if (intersection_rect.left >= intersection_rect.right)
-          continue;
-
-        if (intersection_rect.top >= intersection_rect.bottom)
-          continue;
-
-        size_t intersection_size = (intersection_rect.right - intersection_rect.left) * (intersection_rect.bottom - intersection_rect.top);
-
-        if (intersection_size > max_intersection_size)
-        {
-          max_intersection_size = intersection_size;
-          best_output           = display;
-        }
-      }
-
-      return (screen_t)best_output;
+      return 0;
     }
 
   private:
@@ -229,20 +199,20 @@ void display_reconfiguration_callback (CGDirectDisplayID display, CGDisplayChang
     Создание / удаление экрана
 */
 
-screen_t MacOsScreenManager::CreateScreen  (size_t screen_index)
+screen_t MacOsXScreenManager::CreateScreen  (size_t screen_index)
 {
   try
   {
-    return (screen_t)ScreenManagerSingleton::Instance ()->GetScreen (screen_index).GetDisplayID ();
+    return (screen_t)(size_t)ScreenManagerSingleton::Instance ()->GetScreen (screen_index).GetDisplayID ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::CreateScreen");
+    e.touch ("syslib::MacOsXScreenManager::CreateScreen");
     throw;
   }
 }
 
-void MacOsScreenManager::DestroyScreen (screen_t)
+void MacOsXScreenManager::DestroyScreen (screen_t)
 {
   //do nothing
 }
@@ -251,7 +221,7 @@ void MacOsScreenManager::DestroyScreen (screen_t)
     Перечисление экранов
 */
 
-size_t MacOsScreenManager::GetScreensCount ()
+size_t MacOsXScreenManager::GetScreensCount ()
 {
   try
   {
@@ -259,7 +229,7 @@ size_t MacOsScreenManager::GetScreensCount ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreensCount");
+    e.touch ("syslib::MacOsXScreenManager::GetScreensCount");
     throw;
   }
 }
@@ -268,7 +238,7 @@ size_t MacOsScreenManager::GetScreensCount ()
     Имя экрана
 */
 
-const char* MacOsScreenManager::GetScreenName (screen_t screen)
+const char* MacOsXScreenManager::GetScreenName (screen_t screen)
 {
   try
   {
@@ -276,7 +246,7 @@ const char* MacOsScreenManager::GetScreenName (screen_t screen)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenName");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenName");
     throw;
   }
 }
@@ -285,7 +255,7 @@ const char* MacOsScreenManager::GetScreenName (screen_t screen)
     Получение списка видео-режимов экрана
 */
 
-size_t MacOsScreenManager::GetScreenModesCount (screen_t screen)
+size_t MacOsXScreenManager::GetScreenModesCount (screen_t screen)
 {
   try
   {
@@ -293,12 +263,12 @@ size_t MacOsScreenManager::GetScreenModesCount (screen_t screen)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenModesCount");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenModesCount");
     throw;
   }
 }
 
-void MacOsScreenManager::GetScreenMode (screen_t screen, size_t mode_index, ScreenModeDesc& mode_desc)
+void MacOsXScreenManager::GetScreenMode (screen_t screen, size_t mode_index, ScreenModeDesc& mode_desc)
 {
   try
   {
@@ -306,7 +276,7 @@ void MacOsScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Scre
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenMode");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenMode");
     throw;
   }
 }
@@ -315,7 +285,7 @@ void MacOsScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Scre
     Установка текущего видео-режима экрана
 */
 
-void MacOsScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenModeDesc& mode_desc)
+void MacOsXScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenModeDesc& mode_desc)
 {
   try
   {
@@ -323,12 +293,12 @@ void MacOsScreenManager::SetScreenCurrentMode (screen_t screen, const ScreenMode
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::SetScreenCurrentMode");
+    e.touch ("syslib::MacOsXScreenManager::SetScreenCurrentMode");
     throw;
   }
 }
 
-void MacOsScreenManager::GetScreenCurrentMode (screen_t screen, ScreenModeDesc& mode_desc)
+void MacOsXScreenManager::GetScreenCurrentMode (screen_t screen, ScreenModeDesc& mode_desc)
 {
   try
   {
@@ -336,12 +306,12 @@ void MacOsScreenManager::GetScreenCurrentMode (screen_t screen, ScreenModeDesc& 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenCurrentMode");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenCurrentMode");
     throw;
   }
 }
 
-void MacOsScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& mode_desc)
+void MacOsXScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& mode_desc)
 {
   try
   {
@@ -349,7 +319,7 @@ void MacOsScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenDefaultMode");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenDefaultMode");
     throw;
   }
 }
@@ -358,7 +328,7 @@ void MacOsScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& 
     Управление гамма-коррекцией экрана
 */
 
-void MacOsScreenManager::SetScreenGammaRamp (screen_t screen, const Color3f table [256])
+void MacOsXScreenManager::SetScreenGammaRamp (screen_t screen, const Color3f table [256])
 {
   CGGammaValue red_table[256];
   CGGammaValue green_table[256];
@@ -371,13 +341,13 @@ void MacOsScreenManager::SetScreenGammaRamp (screen_t screen, const Color3f tabl
     blue_table[i]  = table[i].blue;
   }
 
-  check_quartz_error (CGSetDisplayTransferByTable ((CGDirectDisplayID)screen, 256, red_table, green_table, blue_table),
-                      "syslib::MacOsScreenManager::SetScreenGammaRamp", "Can't set gamma ramp, ::CGSetDisplayTransferByTable error");
+  check_quartz_error (CGSetDisplayTransferByTable ((CGDirectDisplayID)(size_t)screen, 256, red_table, green_table, blue_table),
+                      "syslib::MacOsXScreenManager::SetScreenGammaRamp", "Can't set gamma ramp, ::CGSetDisplayTransferByTable error");
 }
 
-void MacOsScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [256])
+void MacOsXScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [256])
 {
-  static const char* METHOD_NAME = "syslib::MacOsScreenManager::GetScreenGammaRamp";
+  static const char* METHOD_NAME = "syslib::MacOsXScreenManager::GetScreenGammaRamp";
 
   CGGammaValue red_table[256];
   CGGammaValue green_table[256];
@@ -385,7 +355,7 @@ void MacOsScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [256
 
   uint32_t copied_count;
 
-  check_quartz_error (CGGetDisplayTransferByTable ((CGDirectDisplayID)screen, 256, red_table, green_table, blue_table, &copied_count),
+  check_quartz_error (CGGetDisplayTransferByTable ((CGDirectDisplayID)(size_t)screen, 256, red_table, green_table, blue_table, &copied_count),
                       METHOD_NAME, "Can't get gamma ramp, ::CGGetDisplayTransferByTable error");
 
   if (copied_count != 256)
@@ -403,7 +373,7 @@ void MacOsScreenManager::GetScreenGammaRamp (screen_t screen, Color3f table [256
     Поиск экрана вмещающего окно
 */
 
-screen_t MacOsScreenManager::FindContainingScreen (const void* window)
+screen_t MacOsXScreenManager::FindContainingScreen (const void* window)
 {
   try
   {
@@ -411,7 +381,7 @@ screen_t MacOsScreenManager::FindContainingScreen (const void* window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::FindContaining");
+    e.touch ("syslib::MacOsXScreenManager::FindContaining");
     throw;
   }
 }
@@ -420,15 +390,15 @@ screen_t MacOsScreenManager::FindContainingScreen (const void* window)
     Получение платформо-зависимого дескриптора экрана
 */
 
-const void* MacOsScreenManager::GetNativeScreenHandle (screen_t screen)
+const void* MacOsXScreenManager::GetNativeScreenHandle (screen_t screen)
 {
   try
   {
-    return (const void*)ScreenManagerSingleton::Instance ()->GetScreen (screen).GetDisplayID ();
+    return (const void*)(size_t)ScreenManagerSingleton::Instance ()->GetScreen (screen).GetDisplayID ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetNativeScreenHandle");
+    e.touch ("syslib::MacOsXScreenManager::GetNativeScreenHandle");
     throw;
   }
 }
@@ -437,7 +407,7 @@ const void* MacOsScreenManager::GetNativeScreenHandle (screen_t screen)
     Получение платформо-зависимых свойств экрана
 */
 
-void MacOsScreenManager::GetScreenProperties (screen_t screen, common::PropertyMap& properties)
+void MacOsXScreenManager::GetScreenProperties (screen_t screen, common::PropertyMap& properties)
 {
   try
   {
@@ -445,7 +415,7 @@ void MacOsScreenManager::GetScreenProperties (screen_t screen, common::PropertyM
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::MacOsScreenManager::GetScreenProperties");
+    e.touch ("syslib::MacOsXScreenManager::GetScreenProperties");
     throw;
   }
 }

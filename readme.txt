@@ -4,5 +4,3 @@ Supported MSVS versions - 2012 or newer
 
 ubuntu packages needed for compilation: libasound2-dev libx11-dev libegl1-mesa-dev libgles2-mesa-dev
 ubuntu packages needed for 32bit compilation: gcc-multilib g++-multilib libx11-dev:i386 libgles2-mesa-dev:i386
-
-macosx-10.7 toolsets can be built only using XCode 9.4.1 or older. You can specify XCode path using XCODE_PATH environment variable (i.e. export XCODE_PATH="/Applications/Xcode9.4.1.app")

@@ -20,7 +20,11 @@ void on_application_initialized ()
     Window& window1 = *window1_holder;
     Window& window2 = *window2_holder;
 
+#ifdef _WIN32
     window2.SetCursor ("aero_busy.ani");
+#else
+    window2.SetCursor ("cursor.png");
+#endif
 
     window1.HideCursor ();
     window1.Show ();

@@ -142,7 +142,8 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
   {
     case WindowEvent_OnClose:
       printf ("Window close event\n");
-      Application::Exit (0);      
+      Application::Exit (0);
+      
       break;
     case WindowEvent_OnChangeHandle: printf ("Window changed handle to %p event\n", context.handle); break;
     case WindowEvent_OnActivate:     printf ("Window activate event\n");       break;
@@ -165,7 +166,7 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
 void app_exit ()
 {
   printf ("application exit\n");
-  fflush (stdout);  
+  fflush (stdout);
 }
 
 void print (const char* message)

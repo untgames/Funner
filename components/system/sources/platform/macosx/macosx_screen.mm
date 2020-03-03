@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#import <AppKit/NSScreen.h>
+
 using namespace syslib;
 using namespace syslib::macosx;
 
@@ -14,6 +16,7 @@ struct ScreenModeEntry
 
 bool get_screen_mode_desc (const CFDictionaryRef& mode_dictionary, ScreenModeDesc& mode_desc)
 {
+  //TODO multiple screens support;
   if (!CFNumberGetValue ((CFNumberRef)CFDictionaryGetValue (mode_dictionary, kCGDisplayWidth),
                          kCFNumberIntType, &mode_desc.width))
     return false;
@@ -28,10 +31,10 @@ bool get_screen_mode_desc (const CFDictionaryRef& mode_dictionary, ScreenModeDes
                            kCFNumberIntType, &mode_desc.refresh_rate);
 }
 
-bool get_screen_mode_desc (const CGDisplayModeRef& mode, ScreenModeDesc& mode_desc)
+bool get_screen_mode_desc (const CGDisplayModeRef& mode, ScreenModeDesc& mode_desc, float scale_factor)
 {
-  mode_desc.width        = CGDisplayModeGetWidth (mode);
-  mode_desc.height       = CGDisplayModeGetHeight (mode);
+  mode_desc.width        = CGDisplayModeGetWidth (mode) * scale_factor;
+  mode_desc.height       = CGDisplayModeGetHeight (mode) * scale_factor;
   mode_desc.refresh_rate = (size_t)CGDisplayModeGetRefreshRate (mode);
   mode_desc.color_bits   = 0;
 
@@ -55,24 +58,6 @@ bool get_screen_mode_desc (const CGDisplayModeRef& mode, ScreenModeDesc& mode_de
 }
 
 typedef stl::vector<ScreenModeEntry> ScreenModeArray;
-
-const char* get_gestalt_manager_error_name (OSErr error)
-{
-  switch (error)
-  {
-    case gestaltUndefSelectorErr: return "Undefined selector was passed to the Gestalt Manager";
-    case gestaltDupSelectorErr:   return "Tried to add an entry that already existed";
-    case gestaltLocationErr:      return "Gestalt function ptr was not in the system heap";
-    default:                      return "Unknown error";
-  }
-}
-
-void check_gestalt_manager_error (OSErr error_code, const char* source, const char* message)
-{
-  if (error_code != noErr)
-    throw xtl::format_operation_exception (source, "%s. Gestalt error: %s (code %d)", message,
-                                           get_gestalt_manager_error_name (error_code), error_code);
-}
 
 }
 
@@ -160,41 +145,15 @@ struct CarbonScreen::Impl : public xtl::reference_counter
   {
     static const char* METHOD_NAME = "syslib::macosx::CarbonScreen::GetCurrentMode";
 
-    SInt32 os_version_major, os_version_minor;
+    CGDisplayModeRef cg_current_mode = CGDisplayCopyDisplayMode (display_id);
 
-    try
-    {
-      check_gestalt_manager_error (Gestalt (gestaltSystemVersionMajor, &os_version_major), "::Gestalt", "Can't get OS major version");
-      check_gestalt_manager_error (Gestalt (gestaltSystemVersionMinor, &os_version_minor), "::Gestalt", "Can't get OS minor version");
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch (METHOD_NAME);
-      throw;
-    }
+    if (!cg_current_mode)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
 
-    if ((os_version_major == 10 && os_version_minor > 5) || os_version_major > 10)
-    {
-      CGDisplayModeRef cg_current_mode = CGDisplayCopyDisplayMode (display_id);
+    if (!get_screen_mode_desc (cg_current_mode, current_mode, [NSScreen mainScreen].backingScaleFactor))
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
 
-      if (!cg_current_mode)
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
-
-      if (!get_screen_mode_desc (cg_current_mode, current_mode))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
-
-      CGDisplayModeRelease (cg_current_mode);
-    }
-    else
-    {
-      CFDictionaryRef cf_current_mode = CGDisplayCurrentMode (display_id);
-
-      if (!cf_current_mode)
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
-
-      if (!get_screen_mode_desc (cf_current_mode, current_mode))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
-    }
+    CGDisplayModeRelease (cg_current_mode);
   }
 };
 
