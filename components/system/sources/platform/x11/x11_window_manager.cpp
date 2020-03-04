@@ -835,8 +835,6 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       
       //создание окна
 
-    int blackColor = BlackPixel (impl->display, DefaultScreen (impl->display));
-    
     XWindow parent_window = 0;
     
     if (parent_handle) parent_window = (XWindow)parent_handle;
@@ -849,8 +847,12 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     unsigned int window_width  = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
                  window_height = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
 
-    impl->window = XCreateSimpleWindow (impl->display, parent_window, window_x, window_y,
-      window_width, window_height, 0, blackColor, blackColor);
+    XSetWindowAttributes window_attributes;
+
+    window_attributes.backing_store = Always;
+
+    impl->window = XCreateWindow (impl->display, parent_window, window_x, window_y, window_width, window_height, 0, CopyFromParent,
+                                  InputOutput, CopyFromParent, CWBackingStore, &window_attributes);
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
@@ -1200,13 +1202,32 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
     {
       case WindowFlag_Visible: //видимость окна
       {
-        if (!XMapWindow (handle->display, handle->window))
-          throw xtl::format_operation_exception ("", "XMapWindow failed");          
+        if (state)
+        {
+          if (!XMapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XMapWindow failed");
+        }
+        else
+        {
+          if (!XUnmapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XUnmapWindow failed");
+        }
 
         break;
       }
       case WindowFlag_Active: //активность окна
-        break; //TODO
+        if (state)
+        {
+          if (!XRaiseWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XRaiseWindow failed");
+        }
+        else
+        {
+          if (!XLowerWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XLowerWindow failed");
+        }
+
+        break;
       case WindowFlag_Focus: //фокус ввода
       {
         if (state)
@@ -1248,8 +1269,16 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
       }
       case WindowFlag_Minimized:
       {
-        if (!XUnmapWindow (handle->display, handle->window))
-          throw xtl::format_operation_exception ("", "XUnmapWindow failed");        
+        if (state)
+        {
+          if (!XUnmapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XUnmapWindow failed");
+        }
+        else
+        {
+          if (!XMapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XMapWindow failed");
+        }
         
         break;
       }
