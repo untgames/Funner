@@ -842,17 +842,24 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     
     common::PropertyMap init_params = common::parse_init_string (init_string);
 
-    int          window_x      = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
-                 window_y      = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
-    unsigned int window_width  = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
-                 window_height = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
+    //do not enable backing store by default, because opengl rendering doesn't work with it enabled at least on Ubuntu 16.04 running via Parallels Desktop
+    bool         enable_backing_store = init_params.IsPresent ("enable_backing_store") ? init_params.GetInteger ("enable_backing_store") > 0 : false;
+    int          window_x             = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
+                 window_y             = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
+    unsigned int window_width         = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
+                 window_height        = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
 
     XSetWindowAttributes window_attributes;
+    unsigned long        values_mask = 0;
 
-    window_attributes.backing_store = Always;
+    if (enable_backing_store)
+    {
+      window_attributes.backing_store = Always;
+      values_mask |= CWBackingStore;
+    }
 
     impl->window = XCreateWindow (impl->display, parent_window, window_x, window_y, window_width, window_height, 0, CopyFromParent,
-                                  InputOutput, CopyFromParent, CWBackingStore, &window_attributes);
+                                  InputOutput, CopyFromParent, values_mask, &window_attributes);
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
