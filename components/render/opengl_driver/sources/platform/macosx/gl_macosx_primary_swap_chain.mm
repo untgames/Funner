@@ -390,9 +390,9 @@ void PrimarySwapChain::SetContext (Context* context)
 
     [new_context setValues:&swap_interval forParameter:NSOpenGLCPSwapInterval];
 
-    [new_context setView:((NSWindow*)impl->desc.window_handle).contentView];
-
-    [new_context update];
+    //setView should be executed only on main thread
+    [new_context performSelectorOnMainThread:@selector(setView:) withObject:((NSWindow*)impl->desc.window_handle).contentView waitUntilDone:NO];
+    [new_context performSelectorOnMainThread:@selector(update) withObject:nil waitUntilDone:NO];
 
     current_swap_chain = impl.get ();
   }
