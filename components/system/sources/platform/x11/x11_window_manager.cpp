@@ -437,6 +437,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   XWindow              window;                //дескриптор окна
   bool                 is_destroyed;          //удалено ли окно
   bool                 background_state;      //ложное свойство - состояние фона
+  Point                last_cursor_position;  //последнее положение курсора, для которого было отправлено оповещение, для фильтрации дублирующих оповещений
   Rect                 window_rect;           //область окна
   bool                 window_rect_init;      //инициализирована ли область окна
   Cursor               invisible_cursor;      //невидимый курсор
@@ -528,7 +529,16 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       delete &sender;
     }
   };
-  
+
+  void NotifyMouseMove (const xtl::intrusive_ptr<Message>& message)
+  {
+    if (last_cursor_position.x == message->context.cursor_position.x && last_cursor_position.y == message->context.cursor_position.y)
+      return;
+
+    last_cursor_position = message->context.cursor_position;
+
+    Notify (WindowEvent_OnMouseMove, message);
+  }
   
 ///Обработчик события
   void ProcessEvent (const XEvent& event)
@@ -570,10 +580,12 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       }
       case ButtonPress:
       {
-        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-        
+        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);
+
         GetKeysState (event.xbutton.state, context);
         
+        NotifyMouseMove (message);
+
         switch (event.xbutton.button)
         {
           case Button1: Notify (WindowEvent_OnLeftButtonDown, message); break;
@@ -589,8 +601,10 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       case ButtonRelease:
       {
         context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-        
+
         GetKeysState (event.xbutton.state, context);
+        
+        NotifyMouseMove (message);
         
         switch (event.xbutton.button)
         {
@@ -607,10 +621,10 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
       case MotionNotify:
       {
         context.cursor_position = Point (event.xmotion.x, event.xmotion.y);
-        
+
         GetKeysState (event.xmotion.state, context);
         
-        Notify (WindowEvent_OnMouseMove, message);
+        NotifyMouseMove (message);
         
         break;
       }
@@ -659,13 +673,14 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
         window_rect.right  = (size_t)event.xconfigure.x + event.xconfigure.width;
         window_rect.bottom = (size_t)event.xconfigure.y + event.xconfigure.height;
         
+        //this event is sent on window creation, so do not send change event in this case
         if (window_rect_init)
         {
           if (is_moved)   Notify (WindowEvent_OnMove, message);
           if (is_resized) Notify (WindowEvent_OnSize, message);
         }
         else
-        {        
+        {
           window_rect_init = true;
         }
         
@@ -820,8 +835,6 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       
       //создание окна
 
-    int blackColor = BlackPixel (impl->display, DefaultScreen (impl->display));
-    
     XWindow parent_window = 0;
     
     if (parent_handle) parent_window = (XWindow)parent_handle;
@@ -829,13 +842,24 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     
     common::PropertyMap init_params = common::parse_init_string (init_string);
 
-    int          window_x      = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
-                 window_y      = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
-    unsigned int window_width  = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
-                 window_height = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
+    //do not enable backing store by default, because opengl rendering doesn't work with it enabled at least on Ubuntu 16.04 running via Parallels Desktop
+    bool         enable_backing_store = init_params.IsPresent ("enable_backing_store") ? init_params.GetInteger ("enable_backing_store") > 0 : false;
+    int          window_x             = init_params.IsPresent ("x") ? init_params.GetInteger ("x") : DEFAULT_WINDOW_X,
+                 window_y             = init_params.IsPresent ("y") ? init_params.GetInteger ("y") : DEFAULT_WINDOW_Y;
+    unsigned int window_width         = init_params.IsPresent ("width") ? init_params.GetInteger ("width") : DEFAULT_WINDOW_WIDTH,
+                 window_height        = init_params.IsPresent ("height") ? init_params.GetInteger ("height") : DEFAULT_WINDOW_HEIGHT;
 
-    impl->window = XCreateSimpleWindow (impl->display, parent_window, window_x, window_y,
-      window_width, window_height, 0, blackColor, blackColor);
+    XSetWindowAttributes window_attributes;
+    unsigned long        values_mask = 0;
+
+    if (enable_backing_store)
+    {
+      window_attributes.backing_store = Always;
+      values_mask |= CWBackingStore;
+    }
+
+    impl->window = XCreateWindow (impl->display, parent_window, window_x, window_y, window_width, window_height, 0, CopyFromParent,
+                                  InputOutput, CopyFromParent, values_mask, &window_attributes);
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
@@ -1133,6 +1157,15 @@ void XlibWindowManager::GetWindowRect (window_t handle, Rect& rect)
     rect.top    = (size_t)y_return;
     rect.right  = rect.left + width_return;
     rect.bottom = rect.top + height_return;
+
+    //Window may change it's size more than once during creation before sending first ConfigureNotify.
+    //In this case other code may request window rect before ConfigureNotify was sent and if we do not save rect and init flag here,
+    //ConfigureNotify handler will not send resize notification
+    if (!handle->window_rect_init)
+    {
+      handle->window_rect      = rect;
+      handle->window_rect_init = true;
+    }
   }  
   catch (xtl::exception& e)
   {
@@ -1176,17 +1209,53 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
     {
       case WindowFlag_Visible: //видимость окна
       {
-        if (!XMapWindow (handle->display, handle->window))
-          throw xtl::format_operation_exception ("", "XMapWindow failed");          
+        if (state)
+        {
+          if (!XMapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XMapWindow failed");
+        }
+        else
+        {
+          if (!XUnmapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XUnmapWindow failed");
+        }
 
         break;
       }
       case WindowFlag_Active: //активность окна
-        break; //TODO
+        if (state)
+        {
+          if (!XRaiseWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XRaiseWindow failed");
+        }
+        else
+        {
+          if (!XLowerWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XLowerWindow failed");
+        }
+
+        break;
       case WindowFlag_Focus: //фокус ввода
       {
-//        if (!XSetInputFocus (handle->display, handle->window, RevertToNone, CurrentTime))
-//          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+        if (state)
+        {
+          XWindowAttributes window_attributes_return;
+
+          if (!XGetWindowAttributes (handle->display, handle->window, &window_attributes_return))
+            throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
+
+          //window focus can be set only if it is viewable
+          if (window_attributes_return.map_state == IsViewable)
+          {
+            if (!XSetInputFocus (handle->display, state ? handle->window : None, RevertToNone, CurrentTime))
+              throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+          }
+        }
+        else
+        {
+          if (!XSetInputFocus (handle->display, None, RevertToNone, CurrentTime))
+            throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+        }
 
         break;
       }
@@ -1207,8 +1276,16 @@ void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool st
       }
       case WindowFlag_Minimized:
       {
-        if (!XUnmapWindow (handle->display, handle->window))
-          throw xtl::format_operation_exception ("", "XUnmapWindow failed");        
+        if (state)
+        {
+          if (!XUnmapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XUnmapWindow failed");
+        }
+        else
+        {
+          if (!XMapWindow (handle->display, handle->window))
+            throw xtl::format_operation_exception ("", "XMapWindow failed");
+        }
         
         break;
       }

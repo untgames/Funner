@@ -143,7 +143,7 @@ void login_callback (social::OperationStatus status, const char* error, social::
 
       session->LoadFriends (user, &load_friends_callback, friends_properties);
 
-      common::ActionQueue::PushAction (xtl::bind (&load_user_info, session), common::ActionThread_Main, 10);
+      common::ActionQueue::PushAction (xtl::bind (&load_user_info, session), common::ActionThread_Main, common::ActionQueue::time_t (10));
 
       break;
     }

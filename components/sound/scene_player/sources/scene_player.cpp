@@ -142,7 +142,7 @@ class ScenePlayerEmitter: public xtl::trackable
       if (!sound_manager->IsLooping (emitter))
       {
         auto_stop_action = common::ActionQueue::PushAction (xtl::bind (&ScenePlayerEmitter::OnStop, this),
-          common::ActionThread_Current, sound_manager->Duration (emitter) + STOP_EMITTER_DELAY - play_start_offset);
+          common::ActionThread_Current, common::ActionQueue::time_t ((sound_manager->Duration (emitter) + STOP_EMITTER_DELAY - play_start_offset) * 1000, 1000));
       }      
     }
 

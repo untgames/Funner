@@ -1,7 +1,9 @@
 #include "shared.h"
 
 typedef xtl::shared_ptr<Window> WindowPtr;
+typedef xtl::shared_ptr<Timer> TimerPtr;
 
+TimerPtr timer_holder;
 WindowPtr window_holder;
 
 void destroy (Window&, WindowEvent, const WindowEventContext&)
@@ -11,23 +13,11 @@ void destroy (Window&, WindowEvent, const WindowEventContext&)
   Application::Exit (0);
 }
 
-void on_application_initialized ()
+void after_show (Timer& timer)
 {
-  window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
+  timer.Pause ();
 
   Window& window = *window_holder;
-
-  window.SetTitle ("Test window");
-
-  window.SetPosition (0, 0);
-
-  printf ("title: '%s'\n", window.Title ());
-  printf ("is_active: %d\n", window.IsActive ());
-  printf ("position: x=%lu y=%lu\n", window.Position ().x, window.Position ().y);
-  printf ("width: %lu\n", window.Width ());
-  printf ("height: %lu\n", window.Height ());
-
-  window.Show ();
 
   printf ("after show\n");
 
@@ -53,6 +43,27 @@ void on_application_initialized ()
   window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
 
   window.Close ();
+}
+
+void on_application_initialized ()
+{
+  window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
+
+  Window& window = *window_holder;
+
+  window.SetTitle ("Test window");
+
+  window.SetPosition (0, 0);
+
+  printf ("title: '%s'\n", window.Title ());
+  printf ("is_active: %d\n", window.IsActive ());
+  printf ("position: x=%lu y=%lu\n", window.Position ().x, window.Position ().y);
+  printf ("width: %lu\n", window.Width ());
+  printf ("height: %lu\n", window.Height ());
+
+  window.Show ();
+
+  timer_holder.reset (new Timer (&after_show, 100));
 }
 
 int main ()

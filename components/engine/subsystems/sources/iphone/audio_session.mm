@@ -41,7 +41,7 @@ const char* SUBSYSTEM_NAME = "IPhoneAudioSession";                   //имя п
 const char* COMPONENT_NAME = "engine.subsystems.IPhoneAudioSession"; //имя компонента
 const char* LOG_NAME       = COMPONENT_NAME;
 
-const common::ActionQueue::time_t REACTIVATE_DELAY = 0.25;
+const common::ActionQueue::time_t REACTIVATE_DELAY (250, 1000);
 
 /*
    Подсистема

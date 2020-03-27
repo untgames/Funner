@@ -1,5 +1,9 @@
 #include "shared.h"
 
+typedef xtl::shared_ptr<Window> WindowPtr;
+
+WindowPtr window_holder;
+
 void on_char (Window& window, WindowEvent event, const WindowEventContext& context)
 {
   printf ("char '%s'\n", common::to_utf8_string (&context.char_code, 1).c_str ());
@@ -20,22 +24,22 @@ void log_print (const char* stream, const char* message)
   fflush (stdout);
 }
 
-int main ()
+void on_application_initialized ()
 {
-  printf ("Results of screen_keyboard_test:\n");
-
   try
   {
     common::LogFilter log_filter ("*", &log_print);
     
-    Window window (WindowStyle_Overlapped, 400, 300);
+    window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
+
+    Window& window = *window_holder;
     
     window.SetTitle ("Test window");
     window.Show ();
     window.SetFocus ();
 
-    auto_connection connection1 = window.RegisterEventHandler (WindowEvent_OnChar, &on_char),
-                    connection2 = window.RegisterEventHandler (WindowEvent_OnClose, &on_close);
+    window.RegisterEventHandler (WindowEvent_OnChar, &on_char),
+    window.RegisterEventHandler (WindowEvent_OnClose, &on_close);
     
     fflush (stdout);    
 
@@ -43,6 +47,22 @@ int main ()
 
     keyboard.Show ();
 //    keyboard.Hide ();
+  }
+  catch (std::exception& exception)
+  {
+    printf ("exception: %s\n", exception.what ());
+  }
+}
+
+int main ()
+{
+  printf ("Results of screen_keyboard_test:\n");
+
+  try
+  {
+    common::LogFilter log_filter ("*", &log_print);
+
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
 
     Application::Run ();
 

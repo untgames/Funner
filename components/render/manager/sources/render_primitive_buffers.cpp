@@ -60,11 +60,11 @@ struct VertexBufferHolder
   }
 };
 
-typedef stl::hash_map<size_t, VertexStreamHolder> VertexStreamMap;
-typedef stl::hash_map<size_t, VertexBufferHolder> VertexBufferMap;
-typedef stl::hash_map<size_t, IndexBufferHolder>  IndexBufferMap;
-typedef stl::hash_map<size_t, LowLevelBufferPtr>  CacheBufferMap;
-typedef stl::hash_map<size_t, VertexBufferPtr>    CacheVertexBufferMap;
+typedef stl::hash_map<media::geometry::object_id_t, VertexStreamHolder> VertexStreamMap;
+typedef stl::hash_map<media::geometry::object_id_t, VertexBufferHolder> VertexBufferMap;
+typedef stl::hash_map<media::geometry::object_id_t, IndexBufferHolder>  IndexBufferMap;
+typedef stl::hash_map<media::geometry::object_id_t, LowLevelBufferPtr>  CacheBufferMap;
+typedef stl::hash_map<media::geometry::object_id_t, VertexBufferPtr>    CacheVertexBufferMap;
 
 }
 
@@ -104,21 +104,26 @@ PrimitiveBuffersImpl::~PrimitiveBuffersImpl ()
     Создание отображений буферов
 */
 
-LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometry::VertexStream& vs, MeshBufferUsage usage)
+LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometry::VertexStream& vs, MeshBufferUsage usage, bool updatable)
 {
   try
   {
-    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.SourceId ());
     
     if (iter != impl->vertex_streams.end ())
       return iter->second.buffer;
       
     if (impl->cache_state)
     {
-      CacheBufferMap::iterator iter = impl->vertex_streams_cache.find (vs.Id ());
+      CacheBufferMap::iterator iter = impl->vertex_streams_cache.find (vs.SourceId ());
       
       if (iter != impl->vertex_streams_cache.end ())
+      {
+        if (updatable)
+          impl->vertex_streams.insert_pair (vs.SourceId (), VertexStreamHolder (vs, iter->second, usage));
+
         return iter->second;
+      }
     }
       
     BufferDesc desc;
@@ -149,8 +154,11 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
     buffer->SetData (0, desc.size, vs.Data ());
     
     if (impl->cache_state)
-      impl->vertex_streams_cache.insert_pair (vs.Id (), buffer);
+      impl->vertex_streams_cache.insert_pair (vs.SourceId (), buffer);
     
+    if (updatable)
+      impl->vertex_streams.insert_pair (vs.SourceId (), VertexStreamHolder (vs, buffer, usage));
+
     return buffer;
   }
   catch (xtl::exception& e)
@@ -160,28 +168,52 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
   }
 }
 
-VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry::VertexBuffer& vb, MeshBufferUsage usage)
+VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry::VertexBuffer& vb, MeshBufferUsage usage, bool updatable)
 {
   try
   {
-    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.Id ());
+    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.SourceId ());
     
     if (iter != impl->vertex_buffers.end ())
       return iter->second.buffer;
       
     if (impl->cache_state)
     {
-      CacheVertexBufferMap::iterator iter = impl->vertex_buffers_cache.find (vb.Id ());
+      CacheVertexBufferMap::iterator iter = impl->vertex_buffers_cache.find (vb.SourceId ());
       
       if (iter != impl->vertex_buffers_cache.end ())
+      {
+        if (updatable)
+        {
+          VertexBufferPtr& buffer = iter->second;
+
+          if (vb.StreamsCount () != buffer->StreamsCount ())
+            throw xtl::format_operation_exception ("", "Streams count differs in passed buffer and cached buffer");
+
+          const LowLevelBufferPtr* stream_buffer = buffer->Streams ();
+
+          for (unsigned int i = 0, count = buffer->StreamsCount (); i < count; i++, stream_buffer++)
+          {
+            const media::geometry::VertexStream& vs = vb.Stream (i);
+
+            impl->vertex_streams.insert_pair (vs.SourceId (), VertexStreamHolder (vs, *stream_buffer, usage));
+          }
+
+          impl->vertex_buffers.insert_pair (vb.SourceId (), VertexBufferHolder (vb, buffer));
+        }
+
         return iter->second;
-    }      
+      }
+    }
       
-    VertexBufferPtr buffer (new VertexBuffer (vb, *this, impl->device_manager, usage), false);
+    VertexBufferPtr buffer (new VertexBuffer (vb, *this, impl->device_manager, usage, updatable), false);
     
     if (impl->cache_state)
-      impl->vertex_buffers_cache.insert_pair (vb.Id (), buffer);
-    
+      impl->vertex_buffers_cache.insert_pair (vb.SourceId (), buffer);
+
+    if (updatable)
+      impl->vertex_buffers.insert_pair (vb.SourceId (), VertexBufferHolder (vb, buffer));
+
     return buffer;      
   }
   catch (xtl::exception& e)
@@ -191,21 +223,26 @@ VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry:
   }
 }
 
-LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry::IndexBuffer& ib, MeshBufferUsage usage)
+LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry::IndexBuffer& ib, MeshBufferUsage usage, bool updatable)
 {
   try
   {
-    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.Id ());
+    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.SourceId ());
 
     if (iter != impl->index_buffers.end ())
       return iter->second.buffer;      
       
     if (impl->cache_state)
     {
-      CacheBufferMap::iterator iter = impl->index_buffers_cache.find (ib.Id ());
+      CacheBufferMap::iterator iter = impl->index_buffers_cache.find (ib.SourceId ());
       
       if (iter != impl->index_buffers_cache.end ())
+      {
+        if (updatable)
+          impl->index_buffers.insert_pair (ib.SourceId (), IndexBufferHolder (ib, iter->second, usage));
+
         return iter->second;
+      }
     }
       
     BufferDesc desc;
@@ -236,8 +273,11 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
     buffer->SetData (0, desc.size, ib.Data ());    
     
     if (impl->cache_state)
-      impl->index_buffers_cache.insert_pair (ib.Id (), buffer);
+      impl->index_buffers_cache.insert_pair (ib.SourceId (), buffer);
         
+    if (updatable)
+      impl->index_buffers.insert_pair (ib.SourceId (), IndexBufferHolder (ib, buffer, usage));
+
     return buffer;
   }
   catch (xtl::exception& e)
@@ -255,14 +295,14 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexStream& vs, MeshBuf
 {
   try
   {
-    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.SourceId ());
     
     if (iter != impl->vertex_streams.end ())
       return;    
     
-    LowLevelBufferPtr buffer = CreateVertexStream (vs, usage);
+    LowLevelBufferPtr buffer = CreateVertexStream (vs, usage, false);
     
-    impl->vertex_streams.insert_pair (vs.Id (), VertexStreamHolder (vs, buffer, usage));
+    impl->vertex_streams.insert_pair (vs.SourceId (), VertexStreamHolder (vs, buffer, usage));
   }
   catch (xtl::exception& e)
   {
@@ -275,14 +315,14 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexBuffer& vb, MeshBuf
 {
   try
   {
-    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.Id ());
+    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.SourceId ());
     
     if (iter != impl->vertex_buffers.end ())
       return;    
     
-    VertexBufferPtr buffer = CreateVertexBuffer (vb, usage);
+    VertexBufferPtr buffer = CreateVertexBuffer (vb, usage, false);
     
-    impl->vertex_buffers.insert_pair (vb.Id (), VertexBufferHolder (vb, buffer));
+    impl->vertex_buffers.insert_pair (vb.SourceId (), VertexBufferHolder (vb, buffer));
   }
   catch (xtl::exception& e)
   {
@@ -295,14 +335,14 @@ void PrimitiveBuffersImpl::Add (const media::geometry::IndexBuffer& ib, MeshBuff
 {
   try
   {
-    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.Id ());
+    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.SourceId ());
     
     if (iter != impl->index_buffers.end ())
       return;    
     
-    LowLevelBufferPtr buffer = CreateIndexBuffer (ib, usage);
+    LowLevelBufferPtr buffer = CreateIndexBuffer (ib, usage, false);
     
-    impl->index_buffers.insert_pair (ib.Id (), IndexBufferHolder (ib, buffer, usage));
+    impl->index_buffers.insert_pair (ib.SourceId (), IndexBufferHolder (ib, buffer, usage));
   }
   catch (xtl::exception& e)
   {
@@ -319,18 +359,18 @@ void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
 {
   try
   {
-    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.SourceId ());
     
     if (iter == impl->vertex_streams.end ())
-      throw xtl::make_argument_exception ("", "buffer.Id()", vs.Id (), "Vertex stream not added to primitive buffers");
+      throw xtl::make_argument_exception ("", "buffer.SourceId()", (size_t)vs.SourceId (), "Vertex stream not added to primitive buffers");
       
     VertexStreamHolder& holder = iter->second;
     
     if (holder.vertex_size != vs.VertexSize ())
-      throw xtl::format_operation_exception ("", "Vertex size %u differes from source vertex stream size %u", vs.VertexSize (), holder.vertex_size);
+      throw xtl::format_operation_exception ("", "Vertex size %u differs from source vertex stream size %u", vs.VertexSize (), holder.vertex_size);
       
     if (holder.vertices_count != vs.Size ())
-      throw xtl::format_operation_exception ("", "Vertices count %u differes from source vertices count %u", vs.Size (), holder.vertices_count);
+      throw xtl::format_operation_exception ("", "Vertices count %u differs from source vertices count %u", vs.Size (), holder.vertices_count);
           
     holder.buffer->SetData (0, vs.Size () * vs.VertexSize (), vs.Data ());    
   }
@@ -341,21 +381,67 @@ void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
   }
 }
 
+void PrimitiveBuffersImpl::UpdateVertexStream (media::geometry::object_id_t id, const void* buffer, size_t buffer_size)
+{
+  try
+  {
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (id);
+
+    if (iter == impl->vertex_streams.end ())
+      throw xtl::make_argument_exception ("", "id", (size_t)id, "Vertex stream not added to primitive buffers");
+
+    VertexStreamHolder& holder = iter->second;
+
+    if (holder.vertex_size * holder.vertices_count != buffer_size)
+      throw xtl::format_operation_exception ("", "Buffer size differs from source vertex stream size");
+
+    holder.buffer->SetData (0, buffer_size, buffer);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveBuffersImpl::UpdateVertexStream");
+    throw;
+  }
+}
+
 void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
 {
   try
   {
-    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.Id ());
+    IndexBufferMap::iterator iter = impl->index_buffers.find (ib.SourceId ());
     
     if (iter == impl->index_buffers.end ())
-      throw xtl::make_argument_exception ("", "buffer.Id()", ib.Id (), "Index buffer not added to primitive buffers");
+      throw xtl::make_argument_exception ("", "buffer.SourceId()", (size_t)ib.SourceId (), "Index buffer not added to primitive buffers");
       
     IndexBufferHolder& holder = iter->second;
     
     if (holder.indices_count != ib.Size ())
-      throw xtl::format_operation_exception ("", "Indices count %u differes from source indices count %u", ib.Size (), holder.indices_count);
+      throw xtl::format_operation_exception ("", "Indices count %u differs from source indices count %u", ib.Size (), holder.indices_count);
           
     holder.buffer->SetData (0, ib.Size () * get_index_type_size (ib.DataType ()), ib.Data ());    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveBuffersImpl::Update(const IndexBuffer&)");
+    throw;
+  }
+}
+
+void PrimitiveBuffersImpl::UpdateIndexBuffer (media::geometry::object_id_t id, const void* buffer, size_t buffer_size)
+{
+  try
+  {
+    IndexBufferMap::iterator iter = impl->index_buffers.find (id);
+
+    if (iter == impl->index_buffers.end ())
+      throw xtl::make_argument_exception ("", "id", (size_t)id, "Index buffer not added to primitive buffers");
+
+    IndexBufferHolder& holder = iter->second;
+
+    if (holder.indices_count * get_index_type_size (holder.source.DataType ()) != buffer_size)
+      throw xtl::format_operation_exception ("", "Index buffer size differs from source index buffer size");
+
+    holder.buffer->SetData (0, buffer_size, buffer);
   }
   catch (xtl::exception& e)
   {
@@ -370,17 +456,32 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::VertexStream& vs)
 {
-  impl->vertex_streams.erase (vs.Id ());
+  impl->vertex_streams.erase (vs.SourceId ());
 }
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::VertexBuffer& vb)
 {
-  impl->vertex_buffers.erase (vb.Id ());
+  impl->vertex_buffers.erase (vb.SourceId ());
 }
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::IndexBuffer& ib)
 {
-  impl->index_buffers.erase (ib.Id ());
+  impl->index_buffers.erase (ib.SourceId ());
+}
+
+void PrimitiveBuffersImpl::RemoveAllVertexStreams ()
+{
+  impl->vertex_streams.clear ();
+}
+
+void PrimitiveBuffersImpl::RemoveAllVertexBuffers ()
+{
+  impl->vertex_buffers.clear ();
+}
+
+void PrimitiveBuffersImpl::RemoveAllIndexBuffers ()
+{
+  impl->index_buffers.clear ();
 }
 
 void PrimitiveBuffersImpl::RemoveAll ()

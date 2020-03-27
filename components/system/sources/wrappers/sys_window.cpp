@@ -106,6 +106,9 @@ struct Window::Impl: public xtl::trackable
 //      Notify (WindowEvent_OnClose);      
 
       Platform::DestroyWindow (handle);
+
+      //reset handle, so DestroyWindow will not be called twice
+      handle = 0;
     }
     
 ///Стиль окна

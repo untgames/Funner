@@ -1,0 +1,9 @@
+Results of application_idle_test:
+idle
+idle
+Log message from 'system.application': 'Exception in Application::Notify: count == 1
+    at on_idle'
+idle
+exiting
+Log message from 'common.ComponentManager': 'Unload components '*''
+Log message from 'common.ComponentManager': '...components unloaded successfully'

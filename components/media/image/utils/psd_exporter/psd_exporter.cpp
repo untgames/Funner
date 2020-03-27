@@ -341,6 +341,39 @@ void check_status (psd_status status, const char* source)
   }
 } */
 
+//получение имени режима блендинга
+const char* get_blend_mode_string (psd_blend_mode blend_mode)
+{
+  switch (blend_mode)
+  {
+    case psd_blend_mode_normal:       return "psd_blend_mode_normal";
+    case psd_blend_mode_dissolve:     return "psd_blend_mode_dissolve";
+    case psd_blend_mode_darken:       return "psd_blend_mode_darken";
+    case psd_blend_mode_multiply:     return "psd_blend_mode_multiply";
+    case psd_blend_mode_color_burn:   return "psd_blend_mode_color_burn";
+    case psd_blend_mode_linear_burn:  return "psd_blend_mode_linear_burn";
+    case psd_blend_mode_lighten:      return "psd_blend_mode_lighten";
+    case psd_blend_mode_screen:       return "psd_blend_mode_screen";
+    case psd_blend_mode_color_dodge:  return "psd_blend_mode_color_dodge";
+    case psd_blend_mode_linear_dodge: return "psd_blend_mode_linear_dodge";
+    case psd_blend_mode_overlay:      return "psd_blend_mode_overlay";
+    case psd_blend_mode_soft_light:   return "psd_blend_mode_soft_light";
+    case psd_blend_mode_hard_light:   return "psd_blend_mode_hard_light";
+    case psd_blend_mode_vivid_light:  return "psd_blend_mode_vivid_light";
+    case psd_blend_mode_linear_light: return "psd_blend_mode_linear_light";
+    case psd_blend_mode_pin_light:    return "psd_blend_mode_pin_light";
+    case psd_blend_mode_hard_mix:     return "psd_blend_mode_hard_mix";
+    case psd_blend_mode_difference:   return "psd_blend_mode_difference";
+    case psd_blend_mode_exclusion:    return "psd_blend_mode_exclusion";
+    case psd_blend_mode_hue:          return "psd_blend_mode_hue";
+    case psd_blend_mode_saturation:   return "psd_blend_mode_saturation";
+    case psd_blend_mode_color:        return "psd_blend_mode_color";
+    case psd_blend_mode_luminosity:   return "psd_blend_mode_luminosity";
+    case psd_blend_mode_pass_through: return "psd_blend_mode_pass_through";
+    default:                          return "unknown";
+  }
+}
+
 //преобразование растровой карты
 void convert_image_data (size_t src_width, size_t src_height, const psd_argb_color* src_image, const Rect& src_crop, size_t dst_width, size_t dst_height, void* dst_image)
 {    
@@ -820,7 +853,7 @@ void export_data (Params& params)
     //проверка корректности имени слоя
     for (const char* symbol = name.c_str (); *symbol; symbol++)
     {
-      static const char* allowed_symbols = "_.- $%%!@#^()[],~=";
+      static const char* allowed_symbols = "_.- $%%!:@#^()[],~=";
 
       if (!isalnum (*symbol) && !strchr (allowed_symbols, *symbol))
         throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
@@ -952,6 +985,9 @@ void export_data (Params& params)
 
       xml_writer.WriteAttribute ("Opacity", layer.opacity);
       xml_writer.WriteAttribute ("Visible", layer.visible != 0);      
+
+      if (layer.layer_type != psd_layer_type_folder)
+        xml_writer.WriteAttribute ("BlendMode", get_blend_mode_string (layer.blend_mode));
     }
   }
 

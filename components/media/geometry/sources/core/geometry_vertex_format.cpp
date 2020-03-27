@@ -442,6 +442,183 @@ size_t VertexFormat::Hash () const
 }
 
 /*
+   Сериализация / десериализация
+*/
+
+size_t VertexFormat::SerializationSize () const
+{
+  uint32_t names_data_size = 0, attributes_data_size = impl->attributes.size () * (sizeof (VertexAttribute) - offsetof(VertexAttribute, semantic));
+
+  for (size_t i = 0, count = impl->names.Size (); i < count; i++)
+  {
+    names_data_size += sizeof (uint32_t) + xtl::xstrlen (impl->names [i]) + 1; //store string length, string data and null termination symbol for each name
+  }
+
+  return sizeof (uint32_t) + sizeof (uint32_t) + names_data_size + attributes_data_size + sizeof (impl->min_vertex_size);
+}
+
+size_t VertexFormat::Write (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::VertexFormat::Write";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_written = 0;
+
+  uint32_t names_data_size = 0;
+
+  if (sizeof (names_data_size) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing names data size");
+
+  bytes_written += sizeof (names_data_size);  //skip for now, write names_data_size later
+
+  uint32_t attributes_count = impl->names.Size ();
+
+  if (sizeof (attributes_count) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing attributes count");
+
+  memcpy ((char*)buffer + bytes_written, &attributes_count, sizeof (attributes_count));
+
+  bytes_written += sizeof (attributes_count);
+
+  for (uint32_t i = 0; i < attributes_count; i++)
+  {
+    uint32_t string_length = xtl::xstrlen (impl->names [i]) + 1;
+
+    if (sizeof (string_length) + bytes_written > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing string length");
+
+    memcpy ((char*)buffer + bytes_written, &string_length, sizeof (string_length));
+
+    bytes_written += sizeof (string_length);
+
+    if (string_length + bytes_written > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing string");
+
+    memcpy ((char*)buffer + bytes_written, impl->names [i], string_length);
+
+    bytes_written   += string_length;
+    names_data_size += string_length;
+  }
+
+  memcpy (buffer, &names_data_size, sizeof (names_data_size));
+
+  size_t attribute_size = sizeof (VertexAttribute) - offsetof(VertexAttribute, semantic);
+
+  for (uint32_t i = 0; i < attributes_count; i++)
+  {
+    if (attribute_size + bytes_written > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing attribute");
+
+    memcpy ((char*)buffer + bytes_written, &impl->attributes [i].semantic, attribute_size);
+
+    bytes_written += attribute_size;
+  }
+
+  //update minimal vertex size before writing
+  GetMinimalVertexSize ();
+
+  if (sizeof (impl->min_vertex_size) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing min vertex size");
+
+  memcpy ((char*)buffer + bytes_written, &impl->min_vertex_size, sizeof (impl->min_vertex_size));
+
+  bytes_written += sizeof (impl->min_vertex_size);
+
+  return bytes_written;
+}
+
+size_t VertexFormat::Read (const void* buffer, size_t buffer_size)
+{
+  size_t bytes_read = 0;
+
+  VertexFormat::CreateFromSerializedData (buffer, buffer_size, bytes_read).Swap (*this);
+
+  return bytes_read;
+}
+
+VertexFormat VertexFormat::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
+{
+  static const char* METHOD_NAME = "media::geometry::VertexFormat::CreateFromSerializedData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  VertexFormat new_vf;
+
+  uint32_t names_data_size = 0;
+
+  if (sizeof (names_data_size) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading names data size");
+
+  memcpy (&names_data_size, buffer, sizeof (names_data_size));
+
+  bytes_read += sizeof (names_data_size);
+
+  new_vf.impl->names.ReserveBuffer (names_data_size);
+
+  uint32_t attributes_count;
+
+  if (sizeof (attributes_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading attributes count");
+
+  memcpy (&attributes_count, (char*)buffer + bytes_read, sizeof (attributes_count));
+
+  bytes_read += sizeof (attributes_count);
+
+  new_vf.impl->attributes.resize (attributes_count);
+
+  for (uint32_t i = 0; i < attributes_count; i++)
+  {
+    uint32_t string_length;
+
+    if (sizeof (string_length) + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading string length");
+
+    memcpy (&string_length, (char*)buffer + bytes_read, sizeof (string_length));
+
+    bytes_read += sizeof (string_length);
+
+    if (string_length + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading attribute name");
+
+    new_vf.impl->names.Add ((char*)buffer + bytes_read);
+
+    bytes_read += string_length;
+  }
+
+  size_t attribute_read_size = sizeof (VertexAttribute) - offsetof(VertexAttribute, semantic);
+
+  for (uint32_t i = 0; i < attributes_count; i++)
+  {
+    if (attribute_read_size + bytes_read > buffer_size)
+      throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading attribute");
+
+    new_vf.impl->attributes [i].name = new_vf.impl->names [i];
+
+    memcpy (&new_vf.impl->attributes [i].semantic, (char*)buffer + bytes_read, attribute_read_size);
+
+    bytes_read += attribute_read_size;
+  }
+
+  if (sizeof (new_vf.impl->min_vertex_size) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading min vertex size");
+
+  memcpy (&new_vf.impl->min_vertex_size, (char*)buffer + bytes_read, sizeof (new_vf.impl->min_vertex_size));
+
+  bytes_read += sizeof (new_vf.impl->min_vertex_size);
+
+  new_vf.impl->need_vertex_size_update = false;
+
+  out_bytes_read = bytes_read;
+
+  return new_vf;
+}
+
+/*
     Перегрузка операторов
 */
 

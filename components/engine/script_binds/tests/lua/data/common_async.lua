@@ -9,7 +9,7 @@ function test_async_post()
   
   local callback = Common.File.CreateAsyncLoadHandler (OnLoad)
 
-  local FILE_NAME = "http://svn.untgames.com"       
+  local FILE_NAME = "http://untgames.com"
   local result    = Common.File.AsyncPostString (FILE_NAME, "post_string", callback)
 
   print ("Test completed")

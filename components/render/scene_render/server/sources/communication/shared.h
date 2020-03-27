@@ -12,6 +12,7 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <media/geometry/mesh.h>
 #include <media/image.h>
 
 #include <syslib/semaphore.h>
@@ -34,6 +35,7 @@
 #include <shared/viewport_manager.h>
 #include <shared/window_manager.h>
 
+#include <shared/sg/dynamic_mesh.h>
 #include <shared/sg/light.h>
 #include <shared/sg/line_list.h>
 #include <shared/sg/page_curl.h>

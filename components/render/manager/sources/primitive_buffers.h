@@ -22,9 +22,9 @@ class PrimitiveBuffersImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание отображений буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    LowLevelBufferPtr CreateVertexStream (const media::geometry::VertexStream&, MeshBufferUsage usage);
-    VertexBufferPtr   CreateVertexBuffer (const media::geometry::VertexBuffer&, MeshBufferUsage usage);
-    LowLevelBufferPtr CreateIndexBuffer  (const media::geometry::IndexBuffer&, MeshBufferUsage usage);
+    LowLevelBufferPtr CreateVertexStream (const media::geometry::VertexStream&, MeshBufferUsage usage, bool updatable);
+    VertexBufferPtr   CreateVertexBuffer (const media::geometry::VertexBuffer&, MeshBufferUsage usage, bool updatable);
+    LowLevelBufferPtr CreateIndexBuffer  (const media::geometry::IndexBuffer&, MeshBufferUsage usage, bool updatable);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление буферов
@@ -36,16 +36,21 @@ class PrimitiveBuffersImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    void Update (const media::geometry::VertexStream& buffer);
-    void Update (const media::geometry::IndexBuffer& buffer);
+    void Update             (const media::geometry::VertexStream& buffer);
+    void UpdateVertexStream (media::geometry::object_id_t id, const void* buffer, size_t buffer_size);
+    void Update             (const media::geometry::IndexBuffer& buffer);
+    void UpdateIndexBuffer  (media::geometry::object_id_t id, const void* buffer, size_t buffer_size);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
-    void Remove    (const media::geometry::VertexStream& buffer);
-    void Remove    (const media::geometry::VertexBuffer& buffer);    
-    void Remove    (const media::geometry::IndexBuffer& buffer);
-    void RemoveAll ();
+    void Remove                 (const media::geometry::VertexStream& buffer);
+    void Remove                 (const media::geometry::VertexBuffer& buffer);
+    void Remove                 (const media::geometry::IndexBuffer& buffer);
+    void RemoveAllVertexStreams ();
+    void RemoveAllVertexBuffers ();
+    void RemoveAllIndexBuffers  ();
+    void RemoveAll              ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер пакетирования

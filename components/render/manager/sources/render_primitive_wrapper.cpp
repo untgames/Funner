@@ -45,9 +45,9 @@ size_t Primitive::MeshesCount () const
   return impl->MeshesCount ();
 }
 
-size_t Primitive::AddMesh (const media::geometry::Mesh& mesh, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+size_t Primitive::AddMesh (const media::geometry::Mesh& mesh, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, unsigned int updatable_primitive_buffer_types)
 {
-  return impl->AddMesh (mesh, vb_usage, ib_usage);
+  return impl->AddMesh (mesh, vb_usage, ib_usage, updatable_primitive_buffer_types);
 }
 
 void Primitive::RemoveMeshes (size_t first_mesh, size_t meshes_count)
@@ -55,9 +55,9 @@ void Primitive::RemoveMeshes (size_t first_mesh, size_t meshes_count)
   impl->RemoveMeshes (first_mesh, meshes_count);
 }
 
-void Primitive::RemoveAllMeshes ()
+void Primitive::RemoveAllMeshes (unsigned int updatable_primitive_buffer_types)
 {
-  impl->RemoveAllMeshes ();
+  impl->RemoveAllMeshes (updatable_primitive_buffer_types);
 }
 
 size_t Primitive::SpriteListsCount () const

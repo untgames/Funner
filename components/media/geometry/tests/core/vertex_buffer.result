@@ -1,6 +1,7 @@
 Results of vertex_buffer_test:
+source id is correct after clone
 Dump vb1
-Vertex buffer (2 streams, 10 vertices, 12 weights, vertex_size=44)
+Vertex buffer id=1, source_id=1 (2 streams, 10 vertices, 12 weights, vertex_size=44)
  stream #0: vertices_count=12
 vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='position' type='float3' offset=0
@@ -11,9 +12,9 @@ vertex format (4 attributes, min_vertex_size=36):
 vertex format (1 attributes, min_vertex_size=8):
   attribute: semantic='position' type='float2' offset=0
 Dump vb2
-Vertex buffer (0 streams, 0 vertices, 0 weights, vertex_size=0)
+Vertex buffer id=2, source_id=2 (0 streams, 0 vertices, 0 weights, vertex_size=0)
 vb2 = vb1
-Vertex buffer (2 streams, 10 vertices, 12 weights, vertex_size=44)
+Vertex buffer id=1, source_id=1 (2 streams, 10 vertices, 12 weights, vertex_size=44)
  stream #0: vertices_count=12
 vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='position' type='float3' offset=0
@@ -25,7 +26,7 @@ vertex format (1 attributes, min_vertex_size=8):
   attribute: semantic='position' type='float2' offset=0
 resize streams
 Dump vb1
-Vertex buffer (2 streams, 9 vertices, 12 weights, vertex_size=44)
+Vertex buffer id=1, source_id=1 (2 streams, 9 vertices, 12 weights, vertex_size=44)
  stream #0: vertices_count=9
 vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='position' type='float3' offset=0
@@ -36,7 +37,20 @@ vertex format (4 attributes, min_vertex_size=36):
 vertex format (1 attributes, min_vertex_size=8):
   attribute: semantic='position' type='float2' offset=0
 Dump vb2
-Vertex buffer (2 streams, 9 vertices, 12 weights, vertex_size=44)
+Vertex buffer id=1, source_id=1 (2 streams, 9 vertices, 12 weights, vertex_size=44)
+ stream #0: vertices_count=9
+vertex format (4 attributes, min_vertex_size=36):
+  attribute: semantic='position' type='float3' offset=0
+  attribute: semantic='normal' type='float3' offset=12
+  attribute: semantic='color' type='ubyte4' offset=24
+  attribute: semantic='texcoord0' type='float2' offset=28
+ stream #1: vertices_count=10
+vertex format (1 attributes, min_vertex_size=8):
+  attribute: semantic='position' type='float2' offset=0
+vb1 serialization size is 665
+Bytes written during serialization = 665, data hash = 9ab46c31
+Bytes read during deserialization = 665
+deserialized vb:Vertex buffer id=3, source_id=1 (2 streams, 9 vertices, 12 weights, vertex_size=44)
  stream #0: vertices_count=9
 vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='position' type='float3' offset=0
@@ -47,7 +61,7 @@ vertex format (4 attributes, min_vertex_size=36):
 vertex format (1 attributes, min_vertex_size=8):
   attribute: semantic='position' type='float2' offset=0
 detach stream from vb1
-Vertex buffer (1 streams, 9 vertices, 12 weights, vertex_size=36)
+Vertex buffer id=1, source_id=1 (1 streams, 9 vertices, 12 weights, vertex_size=36)
  stream #0: vertices_count=9
 vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='position' type='float3' offset=0
@@ -55,4 +69,4 @@ vertex format (4 attributes, min_vertex_size=36):
   attribute: semantic='color' type='ubyte4' offset=24
   attribute: semantic='texcoord0' type='float2' offset=28
 clear vb2
-Vertex buffer (0 streams, 0 vertices, 0 weights, vertex_size=0)
+Vertex buffer id=1, source_id=1 (0 streams, 0 vertices, 0 weights, vertex_size=0)

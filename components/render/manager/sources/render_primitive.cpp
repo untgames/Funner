@@ -422,7 +422,7 @@ size_t PrimitiveImpl::MeshesCount ()
   return impl->meshes.size ();
 }
 
-size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, unsigned int updatable_primitive_buffer_types)
 {
   try
   {
@@ -435,7 +435,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     vertex_buffers.reserve (source.VertexBuffersCount ());
     
     for (unsigned int i=0, count=source.VertexBuffersCount (); i<count; i++)
-      vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage));
+      vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage, updatable_primitive_buffer_types & PrimitiveBufferType_VertexStream));
 
       //конвертация индексного буфера (если он есть)
       
@@ -443,7 +443,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     
     if (source.IndexBuffer ().Size ())
     {
-      mesh->index_buffer = impl->buffers->CreateIndexBuffer (source.IndexBuffer (), ib_usage);
+      mesh->index_buffer = impl->buffers->CreateIndexBuffer (source.IndexBuffer (), ib_usage, updatable_primitive_buffer_types & PrimitiveBufferType_IndexBuffer);
       
       switch (source.IndexBuffer ().DataType ())
       {
@@ -465,11 +465,13 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     
     mesh->primitives.reserve (source.PrimitivesCount ());
     
+    const media::geometry::MaterialMap& material_map = source.MaterialMap ();
+
     for (unsigned int i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
       
-      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, i, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, i, impl->material_manager->GetMaterialProxy (material_map.MaterialName (src_primitive.material_id)), *mesh), false);
 
       switch (src_primitive.type)
       {
@@ -538,10 +540,19 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
   InvalidateCache ();  
 }
 
-void PrimitiveImpl::RemoveAllMeshes ()
+void PrimitiveImpl::RemoveAllMeshes (unsigned int updatable_primitive_buffer_types)
 {
+  if (updatable_primitive_buffer_types & PrimitiveBufferType_IndexBuffer)
+    impl->buffers->RemoveAllIndexBuffers ();
+
+  if (updatable_primitive_buffer_types & PrimitiveBufferType_VertexStream)
+  {
+    impl->buffers->RemoveAllVertexBuffers ();
+    impl->buffers->RemoveAllVertexStreams ();
+  }
+
   impl->meshes.clear ();
-  
+
   InvalidateCache ();  
 }
 

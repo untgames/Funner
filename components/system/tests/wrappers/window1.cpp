@@ -1,5 +1,9 @@
 #include "shared.h"
 
+typedef xtl::shared_ptr<Window> WindowPtr;
+
+WindowPtr window_holder;
+
 const char* get_event_name (WindowEvent event)
 {
   switch (event)
@@ -83,6 +87,12 @@ void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
   fflush (stdout);  
 }
 
+void mouseleave (Window& window, WindowEvent, const WindowEventContext& context)
+{
+  printf ("window '%s': mouse leave x=%lu y=%lu\n", window.Title (), context.cursor_position.x, context.cursor_position.y);
+  fflush (stdout);
+}
+
 void touch_event (Window& window, WindowEvent event, const WindowEventContext& context)
 {
   printf ("window '%s': touch event ", window.Title ());
@@ -132,7 +142,8 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
   {
     case WindowEvent_OnClose:
       printf ("Window close event\n");
-      Application::Exit (0);      
+      Application::Exit (0);
+      
       break;
     case WindowEvent_OnChangeHandle: printf ("Window changed handle to %p event\n", context.handle); break;
     case WindowEvent_OnActivate:     printf ("Window activate event\n");       break;
@@ -155,7 +166,7 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
 void app_exit ()
 {
   printf ("application exit\n");
-  fflush (stdout);  
+  fflush (stdout);
 }
 
 void print (const char* message)
@@ -170,6 +181,65 @@ void log_print (const char* stream, const char* message)
   fflush (stdout);
 }
 
+void on_application_initialized ()
+{
+  window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
+
+  Window& window = *window_holder;
+
+  window.SetBackgroundState (true);
+
+  window.SetTitle ("Test window");
+  window.Show ();
+  window.SetFocus ();
+
+  window.RegisterEventHandler (WindowEvent_OnKeyDown, &keys);
+  window.RegisterEventHandler (WindowEvent_OnKeyUp, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMouseMove, &mousemove);
+  window.RegisterEventHandler (WindowEvent_OnMouseLeave, &mouseleave);
+  window.RegisterEventHandler (WindowEvent_OnDestroy, &destroy);
+  window.RegisterEventHandler (WindowEvent_OnLeftButtonDown, &keys);
+  window.RegisterEventHandler (WindowEvent_OnLeftButtonUp, &keys);
+  window.RegisterEventHandler (WindowEvent_OnLeftButtonDoubleClick, &keys);
+  window.RegisterEventHandler (WindowEvent_OnRightButtonDown, &keys);
+  window.RegisterEventHandler (WindowEvent_OnRightButtonUp, &keys);
+  window.RegisterEventHandler (WindowEvent_OnRightButtonDoubleClick, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMiddleButtonDown, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMiddleButtonUp, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, &keys);
+  window.RegisterEventHandler (WindowEvent_OnChar, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMouseVerticalWheel, &keys);
+  window.RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton1Down, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton1Up, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton1DoubleClick, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton2Down, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton2Up, &keys);
+  window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys);
+  window.RegisterEventHandler (WindowEvent_OnClose, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnActivate, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnDeactivate, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnShow, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnHide, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnSetFocus, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnLostFocus, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnPaint, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnMove, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnSize, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnTouchesBegan, &touch_event);
+  window.RegisterEventHandler (WindowEvent_OnTouchesDoubletap, &touch_event);
+  window.RegisterEventHandler (WindowEvent_OnTouchesMoved, &touch_event);
+  window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event);
+  window.RegisterEventHandler (WindowEvent_OnScreenLock, &print_event);
+  window.RegisterEventHandler (WindowEvent_OnScreenUnlock, &print_event);
+
+  window.SetDebugLog (&print);
+  window.SetMultitouchEnabled (true);
+
+  fflush (stdout);
+}
+
 int main ()
 {
   printf ("Results of window1_test:\n");
@@ -178,59 +248,8 @@ int main ()
   {
     common::LogFilter log_filter ("*", &log_print);
     
-    Window window (WindowStyle_Overlapped, 400, 300);
-    
-    window.SetBackgroundState (true);
-
-    window.SetTitle ("Test window");
-    window.Show ();
-    window.SetFocus ();
-
-    auto_connection connection1  = window.RegisterEventHandler (WindowEvent_OnKeyDown, &keys),
-                    connection2  = window.RegisterEventHandler (WindowEvent_OnKeyUp, &keys),
-                    connection3  = window.RegisterEventHandler (WindowEvent_OnMouseMove, &mousemove),
-                    connection4  = window.RegisterEventHandler (WindowEvent_OnDestroy, &destroy),
-                    connection5  = Application::RegisterEventHandler (ApplicationEvent_OnExit, &app_exit),
-                    connection6  = window.RegisterEventHandler (WindowEvent_OnLeftButtonDown, &keys),
-                    connection7  = window.RegisterEventHandler (WindowEvent_OnLeftButtonUp, &keys),
-                    connection8  = window.RegisterEventHandler (WindowEvent_OnLeftButtonDoubleClick, &keys),
-                    connection9  = window.RegisterEventHandler (WindowEvent_OnRightButtonDown, &keys),
-                    connection10 = window.RegisterEventHandler (WindowEvent_OnRightButtonUp, &keys),
-                    connection11 = window.RegisterEventHandler (WindowEvent_OnRightButtonDoubleClick, &keys),
-                    connection12 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonDown, &keys),
-                    connection13 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonUp, &keys),
-                    connection14 = window.RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, &keys),
-                    connection15 = window.RegisterEventHandler (WindowEvent_OnChar, &keys),
-                    connection16 = window.RegisterEventHandler (WindowEvent_OnMouseVerticalWheel, &keys),
-                    connection17 = window.RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel, &keys),
-                    connection18 = window.RegisterEventHandler (WindowEvent_OnXButton1Down, &keys),
-                    connection19 = window.RegisterEventHandler (WindowEvent_OnXButton1Up, &keys),
-                    connection20 = window.RegisterEventHandler (WindowEvent_OnXButton1DoubleClick, &keys),
-                    connection21 = window.RegisterEventHandler (WindowEvent_OnXButton2Down, &keys),
-                    connection22 = window.RegisterEventHandler (WindowEvent_OnXButton2Up, &keys),
-                    connection23 = window.RegisterEventHandler (WindowEvent_OnXButton2DoubleClick, &keys),
-                    connection24 = window.RegisterEventHandler (WindowEvent_OnClose, &print_event),
-                    connection25 = window.RegisterEventHandler (WindowEvent_OnActivate, &print_event),
-                    connection26 = window.RegisterEventHandler (WindowEvent_OnDeactivate, &print_event),
-                    connection27 = window.RegisterEventHandler (WindowEvent_OnShow, &print_event),
-                    connection28 = window.RegisterEventHandler (WindowEvent_OnHide, &print_event),
-                    connection29 = window.RegisterEventHandler (WindowEvent_OnSetFocus, &print_event),
-                    connection30 = window.RegisterEventHandler (WindowEvent_OnLostFocus, &print_event),
-                    connection31 = window.RegisterEventHandler (WindowEvent_OnPaint, &print_event),
-                    connection32 = window.RegisterEventHandler (WindowEvent_OnMove, &print_event),
-                    connection33 = window.RegisterEventHandler (WindowEvent_OnSize, &print_event),
-                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event),
-                    connection35 = window.RegisterEventHandler (WindowEvent_OnTouchesBegan, &touch_event),
-                    connection36 = window.RegisterEventHandler (WindowEvent_OnTouchesDoubletap, &touch_event),
-                    connection37 = window.RegisterEventHandler (WindowEvent_OnTouchesMoved, &touch_event),
-                    connection38 = window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event),
-                    connection39 = window.RegisterEventHandler (WindowEvent_OnScreenLock, &print_event),
-                    connection40 = window.RegisterEventHandler (WindowEvent_OnScreenUnlock, &print_event);
-
-    window.SetDebugLog (&print);
-    window.SetMultitouchEnabled (true);
-    
-    fflush (stdout);    
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
+    Application::RegisterEventHandler (ApplicationEvent_OnExit, &app_exit),
 
     Application::Run ();
 

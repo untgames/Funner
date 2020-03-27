@@ -108,7 +108,7 @@ stl::string DefaultApplicationManager::GetEnvironmentVariable (const char* name)
   const char* result = getenv (name);
   
   if (!result)
-    throw xtl::format_operation_exception ("syslib::DefaultApplicationManager::GetEnvironmentVariable", "Environment variable '%s' not found");
+    throw xtl::format_operation_exception ("syslib::DefaultApplicationManager::GetEnvironmentVariable", "Environment variable '%s' not found", name);
 
   return result;
 }

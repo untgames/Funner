@@ -5,7 +5,7 @@ ML_NAME           := ml64
 include $(TOOLSETS_DIR)/common/msvc.mak
 
 ifneq (,$(VS140COMNTOOLS))
-  LIB := $(UCRT_PATH)Lib/$(UCRT_VERSION)/ucrt/x64/;$(LIB)
+  LIB := $(UCRT_PATH)/Lib/$(UCRT_VERSION)/ucrt/x64/;$(LIB)
 endif
 
 MSVC_BIN_PATH := $(MSVC_BIN_PATH)/amd64

@@ -84,6 +84,10 @@ class ConnectionState: public xtl::noncopyable
     void SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properties_id);
     void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id);
 
+    void UpdateDynamicMesh (object_id_t id, const media::geometry::Mesh& mesh);
+    void UpdateIndexBufferData (interchange::InputStream&);
+    void UpdateVertexStreamData (interchange::InputStream&);
+
     void SetStaticMeshName (object_id_t id, const char* name);
 
     void SetLightParams (object_id_t id, const interchange::LightParams& params);

@@ -93,3 +93,16 @@ Semantic 'texcoord6' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'texcoord7' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
+dump vf4
+vertex format (3 attributes, min_vertex_size=14):
+  attribute: semantic='position' type='float3' offset=2
+  attribute: name='normal_name' semantic='normal' type='short3' offset=3
+  attribute: name='color_name' semantic='color' type='ubyte4' offset=4
+vf4 serialization size is 84
+Bytes written during serialization = 84, data hash = ad0e8fda
+Bytes read during deserialization = 84
+deserialized vertex format:
+vertex format (3 attributes, min_vertex_size=14):
+  attribute: semantic='position' type='float3' offset=2
+  attribute: name='normal_name' semantic='normal' type='short3' offset=3
+  attribute: name='color_name' semantic='color' type='ubyte4' offset=4

@@ -1,0 +1,1 @@
+COMPONENT_DIRS := 3.6

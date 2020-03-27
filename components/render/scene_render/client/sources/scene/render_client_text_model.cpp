@@ -356,14 +356,13 @@ class TextModel: public VisualModel
 
           //сброс кэша
 
-        for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end ();)
+        for (FontTextBlockArray::iterator iter=font_text_blocks.begin (); iter!=font_text_blocks.end (); ++ iter)
           if (*iter && !(*iter)->used)
           {
             context.RemoveSpriteList (Id (), (uint32)(iter - font_text_blocks.begin ()));
 
-            font_text_blocks.erase (iter);
+            *iter = FontTextBlockPtr ();
           }
-          else ++iter;
       }
       catch (xtl::exception& e)
       {

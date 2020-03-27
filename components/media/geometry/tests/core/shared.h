@@ -7,9 +7,11 @@
 #include <common/strlib.h>
 
 #include <media/mesh.h>
+#include <media/geometry/mesh_observer.h>
 
 #include <xtl/function.h>
 #include <xtl/iterator.h>
+#include <xtl/uninitialized_storage.h>
 
 using namespace media::geometry;
 using namespace media;
@@ -76,7 +78,7 @@ void dump (const CustomVertex& v)
 //вывод потока вершин
 void dump (const VertexStream& s)
 {
-  printf ("vertex stream (%u vertices):\n", s.Size ());
+  printf ("vertex stream id=%llu, source_id=%llu (%u vertices):\n", s.Id (), s.SourceId (), s.Size ());
 
   const CustomVertex* verts = s.Data<CustomVertex> ();
   

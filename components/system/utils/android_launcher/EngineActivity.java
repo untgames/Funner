@@ -40,8 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.http.client.CookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 ///Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity
@@ -342,14 +340,14 @@ public class EngineActivity extends Activity
   }
   
 /// Создание окна
-  public EngineViewController createSurfaceViewController (String initString, final long windowRef)
+  public EngineViewController createSurfaceViewController (final long windowRef, final float contentScaleFactor)
   {
     final EngineActivity activity = this;            
     
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef, contentScaleFactor);
         
         addView (controller.getView ());
         

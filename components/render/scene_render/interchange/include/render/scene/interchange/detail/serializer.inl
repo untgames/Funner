@@ -49,6 +49,9 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
     case CommandId_SetVisualModelDynamicShaderProperties: return "SetVisualModelDynamicShaderProperties";
     case CommandId_SetVisualModelStaticShaderProperties: return "SetVisualModelStaticShaderProperties";
+    case CommandId_UpdateDynamicMesh: return "UpdateDynamicMesh";
+    case CommandId_UpdateIndexBufferData: return "UpdateIndexBufferData";
+    case CommandId_UpdateVertexStreamData: return "UpdateVertexStreamData";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
@@ -920,6 +923,56 @@ inline void ClientToServerSerializer::SetVisualModelStaticShaderProperties(objec
   }
 }
 
+inline void ClientToServerSerializer::UpdateDynamicMesh(object_id_t id, media::geometry::Mesh mesh)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdateDynamicMesh);
+    write(*this, id);
+    write(*this, mesh);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline OutputStream& ClientToServerSerializer::UpdateIndexBufferData()
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdateIndexBufferData);
+    return *this;
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline OutputStream& ClientToServerSerializer::UpdateVertexStreamData()
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdateVertexStreamData);
+    return *this;
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::SetStaticMeshName(object_id_t id, const char* mesh_name)
 {
   size_t saved_position = Position ();
@@ -1632,6 +1685,25 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 
       dispatcher.SetVisualModelStaticShaderProperties(arg1, arg2);
 
+      return true;
+    }
+    case CommandId_UpdateDynamicMesh:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      media::geometry::Mesh arg2 = read(*this, xtl::type<media::geometry::Mesh > ());
+
+      dispatcher.UpdateDynamicMesh(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_UpdateIndexBufferData:
+    {
+      dispatcher.UpdateIndexBufferData(*this);
+      return true;
+    }
+    case CommandId_UpdateVertexStreamData:
+    {
+      dispatcher.UpdateVertexStreamData(*this);
       return true;
     }
     case CommandId_SetStaticMeshName:

@@ -1900,5 +1900,5 @@ Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char*
 
   BackgroundCopyFileDataPtr data (new BackgroundCopyFileData (source_file_name, destination_file_name, callback, thread, buffer_size), false);
 
-  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, data), ActionThread_Background, 0, 0);
+  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, data), ActionThread_Background, ActionQueue::time_t (), ActionQueue::time_t ());
 }

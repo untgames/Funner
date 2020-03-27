@@ -1,14 +1,9 @@
 
 /*
- * Author: 
+ * Author:
  *      Guido Draheim <guidod@gmx.de>
  *
- * Copyright (c) 2000,2001,2002,2003 Guido Draheim
- *          All rights reserved,
- *          use under the restrictions of the
- *          Lesser GNU General Public License
- *          or alternatively the restrictions 
- *          of the Mozilla Public License 1.1
+ * Copyright (c) Guido Draheim, use under copyleft (LGPL,MPL)
  */
 
 #include <zzip/lib.h>           /* exported... */
@@ -22,9 +17,9 @@
 #include <stdio.h>
 #endif
 
-/** 
- *  just returns dir->errcode of the ZZIP_DIR handle 
- *  see: => zzip_dir_open, => zzip_diropen, => zzip_readdir, => zzip_dir_read
+/** get errror status.
+ *  This function just returns dir->errcode of the ZZIP_DIR handle
+ *  see: => zzip_dir_open, => zzip_dir_open, => zzip_readdir, => zzip_dir_read
  */
 int
 zzip_error(ZZIP_DIR * dir)
@@ -33,13 +28,13 @@ zzip_error(ZZIP_DIR * dir)
 }
 
 /** => zzip_error
- *  This function just does dir->errcode = errcode 
+ *  This function just does dir->errcode = errcode
  */
 void
 zzip_seterror(ZZIP_DIR * dir, int errcode) { dir->errcode = errcode; }
 
-/** 
- * This function will just return fp->dir 
+/** get handle.
+ * This function will just return the fp->dir value.
  *
  * If a ZZIP_FILE is contained within a zip-file that one will be a valid
  * pointer, otherwise a NULL is returned and the ZZIP_FILE wraps a real file.
@@ -51,10 +46,10 @@ zzip_dirhandle(ZZIP_FILE * fp)
 }
 
 /** => zzip_dirhandle
- *  This function will just return dir->fd 
+ *  This function will just return dir->fd
  *
  * If a ZZIP_DIR does point to a zipfile then the file-descriptor of that
- * zipfile is returned, otherwise a NULL is returned and the ZZIP_DIR wraps 
+ * zipfile is returned, otherwise a NULL is returned and the ZZIP_DIR wraps
  * a real directory DIR (if you have dirent on your system).
  */
 int
@@ -63,58 +58,51 @@ zzip_dirfd(ZZIP_DIR * dir)
     return dir->fd;
 }
 
-/**
- * return static const string of the known compression methods, 
- * otherwise just "zipped" is returned
+#define LENGTH(x) (sizeof(x) / sizeof(*x))
+static const char* comprlevel[] = {
+    "stored",   "shrunk",   "redu:1",   "redu:2",   "redu:3",   "redu:4",
+    "impl:N",   "toknze",   "defl:N",   "defl:B",   "impl:B" };
+
+/** compr name.
+ * This function returns the static const string of the known compression methods,
+ * Unknown id values will return just "zipped" as the string code.
  */
 zzip_char_t *
 zzip_compr_str(int compr)
 {
-    switch (compr)
+    if (0 <= compr && compr < LENGTH(comprlevel))
     {
-	/* *INDENT-OFF* */
-    case ZZIP_IS_STORED:		return "stored";
-    case ZZIP_IS_SHRUNK:		return "shrunk";
-    case ZZIP_IS_REDUCEDx1:
-    case ZZIP_IS_REDUCEDx2:
-    case ZZIP_IS_REDUCEDx3:
-    case ZZIP_IS_REDUCEDx4:		return "reduced";
-    case ZZIP_IS_IMPLODED:		return "imploded";
-    case ZZIP_IS_TOKENIZED:		return "tokenized";
-    case ZZIP_IS_DEFLATED:		return "deflated";
-    case ZZIP_IS_DEFLATED_BETTER:	return "deflatedX";
-    case ZZIP_IS_IMPLODED_BETTER:	return "implodedX";
-    default:
-        if (0 < compr && compr < 256)   return "zipped"; 
-        else
-        {
+        return comprlevel[compr];
+    } else if (0 < compr && compr < 256) 
+    {
+        return "zipped";
+    } else
+    {
 #	ifdef S_ISDIR
-            if (S_ISDIR(compr))		return "directory";
+        if (S_ISDIR(compr))		return "directory";
 #	endif
 #	ifdef S_ISCHR
-            if (S_ISCHR(compr))		return "is/chr";
+        if (S_ISCHR(compr))		return "is/chr";
 #	endif
 #	ifdef S_ISBLK
-            if (S_ISBLK(compr))		return "is/blk";
+        if (S_ISBLK(compr))		return "is/blk";
 #	endif
 #	ifdef S_ISFIFO
-            if (S_ISFIFO(compr))	return "is/fifo";
+        if (S_ISFIFO(compr))	return "is/fifo";
 #	endif
 #	ifdef S_ISSOCK
-            if (S_ISSOCK(compr))	return "is/sock";
+        if (S_ISSOCK(compr))	return "is/sock";
 #	endif
 #	ifdef S_ISLNK
-            if (S_ISLNK(compr))		return "is/lnk";
+        if (S_ISLNK(compr))		return "is/lnk";
 #	endif
-            return "special";
-        }
-	/* *INDENT-ON* */
-    }                           /*switch */
+        return "special";
+    }
 }
 
 /** => zzip_file_real
- * This function checks if the ZZIP_DIR-handle is wrapping 
- * a real directory or a zip-archive. 
+ * This function checks if the ZZIP_DIR-handle is wrapping
+ * a real directory or a zip-archive.
  * Returns 1 for a stat'able directory, and 0 for a handle to zip-archive.
  */
 int
@@ -123,9 +111,9 @@ zzip_dir_real(ZZIP_DIR * dir)
     return dir->realdir != 0;
 }
 
-/**
- * This function checks if the ZZIP_FILE-handle is wrapping 
- * a real file or a zip-contained file. 
+/** check real or zipped file.
+ * This function checks if the ZZIP_FILE-handle is wrapping
+ * a real file or a zip-contained file.
  * Returns 1 for a stat'able file, and 0 for a file inside a zip-archive.
  */
 int
@@ -156,7 +144,7 @@ zzip_realfd(ZZIP_FILE * fp)
     return fp->fd;
 }
 
-/* 
+/*
  * Local variables:
  * c-file-style: "stroustrup"
  * End:

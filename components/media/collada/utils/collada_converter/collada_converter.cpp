@@ -501,9 +501,10 @@ void save_meshes (const Params& params, const Model& model)
     
     for (media::geometry::MeshLibrary::Iterator iter=mesh_library.CreateIterator (); iter; ++iter)
     {
-      media::geometry::Mesh mesh   = *iter;
-      const char*           id     = mesh_library.ItemId (iter);
-      stl::string           new_id = common::format ("%s.%s", params.output_resources_namespace.c_str (), id);
+      media::geometry::Mesh               mesh         = *iter;
+      const media::geometry::MaterialMap& material_map = mesh.MaterialMap ();
+      const char*                         id           = mesh_library.ItemId (iter);
+      stl::string                         new_id       = common::format ("%s.%s", params.output_resources_namespace.c_str (), id);
       
       size_t count = mesh.PrimitivesCount ();
       
@@ -512,7 +513,7 @@ void save_meshes (const Params& params, const Model& model)
         const media::geometry::Primitive& primitive = mesh.Primitive (i);
         
         mesh.AddPrimitive (primitive.type, primitive.vertex_buffer, primitive.first, primitive.count, 
-          common::format ("%s.%s", params.output_resources_namespace.c_str (), primitive.material).c_str ());
+          common::format ("%s.%s", params.output_resources_namespace.c_str (), material_map.MaterialName (primitive.material_id)).c_str ());
       }
 
       for (size_t i=0; i<count; i++)

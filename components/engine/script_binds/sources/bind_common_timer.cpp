@@ -10,8 +10,6 @@ namespace
 
 const char* COMMON_TIMER_LIBRARY = "Common.Timer";
 
-}
-
 Timer create_timer ()
 {
   return Timer ();
@@ -26,6 +24,8 @@ void set_started (Timer& timer, bool state)
 {
   if (state) timer.Start ();
   else       timer.Stop ();
+}
+
 }
 
 namespace engine

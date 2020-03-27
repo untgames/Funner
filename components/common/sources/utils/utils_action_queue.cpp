@@ -52,7 +52,7 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
   bool                           is_completed;    //завершено ли действие
   bool                           is_canceled;     //действие отменено
 
-  ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
+  ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, const ActionQueue::time_t& delay, const ActionQueue::time_t& in_period, const Action::WaitCompleteHandler& in_wait_handler)
     : action_handler (in_handler)
     , wait_handler (in_wait_handler)
     , thread_type (in_thread_type)
@@ -64,6 +64,37 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
     , is_completed (false)
     , is_canceled (false)
   {
+    //next time and period should have same denominator. In other case denominator will grow on each Action re-queue due to rational arithmetics
+    ActionQueue::time_t::int_type next_time_denominator = next_time.denominator (),
+                                  period_denominator    = period.denominator ();
+
+    if (next_time_denominator != period_denominator)
+    {
+      ActionQueue::time_t::int_type next_time_period_denominator;
+
+      if (next_time_denominator % period_denominator == 0)
+      {
+        next_time_period_denominator = next_time_denominator;
+      }
+      else if (period_denominator % next_time_denominator == 0)
+      {
+        next_time_period_denominator = period_denominator;
+      }
+      else
+      {
+        next_time_period_denominator = next_time_denominator * period_denominator;
+      }
+
+      if (next_time_denominator != next_time_period_denominator)
+      {
+        next_time.assign (next_time.numerator () * (next_time_period_denominator / next_time_denominator), next_time_period_denominator);
+      }
+
+      if (period_denominator != next_time_period_denominator)
+      {
+        period.assign (period.numerator () * (next_time_period_denominator / period_denominator), next_time_period_denominator);
+      }
+    }
   }
   
   Action GetWrapper () { return Action (this); }
@@ -214,7 +245,7 @@ class ActionQueueImpl
     }
 
 ///Добавление действия в очередь
-    Action PushAction (const ActionHandler& action_handler, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
+    Action PushAction (const ActionHandler& action_handler, ActionThread thread, bool is_periodic, const time_t& delay, const time_t& period, Timer& timer)
     {
       try
       {
@@ -241,7 +272,7 @@ class ActionQueueImpl
       }
     }
     
-    Action PushAction (const ActionHandler& action_handler, size_t thread_id, bool is_periodic, time_t delay, time_t period, Timer& timer)
+    Action PushAction (const ActionHandler& action_handler, size_t thread_id, bool is_periodic, const time_t& delay, const time_t& period, Timer& timer)
     {
       try
       {
@@ -478,78 +509,78 @@ typedef common::Singleton<ActionQueueImpl> ActionQueueSingleton;
     Врапперы
 */
 
-Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, const time_t& delay)
 {
   ActionQueueSingleton::Instance queue;
 
-  return queue->PushAction (action, thread, false, delay, 0.0, queue->DefaultTimer ());
+  return queue->PushAction (action, thread, false, delay, ActionQueue::time_t (0), queue->DefaultTimer ());
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, const time_t& delay, const time_t& period)
 {
   ActionQueueSingleton::Instance queue;
 
   return queue->PushAction (action, thread, true, delay, period, queue->DefaultTimer ());
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, const time_t& delay, Timer& timer)
 {
   ActionQueueSingleton::Instance queue;
 
-  return queue->PushAction (action, thread, false, delay, 0.0, timer);
+  return queue->PushAction (action, thread, false, delay, ActionQueue::time_t (0), timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, const time_t& delay, const time_t& period, Timer& timer)
 {
   ActionQueueSingleton::Instance queue;
 
   return queue->PushAction (action, thread, true, delay, period, timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, const time_t& delay)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, const time_t& delay, Timer& timer)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay, timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay)
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, const time_t& delay)
 {
   ActionQueueSingleton::Instance queue;
 
-  return queue->PushAction (action, thread_id, false, delay, 0.0, queue->DefaultTimer ());
+  return queue->PushAction (action, thread_id, false, delay, ActionQueue::time_t (0), queue->DefaultTimer ());
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, time_t period)
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, const time_t& delay, const time_t& period)
 {
   ActionQueueSingleton::Instance queue;
 
   return queue->PushAction (action, thread_id, true, delay, period, queue->DefaultTimer ());
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, const time_t& delay, Timer& timer)
 {
   ActionQueueSingleton::Instance queue;
 
-  return queue->PushAction (action, thread_id, false, delay, 0.0, timer);
+  return queue->PushAction (action, thread_id, false, delay, ActionQueue::time_t (0), timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, time_t period, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, const time_t& delay, const time_t& period, Timer& timer)
 {
   ActionQueueSingleton::Instance queue;
 
   return queue->PushAction (action, thread_id, true, delay, period, timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, time_t delay)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, const time_t& delay)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread_id, delay);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, time_t delay, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, const time_t& delay, Timer& timer)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread_id, delay, timer);
 }
@@ -785,10 +816,10 @@ struct ThreadCallbackWrapper
     {
       case ActionThread_Main:
       case ActionThread_Background:        
-        queue->PushAction (callback_handler, thread_type, false, 0, 0, queue->DefaultTimer ());
+        queue->PushAction (callback_handler, thread_type, false, ActionQueue::time_t (0), ActionQueue::time_t (0), queue->DefaultTimer ());
         break;
       case ActionThread_Current:
-        queue->PushAction (callback_handler, thread_id, false, 0, 0, queue->DefaultTimer ());
+        queue->PushAction (callback_handler, thread_id, false, ActionQueue::time_t (0), ActionQueue::time_t (0), queue->DefaultTimer ());
         break;
       default:
         throw xtl::format_operation_exception ("common::ThreadCallbackWrapper::operator()", "Bad ActionThread %d", thread_type);

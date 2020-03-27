@@ -20,6 +20,7 @@ EXTERN.OPENALLIB.NAME                       := funner.extern.openal32
 EXTERN.OPENALLIB.INCLUDE_DIRS               := include sources sources/openal32 sources/alc/mixer_inc
 EXTERN.OPENALLIB.SOURCE_DIRS                := sources/openal32 sources/alc
 EXTERN.OPENALLIB.g++.COMPILER_DEFINES       := AL_ALEXT_PROTOTYPES _GNU_SOURCE=1 AL_BUILD_LIBRARY HAVE_GCC_VISIBILITY
+EXTERN.OPENALLIB.clang.COMPILER_DEFINES     := AL_ALEXT_PROTOTYPES _GNU_SOURCE=1 AL_BUILD_LIBRARY HAVE_GCC_VISIBILITY
 EXTERN.OPENALLIB.msvc.COMPILER_DEFINES      := AL_ALEXT_PROTOTYPES AL_BUILD_LIBRARY snprintf=_snprintf isfinite=_finite strcasecmp=_stricmp strncasecmp=_strnicmp
 EXTERN.OPENALLIB.linux.COMPILER_CFLAGS      := -pthread --no-warn
 EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt

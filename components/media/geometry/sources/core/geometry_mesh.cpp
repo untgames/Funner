@@ -9,32 +9,26 @@ const size_t DEFAULT_PRIMITIVES_ARRAY_RESERVE = 8; //количество рез
 const size_t DEFAULT_VB_ARRAY_RESERVE         = 4; //количество резервируемых вершинных буферов
 
 /*
-    Реализация примитива
-*/
-
-struct PrimitiveImpl: public Primitive
-{
-  size_t material_name_offset; //смещение имени материала в строке имён
-};
-
-/*
     Описание реализации Mesh
 */
 
-typedef stl::vector<PrimitiveImpl> PrimitiveArray;
-typedef stl::vector<VertexBuffer>  VertexBufferArray;
+typedef stl::vector<Primitive>    PrimitiveArray;
+typedef stl::vector<VertexBuffer> VertexBufferArray;
 
-struct Mesh::Impl: public xtl::reference_counter
+struct Mesh::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  string                       name;                       //имя меша
-  VertexBufferArray            vertex_buffers;             //вершинные буферы
-  media::geometry::IndexBuffer index_buffer;               //индексный буфер
-  PrimitiveArray               primitives;                 //примитивы
-  string                       material_names;             //имена материалов
-  bool                         need_material_names_update; //необходимо обновить имена материалов
+  object_id_t                  id;                           //идентификатор меша
+  object_id_t                  source_id;                    //идентификатор меша из которого был клонирован / десериализован данный меш
+  string                       name;                         //имя меша
+  media::geometry::MaterialMap material_map;                 //карта материалов
+  VertexBufferArray            vertex_buffers;               //вершинные буферы
+  media::geometry::IndexBuffer index_buffer;                 //индексный буфер
+  PrimitiveArray               primitives;                   //примитивы
+  unsigned int                 structure_update_index;       //индекс обновления структуры меша (индекс буфер был заменен, либо вершинный буфер был добавлен или удален)
+  unsigned int                 primitives_data_update_index; //индекс обновления данных примитивов
   
   Impl (); 
-  Impl (const Impl&);
+  Impl (const Impl&); //used for clone
 };
 
 /*
@@ -42,21 +36,29 @@ struct Mesh::Impl: public xtl::reference_counter
 */
 
 Mesh::Impl::Impl ()
+  : id (IdPool::AllocateId (ObjectType_Mesh))
+  , source_id (id)
+  , structure_update_index (0)
+  , primitives_data_update_index (0)
 {
   primitives.reserve (DEFAULT_PRIMITIVES_ARRAY_RESERVE);
   vertex_buffers.reserve (DEFAULT_VB_ARRAY_RESERVE);
-  
-  need_material_names_update = true;
 }
 
 Mesh::Impl::Impl (const Impl& impl)
-  : name (impl.name),
-    vertex_buffers (impl.vertex_buffers),
-    index_buffer (impl.index_buffer),
-    primitives (impl.primitives),
-    material_names (impl.material_names),
-    need_material_names_update (true)
+  : id (IdPool::AllocateId (ObjectType_Mesh))
+  , source_id (impl.source_id)
+  , name (impl.name)
+  , material_map (impl.material_map.Clone ())
+  , index_buffer (impl.index_buffer.Clone ())
+  , primitives (impl.primitives)
+  , structure_update_index (0)
+  , primitives_data_update_index (0)
 {
+  vertex_buffers.reserve (impl.vertex_buffers.size ());
+
+  for (VertexBufferArray::const_iterator iter = impl.vertex_buffers.begin (), end = impl.vertex_buffers.end (); iter != end; ++iter)
+    vertex_buffers.push_back (iter->Clone ());
 }
 
 /*
@@ -64,7 +66,7 @@ Mesh::Impl::Impl (const Impl& impl)
 */
 
 Mesh::Mesh ()
-  : impl (new Impl)
+  : impl (new Impl, false)
   {}
   
 Mesh::Mesh (Impl* in_impl)
@@ -103,9 +105,18 @@ Mesh Mesh::Clone () const
     Идентификатор меша
 */
 
-size_t Mesh::Id () const
+object_id_t Mesh::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return impl->id;
+}
+
+/*
+   Идентификатор меша из которого был клонирован / десериализован данный меш
+*/
+
+object_id_t Mesh::SourceId () const
+{
+  return impl->source_id;
 }
 
 /*
@@ -123,6 +134,30 @@ void Mesh::Rename (const char* name)
     throw xtl::make_null_argument_exception ("media::geometry::Mesh::Rename", "name");
     
   impl->name = name;
+}
+
+/*
+   Карта материалов
+*/
+
+void Mesh::Attach (const geometry::MaterialMap& map)
+{
+  impl->material_map = map;
+}
+
+void Mesh::DetachMaterialMap ()
+{
+  impl->material_map = geometry::MaterialMap ();
+}
+
+const geometry::MaterialMap& Mesh::MaterialMap () const
+{
+  return impl->material_map;
+}
+
+geometry::MaterialMap& Mesh::MaterialMap ()
+{
+  return impl->material_map;
 }
 
 /*
@@ -163,37 +198,47 @@ media::geometry::IndexBuffer& Mesh::IndexBuffer ()
     Присоединение/отсоединение буферов
 */
 
-uint32_t Mesh::Attach (media::geometry::VertexBuffer& vb)
+uint32_t Mesh::Attach (const media::geometry::VertexBuffer& vb)
 {
   if (impl->vertex_buffers.size () == (uint32_t)-1)
     throw xtl::format_operation_exception ("media::geometry::Mesh::Attach", "Vertex buffers array max size exceeded");
 
   impl->vertex_buffers.push_back (vb);
 
+  impl->structure_update_index++;
+
   return (uint32_t)impl->vertex_buffers.size () - 1;
 }
 
-void Mesh::Attach (media::geometry::IndexBuffer& ib)
+void Mesh::Attach (const media::geometry::IndexBuffer& ib)
 {
   impl->index_buffer = ib;
+
+  impl->structure_update_index++;
 }
-    
+
 void Mesh::DetachVertexBuffer (uint32_t index)
 {
   if (index >= impl->vertex_buffers.size ())
     return;
 
   impl->vertex_buffers.erase (impl->vertex_buffers.begin () + index);
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachIndexBuffer ()
 {
   impl->index_buffer = media::geometry::IndexBuffer ();
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachAllVertexBuffers ()
 {
   impl->vertex_buffers.clear ();
+
+  impl->structure_update_index++;
 }
 
 void Mesh::DetachAllBuffers ()
@@ -216,16 +261,6 @@ const Primitive& Mesh::Primitive (uint32_t index) const
   if (index >= impl->primitives.size ())
     throw xtl::make_range_exception ("media::geometry::Mesh::Primitive", "index", index, impl->primitives.size ());
     
-  if (impl->need_material_names_update)
-  {
-    const char* name_base = impl->material_names.c_str ();
-    
-    for (PrimitiveArray::iterator i=impl->primitives.begin (), end=impl->primitives.end (); i!=end; ++i)
-      i->material = name_base + i->material_name_offset;
-
-    impl->need_material_names_update = false;
-  }
-
   return impl->primitives [index];
 }
 
@@ -235,6 +270,19 @@ const Primitive& Mesh::Primitive (uint32_t index) const
 
 uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, const char* material)
 {
+  if (!material)
+    material = "";
+
+  int32_t material_id = impl->material_map.FindMaterialId (material);
+
+  if (material_id == MaterialMap::INVALID_MATERIAL_ID)
+    material_id = impl->material_map.SetMaterial (material);
+
+  return AddPrimitive (type, vertex_buffer, first, count, base_vertex, material_id);
+}
+
+uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t base_vertex, uint32_t material_id)
+{
   static const char* METHOD_NAME = "media::geometry::Mesh::AddPrimitive";
 
   if (type < 0 || type >= PrimitiveType_Num)
@@ -243,39 +291,30 @@ uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_
   if (impl->primitives.size () == (uint32_t)-1)
     throw xtl::format_operation_exception (METHOD_NAME, "Primitives max count exceeded");
 
-  if (!material)
-    material = "";
-    
-  PrimitiveImpl primitive;
+  media::geometry::Primitive primitive;
   
-  primitive.type                 = type;
-  primitive.vertex_buffer        = vertex_buffer;
-  primitive.first                = first;
-  primitive.count                = count;
-  primitive.base_vertex          = base_vertex;
-  primitive.material             = 0;
-  primitive.material_name_offset = impl->material_names.size ();
+  primitive.type          = type;
+  primitive.vertex_buffer = vertex_buffer;
+  primitive.first         = first;
+  primitive.count         = count;
+  primitive.base_vertex   = base_vertex;
+  primitive.material_id   = material_id;
 
-  impl->material_names.append (material, xtl::xstrlen (material) + 1);
+  impl->primitives.push_back (primitive);
 
-  try
-  {
-    impl->primitives.push_back (primitive);
+  impl->primitives_data_update_index++;
 
-    impl->need_material_names_update = true;
-
-    return (uint32_t)impl->primitives.size () - 1;
-  }
-  catch (...)
-  {
-    impl->material_names.erase (primitive.material_name_offset);
-    throw;
-  }
+  return (uint32_t)impl->primitives.size () - 1;
 }
 
 uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, const char* material)
 {
   return AddPrimitive (type, vertex_buffer, first, count, 0, material);
+}
+
+uint32_t Mesh::AddPrimitive (PrimitiveType type, uint32_t vertex_buffer, uint32_t first, uint32_t count, uint32_t material_id)
+{
+  return AddPrimitive (type, vertex_buffer, first, count, 0, material_id);
 }
 
 void Mesh::RemovePrimitive (uint32_t primitive_index)
@@ -285,14 +324,14 @@ void Mesh::RemovePrimitive (uint32_t primitive_index)
 
   impl->primitives.erase (impl->primitives.begin () + primitive_index);
 
-  if (impl->primitives.empty ())
-    impl->material_names.clear ();
+  impl->primitives_data_update_index++;
 }
 
 void Mesh::RemoveAllPrimitives ()
 {
   impl->primitives.clear ();
-  impl->material_names.clear ();
+
+  impl->primitives_data_update_index++;
 }
 
 /*
@@ -303,6 +342,230 @@ void Mesh::Clear ()
 {
   RemoveAllPrimitives ();
   DetachAllBuffers ();
+}
+
+/*
+   Текущий индекс обновления
+*/
+
+unsigned int Mesh::CurrentStructureUpdateIndex () const
+{
+  return impl->structure_update_index;
+}
+
+unsigned int Mesh::CurrentPrimitivesDataUpdateIndex () const
+{
+  return impl->primitives_data_update_index;
+}
+
+/*
+   Сериализация / десериализация
+*/
+
+size_t Mesh::SerializationSize () const
+{
+  uint32_t vertex_buffers_size = 0;
+
+  for (VertexBufferArray::iterator iter = impl->vertex_buffers.begin (), end = impl->vertex_buffers.end (); iter != end; ++iter)
+    vertex_buffers_size += iter->SerializationSize ();
+
+  return sizeof (impl->source_id) + sizeof (uint32_t) + impl->name.size () + impl->material_map.SerializationSize () + sizeof (uint32_t) +
+         vertex_buffers_size + impl->index_buffer.SerializationSize () + SerializationPrimitivesDataSize ();
+}
+
+size_t Mesh::SerializationPrimitivesDataSize () const
+{
+  return sizeof (uint32_t) + impl->primitives.size () * sizeof (media::geometry::Primitive);
+}
+
+size_t Mesh::Write (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::Mesh::Write";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_written = 0;
+
+  if (sizeof (impl->source_id) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing source id");
+
+  memcpy (buffer, &impl->source_id, sizeof (impl->source_id));
+
+  bytes_written += sizeof (impl->source_id);
+
+  uint32_t name_size = impl->name.size ();
+
+  if (sizeof (name_size) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing name size");
+
+  memcpy ((char*)buffer + bytes_written, &name_size, sizeof (name_size));
+
+  bytes_written += sizeof (name_size);
+
+  if (name_size + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing name");
+
+  memcpy ((char*)buffer + bytes_written, impl->name.data (), name_size);
+
+  bytes_written += name_size;
+
+  bytes_written += impl->material_map.Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+
+  uint32_t vertex_buffers_count = impl->vertex_buffers.size ();
+
+  if (sizeof (vertex_buffers_count) + bytes_written > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing vertex buffers count");
+
+  memcpy ((char*)buffer + bytes_written, &vertex_buffers_count, sizeof (vertex_buffers_count));
+
+  bytes_written += sizeof (vertex_buffers_count);
+
+  for (VertexBufferArray::iterator iter = impl->vertex_buffers.begin (), end = impl->vertex_buffers.end (); iter != end; ++iter)
+    bytes_written += iter->Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+
+  bytes_written += impl->index_buffer.Write ((char*)buffer + bytes_written, buffer_size - bytes_written);
+
+  return bytes_written + WritePrimitivesData ((char*)buffer + bytes_written, buffer_size - bytes_written);
+}
+
+size_t Mesh::WritePrimitivesData (void* buffer, size_t buffer_size) const
+{
+  static const char* METHOD_NAME = "media::geometry::Mesh::WritePrimitivesData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t data_size = SerializationPrimitivesDataSize ();
+
+  if (buffer_size < data_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for writing primitives data");
+
+  size_t bytes_written = 0;
+
+  uint32_t primitives_count = impl->primitives.size ();
+
+  memcpy (buffer, &primitives_count, sizeof (primitives_count));
+
+  bytes_written += sizeof (primitives_count);
+
+  memcpy ((char*)buffer + bytes_written, &impl->primitives.front (), primitives_count * sizeof (media::geometry::Primitive));
+
+  return data_size;
+}
+
+size_t Mesh::Read (const void* buffer, size_t buffer_size)
+{
+  size_t bytes_read = 0;
+
+  CreateFromSerializedData (buffer, buffer_size, bytes_read).Swap (*this);
+
+  return bytes_read;
+}
+
+size_t Mesh::ReadPrimitivesData (const void* buffer, size_t buffer_size)
+{
+  static const char* METHOD_NAME = "media::geometry::Mesh::ReadPrimitivesData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  uint32_t primitives_count;
+
+  if (sizeof (primitives_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading primitives count");
+
+  memcpy (&primitives_count, (char*)buffer + bytes_read, sizeof (primitives_count));
+
+  bytes_read += sizeof (primitives_count);
+
+  impl->primitives.clear ();
+  impl->primitives.resize (primitives_count);
+
+  size_t primitives_data_size = primitives_count * sizeof (media::geometry::Primitive);
+
+  if (primitives_data_size + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading primitives data");
+
+  memcpy (&impl->primitives.front (), (char*)buffer + bytes_read, primitives_data_size);
+
+  bytes_read += primitives_data_size;
+
+  impl->primitives_data_update_index++;
+
+  return bytes_read;
+}
+
+Mesh Mesh::CreateFromSerializedData (const void* buffer, size_t buffer_size, size_t& out_bytes_read)
+{
+  static const char* METHOD_NAME = "media::geometry::Mesh::CreateFromSerializedData";
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+
+  size_t bytes_read = 0;
+
+  Mesh new_mesh;
+
+  if (sizeof (new_mesh.impl->source_id) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading source id");
+
+  memcpy (&new_mesh.impl->source_id, buffer, sizeof (new_mesh.impl->source_id));
+
+  bytes_read += sizeof (new_mesh.impl->source_id);
+
+  uint32_t name_size;
+
+  if (sizeof (name_size) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading name size");
+
+  memcpy (&name_size, (char*)buffer + bytes_read, sizeof (name_size));
+
+  bytes_read += sizeof (name_size);
+
+  new_mesh.impl->name.fast_resize (name_size);
+
+  if (name_size + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading name");
+
+  memcpy (&new_mesh.impl->name [0], (char*)buffer + bytes_read, name_size);
+
+  bytes_read += name_size;
+
+  bytes_read += new_mesh.impl->material_map.Read ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  uint32_t vertex_buffers_count;
+
+  if (sizeof (vertex_buffers_count) + bytes_read > buffer_size)
+    throw xtl::make_argument_exception (METHOD_NAME, "buffer_size", buffer_size, "Not enough size for reading vertex buffers count");
+
+  memcpy (&vertex_buffers_count, (char*)buffer + bytes_read, sizeof (vertex_buffers_count));
+
+  bytes_read += sizeof (vertex_buffers_count);
+
+  new_mesh.impl->vertex_buffers.resize (vertex_buffers_count);
+
+  for (VertexBufferArray::iterator iter = new_mesh.impl->vertex_buffers.begin (), end = new_mesh.impl->vertex_buffers.end (); iter != end; ++iter)
+    bytes_read += iter->Read ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  bytes_read += new_mesh.impl->index_buffer.Read ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  bytes_read += new_mesh.ReadPrimitivesData ((char*)buffer + bytes_read, buffer_size - bytes_read);
+
+  out_bytes_read = bytes_read;
+
+  return new_mesh;
+}
+
+/*
+   Объект оповещения об удалении
+*/
+
+xtl::trackable& Mesh::Trackable () const
+{
+  return *impl;
 }
 
 /*
@@ -320,10 +583,11 @@ namespace media
 namespace geometry
 {
 
-/*
-    Обмен
-*/
-    
+xtl::trackable& get_trackable (const Mesh& mesh)
+{
+  return mesh.Trackable ();
+}
+
 void swap (Mesh& mesh1, Mesh& mesh2)
 {
   mesh1.Swap (mesh2);

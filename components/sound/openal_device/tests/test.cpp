@@ -32,8 +32,8 @@ const char* file_name2 = "data/sound2.ogg";
 
 const char* LOG_FILTER_MASK = "sound::low_level::openal";
 
-const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
-const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
+const common::ActionQueue::time_t SOURCE_UPDATE_TIME (100, 1000); //период обновления параметров источника звука
+const common::ActionQueue::time_t TEST_WORK_TIME (8);             //время работы теста
 
 float        source_angle = 0;
 Source       source;
@@ -170,8 +170,8 @@ int main ()
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);
     
-    Action timer1 = ActionQueue::PushAction (bind (&TimerHandler, get_pointer (sound_system)), ActionThread_Current, 0, SOURCE_UPDATE_TIME / 1000.0f),
-           timer2 = ActionQueue::PushAction (bind (&Application::Exit, 0), ActionThread_Current, TEST_WORK_TIME / 1000.0f);
+    Action timer1 = ActionQueue::PushAction (bind (&TimerHandler, get_pointer (sound_system)), ActionThread_Current, common::ActionQueue::time_t (), SOURCE_UPDATE_TIME),
+           timer2 = ActionQueue::PushAction (bind (&Application::Exit, 0), ActionThread_Current, TEST_WORK_TIME);
 
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);
 

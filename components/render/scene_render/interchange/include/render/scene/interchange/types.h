@@ -69,6 +69,7 @@ enum NodeType
   NodeType_SpriteList,      //список спрайтов
   NodeType_LineList,        //список линий
   NodeType_ParticleEmitter, //эмиттер частиц
+  NodeType_DynamicMesh,     //динамический меш
 
   NodeType_Num
 };

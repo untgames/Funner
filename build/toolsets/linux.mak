@@ -5,18 +5,17 @@
 ###################################################################################################
 #Constants
 ###################################################################################################
-EXE_SUFFIX    :=
-DLL_SUFFIX    := .so
-DLL_PREFIX    := lib
-DLL_PATH      := LD_LIBRARY_PATH
-COMMON_CFLAGS += -DLINUX
-LIB_GCC       := ar
-SHELL         := /bin/bash
+EXE_SUFFIX        :=
+DLL_SUFFIX        := .so
+DLL_PREFIX        := lib
+DLL_PATH          := LD_LIBRARY_PATH
+COMMON_CFLAGS     += -DLINUX -fPIC -fvisibility=hidden -m32
+COMMON_CFLAGS     += -fno-strict-aliasing
+COMMON_LINK_FLAGS += -Wl,-rpath -Wl,'$$ORIGIN' -Wl,--gc-sections -m32
+LIB_GCC           := ar
+SHELL             := /bin/bash
 
-PROFILES += linux unistd x11 glx haswchar pthread_static_library has_windows x86
-
-COMMON_CFLAGS     += -m32
-COMMON_LINK_FLAGS += -m32
+PROFILES += linux linux-x86 unistd x11 egl gles2 haswchar pthread_static_library has_windows x86
 
 ADDITIONAL_PATHS=$$(pwd)/$(BUILD_DIR)tools/linux
 

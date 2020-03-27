@@ -30,8 +30,6 @@ struct syslib::window_handle: public MessageQueue::Handler
   jmethodID            get_view_method;                           //метод получения окна
   jmethodID            get_top_method;                            //метод получения верхнего угла окна
   jmethodID            get_left_method;                           //метод получения левого угла окна
-  jmethodID            get_width_method;                          //метод получения ширины окна
-  jmethodID            get_height_method;                         //метод получения высоты окна
   jmethodID            layout_method;                             //метод установки размеров и положения окна
   jmethodID            set_visibility_method;                     //метод установки видимости окна
   jmethodID            get_visibility_method;                     //метод получения видимости окна
@@ -45,6 +43,10 @@ struct syslib::window_handle: public MessageQueue::Handler
   jmethodID            remove_from_parent_window_method;          //метод удаления окна
   bool                 is_multitouch_enabled;                     //включен ли multitouch
   int                  current_touch_id;                          //текущий идентификатор касания
+  int                  surface_width;                             //текущая ширина поверхности
+  int                  surface_height;                            //текущая высота поверхности
+  int                  view_width;                                //текущая ширина окна
+  int                  view_height;                               //текущая высота окна
   bool                 is_surface_created;                        //состояние поверхности
   volatile bool        is_native_handle_received;                 //получен ли android window handle
   common::Log          log;                                       //поток протоколирования
@@ -57,6 +59,10 @@ struct syslib::window_handle: public MessageQueue::Handler
     , background_state (0)
     , is_multitouch_enabled (false)
     , current_touch_id (-1)
+    , surface_width (0)
+    , surface_height (0)
+    , view_width (0)
+    , view_height (0)
     , is_surface_created (false)
     , is_native_handle_received (false)
     , log (LOG_NAME)
@@ -101,6 +107,9 @@ struct syslib::window_handle: public MessageQueue::Handler
   
   void OnLayoutCallback (int left, int top, int right, int bottom)
   {
+    view_width  = right - left;
+    view_height = bottom - top;
+
     WindowEventContext context;
 
     memset (&context, 0, sizeof (context));
@@ -131,8 +140,8 @@ struct syslib::window_handle: public MessageQueue::Handler
     Touch& touch = context.touches [0];
 
     touch.touch_id   = pointer_id;
-    touch.position.x = x;
-    touch.position.y = y;
+    touch.position.x = x * surface_width / view_width;
+    touch.position.y = y * surface_height / view_height;
   }
 
   void OnTouchCallback (int pointer_id, int action, float x, float y)
@@ -351,6 +360,12 @@ struct syslib::window_handle: public MessageQueue::Handler
 
     Notify (WindowEvent_OnChangeHandle, context);
   }  
+
+  void OnSurfaceChangedCallback (int width, int height)
+  {
+    surface_width = width;
+    surface_height = height;
+  }
 };
 
 namespace
@@ -377,7 +392,7 @@ class JniWindowManager
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
           
-        create_surface_view_controller_method = find_method (&get_env (), activity_class.get (), "createSurfaceViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
+        create_surface_view_controller_method = find_method (&get_env (), activity_class.get (), "createSurfaceViewController", "(JF)Lcom/untgames/funner/application/EngineViewController;");
         create_web_view_controller_method     = find_method (&get_env (), activity_class.get (), "createWebViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
       }
       catch (xtl::exception& e)
@@ -390,11 +405,18 @@ class JniWindowManager
 ///Создание окна
     local_ref<jobject> CreateSurfaceViewController (const char* init_string, void* window_ref)
     {
-      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_surface_view_controller_method, tojstring (init_string).get (), window_ref));
+      common::PropertyMap init_params = common::parse_init_string (init_string);
+
+      float content_scale_factor = 1;
+
+      if (init_params.IsPresent ("content_scale_factor"))
+        content_scale_factor = init_params.GetFloat ("content_scale_factor");
+
+      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_surface_view_controller_method, (jlong)window_ref, (jfloat)content_scale_factor));
 
       if (!controller)
         throw xtl::format_operation_exception ("", "EngineActivity::createSurfaceViewController failed");
-        
+
       return controller;
     }
     
@@ -549,6 +571,7 @@ void on_surface_created_callback (JNIEnv& env, jobject controller)
 
 void on_surface_changed_callback (JNIEnv& env, jobject controller, jint format, jint width, jint height)
 {
+  push_message (controller, xtl::bind (&window_handle::OnSurfaceChangedCallback, _1, width, height));
   push_message (controller, xtl::bind (&window_handle::OnDrawCallback, _1));    
 }
 
@@ -599,8 +622,6 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->get_view_method                  = find_method (&env, controller_class.get (), "getView", "()Landroid/view/View;");
     window->get_left_method                  = find_method (&env, controller_class.get (), "getLeftThreadSafe", "()I");
     window->get_top_method                   = find_method (&env, controller_class.get (), "getTopThreadSafe", "()I");
-    window->get_width_method                 = find_method (&env, controller_class.get (), "getWidthThreadSafe", "()I");
-    window->get_height_method                = find_method (&env, controller_class.get (), "getHeightThreadSafe", "()I");
     window->layout_method                    = find_method (&env, controller_class.get (), "layoutThreadSafe", "(IIII)V");
     window->set_visibility_method            = find_method (&env, controller_class.get (), "setVisibilityThreadSafe", "(I)V");
     window->get_visibility_method            = find_method (&env, controller_class.get (), "getVisibilityThreadSafe", "()I");
@@ -802,8 +823,8 @@ void AndroidWindowManager::GetWindowRect (window_t window, Rect& out_result)
     
     result.left   = check_errors (env.CallIntMethod (window->controller.get (), window->get_left_method));
     result.top    = check_errors (env.CallIntMethod (window->controller.get (), window->get_top_method));
-    result.right  = result.left + check_errors (env.CallIntMethod (window->controller.get (), window->get_width_method));
-    result.bottom = result.top + check_errors (env.CallIntMethod (window->controller.get (), window->get_height_method));
+    result.right  = result.left + window->surface_width;
+    result.bottom = result.top + window->surface_height;
     
     out_result = result;
   }

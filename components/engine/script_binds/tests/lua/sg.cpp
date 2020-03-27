@@ -31,6 +31,7 @@ int main ()
     env.BindLibraries ("SceneGraph");
     env.BindLibraries ("SceneInput");
     env.BindLibraries ("MediaFont");
+    env.BindLibraries ("Xtl.Rational");
   
     load_script (*script, SCRIPT_FILE_NAME);
     

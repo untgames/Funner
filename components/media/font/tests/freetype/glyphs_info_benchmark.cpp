@@ -7,7 +7,7 @@
 #include <common/time.h>
 
 #include <ft2build.h>
-#include <freetype/freetype.h>
+#include <freetype.h>
 
 const char*  FILE_NAME                  = "data/times_new_roman.ttf";
 const size_t FIRST_GLYPH                = 50;

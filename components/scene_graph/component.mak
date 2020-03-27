@@ -16,7 +16,7 @@ SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      += sources/screen
 SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      += sources/controllers
 SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      += sources/controllers/animation
 SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      += sources/serialization/manager
-SCENE_GRAPH.CORE.SOURCES.IMPORTS          := compile.scene_graph.core compile.common compile.media.rms compile.media.animation compile.media.font
+SCENE_GRAPH.CORE.SOURCES.IMPORTS          := compile.scene_graph.core compile.common compile.media.rms compile.media.animation compile.media.font compile.media.geometry compile.media.spine
 SCENE_GRAPH.CORE.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 
 #Цель №1 - SG components sources
@@ -31,7 +31,8 @@ SCENE_GRAPH.CORE.TESTS.TYPE             := test-suite
 SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/core
 SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/screen
 SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/controllers
-SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim compile.media.font link.media.font.xfont
+SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim compile.media.font compile.media.geometry \
+                                           compile.media.spine link.media.font.xfont link.media.geometry link.media.spine link.media.spine.loader_3.6
 
 #Цель - XScene tests
 SCENE_GRAPH.SERIALIZATION.TESTS.TYPE             := test-suite

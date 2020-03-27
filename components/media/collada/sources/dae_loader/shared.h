@@ -131,7 +131,7 @@ class DaeParser
     void ParseGeometry            (Parser::Iterator);
     void ParseMesh                (Parser::Iterator, Mesh& mesh);
     void ParseMeshSource          (Parser::Iterator, MeshSourceMap& sources);
-    void ParseSurfaceInput        (Parser::Iterator, Parser::Iterator mesh_iter, MeshSourceMap& sources, MeshInputBuilder& inputs);
+    void ParseSurfaceInput        (Parser::Iterator, unsigned int offset, Parser::Iterator mesh_iter, MeshSourceMap& sources, MeshInputBuilder& inputs);
     void ParsePolygonSurface      (Parser::Iterator);
     void ParseSurface             (Parser::Iterator, Parser::Iterator mesh_iter, Mesh& mesh, PrimitiveType type, MeshSourceMap& sources);
     void ParseSurfaceBuffers      (Parser::Iterator, Parser::Iterator surface_iter, SurfaceInfo& info);

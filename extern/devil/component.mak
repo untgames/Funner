@@ -21,6 +21,7 @@ EXTERN.DEVIL.g++.COMPILER_CFLAGS             := --no-warn
 EXTERN.DEVIL.clang.COMPILER_CFLAGS           := -w
 EXTERN.DEVIL.mingw.COMPILER_DEFINES          := XMD_H
 EXTERN.DEVIL.bada_simulator.COMPILER_DEFINES := XMD_H
+EXTERN.DEVIL.msvc_debug.LINK_FLAGS           := -DEBUG
 EXTERN.DEVIL.bada_simulator.IMPORTS          := link.extern.bada_addons
 EXTERN.DEVIL.wince.IMPORTS                   := link.extern.wcecompat
 
@@ -38,3 +39,4 @@ EXTERN.ILU.LIBS                  := funner.extern.devil
 EXTERN.ILU.COMPILER_DEFINES      := HAVE_CONFIG_H
 EXTERN.ILU.g++.COMPILER_CFLAGS   := --no-warn
 EXTERN.ILU.clang.COMPILER_CFLAGS := -w
+EXTERN.ILU.msvc_debug.LINK_FLAGS := -DEBUG

@@ -71,6 +71,7 @@ class FreetypeLibrary
     void    FT_Stroker_Done    (FT_Stroker stroker);
     void    FT_Stroker_New     (FT_Stroker *astroker);
     void    FT_Stroker_Set     (FT_Stroker stroker, FT_Fixed radius, FT_Stroker_LineCap line_cap, FT_Stroker_LineJoin line_join, FT_Fixed miter_limit);
+    void    FT_Glyph_Get_CBox  (FT_Glyph glyph, FT_UInt bbox_mode, FT_BBox *acbox);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -250,6 +251,30 @@ class FreetypeFontRasterizer : public IFontRasterizer, public xtl::reference_cou
   private:
     struct Impl;
     Impl* impl;
+};
+
+//Обводчик глифов
+class FreetypeStroker
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FreetypeStroker (const FreetypeLibrary& in_library, unsigned int stroke_size);
+    ~FreetypeStroker ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение обводичка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FT_Stroker Stroker () { return stroker; }
+
+  private:
+    FreetypeStroker (const FreetypeStroker&);             //no impl
+    FreetypeStroker& operator = (const FreetypeStroker&); //no impl
+
+  private:
+    FreetypeLibrary library;  //библиотека
+    FT_Stroker      stroker;  //обводчик
 };
 
 //Получение имени ошибки free type

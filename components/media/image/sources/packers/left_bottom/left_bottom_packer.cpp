@@ -164,7 +164,7 @@ class TileImageBuilder
           size_t used_area;
 
           pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, (pack_flags & AtlasPackFlag_Fast) != 0,
-                                    (pack_flags & AtlasPackFlag_TopRightEdgeMargin) != 0,
+                                    (pack_flags & AtlasPackFlag_TopRightEdgeMargin) != 0, (pack_flags & AtlasPackFlag_BottomLeftEdgeMargin) != 0,
                                     result_image_horisontal_side, result_image_vertical_side, indices, pack_to_max_image_size,
                                     current_out_origins, current_out_was_packed, used_area);
 
@@ -241,13 +241,16 @@ class TileImageBuilder
       free_spaces.insert (free_space);
     }
 
-    bool PackImages (unsigned int margin, bool swap_axises, bool fast,  bool top_right_edge_margin, unsigned int result_image_horizontal_side,
-                     unsigned int result_image_vertical_side, const IndexArray& indices, bool pack_to_max_image_size,
-                     math::vec2ui* out_origins, bool* out_was_packed, size_t& used_area)
+    bool PackImages (unsigned int margin, bool swap_axises, bool fast, bool top_right_edge_margin, bool bottom_left_edge_margin,
+                     unsigned int result_image_horizontal_side, unsigned int result_image_vertical_side, const IndexArray& indices,
+                     bool pack_to_max_image_size, math::vec2ui* out_origins, bool* out_was_packed, size_t& used_area)
     {
       FreeSpacesSet free_spaces;
 
-      free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side, swap_axises));
+      if (bottom_left_edge_margin)
+        free_spaces.insert (FreeSpace (margin, margin, result_image_horizontal_side - margin, result_image_vertical_side - margin, swap_axises));
+      else
+        free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side, swap_axises));
 
       used_area = 0;
 

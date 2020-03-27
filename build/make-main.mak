@@ -10,6 +10,7 @@ default: build
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak                                                                 #Component configuration file base name
 EXPORT_FILE_SHORT_NAME                  ?= export.mak                                                                    #Export file base name
+DEPENDENCY_FILE_SHORT_NAME              ?= prepare_dependencies.sh                                                       #Prepare dependencies script file base name
 PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak                                                                    #Directory processing configuration file base name
 TMP_DIR_SHORT_NAME                      ?= tmp                                                                           #Temporary files directory base name
 DEFAULT_INSTALLATION_FILES              ?= data/* *.sh                                                                   #List of files, folders and wildcards installed by default
@@ -48,6 +49,7 @@ USER       ?= $(USERNAME)
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := $(strip $(COMPONENT_CONFIGURATION_FILE_SHORT_NAME))
 EXPORT_FILE_SHORT_NAME                  := $(strip $(EXPORT_FILE_SHORT_NAME))
+DEPENDENCY_FILE_SHORT_NAME              := $(strip $(DEPENDENCY_FILE_SHORT_NAME))
 PROCESS_DIR_CONFIG_FILE_SHORT_NAME      := $(strip $(PROCESS_DIR_CONFIG_FILE_SHORT_NAME))
 TMP_DIR_SHORT_NAME                      := $(strip $(TMP_DIR_SHORT_NAME))
 SOURCE_FILES_SUFFIXES                   := $(strip $(SOURCE_FILES_SUFFIXES))
@@ -287,6 +289,7 @@ $(call check_toolset_constant,DLL_PREFIX)
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE := $(firstword $(wildcard $(filter %$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME)))))
 EXPORT_FILES                 := $(wildcard $(filter %$(EXPORT_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(EXPORT_FILE_SHORT_NAME))))
+DEPENDENCY_FILES             := $(shell find . -name $(DEPENDENCY_FILE_SHORT_NAME))
 COMPONENT_DIR                := $(dir $(COMPONENT_CONFIGURATION_FILE))
 
 ifeq (,$(COMPONENT_CONFIGURATION_FILE))
@@ -322,6 +325,30 @@ endif
 endef
 
 $(foreach file,$(EXPORT_FILES),$(eval $(call load_exports,$(file))))
+
+###################################################################################################
+#Prepare dependencies
+###################################################################################################
+define prepare_dependencies
+#Check file existence
+ifeq (,$$(wildcard $1))
+  $$(error Dependencies file '$1' not found)
+endif
+
+  $1.DEPENDENCY_DIR        := $(dir $1)
+  $1.DEPENDENCY_READY_FLAG := $$($1.DEPENDENCY_DIR).dependency_ready
+  
+  prepare_dependencies: $$($1.DEPENDENCY_READY_FLAG)  
+
+  $$($1.DEPENDENCY_READY_FLAG): $1
+		@echo Prepare dependency for $$($1.DEPENDENCY_DIR)...
+		@cd $$($1.DEPENDENCY_DIR) && ./$$(notdir $1)
+		@touch $$($1.DEPENDENCY_READY_FLAG)
+
+endef
+
+$(foreach file,$(DEPENDENCY_FILES),$(eval $(call prepare_dependencies,$(file))))
+
 #$(foreach var,$(sort $(filter export.%,$(.VARIABLES))),$(warning $(var)=$($(var))))
 #$(foreach path,$(sort $(filter paths.%,$(.VARIABLES))),$(warning $(path)=$($(path))))
 

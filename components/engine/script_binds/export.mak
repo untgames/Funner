@@ -80,6 +80,10 @@ export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_
 export.link.engine.script_binds.media.font.LINK_INCLUDES := MediaFontScriptBind
 export.link.engine.script_binds.media.font.IMPORTS       := link.engine.script_binds link.media.font
 
+# Link media spine exports
+export.link.engine.script_binds.media.spine.LINK_INCLUDES := MediaSpineScriptBind
+export.link.engine.script_binds.media.spine.IMPORTS       := link.engine.script_binds link.media.spine
+
 # Link flurry analytics exports
 export.link.engine.script_binds.analytics.flurry.LINK_INCLUDES := FlurryAnalyticsScriptBind
 export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.script_binds link.analytics.flurry
@@ -87,3 +91,7 @@ export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.sc
 # Link push notifications exports
 export.link.engine.script_binds.push_notifications.LINK_INCLUDES := PushNotificationsScriptBind
 export.link.engine.script_binds.push_notifications.IMPORTS       := link.engine.script_binds link.push_notifications.core
+
+# Link xtl rational exports
+export.link.engine.script_binds.xtl.rational.LINK_INCLUDES := XtlRationalScriptBind
+export.link.engine.script_binds.xtl.rational.IMPORTS       := link.engine.script_binds

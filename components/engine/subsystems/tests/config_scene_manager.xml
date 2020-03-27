@@ -10,5 +10,5 @@
   <SceneManager AttachmentName = "SceneManager1" ResourceServer = "Scene">
     <AnimationManager AttachmentName = "AnimationManager1" ResourceServer = "Animation"/>
   </SceneManager>
-  <Shell Interpreter="lua" Sources="data/scene_manager.lua" Libraries="Math SceneGraph LuaOverride Engine Common" Execute="main ()"/>
+  <Shell Interpreter="lua" Sources="data/scene_manager.lua" Libraries="Math SceneGraph LuaOverride Engine Common Xtl.Rational" Execute="main ()"/>
 </Configuration>

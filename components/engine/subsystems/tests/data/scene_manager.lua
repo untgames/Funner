@@ -37,8 +37,8 @@ function main ()
   
   animation:Play ()
   
-  root:Update (0)
-  root:Update (1.12)    
+  root:Update (Xtl.Rational.LongLong.Create (0, 1000))
+  root:Update (Xtl.Rational.LongLong.Create (1120, 1000))    
   
   print ("After animation")  
   

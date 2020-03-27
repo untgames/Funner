@@ -3,24 +3,29 @@
 
 #include <cmath>
 
-#include <string.h>
 #include <float.h>
+#include <string.h>
 
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/array>
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
-#include <xtl/common_exceptions.h>
+#include <xtl/trackable.h>
+#include <xtl/type.h>
 
 #include <math/vector.h>
 
+#include <common/component.h>
+#include <common/hash.h>
 #include <common/string.h>
 #include <common/strlib.h>
-#include <common/hash.h>
-#include <common/component.h>
 
 #include <media/geometry/mesh_library.h>
+#include <media/geometry/mesh_observer.h>
 #include <media/resource_library.h>
 
 namespace media
@@ -28,6 +33,33 @@ namespace media
 
 namespace geometry
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum ObjectType
+{
+  ObjectType_Mesh,
+  ObjectType_MaterialMap,
+  ObjectType_IndexBuffer,
+  ObjectType_VertexBuffer,
+  ObjectType_VertexStream,
+  ObjectType_VertexWeightStream,
+
+  ObjectType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реализация пула идентификаторов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IdPool
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выделение идентификаторов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static object_id_t AllocateId (ObjectType type);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер

@@ -1,5 +1,9 @@
 #include "shared.h"
 
+typedef xtl::shared_ptr<Timer> TimerPtr;
+
+TimerPtr timer_holder;
+
 size_t last = 0;
 
 void test (Timer& timer)
@@ -33,15 +37,20 @@ void test (Timer& timer)
   }
 }
 
+void on_application_initialized ()
+{
+  timer_holder.reset (new Timer (&test, 100));
+
+  last = common::milliseconds ();
+}
+
 int main ()
 {
   printf ("Results of timer_test:\n");
 
   try
   {
-    Timer timer (&test, 100);
-    
-    last = common::milliseconds ();
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
 
     Application::Run ();
 

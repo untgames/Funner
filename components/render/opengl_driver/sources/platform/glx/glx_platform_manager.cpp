@@ -120,8 +120,7 @@ class PlatformManagerImpl
         pixel_formats.reserve (PIXEL_FORMAT_ARRAY_RESERVE_SIZE);
         glx_extensions_entries.reserve (adapters_count);
         
-        int screen    = get_screen_number ((Window)desc.window_handle);
-        int visual_id = XVisualIDFromVisual (DefaultVisual ((Display*)syslib::x11::DisplayManager::DisplayHandle (), screen));        
+        int screen = get_screen_number ((Window)desc.window_handle);
         
         for (size_t i=0; i<adapters_count; i++)
         {
@@ -154,7 +153,7 @@ class PlatformManagerImpl
 
           //choose best match pixel format
 
-        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, visual_id);
+        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, get_window_depth ((Window)desc.window_handle));
         
           //log choosen pixel format
           
@@ -183,9 +182,9 @@ class PlatformManagerImpl
           flags += "STEREO";
         }
 
-        log.Printf ("...choose pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, VisualID: %u, Samples: %u%s)",
+        log.Printf ("...choose pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, Samples: %u%s)",
           pixel_format.pixel_format_index, pixel_format.adapter->GetName (), pixel_format.color_bits,
-          pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.visual_id, pixel_format.samples_count, flags.c_str ());
+          pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.samples_count, flags.c_str ());
 
           //create swap chain
 
@@ -240,8 +239,18 @@ class PlatformManagerImpl
     }
     
 ///Compare two formats (0 - first format matches better, 1 - second format matches better)
-    static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
+    static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc, int color_depth)
     {
+        //choose matching color depth
+      if (fmt0.color_bits != fmt1.color_bits)
+      {
+        if ((int)fmt0.color_bits == color_depth && (int)fmt1.color_bits != color_depth)
+          return 0;
+
+        if ((int)fmt0.color_bits != color_depth && (int)fmt1.color_bits == color_depth)
+          return 1;
+      }
+
         //sort by existing of double buffering
         
       if (fmt0.buffers_count != fmt1.buffers_count)
@@ -324,7 +333,7 @@ class PlatformManagerImpl
     }
     
 ///Choose pixel format
-    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int visual_id)
+    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int color_depth)
     {
         //if suitable pixel format not found - we can't create swap chain
 
@@ -337,15 +346,8 @@ class PlatformManagerImpl
       
       for (Adapter::PixelFormatArray::const_iterator iter=pixel_formats.begin ()+1, end=pixel_formats.end (); iter!=end; ++iter)
       {
-        if (visual_id != iter->visual_id)
-          continue;
-      
-        if (CompareFormats (*best, *iter, swap_chain_desc))
-          best = &*iter;          
-      }
-
-      if (visual_id != best->visual_id)
-        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PlatformManagerImpl::ChoostPixelFormat", "No pixel format for visual ID %d", visual_id);      
+        if (CompareFormats (*best, *iter, swap_chain_desc, color_depth))
+          best = &*iter;      }
 
       return *best;
     }

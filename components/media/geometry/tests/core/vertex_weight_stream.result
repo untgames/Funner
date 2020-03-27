@@ -1,6 +1,6 @@
 Results of vertex_weight_stream_test:
 Dump s1
-Vertex weight stream (12 weights):
+Vertex weight stream id=1, source_id=1 (12 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5
   joint=2 weight=0.5
@@ -14,10 +14,10 @@ Vertex weight stream (12 weights):
   joint=10 weight=0.5
   joint=11 weight=0.5
 Dump s2
-Vertex weight stream (0 weights):
+Vertex weight stream id=2, source_id=2 (0 weights):
 s2 capacity: 14
 copy s1 to s2
-Vertex weight stream (12 weights):
+Vertex weight stream id=3, source_id=1 (12 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5
   joint=2 weight=0.5
@@ -30,10 +30,29 @@ Vertex weight stream (12 weights):
   joint=9 weight=0.5
   joint=10 weight=0.5
   joint=11 weight=0.5
+source id is correct after clone
 clear s2
-Vertex weight stream (0 weights):
+Vertex weight stream id=3, source_id=1 (0 weights):
 instance s2
-Vertex weight stream (5 weights):
+Vertex weight stream id=1, source_id=1 (5 weights):
+  joint=0 weight=0.5
+  joint=1 weight=0.5
+  joint=2 weight=0.5
+  joint=3 weight=0.5
+  joint=4 weight=0.5
+s1 serialization size is 52
+s1 serialization data size is 40
+Bytes written during serialization = 52, data hash = ad78d8a4
+Bytes read during deserialization = 52
+deserialized buffer:Vertex weight stream id=4, source_id=1 (5 weights):
+  joint=0 weight=0.5
+  joint=1 weight=0.5
+  joint=2 weight=0.5
+  joint=3 weight=0.5
+  joint=4 weight=0.5
+Bytes written during data serialization = 40, data hash = 564405e
+Bytes read during data deserialization = 40
+deserialized buffer data:Vertex weight stream id=4, source_id=1 (5 weights):
   joint=0 weight=0.5
   joint=1 weight=0.5
   joint=2 weight=0.5

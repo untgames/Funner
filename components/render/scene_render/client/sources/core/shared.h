@@ -13,6 +13,7 @@
 #include <common/strlib.h>
 #include <common/time.h>
 
+#include <media/geometry/mesh.h>
 #include <media/image.h>
 
 #include <syslib/condition.h>

@@ -19,12 +19,12 @@ int main ()
     parent_timer.Start ();
     child_timer.Start ();
 
-    printf ("Before set time: parent timer time = %.2f, child_timer time = %.2f\n", (float)parent_timer.Time (), (float)child_timer.Time ());
+    printf ("Before set time: parent timer time = %.2f, child_timer time = %.2f\n", parent_timer.Time ().cast<float> (), child_timer.Time ().cast<float> ());
 
-    parent_timer.SetTime (1.f);
+    parent_timer.SetTime (Timer::time_t (1));
     child_timer.Update ();
 
-    printf ("After set time: parent timer time = %.2f, child_timer time = %.2f\n", (float)parent_timer.Time (), (float)child_timer.Time ());
+    printf ("After set time: parent timer time = %.2f, child_timer time = %.2f\n", parent_timer.Time ().cast<float> (), child_timer.Time ().cast<float> ());
   }
   catch (std::exception& exception)
   {

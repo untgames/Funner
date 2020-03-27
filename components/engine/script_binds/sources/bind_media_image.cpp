@@ -96,7 +96,7 @@ void bind_image_library (Environment& environment)
   lib.Register ("set_Name",     make_invoker (&Image::Rename));
 
   lib.Register ("Clone",    make_invoker (&Image::Clone));
-  lib.Register ("Load",     make_invoker (&Image::Clone));
+  lib.Register ("Load",     make_invoker (&Image::Load));
   lib.Register ("Save",     make_invoker (make_invoker (&Image::Save),
       make_invoker<void (Image&, const char*, PixelFormat)>(xtl::bind (&Image::Save, _1, _2, _3, "")),
       make_invoker<void (Image&, const char*)>(xtl::bind (&Image::Save, _1, _2, PixelFormat_Default, ""))));

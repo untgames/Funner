@@ -40,6 +40,9 @@ template class engine::decl_sg_cast<StaticMesh,      Node>;
 template class engine::decl_sg_cast<ParticleEmitter, VisualModel>;
 template class engine::decl_sg_cast<ParticleEmitter, Entity>;
 template class engine::decl_sg_cast<ParticleEmitter, Node>;
+template class engine::decl_sg_cast<SpineSkeleton,   VisualModel>;
+template class engine::decl_sg_cast<SpineSkeleton,   Entity>;
+template class engine::decl_sg_cast<SpineSkeleton,   Node>;
 
 namespace engine
 {
@@ -400,8 +403,8 @@ void bind_particle_emitter_library (Environment& environment)
     //регистрация функций создания
 
   lib.Register ("Create", make_invoker (make_invoker (&create_particle_emitter),
-                                        make_invoker<void (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
-                                        make_invoker<void (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
+                                        make_invoker<ParticleEmitter::Pointer (const char*, Node*)> (xtl::bind (&create_particle_emitter, _1, _2, SpriteMode_Default)),
+                                        make_invoker<ParticleEmitter::Pointer (const char*)> (xtl::bind (&create_particle_emitter, _1, (Node*)0, SpriteMode_Default))));
 
     //регистрация операций
 
@@ -414,6 +417,37 @@ void bind_particle_emitter_library (Environment& environment)
   lib.Register ("Play", make_invoker (&ParticleEmitter::Play));
 
   environment.RegisterType<ParticleEmitter> (SCENE_PARTICLE_EMITTER_LIBRARY);
+}
+
+/*
+    Работа с spine скелетом
+*/
+
+SpineSkeleton::Pointer create_spine_skeleton (const media::spine::Skeleton& skeleton)
+{
+  return SpineSkeleton::Create (skeleton);
+}
+
+void bind_spine_skeleton_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SPINE_SKELETON_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_spine_skeleton));
+
+    //регистрация операций
+
+  lib.Register ("get_IsVisualStructureDirty", make_invoker (&SpineSkeleton::IsVisualStructureDirty));
+  lib.Register ("set_IsVisualStructureDirty", make_invoker (&SpineSkeleton::SetVisualStructureDirty));
+
+  lib.Register ("Skeleton", make_invoker (implicit_cast<media::spine::Skeleton& (SpineSkeleton::*) ()> (&SpineSkeleton::Skeleton)));
+
+  environment.RegisterType<SpineSkeleton> (SCENE_SPINE_SKELETON_LIBRARY);
 }
 
 /*

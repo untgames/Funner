@@ -4,12 +4,7 @@
  *	Guido Draheim <guidod@gmx.de>
  *	Tomi Ollila <Tomi.Ollila@iki.fi>
  *
- * Copyright (c) 1999,2000,2001,2002 Guido Draheim
- * 	    All rights reserved,
- *	    use under the restrictions of the
- *	    Lesser GNU General Public License
- *          or alternatively the restrictions 
- *          of the Mozilla Public License 1.1
+ * Copyright (c) Guido Draheim, use under copyleft (LGPL,MPL)
  *
  * Description:
  *      although this file is defining a function called zzip_stat it
@@ -21,14 +16,17 @@
 #include <zzip/lib.h>           /* exported... */
 #include <zzip/file.h>
 #include <string.h>
+#if defined(_AIX)
+#include <strings.h> /* for strcasecmp */
+#endif
 #include <sys/stat.h>
 
 #define ZZIP_USE_INTERNAL
 #include <zzip/info.h>
 
-/**
- * obtain information about a filename in an opened zip-archive without 
- * opening that file first. Mostly used to obtain the uncompressed 
+/**    get meta infornation on a zipped element.
+ * This function obtains information about a filename in an opened zip-archive 
+ * without opening that file first. Mostly used to obtain the uncompressed 
  * size of a file inside a zip-archive. see => zzip_dir_open.
  */
 int
@@ -37,7 +35,8 @@ zzip_dir_stat(ZZIP_DIR * dir, zzip_char_t * name, ZZIP_STAT * zs, int flags)
     struct zzip_dir_hdr *hdr = dir->hdr0;
     int (*cmp) (zzip_char_t *, zzip_char_t *);
 
-    cmp = (flags & ZZIP_CASEINSENSITIVE) ? strcasecmp : strcmp;
+    if (flags & ZZIP_CASEINSENSITIVE) flags |= ZZIP_CASELESS;
+    cmp = (flags & ZZIP_CASELESS) ? strcasecmp : strcmp;
 
     if (! hdr)
     {

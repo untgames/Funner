@@ -145,30 +145,6 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     return result.intValue ();
   }
   
-  public int getWidthThreadSafe ()
-  {
-    Integer result = (Integer)UiDispatch.run (view, new UiRunnable () {
-      public Object run ()
-      {
-        return new Integer (view.getWidth ());
-      }
-    });
-    
-    return result.intValue ();
-  }
-  
-  public int getHeightThreadSafe ()
-  {
-    Integer result = (Integer)UiDispatch.run (view, new UiRunnable () {
-      public Object run ()
-      {
-        return new Integer (view.getHeight ());
-      }
-    });
-    
-    return result.intValue ();
-  }
-  
   public void layoutThreadSafe (final int left, final int top, final int right, final int bottom)
   {
     UiDispatch.run (view, new UiRunnable () {

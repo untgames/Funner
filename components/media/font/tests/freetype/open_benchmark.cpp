@@ -7,7 +7,7 @@
 #include <common/time.h>
 
 #include <ft2build.h>
-#include <freetype/freetype.h>
+#include <freetype.h>
 
 const char*  FILE_NAME               = "data/times_new_roman.ttf";
 const size_t MEMORY_ITERATIONS_COUNT = 40000;

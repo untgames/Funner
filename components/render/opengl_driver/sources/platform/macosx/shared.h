@@ -23,6 +23,10 @@
 #include <shared/object.h>
 #include <shared/platform.h>
 
+#import <AppKit/NSOpenGL.h>
+#import <AppKit/NSView.h>
+#import <AppKit/NSWindow.h>
+
 #include <ApplicationServices/ApplicationServices.h>
 #include <AGL/agl.h>
 
@@ -88,7 +92,7 @@ class ISwapChainImpl: virtual public ISwapChain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение пиксел формата
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual AGLPixelFormat GetPixelFormat () = 0;
+    virtual NSOpenGLPixelFormat* GetPixelFormat () = 0;
 
   protected:
     virtual ~ISwapChainImpl () {}
@@ -135,8 +139,8 @@ class PrimarySwapChain: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация интерфейса ISwapChainImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void           SetContext     (Context* context);
-    AGLPixelFormat GetPixelFormat ();
+    void                 SetContext     (Context* context);
+    NSOpenGLPixelFormat* GetPixelFormat ();
 
   private:
     struct Impl;
@@ -209,9 +213,9 @@ class Context: virtual public IContext, public Object
     void DetachListener (IContextListener*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение AGL контекста
+///Returns NSOpenGLContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    AGLContext GetAGLContext ();
+    NSOpenGLContext* GetNSOpenGLContext ();
 
   private:
     Context (const Context&); //no impl
@@ -221,14 +225,6 @@ class Context: virtual public IContext, public Object
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
-
-//Проверка ошибок
-void check_event_manager_error  (OSStatus error_code, const char* source, const char* message);  //проверка ошибок EventManager
-void check_quartz_error         (CGError error_code, const char* source, const char* message);   //проверка ошибок Quartz Framework
-void check_window_manager_error (OSStatus error_code, const char* source);                       //генерация исключений WindowManager
-void check_agl_error            (const char* source);                                            //проверка ошибок Agl Framework
-void raise_agl_error            (const char* source);                                            //генерация исключений с информацией об ошибке
-
 
 }
 

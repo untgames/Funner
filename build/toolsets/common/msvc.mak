@@ -19,7 +19,7 @@ endif
   MSVS_COMMON_PATH  ?= $(VS140COMNTOOLS)../../Common7/Ide
   PROFILES          += vc14 haswchar  
   COMMON_CFLAGS     += -wd4005
-  INCLUDE           := $(UCRT_PATH)Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
 endif
 
 ifneq (,$(VS130COMNTOOLS))
@@ -112,7 +112,6 @@ DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
 PROFILES                += msvc has_windows
-COMMON_LINK_FLAGS       += -stack:128000
 SOURCE_PROCESS_MACROSES += process_idl process_rc
 SOURCE_FILES_SUFFIXES   += asm
 IGNORE_PVS_ERROR        += V126 V122 V201
@@ -123,7 +122,7 @@ IGNORE_PVS_ERROR        += V126 V122 V201
 INCLUDE := $(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
 
 ifeq (,$(PLATFORM_SDK_PATH))
-  $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH)')  
+  $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH, default is c:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\)')  
 endif
 
 INCLUDE := $(PLATFORM_SDK_PATH)/include;$(INCLUDE)

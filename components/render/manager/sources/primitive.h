@@ -31,9 +31,9 @@ class PrimitiveImpl: public Object, public CacheSource
 ///Работа с мешами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t MeshesCount     ();
-    size_t AddMesh         (const media::geometry::Mesh&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    size_t AddMesh         (const media::geometry::Mesh&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, unsigned int updatable_primitive_buffer_types);
     void   RemoveMeshes    (size_t first_mesh, size_t meshes_count);
-    void   RemoveAllMeshes ();
+    void   RemoveAllMeshes (unsigned int updatable_primitive_buffer_types);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами

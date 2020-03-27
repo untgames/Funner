@@ -101,9 +101,9 @@ xtl::com_ptr<Controller> attach_controller (Node& node, const Node::UpdateFuncti
   return node.AttachController (fn);
 }
 
-void update_node (Node& node, float t)
+void update_node (Node& node, const xtl::rational<long long> t)
 {
-  node.Update (TimeValue (size_t (t * 1000), 1000));
+  node.Update (TimeValue (t.numerator (), t.denominator ()));
 }
 
 void bind_node_library (Environment& environment)

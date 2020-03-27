@@ -8,5 +8,5 @@ void main (void)
 {
   vec4 diffuse_color = texture2D (DiffuseTexture, DiffuseTexcoord.xy);
    
-  gl_FragColor = diffuse_color;
+  gl_FragColor = diffuse_color * gl_Color;
 }

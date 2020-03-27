@@ -789,7 +789,7 @@
 #define NTLM_WB_FILE "/usr/bin/ntlm_auth"
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin14.0.0"
+#define OS "linux_x86_64"
 
 /* Name of package */
 #define PACKAGE "curl"

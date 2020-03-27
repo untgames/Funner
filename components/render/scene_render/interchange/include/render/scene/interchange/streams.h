@@ -18,6 +18,13 @@ namespace media
 //forward declarations
 class Image;
 
+namespace geometry
+{
+
+class Mesh;
+
+}
+
 }
 
 namespace render
@@ -70,8 +77,9 @@ class OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запись блока данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void WriteData       (const void* data, size_t size);
-    void WriteDataUnsafe (const void* data, size_t size);
+    void  WriteData       (const void* data, size_t size);
+    void  WriteDataUnsafe (const void* data, size_t size);
+    void* WriteData       (size_t size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запись значения
@@ -203,6 +211,7 @@ void write (OutputStream&, const PageCurlParams&);
 void write (OutputStream&, SpriteMode);
 void write (OutputStream&, PrimitiveUsage);
 void write (OutputStream&, const media::Image&);
+void write (OutputStream&, const media::geometry::Mesh&);
 
 template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
@@ -234,6 +243,7 @@ const PageCurlParams&   read (InputStream&, xtl::type<PageCurlParams>);
 const SpriteMode&       read (InputStream&, xtl::type<SpriteMode>);
 const PrimitiveUsage&   read (InputStream&, xtl::type<PrimitiveUsage>);
 media::Image            read (InputStream&, xtl::type<media::Image>);
+media::geometry::Mesh   read (InputStream&, xtl::type<media::geometry::Mesh>);
 
 template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
 template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);

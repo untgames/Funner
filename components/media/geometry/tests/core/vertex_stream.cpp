@@ -26,6 +26,9 @@ int main ()
   vs2 = vs1.Clone ();
   
   dump (vs2);
+
+  if (vs2.SourceId () == vs1.Id ())
+    printf ("source id is correct after clone\n");
   
   printf ("reserve vs1 (current capacity=%u)\n", vs1.Capacity ());
   
@@ -50,6 +53,37 @@ int main ()
   vs2 = vs1;
   
   dump (vs2);
+
+  printf ("vs1 serialization size is %u\n", vs1.SerializationSize ());
+  printf ("vs1 serialization data size is %u\n", vs1.SerializationDataSize ());
+
+  xtl::uninitialized_storage<char> serialization_buffer (vs1.SerializationSize ());
+
+  size_t written_bytes = vs1.Write (serialization_buffer.data (), serialization_buffer.size ());
+
+  printf ("Bytes written during serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+  size_t read_bytes = 0;
+
+  VertexStream vs3 = VertexStream::CreateFromSerializedData (serialization_buffer.data (), serialization_buffer.size (), read_bytes);
+
+  printf ("Bytes read during deserialization = %u\n", read_bytes);
+
+  printf ("deserialized buffer:");
+
+  dump (vs3);
+
+  memset (vs3.Data (), 0, vs3.SerializationDataSize ());
+
+  written_bytes = vs1.WriteData (serialization_buffer.data (), serialization_buffer.size ());
+
+  printf ("Bytes written during data serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+  printf ("Bytes read during data deserialization = %u\n", vs3.ReadData (serialization_buffer.data (), serialization_buffer.size ()));
+
+  printf ("deserialized buffer data:");
+
+  dump (vs3);
 
   printf ("clear vs1 (dump vs2)\n");
   

@@ -24,9 +24,9 @@ inline string basename (const char* src, size_t len, string::allocator_type allo
 
 inline string suffix (const char* src, size_t len, string::allocator_type allocator)
 {
-  for (const char* s=src+len;s!=src;)
+  for (const char *end=src+len, *s=end;s!=src;)
     if (*--s == '.')
-      return string (s, len-(s-src), allocator);
+      return string (s, end, allocator);
 
   return string ("", allocator);
 }

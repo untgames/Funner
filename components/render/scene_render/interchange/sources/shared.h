@@ -18,6 +18,7 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <media/geometry/mesh.h>
 #include <media/image.h>
 
 #include <syslib/application.h>

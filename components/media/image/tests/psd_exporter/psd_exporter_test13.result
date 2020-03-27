@@ -13,11 +13,11 @@ Save layers to dir 'my_layers'...
   fix zero alpha pixels for 'my_layers/my_image_0005.bmp'...
 <?xml version="1.0" encoding="utf-8"?>
 <LayerMap TotalWidth="1024" TotalHeight="768">
-  <Layer Name="border" Image="my_layers/my_image_0001.bmp" Left="182" Top="630" Width="739" Height="162" Opacity="255" Visible="1"/>
-  <Layer Name="word_highlight" Image="my_layers/my_image_0002.bmp" Left="684" Top="736" Width="196" Height="25" Opacity="255" Visible="1"/>
-  <Layer Name="width_1" Image="my_layers/my_image_0003.bmp" Left="525" Top="334" Width="1" Height="9" Opacity="255" Visible="1"/>
-  <Layer Name="height_1" Image="my_layers/my_image_0004.bmp" Left="461" Top="372" Width="19" Height="1" Opacity="255" Visible="1"/>
-  <Layer Name="width_1_height_1" Image="my_layers/my_image_0005.bmp" Left="551" Top="410" Width="1" Height="1" Opacity="255" Visible="1"/>
+  <Layer Name="border" Image="my_layers/my_image_0001.bmp" Left="182" Top="630" Width="739" Height="162" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+  <Layer Name="word_highlight" Image="my_layers/my_image_0002.bmp" Left="684" Top="736" Width="196" Height="25" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+  <Layer Name="width_1" Image="my_layers/my_image_0003.bmp" Left="525" Top="334" Width="1" Height="9" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+  <Layer Name="height_1" Image="my_layers/my_image_0004.bmp" Left="461" Top="372" Width="19" Height="1" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+  <Layer Name="width_1_height_1" Image="my_layers/my_image_0005.bmp" Left="551" Top="410" Width="1" Height="1" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
 </LayerMap>
 9949115f5dc12168194613afe1f38723 *my_layers/my_image_0001.bmp
 b3ac137834cd0240f59df02f3f6164ed *my_layers/my_image_0002.bmp

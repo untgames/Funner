@@ -486,7 +486,7 @@ typedef long long unsigned int ILuint64;
 			#define ILAPI __declspec(dllimport)
 		#endif
 	#endif
-#elif defined(__APPLE__) && !defined(IPHONE)
+#elif (defined(__APPLE__) || defined(LINUX)) && !defined(IPHONE)
 	#define ILAPI extern __attribute__ ((visibility ("default")))  //TODO change for support -fvisibility=hidden
 #else
 	#define ILAPI

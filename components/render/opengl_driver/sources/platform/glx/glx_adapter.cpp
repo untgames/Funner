@@ -192,6 +192,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
       
     int visual_id = get_fb_config_attrib (lib, display, config, GLX_VISUAL_ID);
       
+    //check if config has visual id, otherwise it can't be used to render to window
     if (!visual_id)
       continue;
       
@@ -203,14 +204,13 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
     desc.adapter                 = this;
     desc.glx_extensions_entries  = &impl->glx_entries;
     desc.config                  = config;
-    desc.visual_id               = visual_id;
     desc.pixel_format_index      = get_fb_config_attrib (lib, display, config, GLX_FBCONFIG_ID);
     desc.color_bits              = get_fb_config_attrib (lib, display, config, GLX_BUFFER_SIZE);
     desc.alpha_bits              = get_fb_config_attrib (lib, display, config, GLX_ALPHA_SIZE);
     desc.depth_bits              = get_fb_config_attrib (lib, display, config, GLX_DEPTH_SIZE);
     desc.stencil_bits            = get_fb_config_attrib (lib, display, config, GLX_STENCIL_SIZE);
     
-    if (ext_ARB_multisample_supported) desc.samples_count = get_fb_config_attrib (lib, display, config, GLX_SAMPLE_BUFFERS_ARB);
+    if (ext_ARB_multisample_supported) desc.samples_count = get_fb_config_attrib (lib, display, config, GLX_SAMPLES_ARB);
     else                               desc.samples_count = 0;
 
     if (get_fb_config_attrib (lib, display, config, GLX_DOUBLEBUFFER)) desc.buffers_count = 2;

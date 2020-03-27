@@ -28,14 +28,15 @@ enum AtlasBuilderInsertMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasPackFlag
 {
-  AtlasPackFlag_PowerOfTwoEdges    = 1,       //стороны степени двойки
-  AtlasPackFlag_InvertTilesX       = 1 << 1,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
-  AtlasPackFlag_InvertTilesY       = 1 << 2,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
-  AtlasPackFlag_SwapAxises         = 1 << 3,  //изменить расположение осей при размещении тайлов
-  AtlasPackFlag_SquareAxises       = 1 << 4,  //равные размеры осей
-  AtlasPackFlag_TopRightEdgeMargin = 1 << 5,  //использовать отступ от верхнего и правого краев картинки
-  AtlasPackFlag_PackToMaxImageSize = 1 << 6,  //упаковать максимально возможное количество картинок без превышения заданного размера атласа
-  AtlasPackFlag_Fast               = 1 << 7,  //быстрое сжатие
+  AtlasPackFlag_PowerOfTwoEdges      = 1,       //стороны степени двойки
+  AtlasPackFlag_InvertTilesX         = 1 << 1,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
+  AtlasPackFlag_InvertTilesY         = 1 << 2,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
+  AtlasPackFlag_SwapAxises           = 1 << 3,  //изменить расположение осей при размещении тайлов
+  AtlasPackFlag_SquareAxises         = 1 << 4,  //равные размеры осей
+  AtlasPackFlag_TopRightEdgeMargin   = 1 << 5,  //использовать отступ от верхнего и правого краев картинки
+  AtlasPackFlag_BottomLeftEdgeMargin = 1 << 6,  //использовать отступ от нижнего и левого краев картинки
+  AtlasPackFlag_PackToMaxImageSize   = 1 << 7,  //упаковать максимально возможное количество картинок без превышения заданного размера атласа
+  AtlasPackFlag_Fast                 = 1 << 8,  //быстрое сжатие
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +52,7 @@ class AtlasBuilder
       math::vec2ui*       out_origins;     //результирующие координаты картинок
       bool*               out_was_packed;  //для каждой картинки true - если была упакована, false - если не влезла. Может быть равен 0
       unsigned int        margin;          //отступ между картинками
+      unsigned int        alignment;       //выравнивание картинок
       unsigned int        max_image_size;  //максимальный размер результирующей картинки (используется только если установлен флаг )
       unsigned int        pack_flags;      //параметры упаковки
     };
@@ -75,6 +77,12 @@ class AtlasBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void         SetMargin (unsigned int margin);
     unsigned int Margin    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка/получение выравнивания картинок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void         SetAlignment (unsigned int alignment);
+    unsigned int Alignment    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение флагов упаковки

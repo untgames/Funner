@@ -4,12 +4,7 @@
  *	Guido Draheim <guidod@gmx.de>
  *      Mike Nordell <tamlin-@-algonet-se>
  *
- * Copyright (c) 2002,2003 Guido Draheim
- * 	    All rights reserved,
- *	    use under the restrictions of the
- *	    Lesser GNU General Public License
- *          or alternatively the restrictions 
- *          of the Mozilla Public License 1.1
+ * Copyright (c) Guido Draheim, use under copyleft (LGPL,MPL)
  */
 
 #include <zzip/lib.h>
@@ -26,6 +21,9 @@
 #include <zzip/file.h>
 #include <zzip/format.h>
 
+/** get file size.
+ * This function works on a real file descriptor.
+ */
 zzip_off_t
 zzip_filesize(int fd)
 {
@@ -55,17 +53,22 @@ static const struct zzip_plugin_io default_io = {
 
 /** => zzip_init_io
  * This function returns a zzip_plugin_io_t handle to static defaults
- * wrapping the posix io file functions for actual file access.
+ * wrapping the posix io file functions for actual file access. The
+ * returned structure is shared by all threads in the system.
  */
 zzip_plugin_io_t
-zzip_get_default_io()
+zzip_get_default_io(void)
 {
     return (zzip_plugin_io_t) & default_io;
 }
 
-/**
+/** init plugin struct.
+ *
  * This function initializes the users handler struct to default values 
  * being the posix io functions in default configured environments.
+ *
+ * Note that the target io_handlers_t structure should be static or 
+ * atleast it should be kept during the lifetime of zzip operations.
  */
 int
 zzip_init_io(zzip_plugin_io_handlers_t io, int flags)

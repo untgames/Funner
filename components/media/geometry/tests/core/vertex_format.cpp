@@ -94,6 +94,35 @@ int main ()
 
         vf1.Clear ();        
       }
+
+    VertexFormat vf4;
+
+    vf4.AddAttribute (VertexAttributeSemantic_Position, VertexAttributeType_Float3, 2);
+    vf4.AddAttribute ("normal_name", VertexAttributeSemantic_Normal, VertexAttributeType_Short3, 3);
+    vf4.AddAttribute ("color_name", VertexAttributeSemantic_Color, VertexAttributeType_UByte4, 4);
+
+    printf ("dump vf4\n");
+
+    dump (vf4);
+
+    printf ("vf4 serialization size is %u\n", vf4.SerializationSize ());
+
+    xtl::uninitialized_storage<char> serialization_buffer (vf4.SerializationSize ());
+
+    size_t written_bytes = vf4.Write (serialization_buffer.data (), serialization_buffer.size ());
+
+    printf ("Bytes written during serialization = %u, data hash = %x\n", written_bytes, common::crc32 (serialization_buffer.data (), written_bytes));
+
+    size_t bytes_read;
+
+    VertexFormat vf_deserialized = VertexFormat::CreateFromSerializedData (serialization_buffer.data (), serialization_buffer.size (), bytes_read);
+
+    printf ("Bytes read during deserialization = %u\n", bytes_read);
+
+    printf ("deserialized vertex format:\n");
+
+    dump (vf_deserialized);
+
   }
   catch (std::exception& exception)
   {

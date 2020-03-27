@@ -1,4 +1,4 @@
-#include "shared.h"
+  #include "shared.h"
 
 size_t get_clamped_time ()
 {
@@ -17,12 +17,12 @@ template <int I> void action_handler (Action& action)
 template <int I> void callback_handler (size_t thread_id)
 {
   bool is_creator = Thread::GetCurrentThreadId () == thread_id;
+
+  printf ("[%08u] callback %d executed in thread %s\n", get_clamped_time (), I, is_creator ? "creator" : "not creator");
+  fflush (stdout);
   
   if (is_creator)
     Application::Exit (0);
-
-  printf ("[%08u] callback %d executed in thread %s\n", get_clamped_time (), I, is_creator ? "creator" : "not creator");
-  fflush (stdout);  
 }
 
 void log_message (const char* stream, const char* message)
@@ -39,7 +39,7 @@ int main ()
   
   ActionQueue::PushAction (&action_handler<1>, xtl::bind (&callback_handler<1>, Thread::GetCurrentThreadId ()), ActionThread_Background);
   ActionQueue::PushAction (&action_handler<2>, make_callback_wrapper (ActionThread_Current, xtl::bind (&callback_handler<2>, Thread::GetCurrentThreadId ())), ActionThread_Background, 1);
-  ActionQueue::PushAction (&action_handler<3>, ActionThread_Main, 0.5f);
+  ActionQueue::PushAction (&action_handler<3>, ActionThread_Main, common::ActionQueue::time_t (5, 10));
 
   Application::Run ();
 

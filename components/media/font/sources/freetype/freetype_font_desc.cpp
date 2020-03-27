@@ -65,6 +65,61 @@ struct FreetypeFontDesc::Impl
       throw;
     }
   }
+
+  void FillGlyphInfo (FT_ULong char_code, FT_Face face_handle, FreetypeStroker& stroker, GlyphInfo* fallback_glyph, GlyphInfo& out_glyph)
+  {
+    if (!library.FT_Load_Char (face_handle, char_code, FT_LOAD_DEFAULT, true))
+    {
+      if (fallback_glyph)
+      {
+        memcpy (&out_glyph, fallback_glyph, sizeof (GlyphInfo));
+
+        log.Printf ("Font '%s' has no char %lu.", source.c_str (), char_code);
+      }
+      else
+        memset (&out_glyph, 0, sizeof (out_glyph));
+
+      return;
+    }
+
+    FT_Glyph stroked_glyph = 0;
+
+    if (stroker.Stroker ())
+    {
+      library.FT_Get_Glyph (face_handle->glyph, &stroked_glyph);
+
+      try
+      {
+        library.FT_Glyph_Stroke (&stroked_glyph, stroker.Stroker (), true);
+      }
+      catch (...)
+      {
+        //ignore all errors
+      }
+    }
+
+    if (stroked_glyph)
+    {
+      FT_BBox bbox;
+
+      library.FT_Glyph_Get_CBox (stroked_glyph, FT_GLYPH_BBOX_PIXELS, &bbox);
+
+      library.FT_Done_Glyph (stroked_glyph);
+
+      out_glyph.width  = bbox.xMax - bbox.xMin;
+      out_glyph.height = bbox.yMax - bbox.yMin;
+    }
+    else
+    {
+      out_glyph.width  = face_handle->glyph->metrics.width / 64.f;
+      out_glyph.height = face_handle->glyph->metrics.height / 64.f;
+    }
+
+    out_glyph.bearing_x = face_handle->glyph->metrics.horiBearingX / 64.f;
+    out_glyph.bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
+    out_glyph.advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
+    out_glyph.advance_y = 0;
+  }
 };
 
 }
@@ -169,6 +224,8 @@ Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams&
 
     if (charset_size)
     {
+      FreetypeStroker stroker (impl->library, params.stroke_size);
+
       unsigned int first_glyph_code = utf32_charset.data () [0];
 
       builder.SetFirstGlyphCode (first_glyph_code);
@@ -192,17 +249,7 @@ Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams&
 
         GlyphInfo null_glyph;
 
-        if (impl->library.FT_Load_Char (face_handle, '?', FT_LOAD_DEFAULT, true))
-        {
-          null_glyph.width     = face_handle->glyph->metrics.width / 64.f;
-          null_glyph.height    = face_handle->glyph->metrics.height / 64.f;
-          null_glyph.bearing_x = face_handle->glyph->metrics.horiBearingX / 64.f;
-          null_glyph.bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
-          null_glyph.advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
-          null_glyph.advance_y = 0;
-        }
-        else
-          memset (&null_glyph, 0, sizeof (null_glyph));
+        impl->FillGlyphInfo ('?', face_handle, stroker, 0, null_glyph);
 
         unsigned int previous_glyph_code = first_glyph_code;
 
@@ -227,23 +274,8 @@ Font FreetypeFontDesc::CreateFont (unsigned int index, const FontCreationParams&
             continue;
           }
 
-          if (!impl->library.FT_Load_Char (face_handle, *current_char_code, FT_LOAD_DEFAULT, true))
-          {
-            memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
-
-            impl->log.Printf ("Can't load char %lu.", *current_char_code);
-
-            continue;
-          }
-
-          //TODO проверить, есть ли прирост скорости, если сохрянать глифы и для рендеринга использовать FT_Glyph_To_Bitmap
-
-          current_glyph->width     = face_handle->glyph->metrics.width / 64.f;
-          current_glyph->height    = face_handle->glyph->metrics.height / 64.f;
-          current_glyph->bearing_x = face_handle->glyph->metrics.horiBearingX / 64.f;
-          current_glyph->bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
-          current_glyph->advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
-          current_glyph->advance_y = 0;
+          //TODO проверить, есть ли прирост скорости, если сохранять глифы и для рендеринга использовать FT_Glyph_To_Bitmap
+          impl->FillGlyphInfo (*current_char_code, face_handle, stroker, &null_glyph, *current_glyph);
         }
 
           //Формирование кёрнингов

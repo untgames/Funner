@@ -250,6 +250,7 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
   try
   {
     const IndexBuffer& index_buffer = mesh.IndexBuffer ();
+    const MaterialMap& material_map = mesh.MaterialMap ();
     
       //проверка примитивов
     
@@ -282,8 +283,8 @@ bool check (const Mesh& mesh, uint32_t joints_count, const xtl::function<void (c
           log.Error ("primitive[%u] has unknown type=%d", i, primitive.type);
           break;
       }
-      
-      if (!primitive.material)
+
+      if (!material_map.MaterialName (primitive.material_id))
         log.Error ("null primitive[%u].material", i);
 
       if (primitive.first >= max_index)

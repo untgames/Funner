@@ -59,4 +59,52 @@ media::Image read (InputStream& s, xtl::type<media::Image>)
   }
 }
 
+void write (OutputStream& s, const media::geometry::Mesh& mesh)
+{
+  if (s.InprocessOwnerId ())
+  {
+    object_id_t object_id = InprocessExchangeStorage::Attach (s.InprocessOwnerId (), mesh);
+
+    write (s, object_id);
+  }
+  else
+  {
+    //TODO test this
+
+    object_id_t object_id = 0;
+
+    write (s, object_id);
+
+    uint32 mesh_serialization_size = mesh.SerializationSize ();
+
+    write (s, mesh_serialization_size);
+
+    mesh.Write (s.WriteData (mesh_serialization_size), mesh_serialization_size);
+  }
+}
+
+media::geometry::Mesh read (InputStream& s, xtl::type<media::geometry::Mesh>)
+{
+  object_id_t object_id = read (s, xtl::type<object_id_t> ());
+
+  if (object_id)
+  {
+    media::geometry::Mesh mesh = InprocessExchangeStorage::Attachment<media::geometry::Mesh> (object_id);
+
+    InprocessExchangeStorage::Detach (object_id);
+
+    return mesh;
+  }
+  else
+  {
+    //TODO test this
+
+    uint32 mesh_serialization_size = read (s, xtl::type<uint32> ());
+
+    size_t dummy;
+
+    return media::geometry::Mesh::CreateFromSerializedData (s.ReadData (mesh_serialization_size), mesh_serialization_size, dummy);
+  }
+}
+
 }}}

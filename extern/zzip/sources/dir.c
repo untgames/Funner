@@ -1,14 +1,9 @@
 
 /*
  * Author: 
- *	Guido Draheim <guidod@gmx.de>
+ *    Guido Draheim <guidod@gmx.de>
  *
- *	Copyright (c) 1999,2000,2001,2002,2003 Guido Draheim
- * 	    All rights reserved,
- *	    use under the restrictions of the
- *	    Lesser GNU General Public License
- *          or alternatively the restrictions 
- *          of the Mozilla Public License 1.1
+ * Copyright (c) Guido Draheim, use under copyleft (LGPL,MPL)
  */
 
 #include <zzip/lib.h>           /* exported... */
@@ -42,7 +37,8 @@
 # endif
 #endif
 
-/** 
+/** rewind.
+ *
  * This function is the equivalent of a => rewinddir(2) for a realdir or
  * the zipfile in place of a directory. The ZZIP_DIR handle returned from
  * => zzip_opendir has a flag saying realdir or zipfile. As for a zipfile,
@@ -110,7 +106,8 @@ real_readdir(ZZIP_DIR * dir)
 }
 #endif
 
-/**
+/** read dir.
+ *
  * This function is the equivalent of a => readdir(2) for a realdir 
  * or a zipfile referenced by the ZZIP_DIR returned from => zzip_opendir.
  *
@@ -186,34 +183,52 @@ zzip_seekdir(ZZIP_DIR * dir, zzip_off_t offset)
     }
 }
 
+#ifndef EOVERFLOW
+#define EOVERFLOW EFBIG
+#endif
+
+/** => zzip_rewinddir
+ * This function is provided for users who can not use any largefile-mode.
+ */
+long
+zzip_telldir32(ZZIP_DIR * dir)
+{
+    if (sizeof(zzip_off_t) == sizeof(long))
+    {
+        return zzip_telldir(dir);
+    } else
+    {
+        off_t off = zzip_telldir(dir);
+        if (off >= 0) {
+            register long off32 = off;
+            if (off32 == off) return off32;
+            errno = EOVERFLOW;
+        }
+        return -1;
+    }
+}
+
+/** => zzip_rewinddir
+ * This function is provided for users who can not use any largefile-mode.
+ */
+void
+zzip_seekdir32(ZZIP_DIR * dir, long offset)
+{
+    zzip_seekdir(dir, offset);
+}
+
 #if defined ZZIP_LARGEFILE_RENAME && defined EOVERFLOW && defined PIC
+/* DLL compatibility layer - so that 32bit code can link with a 64on32 too */
+
 #undef zzip_seekdir             /* zzip_seekdir64 */
 #undef zzip_telldir             /* zzip_telldir64 */
 
-long zzip_telldir(ZZIP_DIR * dir);
-void zzip_seekdir(ZZIP_DIR * dir, long offset);
-
-/* DLL compatibility layer - so that 32bit code can link with this lib too */
-
-long
-zzip_telldir(ZZIP_DIR * dir)
-{
-    off_t off = zzip_telldir64(dir);
-    long offs = off;
-
-    if (offs != off)
-        { errno = EOVERFLOW; return -1; }
-    return offs;
-}
-
-void
-zzip_seekdir(ZZIP_DIR * dir, long offset)
-{
-    zzip_seekdir64(dir, offset);
-}
+long zzip_telldir(ZZIP_DIR * dir) { return zzip_telldir32(dir); }
+void zzip_seekdir(ZZIP_DIR * dir, long offset) { zzip_seekdir32(dir, offset); }
 #endif
 
-/**
+/** start usage.
+ * 
  * This function is the equivalent of => opendir(3) for a realdir or zipfile.
  * 
  * This function has some magic - if the given argument-path
@@ -282,7 +297,8 @@ zzip_opendir_ext_io(zzip_char_t * filename, int o_modes,
     return dir;
 }
 
-/**
+/** stop usage.
+ *
  * This function is the equivalent of => closedir(3) for a realdir or zipfile.
  * 
  * This function is magic - if the given arg-ZZIP_DIR

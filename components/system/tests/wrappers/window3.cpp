@@ -1,7 +1,9 @@
 #include "shared.h"
 
 typedef xtl::shared_ptr<Window> WindowPtr;
+typedef xtl::shared_ptr<Timer> TimerPtr;
 
+TimerPtr timer_holder;
 WindowPtr window_holder;
 
 void destroy (Window&, WindowEvent, const WindowEventContext&)
@@ -31,6 +33,23 @@ void print_window_info (syslib::Window& window)
   printf ("window style: %s\n", get_name (window.Style ()));
 }
 
+void after_show (Timer& timer)
+{
+  timer.Pause ();
+
+  Window& window = *window_holder;
+
+  print_window_info (window);
+
+  window.SetStyle (WindowStyle_PopUp);
+
+  print_window_info (window);
+
+  window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
+
+  window.Close ();
+}
+
 void on_application_initialized ()
 {
   window_holder.reset (new Window (WindowStyle_Overlapped, 400, 300));
@@ -42,15 +61,7 @@ void on_application_initialized ()
 
   window.Show ();
 
-  print_window_info (window);
-
-  window.SetStyle (WindowStyle_PopUp);
-
-  print_window_info (window);
-
-  window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
-
-  window.Close ();
+  timer_holder.reset (new Timer (&after_show, 100));
 }
 
 int main ()

@@ -106,6 +106,8 @@ class ParticleEmitter: public VisualModel
               synchronizer = PropertyMapSynchronizer ();
             }
 
+            client.Synchronize ();
+
             cached_properties_id = properties_id;
           }
 

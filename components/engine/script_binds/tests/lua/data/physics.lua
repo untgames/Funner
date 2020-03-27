@@ -217,7 +217,7 @@ function test_physics()
 
   print_node (node)
 
-  node:Update (0.1)
+  node:Update (Xtl.Rational.LongLong.Create (1, 10))
 
   print_node (node)
 end
