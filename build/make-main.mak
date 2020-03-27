@@ -284,12 +284,14 @@ $(call check_toolset_constant,DLL_SUFFIX)
 $(call check_toolset_constant,EXE_SUFFIX)
 $(call check_toolset_constant,DLL_PREFIX)
 
+rwildcard=$(strip $(wildcard $1/$2) $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2)))
+
 ###################################################################################################
 #Include component configuration and export files
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE := $(firstword $(wildcard $(filter %$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(COMPONENT_CONFIGURATION_FILE_SHORT_NAME)))))
 EXPORT_FILES                 := $(wildcard $(filter %$(EXPORT_FILE_SHORT_NAME), $(MAKEFILE_LIST:makefile=$(EXPORT_FILE_SHORT_NAME))))
-DEPENDENCY_FILES             := $(shell find . -name $(DEPENDENCY_FILE_SHORT_NAME))
+DEPENDENCY_FILES             := $(call rwildcard,.,$(DEPENDENCY_FILE_SHORT_NAME))
 COMPONENT_DIR                := $(dir $(COMPONENT_CONFIGURATION_FILE))
 
 ifeq (,$(COMPONENT_CONFIGURATION_FILE))
