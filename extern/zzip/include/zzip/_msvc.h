@@ -1,6 +1,9 @@
 #ifndef _ZZIP__MSVC_H
 #define _ZZIP__MSVC_H 1
- 
+
+//for compatibility with older MSVC
+#define __func__ __FUNCTION__
+
 /* zzip/_msvc.h. Generated automatically at end of configure. */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
