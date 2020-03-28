@@ -5,6 +5,28 @@
 ###################################################################################################
 #Choose MSVC configuration
 ###################################################################################################
+
+VSWHERE_PATH := C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe
+
+ifneq (,$(wildcard $(subst $(SPACE),\$(SPACE),$(VSWHERE_PATH))))
+
+ifeq (,$(UCRT_PATH))
+  $(error 'Universal CRT path not defined (empty UCRT_PATH, default is c:\Program Files (x86)\Windows Kits\10)')
+endif
+
+ifeq (,$(UCRT_VERSION))
+  $(error 'Universal CRT version not defined (empty UCRT_VERSION)')
+endif
+
+  MSVC_PATH         ?= $(shell "$(VSWHERE_PATH)" -latest -find VC/**/atlmfc)/../
+  MSVC_BIN_PATH     ?= $(MSVC_PATH)bin/Hostx86/x86
+  MSVS_COMMON_PATH  ?= $(shell "$(VSWHERE_PATH)" -latest -find Common7/IDE)
+  PROFILES          += vc14 haswchar  
+  COMMON_CFLAGS     += -wd4005
+  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+
+else
+
 ifneq (,$(VS140COMNTOOLS))
 
 ifeq (,$(UCRT_PATH))
@@ -20,6 +42,8 @@ endif
   PROFILES          += vc14 haswchar  
   COMMON_CFLAGS     += -wd4005
   INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+endif
+
 endif
 
 ifneq (,$(VS130COMNTOOLS))
@@ -43,43 +67,6 @@ ifneq (,$(VS110COMNTOOLS))
   COMMON_CFLAGS     += -wd4005
 endif
 
-ifneq (,$(VS100COMNTOOLS))
-  MSVC_PATH         ?= $(VS100COMNTOOLS)../../vc
-  MSVS_COMMON_PATH  ?= $(VS100COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc10 haswchar
-endif
-
-ifneq (,$(VS90COMNTOOLS))
-  MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc
-  MSVS_COMMON_PATH  ?= $(VS90COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc9 haswchar
-endif
-
-ifneq (,$(VS80COMNTOOLS))
-  MSVC_PATH         ?= $(VS80COMNTOOLS)../../vc
-  MSVS_COMMON_PATH  ?= $(VS80COMNTOOLS)../../Common7/Ide
-  PLATFORM_SDK_PATH ?= $(MSVC_PATH)/platformsdk
-  PROFILES          += vc8 haswchar
-endif
-
-ifneq (,$(VS71COMNTOOLS))
-  MSVC_PATH         ?= $(VS71COMNTOOLS)../../vc7
-  MSVS_COMMON_PATH  ?= $(VS71COMNTOOLS)../../Common7/Ide
-  PLATFORM_SDK_PATH ?= $(MSVC_PATH)/platformsdk
-  PROFILES          += vc7
-endif
-
-ifneq (,$(VCTOOLKITINSTALLDIR))
-  MSVC_PATH         ?= $(VCTOOLKITINSTALLDIR).
-  MSVS_COMMON_PATH  ?= $(VCTOOLKITINSTALLDIR)bin
-  PROFILES          += vc7
-endif
-
-ifneq (,$(filter vc7,$(PROFILES)))
-  COMMON_CFLAGS += -wd4675 -GR
-  PROFILES      += nowchar
-endif
-
 ifeq (,$(MSVS_COMMON_PATH))
   $(error 'Microsoft Visual Studio not detected (empty MSVC_PATH)')
 endif
@@ -96,7 +83,7 @@ endif
 
 MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 PVS_STUDIO_DIR     := $(call convert_path,$(PVS_STUDIO_DIR))
-MSVC_BIN_PATH      := $(MSVC_PATH)/bin
+MSVC_BIN_PATH      ?= $(MSVC_PATH)/bin
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
 FRAMEWORK_DIR      := ${SYSTEMROOT}/Microsoft.NET/Framework/v2.0.50727
@@ -120,6 +107,16 @@ IGNORE_PVS_ERROR        += V126 V122 V201
 #Configuration of libraries location variables
 ###################################################################################################
 INCLUDE := $(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
+
+ifeq (,$(PLATFORM_SDK_PATH))
+#chedck default path
+PLATFORM_SDK_DEFAULT_PATH := C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/
+
+ifneq (,$(wildcard $(subst $(SPACE),\$(SPACE),$(PLATFORM_SDK_DEFAULT_PATH))))
+  PLATFORM_SDK_PATH := $(PLATFORM_SDK_DEFAULT_PATH)
+endif
+
+endif
 
 ifeq (,$(PLATFORM_SDK_PATH))
   $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH, default is c:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\)')  

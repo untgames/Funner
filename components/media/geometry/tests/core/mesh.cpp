@@ -85,6 +85,9 @@ int main ()
       printf ("vb source id is correct after clone\n");
   }
 
+  memset (vs.Data (), 0, vs.Size () * vs.VertexSize ());
+  memset (ib.Data (), 0, ib.SerializationDataSize ());
+
   printf ("mesh1 serialization size is %u\n", mesh1.SerializationSize ());
   printf ("mesh1 serialization data size is %u\n", mesh1.SerializationPrimitivesDataSize ());
 

@@ -1,0 +1,38 @@
+Results of body_flags_test:
+Simulating one second
+position_x_frozen_body state:
+Body world transform:
+  position = 0.00; -7.06; -6.87
+  orientation = 0.0; 0.0; 0.0; 1.0
+position_y_frozen_body state:
+Body world transform:
+  position = -5.40; 0.00; -6.65
+  orientation = 0.0; 0.0; 0.0; 0.9
+position_z_frozen_body state:
+Body world transform:
+  position = -6.13; -5.98; 0.00
+  orientation = 0.0; 0.0; 0.0; 0.9
+position_frozen_body state:
+Body world transform:
+  position = 0.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 0.9
+rotation_x_frozen_body state:
+Body world transform:
+  position = -7.13; -4.26; -5.21
+  orientation = 0.0; 0.0; 0.0; 0.9
+rotation_y_frozen_body state:
+Body world transform:
+  position = -8.94; -5.05; -4.77
+  orientation = 0.0; 0.0; 0.0; 0.9
+rotation_z_frozen_body state:
+Body world transform:
+  position = -10.92; -4.72; -4.80
+  orientation = 0.0; 0.0; 0.0; 0.9
+rotation_frozen_body state:
+Body world transform:
+  position = -13.18; -4.99; -4.91
+  orientation = 0.0; 0.0; 0.0; 1.0
+kinematic_body state:
+Body world transform:
+  position = 0.00; 0.00; 0.00
+  orientation = 0.0; 0.0; 0.0; 1.0

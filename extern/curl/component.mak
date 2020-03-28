@@ -1,4 +1,4 @@
-TARGETS := EXTERN.CURL.SOURCES EXTERN.CURL.TESTS
+TARGETS := EXTERN.CURL.SOURCES
 
 EXTERN.CURL.SOURCES.TYPE                     := static-lib
 EXTERN.CURL.SOURCES.NAME                     := funner.extern.curl
@@ -17,21 +17,3 @@ EXTERN.CURL.SOURCES.android.INCLUDE_DIRS     := addons/android
 EXTERN.CURL.SOURCES.linux-x86.INCLUDE_DIRS   := addons/linux-i386
 EXTERN.CURL.SOURCES.linux-x64.INCLUDE_DIRS   := addons/linux-x64
 EXTERN.CURL.SOURCES.IMPORTS                  := compile.extern.zlib compile.extern.openssl
-
-EXTERN.CURL.TESTS.TYPE                     := test-suite
-EXTERN.CURL.TESTS.SOURCE_DIRS              := tests
-EXTERN.CURL.TESTS.INCLUDE_DIRS             := sources
-EXTERN.CURL.TESTS.INCLUDE_FILES            := first.c testutil.c
-EXTERN.CURL.TESTS.cocoa.COMPILER_DEFINES   := HAVE_CONFIG_H
-EXTERN.CURL.TESTS.android.COMPILER_DEFINES := HAVE_CONFIG_H
-EXTERN.CURL.TESTS.linux.COMPILER_DEFINES   := HAVE_CONFIG_H
-EXTERN.CURL.TESTS.macosx.INCLUDE_DIRS      := addons/macosx-x86-64
-EXTERN.CURL.TESTS.iosx86.INCLUDE_DIRS      := addons/ios-i386
-EXTERN.CURL.TESTS.iosx86-64.INCLUDE_DIRS   := addons/ios-x86-64
-EXTERN.CURL.TESTS.iosarm32.INCLUDE_DIRS    := addons/ios-arm32
-EXTERN.CURL.TESTS.iosarm64.INCLUDE_DIRS    := addons/ios-arm64
-EXTERN.CURL.TESTS.android.INCLUDE_DIRS     := addons/android
-EXTERN.CURL.TESTS.linux-x86.INCLUDE_DIRS   := addons/linux-i386
-EXTERN.CURL.TESTS.linux-x64.INCLUDE_DIRS   := addons/linux-x64
-EXTERN.CURL.TESTS.IMPORTS                  := compile.extern.curl link.extern.curl
-EXTERN.CURL.TESTS.vcx86-64.COMPILER_CFLAGS := -wd4244

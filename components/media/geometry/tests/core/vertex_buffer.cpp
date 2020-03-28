@@ -51,6 +51,11 @@ int main ()
   vs1.Resize (9);
   vs2.Resize (8);
   
+  memset (vs1.Data (), 0, vs1.Size () * vs1.VertexSize ());
+  memset (vs2.Data (), 0, vs2.Size () * vs2.VertexSize ());
+  memset (vs3.Data (), 0, vs3.Size () * vs3.VertexSize ());
+  memset (weights.Data (), 0, weights.Size () * sizeof (VertexWeight));
+
   printf ("Dump vb1\n");
   
   dump (vb1);
