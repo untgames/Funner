@@ -26,7 +26,7 @@ SkeletonSpineImpl::SkeletonSpineImpl (SpineAtlasPtr in_atlas, SkeletonClippingSp
 
   spSkeleton* native_handle = skeleton->NativeHandle ();
 
-  for (unsigned int i = 0; i < native_handle->slotsCount; ++i)
+  for (int i = 0; i < native_handle->slotsCount; ++i)
     slots_index_map.insert_pair (native_handle->slots [i], i);
 }
 
