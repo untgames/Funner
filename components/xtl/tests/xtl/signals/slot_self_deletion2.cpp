@@ -1,6 +1,6 @@
 #include "test.h"
 
-typedef signal<void ()> my_signal;
+typedef xtl::signal<void ()> my_signal;
 
 stl::auto_ptr<my_signal> self_destroy_signal;
 

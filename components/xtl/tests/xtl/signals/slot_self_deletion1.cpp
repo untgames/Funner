@@ -5,7 +5,7 @@
 
 const int NUM = 100000;
 
-typedef signal<void (int)> my_signal;
+typedef xtl::signal<void (int)> my_signal;
 
 connection self_destroy_connections [NUM];
 my_signal  self_destroy_signals [NUM];

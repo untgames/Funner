@@ -1,6 +1,6 @@
 #include "test.h"
 
-typedef signal<void ()> my_signal;
+typedef xtl::signal<void ()> my_signal;
 
 struct Fn
 {

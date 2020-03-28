@@ -49,7 +49,7 @@ struct make_increasing_int {
 static void
 test_one_arg()
 {
-  signal<int (int value), max_or_default<int> > s1;
+  xtl::signal<int (int value), max_or_default<int> > s1;
 
   s1.connect(negate<int>());
   s1.connect(bind1st(multiplies<int>(), 2));

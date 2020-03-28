@@ -96,8 +96,8 @@ int main ()
     
     printf ("events:\n");
     
-    state1.SetTime (1.0f);
-    state2.SetTime (1.0f);
+    state1.SetTime (0.99f);
+    state2.SetTime (0.99f);
     
     blender.Update (&print_event);
     
