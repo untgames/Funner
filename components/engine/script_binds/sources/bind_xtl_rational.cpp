@@ -4,10 +4,7 @@ using namespace engine;
 using namespace script;
 using namespace stl;
 
-namespace components
-{
-
-namespace xtl_script_bind
+namespace
 {
 
 /*
@@ -62,6 +59,18 @@ xtl::rational<T> create_default_rational ()
   return xtl::rational<T> ();
 }
 
+template <class T>
+double get_rational_numerator (const xtl::rational<T>& r)
+{
+  return (double)r.numerator ();
+}
+
+template <class T>
+double get_rational_denominator (const xtl::rational<T>& r)
+{
+  return (double)r.denominator ();
+}
+
 /*
     Register library for work with rational type
 */
@@ -79,8 +88,8 @@ void bind_rational_library (InvokerRegistry& rational_lib)
 
     //register getters
 
-  rational_lib.Register ("get_Numerator",   make_invoker (&rational_type::numerator));
-  rational_lib.Register ("get_Denominator", make_invoker (&rational_type::denominator));
+  rational_lib.Register ("get_Numerator",   make_invoker (&get_rational_numerator<T>));
+  rational_lib.Register ("get_Denominator", make_invoker (&get_rational_denominator<T>));
 
     //register operators
 
@@ -126,6 +135,14 @@ void bind_xtl_rational_library (Environment& environment)
 
   environment.RegisterType<xtl::rational<long long> > (XTL_RATIONAL_LONG_LONG_LIBRARY);
 }
+
+}
+
+namespace components
+{
+
+namespace xtl_script_bind
+{
 
 /*
     Component

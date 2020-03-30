@@ -1,0 +1,148 @@
+Results of physics_test:
+Test library:
+Physics test
+Manager description is 'physics::low_level::bullet::Driver'
+Shape list size = 0
+Shape list size = 4
+Shape list 0 shape margin = 0.04 position is 0 0 0 orientation is 0 0 0 1
+Shape list 1 shape margin = 1.00 position is 1 2 3 orientation is 0 0 0 1
+Shape list 2 shape margin = 0.04 position is 0 0 0 orientation is 1 2 3 4
+Shape list 3 shape margin = 0.00 position is 5 6 7 orientation is 1 2 3 4
+Shape list size = 3
+Shape list size = 0
+Material linear damping = 0.00, angular damping = 0.00, friction = 0.50, anisotropic friction = 1.00 1.00 1.00, restitution = 0.00
+Material linear damping = 1.00, angular damping = 2.00, friction = 3.00, anisotropic friction = 4.00 5.00 6.00, restitution = 7.00
+box_shape margin = 0.04
+new box_shape margin = 5
+Scene gravity = 0 -9.8 0
+Scene simulation step = 0.02
+Scene gravity = 0 -8 0
+Scene simulation step = 0.10
+Rigid body:
+  mass 1.00
+  mass space inertia tensor 1 1 1
+  world position 0 0 0
+  world orientation 0 0 0 1
+  sleep linear velocity 0.80
+  sleep angular velocity 1.00
+  ccd motion threshold 0.00
+  shape margin 5.00
+  material linear damping 0.00
+  collision group ''
+  linear velocity 0 0 0
+  angular velocity 0 0 0
+  flags:
+    frozen position x = false
+    frozen position y = false
+    frozen position z = false
+    frozen position = false
+    frozen rotation x = false
+    frozen rotation y = false
+    frozen rotation z = false
+    frozen rotation = false
+    kinematic = false
+Rigid body:
+  mass 2.00
+  mass space inertia tensor 1 1 1
+  world position 0 0 0
+  world orientation 0 0 0 1
+  sleep linear velocity 0.80
+  sleep angular velocity 1.00
+  ccd motion threshold 0.00
+  shape margin 0.00
+  material linear damping 0.00
+  collision group ''
+  linear velocity 0 0 0
+  angular velocity 0 0 0
+  flags:
+    frozen position x = false
+    frozen position y = false
+    frozen position z = false
+    frozen position = false
+    frozen rotation x = false
+    frozen rotation y = false
+    frozen rotation z = false
+    frozen rotation = false
+    kinematic = false
+Rigid body:
+  mass 4.00
+  mass space inertia tensor 1 2 3
+  world position 2 3 4
+  world orientation 1 2 3 4
+  sleep linear velocity 5.00
+  sleep angular velocity 6.00
+  ccd motion threshold 7.00
+  shape margin 5.00
+  material linear damping 1.00
+  collision group 'object'
+  linear velocity 7 8 9
+  angular velocity 8 9 10
+  flags:
+    frozen position x = true
+    frozen position y = false
+    frozen position z = false
+    frozen position = false
+    frozen rotation x = false
+    frozen rotation y = true
+    frozen rotation z = false
+    frozen rotation = false
+    kinematic = true
+Rigid body:
+  mass 4.00
+  mass space inertia tensor 1 2 3
+  world position 2 3 4
+  world orientation 1 2 3 4
+  sleep linear velocity 5.00
+  sleep angular velocity 6.00
+  ccd motion threshold 7.00
+  shape margin 5.00
+  material linear damping 1.00
+  collision group 'object'
+  linear velocity 7 8 9
+  angular velocity 8 9 10
+  flags:
+    frozen position x = true
+    frozen position y = true
+    frozen position z = true
+    frozen position = true
+    frozen rotation x = true
+    frozen rotation y = false
+    frozen rotation z = true
+    frozen rotation = false
+    kinematic = true
+Bind anchor = 0 0 0 axis = 0 0 1
+Bind anchor = 1 2 3 axis = 0 0 1
+Bind anchor = 2 3 4 axis = 1 0 0
+Bind anchor = 3 4 5 axis = 0 1 0
+hinge joint bodies count = 2
+Node position = [0.00 0.00 0.00]
+Collision filter called
+Body collision callback called for event Begin at point [1.00 1.00 1.00]
+Collision callback called for event Begin at point [1.00 1.00 1.00]
+body transform updated
+Collision filter called
+Body collision callback called for event Begin at point [4.52 0.56 5.31]
+Collision callback called for event Begin at point [4.52 0.56 5.31]
+body transform updated
+Body collision callback called for event Begin at point [1.92 1.19 0.57]
+Collision callback called for event Begin at point [1.92 1.19 0.57]
+body transform updated
+Body collision callback called for event Begin at point [3.86 0.55 6.23]
+Collision callback called for event Begin at point [3.86 0.55 6.23]
+body transform updated
+Body collision callback called for event Begin at point [3.32 1.52 0.62]
+Collision callback called for event Begin at point [3.32 1.52 0.62]
+body transform updated
+Body collision callback called for event Begin at point [-0.18 1.68 6.68]
+Collision callback called for event Begin at point [-0.18 1.68 6.68]
+body transform updated
+Body collision callback called for event Begin at point [4.05 1.67 0.87]
+Collision callback called for event Begin at point [4.05 1.67 0.87]
+body transform updated
+Body collision callback called for event Begin at point [-0.32 1.28 6.41]
+Collision callback called for event Begin at point [-0.32 1.28 6.41]
+body transform updated
+Collision filter called
+body transform updated
+Node position = [0.00 0.00 0.00]
+Node position = [2.23 2.40 4.01]
