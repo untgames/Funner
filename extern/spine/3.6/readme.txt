@@ -1,2 +1,3 @@
 Spine commit 54c20904fda6d352277ac703ddb7c81d275eaaa6 from repository https://github.com/EsotericSoftware/spine-runtimes.git should be patched with patch file funner.patch.
-Folder spine-c/spine-c/include should be copied to include and folder spine-c/spine-c/src/ should be copied to sources 
+Folder spine-c/spine-c/include should be copied to include and folder spine-c/spine-c/src/ should be copied to sources
+Folders examples/* should be copied to components/media/spine/tests/data/, components/scene_graph/tests/controllers/data/, components/scene_graph/tests/core/data/, components/render/scene_render/server/tests/renderer/data/, components/engine/script_binds/tests/lua/data/ (for unit tests)
