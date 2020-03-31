@@ -16,7 +16,7 @@ function user_event_handler (track, event_name, int, float, string)
 end
 
 function test ()
-  local skeleton_data = Media.SpineSkeletonData.Create ("data/goblins/export/goblins-pro.skel", "data/goblins/export/goblins.atlas")
+  local skeleton_data = Media.SpineSkeletonData.Create ("data/spine_3.6/goblins/export/goblins-pro.skel", "data/spine_3.6/goblins/export/goblins.atlas")
 
   print (string.format ("Skeleton data size is %d x %d", skeleton_data.Width, skeleton_data.Height))
   print ("Skeleton data animations count is " .. skeleton_data.AnimationsCount)

@@ -1,39 +1,53 @@
 #include "shared.h"
 
-//const char* SPINE_FILE_NAME  = "data/alien/export/alien-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/alien/export/alien.atlas";
-const char* SPINE_FILE_NAME  = "data/alien/export/alien-pro.skel";
-const char* SPINE_ATLAS_NAME = "data/alien/export/alien.atlas";
-//const char* SPINE_FILE_NAME  = "data/coin/export/coin-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/coin/export/coin.atlas";
-//const char* SPINE_FILE_NAME  = "data/dragon/export/dragon-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/dragon/export/dragon.atlas";
-//const char* SPINE_FILE_NAME  = "data/goblins/export/goblins-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/goblins/export/goblins.atlas";
-//const char* SPINE_FILE_NAME  = "data/goblins/export/goblins-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/goblins/export/goblins.atlas";
-//const char* SPINE_FILE_NAME  = "data/hero/export/hero-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/hero/export/hero.atlas";
-//const char* SPINE_FILE_NAME  = "data/hero/export/hero-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/hero/export/hero.atlas";
-//const char* SPINE_FILE_NAME  = "data/powerup/export/powerup-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/powerup/export/powerup.atlas";
-//const char* SPINE_FILE_NAME  = "data/powerup/export/powerup-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/powerup/export/powerup.atlas";
-//const char* SPINE_FILE_NAME  = "data/raptor/export/raptor-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/raptor/export/raptor.atlas";
-//const char* SPINE_FILE_NAME  = "data/speedy/export/speedy-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/speedy/export/speedy.atlas";
-//const char* SPINE_FILE_NAME  = "data/spineboy/export/spineboy-ess.skel";
-//const char* SPINE_ATLAS_NAME = "data/spineboy/export/spineboy.atlas";
-//const char* SPINE_FILE_NAME  = "data/spineboy/export/spineboy-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/spineboy/export/spineboy.atlas";
-//const char* SPINE_FILE_NAME  = "data/stretchyman/export/stretchyman-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/stretchyman/export/stretchyman.atlas";
-//const char* SPINE_FILE_NAME  = "data/tank/export/tank-pro.skel";
-//const char* SPINE_ATLAS_NAME = "data/tank/export/tank.atlas";
-//const char* SPINE_FILE_NAME  = "data/vine/export/vine-pro.json";
-//const char* SPINE_ATLAS_NAME = "data/vine/export/vine.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/alien/export/alien-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/alien/export/alien.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/alien/export/alien-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/alien/export/alien.atlas";
+const char* SPINE_FILE_NAME         = "data/spine_3.8/alien/export/alien-pro.skel";
+const char* SPINE_ATLAS_NAME        = "data/spine_3.8/alien/export/alien.atlas";
+const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.8/alien/export/alien.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/coin/export/coin-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/coin/export/coin.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/coin/export/coin.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/dragon/export/dragon-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/dragon/export/dragon.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/dragon/export/dragon.png", "data/spine_3.6/dragon/export/dragon2.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/goblins/export/goblins-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/goblins/export/goblins.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/goblins/export/goblins-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/goblins/export/goblins.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/goblins/export/goblins.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/hero/export/hero-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/hero/export/hero.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/hero/export/hero-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/hero/export/hero.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/hero/export/hero.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/powerup/export/powerup-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/powerup/export/powerup.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/powerup/export/powerup-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/powerup/export/powerup.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/powerup/export/powerup.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/raptor/export/raptor-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/raptor/export/raptor.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/raptor/export/raptor.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/speedy/export/speedy-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/speedy/export/speedy.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/speedy/export/speedy.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/spineboy/export/spineboy-ess.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/spineboy/export/spineboy.atlas";
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/spineboy/export/spineboy-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/spineboy/export/spineboy.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/spineboy/export/spineboy.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/stretchyman/export/stretchyman-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/stretchyman/export/stretchyman.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/stretchyman/export/stretchyman.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/tank/export/tank-pro.skel";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/tank/export/tank.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/tank/export/tank.png" };
+//const char* SPINE_FILE_NAME         = "data/spine_3.6/vine/export/vine-pro.json";
+//const char* SPINE_ATLAS_NAME        = "data/spine_3.6/vine/export/vine.atlas";
+//const char* SPINE_TEXTURES_NAMES [] = { "data/spine_3.6/vine/export/vine.png" };
 
 struct Test
 {
@@ -90,7 +104,7 @@ void idle (Test& test)
     
     frames_count++;
     
-    float angle = common::milliseconds () / 100.0f;
+//    float angle = common::milliseconds () / 100.0f;
 
     if (test.skeleton)
       test.skeleton->SetWorldOrientation (math::degree (0.f), 0.0f, 0.0f, 1.0f);   //TODO just to update on each frame
@@ -136,19 +150,9 @@ int main ()
 
     client.LoadResource ("data/render_spine.rfx");
     client.LoadResource ("data/spine.xmtl");
-    client.LoadResource ("data/alien/export/alien.png");
-    client.LoadResource ("data/coin/export/coin.png");
-    client.LoadResource ("data/dragon/export/dragon.png");
-    client.LoadResource ("data/dragon/export/dragon2.png");
-    client.LoadResource ("data/goblins/export/goblins.png");
-    client.LoadResource ("data/hero/export/hero.png");
-    client.LoadResource ("data/powerup/export/powerup.png");
-    client.LoadResource ("data/raptor/export/raptor.png");
-    client.LoadResource ("data/speedy/export/speedy.png");
-    client.LoadResource ("data/spineboy/export/spineboy.png");
-    client.LoadResource ("data/stretchyman/export/stretchyman.png");
-    client.LoadResource ("data/tank/export/tank.png");
-    client.LoadResource ("data/vine/export/vine.png");
+
+    for (size_t i = 0, count = sizeof (SPINE_TEXTURES_NAMES) / sizeof (*SPINE_TEXTURES_NAMES); i < count; i++)
+      client.LoadResource (SPINE_TEXTURES_NAMES [i]);
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
 

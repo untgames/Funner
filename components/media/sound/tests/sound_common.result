@@ -8,19 +8,19 @@ Empty sample properties:
 Sample name - 'data/sound1.ogg'
 New sample name - 'new_name'
 Sample properties:
-  Samples   - 55167
-  Size      - 220668
+  Samples   - 66150
+  Size      - 264600
   Frequency - 22050
   Channels  - 2
   Bits per sample - 16
 Calculated sample properties:
-  Bytes    - 220668
-  Samples  - 55167
-  Duration - 2.501905
-  Samples  - 55167
+  Bytes    - 264600
+  Samples  - 66150
+  Duration - 3.000000
+  Samples  - 66150
 Clonned sample properties:
-  Samples   - 55167
-  Size      - 220668
+  Samples   - 66150
+  Size      - 264600
   Frequency - 22050
   Channels  - 2
   Bits per sample - 16

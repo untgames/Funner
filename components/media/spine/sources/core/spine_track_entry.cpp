@@ -131,6 +131,27 @@ void TrackEntry::SetTrackTime (float track_time)
   impl->SetTrackTime (track_time);
 }
 
+//tracks blending (available for spine 3.8 or newer)
+media::spine::MixBlend TrackEntry::MixBlend () const
+{
+  return impl->MixBlend ();
+}
+
+void TrackEntry::SetMixBlend (media::spine::MixBlend mix_blend)
+{
+  impl->SetMixBlend (mix_blend);
+}
+
+bool TrackEntry::HoldPrevious () const
+{
+  return impl->HoldPrevious ();
+}
+
+void TrackEntry::SetHoldPrevious (bool hold)
+{
+  impl->SetHoldPrevious (hold);
+}
+
 /*
    Mixing parameters
 */

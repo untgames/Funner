@@ -1,7 +1,7 @@
 #include "shared.h"
 
-const char* SPINE_FILE_NAME  = "data/vine/export/vine-pro.json";
-const char* SPINE_ATLAS_NAME = "data/vine/export/vine.atlas";
+const char* SPINE_FILE_NAME  = "data/spine_3.6/vine/export/vine-pro.json";
+const char* SPINE_ATLAS_NAME = "data/spine_3.6/vine/export/vine.atlas";
 
 int main ()
 {

@@ -71,12 +71,8 @@ class Component
     {
       stl::string spine_float_version_string = SPINE_VERSION_STRING;
 
-      //replace underscore with dot to make valid float string
-      for (char* ch = spine_float_version_string.begin (); *ch; ch++)
-      {
-        if (*ch == '_')
-          *ch = '.';
-      }
+      //insert dot before last digit, because spine version is represented as integer instead of float (version * 10)
+      spine_float_version_string.insert (spine_float_version_string.begin () + spine_float_version_string.size () - 1, '.');
 
       SerializerManager::RegisterLoader ("json", spine_float_version_string.c_str (), &LoadJsonSkeletonData);
       SerializerManager::RegisterLoader ("skel", spine_float_version_string.c_str (), &LoadBinarySkeletonData);

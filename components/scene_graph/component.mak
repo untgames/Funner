@@ -32,7 +32,7 @@ SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/core
 SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/screen
 SCENE_GRAPH.CORE.TESTS.SOURCE_DIRS      += tests/controllers
 SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim compile.media.font compile.media.geometry \
-                                           compile.media.spine link.media.font.xfont link.media.geometry link.media.spine link.media.spine.loader_3.6
+                                           compile.media.spine link.media.font.xfont link.media.geometry link.media.spine link.media.spine.loader_3.6 link.media.spine.loader_3.8
 
 #Цель - XScene tests
 SCENE_GRAPH.SERIALIZATION.TESTS.TYPE             := test-suite

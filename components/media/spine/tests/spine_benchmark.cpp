@@ -17,8 +17,8 @@
 
 using namespace media::spine;
 
-const char*  SPINE_FILE_NAME = "data/tank/export/tank-pro.skel";
-const char*  ATLAS_FILE_NAME = "data/tank/export/tank.atlas";
+const char*  SPINE_FILE_NAME = "data/3.6/tank/export/tank-pro.skel";
+const char*  ATLAS_FILE_NAME = "data/3.6/tank/export/tank.atlas";
 const size_t TEST_LOOP_SIZE  = 20000;
 
 void print_log (const char* log, const char* message)

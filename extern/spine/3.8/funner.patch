@@ -1,0 +1,1856 @@
+From a7566079af185eff28751517910a762f8ca12136 Mon Sep 17 00:00:00 2001
+From: Ievgen Mukhin <ievgen@Ievgens-MacBook-Pro.local>
+Date: Mon, 30 Mar 2020 17:15:22 +0300
+Subject: [PATCH 1/1] Funner changes.
+
+Signed-off-by: Ievgen Mukhin <ievgen@Ievgens-MacBook-Pro.local>
+---
+ spine-c/spine-c/include/spine/Animation.h     |  7 ++-----
+ .../spine-c/include/spine/AnimationState.h    |  7 ++-----
+ .../include/spine/AnimationStateData.h        |  7 ++-----
+ spine-c/spine-c/include/spine/Array.h         |  7 ++-----
+ spine-c/spine-c/include/spine/Atlas.h         |  7 ++-----
+ .../include/spine/AtlasAttachmentLoader.h     |  7 ++-----
+ spine-c/spine-c/include/spine/Attachment.h    |  7 ++-----
+ .../spine-c/include/spine/AttachmentLoader.h  |  7 ++-----
+ spine-c/spine-c/include/spine/Bone.h          |  7 ++-----
+ spine-c/spine-c/include/spine/BoneData.h      |  7 ++-----
+ .../include/spine/BoundingBoxAttachment.h     |  7 ++-----
+ .../include/spine/ClippingAttachment.h        |  7 ++-----
+ spine-c/spine-c/include/spine/Color.h         |  7 ++-----
+ spine-c/spine-c/include/spine/Event.h         |  7 ++-----
+ spine-c/spine-c/include/spine/EventData.h     |  7 ++-----
+ spine-c/spine-c/include/spine/IkConstraint.h  |  7 ++-----
+ .../spine-c/include/spine/IkConstraintData.h  |  7 ++-----
+ .../spine-c/include/spine/MeshAttachment.h    |  7 ++-----
+ .../spine-c/include/spine/PathAttachment.h    |  7 ++-----
+ .../spine-c/include/spine/PathConstraint.h    |  7 ++-----
+ .../include/spine/PathConstraintData.h        |  7 ++-----
+ .../spine-c/include/spine/PointAttachment.h   |  7 ++-----
+ .../spine-c/include/spine/RegionAttachment.h  |  7 ++-----
+ spine-c/spine-c/include/spine/Skeleton.h      |  7 ++-----
+ .../spine-c/include/spine/SkeletonBinary.h    |  7 ++-----
+ .../spine-c/include/spine/SkeletonBounds.h    |  7 ++-----
+ .../spine-c/include/spine/SkeletonClipping.h  |  7 ++-----
+ spine-c/spine-c/include/spine/SkeletonData.h  |  7 ++-----
+ spine-c/spine-c/include/spine/SkeletonJson.h  |  7 ++-----
+ spine-c/spine-c/include/spine/Skin.h          |  7 ++-----
+ spine-c/spine-c/include/spine/Slot.h          |  7 ++-----
+ spine-c/spine-c/include/spine/SlotData.h      |  7 ++-----
+ .../include/spine/TransformConstraint.h       |  7 ++-----
+ .../include/spine/TransformConstraintData.h   |  7 ++-----
+ spine-c/spine-c/include/spine/Triangulator.h  |  7 ++-----
+ .../spine-c/include/spine/VertexAttachment.h  |  7 ++-----
+ spine-c/spine-c/include/spine/VertexEffect.h  |  7 ++-----
+ spine-c/spine-c/include/spine/extension.h     |  7 ++-----
+ .../spine-c/include/spine/funner_defines.h    |  3 +++
+ spine-c/spine-c/src/spine/Animation.c         |  5 +++++
+ spine-c/spine-c/src/spine/AnimationState.c    |  5 +++++
+ .../spine-c/src/spine/AnimationStateData.c    |  5 +++++
+ spine-c/spine-c/src/spine/Array.c             |  5 +++++
+ spine-c/spine-c/src/spine/Atlas.c             |  5 +++++
+ .../spine-c/src/spine/AtlasAttachmentLoader.c |  5 +++++
+ spine-c/spine-c/src/spine/Attachment.c        |  5 +++++
+ spine-c/spine-c/src/spine/AttachmentLoader.c  |  5 +++++
+ spine-c/spine-c/src/spine/Bone.c              |  6 ++++++
+ spine-c/spine-c/src/spine/BoneData.c          |  5 +++++
+ .../spine-c/src/spine/BoundingBoxAttachment.c |  5 +++++
+ .../spine-c/src/spine/ClippingAttachment.c    |  5 +++++
+ spine-c/spine-c/src/spine/Color.c             |  5 +++++
+ spine-c/spine-c/src/spine/Event.c             |  5 +++++
+ spine-c/spine-c/src/spine/EventData.c         |  5 +++++
+ spine-c/spine-c/src/spine/IkConstraint.c      |  5 +++++
+ spine-c/spine-c/src/spine/IkConstraintData.c  |  5 +++++
+ spine-c/spine-c/src/spine/Json.c              |  5 +++++
+ spine-c/spine-c/src/spine/Json.h              |  7 ++-----
+ spine-c/spine-c/src/spine/MeshAttachment.c    |  5 +++++
+ spine-c/spine-c/src/spine/PathAttachment.c    |  5 +++++
+ spine-c/spine-c/src/spine/PathConstraint.c    |  5 +++++
+ .../spine-c/src/spine/PathConstraintData.c    |  5 +++++
+ spine-c/spine-c/src/spine/PointAttachment.c   |  5 +++++
+ spine-c/spine-c/src/spine/RegionAttachment.c  |  5 +++++
+ spine-c/spine-c/src/spine/Skeleton.c          |  5 +++++
+ spine-c/spine-c/src/spine/SkeletonBinary.c    |  5 +++++
+ spine-c/spine-c/src/spine/SkeletonBounds.c    |  5 +++++
+ spine-c/spine-c/src/spine/SkeletonClipping.c  |  5 +++++
+ spine-c/spine-c/src/spine/SkeletonData.c      |  5 +++++
+ spine-c/spine-c/src/spine/SkeletonJson.c      |  5 +++++
+ spine-c/spine-c/src/spine/Skin.c              |  5 +++++
+ spine-c/spine-c/src/spine/Slot.c              |  5 +++++
+ spine-c/spine-c/src/spine/SlotData.c          |  5 +++++
+ .../spine-c/src/spine/TransformConstraint.c   |  5 +++++
+ .../src/spine/TransformConstraintData.c       |  5 +++++
+ spine-c/spine-c/src/spine/Triangulator.c      |  5 +++++
+ spine-c/spine-c/src/spine/VertexAttachment.c  |  5 +++++
+ spine-c/spine-c/src/spine/VertexEffect.c      |  5 +++++
+ spine-c/spine-c/src/spine/extension.c         |  5 +++++
+ 80 files changed, 277 insertions(+), 216 deletions(-)
+ create mode 100644 spine-c/spine-c/include/spine/funner_defines.h
+
+diff --git a/spine-c/spine-c/include/spine/Animation.h b/spine-c/spine-c/include/spine/Animation.h
+index 6bdaedd68..6cc7f2832 100644
+--- a/spine-c/spine-c/include/spine/Animation.h
++++ b/spine-c/spine-c/include/spine/Animation.h
+@@ -34,9 +34,8 @@
+ #include <spine/Event.h>
+ #include <spine/Attachment.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spTimeline spTimeline;
+ struct spSkeleton;
+@@ -581,8 +580,6 @@ typedef spPathConstraintMixTimeline PathConstraintMixTimeline;
+ 
+ /**/
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ANIMATION_H_ */
+diff --git a/spine-c/spine-c/include/spine/AnimationState.h b/spine-c/spine-c/include/spine/AnimationState.h
+index c83c28b83..bd75b581d 100644
+--- a/spine-c/spine-c/include/spine/AnimationState.h
++++ b/spine-c/spine-c/include/spine/AnimationState.h
+@@ -36,9 +36,8 @@
+ #include <spine/Event.h>
+ #include <spine/Array.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef enum {
+ 	SP_ANIMATION_START, SP_ANIMATION_INTERRUPT, SP_ANIMATION_END, SP_ANIMATION_COMPLETE, SP_ANIMATION_DISPOSE, SP_ANIMATION_EVENT
+@@ -182,8 +181,6 @@ typedef spAnimationState AnimationState;
+ #define AnimationState_clearListenerNotifications(...) spAnimationState_clearListenerNotifications(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ANIMATIONSTATE_H_ */
+diff --git a/spine-c/spine-c/include/spine/AnimationStateData.h b/spine-c/spine-c/include/spine/AnimationStateData.h
+index bd11b09a6..3ed2e18b0 100644
+--- a/spine-c/spine-c/include/spine/AnimationStateData.h
++++ b/spine-c/spine-c/include/spine/AnimationStateData.h
+@@ -34,9 +34,8 @@
+ #include <spine/Animation.h>
+ #include <spine/SkeletonData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spAnimationStateData {
+ 	spSkeletonData* const skeletonData;
+@@ -69,8 +68,6 @@ typedef spAnimationStateData AnimationStateData;
+ #define AnimationStateData_getMix(...) spAnimationStateData_getMix(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ANIMATIONSTATEDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/Array.h b/spine-c/spine-c/include/spine/Array.h
+index 1d1cb171b..189fb6e50 100644
+--- a/spine-c/spine-c/include/spine/Array.h
++++ b/spine-c/spine-c/include/spine/Array.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ #define _SP_ARRAY_DECLARE_TYPE(name, itemType) \
+ 	typedef struct name { int size; int capacity; itemType* items; } name; \
+@@ -125,8 +124,6 @@ _SP_ARRAY_DECLARE_TYPE(spUnsignedShortArray, unsigned short)
+ _SP_ARRAY_DECLARE_TYPE(spArrayFloatArray, spFloatArray*)
+ _SP_ARRAY_DECLARE_TYPE(spArrayShortArray, spShortArray*)
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ARRAY_H */
+diff --git a/spine-c/spine-c/include/spine/Atlas.h b/spine-c/spine-c/include/spine/Atlas.h
+index 4cafcd28a..6c702cfcd 100644
+--- a/spine-c/spine-c/include/spine/Atlas.h
++++ b/spine-c/spine-c/include/spine/Atlas.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spAtlas spAtlas;
+ 
+@@ -167,8 +166,6 @@ typedef spAtlas Atlas;
+ #define Atlas_findRegion(...) spAtlas_findRegion(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ATLAS_H_ */
+diff --git a/spine-c/spine-c/include/spine/AtlasAttachmentLoader.h b/spine-c/spine-c/include/spine/AtlasAttachmentLoader.h
+index a68111407..7895bc0c8 100644
+--- a/spine-c/spine-c/include/spine/AtlasAttachmentLoader.h
++++ b/spine-c/spine-c/include/spine/AtlasAttachmentLoader.h
+@@ -34,9 +34,8 @@
+ #include <spine/AttachmentLoader.h>
+ #include <spine/Atlas.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spAtlasAttachmentLoader {
+ 	spAttachmentLoader super;
+@@ -50,8 +49,6 @@ typedef spAtlasAttachmentLoader AtlasAttachmentLoader;
+ #define AtlasAttachmentLoader_create(...) spAtlasAttachmentLoader_create(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ATLASATTACHMENTLOADER_H_ */
+diff --git a/spine-c/spine-c/include/spine/Attachment.h b/spine-c/spine-c/include/spine/Attachment.h
+index 1f7d943f8..8def822c0 100644
+--- a/spine-c/spine-c/include/spine/Attachment.h
++++ b/spine-c/spine-c/include/spine/Attachment.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spAttachmentLoader;
+ 
+@@ -79,8 +78,6 @@ typedef spAttachment Attachment;
+ #define Attachment_dispose(...) spAttachment_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/AttachmentLoader.h b/spine-c/spine-c/include/spine/AttachmentLoader.h
+index a78976042..9e6018b5a 100644
+--- a/spine-c/spine-c/include/spine/AttachmentLoader.h
++++ b/spine-c/spine-c/include/spine/AttachmentLoader.h
+@@ -34,9 +34,8 @@
+ #include <spine/Attachment.h>
+ #include <spine/Skin.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spAttachmentLoader {
+ 	const char* error1;
+@@ -71,8 +70,6 @@ typedef spAttachmentLoader AttachmentLoader;
+ #define AttachmentLoader_disposeAttachment(...) spAttachmentLoader_disposeAttachment(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_ATTACHMENTLOADER_H_ */
+diff --git a/spine-c/spine-c/include/spine/Bone.h b/spine-c/spine-c/include/spine/Bone.h
+index eb3e89baf..bf0ac74aa 100644
+--- a/spine-c/spine-c/include/spine/Bone.h
++++ b/spine-c/spine-c/include/spine/Bone.h
+@@ -33,9 +33,8 @@
+ #include <spine/dll.h>
+ #include <spine/BoneData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spSkeleton;
+ 
+@@ -120,8 +119,6 @@ typedef spBone Bone;
+ #define Bone_rotateWorld(...) spBone_rotateWorld(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_BONE_H_ */
+diff --git a/spine-c/spine-c/include/spine/BoneData.h b/spine-c/spine-c/include/spine/BoneData.h
+index 33a42fcc5..8eea3cba7 100644
+--- a/spine-c/spine-c/include/spine/BoneData.h
++++ b/spine-c/spine-c/include/spine/BoneData.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef enum {
+ 	SP_TRANSFORMMODE_NORMAL,
+@@ -79,8 +78,6 @@ typedef spBoneData BoneData;
+ #define BoneData_dispose(...) spBoneData_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_BONEDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/BoundingBoxAttachment.h b/spine-c/spine-c/include/spine/BoundingBoxAttachment.h
+index 80e94160f..02cc8563a 100644
+--- a/spine-c/spine-c/include/spine/BoundingBoxAttachment.h
++++ b/spine-c/spine-c/include/spine/BoundingBoxAttachment.h
+@@ -36,9 +36,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spBoundingBoxAttachment {
+ 	spVertexAttachment super;
+@@ -51,8 +50,6 @@ typedef spBoundingBoxAttachment BoundingBoxAttachment;
+ #define BoundingBoxAttachment_create(...) spBoundingBoxAttachment_create(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_BOUNDINGBOXATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/ClippingAttachment.h b/spine-c/spine-c/include/spine/ClippingAttachment.h
+index 7f2d782c9..282959698 100644
+--- a/spine-c/spine-c/include/spine/ClippingAttachment.h
++++ b/spine-c/spine-c/include/spine/ClippingAttachment.h
+@@ -36,9 +36,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spClippingAttachment {
+ 	spVertexAttachment super;
+@@ -53,8 +52,6 @@ typedef spClippingAttachment ClippingAttachment;
+ #define ClippingAttachment_create(...) spClippingAttachment_create(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_CLIPPINGATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/Color.h b/spine-c/spine-c/include/spine/Color.h
+index 92be27ef2..411faa2cb 100644
+--- a/spine-c/spine-c/include/spine/Color.h
++++ b/spine-c/spine-c/include/spine/Color.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spColor {
+ 	float r, g, b, a;
+@@ -70,8 +69,6 @@ typedef spColor color;
+ #define Color_clamp(...) spColor_clamp(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_COLOR_H_ */
+diff --git a/spine-c/spine-c/include/spine/Event.h b/spine-c/spine-c/include/spine/Event.h
+index 75ea3c6bc..0379c5db6 100644
+--- a/spine-c/spine-c/include/spine/Event.h
++++ b/spine-c/spine-c/include/spine/Event.h
+@@ -33,9 +33,8 @@
+ #include <spine/dll.h>
+ #include <spine/EventData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spEvent {
+ 	spEventData* const data;
+@@ -68,8 +67,6 @@ typedef spEvent Event;
+ #define Event_dispose(...) spEvent_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_EVENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/EventData.h b/spine-c/spine-c/include/spine/EventData.h
+index 099df4266..e23fe59b9 100644
+--- a/spine-c/spine-c/include/spine/EventData.h
++++ b/spine-c/spine-c/include/spine/EventData.h
+@@ -32,9 +32,8 @@
+ 
+ #include <spine/dll.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spEventData {
+ 	const char* const name;
+@@ -67,8 +66,6 @@ typedef spEventData EventData;
+ #define EventData_dispose(...) spEventData_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_EVENTDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/IkConstraint.h b/spine-c/spine-c/include/spine/IkConstraint.h
+index 079095864..7f25fe6db 100644
+--- a/spine-c/spine-c/include/spine/IkConstraint.h
++++ b/spine-c/spine-c/include/spine/IkConstraint.h
+@@ -34,9 +34,8 @@
+ #include <spine/IkConstraintData.h>
+ #include <spine/Bone.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spSkeleton;
+ 
+@@ -87,8 +86,6 @@ typedef spIkConstraint IkConstraint;
+ #define IkConstraint_apply2(...) spIkConstraint_apply2(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_IKCONSTRAINT_H_ */
+diff --git a/spine-c/spine-c/include/spine/IkConstraintData.h b/spine-c/spine-c/include/spine/IkConstraintData.h
+index 361315e98..7d4ba9158 100644
+--- a/spine-c/spine-c/include/spine/IkConstraintData.h
++++ b/spine-c/spine-c/include/spine/IkConstraintData.h
+@@ -33,9 +33,8 @@
+ #include <spine/dll.h>
+ #include <spine/BoneData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spIkConstraintData {
+ 	const char* const name;
+@@ -79,8 +78,6 @@ typedef spIkConstraintData IkConstraintData;
+ #define IkConstraintData_dispose(...) spIkConstraintData_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_IKCONSTRAINTDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/MeshAttachment.h b/spine-c/spine-c/include/spine/MeshAttachment.h
+index d7464a9e3..b1156ab32 100644
+--- a/spine-c/spine-c/include/spine/MeshAttachment.h
++++ b/spine-c/spine-c/include/spine/MeshAttachment.h
+@@ -36,9 +36,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spMeshAttachment spMeshAttachment;
+ struct spMeshAttachment {
+@@ -84,8 +83,6 @@ typedef spMeshAttachment MeshAttachment;
+ #define MeshAttachment_setParentMesh(...) spMeshAttachment_setParentMesh(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_MESHATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/PathAttachment.h b/spine-c/spine-c/include/spine/PathAttachment.h
+index 179c78f4a..0ca259d4c 100644
+--- a/spine-c/spine-c/include/spine/PathAttachment.h
++++ b/spine-c/spine-c/include/spine/PathAttachment.h
+@@ -36,9 +36,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spPathAttachment {
+ 	spVertexAttachment super;
+@@ -55,8 +54,6 @@ typedef spPathAttachment PathAttachment;
+ #define PathAttachment_computeWorldVertices(...) spPathAttachment_computeWorldVertices(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_PATHATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/PathConstraint.h b/spine-c/spine-c/include/spine/PathConstraint.h
+index a929ce2e2..8904ee05c 100644
+--- a/spine-c/spine-c/include/spine/PathConstraint.h
++++ b/spine-c/spine-c/include/spine/PathConstraint.h
+@@ -36,9 +36,8 @@
+ #include <spine/Slot.h>
+ #include "PathAttachment.h"
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spSkeleton;
+ 
+@@ -108,8 +107,6 @@ typedef spPathConstraint PathConstraint;
+ #define PathConstraint_apply(...) spPathConstraint_apply(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_PATHCONSTRAINT_H_ */
+diff --git a/spine-c/spine-c/include/spine/PathConstraintData.h b/spine-c/spine-c/include/spine/PathConstraintData.h
+index 2f4f96e88..d9b6173a5 100644
+--- a/spine-c/spine-c/include/spine/PathConstraintData.h
++++ b/spine-c/spine-c/include/spine/PathConstraintData.h
+@@ -34,9 +34,8 @@
+ #include <spine/BoneData.h>
+ #include <spine/SlotData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef enum {
+ 	SP_POSITION_MODE_FIXED, SP_POSITION_MODE_PERCENT
+@@ -92,8 +91,6 @@ typedef spPathConstraintData PathConstraintData;
+ #define PathConstraintData_dispose(...) spPathConstraintData_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_PATHCONSTRAINTDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/PointAttachment.h b/spine-c/spine-c/include/spine/PointAttachment.h
+index 6fed456dd..79848f52d 100644
+--- a/spine-c/spine-c/include/spine/PointAttachment.h
++++ b/spine-c/spine-c/include/spine/PointAttachment.h
+@@ -36,9 +36,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spPointAttachment {
+ 	spAttachment super;
+@@ -57,8 +56,6 @@ typedef spPointAttachment PointAttachment;
+ #define PointAttachment_computeWorldRotation(...) spPointAttachment_computeWorldRotation(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_POINTATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/RegionAttachment.h b/spine-c/spine-c/include/spine/RegionAttachment.h
+index f313e10cb..e41d5dc20 100644
+--- a/spine-c/spine-c/include/spine/RegionAttachment.h
++++ b/spine-c/spine-c/include/spine/RegionAttachment.h
+@@ -35,9 +35,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spRegionAttachment {
+ 	spAttachment super;
+@@ -67,8 +66,6 @@ typedef spRegionAttachment RegionAttachment;
+ #define RegionAttachment_computeWorldVertices(...) spRegionAttachment_computeWorldVertices(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_REGIONATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/Skeleton.h b/spine-c/spine-c/include/spine/Skeleton.h
+index 2dd03cb87..983643870 100644
+--- a/spine-c/spine-c/include/spine/Skeleton.h
++++ b/spine-c/spine-c/include/spine/Skeleton.h
+@@ -38,9 +38,8 @@
+ #include <spine/TransformConstraint.h>
+ #include <spine/PathConstraint.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spSkeleton {
+ 	spSkeletonData* const data;
+@@ -166,8 +165,6 @@ typedef spSkeleton Skeleton;
+ #define Skeleton_update(...) spSkeleton_update(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETON_H_*/
+diff --git a/spine-c/spine-c/include/spine/SkeletonBinary.h b/spine-c/spine-c/include/spine/SkeletonBinary.h
+index ca93bddbe..f476e578d 100644
+--- a/spine-c/spine-c/include/spine/SkeletonBinary.h
++++ b/spine-c/spine-c/include/spine/SkeletonBinary.h
+@@ -36,9 +36,8 @@
+ #include <spine/SkeletonData.h>
+ #include <spine/Atlas.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spAtlasAttachmentLoader;
+ 
+@@ -64,8 +63,6 @@ typedef spSkeletonBinary SkeletonBinary;
+ #define SkeletonBinary_readSkeletonDataFile(...) spSkeletonBinary_readSkeletonDataFile(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETONBINARY_H_ */
+diff --git a/spine-c/spine-c/include/spine/SkeletonBounds.h b/spine-c/spine-c/include/spine/SkeletonBounds.h
+index f32857d9c..b8e27e0cf 100644
+--- a/spine-c/spine-c/include/spine/SkeletonBounds.h
++++ b/spine-c/spine-c/include/spine/SkeletonBounds.h
+@@ -34,9 +34,8 @@
+ #include <spine/BoundingBoxAttachment.h>
+ #include <spine/Skeleton.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spPolygon {
+ 	float* const vertices;
+@@ -105,8 +104,6 @@ typedef spSkeletonBounds SkeletonBounds;
+ #define SkeletonBounds_getPolygon(...) spSkeletonBounds_getPolygon(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETONBOUNDS_H_ */
+diff --git a/spine-c/spine-c/include/spine/SkeletonClipping.h b/spine-c/spine-c/include/spine/SkeletonClipping.h
+index 45701c4bb..3902a9807 100644
+--- a/spine-c/spine-c/include/spine/SkeletonClipping.h
++++ b/spine-c/spine-c/include/spine/SkeletonClipping.h
+@@ -36,9 +36,8 @@
+ #include <spine/Slot.h>
+ #include <spine/Triangulator.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spSkeletonClipping {
+ 	spTriangulator* triangulator;
+@@ -60,8 +59,6 @@ SP_API int /*boolean*/ spSkeletonClipping_isClipping(spSkeletonClipping* self);
+ SP_API void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs, int stride);
+ SP_API void spSkeletonClipping_dispose(spSkeletonClipping* self);
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETONCLIPPING_H */
+diff --git a/spine-c/spine-c/include/spine/SkeletonData.h b/spine-c/spine-c/include/spine/SkeletonData.h
+index 3b7e78826..911675d31 100644
+--- a/spine-c/spine-c/include/spine/SkeletonData.h
++++ b/spine-c/spine-c/include/spine/SkeletonData.h
+@@ -40,9 +40,8 @@
+ #include <spine/TransformConstraintData.h>
+ #include <spine/PathConstraintData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spSkeletonData {
+ 	const char* version;
+@@ -112,8 +111,6 @@ typedef spSkeletonData SkeletonData;
+ #define SkeletonData_findAnimation(...) spSkeletonData_findAnimation(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETONDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/SkeletonJson.h b/spine-c/spine-c/include/spine/SkeletonJson.h
+index f4b9dd61b..96d4e915d 100644
+--- a/spine-c/spine-c/include/spine/SkeletonJson.h
++++ b/spine-c/spine-c/include/spine/SkeletonJson.h
+@@ -37,9 +37,8 @@
+ #include <spine/Atlas.h>
+ #include <spine/Animation.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spAtlasAttachmentLoader;
+ 
+@@ -65,8 +64,6 @@ typedef spSkeletonJson SkeletonJson;
+ #define SkeletonJson_readSkeletonDataFile(...) spSkeletonJson_readSkeletonDataFile(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKELETONJSON_H_ */
+diff --git a/spine-c/spine-c/include/spine/Skin.h b/spine-c/spine-c/include/spine/Skin.h
+index dd521ccb5..9f09157a4 100644
+--- a/spine-c/spine-c/include/spine/Skin.h
++++ b/spine-c/spine-c/include/spine/Skin.h
+@@ -37,9 +37,8 @@
+ #include <spine/PathConstraintData.h>
+ #include <spine/Array.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ /* Size of hashtable used in skin structure for fast attachment lookup. */
+ #define SKIN_ENTRIES_HASH_TABLE_SIZE 100
+@@ -128,8 +127,6 @@ typedef spSkin Skin;
+ #define Skin_attachAll(...) spSkin_attachAll(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SKIN_H_ */
+diff --git a/spine-c/spine-c/include/spine/Slot.h b/spine-c/spine-c/include/spine/Slot.h
+index a3e080c95..c2ac31d05 100644
+--- a/spine-c/spine-c/include/spine/Slot.h
++++ b/spine-c/spine-c/include/spine/Slot.h
+@@ -35,9 +35,8 @@
+ #include <spine/Attachment.h>
+ #include <spine/SlotData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spSlot {
+ 	spSlotData* const data;
+@@ -85,8 +84,6 @@ typedef spSlot Slot;
+ #define Slot_setToSetupPose(...) spSlot_setToSetupPose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SLOT_H_ */
+diff --git a/spine-c/spine-c/include/spine/SlotData.h b/spine-c/spine-c/include/spine/SlotData.h
+index 69b598e15..31e6d24f7 100644
+--- a/spine-c/spine-c/include/spine/SlotData.h
++++ b/spine-c/spine-c/include/spine/SlotData.h
+@@ -34,9 +34,8 @@
+ #include <spine/BoneData.h>
+ #include <spine/Color.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef enum {
+ 	SP_BLEND_MODE_NORMAL, SP_BLEND_MODE_ADDITIVE, SP_BLEND_MODE_MULTIPLY, SP_BLEND_MODE_SCREEN
+@@ -82,8 +81,6 @@ typedef spSlotData SlotData;
+ #define SlotData_setAttachmentName(...) spSlotData_setAttachmentName(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_SLOTDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/TransformConstraint.h b/spine-c/spine-c/include/spine/TransformConstraint.h
+index 3e572d0ad..c5a7214b1 100644
+--- a/spine-c/spine-c/include/spine/TransformConstraint.h
++++ b/spine-c/spine-c/include/spine/TransformConstraint.h
+@@ -34,9 +34,8 @@
+ #include <spine/TransformConstraintData.h>
+ #include <spine/Bone.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spSkeleton;
+ 
+@@ -75,8 +74,6 @@ typedef spTransformConstraint TransformConstraint;
+ #define TransformConstraint_apply(...) spTransformConstraint_apply(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_TRANSFORMCONSTRAINT_H_ */
+diff --git a/spine-c/spine-c/include/spine/TransformConstraintData.h b/spine-c/spine-c/include/spine/TransformConstraintData.h
+index bc0f98715..5d5d8fd19 100644
+--- a/spine-c/spine-c/include/spine/TransformConstraintData.h
++++ b/spine-c/spine-c/include/spine/TransformConstraintData.h
+@@ -33,9 +33,8 @@
+ #include <spine/dll.h>
+ #include <spine/BoneData.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spTransformConstraintData {
+ 	const char* const name;
+@@ -82,8 +81,6 @@ typedef spTransformConstraintData TransformConstraintData;
+ #define TransformConstraintData_dispose(...) spTransformConstraintData_dispose(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_TRANSFORMCONSTRAINTDATA_H_ */
+diff --git a/spine-c/spine-c/include/spine/Triangulator.h b/spine-c/spine-c/include/spine/Triangulator.h
+index efb5dc08e..7cdd18849 100644
+--- a/spine-c/spine-c/include/spine/Triangulator.h
++++ b/spine-c/spine-c/include/spine/Triangulator.h
+@@ -33,9 +33,8 @@
+ #include <spine/dll.h>
+ #include <spine/Array.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spTriangulator {
+ 	spArrayFloatArray* convexPolygons;
+@@ -55,8 +54,6 @@ SP_API spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloat
+ SP_API void spTriangulator_dispose(spTriangulator* self);
+ 
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_TRIANGULATOR_H_ */
+diff --git a/spine-c/spine-c/include/spine/VertexAttachment.h b/spine-c/spine-c/include/spine/VertexAttachment.h
+index 82393363d..aa6c1776a 100644
+--- a/spine-c/spine-c/include/spine/VertexAttachment.h
++++ b/spine-c/spine-c/include/spine/VertexAttachment.h
+@@ -34,9 +34,8 @@
+ #include <spine/Attachment.h>
+ #include <spine/Slot.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ typedef struct spVertexAttachment spVertexAttachment;
+ struct spVertexAttachment {
+@@ -64,8 +63,6 @@ typedef spVertexAttachment VertexAttachment;
+ #define VertexAttachment_computeWorldVertices(...) spVertexAttachment_computeWorldVertices(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_VERTEXATTACHMENT_H_ */
+diff --git a/spine-c/spine-c/include/spine/VertexEffect.h b/spine-c/spine-c/include/spine/VertexEffect.h
+index 4f094b45a..c0e156744 100644
+--- a/spine-c/spine-c/include/spine/VertexEffect.h
++++ b/spine-c/spine-c/include/spine/VertexEffect.h
+@@ -34,9 +34,8 @@
+ #include <spine/Skeleton.h>
+ #include <spine/Color.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ struct spVertexEffect;
+ 
+@@ -77,8 +76,6 @@ SP_API spSwirlVertexEffect *spSwirlVertexEffect_create(float radius);
+ 
+ SP_API void spSwirlVertexEffect_dispose(spSwirlVertexEffect *effect);
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_VERTEX_EFFECT_H_ */
+diff --git a/spine-c/spine-c/include/spine/extension.h b/spine-c/spine-c/include/spine/extension.h
+index 67221f0b8..ea6ea3878 100644
+--- a/spine-c/spine-c/include/spine/extension.h
++++ b/spine-c/spine-c/include/spine/extension.h
+@@ -148,9 +148,8 @@
+ #include <spine/PointAttachment.h>
+ #include <spine/AnimationState.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ /*
+  * Functions that must be implemented:
+@@ -317,8 +316,6 @@ int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target
+ #define _CurveTimeline_binarySearch(...) _spCurveTimeline_binarySearch(__VA_ARGS__)
+ #endif
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_EXTENSION_H_ */
+diff --git a/spine-c/spine-c/include/spine/funner_defines.h b/spine-c/spine-c/include/spine/funner_defines.h
+new file mode 100644
+index 000000000..61fbd9dae
+--- /dev/null
++++ b/spine-c/spine-c/include/spine/funner_defines.h
+@@ -0,0 +1,3 @@
++#define NAMESPACE_NAME_HELPER(...) spine_ ## __VA_ARGS__
++#define NAMESPACE_NAME(...) NAMESPACE_NAME_HELPER(__VA_ARGS__)
++#define SPINE_NAMESPACE_NAME NAMESPACE_NAME(SPINE_VERSION)
+diff --git a/spine-c/spine-c/src/spine/Animation.c b/spine-c/spine-c/src/spine/Animation.c
+index 8a53361c4..17b0d9d18 100644
+--- a/spine-c/spine-c/src/spine/Animation.c
++++ b/spine-c/spine-c/src/spine/Animation.c
+@@ -32,6 +32,9 @@
+ #include <limits.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spAnimation* spAnimation_create (const char* name, int timelinesCount) {
+ 	spAnimation* self = NEW(spAnimation);
+ 	MALLOC_STR(self->name, name);
+@@ -1763,3 +1766,5 @@ void spPathConstraintMixTimeline_setFrame (spPathConstraintMixTimeline* self, in
+ 	self->frames[frameIndex + PATHCONSTRAINTMIX_ROTATE] = rotateMix;
+ 	self->frames[frameIndex + PATHCONSTRAINTMIX_TRANSLATE] = translateMix;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/AnimationState.c b/spine-c/spine-c/src/spine/AnimationState.c
+index 7fc675dde..2f2f86355 100644
+--- a/spine-c/spine-c/src/spine/AnimationState.c
++++ b/spine-c/spine-c/src/spine/AnimationState.c
+@@ -31,6 +31,9 @@
+ #include <spine/extension.h>
+ #include <limits.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ #define SUBSEQUENT 0
+ #define FIRST 1
+ #define HOLD 2
+@@ -1018,3 +1021,5 @@ void _spTrackEntry_computeNotLast(spTrackEntry* entry, spAnimationState* state)
+ 		}
+ 	}
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/AnimationStateData.c b/spine-c/spine-c/src/spine/AnimationStateData.c
+index d1b12128f..61559ee2d 100644
+--- a/spine-c/spine-c/src/spine/AnimationStateData.c
++++ b/spine-c/spine-c/src/spine/AnimationStateData.c
+@@ -30,6 +30,9 @@
+ #include <spine/AnimationStateData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef struct _ToEntry _ToEntry;
+ struct _ToEntry {
+ 	spAnimation* animation;
+@@ -148,3 +151,5 @@ float spAnimationStateData_getMix (spAnimationStateData* self, spAnimation* from
+ 	}
+ 	return self->defaultMix;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Array.c b/spine-c/spine-c/src/spine/Array.c
+index c9a5313e7..8249debe2 100644
+--- a/spine-c/spine-c/src/spine/Array.c
++++ b/spine-c/spine-c/src/spine/Array.c
+@@ -30,9 +30,14 @@
+ #include <spine/Array.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ _SP_ARRAY_IMPLEMENT_TYPE(spFloatArray, float)
+ _SP_ARRAY_IMPLEMENT_TYPE(spIntArray, int)
+ _SP_ARRAY_IMPLEMENT_TYPE(spShortArray, short)
+ _SP_ARRAY_IMPLEMENT_TYPE(spUnsignedShortArray, unsigned short)
+ _SP_ARRAY_IMPLEMENT_TYPE(spArrayFloatArray, spFloatArray*)
+ _SP_ARRAY_IMPLEMENT_TYPE(spArrayShortArray, spShortArray*)
++
++}
+diff --git a/spine-c/spine-c/src/spine/Atlas.c b/spine-c/spine-c/src/spine/Atlas.c
+index 1a196bf10..0ee32ab41 100644
+--- a/spine-c/spine-c/src/spine/Atlas.c
++++ b/spine-c/spine-c/src/spine/Atlas.c
+@@ -31,6 +31,9 @@
+ #include <ctype.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spAtlasPage* spAtlasPage_create(spAtlas* atlas, const char* name) {
+ 	spAtlasPage* self = NEW(spAtlasPage);
+ 	CONST_CAST(spAtlas*, self->atlas) = atlas;
+@@ -359,3 +362,5 @@ spAtlasRegion* spAtlas_findRegion(const spAtlas* self, const char* name) {
+ 	}
+ 	return 0;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/AtlasAttachmentLoader.c b/spine-c/spine-c/src/spine/AtlasAttachmentLoader.c
+index 73488cc31..0db10bcb3 100644
+--- a/spine-c/spine-c/src/spine/AtlasAttachmentLoader.c
++++ b/spine-c/spine-c/src/spine/AtlasAttachmentLoader.c
+@@ -30,6 +30,9 @@
+ #include <spine/AtlasAttachmentLoader.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loader, spSkin* skin, spAttachmentType type,
+ 		const char* name, const char* path) {
+ 	spAtlasAttachmentLoader* self = SUB_CAST(spAtlasAttachmentLoader, loader);
+@@ -98,3 +101,5 @@ spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas) {
+ 	self->atlas = atlas;
+ 	return self;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Attachment.c b/spine-c/spine-c/src/spine/Attachment.c
+index 9cf5a44f6..cdb2832e6 100644
+--- a/spine-c/spine-c/src/spine/Attachment.c
++++ b/spine-c/spine-c/src/spine/Attachment.c
+@@ -31,6 +31,9 @@
+ #include <spine/extension.h>
+ #include <spine/Slot.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef struct _spAttachmentVtable {
+ 	void (*dispose) (spAttachment* self);
+ 	spAttachment* (*copy) (spAttachment* self);
+@@ -62,3 +65,5 @@ void spAttachment_dispose (spAttachment* self) {
+ 	if (self->refCount <= 0)
+ 		VTABLE(spAttachment, self) ->dispose(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/AttachmentLoader.c b/spine-c/spine-c/src/spine/AttachmentLoader.c
+index 41bcb9afb..1cfd24abe 100644
+--- a/spine-c/spine-c/src/spine/AttachmentLoader.c
++++ b/spine-c/spine-c/src/spine/AttachmentLoader.c
+@@ -31,6 +31,9 @@
+ #include <stdio.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef struct _spAttachmentLoaderVtable {
+ 	spAttachment* (*createAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name, const char* path);
+ 	void (*configureAttachment) (spAttachmentLoader* self, spAttachment*);
+@@ -94,3 +97,5 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
+ 	sprintf(buffer, "%d", type);
+ 	_spAttachmentLoader_setError(self, "Unknown attachment type: ", buffer);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Bone.c b/spine-c/spine-c/src/spine/Bone.c
+index d177d9d6d..5963ce76f 100644
+--- a/spine-c/spine-c/src/spine/Bone.c
++++ b/spine-c/spine-c/src/spine/Bone.c
+@@ -30,6 +30,10 @@
+ #include <spine/Bone.h>
+ #include <spine/extension.h>
+ #include <stdio.h>
++
++namespace SPINE_NAMESPACE_NAME
++{
++
+ static int yDown;
+ 
+ void spBone_setYDown (int value) {
+@@ -285,3 +289,5 @@ void spBone_rotateWorld (spBone* self, float degrees) {
+ 	CONST_CAST(float, self->d) = sine * b + cosine * d;
+ 	CONST_CAST(int, self->appliedValid) = 0;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/BoneData.c b/spine-c/spine-c/src/spine/BoneData.c
+index 8fde114e1..d02f1c5de 100644
+--- a/spine-c/spine-c/src/spine/BoneData.c
++++ b/spine-c/spine-c/src/spine/BoneData.c
+@@ -30,6 +30,9 @@
+ #include <spine/BoneData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spBoneData* spBoneData_create (int index, const char* name, spBoneData* parent) {
+ 	spBoneData* self = NEW(spBoneData);
+ 	CONST_CAST(int, self->index) = index;
+@@ -45,3 +48,5 @@ void spBoneData_dispose (spBoneData* self) {
+ 	FREE(self->name);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/BoundingBoxAttachment.c b/spine-c/spine-c/src/spine/BoundingBoxAttachment.c
+index 3cafb7313..8317d05ac 100644
+--- a/spine-c/spine-c/src/spine/BoundingBoxAttachment.c
++++ b/spine-c/spine-c/src/spine/BoundingBoxAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/BoundingBoxAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spBoundingBoxAttachment_dispose (spAttachment* attachment) {
+ 	spBoundingBoxAttachment* self = SUB_CAST(spBoundingBoxAttachment, attachment);
+ 
+@@ -51,3 +54,5 @@ spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
+ 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_BOUNDING_BOX, _spBoundingBoxAttachment_dispose, _spBoundingBoxAttachment_copy);
+ 	return self;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/ClippingAttachment.c b/spine-c/spine-c/src/spine/ClippingAttachment.c
+index 71167fa5d..0553fb72d 100644
+--- a/spine-c/spine-c/src/spine/ClippingAttachment.c
++++ b/spine-c/spine-c/src/spine/ClippingAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/ClippingAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spClippingAttachment_dispose (spAttachment* attachment) {
+ 	spClippingAttachment* self = SUB_CAST(spClippingAttachment, attachment);
+ 
+@@ -53,3 +56,5 @@ spClippingAttachment* spClippingAttachment_create (const char* name) {
+ 	self->endSlot = 0;
+ 	return self;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Color.c b/spine-c/spine-c/src/spine/Color.c
+index 3116d8ad9..a40c6a633 100644
+--- a/spine-c/spine-c/src/spine/Color.c
++++ b/spine-c/spine-c/src/spine/Color.c
+@@ -30,6 +30,9 @@
+ #include <spine/Color.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spColor* spColor_create() {
+ 	return MALLOC(spColor, 1);
+ }
+@@ -82,3 +85,5 @@ void spColor_clamp(spColor* self) {
+ 	if (self->a < 0) self->a = 0;
+ 	else if (self->a > 1) self->a = 1;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Event.c b/spine-c/spine-c/src/spine/Event.c
+index 0a76d1319..77fa2170d 100644
+--- a/spine-c/spine-c/src/spine/Event.c
++++ b/spine-c/spine-c/src/spine/Event.c
+@@ -30,6 +30,9 @@
+ #include <spine/Event.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spEvent* spEvent_create (float time, spEventData* data) {
+ 	spEvent* self = NEW(spEvent);
+ 	CONST_CAST(spEventData*, self->data) = data;
+@@ -41,3 +44,5 @@ void spEvent_dispose (spEvent* self) {
+ 	FREE(self->stringValue);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/EventData.c b/spine-c/spine-c/src/spine/EventData.c
+index b6267fe89..cae796270 100644
+--- a/spine-c/spine-c/src/spine/EventData.c
++++ b/spine-c/spine-c/src/spine/EventData.c
+@@ -30,6 +30,9 @@
+ #include <spine/EventData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spEventData* spEventData_create (const char* name) {
+ 	spEventData* self = NEW(spEventData);
+ 	MALLOC_STR(self->name, name);
+@@ -42,3 +45,5 @@ void spEventData_dispose (spEventData* self) {
+ 	FREE(self->name);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/IkConstraint.c b/spine-c/spine-c/src/spine/IkConstraint.c
+index a917fd775..f4b999d72 100644
+--- a/spine-c/spine-c/src/spine/IkConstraint.c
++++ b/spine-c/spine-c/src/spine/IkConstraint.c
+@@ -32,6 +32,9 @@
+ #include <spine/extension.h>
+ #include <float.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const spSkeleton *skeleton) {
+ 	int i;
+ 
+@@ -273,3 +276,5 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float
+ 		spBone_updateWorldTransformWith(child, cx, cy, child->arotation + a2 * alpha, child->ascaleX, child->ascaleY, child->ashearX, child->ashearY);
+ 	}
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/IkConstraintData.c b/spine-c/spine-c/src/spine/IkConstraintData.c
+index d5e923ce8..1825d7bb7 100644
+--- a/spine-c/spine-c/src/spine/IkConstraintData.c
++++ b/spine-c/spine-c/src/spine/IkConstraintData.c
+@@ -30,6 +30,9 @@
+ #include <spine/IkConstraintData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spIkConstraintData* spIkConstraintData_create (const char* name) {
+ 	spIkConstraintData* self = NEW(spIkConstraintData);
+ 	MALLOC_STR(self->name, name);
+@@ -46,3 +49,5 @@ void spIkConstraintData_dispose (spIkConstraintData* self) {
+ 	FREE(self->bones);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Json.c b/spine-c/spine-c/src/spine/Json.c
+index 852e76d25..fa3c3a828 100644
+--- a/spine-c/spine-c/src/spine/Json.c
++++ b/spine-c/spine-c/src/spine/Json.c
+@@ -41,6 +41,9 @@ THE SOFTWARE.
+ #include <string.h> /* strcasecmp (4.4BSD - compatibility), _stricmp (_WIN32) */
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ #ifndef SPINE_JSON_DEBUG
+ /* Define this to do extra NULL and expected-character checking */
+ #define SPINE_JSON_DEBUG 0
+@@ -459,3 +462,5 @@ int Json_getInt (Json* value, const char* name, int defaultValue) {
+ 	value = Json_getItem(value, name);
+ 	return value ? value->valueInt : defaultValue;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Json.h b/spine-c/spine-c/src/spine/Json.h
+index 1742525dd..005e0a942 100644
+--- a/spine-c/spine-c/src/spine/Json.h
++++ b/spine-c/spine-c/src/spine/Json.h
+@@ -25,9 +25,8 @@
+ #ifndef SPINE_JSON_H_
+ #define SPINE_JSON_H_
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
++namespace SPINE_NAMESPACE_NAME
++{
+ 
+ /* Json Types: */
+ #define Json_False 0
+@@ -76,8 +75,6 @@ int Json_getInt (Json* json, const char* name, int defaultValue);
+ /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_create() returns 0. 0 when Json_create() succeeds. */
+ const char* Json_getError (void);
+ 
+-#ifdef __cplusplus
+ }
+-#endif
+ 
+ #endif /* SPINE_JSON_H_ */
+diff --git a/spine-c/spine-c/src/spine/MeshAttachment.c b/spine-c/spine-c/src/spine/MeshAttachment.c
+index 80e8ed167..0d0ad34cf 100644
+--- a/spine-c/spine-c/src/spine/MeshAttachment.c
++++ b/spine-c/spine-c/src/spine/MeshAttachment.c
+@@ -31,6 +31,9 @@
+ #include <spine/extension.h>
+ #include <stdio.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spMeshAttachment_dispose (spAttachment* attachment) {
+ 	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
+ 	FREE(self->path);
+@@ -209,3 +212,5 @@ void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* p
+ 		self->height = parentMesh->height;
+ 	}
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/PathAttachment.c b/spine-c/spine-c/src/spine/PathAttachment.c
+index ca46e048c..e0fd9dc5f 100644
+--- a/spine-c/spine-c/src/spine/PathAttachment.c
++++ b/spine-c/spine-c/src/spine/PathAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/PathAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spPathAttachment_dispose (spAttachment* attachment) {
+ 	spPathAttachment* self = SUB_CAST(spPathAttachment, attachment);
+ 
+@@ -57,3 +60,5 @@ spPathAttachment* spPathAttachment_create (const char* name) {
+ 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_PATH, _spPathAttachment_dispose, _spPathAttachment_copy);
+ 	return self;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/PathConstraint.c b/spine-c/spine-c/src/spine/PathConstraint.c
+index 672877973..5f5282325 100644
+--- a/spine-c/spine-c/src/spine/PathConstraint.c
++++ b/spine-c/spine-c/src/spine/PathConstraint.c
+@@ -31,6 +31,9 @@
+ #include <spine/Skeleton.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ #define PATHCONSTRAINT_NONE -1
+ #define PATHCONSTRAINT_BEFORE -2
+ #define PATHCONSTRAINT_AFTER -3
+@@ -490,3 +493,5 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
+ 	}
+ 	return out;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/PathConstraintData.c b/spine-c/spine-c/src/spine/PathConstraintData.c
+index 551b891b3..93341da2f 100644
+--- a/spine-c/spine-c/src/spine/PathConstraintData.c
++++ b/spine-c/spine-c/src/spine/PathConstraintData.c
+@@ -30,6 +30,9 @@
+ #include <spine/PathConstraintData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spPathConstraintData* spPathConstraintData_create (const char* name) {
+ 	spPathConstraintData* self = NEW(spPathConstraintData);
+ 	MALLOC_STR(self->name, name);
+@@ -41,3 +44,5 @@ void spPathConstraintData_dispose (spPathConstraintData* self) {
+ 	FREE(self->bones);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/PointAttachment.c b/spine-c/spine-c/src/spine/PointAttachment.c
+index d702edc2a..97ff9be6f 100644
+--- a/spine-c/spine-c/src/spine/PointAttachment.c
++++ b/spine-c/spine-c/src/spine/PointAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/PointAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spPointAttachment_dispose (spAttachment* attachment) {
+ 	spPointAttachment* self = SUB_CAST(spPointAttachment, attachment);
+ 	_spAttachment_deinit(attachment);
+@@ -65,3 +68,5 @@ float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* b
+ 	y = cosine * bone->c + sine * bone->d;
+ 	return ATAN2(y, x) * RAD_DEG;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/RegionAttachment.c b/spine-c/spine-c/src/spine/RegionAttachment.c
+index bf20317b5..d836ff062 100644
+--- a/spine-c/spine-c/src/spine/RegionAttachment.c
++++ b/spine-c/spine-c/src/spine/RegionAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/RegionAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef enum {
+ 	BLX = 0, BLY, ULX, ULY, URX, URY, BRX, BRY
+ } spVertexIndex;
+@@ -151,3 +154,5 @@ void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone*
+ 	vertices[offset] = offsetX * bone->a + offsetY * bone->b + x; /* ur */
+ 	vertices[offset + 1] = offsetX * bone->c + offsetY * bone->d + y;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Skeleton.c b/spine-c/spine-c/src/spine/Skeleton.c
+index e074cc065..c8281af93 100644
+--- a/spine-c/spine-c/src/spine/Skeleton.c
++++ b/spine-c/spine-c/src/spine/Skeleton.c
+@@ -32,6 +32,9 @@
+ #include <string.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef enum {
+ 	SP_UPDATE_BONE, SP_UPDATE_IK_CONSTRAINT, SP_UPDATE_PATH_CONSTRAINT, SP_UPDATE_TRANSFORM_CONSTRAINT
+ } _spUpdateType;
+@@ -615,3 +618,5 @@ spPathConstraint* spSkeleton_findPathConstraint (const spSkeleton* self, const c
+ void spSkeleton_update (spSkeleton* self, float deltaTime) {
+ 	self->time += deltaTime;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SkeletonBinary.c b/spine-c/spine-c/src/spine/SkeletonBinary.c
+index e1ca3f8ee..c23b4a4e2 100644
+--- a/spine-c/spine-c/src/spine/SkeletonBinary.c
++++ b/spine-c/spine-c/src/spine/SkeletonBinary.c
+@@ -34,6 +34,9 @@
+ #include <spine/Animation.h>
+ #include <spine/Array.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef struct {
+ 	const unsigned char* cursor;
+ 	const unsigned char* end;
+@@ -1145,3 +1148,5 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
+ 	FREE(input);
+ 	return skeletonData;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SkeletonBounds.c b/spine-c/spine-c/src/spine/SkeletonBounds.c
+index 92ce2cf7f..268a90568 100644
+--- a/spine-c/spine-c/src/spine/SkeletonBounds.c
++++ b/spine-c/spine-c/src/spine/SkeletonBounds.c
+@@ -31,6 +31,9 @@
+ #include <limits.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spPolygon* spPolygon_create (int capacity) {
+ 	spPolygon* self = NEW(spPolygon);
+ 	self->capacity = capacity;
+@@ -207,3 +210,5 @@ spPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAtt
+ 		if (self->boundingBoxes[i] == boundingBox) return self->polygons[i];
+ 	return 0;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SkeletonClipping.c b/spine-c/spine-c/src/spine/SkeletonClipping.c
+index db1687e46..1de1e0046 100644
+--- a/spine-c/spine-c/src/spine/SkeletonClipping.c
++++ b/spine-c/spine-c/src/spine/SkeletonClipping.c
+@@ -30,6 +30,9 @@
+ #include <spine/SkeletonClipping.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spSkeletonClipping* spSkeletonClipping_create() {
+ 	spSkeletonClipping* clipping = CALLOC(spSkeletonClipping, 1);
+ 
+@@ -323,3 +326,5 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
+ 	}
+ 	UNUSED(verticesLength);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SkeletonData.c b/spine-c/spine-c/src/spine/SkeletonData.c
+index eee6eb1e2..3303bd1fa 100644
+--- a/spine-c/spine-c/src/spine/SkeletonData.c
++++ b/spine-c/spine-c/src/spine/SkeletonData.c
+@@ -31,6 +31,9 @@
+ #include <string.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spSkeletonData* spSkeletonData_create () {
+ 	return NEW(spSkeletonData);
+ }
+@@ -149,3 +152,5 @@ spPathConstraintData* spSkeletonData_findPathConstraint (const spSkeletonData* s
+ 		if (strcmp(self->pathConstraints[i]->name, constraintName) == 0) return self->pathConstraints[i];
+ 	return 0;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SkeletonJson.c b/spine-c/spine-c/src/spine/SkeletonJson.c
+index f9851390a..5f8be36eb 100644
+--- a/spine-c/spine-c/src/spine/SkeletonJson.c
++++ b/spine-c/spine-c/src/spine/SkeletonJson.c
+@@ -34,6 +34,9 @@
+ #include <spine/AtlasAttachmentLoader.h>
+ #include <spine/Array.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+ #define strdup _strdup
+ #endif
+@@ -1180,3 +1183,5 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
+ 	Json_dispose(root);
+ 	return skeletonData;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Skin.c b/spine-c/spine-c/src/spine/Skin.c
+index 5a68cc3b2..29709e397 100644
+--- a/spine-c/spine-c/src/spine/Skin.c
++++ b/spine-c/spine-c/src/spine/Skin.c
+@@ -31,6 +31,9 @@
+ #include <spine/extension.h>
+ #include <stdio.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ _SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData*)
+ _SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+ _SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+@@ -274,3 +277,5 @@ void spSkin_clear(spSkin* self) {
+ 	spTransformConstraintDataArray_clear(self->transformConstraints);
+ 	spPathConstraintDataArray_clear(self->pathConstraints);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Slot.c b/spine-c/spine-c/src/spine/Slot.c
+index c67f1fdcb..43da58abb 100644
+--- a/spine-c/spine-c/src/spine/Slot.c
++++ b/spine-c/spine-c/src/spine/Slot.c
+@@ -30,6 +30,9 @@
+ #include <spine/Slot.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ typedef struct {
+ 	spSlot super;
+ 	float attachmentTime;
+@@ -79,3 +82,5 @@ void spSlot_setToSetupPose (spSlot* self) {
+ 		spSlot_setAttachment(self, attachment);
+ 	}
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/SlotData.c b/spine-c/spine-c/src/spine/SlotData.c
+index d23a626a9..ba81ce012 100644
+--- a/spine-c/spine-c/src/spine/SlotData.c
++++ b/spine-c/spine-c/src/spine/SlotData.c
+@@ -30,6 +30,9 @@
+ #include <spine/SlotData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spSlotData* spSlotData_create (const int index, const char* name, spBoneData* boneData) {
+ 	spSlotData* self = NEW(spSlotData);
+ 	CONST_CAST(int, self->index) = index;
+@@ -53,3 +56,5 @@ void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName)
+ 	else
+ 		CONST_CAST(char*, self->attachmentName) = 0;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/TransformConstraint.c b/spine-c/spine-c/src/spine/TransformConstraint.c
+index 4fede676b..c1b237a71 100644
+--- a/spine-c/spine-c/src/spine/TransformConstraint.c
++++ b/spine-c/spine-c/src/spine/TransformConstraint.c
+@@ -31,6 +31,9 @@
+ #include <spine/Skeleton.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const spSkeleton* skeleton) {
+ 	int i;
+ 	spTransformConstraint* self = NEW(spTransformConstraint);
+@@ -270,3 +273,5 @@ void spTransformConstraint_apply (spTransformConstraint* self) {
+ 			_spTransformConstraint_applyAbsoluteWorld(self);
+ 	}
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/TransformConstraintData.c b/spine-c/spine-c/src/spine/TransformConstraintData.c
+index d1f68f3b4..b7947db4d 100644
+--- a/spine-c/spine-c/src/spine/TransformConstraintData.c
++++ b/spine-c/spine-c/src/spine/TransformConstraintData.c
+@@ -30,6 +30,9 @@
+ #include <spine/TransformConstraintData.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spTransformConstraintData* spTransformConstraintData_create (const char* name) {
+ 	spTransformConstraintData* self = NEW(spTransformConstraintData);
+ 	MALLOC_STR(self->name, name);
+@@ -41,3 +44,5 @@ void spTransformConstraintData_dispose (spTransformConstraintData* self) {
+ 	FREE(self->bones);
+ 	FREE(self);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/Triangulator.c b/spine-c/spine-c/src/spine/Triangulator.c
+index e7e7c8c9c..974a8df11 100644
+--- a/spine-c/spine-c/src/spine/Triangulator.c
++++ b/spine-c/spine-c/src/spine/Triangulator.c
+@@ -31,6 +31,9 @@
+ #include <spine/extension.h>
+ #include <stdio.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ spTriangulator* spTriangulator_create() {
+ 	spTriangulator* triangulator = CALLOC(spTriangulator, 1);
+ 
+@@ -359,3 +362,5 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray*
+ 
+ 	return convexPolygons;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/VertexAttachment.c b/spine-c/spine-c/src/spine/VertexAttachment.c
+index 9c8ca6b58..1269f4e68 100644
+--- a/spine-c/spine-c/src/spine/VertexAttachment.c
++++ b/spine-c/spine-c/src/spine/VertexAttachment.c
+@@ -30,6 +30,9 @@
+ #include <spine/VertexAttachment.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ /* FIXME this is not thread-safe */
+ static int nextID = 0;
+ 
+@@ -139,3 +142,5 @@ void spVertexAttachment_copyTo(spVertexAttachment* from, spVertexAttachment* to)
+ 	}
+ 	to->worldVerticesLength = from->worldVerticesLength;
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/VertexEffect.c b/spine-c/spine-c/src/spine/VertexEffect.c
+index 5b299480c..a39a948bc 100644
+--- a/spine-c/spine-c/src/spine/VertexEffect.c
++++ b/spine-c/spine-c/src/spine/VertexEffect.c
+@@ -30,6 +30,9 @@
+ #include <spine/VertexEffect.h>
+ #include <spine/extension.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ void _spJitterVertexEffect_begin(spVertexEffect* self, spSkeleton* skeleton) {
+ 	UNUSED(self);
+ 	UNUSED(skeleton);
+@@ -107,3 +110,5 @@ spSwirlVertexEffect* spSwirlVertexEffect_create(float radius) {
+ void spSwirlVertexEffect_dispose(spSwirlVertexEffect* effect) {
+ 	FREE(effect);
+ }
++
++}
+diff --git a/spine-c/spine-c/src/spine/extension.c b/spine-c/spine-c/src/spine/extension.c
+index 3cadede9b..1ba4112ae 100644
+--- a/spine-c/spine-c/src/spine/extension.c
++++ b/spine-c/spine-c/src/spine/extension.c
+@@ -30,6 +30,9 @@
+ #include <spine/extension.h>
+ #include <stdio.h>
+ 
++namespace SPINE_NAMESPACE_NAME
++{
++
+ float _spInternalRandom () {
+ 	return rand() / (float)RAND_MAX;
+ }
+@@ -125,3 +128,5 @@ float _spMath_pow2_apply(float a) {
+ float _spMath_pow2out_apply(float a) {
+ 	return POW(a - 1, 2) * -1 + 1;
+ }
++
++}
+-- 
+2.24.1 (Apple Git-126)
+

@@ -1,0 +1,14 @@
+Results of sg_spine_test:
+Test library:
+Skeleton data size is 266 x 349
+Skeleton data animations count is 1
+Skeleton slots count is 23
+Animation state data default mix is 0
+Is SG skeleton visual structure dirty = true
+Animation event 'Start'
+Default track mix blend = 2
+Default track hold previous = false
+New track mix blend = 3
+New track hold previous = true
+Is SG skeleton visual structure dirty = false
+Animation event 'Complete'

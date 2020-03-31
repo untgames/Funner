@@ -3,7 +3,7 @@
   <layouts/>
   <texmaps/>
   <materials>
-    <material id="spine_data/vine/export/vine.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/vine/export/vine.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -19,9 +19,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/vine/export/vine.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/vine/export/vine.png" sampler="default"/>
     </material>
-    <material id="spine_data/alien/export/alien.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/alien/export/alien.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -37,9 +37,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/alien/export/alien.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/alien/export/alien.png" sampler="default"/>
     </material>
-    <material id="spine_data/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -55,9 +55,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/coin/export/coin.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/coin/export/coin.png" sampler="default"/>
     </material>
-    <material id="spine_data/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -73,9 +73,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/coin/export/coin.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/coin/export/coin.png" sampler="default"/>
     </material>
-    <material id="spine_data/coin/export/coin.png_1_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/coin/export/coin.png_1_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -91,9 +91,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/coin/export/coin.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/coin/export/coin.png" sampler="default"/>
     </material>
-    <material id="spine_data/dragon/export/dragon.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/dragon/export/dragon.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -109,9 +109,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/dragon/export/dragon.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/dragon/export/dragon.png" sampler="default"/>
     </material>
-    <material id="spine_data/dragon/export/dragon2.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/dragon/export/dragon2.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -127,9 +127,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/dragon/export/dragon2.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/dragon/export/dragon2.png" sampler="default"/>
     </material>
-    <material id="spine_data/goblins/export/goblins.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/goblins/export/goblins.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -145,9 +145,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/goblins/export/goblins.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/goblins/export/goblins.png" sampler="default"/>
     </material>
-    <material id="spine_data/hero/export/hero.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/hero/export/hero.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -163,9 +163,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/hero/export/hero.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/hero/export/hero.png" sampler="default"/>
     </material>
-    <material id="spine_data/powerup/export/powerup.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/powerup/export/powerup.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -181,9 +181,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/powerup/export/powerup.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/powerup/export/powerup.png" sampler="default"/>
     </material>
-    <material id="spine_data/powerup/export/powerup.png_1_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/powerup/export/powerup.png_1_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -199,9 +199,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/powerup/export/powerup.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/powerup/export/powerup.png" sampler="default"/>
     </material>
-    <material id="spine_data/raptor/export/raptor.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/raptor/export/raptor.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -217,9 +217,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/raptor/export/raptor.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/raptor/export/raptor.png" sampler="default"/>
     </material>
-    <material id="spine_data/speedy/export/speedy.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/speedy/export/speedy.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -235,9 +235,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/speedy/export/speedy.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/speedy/export/speedy.png" sampler="default"/>
     </material>
-    <material id="spine_data/spineboy/export/spineboy.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/spineboy/export/spineboy.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -253,9 +253,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/spineboy/export/spineboy.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/spineboy/export/spineboy.png" sampler="default"/>
     </material>
-    <material id="spine_data/stretchyman/export/stretchyman.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/stretchyman/export/stretchyman.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -271,9 +271,9 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/stretchyman/export/stretchyman.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/stretchyman/export/stretchyman.png" sampler="default"/>
     </material>
-    <material id="spine_data/tank/export/tank.png_0_1_1" program="flat_dynamic" tags="transparent">
+    <material id="spine_data/spine_3.6/tank/export/tank.png_0_1_1" program="flat_dynamic" tags="transparent">
       <property name="Reflectivity" type="float" value="0.4"/>
       <property name="Transparency" type="float" value="1"/>
       <property name="Shininess" type="float" value="20"/>
@@ -289,7 +289,295 @@
       <property name="EmissionColor" type="vector">
         0 0 0 1
       </property>
-      <texmap semantic="diffuse" image="data/tank/export/tank.png" sampler="default"/>
+      <texmap semantic="diffuse" image="data/spine_3.6/tank/export/tank.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/vine/export/vine.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/vine/export/vine.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/alien/export/alien.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/alien/export/alien.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/coin/export/coin.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/coin/export/coin.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/coin/export/coin.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/coin/export/coin.png_1_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/coin/export/coin.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/dragon/export/dragon.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/dragon/export/dragon.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/dragon/export/dragon2.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/dragon/export/dragon2.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/goblins/export/goblins.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/goblins/export/goblins.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/hero/export/hero.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/hero/export/hero.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/powerup/export/powerup.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/powerup/export/powerup.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/powerup/export/powerup.png_1_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/powerup/export/powerup.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/raptor/export/raptor.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/raptor/export/raptor.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/speedy/export/speedy.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/speedy/export/speedy.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/spineboy/export/spineboy.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/spineboy/export/spineboy.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/stretchyman/export/stretchyman.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/stretchyman/export/stretchyman.png" sampler="default"/>
+    </material>
+    <material id="spine_data/spine_3.8/tank/export/tank.png_0_1_1" program="flat_dynamic" tags="transparent">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <texmap semantic="diffuse" image="data/spine_3.8/tank/export/tank.png" sampler="default"/>
     </material>
   </materials>
 </material_library>

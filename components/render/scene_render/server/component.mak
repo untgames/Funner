@@ -20,4 +20,4 @@ RENDER.SCENE_RENDER.SERVER.TESTS.IMPORTS     := compile.render.scene_render.serv
                                                 run.render.low_level.opengl_driver link.media.image.dds link.media.rfx.default_serializers \
                                                 link.media.geometry.binmesh link.media.geometry.xmesh compile.media.font link.media.font.xfont \
                                                 compile.media.particles link.media.particles link.media.particles.particle_designer_serializer \
-                                                compile.media.spine link.media.spine.loader_3.6
+                                                compile.media.spine link.media.spine.loader_3.6 link.media.spine.loader_3.8

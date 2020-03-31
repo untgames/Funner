@@ -28,20 +28,20 @@ struct TestDesc
   const char* atlas_file_name;
 };
 
-TestDesc TEST_DESCS [] = { { "data/vine/export/vine-pro.skel", "data/vine/export/vine.atlas" },
-                           { "data/vine/export/vine-pro.json", "data/vine/export/vine.atlas" },
-                           { "data/alien/export/alien-ess.skel", "data/alien/export/alien.atlas" },
-                           { "data/alien/export/alien-ess.json", "data/alien/export/alien.atlas" },
-                           { "data/alien/export/alien-pro.skel", "data/alien/export/alien.atlas" },
-                           { "data/alien/export/alien-pro.json", "data/alien/export/alien.atlas" },
-                           { "data/coin/export/coin-pro.skel", "data/coin/export/coin.atlas" },
-                           { "data/coin/export/coin-pro.json", "data/coin/export/coin.atlas" },
-                           { "data/dragon/export/dragon-ess.skel", "data/dragon/export/dragon.atlas" },
-                           { "data/dragon/export/dragon-ess.json", "data/dragon/export/dragon.atlas" },
-                           { "data/goblins/export/goblins-ess.skel", "data/goblins/export/goblins.atlas" },
-                           { "data/goblins/export/goblins-ess.json", "data/goblins/export/goblins.atlas" },
-                           { "data/tank/export/tank-pro.skel", "data/tank/export/tank.atlas" },
-                           { "data/tank/export/tank-pro.json", "data/tank/export/tank.atlas" }};
+TestDesc TEST_DESCS [] = { { "data/3.6/vine/export/vine-pro.skel", "data/3.6/vine/export/vine.atlas" },
+                           { "data/3.6/vine/export/vine-pro.json", "data/3.6/vine/export/vine.atlas" },
+                           { "data/3.6/alien/export/alien-ess.skel", "data/3.6/alien/export/alien.atlas" },
+                           { "data/3.6/alien/export/alien-ess.json", "data/3.6/alien/export/alien.atlas" },
+                           { "data/3.6/alien/export/alien-pro.skel", "data/3.6/alien/export/alien.atlas" },
+                           { "data/3.6/alien/export/alien-pro.json", "data/3.6/alien/export/alien.atlas" },
+                           { "data/3.6/coin/export/coin-pro.skel", "data/3.6/coin/export/coin.atlas" },
+                           { "data/3.6/coin/export/coin-pro.json", "data/3.6/coin/export/coin.atlas" },
+                           { "data/3.6/dragon/export/dragon-ess.skel", "data/3.6/dragon/export/dragon.atlas" },
+                           { "data/3.6/dragon/export/dragon-ess.json", "data/3.6/dragon/export/dragon.atlas" },
+                           { "data/3.6/goblins/export/goblins-ess.skel", "data/3.6/goblins/export/goblins.atlas" },
+                           { "data/3.6/goblins/export/goblins-ess.json", "data/3.6/goblins/export/goblins.atlas" },
+                           { "data/3.6/tank/export/tank-pro.skel", "data/3.6/tank/export/tank.atlas" },
+                           { "data/3.6/tank/export/tank-pro.json", "data/3.6/tank/export/tank.atlas" } };
 
 void print_log (const char* log, const char* message)
 {

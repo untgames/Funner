@@ -509,6 +509,12 @@ class TrackEntrySpineImpl : public Object, public media::spine::TrackEntryImpl
     float       TrackTime         ();
     void        SetTrackTime      (float track_time);
 
+    //tracks blending (available for spine 3.8 or newer)
+    media::spine::MixBlend MixBlend    ();
+    void                   SetMixBlend (media::spine::MixBlend mix_blend);
+    bool                   HoldPrevious    ();
+    void                   SetHoldPrevious (bool hold);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Mixing parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////

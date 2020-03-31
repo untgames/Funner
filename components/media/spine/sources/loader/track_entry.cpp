@@ -213,6 +213,85 @@ void TrackEntrySpineImpl::SetTrackTime (float track_time)
   track_entry->trackTime = track_time;
 }
 
+//tracks blending (available for spine 3.8 or newer)
+media::spine::MixBlend TrackEntrySpineImpl::MixBlend ()
+{
+  static const char* METHOD_NAME = "media::spine::TrackEntrySpineImpl::MixBlend";
+
+  CheckDisposed (METHOD_NAME);
+
+#if SPINE_VERSION > 36
+  switch (track_entry->mixBlend)
+  {
+    case SP_MIX_BLEND_SETUP:
+      return media::spine::MixBlend_Setup;
+    case SP_MIX_BLEND_FIRST:
+      return media::spine::MixBlend_First;
+    case SP_MIX_BLEND_REPLACE:
+      return media::spine::MixBlend_Replace;
+    case SP_MIX_BLEND_ADD:
+      return media::spine::MixBlend_Add;
+    default:
+      throw xtl::format_operation_exception (METHOD_NAME, "Unknown mixBlend value %d", (int)track_entry->mixBlend);
+  }
+#else
+  return media::spine::MixBlend_Replace;
+#endif
+}
+
+void TrackEntrySpineImpl::SetMixBlend (media::spine::MixBlend mix_blend)
+{
+  static const char* METHOD_NAME = "media::spine::TrackEntrySpineImpl::SetMixBlend";
+
+  CheckDisposed (METHOD_NAME);
+
+#if SPINE_VERSION > 36
+  switch (mix_blend)
+  {
+    case media::spine::MixBlend_Setup:
+      track_entry->mixBlend = SP_MIX_BLEND_SETUP;
+      break;
+    case media::spine::MixBlend_First:
+      track_entry->mixBlend = SP_MIX_BLEND_FIRST;
+      break;
+    case media::spine::MixBlend_Replace:
+      track_entry->mixBlend = SP_MIX_BLEND_REPLACE;
+      break;
+    case media::spine::MixBlend_Add:
+      track_entry->mixBlend = SP_MIX_BLEND_ADD;
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "mix_blend", mix_blend);
+  }
+#else
+  throw xtl::format_operation_exception (METHOD_NAME, "MixBlend is not supported by this spine version (%d)", (int)SPINE_VERSION);
+#endif
+}
+
+bool TrackEntrySpineImpl::HoldPrevious ()
+{
+  CheckDisposed ("media::spine::TrackEntrySpineImpl::HoldPrevious");
+
+#if SPINE_VERSION > 36
+  return track_entry->holdPrevious;
+#else
+  return false;
+#endif
+}
+
+void TrackEntrySpineImpl::SetHoldPrevious (bool hold)
+{
+  static const char* METHOD_NAME = "media::spine::TrackEntrySpineImpl::SetHoldPrevious";
+
+  CheckDisposed (METHOD_NAME);
+
+#if SPINE_VERSION > 36
+  track_entry->holdPrevious = hold;
+#else
+  throw xtl::format_operation_exception (METHOD_NAME, "HoldPrevious is not supported by this spine version (%d)", (int)SPINE_VERSION);
+#endif
+}
+
 /*
    Mixing parameters
 */

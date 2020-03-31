@@ -43,6 +43,12 @@ class TrackEntryImpl : virtual public IObject
     virtual float       TrackTime         () = 0;
     virtual void        SetTrackTime      (float track_time) = 0;
 
+    //tracks blending (available for spine 3.8 or newer)
+    virtual media::spine::MixBlend MixBlend        () = 0;
+    virtual void                   SetMixBlend     (media::spine::MixBlend mix_blend) = 0;
+    virtual bool                   HoldPrevious    () = 0;
+    virtual void                   SetHoldPrevious (bool hold) = 0;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Mixing parameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////

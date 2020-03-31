@@ -26,6 +26,17 @@ enum AnimationEvent
   AnimationEvent_Num
 };
 
+//Possible track blending modes
+enum MixBlend
+{
+  MixBlend_Setup,
+  MixBlend_First,
+  MixBlend_Replace,
+  MixBlend_Add,
+
+  MixBlend_Num
+};
+
 typedef xtl::function<void (const TrackEntry& track, AnimationEvent event)> AnimationEventHandler;
 typedef xtl::function<void (const TrackEntry& track, const char* event_name, int int_value, float float_value, const char* string_value)> UserEventHandler;
 
@@ -67,6 +78,12 @@ class TrackEntry
     void        SetTimeScale      (float time_scale);
     float       TrackTime         () const;
     void        SetTrackTime      (float track_time);
+
+    //tracks blending (available for spine 3.8 or newer)
+    media::spine::MixBlend MixBlend        () const;
+    void                   SetMixBlend     (media::spine::MixBlend mix_blend);
+    bool                   HoldPrevious    () const;
+    void                   SetHoldPrevious (bool hold);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Mixing parameters, returned object is owned by callee.

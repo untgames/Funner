@@ -1,2 +1,3 @@
 #files copied from spine repo during prepare_dependencies make step 
-goblins
+spine_3.6
+spine_3.8

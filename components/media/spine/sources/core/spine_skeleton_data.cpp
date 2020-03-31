@@ -158,13 +158,13 @@ void SkeletonData::Load (const char* skeleton_file_name, const char* atlas_file_
         int hash_length = spine_read_var_int (input, 1);
 
         //check hash length was read correctly and we have enough data in read buffer
-        if (hash_length > 0 && (hash_length + 5) < sizeof (read_buffer))
+        if (hash_length > 0 && (hash_length + 5) < (int)sizeof (read_buffer))
         {
           input += hash_length - 1;
 
           int version_length = spine_read_var_int (input, 1);
 
-          if (version_length > 0 && (input - (unsigned char*)read_buffer + version_length) < sizeof (read_buffer))
+          if (version_length > 0 && (input - (unsigned char*)read_buffer + version_length) < (int)sizeof (read_buffer))
           {
             input [version_length - 1] = 0;  //terminate string after version
 

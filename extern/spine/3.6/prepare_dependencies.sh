@@ -15,26 +15,31 @@ git apply --reject --whitespace=fix ../funner.patch
 mv spine-c/spine-c/include ../include
 rm -rf ../sources
 mv spine-c/spine-c/src ../sources
-cp -R examples/alien ../../../../components/media/spine/tests/data/
-cp -R examples/coin ../../../../components/media/spine/tests/data/
-cp -R examples/dragon ../../../../components/media/spine/tests/data/
-cp -R examples/goblins ../../../../components/media/spine/tests/data/
-cp -R examples/tank ../../../../components/media/spine/tests/data/
-cp -R examples/vine ../../../../components/media/spine/tests/data/
-cp -R examples/vine ../../../../components/scene_graph/tests/controllers/data/
-cp -R examples/vine ../../../../components/scene_graph/tests/core/data/
-cp -R examples/alien ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/coin ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/dragon ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/goblins ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/hero ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/powerup ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/raptor ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/speedy ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/spineboy ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/stretchyman ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/tank ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/vine ../../../../components/render/scene_render/server/tests/renderer/data/
-cp -R examples/goblins ../../../../components/engine/script_binds/tests/lua/data/
+mkdir ../../../../components/media/spine/tests/data/3.6
+cp -R examples/alien ../../../../components/media/spine/tests/data/3.6/
+cp -R examples/coin ../../../../components/media/spine/tests/data/3.6/
+cp -R examples/dragon ../../../../components/media/spine/tests/data/3.6/
+cp -R examples/goblins ../../../../components/media/spine/tests/data/3.6/
+cp -R examples/tank ../../../../components/media/spine/tests/data/3.6/
+cp -R examples/vine ../../../../components/media/spine/tests/data/3.6/
+mkdir ../../../../components/scene_graph/tests/controllers/data/spine_3.6/
+cp -R examples/vine ../../../../components/scene_graph/tests/controllers/data/spine_3.6/
+mkdir ../../../../components/scene_graph/tests/core/data/spine_3.6/
+cp -R examples/vine ../../../../components/scene_graph/tests/core/data/spine_3.6/
+mkdir ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/alien ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/coin ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/dragon ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/goblins ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/hero ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/powerup ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/raptor ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/speedy ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/spineboy ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/stretchyman ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/tank ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+cp -R examples/vine ../../../../components/render/scene_render/server/tests/renderer/data/spine_3.6/
+mkdir ../../../../components/engine/script_binds/tests/lua/data/spine_3.6/
+cp -R examples/goblins ../../../../components/engine/script_binds/tests/lua/data/spine_3.6/
 cd ..
 rm -rf dependencies

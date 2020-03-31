@@ -1,13 +1,3 @@
 #files copied from spine repo during prepare_dependencies make step 
-alien
-coin
-dragon
-goblins
-hero
-powerup
-raptor
-speedy
-spineboy
-stretchyman
-tank
-vine
+spine_3.6
+spine_3.8

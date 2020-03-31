@@ -20,6 +20,7 @@ const char* ANIMATION_STATE_LIBRARY       = "Media.SpineAnimationState";
 const char* ATTACHMENT_LIBRARY            = "Media.SpineAttachment";
 const char* ATTACHMENT_TYPE_LIBRARY       = "Media.SpineAttachmentType";
 const char* BONE_LIBRARY                  = "Media.SpineBone";
+const char* MIX_BLEND_LIBRARY             = "Media.SpineMixBlend";
 const char* POINT_ATTACHMENT_DATA_LIBRARY = "Media.PointAttachmentData";
 const char* SKELETON_LIBRARY              = "Media.SpineSkeleton";
 const char* SKELETON_DATA_LIBRARY         = "Media.SpineSkeletonData";
@@ -220,6 +221,7 @@ void bind_static_spine_library (Environment& environment)
 {
   InvokerRegistry animation_event_lib = environment.CreateLibrary (ANIMATION_EVENT_LIBRARY);
   InvokerRegistry attachment_type_lib = environment.CreateLibrary (ATTACHMENT_TYPE_LIBRARY);
+  InvokerRegistry mix_blend_lib       = environment.CreateLibrary (MIX_BLEND_LIBRARY);
   InvokerRegistry spine_lib           = environment.CreateLibrary (SPINE_LIBRARY);
 
   animation_event_lib.Register ("get_Start",     make_const (AnimationEvent_Start));
@@ -236,6 +238,11 @@ void bind_static_spine_library (Environment& environment)
   attachment_type_lib.Register ("get_Path",        make_const (AttachmentType_Path));
   attachment_type_lib.Register ("get_Point",       make_const (AttachmentType_Point));
   attachment_type_lib.Register ("get_Clipping",    make_const (AttachmentType_Clipping));
+
+  mix_blend_lib.Register ("get_Setup",   make_const (MixBlend_Setup));
+  mix_blend_lib.Register ("get_First",   make_const (MixBlend_First));
+  mix_blend_lib.Register ("get_Replace", make_const (MixBlend_Replace));
+  mix_blend_lib.Register ("get_Add",     make_const (MixBlend_Add));
 
   spine_lib.Register ("CreateAnimationEventHandler", make_callback_invoker<AnimationEventHandler::signature_type> ());
   spine_lib.Register ("CreateUserEventHandler",      make_callback_invoker<UserEventHandler::signature_type> ());
@@ -269,6 +276,10 @@ void bind_track_entry_library (Environment& environment)
   lib.Register ("set_TimeScale",      make_invoker (&TrackEntry::SetTimeScale));
   lib.Register ("get_TrackTime",      make_invoker (&TrackEntry::TrackTime));
   lib.Register ("set_TrackTime",      make_invoker (&TrackEntry::SetTrackTime));
+  lib.Register ("get_MixBlend",       make_invoker (&TrackEntry::MixBlend));
+  lib.Register ("set_MixBlend",       make_invoker (&TrackEntry::SetMixBlend));
+  lib.Register ("get_HoldPrevious",   make_invoker (&TrackEntry::HoldPrevious));
+  lib.Register ("set_HoldPrevious",   make_invoker (&TrackEntry::SetHoldPrevious));
   lib.Register ("get_MixDuration",    make_invoker (&TrackEntry::MixDuration));
   lib.Register ("set_MixDuration",    make_invoker (&TrackEntry::SetMixDuration));
   lib.Register ("get_MixTime",        make_invoker (&TrackEntry::MixTime));
