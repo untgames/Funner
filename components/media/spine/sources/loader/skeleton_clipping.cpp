@@ -17,7 +17,7 @@ SkeletonClippingSpineImpl::SkeletonClippingSpineImpl (SpineSkeletonClippingPtr i
 
 bool SkeletonClippingSpineImpl::IsClipping ()
 {
-  return spSkeletonClipping_isClipping (clipper->NativeHandle ());
+  return spSkeletonClipping_isClipping (clipper->NativeHandle ()) != 0;
 }
 
 void SkeletonClippingSpineImpl::ClipStart (media::spine::SlotImpl* slot, media::spine::AttachmentImpl* clip_attachment)

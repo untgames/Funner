@@ -51,7 +51,7 @@ media::spine::BlendMode SlotSpineImpl::BlendMode ()
 
 bool SlotSpineImpl::HasBone ()
 {
-  return slot->bone;
+  return slot->bone != 0;
 }
 
 media::spine::BoneImpl* SlotSpineImpl::CreateBoneImpl ()
@@ -69,7 +69,7 @@ media::spine::BoneImpl* SlotSpineImpl::CreateBoneImpl ()
 
 bool SlotSpineImpl::HasAttachment ()
 {
-  return slot->attachment;
+  return slot->attachment != 0;
 }
 
 const char* SlotSpineImpl::AttachmentName ()

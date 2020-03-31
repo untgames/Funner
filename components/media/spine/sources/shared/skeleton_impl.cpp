@@ -115,7 +115,7 @@ void SkeletonImpl::BuildMeshes ()
 
       attachment->ComputeWorldVertices (slot, vertices_to_clip_buffer.data (), 0, 2);
 
-      clipper->ClipTriangles (vertices_to_clip_buffer.data (), vertices_to_clip_buffer.size (), (unsigned short*)attachment->Indices (), attachment->TrianglesCount () * 3, (float*)attachment->Texcoords (), 2);
+      clipper->ClipTriangles (vertices_to_clip_buffer.data (), (int)vertices_to_clip_buffer.size (), (unsigned short*)attachment->Indices (), attachment->TrianglesCount () * 3, (float*)attachment->Texcoords (), 2);
 
       if (clipper->ClippedTrianglesCount ())
       {
@@ -449,7 +449,7 @@ unsigned int SkeletonImpl::MeshesCount ()
   if (draw_order.empty ())
     BuildMeshes ();
 
-  return draw_order.size ();
+  return (unsigned int)draw_order.size ();
 }
 
 media::geometry::Mesh SkeletonImpl::Mesh (unsigned int mesh_index)

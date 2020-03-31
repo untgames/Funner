@@ -136,14 +136,14 @@ bool SkeletonSpineImpl::SetSkin (const char* skin_name)
 {
   InvalidateMeshes ();
 
-  return spSkeleton_setSkinByName (skeleton->NativeHandle (), skin_name);
+  return spSkeleton_setSkinByName (skeleton->NativeHandle (), skin_name) != 0;
 }
 
 bool SkeletonSpineImpl::SetAttachment (const char* slot_name, const char* attachment_name)
 {
   InvalidateMeshes ();
 
-  return spSkeleton_setAttachment (skeleton->NativeHandle (), slot_name, attachment_name);
+  return spSkeleton_setAttachment (skeleton->NativeHandle (), slot_name, attachment_name) != 0;
 }
 
 /*

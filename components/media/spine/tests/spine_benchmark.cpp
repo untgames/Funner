@@ -47,7 +47,7 @@ int main ()
 
     AnimationState animation_state = animation_state_data.CreateAnimationState ();
 
-    for (size_t i = 0, count = skeleton_data.AnimationsCount(); i < count; i++)
+    for (unsigned int i = 0, count = skeleton_data.AnimationsCount(); i < count; i++)
       animation_state.SetAnimation (i, skeleton_data.AnimationName (i), true);
 
     for (;;)

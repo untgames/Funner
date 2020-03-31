@@ -273,7 +273,7 @@ bool TrackEntrySpineImpl::HoldPrevious ()
   CheckDisposed ("media::spine::TrackEntrySpineImpl::HoldPrevious");
 
 #if SPINE_VERSION > 36
-  return track_entry->holdPrevious;
+  return track_entry->holdPrevious != 0;
 #else
   return false;
 #endif

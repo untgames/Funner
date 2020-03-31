@@ -118,7 +118,7 @@ class Component
       ReadFileData (atlas_file_name, atlas_file_data);
 
       //load atlas
-      SpineAtlasPtr atlas (new SpineHandleHolder<spAtlas> (spAtlas_create (atlas_file_data.data (), atlas_file_data.size (), common::dir (atlas_file_name).c_str (), 0), spAtlas_dispose), false);
+      SpineAtlasPtr atlas (new SpineHandleHolder<spAtlas> (spAtlas_create (atlas_file_data.data (), (int)atlas_file_data.size (), common::dir (atlas_file_name).c_str (), 0), spAtlas_dispose), false);
 
       if (!atlas->NativeHandle ())
         throw xtl::format_operation_exception (METHOD_NAME, "Can't load atlas from file '%s'", atlas_file_name);
@@ -182,7 +182,7 @@ class Component
 
         //load skeleton
         spSkeletonBinary*    skeleton_binary = spSkeletonBinary_create (atlas->NativeHandle ());
-        SpineSkeletonDataPtr skeleton_data (new SpineHandleHolder<spSkeletonData> (spSkeletonBinary_readSkeletonData (skeleton_binary, (const unsigned char*)skeleton_file_data.data (), skeleton_file_data.size ()), spSkeletonData_dispose), false);
+        SpineSkeletonDataPtr skeleton_data (new SpineHandleHolder<spSkeletonData> (spSkeletonBinary_readSkeletonData (skeleton_binary, (const unsigned char*)skeleton_file_data.data (), (int)skeleton_file_data.size ()), spSkeletonData_dispose), false);
 
         if (!skeleton_data->NativeHandle ())
         {
