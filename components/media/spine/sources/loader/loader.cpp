@@ -12,6 +12,11 @@ using namespace SPINE_NAMESPACE_NAME;
 #define MACRO_TO_STRING(macro) MACRO_TO_STRING_HELPER(macro)
 #define SPINE_VERSION_STRING MACRO_TO_STRING(SPINE_VERSION)
 
+//Use this hack to have different contant name for different spine versions. Without this compilation fails on MSVC 2013 (anonymous namespace entry conflict)
+#define COMPONENT_NAME_FORMAT_SUB_HELPER(...) COMPONENT_NAME_FORMAT_ ## __VA_ARGS__
+#define COMPONENT_NAME_FORMAT_HELPER(...) COMPONENT_NAME_FORMAT_SUB_HELPER(__VA_ARGS__)
+#define SPINE_COMPONENT_NAME_FORMAT COMPONENT_NAME_FORMAT_HELPER(SPINE_VERSION)
+
 namespace
 {
 
@@ -19,7 +24,7 @@ namespace
    Constants
 */
 
-const char* COMPONENT_NAME_FORMAT = "media.spine.loaders.SpineLoader_%s"; //component name
+const char* SPINE_COMPONENT_NAME_FORMAT = "media.spine.loaders.SpineLoader_%s"; //component name
 
 }
 
@@ -224,7 +229,7 @@ SkeletonClippingSpineImplPtr Component::clipper;
 
 extern "C"
 {
-  ComponentRegistrator<Component> SPINE_LOADER_COMPONENT_NAME (common::format (COMPONENT_NAME_FORMAT, SPINE_VERSION_STRING).c_str ());
+  ComponentRegistrator<Component> SPINE_LOADER_COMPONENT_NAME (common::format (SPINE_COMPONENT_NAME_FORMAT, SPINE_VERSION_STRING).c_str ());
 }
 
 }

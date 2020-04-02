@@ -7,6 +7,11 @@ using namespace SPINE_NAMESPACE_NAME;
 namespace
 {
 
+//Use this hack to have different contant name for different spine versions. Without this compilation fails on MSVC 2013 (anonymous namespace entry conflict)
+#define LOG_NAME_SUB_HELPER(...) SPINE_LOG_NAME_ ## __VA_ARGS__
+#define LOG_NAME_HELPER(...) LOG_NAME_SUB_HELPER(__VA_ARGS__)
+#define LOG_NAME LOG_NAME_HELPER(SPINE_VERSION)
+
 //Constants
 const char* LOG_NAME = "media.spine.AnimationStateSpineImpl"; //log stream name
 
