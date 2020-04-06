@@ -38,7 +38,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.media.rfx.default_serializers link.media.geometry.binmesh link.media.geometry.xmesh \
                                 link.media.video.theora link.media.particles.particle_designer_serializer link.network link.common.iconv \
                                 link.physics.low_level.bullet_driver link.media.animation.xanim link.media.animation.binanim \
-                                link.scene_graph.xscene link.social.facebook link.media.spine.loader_3.6
+                                link.scene_graph.xscene link.social.facebook link.media.spine.loader_3.6 link.media.spine.loader_3.8
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain
