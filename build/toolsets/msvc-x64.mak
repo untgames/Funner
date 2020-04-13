@@ -8,7 +8,14 @@ ifneq (,$(VS140COMNTOOLS))
   LIB := $(UCRT_PATH)/Lib/$(UCRT_VERSION)/ucrt/x64/;$(LIB)
 endif
 
+ifeq (,$(filter vc14_1,$(PROFILES)))
+#For VS 2013/2015
 MSVC_BIN_PATH := $(MSVC_BIN_PATH)/amd64
 LIB           := $(MSVC_PATH)/lib/amd64;$(MSVC_PATH)/atlmfc/lib/amd64;$(PLATFORM_SDK_PATH)/lib/x64;$(LIB)
+else
+#For VS 2017/2019/...
+MSVC_BIN_PATH := $(MSVC_PATH)bin/Hostx86/x64
+LIB           := $(MSVC_PATH)/lib/x64;$(MSVC_PATH)/atlmfc/lib/x64;$(PLATFORM_SDK_PATH)/lib/x64;$(LIB)
+endif
 
 export LIB

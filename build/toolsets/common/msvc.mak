@@ -21,7 +21,7 @@ endif
   MSVC_PATH         ?= $(shell "$(VSWHERE_PATH)" -latest -find VC/**/atlmfc)/../
   MSVC_BIN_PATH     ?= $(MSVC_PATH)bin/Hostx86/x86
   MSVS_COMMON_PATH  ?= $(shell "$(VSWHERE_PATH)" -latest -find Common7/IDE)
-  PROFILES          += vc14 haswchar  
+  PROFILES          += vc14 vc14_1 haswchar  
   COMMON_CFLAGS     += -wd4005
   INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
 
