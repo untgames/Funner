@@ -29,7 +29,6 @@ EXTERN.LUA_UTILS.TARGET_DIR              = $(DIST_BIN_DIR)
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS   := -TP
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS    := -x c++
 EXTERN.LUA_UTILS.clang.COMPILER_CFLAGS  := -x c++
-EXTERN.LUA_UTILS.bada_simulator.IMPORTS := link.extern.bada_addons
 EXTERN.LUA_UTILS.wp8.COMPILER_CFLAGS    := -FIwp8_wrapper.h
 
 #Target - LUA_TESTS

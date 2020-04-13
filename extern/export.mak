@@ -1,9 +1,9 @@
 COMPONENT_DIRS := zzip pcre tiff devil libpsd gles_win32 gles_wince bullet ogg vorbis \
-                  vorbisfile theora lua luajit firebreath mongoose beagleboard openalsdk shiny meego \
+                  vorbisfile theora lua luajit firebreath mongoose openalsdk shiny meego \
                   wcecompat libffi pthreads_wince lib64 dxsdk angle \
                   libiconv win32_load_dll win8_compat flac spine
 
-ifeq (,$(filter beagleboard,$(PROFILES))$(filter tabletos,$(PROFILES)))
+ifeq (,$(filter tabletos,$(PROFILES)))
   COMPONENT_DIRS += curl
 endif
 
@@ -11,10 +11,6 @@ ifeq (,$(filter tabletos,$(PROFILES)))
   COMPONENT_DIRS += zlib jpeg libpng freetype openssl
 else
   COMPONENT_DIRS += tabletos
-endif
-
-ifneq (,$(filter bada,$(PROFILES)))
-  COMPONENT_DIRS += bada
 endif
 
 ifneq (,$(filter android-arm,$(PROFILES)))

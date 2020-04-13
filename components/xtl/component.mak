@@ -13,7 +13,6 @@ XTL.STL.TESTS.LIBS               :=
 XTL.STL.TESTS.COMPILER_CFLAGS    :=
 XTL.STL.TESTS.COMPILER_DEFINES   := __MYSTL_STANDALONE__
 XTL.STL.TESTS.DOCUMENTATION_DIRS := include
-XTL.STL.TESTS.bada.IMPORTS       := compile.extern.bada
 XTL.STL.TESTS.wince.IMPORTS      := link.extern.wcecompat
 
 #Цель №2 - TR1 tests
@@ -29,7 +28,6 @@ XTL.TR1.TESTS.cygwin.COMPILER_CFLAGS      := --no-warn
 XTL.TR1.TESTS.win32.SOURCE_DIRS           := tests/tr1/smart_ptr/mt-tests
 XTL.TR1.TESTS.unistd.SOURCE_DIRS          := tests/tr1/smart_ptr/mt-tests
 XTL.TR1.TESTS.pthread_static_library.LIBS := pthread
-XTL.TR1.TESTS.bada.IMPORTS                := compile.extern.bada
 XTL.TR1.TESTS.wince.IMPORTS               := link.extern.wcecompat
 
 #Цель №3 - XTL tests
@@ -43,7 +41,6 @@ XTL.XTL.TESTS.COMPILER_CFLAGS      :=
 XTL.XTL.TESTS.COMPILER_DEFINES     := __MYSTL_STANDALONE__
 XTL.XTL.TESTS.IMPORTS              := compile.math.vecmath
 XTL.XTL.TESTS.haswchar.SOURCE_DIRS := tests/xtl/utils/wchar
-XTL.XTL.TESTS.bada.IMPORTS         := compile.extern.bada
 
 #XTL SDK
 XTL.SDK.TYPE              := installation

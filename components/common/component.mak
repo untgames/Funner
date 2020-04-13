@@ -23,8 +23,6 @@ COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.winrt.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.wp8.SOURCE_DIRS            := sources/platform/win32
-COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
-COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
 COMMON.SOURCES.linux.COMPILER_DEFINES     := HAS_PWD_H
 COMMON.SOURCES.tabletos.COMPILER_DEFINES  := HAS_PWD_H
 COMMON.SOURCES.tabletos.SOURCE_DIRS       := sources/platform/tabletos
@@ -89,14 +87,12 @@ COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                      link.common.zip_file_system link.common.default_console_handler link.common.iconv \
                                      link.common.json
-COMMON.TESTS.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - CommonLib crypter
 COMMON.UTILS.FILE_CRYPTER.TYPE        := application
 COMMON.UTILS.FILE_CRYPTER.NAME        := file-crypter
 COMMON.UTILS.FILE_CRYPTER.SOURCE_DIRS := utils/file_crypter
 COMMON.UTILS.FILE_CRYPTER.IMPORTS     := compile.common link.common link.common.aes
-COMMON.UTILS.FILE_CRYPTER.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - License generator
 COMMON.UTILS.LICENSE_GENERATOR.TYPE         := application

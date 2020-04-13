@@ -1,7 +1,6 @@
 # Compile exports
 export.compile.extern.openssl.INCLUDE_DIRS              := include include/openssl
 export.compile.extern.openssl.unistd.COMPILER_DEFINES   := HAVE_UNISTD_H
-export.compile.extern.openssl.bada.COMPILER_DEFINES     := HAVE_UNISTD_H
 export.compile.extern.openssl.g++x86-64.COMPILER_CFLAGS += -D"DES_LONG=unsigned int"
 
 # Link exports

@@ -190,26 +190,9 @@ class TabletOsPlatform: public UnistdPlatform
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///bada
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class BadaPlatform : public UnistdPlatform
-{
-  public:
-    static void InitLockable    (lockable_t&);
-    static void DestroyLockable (lockable_t&);
-    static void Lock            (lockable_t&);
-    static void Unlock          (lockable_t&);
-
-    static threadid_t GetCurrentThreadId ();
-};
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указание текущей платформы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-#ifdef BADA
-  typedef BadaPlatform Platform;
-#elif defined _WIN32
+#if defined _WIN32
   typedef Win32Platform Platform;
 #elif defined IPHONE
   typedef CocoaIPhonePlatform Platform;

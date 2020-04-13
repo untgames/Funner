@@ -76,6 +76,8 @@ endif #VS130COMNTOOLS
 
 endif #VS140COMNTOOLS
 
+endif #vswhere
+
 ifeq (,$(MSVS_COMMON_PATH))
   $(error 'Microsoft Visual Studio not detected (empty MSVC_PATH)')
 endif

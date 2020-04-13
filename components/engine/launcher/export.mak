@@ -10,7 +10,6 @@ export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr \
 export.link.engine.launcher_shared.android.IMPORTS     := link.media.image.pvr link.store.android_store link.store.amazon_store \
                                                           link.push_notifications.google_push_notifications link.push_notifications.amazon_push_notifications
 export.link.engine.launcher_shared.tabletos.IMPORTS    := link.media.image.pvr
-export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
 export.link.engine.launcher_shared.linux.IMPORTS       := link.media.image.ktx
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                 link.media.rms link.media.sound.snddecl link.media.sound.default_decoders \

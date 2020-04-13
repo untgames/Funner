@@ -28,7 +28,7 @@ ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.x86-64.COMPONENTS := geekinfo
 endif
 
-ifeq (,$(filter beagleboard,$(PROFILES))$(filter webos,$(PROFILES))$(filter tabletos,$(PROFILES)))
+ifeq (,$(filter webos,$(PROFILES))$(filter tabletos,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 
@@ -50,14 +50,6 @@ endif
 
 ifneq (,$(filter android-arm,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += android_ndk_profiler
-endif
-
-ifneq (,$(filter psp,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS := psp_addons $(FUNNER_EXTERN_LIBS.COMPONENTS)
-endif
-
-ifneq (,$(filter bada,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS := bada $(FUNNER_EXTERN_LIBS.COMPONENTS)
 endif
 
 ifneq (,$(filter wince,$(PROFILES)))

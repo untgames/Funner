@@ -25,7 +25,6 @@ EXTERN.OPENALLIB.msvc.COMPILER_DEFINES      := AL_ALEXT_PROTOTYPES AL_BUILD_LIBR
 EXTERN.OPENALLIB.linux.COMPILER_CFLAGS      := -pthread --no-warn
 EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt
 EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread
-EXTERN.OPENALLIB.beagleboard.LINK_FLAGS     := -rdynamic
 EXTERN.OPENALLIB.meego.LINK_FLAGS           := -rdynamic
 EXTERN.OPENALLIB.android.LIBS               := log
 EXTERN.OPENALLIB.win32.LIBS                 := winmm user32 shell32 ole32 ksguid
