@@ -42,30 +42,39 @@ endif
   PROFILES          += vc14 haswchar  
   COMMON_CFLAGS     += -wd4005
   INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
-endif
 
-endif
+else
 
 ifneq (,$(VS130COMNTOOLS))
+
   MSVC_PATH         ?= $(VS130COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS130COMNTOOLS)../../Common7/Ide
   PROFILES          += vc13 haswchar  
   COMMON_CFLAGS     += -wd4005
-endif
+
+else
 
 ifneq (,$(VS120COMNTOOLS))
+
   MSVC_PATH         ?= $(VS120COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS120COMNTOOLS)../../Common7/Ide
   PROFILES          += vc12 haswchar  
   COMMON_CFLAGS     += -wd4005
-endif
+
+else
 
 ifneq (,$(VS110COMNTOOLS))
   MSVC_PATH         ?= $(VS110COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS110COMNTOOLS)../../Common7/Ide
   PROFILES          += vc11 haswchar
   COMMON_CFLAGS     += -wd4005
-endif
+endif #VS110COMNTOOLS
+
+endif #VS120COMNTOOLS
+
+endif #VS130COMNTOOLS
+
+endif #VS140COMNTOOLS
 
 ifeq (,$(MSVS_COMMON_PATH))
   $(error 'Microsoft Visual Studio not detected (empty MSVC_PATH)')
