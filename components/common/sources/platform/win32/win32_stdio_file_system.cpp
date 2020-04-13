@@ -234,7 +234,7 @@ void Win32FileSystem::Search (const char* mask,const FileSearchHandler& insert_h
   {    
     stl::string name = to_utf8_string (find_data.name);
 
-    if (name != "." && name != ".." && !(find_data.attrib & _A_HIDDEN))
+    if (name != "." && name != "..")
     {
       info.size         = find_data.size;
       info.time_modify  = find_data.time_write;
