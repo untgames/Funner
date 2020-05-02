@@ -15,7 +15,7 @@ int run ()
 
 //  printf ("wait time = %u\n", wait_time);
 
-  printf ("sem wait finished in time '%s', result = '%s'\n", wait_time > 99 && wait_time < 150 ? "true" : "false", result ? "true" : "false");
+  printf ("sem wait finished in time '%s', result = '%s'\n", wait_time > 99 && wait_time < 200 ? "true" : "false", result ? "true" : "false");
 
   return 0;
 }

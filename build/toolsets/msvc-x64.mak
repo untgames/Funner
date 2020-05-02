@@ -4,8 +4,8 @@ ML_NAME           := ml64
 
 include $(TOOLSETS_DIR)/common/msvc.mak
 
-ifneq (,$(VS140COMNTOOLS))
-  LIB := $(UCRT_PATH)/Lib/$(UCRT_VERSION)/ucrt/x64/;$(LIB)
+ifneq (,$(UCRT_PATH))
+  LIB := $(UCRT_PATH)/Lib/$(UCRT_VERSION)/um/x64/;$(UCRT_PATH)/Lib/$(UCRT_VERSION)/ucrt/x64/;$(LIB)
 endif
 
 ifeq (,$(filter vc14_1,$(PROFILES)))
@@ -19,3 +19,7 @@ LIB           := $(MSVC_PATH)/lib/x64;$(MSVC_PATH)/atlmfc/lib/x64;$(PLATFORM_SDK
 endif
 
 export LIB
+
+ifneq (,$(filter vc14,$(PROFILES)))
+PROFILES += vc14-x86-64
+endif

@@ -23,7 +23,7 @@ endif
   MSVS_COMMON_PATH  ?= $(shell "$(VSWHERE_PATH)" -latest -find Common7/IDE)
   PROFILES          += vc14 vc14_1 haswchar  
   COMMON_CFLAGS     += -wd4005
-  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/shared/;$(UCRT_PATH)/Include/$(UCRT_VERSION)/um/;$(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
 
 else
 
@@ -41,7 +41,7 @@ endif
   MSVS_COMMON_PATH  ?= $(VS140COMNTOOLS)../../Common7/Ide
   PROFILES          += vc14 haswchar  
   COMMON_CFLAGS     += -wd4005
-  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
+  INCLUDE           := $(UCRT_PATH)/Include/$(UCRT_VERSION)/shared/;$(UCRT_PATH)/Include/$(UCRT_VERSION)/um/;$(UCRT_PATH)/Include/$(UCRT_VERSION)/ucrt/;$(INCLUDE)
 
 else
 
