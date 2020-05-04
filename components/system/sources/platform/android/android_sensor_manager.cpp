@@ -356,12 +356,12 @@ class JniSensorManager
 
 typedef common::Singleton<JniSensorManager> JniSensorManagerSingleton;
 
-void JNICALL on_accuracy_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint accuracy)
+void JNICALL on_accuracy_changed (JNIEnv&, jobject obj, jlong sensorRef, jobject sensor, jint accuracy)
 {
 ///ignored
 }
 
-void JNICALL on_sensor_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint accuracy, jlong timestamp, jfloatArray values, jint orientation)
+void JNICALL on_sensor_changed (JNIEnv&, jobject obj, jlong sensorRef, jobject sensor, jint accuracy, jlong timestamp, jfloatArray values, jint orientation)
 {
   sensor_t handle = reinterpret_cast<sensor_t> (sensorRef);  
 

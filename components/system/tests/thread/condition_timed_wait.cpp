@@ -18,8 +18,16 @@ int run ()
 
 //  printf ("wait time = %u\n", wait_time);
 
-  printf ("wait finished in time '%s', result = '%s'\n", wait_time > 99 && wait_time < 200 ? "true" : "false", result ? "true" : "false");
+  bool finished_in_time = wait_time > 90 && wait_time < 500;
+
+  printf ("wait finished in time '%s', result = '%s'\n", finished_in_time ? "true" : "false", result ? "true" : "false");
   fflush (stdout);
+
+  if (!finished_in_time)
+  {
+    printf ("wait finished in %u\n", wait_time);
+    fflush (stdout);
+  }
 
   return 0;
 }

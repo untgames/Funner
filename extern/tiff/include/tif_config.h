@@ -120,7 +120,9 @@ static int _wopen (const void* name, int mode, ...)
 
 #ifdef ANDROID
 
-void * lfind (const void *key, const void *base, unsigned int *num, unsigned int width, int (*compare)(const void *, const void *));
+# include <sys/types.h>
+
+void * lfind (const void *key, const void *base, size_t *num, size_t width, int (*compare)(const void *, const void *));
 
 #endif
 

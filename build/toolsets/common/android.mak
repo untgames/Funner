@@ -34,7 +34,7 @@ REMOTE_DEBUG_DIR           ?= $(SDCARD_DIR)/funner
 EXE_SUFFIX                 :=
 DLL_SUFFIX                 := .so
 DLL_PREFIX                 := lib
-ANDROID_NDK_PLATFORM       := 16
+ANDROID_NDK_PLATFORM       ?= 16
 ANDROID_SDK_PLATFORM       := android-28
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
@@ -81,7 +81,11 @@ COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/li
 COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR) -dead_strip
 COMMON_LINK_FLAGS          += -fPIC -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -std=c++03 -Wall -Oz -DNDEBUG -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a -nostdlib++ -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--exclude-libs,libunwind.a 
 COMMON_LINK_FLAGS          += -L$(ANDROID_STL_LIB_DIR) -Qunused-arguments -Wl,-z,relro -Wl,-z,now
-COMMON_LINK_FLAGS          += -landroid -llog -latomic -lm -ldl -lc $(ANDROID_STL_LIB_DIR)/libc++_static.a $(ANDROID_STL_LIB_DIR)/libc++abi.a $(ANDROID_STL_LIB_DIR)/libandroid_support.a $(ANDROID_STL_LIB_DIR)/libunwind.a
+COMMON_LINK_FLAGS          += -landroid -llog -latomic -lm -ldl -lc $(ANDROID_STL_LIB_DIR)/libc++_static.a $(ANDROID_STL_LIB_DIR)/libc++abi.a
+
+ifeq (,$(filter android-arm64,$(PROFILES)))
+COMMON_LINK_FLAGS          += $(ANDROID_STL_LIB_DIR)/libandroid_support.a $(ANDROID_STL_LIB_DIR)/libunwind.a
+endif
 
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar

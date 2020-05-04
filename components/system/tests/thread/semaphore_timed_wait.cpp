@@ -13,9 +13,12 @@ int run ()
 
   size_t wait_time = milliseconds () - wait_start_time;
 
-//  printf ("wait time = %u\n", wait_time);
+  bool finished_in_time = wait_time > 90 && wait_time < 500;
 
-  printf ("sem wait finished in time '%s', result = '%s'\n", wait_time > 99 && wait_time < 200 ? "true" : "false", result ? "true" : "false");
+  printf ("sem wait finished in time '%s', result = '%s'\n", finished_in_time ? "true" : "false", result ? "true" : "false");
+
+  if (!finished_in_time)
+    printf ("wait finished in %u\n", wait_time);
 
   return 0;
 }

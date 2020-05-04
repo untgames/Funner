@@ -13,7 +13,7 @@ else
   COMPONENT_DIRS += tabletos
 endif
 
-ifneq (,$(filter android-arm,$(PROFILES)))
+ifneq (,$(filter android-armv7,$(PROFILES)))
   COMPONENT_DIRS += android_ndk_profiler
 endif
 

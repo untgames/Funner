@@ -48,7 +48,7 @@ ifneq (,$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk google_play_billing
 endif
 
-ifneq (,$(filter android-arm,$(PROFILES)))
+ifneq (,$(filter android-armv7,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += android_ndk_profiler
 endif
 

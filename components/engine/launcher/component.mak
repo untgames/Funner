@@ -76,7 +76,8 @@ ifneq (,$(filter android,$(PROFILES)))
 ENGINE.LAUNCHER.SOURCES.LIBS                    := funner.system #for duplicate JNI_OnLoad in OpenAL32 & system
 endif
 ENGINE.LAUNCHER.SOURCES.android.SOURCE_DIRS     := sources/platform/android
-ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher compile.extern.android_ndk_profiler link.extern.android_ndk_profiler
+ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher
+ENGINE.LAUNCHER.SOURCES.android-armv7.IMPORTS   := compile.extern.android_ndk_profiler link.extern.android_ndk_profiler
 ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_generator
 ENGINE.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS     := sources/platform/tabletos
 ENGINE.LAUNCHER.SOURCES.tabletos.IMPORTS         := compile.engine.core link.engine.launcher

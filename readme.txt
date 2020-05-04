@@ -1,4 +1,4 @@
-Maintained toolsets: msvc, msvc-x64, macosx-10.7, linux, linux-x64, iphone-device-armv7, iphone-device-arm64, iphone-simulator-x86, iphone-simulator-x86-64, android-armv7 
+Maintained toolsets: msvc, msvc-x64, macosx-10.7, linux, linux-x64, iphone-device-armv7, iphone-device-arm64, iphone-simulator-x86, iphone-simulator-x86-64, android-armv7, android-arm64 
 
 Supported MSVS versions - 2012 or newer
 

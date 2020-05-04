@@ -18,9 +18,17 @@ void raise_parser_exception (const ParseNode& node, const char* format, ...)
 
   va_start (args, format);    
 
-  node.Log ().VError (node, format, args);
+  va_list args_copy;
+
+  va_copy (args_copy, args);
+
+  node.Log ().VError (node, format, args_copy);
+
+  va_end (args_copy);
 
   stl::string message = vformat (format, args);
+
+  va_end (args);
 
   throw xtl::format_exception<ParserException> (METHOD_NAME, "%s(%u): node '%s': %s", node.Source (), node.LineNumber (),
     node.Name (), message.c_str ());
