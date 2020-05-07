@@ -44,7 +44,7 @@ ENGINE.FUNNER_LIBRARY.LINK_INCLUDES         :=
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.TYPE     := lipo-lib
 ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
-ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
+ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-arm64 iphone-device-armv7 iphone-simulator-x86 iphone-simulator-x86-64
 
 #Цель - application
 ifneq (,$(filter android,$(PROFILES)))

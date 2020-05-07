@@ -164,6 +164,8 @@ struct screen_keyboard_handle
           if (!IPhoneScreenKeyboardManager::IsScreenKeyboardSupported (name))
             throw xtl::format_operation_exception ("", "Keyboard with name '%s' is not supported", name);
 
+          bool known_type = false;
+
           for (size_t i = 0, count = sizeof (SUPPORTED_PLATFORM_SPECIFIC_KEYBOARDS) / sizeof (*SUPPORTED_PLATFORM_SPECIFIC_KEYBOARDS); i < count; i++)
           {
             const PlatformSpecificKeyboardDesc& keyboard_desc = SUPPORTED_PLATFORM_SPECIFIC_KEYBOARDS [i];
@@ -171,9 +173,13 @@ struct screen_keyboard_handle
             if (!xtl::xstrcmp (keyboard_desc.name, name))
             {
               ui_keyboard_type = keyboard_desc.type;
+              known_type       = true;
               break;
             }
           }
+
+          if (!known_type)
+            throw xtl::make_argument_exception ("", "type", type);
 
           break;
         }

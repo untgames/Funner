@@ -16,7 +16,7 @@ namespace detail
 {
 
 /*
-    Получение указателя на компоненты
+    Get pointers to components
 */
 
 template <class T, unsigned int Size>
@@ -68,7 +68,7 @@ inline const T* get_components (const vector<T, 2>& v)
 }
 
 /*
-    Покомпонентные векторные операции
+    Per-component vector operations
 */
 
 struct vec_add {
@@ -152,7 +152,7 @@ struct vec_div_scalar {
 };
 
 /*
-    Векторное присваивание
+    Vector assignment
 */
 
 struct vec_copy {
@@ -192,7 +192,7 @@ struct vec_assign_scalar {
 };
 
 /*
-        Утилиты
+    Utilities
 */
 
 struct vec_neg {
@@ -270,7 +270,7 @@ struct vec_max {
 };
 
 /*
-    Векторное произведение
+    Cross product
 */
 
 struct vec_cross_product {
@@ -320,7 +320,7 @@ inline void init_data (T* start, T* end)
 }
 
 /*
-    Конструкторы
+    Constructors
 */
 
 template <class T, unsigned int Size>
@@ -390,7 +390,7 @@ vector<T, Size>::vector (const vector<value_type, size-1>& v, const value_type& 
 }
 
 /*
-    Присваивание
+    Assignment
 */
 
 template <class T, unsigned int Size> template <unsigned int Size1>
@@ -415,7 +415,7 @@ vector<T, Size>& vector<T, Size>::operator = (const T& a)
 }
 
 /*
-    Операции доступа
+    Indexing
 */
 
 template <class T, unsigned int Size>
@@ -431,7 +431,7 @@ const typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsign
 }
 
 /*
-    Базовые унарные опреации
+    Unary operators
 */
 
 template <class T, unsigned int Size>
@@ -447,7 +447,7 @@ vector<T, Size> vector<T, Size>::operator - () const
 }
 
 /*
-    Базовые бинарные операции
+    Binary operators
 */
 
 template <class T, unsigned int Size>
@@ -535,7 +535,7 @@ vector<T, Size> vector<T, Size>::operator / (const T& a) const
 }
 
 /*
-    Сравнение векторов
+    Comparison
 */
 
 template <class T, unsigned int Size>
@@ -555,7 +555,7 @@ bool vector<T, Size>::operator != (const vector& v) const
 }
 
 /*
-    Утилиты
+    Utilities
 */
 
 template <class T, unsigned int Size> 
@@ -588,7 +588,7 @@ vector<T, Size> max (const vector<T, Size>& a, const vector<T, Size>& b)
 } 
 
 /*
-    Длина и нормализация
+    Length and normalization
 */
 
 template <class T, unsigned int Size> 
@@ -636,7 +636,7 @@ bool equal (const vector<T, Size>& a, const vector<T, Size>& b, const T& eps)
 }
 
 /*
-    Векторное произведение
+    Cross product
 */
 
 template <class T>

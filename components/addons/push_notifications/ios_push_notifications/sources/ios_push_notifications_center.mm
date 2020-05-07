@@ -51,71 +51,37 @@ class IOSCenter
         is_registering_for_notifications    = true;
         register_for_notifications_callback = callback;
 
-        if ([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending)
+        UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+
+        if (properties.IsPresent ("Types"))
         {
-          UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+          common::StringArray params_types = common::split (properties.GetString ("Types"));
 
-          if (properties.IsPresent ("Types"))
+          types = 0;
+
+          for (size_t i = 0, count = params_types.Size (); i < count; i++)
           {
-            common::StringArray params_types = common::split (properties.GetString ("Types"));
+            const char* type = params_types [i];
 
-            types = 0;
-
-            for (size_t i = 0, count = params_types.Size (); i < count; i++)
-            {
-              const char* type = params_types [i];
-
-              if (!xtl::xstrcmp (type, "Badge"))
-                types |= UIUserNotificationTypeBadge;
-              else if (!xtl::xstrcmp (type, "Sound"))
-                types |= UIUserNotificationTypeSound;
-              else if (!xtl::xstrcmp (type, "Alert"))
-                types |= UIUserNotificationTypeAlert;
-              else
-                log.Printf ("Ignored unknown push notification type '%s'", type);
-            }
+            if (!xtl::xstrcmp (type, "Badge"))
+              types |= UIUserNotificationTypeBadge;
+            else if (!xtl::xstrcmp (type, "Sound"))
+              types |= UIUserNotificationTypeSound;
+            else if (!xtl::xstrcmp (type, "Alert"))
+              types |= UIUserNotificationTypeAlert;
+            else
+              log.Printf ("Ignored unknown push notification type '%s'", type);
           }
-
-          NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-          UIUserNotificationSettings* notification_settings = [UIUserNotificationSettings settingsForTypes:types categories:[NSSet set]];
-
-          [[UIApplication sharedApplication] registerUserNotificationSettings:notification_settings];
-          [[UIApplication sharedApplication] registerForRemoteNotifications];
-
-          [pool release];
         }
-        else
-        {
-          UIRemoteNotificationType types = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert;
 
-          if (properties.IsPresent ("Types"))
-          {
-            common::StringArray params_types = common::split (properties.GetString ("Types"));
+        NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-            types = 0;
+        UIUserNotificationSettings* notification_settings = [UIUserNotificationSettings settingsForTypes:types categories:[NSSet set]];
 
-            for (size_t i = 0, count = params_types.Size (); i < count; i++)
-            {
-              const char* type = params_types [i];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:notification_settings];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
 
-              if (!xtl::xstrcmp (type, "Badge"))
-                types |= UIRemoteNotificationTypeBadge;
-              else if (!xtl::xstrcmp (type, "Sound"))
-                types |= UIRemoteNotificationTypeSound;
-              else if (!xtl::xstrcmp (type, "Alert"))
-                types |= UIRemoteNotificationTypeAlert;
-              else
-                log.Printf ("Ignored unknown push notification type '%s'", type);
-            }
-          }
-
-          NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-          [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
-
-          [pool release];
-        }
+        [pool release];
       }
       catch (xtl::exception& e)
       {

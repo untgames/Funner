@@ -1,8 +1,8 @@
 ###################################################################################################
-#Build for iPhone Device 7.0
+#Build for iPhone Device 8.0
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET ?= 7.0
+IPHONEOS_DEPLOYMENT_TARGET ?= 8.0
 
 export IPHONEOS_DEPLOYMENT_TARGET
 

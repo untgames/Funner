@@ -1,5 +1,5 @@
 /*
-   Конструкторы
+   Constructor
 */
 
 template <class T>
@@ -18,7 +18,7 @@ plane<T>::plane (const value_type& in_a, const value_type& in_b, const value_typ
   {}
 
 /*
-   Получение параметров
+   Get parameters
 */
 
 template <class T>
@@ -34,7 +34,7 @@ typename plane<T>::vec_type& plane<T>::normal ()
 }
 
 /*
-   Индексирование
+   Indexing
 */
 
 template <class T>
@@ -50,7 +50,7 @@ const typename plane<T>::value_type& plane<T>::operator [] (unsigned int index) 
 }
 
 /*
-   Сравнение
+   Comparison
 */
 
 template <class T>
@@ -70,7 +70,7 @@ bool plane<T>::operator != (const plane& p) const
 }
 
 /*
-   Проверка эквивалентности
+   Equality check
 */
 
 template <class T>
@@ -88,7 +88,7 @@ bool equal (const plane<T>& p1, const plane<T>& p2, const T& eps)
 }
 
 /*
-   Возвращает нормированную плоскость
+   Get normalized plane
 */
 
 template <class T>
@@ -100,7 +100,7 @@ plane<T> normalize (const plane<T>& p)
 }
 
 /*
-   Возвращает дистанцию от точки до плоскости
+   Get distance from point to plane
 */
 
 template <class T>
@@ -110,7 +110,7 @@ typename plane<T>::value_type distance (const plane<T>& p, const vector<T, 3>& p
 }
 
 /*
-   Возвращает проекцию вектора на плоскость
+   Get projection of vector on plane
 */
 
 template <class T>
@@ -134,7 +134,7 @@ vector<T, 3> project (const plane<T>& p, const vector<T, 3>& v)
 }
 
 /*
-   Возвращает с какой стороны плоскости находится точка
+   Get side where point is located relative to plane
 */
 
 template <class T>
@@ -152,7 +152,7 @@ plane_side side (const plane<T>& p, const vector<T, 3>& point, const T& eps)
 }
 
 /*
-    Возвращает точку пересечения луча с плоскостью
+    Get intersection point of ray and plane
 */
 
 template <class T>

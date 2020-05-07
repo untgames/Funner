@@ -1,7 +1,7 @@
 #ifdef VECMATH_SSE
 
 /*
-    База кватерниона
+    Quaternion base
 */
 
 template <> struct quat_base<float>
@@ -20,7 +20,7 @@ namespace detail
 {
 
 /*
-    Бинарные операции
+    Binary operators
 */
 
 struct quat_add {
@@ -90,7 +90,7 @@ struct quat_div_scalar {
 };
 
 /*
-    Унарные операции
+    unary operators
 */
 
 struct quat_copy {
@@ -147,7 +147,7 @@ struct quat_neg {
 };
 
 /*
-    Умножение на вектор
+    Multiplication by vector
 */
 
 struct quat_mul_vec {
@@ -196,7 +196,7 @@ struct quat_inverse {
 }
 
 /*
-    Конструкторы
+    Constructors
 */
 
 template <class T>
@@ -248,7 +248,7 @@ quat<T>::quat (const quat& q)
 }
 
 /*
-    Присваивание
+    Assignment
 */
 
 template <class T>
@@ -266,7 +266,7 @@ quat<T>& quat<T>::operator = (const quat<T>& q)
 }
 
 /*
-    Индексирование
+    Indexing
 */
 
 template <class T>
@@ -282,7 +282,7 @@ const typename quat<T>::value_type& quat<T>::operator [] (unsigned int index) co
 }
 
 /*
-    Унарные операции
+    Unary operators
 */
 
 template <class T>
@@ -298,7 +298,7 @@ quat<T> quat<T>::operator - () const
 }
 
 /*
-    Бинарные операции
+    Binary operators
 */
 
 template <class T>
@@ -373,7 +373,7 @@ quat<T> quat<T>::operator / (const value_type& a) const
 }
 
 /*
-    Сравнение
+    Comparison
 */
 
 template <class T>  
@@ -407,7 +407,7 @@ bool equal (const quat<T>& a, const quat<T>& b, const T& eps)
 }
 
 /*
-    Умножение кватерниона на вектор
+    Multiplication by vector
 */
 
 template <class T>
@@ -429,7 +429,7 @@ vector<T, Size> operator * (const vector<T, Size>& v, const quat<T>& q)
 }
 
 /*
-    Скалярное произведение
+    Scalar multiplication
 */
 
 template <class T>
@@ -444,7 +444,7 @@ typename quat<T>::value_type inner (const quat<T>& a, const quat<T>& b)
 }
 
 /*
-    Длина / норма / нормирование
+    Length / norm / normalization
 */
 
 template <class T>
@@ -480,7 +480,7 @@ quat<T> normalize (const quat<T>& q)
 }
 
 /*
-    Нахождение обратного кватерниона
+    Inverse quaternion
 */
 
 template <class T>
