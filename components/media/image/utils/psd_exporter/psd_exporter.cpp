@@ -1067,12 +1067,22 @@ void export_data (Params& params)
         image_height = (unsigned int)get_next_higher_power_of_two (image_height);
       }
 
+      bool image_empty = false;
+
+      if (!image_width && !image_height)
+      {
+        image_empty = true;
+        image_width = 1;
+        image_height = 1;
+      }
+
       media::Image image (image_width, image_height, 1, media::PixelFormat_RGBA8, 0);
 
-      if (params.need_pot_extent)
+      if (params.need_pot_extent || image_empty)
         memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());
 
-      convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
+      if (!image_empty)
+        convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
 
       if (params.need_fix_zero_alpha_color)
       {

@@ -1,0 +1,8 @@
+Results of psd_exporter_test17:
+<?xml version="1.0" encoding="utf-8"?>
+<LayerMap TotalWidth="128" TotalHeight="128">
+  <Layer Name="Layer 1" Image="my_layers/my_image_0001.bmp" Left="21" Top="17" Width="89" Height="90" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+  <Layer Name="Layer 6" Image="my_layers/my_image_0002.bmp" Left="0" Top="0" Width="0" Height="0" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
+</LayerMap>
+ae9d447dba84670b2ca0319418cef03e *my_layers/my_image_0001.bmp
+b9087b6187b6627950ef0db04caf9b9a *my_layers/my_image_0002.bmp

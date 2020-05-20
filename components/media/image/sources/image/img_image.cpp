@@ -373,14 +373,25 @@ void Image::Load (const char* file_name)
 
 void Image::Save (const char* file_name, PixelFormat recommended_format, const char* format_specific_flags)
 {
+  static const char* METHOD_NAME = "media::Image::Save";
+
   if (!file_name)
-    throw xtl::make_null_argument_exception ("media::Image::Save", "file_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
     
   if (!format_specific_flags)
-    throw xtl::make_null_argument_exception ("media::Image::Save", "format_specific_flags");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "format_specific_flags");
 
   if (recommended_format < 0 || recommended_format >= PixelFormat_Num)
     throw xtl::make_argument_exception ("media::Image::Save", "recommended_format", recommended_format);
+
+  if (!Width ())
+    throw xtl::format_operation_exception (METHOD_NAME, "image width is 0");
+
+  if (!Height ())
+    throw xtl::format_operation_exception (METHOD_NAME, "image height is 0");
+
+  if (!Depth ())
+    throw xtl::format_operation_exception (METHOD_NAME, "image depth is 0");
 
   if (recommended_format != PixelFormat_Default && recommended_format != Format ())
   {  
@@ -396,7 +407,7 @@ void Image::Save (const char* file_name, PixelFormat recommended_format, const c
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::Image::Save");
+    exception.touch (METHOD_NAME);
     throw;
   }
 }
