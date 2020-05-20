@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* file_names [] = { "data/ape.dae", "data/user_properties.dae" };
+const char* file_names [] = { "data/ape.dae", "data/user_properties.dae", "data/st_tex_coords.dae" };
 
 struct TexmapName
 {

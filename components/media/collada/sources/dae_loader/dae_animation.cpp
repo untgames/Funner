@@ -162,7 +162,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
     if (samples_count < 0)
       samples_count = (int)source_size;
 
-    if (source_size != samples_count)
+    if ((int)source_size != samples_count)
       raise_parser_exception (*sampler, "Incorrect 'sampler', 'source' for id '%s' has different size from previous source", input_source);
   }
 

@@ -400,17 +400,22 @@ class VertexStreamReader
         if (index >= max_count)
           raise_parser_exception (surface_node.First ("p"), "Wrong index %u (max_count=%u)", index, max_count);
            
-        SetField (source + index * stride, fn (*output_vertex));
+        SetField (source + index * stride, stride, fn (*output_vertex));
       }
     }  
     
   private:
 ///Чтение вектора
     template <unsigned int N>
-    void SetField (const float* src, math::vector<float, N>& res)
+    void SetField (const float* src, unsigned int stride, math::vector<float, N>& res)
     {
-      for (unsigned int i=0; i<N; i++)
+      //source data may have fewer components than result vector (i.e. for texcoord, where result is vec3, but source can be vec2)
+      for (unsigned int i=0, count=stl::min (stride, N); i<count; i++)
         res [i] = src [i];
+
+      //zero out unused fields
+      for (unsigned int i=stride; i<N; i++)
+        res [i] = 0;
     }
   
   private:
