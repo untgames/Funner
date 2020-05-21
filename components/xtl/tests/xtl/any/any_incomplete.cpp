@@ -15,7 +15,12 @@ class B: public A
     void test () { printf ("hello from B::test\n"); }
 };
 
+namespace xtl
+{
+
 template class declcast<B, A>;
+
+}
 
 int main ()
 {

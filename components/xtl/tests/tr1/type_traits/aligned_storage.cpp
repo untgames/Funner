@@ -41,7 +41,7 @@ void check (const T&)
    TEST (sizeof(t2) == T::value*2);
    TEST (is_pod<t2>::value == true);
 
-   typedef typename aligned_storage<T::value,-1L>::type t3;
+   typedef typename aligned_storage<T::value,(size_t)-1>::type t3;
 
    t3 as3;
 

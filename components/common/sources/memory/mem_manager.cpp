@@ -16,16 +16,11 @@ struct MemoryManagerImpl
 
 }
 
-typedef Singleton<MemoryManagerImpl> MemoryManagerSingleton;
+typedef Singleton<MemoryManagerImpl, SingletonStaticNoDestroy> MemoryManagerSingleton;
 
 /*
     MemoryManager
 */
-
-Heap& MemoryManager::GetHeap ()
-{
-  return MemoryManagerSingleton::Instance ()->heap;
-}
 
 bool MemoryManager::IsInitialized ()
 {

@@ -103,7 +103,7 @@ template <class T> struct add_pointer;     //добавление указате
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хранилище (буфер) для объекта размером Len и выравниванием Align
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <size_t Len, size_t Align=-1> struct aligned_storage;
+template <size_t Len, size_t Align=(size_t)-1> struct aligned_storage;
 
 #include <xtl/detail/type_traits/intrinsics.inl>
 #include <xtl/detail/type_traits/basic.inl>

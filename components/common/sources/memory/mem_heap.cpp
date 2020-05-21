@@ -5,6 +5,7 @@
 #include <platform/platform.h>
 
 #include <xtl/function.h>
+#include <xtl/string.h>
 
 #include "shared.h"
 
@@ -96,7 +97,7 @@ Heap::Impl::Impl (Heap* heap,ICustomAllocator* allocator)
   default_node.first_child  = NULL;
 
   memset (small_first_free,0,sizeof (small_first_free));
-  strcpy (default_node.name,DEFAULT_NODE_NAME);
+  xtl::xstrcpy (default_node.name,DEFAULT_NODE_NAME);
   
   default_node.stat.Init ();
 }

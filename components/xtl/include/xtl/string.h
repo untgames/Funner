@@ -30,6 +30,8 @@ size_t xstrlen (const wchar_t* s);
     Копирование строк
 */
 
+char*    xstrcpy (char* dst, const char* src);
+wchar_t* xstrcpy (wchar_t* dst, const wchar_t* src);
 char*    xstrncpy (char* dst, const char* src, int length);
 wchar_t* xstrncpy (wchar_t* dst, const wchar_t* src, int length);
 

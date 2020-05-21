@@ -926,7 +926,7 @@ void MacOSXWindowManager::SetCursorPosition (const Point& position)
 
   try
   {
-    CGEventRef event = CGEventCreateMouseEvent (0, kCGEventMouseMoved, new_cursor_position, 0);
+    CGEventRef event = CGEventCreateMouseEvent (0, kCGEventMouseMoved, new_cursor_position, kCGMouseButtonLeft);
 
     if (!event)
       throw xtl::format_operation_exception ("::CGEventCreateMouseEvent", "Can't create mouse event");

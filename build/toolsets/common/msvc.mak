@@ -52,26 +52,6 @@ ifneq (,$(VS130COMNTOOLS))
   PROFILES          += vc13 haswchar  
   COMMON_CFLAGS     += -wd4005
 
-else
-
-ifneq (,$(VS120COMNTOOLS))
-
-  MSVC_PATH         ?= $(VS120COMNTOOLS)../../vc
-  MSVS_COMMON_PATH  ?= $(VS120COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc12 haswchar  
-  COMMON_CFLAGS     += -wd4005
-
-else
-
-ifneq (,$(VS110COMNTOOLS))
-  MSVC_PATH         ?= $(VS110COMNTOOLS)../../vc
-  MSVS_COMMON_PATH  ?= $(VS110COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc11 haswchar
-  COMMON_CFLAGS     += -wd4005
-endif #VS110COMNTOOLS
-
-endif #VS120COMNTOOLS
-
 endif #VS130COMNTOOLS
 
 endif #VS140COMNTOOLS

@@ -363,6 +363,12 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::DefaultRe
     Инстанцирование
 */
 
+namespace render
+{
+
+namespace manager
+{
+
 template class ResourceProxy<TexturePtr>;
 template class ResourceProxy<LowLevelSamplerStatePtr>;
 template class ResourceProxy<LowLevelTextureDescPtr>;
@@ -379,3 +385,7 @@ template class ResourceProxyManager<PrimitivePtr>;
 template class ResourceProxyManager<ProgramPtr>;
 template class ResourceProxyManager<EffectPtr>;
 template class ResourceProxyManager<LowLevelBlendStatePtr>;
+
+}
+
+}

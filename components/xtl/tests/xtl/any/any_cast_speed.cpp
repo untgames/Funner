@@ -10,7 +10,12 @@ struct B : A
   virtual const char* name () const { return "class B"; }
 };
 
+namespace xtl
+{
+
 template class declcast<B*, A*, reinterpret_caster>;
+
+}
 
 int main ()
 {

@@ -119,5 +119,15 @@ void swap (SimplePrimitiveList<T>& list1, SimplePrimitiveList<T>& list2)
     Инстанцирование
 */
 
+namespace render
+{
+
+namespace manager
+{
+
 template class SimplePrimitiveList<Sprite>;
 template class SimplePrimitiveList<Line>;
+
+}
+
+}

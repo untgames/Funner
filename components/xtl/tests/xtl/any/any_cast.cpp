@@ -29,6 +29,9 @@ void print (double x)
   printf ("%g", x);
 }
 
+namespace xtl
+{
+
 template class declcast<B, A>;
 template class declcast<C, A>;
 template class declcast<D, C>;
@@ -42,6 +45,8 @@ template class declcast<A>;
 template class declcast<B>;
 template class declcast<C>;
 template class declcast<D>;
+
+}
 
 namespace test_namespace
 {
@@ -62,9 +67,14 @@ struct Y : X
 
 }
 
+namespace xtl
+{
+
 template class declcast<test_namespace::X>;
 template class declcast<test_namespace::Y>;
 template class declcast<test_namespace::Y, test_namespace::X>;
+
+}
 
 void print (const volatile A& a)
 {

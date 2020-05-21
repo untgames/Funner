@@ -7,8 +7,13 @@ using namespace xtl;
 class A {};
 class B : public A {};
 
+namespace xtl
+{
+
 template class declcast<B, A>;
 template class declcast<A>;
+
+}
 
 int main ()
 {

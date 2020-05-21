@@ -8,9 +8,14 @@ struct A { virtual ~A () {} };
 struct B : public A {};
 struct C : public A {};
 
+namespace xtl
+{
+
 template class declcast<B, A>;
 template class declcast<A, B, dynamic_caster>;
 template class declcast<A, C, dynamic_caster>;
+
+}
 
 int main ()
 {

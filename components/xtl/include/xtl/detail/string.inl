@@ -63,6 +63,34 @@ inline size_t xstrlen (const wchar_t* s)
     Копирование строк
 */
 
+inline char* xstrcpy (char* dst, const char* src)
+{
+  if (!dst || !src)
+    return dst;
+
+  char* start = dst;
+
+  while ((*dst++ = *src++));
+
+  *dst++ = '\0';
+
+  return start;
+}
+
+inline wchar_t* xstrcpy (wchar_t* dst, const wchar_t* src)
+{
+  if (!dst || !src)
+    return dst;
+
+  wchar_t* start = dst;
+
+  while ((*dst++ = *src++));
+
+  *dst++ = L'\0';
+
+  return start;
+}
+
 inline char* xstrncpy (char* dst, const char* src, int length)
 {
   if (!dst || !src)

@@ -149,7 +149,7 @@ struct PrimarySwapChain::Impl : public IViewFrameChangeListener
       *attr++ = in_desc.samples_count;
     }
 
-    *attr++ = (NSOpenGLPixelFormatAttribute)nil;
+    *attr++ = (NSOpenGLPixelFormatAttribute)0;
 
     log.Printf ("...call aglChoosePixelFormat");
 

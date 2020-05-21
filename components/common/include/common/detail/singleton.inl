@@ -85,6 +85,28 @@ inline void SingletonStatic<T>::Destroy (T* object)
 }
 
 /*
+   Размещение не удаляемого синглтона в статической памяти
+*/
+
+template <class T>
+inline T* SingletonStaticNoDestroy<T>::Create ()
+{
+#if __cplusplus < 201103L
+  #error "Unsupported compiler"
+#endif
+
+  static T* object = SingletonStatic<T>::Create();
+
+  return object;
+}
+
+template <class T>
+inline void SingletonStaticNoDestroy<T>::Destroy (T*)
+{
+  //do nothing
+}
+
+/*
     Singleton
 */
 

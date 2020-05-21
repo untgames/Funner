@@ -8,15 +8,31 @@ const size_t MAX_SIZE = 2000;
 
 using namespace common;
 
+struct MyRand
+{
+  size_t next;
+
+  MyRand () : next (0) {}
+
+  size_t operator () (size_t max_rand)
+  {
+    next = next * 1103515245 + 12345;
+
+    return (size_t)(next / 65536) % max_rand;
+  }
+};
+
 int main ()
 {
   printf ("Results of stat_test:\n");
 
   Heap heap;
 
+  MyRand my_rand;
+
   for (size_t i=0;i<TOTAL;i++)
 //    heap.Allocate (i&1023);
-    heap.Allocate (rand () % (MAX_SIZE-MIN_SIZE)+MIN_SIZE);
+    heap.Allocate (my_rand (MAX_SIZE-MIN_SIZE)+MIN_SIZE);
 
   HeapStat stat;
 

@@ -271,7 +271,7 @@ typedef int (UDT::*cmf)(int) const;
 
 //ссылочные типы
 typedef int& r_type;
-typedef const r_type cr_type;
+typedef const int& cr_type;
 
 #ifdef _MSC_VER
   #pragma warning (pop)

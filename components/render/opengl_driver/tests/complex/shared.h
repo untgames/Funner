@@ -51,7 +51,7 @@ using namespace render::low_level;
 #ifdef _MSC_VER
   #define TEST_OFFSETOF(X,Y) offsetof(X,Y)
 #else
-  #define TEST_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+  #define TEST_OFFSETOF(X,Y) ((unsigned int)reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
 #endif
 
 typedef xtl::com_ptr<IDriver>                  DriverPtr;

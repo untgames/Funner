@@ -5,7 +5,7 @@ using namespace render::manager;
 #ifdef _MSC_VER
   #define VERTEX_OFFSETOF(X,Y) offsetof(X,Y)
 #else
-  #define VERTEX_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+  #define VERTEX_OFFSETOF(X,Y) ((unsigned int)reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
 #endif
 
 namespace media
