@@ -1,0 +1,43 @@
+Results of stat_test:
+Statistics:
+	Alloc from system:       107.55M
+	Deallocate to system:    0.00M
+	System alloc calls:      25953
+	System free calls:       0
+	Reserve size:            0.00M
+	Allocate count:          100000
+	Deallocate count:        0
+	Allocate size:           106.17M
+	Deallocate size:         0.00M
+	Medium search:           23741
+	Medium top use count:    42441
+	Medium search steps:     41731
+	Medium max search steps: 4
+	Avg medium steps:        1.76
+	Min block size:          32
+	Max block size:          2304
+Range statistics:
+				 Blocks	Total size
+--------------------------------------------------------------------------------
+	[      16;      31]:      807	   25824
+	[      32;      47]:      783	   37584
+	[      48;      63]:      826	   52864
+	[      64;      79]:      811	   64880
+	[      80;      95]:      790	   75840
+	[      96;     111]:      822	   92064
+	[     112;     127]:      773	   98944
+	[     128;     143]:      771	  111024
+	[     144;     159]:      785	  125600
+	[     160;     175]:      816	  143616
+	[     176;     191]:      779	  149568
+	[     192;     207]:      822	  170976
+	[     208;     223]:      847	  189728
+	[     224;     239]:      770	  184800
+	[     240;     255]:      814	  208384
+	[     255;     383]:     4046	 1372000
+	[     384;     511]:     6203	 2775584
+	[     512;     767]:    12819	 8279088
+	[     768;    1023]:    12831	11548176
+	[    1024;    1535]:    25602	32882864
+	[    1536;    2047]:    25490	45457952
+	[    2048;    3071]:      993	 2123104

@@ -243,7 +243,7 @@ void Heap::Impl::TrimFreePages (size_t limit)
 
 void* Heap::Impl::AllocSmallBlock (size_t size)
 {
-  size_t pool_index = (size + sizeof (unsigned char)) / ALIGN_SIZE;  
+  unsigned char pool_index = static_cast<unsigned char> ((size + sizeof (unsigned char)) / ALIGN_SIZE);
     
   size = (pool_index + 1) * ALIGN_SIZE;  
   

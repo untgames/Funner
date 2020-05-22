@@ -53,8 +53,11 @@ endef
 #Linking (output file name, files list, static libraries directories list,
 #include link symbols list, link flags, def-file, errors file)
 ###################################################################################################
+LINKER_START_GROUP_FLAG := -Wl,--start-group
+LINKER_END_GROUP_FLAG   := -Wl,--end-group
+
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(patsubst %,-F%,$8) $(if $6,$(call tools.link.deffile,$6)) $(if $7, 2> $7) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(LINKER_START_GROUP_FLAG) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(LINKER_END_GROUP_FLAG) $(patsubst %,-F%,$8) $(if $6,$(call tools.link.deffile,$6)) $(if $7, 2> $7) && chmod u+x "$1"
 endef
 #$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(patsubst %,-F%,$8) $(if $6,$(call tools.link.deffile,$6)) $(MAP_FILE_LINK_OPTION_PREFIX)$(basename $1).map $(if $7, 2> $7) && chmod u+x "$1"
 

@@ -1,6 +1,8 @@
-#include <common/heap.h>
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <common/heap.h>
 
 const size_t TOTAL    = 100000;
 const size_t MIN_SIZE = 15;
@@ -10,7 +12,7 @@ using namespace common;
 
 struct MyRand
 {
-  size_t next;
+  uint64_t next;
 
   MyRand () : next (0) {}
 
@@ -18,7 +20,7 @@ struct MyRand
   {
     next = next * 1103515245 + 12345;
 
-    return (size_t)(next / 65536) % max_rand;
+    return (uint64_t)(next / 65536) % max_rand;
   }
 };
 
