@@ -91,7 +91,14 @@ inline void SingletonStatic<T>::Destroy (T* object)
 template <class T>
 inline T* SingletonStaticNoDestroy<T>::Create ()
 {
-#if __cplusplus < 201103L
+#ifdef _MSC_VER
+
+//MSVC 2015 doesn't define correct value for __cplusplus, so use MSVC version check instead
+#if _MSC_VER < 1900
+  #error "MSVC 2015 or later is required"
+#endif
+
+#elif __cplusplus < 201103L
   #error "Unsupported compiler"
 #endif
 
