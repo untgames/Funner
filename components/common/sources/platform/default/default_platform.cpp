@@ -8,7 +8,7 @@ using namespace common;
 
 ICustomAllocator* DefaultPlatform::GetSystemAllocator ()
 {
-  return &*Singleton<MallocAllocator>::Instance ();
+  return &*Singleton<MallocAllocator, SingletonStaticNoDestroy>::Instance ();
 }
 
 /*
