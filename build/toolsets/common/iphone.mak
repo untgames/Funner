@@ -22,6 +22,9 @@ MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 
 include $(TOOLSETS_DIR)/g++.mak
 
+LINKER_START_GROUP_FLAG :=
+LINKER_END_GROUP_FLAG   :=
+
 PROFILES := $(filter-out g++,$(PROFILES))
 
 SOURCE_FILES_SUFFIXES += mm         #Source files extension
