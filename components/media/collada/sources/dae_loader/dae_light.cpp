@@ -86,6 +86,18 @@ void DaeParser::ParseLight (Parser::Iterator light_iter)
       light.SetIntensity (intensity);
     }
   }
+
+  for (Parser::NamesakeIterator technique_iter=light_iter->First ("technique"); technique_iter; ++technique_iter)
+  {
+    const char* profile = get<const char*> (*technique_iter, "profile", "");
+
+    if (!xtl::xstricmp (profile, "MAYA"))
+    {
+      float intensity = get<float> (*technique_iter, "intensity.#text", 1.0f);
+
+      light.SetIntensity (intensity);
+    }
+  }
   
     //чтение параметров источника света
     
