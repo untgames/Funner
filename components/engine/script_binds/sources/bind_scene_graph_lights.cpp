@@ -117,9 +117,11 @@ void bind_light_library (Environment& environment)
     //регистрация операций
 
   lib.Register ("set_LightColor",  make_invoker (&Light::SetLightColor));
+  lib.Register ("set_Intensity",   make_invoker (&Light::SetIntensity));
   lib.Register ("set_Attenuation", make_invoker (&Light::SetAttenuation));
   lib.Register ("set_Range",       make_invoker (&Light::SetRange));
   lib.Register ("get_LightColor",  make_invoker (&Light::LightColor));
+  lib.Register ("get_Intensity",   make_invoker (&Light::Intensity));
   lib.Register ("get_Attenuation", make_invoker (&Light::Attenuation));
   lib.Register ("get_Range",       make_invoker (&Light::Range));
 

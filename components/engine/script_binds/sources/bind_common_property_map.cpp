@@ -29,9 +29,57 @@ template <class Ret> Ret get_property (PropertyMap& properties, const char* name
   return result.value;
 }
 
+template <class Ret> Ret get_property_element (PropertyMap& properties, const char* name, size_t element_index)
+{
+  xtl::uninitialized_storage<Ret> result;
+
+  size_t elements_count = properties.PropertyElementsCount (name);
+
+  if (element_index >= elements_count)
+    throw xtl::make_range_exception ("engine::script_binds::get_property_element", "element_index", element_index, 0u, elements_count);
+
+  result.resize (elements_count);
+
+  properties.GetProperty (name, elements_count, result.data ());
+
+  return result.data () [element_index];
+}
+
+template <class T> void set_property_element (PropertyMap& properties, const char* name, size_t element_index, const T& value)
+{
+  xtl::uninitialized_storage<T> values;
+
+  size_t elements_count = properties.PropertyElementsCount (name);
+
+  if (element_index >= elements_count)
+    throw xtl::make_range_exception ("engine::script_binds::get_property_element", "element_index", element_index, 0u, elements_count);
+
+  values.resize (elements_count);
+
+  properties.GetProperty (name, elements_count, values.data ());
+
+  values.data () [element_index] = value;
+
+  properties.SetProperty (name, elements_count, values.data ());
+}
+
 PropertyMap create_property_map ()
 {
   return PropertyMap ();
+}
+
+void set_vector_array (PropertyMap& properties, const char* name, const math::vec4f& vec1, const math::vec4f& vec2, const math::vec4f& vec3, const math::vec4f& vec4)
+{
+  math::vec4f values [4] = { vec1, vec2, vec3, vec4 };
+
+  properties.SetProperty (name, 4, values);
+}
+
+void set_vector_array (PropertyMap& properties, const char* name, const math::vec4f& vec1, const math::vec4f& vec2, const math::vec4f& vec3)
+{
+  math::vec4f values [3] = { vec1, vec2, vec3 };
+
+  properties.SetProperty (name, 3, values);
 }
 
 }
@@ -84,6 +132,14 @@ void bind_common_property_map (Environment& environment)
   lib.Register ("SetFloat",        make_invoker (implicit_cast<void (PropertyMap::*)(const char*, float)> (&PropertyMap::SetProperty)));
   lib.Register ("SetVector",       make_invoker (implicit_cast<void (PropertyMap::*)(const char*, const math::vec4f&)> (&PropertyMap::SetProperty)));
   lib.Register ("SetMatrix",       make_invoker (implicit_cast<void (PropertyMap::*)(const char*, const math::mat4f&)> (&PropertyMap::SetProperty)));
+  lib.Register ("GetIntegerPropertyElement", make_invoker (&get_property_element<int>));
+  lib.Register ("GetFloatPropertyElement",   make_invoker (&get_property_element<float>));
+  lib.Register ("GetVectorPropertyElement",  make_invoker (&get_property_element<math::vec4f>));
+  lib.Register ("GetMatrixPropertyElement",  make_invoker (&get_property_element<math::mat4f>));
+  lib.Register ("SetIntegerPropertyElement", make_invoker (&set_property_element<int>));
+  lib.Register ("SetFloatPropertyElement",   make_invoker (&set_property_element<float>));
+  lib.Register ("SetVectorPropertyElement",  make_invoker (&set_property_element<math::vec4f>));
+  lib.Register ("SetMatrixPropertyElement",  make_invoker (&set_property_element<math::mat4f>));
 
     //регистрация типов данных
 
