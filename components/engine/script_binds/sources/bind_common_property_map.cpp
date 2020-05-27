@@ -68,20 +68,6 @@ PropertyMap create_property_map ()
   return PropertyMap ();
 }
 
-void set_vector_array (PropertyMap& properties, const char* name, const math::vec4f& vec1, const math::vec4f& vec2, const math::vec4f& vec3, const math::vec4f& vec4)
-{
-  math::vec4f values [4] = { vec1, vec2, vec3, vec4 };
-
-  properties.SetProperty (name, 4, values);
-}
-
-void set_vector_array (PropertyMap& properties, const char* name, const math::vec4f& vec1, const math::vec4f& vec2, const math::vec4f& vec3)
-{
-  math::vec4f values [3] = { vec1, vec2, vec3 };
-
-  properties.SetProperty (name, 3, values);
-}
-
 }
 
 namespace engine
