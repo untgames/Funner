@@ -146,6 +146,8 @@ void VboBuffer::Bind ()
     //установка кэш-переменной
 
   SetContextCacheValue (CacheEntry_BindedVboBuffer, GetId ());
+
+  GetContextManager ().StageRebindNotify (Stage_Input);
 }
 
 /*
