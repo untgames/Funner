@@ -117,6 +117,7 @@ void print (const Slot& slot)
   printf ("    slot '%s':\n", slot.Name ());
 
   printf ("      color %.2f %.2f %.2f %.2f\n", slot.Color ().x, slot.Color ().y, slot.Color ().z, slot.Color ().w);
+  printf ("      dark color %.2f %.2f %.2f %.2f\n", slot.DarkColor ().x, slot.DarkColor ().y, slot.DarkColor ().z, slot.DarkColor ().w);
 
   if (slot.Bone ())
     printf ("      bone name '%s'\n", slot.Bone ()->Name ());

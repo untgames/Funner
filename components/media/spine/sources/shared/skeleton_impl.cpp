@@ -295,16 +295,21 @@ void SkeletonImpl::BuildMeshes ()
 
           //fill texcoords and color
           math::vec4f  color                = current_slot->Color () * current_attachment->Color ();
+          math::vec4f  dark_color           = current_slot->DarkColor ();
           const float* attachment_texcoords = current_attachment->Texcoords ();
 
-          for (unsigned int k = 0; k < 4; k++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
+          for (unsigned int k = 0; k < 4; k++, current_vertex_color_texcoord += 10, attachment_texcoords += 2)
           {
             current_vertex_color_texcoord [0] = color.x;
             current_vertex_color_texcoord [1] = color.y;
             current_vertex_color_texcoord [2] = color.z;
             current_vertex_color_texcoord [3] = color.w;
-            current_vertex_color_texcoord [4] = attachment_texcoords [0];
-            current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
+            current_vertex_color_texcoord [4] = dark_color.x;
+            current_vertex_color_texcoord [5] = dark_color.y;
+            current_vertex_color_texcoord [6] = dark_color.z;
+            current_vertex_color_texcoord [7] = dark_color.w;
+            current_vertex_color_texcoord [8] = attachment_texcoords [0];
+            current_vertex_color_texcoord [9] = 1.f - attachment_texcoords [1];
           }
         }
 
@@ -492,7 +497,8 @@ media::geometry::Mesh SkeletonImpl::CreateMesh ()
 
   position_vertex_format.AddAttribute (media::geometry::VertexAttributeSemantic_Position, media::geometry::VertexAttributeType_Float2, 0);
   color_texcoord_vertex_format.AddAttribute (media::geometry::VertexAttributeSemantic_Color, media::geometry::VertexAttributeType_Float4, 0);
-  color_texcoord_vertex_format.AddAttribute (media::geometry::VertexAttributeSemantic_TexCoord0, media::geometry::VertexAttributeType_Float2, sizeof (float) * 4);
+  color_texcoord_vertex_format.AddAttribute ("aDarkColor", media::geometry::VertexAttributeType_Float4, sizeof (float) * 4);
+  color_texcoord_vertex_format.AddAttribute (media::geometry::VertexAttributeSemantic_TexCoord0, media::geometry::VertexAttributeType_Float2, sizeof (float) * 8);
 
   media::geometry::VertexDeclaration position_vertex_declaration       (position_vertex_format),
                                      color_texcoord_vertex_declaration (color_texcoord_vertex_format);
@@ -582,23 +588,29 @@ float* SkeletonImpl::AddMeshToDrawOrder (unsigned int next_triangle_list_mesh_to
 
   //fill texcoords and color
   math::vec4f  color          = slot->Color () * attachment->Color ();
+  math::vec4f  dark_color     = slot->DarkColor ();
   size_t       texcoords_hash = common::crc32 (attachment_texcoords, vertices_count * 2 * sizeof (float));
 
-  if (color != mesh_desc.color || texcoords_hash != mesh_desc.texcoords_hash)
+  if (color != mesh_desc.color || dark_color != mesh_desc.dark_color || texcoords_hash != mesh_desc.texcoords_hash)
   {
     float* current_vertex_color_texcoord = (float*)color_texcoord_vertex_stream.Data ();
 
-    for (unsigned int i = 0; i < vertices_count; i++, current_vertex_color_texcoord += 6, attachment_texcoords += 2)
+    for (unsigned int i = 0; i < vertices_count; i++, current_vertex_color_texcoord += 10, attachment_texcoords += 2)
     {
       current_vertex_color_texcoord [0] = color.x;
       current_vertex_color_texcoord [1] = color.y;
       current_vertex_color_texcoord [2] = color.z;
       current_vertex_color_texcoord [3] = color.w;
-      current_vertex_color_texcoord [4] = attachment_texcoords [0];
-      current_vertex_color_texcoord [5] = 1.f - attachment_texcoords [1];
+      current_vertex_color_texcoord [4] = dark_color.x;
+      current_vertex_color_texcoord [5] = dark_color.y;
+      current_vertex_color_texcoord [6] = dark_color.z;
+      current_vertex_color_texcoord [7] = dark_color.w;
+      current_vertex_color_texcoord [8] = attachment_texcoords [0];
+      current_vertex_color_texcoord [9] = 1.f - attachment_texcoords [1];
     }
 
     mesh_desc.color          = color;
+    mesh_desc.dark_color     = dark_color;
     mesh_desc.texcoords_hash = texcoords_hash;
 
     color_texcoord_vertex_stream.InvalidateData ();

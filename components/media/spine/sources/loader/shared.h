@@ -284,6 +284,7 @@ class SlotSpineImpl : public Object, public media::spine::SlotImpl
 ///Params
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     math::vec4f             Color          ();
+    math::vec4f             DarkColor      ();
     media::spine::BlendMode BlendMode      ();
     bool                    HasBone        ();
     media::spine::BoneImpl* CreateBoneImpl ();

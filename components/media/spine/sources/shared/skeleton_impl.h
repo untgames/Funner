@@ -111,6 +111,7 @@ class SkeletonImpl : virtual public IObject
       stl::string    material;
       unsigned int   triangles_count;
       math::vec4f    color;
+      math::vec4f    dark_color;
       size_t         index_buffer_hash;
       size_t         texcoords_hash;
 

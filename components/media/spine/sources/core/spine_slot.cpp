@@ -50,6 +50,11 @@ math::vec4f Slot::Color () const
   return impl->Color ();
 }
 
+math::vec4f Slot::DarkColor () const
+{
+  return impl->DarkColor ();
+}
+
 const Bone* Slot::Bone () const
 {
   return impl->Bone ();

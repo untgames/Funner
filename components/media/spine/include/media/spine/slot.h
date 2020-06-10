@@ -38,8 +38,9 @@ class Slot
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Params, returned object is owned by callee.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    math::vec4f               Color () const;  //only color parameter available, darkColor parameter not available
-    const media::spine::Bone* Bone  () const;
+    math::vec4f               Color     () const;
+    math::vec4f               DarkColor () const; //darkColor is all zeroes if it is not available for slot
+    const media::spine::Bone* Bone      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Attachment, returned object is owned by callee.

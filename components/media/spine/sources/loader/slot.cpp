@@ -32,6 +32,14 @@ math::vec4f SlotSpineImpl::Color ()
   return math::vec4f (slot->color.r, slot->color.g, slot->color.b, slot->color.a);
 }
 
+math::vec4f SlotSpineImpl::DarkColor ()
+{
+  if (slot->darkColor)
+    return math::vec4f (slot->darkColor->r, slot->darkColor->g, slot->darkColor->b, slot->darkColor->a);
+  else
+    return math::vec4f ();
+}
+
 media::spine::BlendMode SlotSpineImpl::BlendMode ()
 {
   switch (slot->data->blendMode)
