@@ -2,7 +2,7 @@ Results of stat_test:
 Statistics:
 	Alloc from system:       107.55M
 	Deallocate to system:    0.00M
-	System alloc calls:      25953
+	System alloc calls:      25954
 	System free calls:       0
 	Reserve size:            0.00M
 	Allocate count:          100000

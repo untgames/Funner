@@ -271,7 +271,7 @@ void* Heap::Impl::AllocSmallBlock (size_t size)
     }    
 
     block          = (unsigned char*)AlignPtr ((unsigned char*)page + sizeof (MemPage), ALIGN_SIZE, sizeof (unsigned char) + sizeof (BlockTag));
-    small_page_end = block + page->size;
+    small_page_end = block + page->size - ALIGN_SIZE;  //substract ALIGN SIZE because block is shifted from page start on previous line
     small_page_pos = block + size;
     *block         = pool_index;
   }
