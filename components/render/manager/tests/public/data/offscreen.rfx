@@ -1,4 +1,4 @@
-library "data/shaders/*"
+library "data/shaders_offscreen/*"
 
 //texture for offscreen rendering
 texture "offscreen_color"
