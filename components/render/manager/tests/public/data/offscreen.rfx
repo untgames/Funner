@@ -1,0 +1,118 @@
+library "data/shaders/*"
+
+//texture for offscreen rendering
+texture "offscreen_color"
+{
+  size       1920 1080
+  format     rgb8
+  bind_flags texture render_target
+}
+
+texture "offscreen_depth_stencil"
+{
+  size       1920 1080
+  format     d16
+  bind_flags texture depth_stencil
+}
+
+//blend stage state for rendering solid (non transaparent) geometry
+blend "solid"
+{
+  blend_enable     false //blending is disabled
+  color_write_mask rgba  //write color to all color planes
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "solid"
+{
+  depth_test   true     //z-test is enabled
+  depth_write  true     //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
+}
+
+//default rasterizer stage settings
+rasterizer "default"
+{
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  true   //front faces is described as clockwise
+  cull_mode                back   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "sprites"
+{
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse" "DiffuseTexture"
+}
+
+program "postprocess"
+{
+  shader "postprocess" "glsl.vs" "glsl.ps" //reference to shader source
+
+  framemap "offscreen_color" "DiffuseTexture" "offscreen_sampler"
+}
+
+//texture sampler description
+sampler "default"
+{
+  min_filter      linear            //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//texture sampler description
+sampler "offscreen_sampler"
+{
+  min_filter      linear            //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         0                 //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//description of effects rendering
+effect "main"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  //render solid (non-transaparent) geometry
+  pass
+  {
+    tags                  "offscreen"
+    clear                 all
+    sort                  states
+    color_targets         "offscreen_color_target"
+    depth_stencil_target  "offscreen_depth_stencil_target"
+    blend_state           "solid"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"
+  }
+
+  //render solid (non-transaparent) geometry
+  pass
+  {
+    tags                  "onscreen"                       //render only non-transparent geometry
+    clear                 all                           //clear all render targets & depth-stencil target
+    sort                  states                        //sort geometry for decrease state switches
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+    blend_state           "solid"                       //use blend stage settings for solid geometry
+    depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
+    rasterizer_state      "default"                     //use default rasterizer
+  }
+}

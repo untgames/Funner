@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <layouts>
+    <layout id="layout#1">
+    </layout>
+  </layouts>
+  <texmaps/>
+  <materials>
+    <material id="offscreen_material" name="offscreen_material" program="sprites" layout="layout#1" tags="offscreen">
+      <texmap semantic="diffuse" image="data/bottom.jpg" sampler="default"/>
+    </material>
+    <material id="onscreen_material" name="onscreen_material" program="postprocess" layout="layout#1" tags="onscreen">
+    </material>
+  </materials>
+</material_library>
