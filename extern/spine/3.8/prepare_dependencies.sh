@@ -4,13 +4,15 @@ set -e
 
 rm -rf dependencies
 mkdir dependencies
-git clone https://github.com/EsotericSoftware/spine-runtimes.git dependencies
 cd dependencies
+git init
 git config core.autocrlf input
+git remote add origin https://github.com/EsotericSoftware/spine-runtimes.git
+git fetch --depth 1 origin b67bf992a0349b779aac9f619f027d34e296267c
+git checkout FETCH_HEAD
 git reset --hard
 git rm .gitattributes
 git checkout .
-git checkout b67bf992a0349b779aac9f619f027d34e296267c
 git apply --reject --whitespace=fix ../funner.patch
 mv spine-c/spine-c/include ../include
 rm -rf ../sources
