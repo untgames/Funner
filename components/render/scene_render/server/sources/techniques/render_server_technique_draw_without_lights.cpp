@@ -13,25 +13,26 @@ namespace scene
 namespace server
 {
 
-///Техника рендеринга: отрисовка изображения без освещения
+///Rendering technique: draw without lights
 class DrawWithoutLights: public Technique
 {
   public:
-///Конструктор / деструктор
+///Constructor
     DrawWithoutLights (RenderManager& in_manager, const common::ParseNode& node)
-      : manager (in_manager)
+      : Technique (in_manager, node)
+      , manager (in_manager)
     {
-        //чтение имени эффекта
+        //read configuration
 
       effect_name = common::get<const char*> (node, "effect");
     }
 
-/// Имена для регистрации
+///Registration names
     static const char* ClassName     () { return "draw_without_lights"; }
     static const char* ComponentName () { return "render.scene.server.techniques.draw_without_lights"; }
 
   protected:
-///Данные для рендеринга техники в каждом кадре
+///Render data for each frame
     struct PrivateData
     {
       BasicRendererPtr renderer;
@@ -39,16 +40,16 @@ class DrawWithoutLights: public Technique
       PrivateData (DrawWithoutLights& technique) : renderer (new BasicRenderer (technique.manager, technique.effect_name.c_str ()), false) {}
     };
 
-///Обновление кадра
+///Update frame
     void UpdateFrameCore (RenderingContext& parent_context, TechniquePrivateData& private_data_holder)
     {
       try
       {
-          //получение приватных данных техники
+          //get technique private data
 
         PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
-          //обновление кадра
+          //update frame
 
         private_data.renderer->Draw (parent_context);
       }
@@ -59,15 +60,15 @@ class DrawWithoutLights: public Technique
       }
     }
 
-///Обновление свойств
+///Update properties
     void UpdatePropertiesCore () {}
 
-///Связывание свойств техники с методами техники
+///Binding technique properties with methods
     void BindProperties (common::PropertyBindingMap&) {}
 
   private:
-    RenderManager manager;     //менеджер рендеринга
-    stl::string   effect_name; //имя эффекта
+    RenderManager manager;     //render manager
+    stl::string   effect_name; //effect name
 };
 
 }

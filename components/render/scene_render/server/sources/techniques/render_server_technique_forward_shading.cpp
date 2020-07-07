@@ -32,7 +32,8 @@ class ForwardShading: public Technique
   public:
 ///Конструктор / деструктор
     ForwardShading (RenderManager& in_manager, const common::ParseNode& node)
-      : manager (in_manager)
+      : Technique (in_manager, node)
+      , manager (in_manager)
       , shadow_map_renderer (in_manager, node.First ("shadow_map"))
       , shadows_enabled (true)
     {

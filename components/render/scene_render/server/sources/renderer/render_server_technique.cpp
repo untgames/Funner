@@ -3,39 +3,96 @@
 using namespace render;
 using namespace render::scene::server;
 
+namespace
+{
+
+struct FrameMapDesc
+{
+  manager::Texture color_texture;       //color texture
+  manager::Texture depth_texture;       //depth texture
+  stl::string      color_render_target; //color render target name
+  stl::string      depth_render_target; //depth render target name
+  stl::string      framemap;            //frame map name
+
+  FrameMapDesc (const manager::Texture& in_color_texture, const manager::Texture& in_depth_texture, const char* in_color_render_target,
+                const char* in_depth_render_target, const char* in_framemap)
+    : color_texture (in_color_texture)
+    , depth_texture (in_depth_texture)
+    , color_render_target (in_color_render_target)
+    , depth_render_target (in_depth_render_target)
+    , framemap (in_framemap)
+    {}
+};
+
+typedef stl::vector<FrameMapDesc> FrameMapArray;
+
+}
+
 /*
-    Описание реализации техники рендеринга
+    Rendering technique implementation
 */
 
 struct Technique::Impl
 {
-  stl::string                                           name;                            //имя техники
-  common::PropertyMap                                   properties;                      //свойства
-  common::PropertyMap                                   default_properties;              //свойства по умолчанию
-  common::PropertyMap                                   binded_properties;               //значения свойств после связывания
-  common::PropertyBindingMap                            property_bindings;               //связывание методом техники со свойствами
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> binded_properties_synchronizer;  //синхронизатор свойств после связывания
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> default_properties_synchronizer; //синхронизатор свойств по умолчанию
-  stl::auto_ptr<common::PropertyBindingMapSynchronizer> properties_synchronizer;         //синхронизатор свойств
-  bool                                                  need_update_properties;          //флаг необходимости обновления свойств
-  bool                                                  need_bind_properties;            //флаг необходимости биндинга свойств
-  xtl::auto_connection                                  properties_update_connection;    //соединение с сигналом обновления свойств
-  common::PropertyMap::EventHandler                     properties_update_handler;       //обработчик сигнала обновления свойств
+  stl::string                                           name;                            //technique name
+  common::PropertyMap                                   properties;                      //properties
+  common::PropertyMap                                   default_properties;              //default properties
+  common::PropertyMap                                   binded_properties;               //properties values after binding
+  common::PropertyBindingMap                            property_bindings;               //binding technique methods with properties
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> binded_properties_synchronizer;  //binded properties synchronizer
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> default_properties_synchronizer; //default properties synchronizer
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> properties_synchronizer;         //properties synchronizer
+  bool                                                  need_update_properties;          //is properties update required flag
+  bool                                                  need_bind_properties;            //is properties binding required flag
+  bool                                                  need_bind_framemaps;             //is framemaps binding required flag
+  xtl::auto_connection                                  properties_update_connection;    //properties update connection
+  common::PropertyMap::EventHandler                     properties_update_handler;       //properties update handler
+  FrameMapArray                                         framemaps;                       //framemaps array
   
-///Конструктор
-  Impl ()
-    : need_update_properties (true) 
+///Constructor
+  Impl (RenderManager& manager, const common::ParseNode& node)
+    : need_update_properties (true)
     , need_bind_properties (true)
+    , need_bind_framemaps (true)
   {
+    size_t framemaps_count = 0;
+
+    for (common::ParseNode framemap_node = node.First ("framemap"); framemap_node; framemap_node = framemap_node.NextNamesake (), framemaps_count++);
+
+    framemaps.reserve (framemaps_count);
+
+    for (common::ParseNode framemap_node = node.First ("framemap"); framemap_node; framemap_node = framemap_node.NextNamesake ())
+    {
+      const char* color_texture_name = common::get<const char*> (framemap_node, "color_texture");
+      const char* depth_texture_name = common::get<const char*> (framemap_node, "depth_texture");
+
+      bool color_texture_shared = manager.Manager ().HasSharedTexture (color_texture_name);
+      bool depth_texture_shared = manager.Manager ().HasSharedTexture (depth_texture_name);
+
+      manager::Texture color_texture = color_texture_shared ? manager.Manager ().CreateSharedTexture (color_texture_name) : manager.Manager ().CreateTexture (color_texture_name);
+      manager::Texture depth_texture = depth_texture_shared ? manager.Manager ().CreateSharedTexture (depth_texture_name) : manager.Manager ().CreateTexture (depth_texture_name);
+
+      framemaps.push_back (FrameMapDesc (color_texture,
+                                         depth_texture,
+                                         common::get<const char*> (framemap_node, "color_render_target"),
+                                         common::get<const char*> (framemap_node, "depth_render_target", ""),
+                                         common::get<const char*> (framemap_node, "framemap")));
+
+      if (!color_texture_shared)
+        manager.Manager ().ShareTexture (color_texture_name, color_texture);
+
+      if (!depth_texture_shared)
+        manager.Manager ().ShareTexture (depth_texture_name, depth_texture);
+    }
   }
 };
 
 /*
-    Конструктор / деструктор
+    Constructor / destructor
 */
 
-Technique::Technique ()
-  : impl (new Impl)
+Technique::Technique (RenderManager& manager, const common::ParseNode& node)
+  : impl (new Impl (manager, node))
 {
   impl->properties_update_handler = xtl::bind (&Technique::UpdateProperties, this);
 }
@@ -45,7 +102,7 @@ Technique::~Technique ()
 }
 
 /*
-    Имя техники
+    Technique name
 */
 
 void Technique::SetName (const char* name)
@@ -62,11 +119,7 @@ const char* Technique::Name () const
 }
 
 /*
-    Камера
-*/
-
-/*
-    Свойства по умолчанию
+    Default properties
 */
 
 void Technique::SetDefaultProperties (const common::PropertyMap& properties)
@@ -98,7 +151,7 @@ const common::PropertyMap& Technique::DefaultProperties ()
 }
 
 /*
-    Свойства рендеринга
+    Rendering properties
 */
 
 void Technique::SetProperties (const common::PropertyMap& properties)
@@ -124,7 +177,7 @@ void Technique::UpdateProperties ()
 }
 
 /*
-    Связывание свойств техники с методами техники
+    Binding technique properties with methods
 */
 
 void Technique::BindProperties (common::PropertyBindingMap&)
@@ -132,18 +185,18 @@ void Technique::BindProperties (common::PropertyBindingMap&)
 }
 
 /*
-    Отрисовка
+    Rendering
 */
 
 void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& private_data)
 {
   try
   {
-      //обновление свойств
+      //properties update
 
     if (impl->need_update_properties)
     {
-        //биндинг свойств
+        //properties binding
 
       if (impl->need_bind_properties)
       {        
@@ -156,7 +209,7 @@ void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& pr
         impl->need_bind_properties = false;
       }
 
-        //обновление свойств по умолчанию
+        //default properties binding
 
       if (!impl->default_properties_synchronizer)
       {
@@ -165,30 +218,46 @@ void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& pr
         impl->default_properties_synchronizer->CopyFromPropertyMap (); //updates only once
       }
 
-        //обновление свойств
+        //properties update
 
       if (!impl->properties_synchronizer)
       {
-          //применение свойств по умолчанию
+          //apply default properties
 
         impl->binded_properties_synchronizer->CopyFromPropertyMap ();
         impl->default_properties_synchronizer->CopyFromPropertyMap ();
 
-          //созданеи синхронизатора
+          //create synchronizer
 
         impl->properties_synchronizer.reset (new common::PropertyBindingMapSynchronizer (impl->property_bindings, impl->properties));
       }
 
       impl->properties_synchronizer->CopyFromPropertyMap ();
 
-        //оповещение об обновлении
+        //update notification
 
       UpdatePropertiesCore ();
 
       impl->need_update_properties = false;
     }
 
-      //отрисовка кадра
+    if (impl->need_bind_framemaps)
+    {
+      manager::Frame& frame = context.Frame ();
+
+      for (FrameMapArray::const_iterator iter = impl->framemaps.begin (), end = impl->framemaps.end (); iter != end; ++iter)
+      {
+        frame.SetRenderTarget (iter->color_render_target.c_str (), iter->color_texture.RenderTarget (0, 0));
+        frame.SetLocalTexture (iter->framemap.c_str (), iter->color_texture);
+
+        if (!iter->depth_render_target.empty ())
+          frame.SetRenderTarget (iter->depth_render_target.c_str (), iter->depth_texture.RenderTarget (0, 0));
+      }
+
+      impl->need_bind_framemaps = false;
+    }
+
+      //render frame
 
     UpdateFrameCore (context, private_data);
   }

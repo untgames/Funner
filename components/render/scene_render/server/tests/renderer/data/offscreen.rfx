@@ -1,0 +1,262 @@
+library "data/shaders_offscreen/*"
+
+//texture for offscreen rendering
+texture "offscreen_color_r"
+{
+  size       1920 1080
+  format     rgb8
+  bind_flags texture render_target
+}
+
+texture "offscreen_color_gb"
+{
+  size       1920 1080
+  format     rgb8
+  bind_flags texture render_target
+}
+
+texture "offscreen_depth_stencil"
+{
+  size       1920 1080
+  format     d16
+  bind_flags texture depth_stencil
+}
+
+//blend stage state for rendering solid (non transaparent) geometry
+blend "solid"
+{
+  blend_enable     false //blending is disabled
+  color_write_mask rgba  //write color to all color planes
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "solid"
+{
+  depth_test   true     //z-test is enabled
+  depth_write  true     //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "always_pass"
+{
+  depth_test   false    //z-test is enabled
+  depth_write  false    //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
+}
+
+//default rasterizer stage settings
+rasterizer "default"
+{
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  true   //front faces is described as clockwise
+  cull_mode                back   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "sprites"
+{
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse" "DiffuseTexture"
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "sprites_r"
+{
+  defines "ONLY_R"
+
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse" "DiffuseTexture"
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "sprites_gb"
+{
+  defines "ONLY_GB"
+
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse" "DiffuseTexture"
+}
+
+program "postprocess"
+{
+  shader "postprocess" "glsl.vs" "glsl.ps" //reference to shader source
+
+  framemap "offscreen_r" "DiffuseRTexture" "offscreen_sampler"
+  framemap "offscreen_gb" "DiffuseGBTexture" "offscreen_sampler"
+}
+
+//texture sampler description
+sampler "default"
+{
+  min_filter      linear            //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//texture sampler description
+sampler "offscreen_sampler"
+{
+  min_filter      linear            //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         0                 //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//description of effects rendering
+effect "main_offscreen"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  effect_group "clearing"        //clear frame
+
+  //child effects for rendering geometry in selected light
+  effect_group "lighting_offscreen" //use only effects with tag 'lighting'
+}
+
+//description of effects rendering
+effect "main_onscreen"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  effect_group "clearing"        //clear frame
+
+  //child effects for rendering geometry in selected light
+  effect_group "lighting_onscreen" //use only effects with tag 'lighting'
+}
+
+//description of effects rendering
+effect "lighting_offscreen"
+{
+  tags "lighting_offscreen"
+
+  pass
+  {
+    tags                  "offscreen"
+    program               "sprites_r"
+    clear                 all
+    sort                  states
+    color_targets         "offscreen_color_r_target"
+    depth_stencil_target  "offscreen_depth_stencil_target"
+    blend_state           "solid"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"
+  }
+
+  pass
+  {
+    tags                  "offscreen"
+    program               "sprites_gb"
+    clear                 all
+    sort                  states
+    color_targets         "offscreen_color_gb_target"
+    depth_stencil_target  "offscreen_depth_stencil_target"
+    blend_state           "solid"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"
+  }
+}
+
+//description of effects rendering
+effect "lighting_onscreen"
+{
+  tags "lighting_onscreen"
+
+  pass
+  {
+    tags                  "onscreen"                    //render only non-transparent geometry
+    sort                  states                        //sort geometry for decrease state switches
+    color_targets         "default_color"               //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"       //render to effect depth stencil buffer
+    blend_state           "solid"                       //use blend stage settings for solid geometry
+    depth_stencil_state   "always_pass"                 //use depth stencil stage settings for solid geometry
+    rasterizer_state      "default"                     //use default rasterizer
+  }
+}
+
+effect "clearing"
+{
+  tags "clearing"
+
+  pass
+  {
+    tags                  ""
+    clear                 depth
+    color_targets         "default_color"
+    depth_stencil_target  "default_depth_stencil"
+  }
+}
+
+technique "offscreen"
+{
+  effect  "main_offscreen"                    //name of the root effect for this technique
+
+  program "draw_without_lights" //name of the builtin program for scene enumeration
+  {
+    effect "lighting_offscreen"
+    
+    framemap
+    {
+      color_texture       "offscreen_color_r"
+      depth_texture       "offscreen_depth_stencil"
+      color_render_target "offscreen_color_r_target"
+      depth_render_target "offscreen_depth_stencil_target"
+      framemap            "offscreen_r"
+    }
+    
+    framemap
+    {
+      color_texture       "offscreen_color_gb"
+      depth_texture       "offscreen_depth_stencil"
+      color_render_target "offscreen_color_gb_target"
+      framemap            "offscreen_gb"
+    }
+  }
+}
+
+technique "onscreen"
+{
+  effect  "main_onscreen"                    //name of the root effect for this technique
+
+  program "draw_without_lights" //name of the builtin program for scene enumeration
+  {
+    effect "lighting_onscreen"
+    
+    framemap
+    {
+      color_texture       "offscreen_color_r"
+      depth_texture       "offscreen_depth_stencil"
+      color_render_target "offscreen_color_r_target"
+      depth_render_target "offscreen_depth_stencil_target"
+      framemap            "offscreen_r"
+    }
+    
+    framemap
+    {
+      color_texture       "offscreen_color_gb"
+      depth_texture       "offscreen_depth_stencil"
+      color_render_target "offscreen_color_gb_target"
+      framemap            "offscreen_gb"
+    }
+  }
+}
+
+batch '*'
