@@ -917,6 +917,8 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
 
   size_t texture_id = 0;
 
+  stl::hash_map<stl::hash_key<const char*>, size_t> texture_ids_map;
+
   for (ImageLibrary::ConstIterator iter = model.Images ().CreateIterator (); iter; ++iter)
   {
     const Image& image = *iter;
@@ -948,30 +950,42 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
     if (image_path.empty ())
       image_path = common::notdir (image.Path ());
 
-    if (!params.silent)
-      printf ("  process texture '%s'...", image_path.c_str ());
+    stl::hash_map<stl::hash_key<const char*>, size_t>::iterator texture_iter = texture_ids_map.find(image_path.c_str ());
 
-    TexturePtr texture = load_texture (params, image_path.c_str ());
+    size_t this_texture_id;
 
-    if (!texture)
+    if (texture_iter == texture_ids_map.end ())
     {
+      this_texture_id = texture_id++;
+
       if (!params.silent)
-        printf ("Failed!\n");
+        printf ("  process texture '%s'...", image_path.c_str ());
 
-      throw xtl::format_operation_exception ("::save_images", "Image '%s' not found", image_path.c_str ());
+      TexturePtr texture = load_texture (params, image_path.c_str ());
+
+      if (!texture)
+      {
+        if (!params.silent)
+          printf ("Failed!\n");
+
+        throw xtl::format_operation_exception ("::save_images", "Image '%s' not found", image_path.c_str ());
+      }
+
+      stl::string output_texture_name = get_texture_name (params.output_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), this_texture_id);
+
+      texture->Save (output_texture_name.c_str ());
+
+      texture_ids_map [image_path.c_str ()] = this_texture_id;
+
+      if (!params.silent)
+        printf ("Ok\n");
     }
-      
-    stl::string output_texture_name   = get_texture_name (params.output_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id),
-                material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.material_textures_dir_name.c_str (), image_path.c_str (), texture_id);
+    else
+      this_texture_id = texture_iter->second;
 
-    texture->Save (output_texture_name.c_str ());
+    stl::string material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.material_textures_dir_name.c_str (), image_path.c_str (), this_texture_id);
 
     images_map.insert_pair (image.Id (), material_texture_name.c_str ());
-
-    ++texture_id;
-
-    if (!params.silent)
-      printf ("Ok\n");
   }  
 }
 
