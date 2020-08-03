@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<License SinceDate="2010-08-17" TillDate="2020-07-17" LicenseHash="7dc4061afeb3a04f3d9e0bada4a84f3b">
+<License LicenseHash="2a3ca975ee4de273127703d704288eaa" SinceDate="2020-08-03" TillDate="2030-08-03">
   <AllowedComponents>
     <Component Wildcard="common.zip*"/>
     <Component Wildcard="media.image.loaders*"/>

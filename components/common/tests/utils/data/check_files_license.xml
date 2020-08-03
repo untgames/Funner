@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<License LicenseHash="3dd0ee37913c3966d5ec594e4a1ab4fc" SinceDate="2012-01-11" TillDate="2022-01-11">
+<License LicenseHash="37187de425795f073d88aaeee5993edc" SinceDate="2020-08-03" TillDate="2030-08-03">
   <CheckFiles>
     <File Path="data/valid_license.xml" HashSize="64"/>
     <File Path="data/invalid_license.xml"/>
