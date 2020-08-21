@@ -729,8 +729,14 @@ void FrameImpl::Draw (RenderingContext* previous_context)
     }
     catch (...)
     {
+      if (impl->auto_cleanup_state)
+      {
+        RemoveAllFrames ();
+        RemoveAllEntities ();
+      }
+
       if (!previous_context)
-        Cleanup ();      
+        Cleanup ();
 
       throw;
     }
