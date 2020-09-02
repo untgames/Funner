@@ -15,15 +15,13 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 {
   try
   {
-    common::Heap& heap = *reinterpret_cast<common::Heap*> (user_data);
-
     if (!new_size)
     {
-      heap.Deallocate (ptr);
+      MemoryManager::Deallocate (ptr);
       return 0;
     }
 
-    void* new_buffer = heap.Allocate (new_size);
+    void* new_buffer = MemoryManager::Allocate (new_size);
 
     if (!new_buffer)
       return 0;
@@ -32,7 +30,7 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
     {
       memcpy (new_buffer, ptr, old_size < new_size ? old_size : new_size);
 
-      heap.Deallocate (ptr);
+      MemoryManager::Deallocate (ptr);
     }
 
     return new_buffer;
@@ -52,9 +50,7 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 
 StateHolder::StateHolder ()
 {
-//  state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
-  //state = lua_open ();
-  state = luaL_newstate ();  
+  state = lua_newstate (&reallocate, 0);
 
   if (!state)
     throw xtl::format_exception<InterpreterException> ("script::lua::StateHolder::StateHolder", "Can't create lua state");

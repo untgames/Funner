@@ -212,7 +212,7 @@ class BulletDriverComponent
   public:
     BulletDriverComponent ()
     {
-//      btAlignedAllocSetCustomAligned (&bullet_allocate, &bullet_deallocate);
+      btAlignedAllocSetCustomAligned (&bullet_allocate, &bullet_deallocate);
 
       DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
     }
