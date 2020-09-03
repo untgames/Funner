@@ -27,6 +27,7 @@
 #include <syslib/window.h>
 
 #include <sg/camera.h>
+#include <sg/height_map.h>
 #include <sg/light.h>
 #include <sg/line.h>
 #include <sg/mesh.h>
@@ -40,6 +41,7 @@
 
 #include <sg/controllers/spine_animation.h>
 #include <sg/controllers/spine_skeleton_visual_structure_builder.h>
+#include <sg/controllers/water.h>
 
 #include <render/scene_render_client.h>
 #include <render/scene_render_server.h>

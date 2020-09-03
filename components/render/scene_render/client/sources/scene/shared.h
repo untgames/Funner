@@ -17,6 +17,7 @@
 #include <media/image.h>
 
 #include <sg/dynamic_mesh.h>
+#include <sg/height_map.h>
 #include <sg/light.h>
 #include <sg/line.h>
 #include <sg/mesh.h>
@@ -29,6 +30,7 @@
 #include <shared/client.h>
 #include <shared/scene_manager.h>
 
+#include "dynamic_mesh_helper.h"
 #include "visual_model.h"
 
 namespace render
@@ -62,6 +64,7 @@ Node* create_node (scene_graph::SpriteModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::LineModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::TextModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::ParticleEmitter&, SceneManager& scene_manager);
+Node* create_node (scene_graph::HeightMap&, SceneManager& scene_manager);
 
 ///Получение для scene_graph::SpriteMode соответствующего interchange::SpriteMode
 interchange::SpriteMode get_sprite_mode (scene_graph::SpriteMode sprite_mode);

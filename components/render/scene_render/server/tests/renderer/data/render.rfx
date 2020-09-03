@@ -161,6 +161,14 @@ program "flat"
 }
 
 //program instance for flat program, specified by (material, entity, frame)
+program "water"
+{
+  shader "water" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse"  "DiffuseTexture"
+}
+
+//program instance for flat program, specified by (material, entity, frame)
 program "flat_dynamic"
 {
   shader "flat_dynamic" "glsl.vs" "glsl.ps" //reference to shader source
