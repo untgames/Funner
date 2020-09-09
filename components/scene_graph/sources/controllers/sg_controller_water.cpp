@@ -209,25 +209,24 @@ void Water::PutStorm (const math::vec3f& position, float amplitude, float radius
   if (!impl->height_map)
     return;        
 
-  int    storm_rows    = (int)(impl->height_map->RowsCount () * radius),
-         storm_columns = (int)(impl->height_map->ColumnsCount () * radius),
+  int    storm_cells   = (int)(stl::min (impl->height_map->RowsCount (), impl->height_map->ColumnsCount ()) * radius),
          row           = (int)((position.y + 0.5f) * impl->height_map->RowsCount ()),
          column        = (int)((position.x + 0.5f) * impl->height_map->ColumnsCount ()),
          rows_count    = (int)impl->height_map->RowsCount (),
          columns_count = (int)impl->height_map->ColumnsCount ();
          
-  float max_v = (float)(storm_rows * storm_rows + storm_columns * storm_columns);  
+  float max_v = (float)(2 * storm_cells * storm_cells);
          
-  for (int i=-storm_rows; i<=storm_rows; i++)
+  for (int i=-storm_cells; i<=storm_cells; i++)
   {
-    int affected_row = i + row + storm_rows - 1;
+    int affected_row = i + row + storm_cells - 1;
     
     if (affected_row >= rows_count || affected_row < 0)
       continue;
     
-    for (int j=-storm_columns; j<=storm_columns; j++)
+    for (int j=-storm_cells; j<=storm_cells; j++)
     {
-      int affected_column = j + column + storm_columns - 1;
+      int affected_column = j + column + storm_cells - 1;
       
       if (affected_column >= columns_count || affected_column < 0)
         continue;
