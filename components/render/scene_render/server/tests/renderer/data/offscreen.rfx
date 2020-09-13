@@ -122,6 +122,17 @@ sampler "offscreen_sampler"
 }
 
 //description of effects rendering
+effect "main"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  effect_group "clearing"        //clear frame
+
+  //child effects for rendering geometry in selected light
+  effect_group "lighting" //use only effects with tag 'lighting'
+}
+
+//description of effects rendering
 effect "main_offscreen"
 {
   tags "main_effect_tag" //list of tags for this effect (used in effect_group)
@@ -141,6 +152,25 @@ effect "main_onscreen"
 
   //child effects for rendering geometry in selected light
   effect_group "lighting_onscreen" //use only effects with tag 'lighting'
+}
+
+//description of effects rendering
+effect "lighting"
+{
+  tags "lighting"
+
+  pass
+  {
+    tags                  "offscreen"
+    program               "sprites_r"
+    clear                 all
+    sort                  states
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "solid"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"
+  }
 }
 
 //description of effects rendering
@@ -202,6 +232,16 @@ effect "clearing"
     clear                 depth
     color_targets         "default_color"
     depth_stencil_target  "default_depth_stencil"
+  }
+}
+
+technique "default"
+{
+  effect  "main"                    //name of the root effect for this technique
+
+  program "draw_without_lights" //name of the builtin program for scene enumeration
+  {
+    effect "lighting"
   }
 }
 

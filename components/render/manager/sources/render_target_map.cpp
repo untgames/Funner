@@ -55,12 +55,7 @@ void RenderTargetMapImpl::SetRenderTarget (const char* name, const RenderTargetP
     if (!target)
       throw xtl::make_null_argument_exception ("", "target");
 
-    RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
-
-    if (iter != impl->render_targets.end ())
-      throw xtl::make_argument_exception ("", "name", name, "Render target has already registered");
-
-    impl->render_targets.insert_pair (name, RenderTargetDescPtr (new render::manager::RenderTargetDesc (target, viewport, scissor), false));
+    impl->render_targets [name] = RenderTargetDescPtr (new render::manager::RenderTargetDesc (target, viewport, scissor), false);
   }
   catch (xtl::exception& e)
   {
