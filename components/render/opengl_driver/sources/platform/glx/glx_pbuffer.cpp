@@ -84,8 +84,8 @@ struct PBuffer::Impl
       
         //создание PBuffer
 
-      int pbuffer_attributes []  = { GLX_PBUFFER_WIDTH, desc.frame_buffer.width,
-                                     GLX_PBUFFER_HEIGHT, desc.frame_buffer.height,
+      int pbuffer_attributes []  = { GLX_PBUFFER_WIDTH, (int)desc.frame_buffer.width,
+                                     GLX_PBUFFER_HEIGHT, (int)desc.frame_buffer.height,
                                      GLX_LARGEST_PBUFFER, create_largest_flag,
                                      GLX_PRESERVED_CONTENTS, False};
 

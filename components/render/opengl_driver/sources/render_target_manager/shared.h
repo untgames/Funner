@@ -14,6 +14,8 @@
 #include <render/low_level/utils.h>
 
 #include <shared/context_object.h>
+#include <shared/log.h>
+#include <shared/platform.h>
 #include <shared/render_target_manager.h>
 #include <shared/texture_manager.h>
 

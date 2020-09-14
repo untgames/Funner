@@ -164,15 +164,17 @@ struct PrimarySwapChain::Impl : public IViewFrameChangeListener
     {
       memset (&desc, 0, sizeof (desc));
 
-      NSRect window_rect = ((NSWindow*)in_desc.window_handle).frame;
+      NSWindow* window = (NSWindow*)in_desc.window_handle;
 
-      window_width  = window_rect.size.width;
-      window_height = window_rect.size.height;
+      NSRect window_rect = window.frame;
 
-      window_rect = ((NSWindow*)in_desc.window_handle).contentView.frame;
+      window_width  = window_rect.size.width * window.backingScaleFactor;
+      window_height = window_rect.size.height * window.backingScaleFactor;
 
-      desc.frame_buffer.width        = window_rect.size.width;
-      desc.frame_buffer.height       = window_rect.size.height;
+      window_rect = window.contentView.frame;
+
+      desc.frame_buffer.width        = window_rect.size.width * window.backingScaleFactor;
+      desc.frame_buffer.height       = window_rect.size.height * window.backingScaleFactor;
       desc.frame_buffer.color_bits   = static_cast<size_t> (GetPixelFormatValue (NSOpenGLPFAColorSize));
       desc.frame_buffer.alpha_bits   = static_cast<size_t> (GetPixelFormatValue (NSOpenGLPFAAlphaSize));
       desc.frame_buffer.depth_bits   = static_cast<size_t> (GetPixelFormatValue (NSOpenGLPFADepthSize));

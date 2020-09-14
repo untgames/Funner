@@ -173,11 +173,15 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 namespace
 {
 
+#ifdef HAS_XRANDR
+
 void raise_format_not_supported_exception (const OutputModeDesc& mode_desc)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetModeDesc", 
     "Screen mode '%dx%dx%d@%d' not supported", mode_desc.width, mode_desc.height, mode_desc.color_bits, mode_desc.refresh_rate);
 }
+
+#endif
 
 }
 

@@ -422,11 +422,13 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
                      viewport_hash         = GetViewportHash (render_target_slot),
                      scissor_hash          = GetScissorHash (render_target_slot);
 
+        size_t render_target_height = (current_viewport_hash != viewport_hash || current_scissor_hash != scissor_hash) ? GetRenderTargetHeight (render_target_slot) : 0;
+
         if (current_viewport_hash != viewport_hash)
         {
           const Viewport& viewport = GetViewport (render_target_slot);
 
-          glViewport (viewport.x, viewport.y, viewport.width, viewport.height);
+          glViewport (viewport.x, render_target_height - viewport.y - viewport.height, viewport.width, viewport.height);
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
           glDepthRange  (viewport.min_depth, viewport.max_depth);
@@ -439,10 +441,15 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         
         if (current_scissor_hash != scissor_hash)
         {        
-          const Rect&     scissor  = GetScissor (render_target_slot);
-          const Viewport& viewport = GetViewport (render_target_slot);
+          const Rect& scissor = GetScissor (render_target_slot);
           
-          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? viewport.height - scissor.y - scissor.height: 0, scissor.width, scissor.height);
+          int scissor_bottom = render_target_height - scissor.y - scissor.height,
+              scissor_right  = scissor.width + scissor.x,
+              scissor_top    = scissor.height + scissor_bottom;
+
+          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor_bottom >= 0 ? scissor_bottom : 0,
+                     scissor.x >= 0 ? scissor.width : scissor_right > 0 ? scissor_right : 0,
+                     scissor_bottom >= 0 ? scissor.height : scissor_top > 0 ? scissor_top : 0);
 
           SetContextCacheValue (CacheEntry_ScissorHash0 + render_target_slot, scissor_hash);
         }
@@ -585,7 +592,15 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           {
             const Viewport& viewport = GetViewport (0);
 
-            glScissor (viewport.x >= 0 ? viewport.x : 0, viewport.y >= 0 ? viewport.y : 0, viewport.width, viewport.height);
+            size_t render_target_height = GetRenderTargetHeight (0);
+
+            int scissor_bottom = render_target_height - viewport.y - viewport.height,
+                scissor_right  = viewport.width + viewport.x,
+                scissor_top    = viewport.height + scissor_bottom;
+
+            glScissor (viewport.x >= 0 ? viewport.x : 0, scissor_bottom >= 0 ? scissor_bottom : 0,
+                       viewport.x >= 0 ? viewport.width : scissor_right > 0 ? scissor_right : 0,
+                       scissor_bottom >= 0 ? viewport.height : scissor_top > 0 ? scissor_top : 0);
 
             SetContextCacheValue (CacheEntry_ScissorHash0, viewport_rect_hash);
 
@@ -674,6 +689,28 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderTargetManager::GetCurrentFrameBuffer", "MRT is not yet supported");
 
       return render_target_registry.GetFrameBuffer (render_target_views [0], GetDepthStencilView ());
+    }
+
+///Получение высоты цели рендеринга
+    unsigned int GetRenderTargetHeight (unsigned int render_target_slot)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::RenderTargetManager::GetRenderTargetHeight";
+
+      View* render_target_view = GetRenderTargetView (render_target_slot);
+
+      if (!render_target_view)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get render target view");
+
+      ITexture* render_target_texture = render_target_view->GetTexture ();
+
+      if (!render_target_texture)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get render target texture");
+
+      TextureDesc texture_desc;
+
+      render_target_texture->GetDesc (texture_desc);
+
+      return texture_desc.height;
     }
 
 ///Установка текущих целевых буферов отрисовки в контекст OpenGL

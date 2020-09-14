@@ -337,7 +337,7 @@ class Adapter: virtual public IAdapter, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///SwapChain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ISwapChainImpl: virtual public ISwapChain
+class ISwapChainImpl: virtual public SwapChain
 {
   public:
     virtual Adapter*                    GetAdapterImpl          () = 0; //get adapter implementation

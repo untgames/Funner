@@ -290,11 +290,9 @@ struct EffectRenderer::Impl
   MatrixArray                 mvp_matrices;        //матрицы
   NormalizedScissorArray      normalized_scissors; //нормированные области вывода
   BatchingManagerArray        batching_managers;   //менеджеры пакетирования
-  bool                        right_hand_viewport; //является ли область вывода правосторонней
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
-    , right_hand_viewport (false)
   {
     mvp_matrices.reserve (RESERVE_MVP_MATRIX_ARRAY);
     normalized_scissors.reserve (RESERVE_NORMALIZED_SCISSOR_ARRAY);
@@ -318,10 +316,6 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");                  
-      
-      //получение свойств устройства
-    
-    impl->right_hand_viewport = device_manager->DeviceCaps ().has_right_hand_viewport;
       
       //копирование тэго эффекта в состояние рендера
       
@@ -676,10 +670,9 @@ struct RenderOperationsExecutor
   const MatrixArray&                 mvp_matrices;               //массив матриц Model-View-Projection
   const NormalizedScissorArray&      normalized_scissors;        //нормированные области отсечения
   BatchingManagerArray&              batching_managers;          //менеджеры пакетирования
-  bool                               right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
-  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, const NormalizedScissorArray& in_normalized_scissors, BatchingManagerArray& in_batching_managers, bool in_right_hand_viewport)
+  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, const NormalizedScissorArray& in_normalized_scissors, BatchingManagerArray& in_batching_managers)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
@@ -691,7 +684,6 @@ struct RenderOperationsExecutor
     , mvp_matrices (in_mvp_matrices)
     , normalized_scissors (in_normalized_scissors)
     , batching_managers (in_batching_managers)
-    , right_hand_viewport (in_right_hand_viewport)
   {
       //обновление динамических данных
 
@@ -803,9 +795,6 @@ struct RenderOperationsExecutor
         viewport_desc.height    = rect.height;
         viewport_desc.min_depth = viewport->MinDepth ();
         viewport_desc.max_depth = viewport->MaxDepth ();
-
-        if (right_hand_viewport)
-          viewport_desc.y = height - viewport_desc.height - viewport_desc.y;
       }
       else
       {
@@ -1269,7 +1258,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
   {
       //исполнение операций
 
-    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->normalized_scissors, impl->batching_managers, impl->right_hand_viewport);
+    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->normalized_scissors, impl->batching_managers);
 
     executor.Draw (impl->operations);
   }

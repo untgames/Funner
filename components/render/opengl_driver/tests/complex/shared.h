@@ -144,12 +144,17 @@ struct Test
     {
       syslib::Rect rect = window.ClientRect ();
 
+      unsigned int width  = rect.right - rect.left,
+                   height = rect.bottom - rect.top;
+
+      swap_chain->SetSize (width, height);
+
       Viewport vp;
 
       vp.x         = rect.left;
       vp.y         = rect.top;
-      vp.width     = rect.right - rect.left;
-      vp.height    = rect.bottom - rect.top;
+      vp.width     = width;
+      vp.height    = height;
       vp.min_depth = 0;
       vp.max_depth = 1;
       
@@ -157,9 +162,6 @@ struct Test
       
       device->GetCaps (caps);
       
-//      if (caps.has_right_hand_viewport)
-//        vp.y = window.Height () - vp.height - vp.y;
-
       device->GetImmediateContext ()->RSSetViewport (0, vp);
     }
     catch (std::exception& e)

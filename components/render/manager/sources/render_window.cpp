@@ -182,7 +182,10 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     try
     {
       UpdateSizes (width, height);  
-      
+
+      if (swap_chain)
+        swap_chain->SetSize (width, height);
+
       if (signals [WindowEvent_OnResize].empty ())
         return;
       

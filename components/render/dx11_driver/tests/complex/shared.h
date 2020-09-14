@@ -150,10 +150,6 @@ struct Test
       DeviceCaps caps;
       
       device->GetCaps (caps);
-      
-      if (caps.has_right_hand_viewport)
-        vp.y = window.Height () - vp.height - vp.y;
-
       device->GetImmediateContext ()->RSSetViewport (0, vp);
     }
     catch (std::exception& e)

@@ -57,9 +57,16 @@ struct PrimarySwapChain::Impl
       glx_fb_config = pixel_format.config;
             
         //инициализация дескриптора цепочки обмена
-        
-      desc.frame_buffer.width        = XWidthOfScreen (get_screen (window));
-      desc.frame_buffer.height       = XHeightOfScreen (get_screen (window));
+
+      Window root_return = 0;
+      int x_return = 0, y_return = 0;
+      unsigned int window_width_return, window_height_return, border_width_return = 0, depth_return = 0;
+
+      if (!XGetGeometry (display, window, &root_return, &x_return, &y_return, &window_width_return, &window_height_return, &border_width_return, &depth_return))
+        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PrimarySwapChain::Impl::Impl", "XGetGeometry failed");
+
+      desc.frame_buffer.width        = window_width_return;
+      desc.frame_buffer.height       = window_height_return;
       desc.frame_buffer.color_bits   = pixel_format.color_bits;
       desc.frame_buffer.alpha_bits   = pixel_format.alpha_bits;
       desc.frame_buffer.depth_bits   = pixel_format.depth_bits;
@@ -122,8 +129,7 @@ struct PrimarySwapChain::Impl
       output->SetCurrentMode (mode_desc);
     }
     else
-    {    
-      output->RestoreDefaultMode ();      
+    {      output->RestoreDefaultMode ();      
     }
   }
   

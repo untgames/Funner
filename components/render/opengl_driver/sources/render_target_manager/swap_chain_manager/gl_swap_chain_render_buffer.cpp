@@ -33,6 +33,11 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
 
     if (Object* object = dynamic_cast<Object*> (in_swap_chain))
       frame_buffer_cache_id = object->GetId ();
+
+    SwapChain* swap_chain_impl = dynamic_cast<SwapChain*> (in_swap_chain);
+
+    if (swap_chain_impl)
+      swap_chain_size_change_connection = swap_chain_impl->RegisterSizeChangeHandler (xtl::bind (&SwapChainRenderBuffer::SetSize, this, _1, _2));
   }
   catch (xtl::exception& exception)
   {
@@ -60,6 +65,11 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
     
     if (Object* object = dynamic_cast<Object*> (in_swap_chain))
       frame_buffer_cache_id = object->GetId ();
+
+    SwapChain* swap_chain_impl = dynamic_cast<SwapChain*> (in_swap_chain);
+
+    if (swap_chain_impl)
+      swap_chain_size_change_connection = swap_chain_impl->RegisterSizeChangeHandler (xtl::bind (&SwapChainRenderBuffer::SetSize, this, _1, _2));
   }
   catch (xtl::exception& exception)
   {

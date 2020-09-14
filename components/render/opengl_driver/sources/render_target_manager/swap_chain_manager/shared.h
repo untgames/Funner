@@ -108,10 +108,11 @@ class SwapChainRenderBuffer: public RenderBuffer
     typedef xtl::com_ptr<ISwapChain> SwapChainPtr;    
 
   private:
-    FrameBufferManagerPtr frame_buffer_manager;  //менеджер буферов кадра
-    SwapChainPtr          swap_chain;            //цепочка обмена    
-    unsigned int          frame_buffer_id;       //буфер кадра
-    size_t                frame_buffer_cache_id; //идентификатор цепочки обмена
+    FrameBufferManagerPtr frame_buffer_manager;              //менеджер буферов кадра
+    SwapChainPtr          swap_chain;                        //цепочка обмена
+    unsigned int          frame_buffer_id;                   //буфер кадра
+    size_t                frame_buffer_cache_id;             //идентификатор цепочки обмена
+    xtl::auto_connection  swap_chain_size_change_connection; //соединение оповещения о изменении размеров цепочки обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

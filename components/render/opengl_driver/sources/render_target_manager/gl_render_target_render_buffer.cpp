@@ -234,8 +234,14 @@ void RenderBuffer::GetDesc (TextureDesc& out_desc)
 
 void RenderBuffer::SetSize (unsigned int width, unsigned int height)
 {
+  if (desc.width == width && desc.height == height)
+    return;
+
   desc.width  = width;
   desc.height = height;
+
+  for (unsigned int i = 0, count = CacheEntry_ScissorHash7 - CacheEntry_ScissorHash0; i <= count; i++)
+    SetContextCacheValue (CacheEntry_ScissorHash0 + i, 0);
 }
 
 /*
