@@ -116,9 +116,13 @@ struct PrimarySwapChain::Impl: private IWindowListener
     adapter->GetLibrary ().SetPixelFormat (output_context, pixel_format_index);
 
       //инициализация дескриптора цепочки обмена
+    RECT client_rect;
 
-    desc.frame_buffer.width        = GetDeviceCaps (output_context, HORZRES);
-    desc.frame_buffer.height       = GetDeviceCaps (output_context, VERTRES);
+    if (!GetClientRect (output_window, &client_rect))
+      raise_error ("GetClientRect");
+
+    desc.frame_buffer.width        = client_rect.right - client_rect.left;
+    desc.frame_buffer.height       = client_rect.bottom - client_rect.top;
     desc.frame_buffer.color_bits   = pixel_format.color_bits;
     desc.frame_buffer.alpha_bits   = pixel_format.alpha_bits;
     desc.frame_buffer.depth_bits   = pixel_format.depth_bits;
