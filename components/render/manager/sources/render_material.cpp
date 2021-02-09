@@ -344,7 +344,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
       size_t state_block_mask_hash = mask.Hash ();
 
-//      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash)  //TODO commented because of bug http://jira.untgames.com:8088/browse/FUNNER-20
+//      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash)  //TODO commented because of bug https://jira.untgames.com/browse/FUNNER-41
       {
         if (has_debug_log)
           log.Printf ("...create state block for material");

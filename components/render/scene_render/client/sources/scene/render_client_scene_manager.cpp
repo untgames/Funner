@@ -199,7 +199,7 @@ NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
 
     NodePtr node (SceneFactory::Create (src_node, *this), false);
 
-    if (!node)         //TODO Temprorary fix for http://jira.untgames.com:8088/browse/FUNNER-21
+    if (!node)         //TODO Temprorary fix for https://jira.untgames.com/browse/FUNNER-11
       return node;
 
     iter = impl->nodes.insert_pair (&src_node, node).first;
