@@ -8,7 +8,7 @@ struct syslib::semaphore_handle
 };
 
 //создание семафора
-semaphore_t IPhoneThreadManager::CreateSemaphore (size_t initial_value)
+syslib::semaphore_t IPhoneThreadManager::CreateSemaphore (size_t initial_value)
 {
   stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
 

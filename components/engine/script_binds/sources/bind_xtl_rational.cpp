@@ -26,7 +26,7 @@ inline Invoker make_binary_invoker ()
 }
 
 template <class Ret, class Arg1, class Arg2, template <class, class> class Operation>
-inline Invoker make_binary_invoker ()
+inline Invoker make_comparison_invoker ()
 {
   return make_invoker<Ret (Arg1, Arg2)> (Operation<Arg1, Arg2> ());
 }
@@ -106,9 +106,9 @@ void bind_rational_library (InvokerRegistry& rational_lib)
   rational_lib.Register ("__div", make_invoker (make_binary_invoker<rational_type, rational_type, rational_type, divides> (),
                                            make_binary_invoker<rational_type, rational_type, T, divides> (),
                                            make_binary_invoker<rational_type, T, rational_type, divides> ()));
-  rational_lib.Register ("__eq", make_binary_invoker<bool, rational_type, rational_type, equal_to> ());
-  rational_lib.Register ("__lt", make_binary_invoker<bool, rational_type, rational_type, less> ());
-  rational_lib.Register ("__le", make_binary_invoker<bool, rational_type, rational_type, less_equal> ());
+  rational_lib.Register ("__eq", make_comparison_invoker<bool, rational_type, rational_type, equal_to> ());
+  rational_lib.Register ("__lt", make_comparison_invoker<bool, rational_type, rational_type, less> ());
+  rational_lib.Register ("__le", make_comparison_invoker<bool, rational_type, rational_type, less_equal> ());
 
     //register functions
 
