@@ -28,7 +28,6 @@
 #import <AppKit/NSWindow.h>
 
 #include <ApplicationServices/ApplicationServices.h>
-#include <AGL/agl.h>
 
 namespace render
 {
