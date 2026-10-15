@@ -9,7 +9,40 @@ namespace
 const char* LOG_NAME = "syslib.CarbonTimer";
 
 /*
-    Описание реализации таймера
+    Resources shared by all timers
+*/
+
+struct CarbonTimerResources
+{
+  EventRef    dummy_event;
+  common::Log log;
+
+  CarbonTimerResources ()
+    : dummy_event (0), log (LOG_NAME)
+  {
+    check_event_manager_error (CreateEvent (0, 0, 0, 0, kEventAttributeNone, &dummy_event), "::CreateEvent", "Can't create dummy event");
+  }
+
+  ~CarbonTimerResources ()
+  {
+    if (dummy_event)
+      ReleaseEvent (dummy_event);
+  }
+
+  private:
+    CarbonTimerResources (const CarbonTimerResources&) = delete;
+    CarbonTimerResources& operator = (const CarbonTimerResources&) = delete;
+};
+
+CarbonTimerResources& GetCarbonTimerResources ()
+{
+  static CarbonTimerResources resources;
+
+  return resources;
+}
+
+/*
+    Timer implementation
 */
 
 class CarbonTimer
@@ -25,11 +58,9 @@ class CarbonTimer
     static void TimerProc (EventLoopTimerRef in_timer, void* user_data);
 
   private:
-    EventLoopTimerRef timer;       //таймер
-    TimerHandler      handler;     //обработчик
-    void*             user_data;   //пользовательские данные
-    EventRef          dummy_event; //событие, посылаемое при каждом вызове TimerProc
-    common::Log       log;         //дебаг-лог
+    EventLoopTimerRef timer;       //timer
+    TimerHandler      handler;     //handler
+    void*             user_data;   //user data
 };
 
 }
@@ -39,11 +70,11 @@ class CarbonTimer
 */
 
 CarbonTimer::CarbonTimer (size_t period_in_milliseconds, const TimerHandler& in_handler, void* in_user_data)
-  : timer (0), handler (in_handler), user_data (in_user_data), dummy_event (0), log (LOG_NAME)
+  : timer (0), handler (in_handler), user_data (in_user_data)
 {
   try
   {
-    check_event_manager_error (CreateEvent (0, 0, 0, 0, kEventAttributeNone, &dummy_event), "::CreateEvent", "Can't create dummy event");
+    GetCarbonTimerResources ();
 
     float period_in_seconds = period_in_milliseconds / 1000.f;
 
@@ -63,39 +94,38 @@ CarbonTimer::CarbonTimer (size_t period_in_milliseconds, const TimerHandler& in_
 CarbonTimer::~CarbonTimer ()
 {
   RemoveEventLoopTimer (timer);
-
-  if (dummy_event)
-    ReleaseEvent (dummy_event);
 }
 
 void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
 {
   CarbonTimer* carbon_timer = (CarbonTimer*)user_data;
+  CarbonTimerResources& resources = GetCarbonTimerResources ();
 
   try
   {
+    //The handler may destroy this timer; do not access carbon_timer after calling it.
     carbon_timer->handler (carbon_timer->user_data);
 
     EventQueueRef current_event_queue (GetCurrentEventQueue ());
 
-    if (!IsEventInQueue (current_event_queue, carbon_timer->dummy_event))
-      check_event_manager_error (PostEventToQueue (current_event_queue, carbon_timer->dummy_event, kEventPriorityLow),
-                                 "::SendEventToEventTarget", "Can't dispatch dummy event");
+    if (!IsEventInQueue (current_event_queue, resources.dummy_event))
+      check_event_manager_error (PostEventToQueue (current_event_queue, resources.dummy_event, kEventPriorityLow),
+                                 "::PostEventToQueue", "Can't dispatch dummy event");
   }
   catch (xtl::exception& exception)
   {
-    carbon_timer->log.Printf ("Error at TimerProc: '%s'", exception.what ());
+    resources.log.Printf ("Error at TimerProc: '%s'", exception.what ());
     printf ("Error at TimerProc: '%s'\n", exception.what ());
   }
   catch (...)
   {
-    carbon_timer->log.Printf ("Error at TimerProc: unknown exception");
-    printf ("Error at TimerProc: unkn exc\n");
+    resources.log.Printf ("Error at TimerProc: unknown exception");
+    printf ("Error at TimerProc: unknown exception\n");
   }
 }
 
 /*
-    Создание / уничтожение таймера
+    Timer creation / destruction
 */
 
 timer_t CarbonTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
