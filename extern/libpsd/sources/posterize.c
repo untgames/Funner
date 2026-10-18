@@ -23,6 +23,7 @@
  * $Id: posterize.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -37,7 +38,7 @@ extern void psd_adjustment_blend_image(psd_context * context, psd_layer_record *
 psd_status psd_get_layer_posterize(psd_context * context, psd_layer_record * layer)
 {
 	psd_layer_posterize * data;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_posterize;
 	layer->layer_type = psd_layer_type_posterize;
 
@@ -76,7 +77,7 @@ psd_bool psd_layer_blend_posterize(psd_context * context, psd_layer_record * lay
 	}
 	if(data == NULL)
 		return psd_false;
-	
+
 	if(layer->adjustment_valid == psd_true)
 	{
 		reciprocal = 255.0f / data->levels;
@@ -90,7 +91,7 @@ psd_bool psd_layer_blend_posterize(psd_context * context, psd_layer_record * lay
 	psd_adjustment_blend_image(context, layer, dst_rect, data->lookup_table);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

@@ -23,6 +23,7 @@
  * $Id: pattern_fill.c, created by Patrick in 2006.06.21, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -37,7 +38,7 @@ psd_status psd_get_layer_pattern_fill(psd_context * context, psd_layer_record * 
 	psd_int number_items;
 	psd_uint type, key, rootkey;
 	psd_uchar keychar[256];
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_pattern_fill;
 	layer->layer_type = psd_layer_info_type_pattern_fill;
 
@@ -87,11 +88,11 @@ psd_status psd_get_layer_pattern_fill(psd_context * context, psd_layer_record * 
 		{
 			case 'Scl ':
 				psd_assert(type == 'UntF');
-				
+
 				// '#Prc' = percent:
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Prc');
-								
+
 				// Actual value (double)
 				data->scale = (psd_int)psd_stream_get_double(context);
 				break;

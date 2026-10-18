@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -39,7 +40,7 @@ extern void psd_adjustment_blend_image(psd_context * context, psd_layer_record *
 psd_status psd_get_layer_brightness_contrast(psd_context * context, psd_layer_record * layer)
 {
 	psd_layer_brightness_contrast * data;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_brightness_contrast;
 	layer->layer_type = psd_layer_type_brightness_contrast;
 
@@ -80,7 +81,7 @@ psd_bool psd_layer_blend_brightness_contrast(psd_context * context, psd_layer_re
 	}
 	if(data == NULL)
 		return psd_false;
-	
+
 	if(layer->adjustment_valid == psd_true)
 	{
 		if(data->brightness != 0 && data->contrast != 0)
@@ -114,7 +115,7 @@ psd_bool psd_layer_blend_brightness_contrast(psd_context * context, psd_layer_re
 	psd_adjustment_blend_image(context, layer, dst_rect, data->lookup_table);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

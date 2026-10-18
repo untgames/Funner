@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -39,7 +40,7 @@ extern void psd_bitmap_gaussian_blur_alpha_channel(psd_bitmap * bitmap, psd_doub
 static void psd_set_layer_bevel_emboss_default(psd_layer_effects_bevel_emboss * bevel_emboss)
 {
 	psd_int i;
-	
+
 	bevel_emboss->style = psd_bevel_inner_bevel;
 	bevel_emboss->technique = psd_technique_slope_limit;
 	bevel_emboss->direction = psd_direction_up;
@@ -50,7 +51,7 @@ static void psd_set_layer_bevel_emboss_default(psd_layer_effects_bevel_emboss * 
 	bevel_emboss->angle = 120;
 	bevel_emboss->use_global_light = psd_true;
 	bevel_emboss->altitude = 30;
-	
+
 	for(i = 0; i < 256; i ++)
 		bevel_emboss->gloss_contour_lookup_table[i] = i;
 	bevel_emboss->gloss_anti_aliased = psd_false;
@@ -83,7 +84,7 @@ psd_status psd_get_layer_bevel_emboss(psd_context * context, psd_layer_effects_b
 
 	// Size of the remaining items (58 for version 0, 78 for version 20
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 0 for Photoshop 5.0; 2 for 5.5
 	version = psd_stream_get_int(context);
 	if(version != 0 && version != 2)
@@ -103,7 +104,7 @@ psd_status psd_get_layer_bevel_emboss(psd_context * context, psd_layer_effects_b
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	bevel_emboss->highlight_blend_mode = psd_stream_get_blend_mode(context);
 
@@ -112,7 +113,7 @@ psd_status psd_get_layer_bevel_emboss(psd_context * context, psd_layer_effects_b
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	bevel_emboss->shadow_blend_mode = psd_stream_get_blend_mode(context);
 
@@ -158,7 +159,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_bevel_emboss_default(bevel_emboss);
 
 	// Unicode string: name from classID
@@ -224,7 +225,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 				else if(strcmp(keychar, "phase") == 0)
 				{
 					psd_assert(type == 'Objc');
-					psd_stream_get_object_point(&bevel_emboss->texture_horz_phase, 
+					psd_stream_get_object_point(&bevel_emboss->texture_horz_phase,
 						&bevel_emboss->texture_vert_phase, context);
 				}
 				else
@@ -233,7 +234,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 					psd_stream_get_object_null(type, context);
 				}
 				break;
-				
+
 			// effect enable
 			case 'enab':
 				psd_assert(type == 'bool');
@@ -257,7 +258,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 			case 'hglC':
 				// Descriptor
 				psd_assert(type == 'Objc');
-				bevel_emboss->highlight_color = bevel_emboss->real_highlight_color = 
+				bevel_emboss->highlight_color = bevel_emboss->real_highlight_color =
 					psd_stream_get_object_color(context);
 				break;
 
@@ -288,7 +289,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 			case 'sdwC':
 				// Descriptor
 				psd_assert(type == 'Objc');
-				bevel_emboss->shadow_color = bevel_emboss->real_shadow_color = 
+				bevel_emboss->shadow_color = bevel_emboss->real_shadow_color =
 					psd_stream_get_object_color(context);
 				break;
 
@@ -314,7 +315,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 				psd_assert(key == 'bvlT');
 				bevel_emboss->technique = psd_stream_get_object_technique(context);
 				break;
-				
+
 			// style
 			case 'bvlS':
 				psd_assert(type == 'enum');
@@ -360,7 +361,7 @@ psd_status psd_get_layer_bevel_emboss2(psd_context * context, psd_layer_effects_
 						break;
 				}
 				break;
-				
+
 			// use global light
 			case 'uglg':
 				psd_assert(type == 'bool');
@@ -530,12 +531,12 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 		angle = bevel_emboss->angle;
 		altitude = bevel_emboss->altitude;
 	}
-	distance_x = -(psd_int)(bevel_emboss->size * cos(PSD_PI * angle / 180) * 
+	distance_x = -(psd_int)(bevel_emboss->size * cos(PSD_PI * angle / 180) *
 		cos(PSD_PI * altitude / 180) + 0.5);
 	distance_y = (psd_int)(bevel_emboss->size * sin(PSD_PI * angle / 180) *
 		cos(PSD_PI * altitude / 180) + 0.5);
 
-	for(index = psd_layer_effects_bevel_emboss_outer_shadow; 
+	for(index = psd_layer_effects_bevel_emboss_outer_shadow;
 		index <= psd_layer_effects_bevel_emboss_texture; index ++)
 	{
 		data->left[index] = -bevel_emboss->size * 2;
@@ -545,7 +546,7 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 		data->right[index] = data->left[index] + width;
 		data->bottom[index] = data->top[index] + height;
 	}
-	
+
 	data->blend_mode[psd_layer_effects_bevel_emboss_outer_shadow] = bevel_emboss->shadow_blend_mode;
 	data->opacity[psd_layer_effects_bevel_emboss_outer_shadow] = bevel_emboss->shadow_opacity;
 	data->blend_mode[psd_layer_effects_bevel_emboss_outer_light] = bevel_emboss->highlight_blend_mode;
@@ -557,7 +558,7 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 	data->blend_mode[psd_layer_effects_bevel_emboss_texture] = psd_blend_mode_overlay;
 	data->opacity[psd_layer_effects_bevel_emboss_texture] = bevel_emboss->texture_depth * 255 / 100;
 
-	for(index = psd_layer_effects_bevel_emboss_outer_shadow; 
+	for(index = psd_layer_effects_bevel_emboss_outer_shadow;
 		index <= psd_layer_effects_bevel_emboss_texture; index ++)
 	{
 		if(index == psd_layer_effects_bevel_emboss_texture)
@@ -599,7 +600,7 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 					break;
 			}
 		}
-		
+
 		if(data->image_data[index] != NULL)
 		{
 			if(data->width[index] != width ||
@@ -649,16 +650,16 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 			dst_bmp.image_data = data->image_data[psd_layer_effects_bevel_emboss_outer_light];
 			psd_bitmap_knock_out(&dst_bmp, &shadow_bmp);
 			break;
-			
+
 		case psd_bevel_inner_bevel:
 			break;
-			
+
 		case psd_bevel_emboss:
 			break;
-			
+
 		case psd_bevel_pillow_emboss:
 			break;
-			
+
 		case psd_bevel_stroke_emboss:
 			break;
 	}
@@ -666,7 +667,7 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 	memcpy(&layer_mask_info, &layer->layer_mask_info, sizeof(psd_layer_mask_info));
 	if(layer_mask_info.disabled == psd_false && (layer_mask_info.default_color != 255 || layer_mask_info.mask_data != NULL))
 	{
-		for(index = psd_layer_effects_bevel_emboss_outer_shadow; 
+		for(index = psd_layer_effects_bevel_emboss_outer_shadow;
 			index <= psd_layer_effects_bevel_emboss_texture; index ++)
 		{
 			if(data->image_data[index] != NULL && data->opacity[index] > 0)
@@ -680,13 +681,13 @@ psd_status psd_layer_effects_blend_bevel_emboss(psd_context * context, psd_layer
 		}
 	}
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, bevel_emboss->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, bevel_emboss->contour_lookup_table,
 		psd_true, psd_true);
 
 	psd_free_bitmap(&shadow_bmp);
-	
+
 	data->valid[psd_layer_effects_type_bevel_emboss] = psd_false;
-	
+
 	return psd_status_done;
 }
 

@@ -23,6 +23,7 @@
  * $Id: effects.c, created by Patrick in 2006.05.23, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -73,7 +74,7 @@ psd_status psd_get_layer_effects(psd_context * context, psd_layer_record * layer
 	psd_layer_effects * data;
 	psd_int i, size;
 	psd_uint tag;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_effects;
 
 	data = (psd_layer_effects *)psd_malloc(sizeof(psd_layer_effects));
@@ -115,7 +116,7 @@ psd_status psd_get_layer_effects(psd_context * context, psd_layer_record * layer
 				// Unused: always 0
 				psd_stream_get_short(context);
 				break;
-				
+
 			case 'dsdw':	// drop shadow
 				psd_get_layer_drop_shadow(context, &data->drop_shadow);
 				data->fill[psd_layer_effects_type_drop_shadow] = psd_true;
@@ -146,7 +147,7 @@ psd_status psd_get_layer_effects(psd_context * context, psd_layer_record * layer
 				data->fill[psd_layer_effects_type_color_overlay] = psd_true;
 				data->valid[psd_layer_effects_type_color_overlay] = psd_true;
 				break;
-				
+
 			default:
 				psd_assert(0);
 				return psd_status_unsupport_effects_type;
@@ -163,7 +164,7 @@ psd_status psd_get_layer_effects2(psd_context * context, psd_layer_record * laye
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_effects2;
 
 	data = (psd_layer_effects *)psd_malloc(sizeof(psd_layer_effects));
@@ -172,7 +173,7 @@ psd_status psd_get_layer_effects2(psd_context * context, psd_layer_record * laye
 	memset(data, 0, sizeof(psd_layer_effects));
 	layer->layer_info_data[layer->layer_info_count] = (psd_uint)(void *)data;
 	layer->layer_info_count ++;
-	
+
 	// Object effects version: 0
 	if(psd_stream_get_int(context) != 0)
 		return psd_status_effects_unsupport_version;
@@ -195,7 +196,7 @@ psd_status psd_get_layer_effects2(psd_context * context, psd_layer_record * laye
 
 	// Number of items in descriptor
 	number_items = psd_stream_get_int(context);
-	
+
 	while(number_items--)
 	{
 		length = psd_stream_get_int(context);
@@ -358,7 +359,7 @@ psd_status psd_layer_effects_update(psd_layer_record * layer, psd_layer_effects_
 {
 	psd_layer_effects * data = NULL;
 	psd_int i;
-	
+
 	if(layer == NULL)
 		return psd_status_invalid_layer;
 	if(type < 0 || type >= psd_layer_effects_type_count)
@@ -374,7 +375,7 @@ psd_status psd_layer_effects_update(psd_layer_record * layer, psd_layer_effects_
 	}
 	if(data == NULL)
 		return psd_status_invalid_layer_effects;
-	
+
 	data->valid[type] = psd_true;
 
 	return psd_status_done;
@@ -383,7 +384,7 @@ psd_status psd_layer_effects_update(psd_layer_record * layer, psd_layer_effects_
 
 #ifdef PSD_SUPPORT_EFFECTS_BLEND
 
-static void psd_layer_blend_effects_image(psd_context * context, psd_layer_record * layer, 
+static void psd_layer_blend_effects_image(psd_context * context, psd_layer_record * layer,
 	psd_rect * dst_rect, psd_layer_effects * data, psd_int index)
 {
 	psd_rect layer_rect, mask_rect;
@@ -391,7 +392,7 @@ static void psd_layer_blend_effects_image(psd_context * context, psd_layer_recor
 
 	if(data->image_data[index] == NULL || data->opacity[index] == 0)
 		return;
-	
+
 	memcpy(&effects_layer, layer, sizeof(psd_layer_record));
 	effects_layer.left = data->left[index] + layer->left;
 	effects_layer.top = data->top[index] + layer->top;
@@ -414,7 +415,7 @@ static void psd_layer_blend_effects_image(psd_context * context, psd_layer_recor
 			if(psd_incept_rect(&mask_rect, &layer_rect, &layer_rect) == psd_false)
 				return;
 		}
-		
+
 		if(psd_layer_check_restricted(context, &effects_layer) == psd_true)
 		{
 			if(effects_layer.blend_mode != psd_blend_mode_normal ||
@@ -492,9 +493,9 @@ psd_bool psd_layer_effects_blend_background(psd_context * context, psd_layer_rec
 
 		if(i == psd_layer_effects_type_bevel_emboss)
 		{
-			psd_layer_blend_effects_image(context, layer, dst_rect, data, 
+			psd_layer_blend_effects_image(context, layer, dst_rect, data,
 				psd_layer_effects_bevel_emboss_outer_shadow);
-			psd_layer_blend_effects_image(context, layer, dst_rect, data, 
+			psd_layer_blend_effects_image(context, layer, dst_rect, data,
 				psd_layer_effects_bevel_emboss_inner_shadow);
 		}
 		else
@@ -513,7 +514,7 @@ psd_bool psd_layer_effects_blend_foreground(psd_context * context, psd_layer_rec
 
 	if(layer->image_data == NULL || layer->width <= 0 || layer->height <= 0)
 		return psd_false;
-	
+
 	for(i = 0; i < layer->layer_info_count; i ++)
 	{
 		if(layer->layer_info_type[i] == psd_layer_info_type_effects2)
@@ -602,17 +603,17 @@ psd_bool psd_layer_effects_blend_foreground(psd_context * context, psd_layer_rec
 			default:
 				continue;
 		}
-		
+
 		if(data->image_data[i] == NULL)
 			continue;
 
 		if(i == psd_layer_effects_type_bevel_emboss)
 		{
-			psd_layer_blend_effects_image(context, layer, dst_rect, data, 
+			psd_layer_blend_effects_image(context, layer, dst_rect, data,
 				psd_layer_effects_bevel_emboss_outer_light);
-			psd_layer_blend_effects_image(context, layer, dst_rect, data, 
+			psd_layer_blend_effects_image(context, layer, dst_rect, data,
 				psd_layer_effects_bevel_emboss_inner_light);
-			psd_layer_blend_effects_image(context, layer, dst_rect, data, 
+			psd_layer_blend_effects_image(context, layer, dst_rect, data,
 				psd_layer_effects_bevel_emboss_texture);
 		}
 		else
@@ -641,14 +642,14 @@ void psd_effects_add_noise(psd_bitmap * bitmap, psd_int noise, psd_int left, psd
 	{
 		if(i + top >= context->height)
 			break;
-		
+
 		src_data = bitmap->image_data + i * bitmap->width + PSD_MAX(-left, 0);
 		rand_data = context->rand_data + (i + top) * context->width + left;
 		for(j = PSD_MAX(-left, 0); j < width; j ++, src_data ++, rand_data ++)
 		{
 			if(j + left >= context->width)
 				break;
-			
+
 			x = j + (*rand_data >> 4) - 8;
 			y = i + (*rand_data & 0x0F) - 8;
 			x = (x + j) >> 1;
@@ -695,13 +696,13 @@ void psd_effects_add_noise(psd_bitmap * bitmap, psd_int noise, psd_int left, psd
 	}
 }
 
-void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden, 
+void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden,
 	psd_int jitter, psd_int left, psd_int top, psd_context * context)
 {
 	psd_int i, j, alpha, gradient_index;
 	psd_argb_color * dst_data;
 	psd_uchar * rand_data;
-	
+
 	if(jitter > 0)
 	{
 		jitter = jitter * 256 / 100;
@@ -709,7 +710,7 @@ void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_t
 		{
 			if(i + top >= context->height)
 				break;
-			
+
 			dst_data = bitmap->image_data + i * bitmap->width + PSD_MAX(-left, 0);
 			rand_data = context->rand_data + (i + top) * context->width + left;
 			for(j = PSD_MAX(-left, 0); j < bitmap->width; j ++, dst_data ++, rand_data ++)
@@ -720,7 +721,7 @@ void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_t
 				gradient_index = 255 - alpha;
 				gradient_index += jitter * *rand_data >> 8;
 				gradient_index &= 0xFF;
-				
+
 				if(edge_hidden == psd_true && alpha < 24)
 				{
 					if(PSD_GET_ALPHA_COMPONENT(gradient_table[gradient_index]) != 255)
@@ -729,7 +730,7 @@ void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_t
 					}
 					else
 					{
-						*dst_data = (gradient_table[gradient_index] & 0x00FFFFFF) | 
+						*dst_data = (gradient_table[gradient_index] & 0x00FFFFFF) |
 							(alpha * 10 * PSD_GET_ALPHA_COMPONENT(gradient_table[gradient_index]) >> 8 << 24);
 					}
 				}
@@ -754,7 +755,7 @@ void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_t
 				}
 				else
 				{
-					*dst_data = (gradient_table[255 - alpha] & 0x00FFFFFF) | 
+					*dst_data = (gradient_table[255 - alpha] & 0x00FFFFFF) |
 						(alpha * 10 * PSD_GET_ALPHA_COMPONENT(gradient_table[255 - alpha]) >> 8 << 24);
 				}
 			}
@@ -786,7 +787,7 @@ void psd_layer_effects_free(psd_uint layer_info)
 {
 	psd_layer_effects * data;
 	psd_int i;
-	
+
 	data = (psd_layer_effects *)layer_info;
 	if(data == NULL)
 		return;

@@ -23,6 +23,7 @@
  * $Id: color_overlay.c, created by Patrick in 2006.05.23, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -49,7 +50,7 @@ psd_status psd_get_layer_color_overlay(psd_context * context, psd_layer_effects_
 
 	// Size: 34
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 2
 	version = psd_stream_get_int(context);
 	if(version != 2)
@@ -58,7 +59,7 @@ psd_status psd_get_layer_color_overlay(psd_context * context, psd_layer_effects_
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Key for blend mode
 	color_overlay->blend_mode = psd_stream_get_blend_mode(context);
 
@@ -82,7 +83,7 @@ psd_status psd_get_layer_color_overlay2(psd_context * context, psd_layer_effects
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_color_overlay_default(color_overlay);
 
 	// Unicode string: name from classID
@@ -126,7 +127,7 @@ psd_status psd_get_layer_color_overlay2(psd_context * context, psd_layer_effects
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -146,7 +147,7 @@ psd_status psd_get_layer_color_overlay2(psd_context * context, psd_layer_effects
 				// Actual value (double)
 				color_overlay->opacity = (psd_int)(psd_stream_get_double(context) * 2.55 + 0.5);
 				break;
-				
+
 			// color or native color
 			case 'Clr ':
 				// Descriptor
@@ -206,7 +207,7 @@ psd_status psd_layer_effects_blend_color_overlay(psd_context * context, psd_laye
 	}
 
 	data->valid[psd_layer_effects_type_color_overlay] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

@@ -23,6 +23,7 @@
  * $Id: file_header.c, created by Patrick in 2006.05.18, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_color.h"
@@ -64,24 +65,24 @@ psd_status psd_get_file_header(psd_context * context)
 		context->height = PSD_CHAR_TO_INT(header.height_of_image);
 		// Supported range is 1 to 30,000
 		psd_assert(context->height >= 1 && context->height <= 30000);
-		
+
 		// The width of the image in pixels
 		context->width = PSD_CHAR_TO_INT(header.width_of_image);
 		// Supported range is 1 to 30,000
 		psd_assert(context->width >= 1 && context->width <= 30000);
-		
+
 		// The number of channels in the image, including any alpha channels
 		context->color_channels = context->channels = PSD_CHAR_TO_SHORT(header.number_of_channels);
 		// Supported range is 1 to 56.
 		psd_assert(context->channels >= 1 && context->channels <= 56);
-		
+
 		// Depth: the number of bits per channel
 		context->depth = PSD_CHAR_TO_SHORT(header.depth);
 		// Supported values are 1, 8, and 16.
 		psd_assert(context->depth == 1 || context->depth == 8 || context->depth == 16);
 		if(context->depth != 1 && context->depth != 8 && context->depth != 16)
 			return psd_status_unsupport_color_depth;
-		
+
 		// The color mode of the file
 		context->color_mode = PSD_CHAR_TO_SHORT(header.color_mode);
 		switch(context->color_mode)
@@ -92,7 +93,7 @@ psd_status psd_get_file_header(psd_context * context)
 			case psd_color_mode_rgb:
 			case psd_color_mode_duotone:
 				break;
-				
+
 			case psd_color_mode_cmyk:
 #ifndef PSD_SUPPORT_CMYK
 				return psd_status_unknown_color_mode;

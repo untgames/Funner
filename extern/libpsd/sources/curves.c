@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -45,7 +46,7 @@ static psd_matrix psd_basis_matrix =
 /*  this can be adjusted to give a finer or coarser curve  */
 #define PSD_CURVES_SUBDIVIDE  512
 
-extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_uchar * red_lookup_table, psd_uchar * green_lookup_table, psd_uchar * blue_lookup_table,
 	psd_bool preserve_luminosity);
 
@@ -85,7 +86,7 @@ psd_status psd_get_layer_curves(psd_context * context, psd_layer_record * layer,
 		if(tag & (1 << i))
 			data->curve_count ++;
 	}
-	
+
 	data->curve = (psd_layer_curves_data *)psd_malloc(data->curve_count * sizeof(psd_layer_curves_data));
 	if(data->curve == NULL)
 		return psd_status_malloc_failed;
@@ -107,7 +108,7 @@ psd_status psd_get_layer_curves(psd_context * context, psd_layer_record * layer,
 				count ++;
 			}
 		}
-		
+
 		// Count of points in the curve (psd_short integer from 2...19)
 		data->curve[i].point_count = psd_stream_get_short(context);
 		psd_assert(data->curve[i].point_count >= 2 && data->curve[i].point_count <= 19);
@@ -142,7 +143,7 @@ psd_status psd_get_layer_curves(psd_context * context, psd_layer_record * layer,
 		psd_assert(curve_count == data->curve_count);
 		if(curve_count != data->curve_count)
 			return psd_status_done;
-		
+
 		// The following is the data for each curve specified by count above
 		for(i = 0; i < data->curve_count; i ++)
 		{
@@ -153,7 +154,7 @@ psd_status psd_get_layer_curves(psd_context * context, psd_layer_record * layer,
 			psd_assert(point_count == data->curve[i].point_count);
 			if(point_count != data->curve[i].point_count)
 				return psd_status_done;
-			
+
 			for(j = 0; j < point_count; j ++)
 			{
 				// Curve points. Each curve point is a pair of psd_short integers where the
@@ -161,9 +162,9 @@ psd_status psd_get_layer_curves(psd_context * context, psd_layer_record * layer,
 				// dialog graph) and the second is the input value.
 				output_value = psd_stream_get_short(context);
 				input_value = psd_stream_get_short(context);
-				psd_assert(output_value == data->curve[i].output_value[j] && 
+				psd_assert(output_value == data->curve[i].output_value[j] &&
 					input_value == data->curve[i].input_value[j]);
-				if(output_value != data->curve[i].output_value[j] || 
+				if(output_value != data->curve[i].output_value[j] ||
 					input_value != data->curve[i].input_value[j])
 					return psd_status_done;
 			}
@@ -187,7 +188,7 @@ void psd_layer_curves_free(psd_uint info_data)
 static void psd_curves_compose(psd_matrix a, psd_matrix b, psd_matrix ab)
 {
 	psd_int i, j;
-	
+
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 4; j++)
@@ -295,7 +296,7 @@ static void psd_curves_calculate_table(psd_layer_curves_data * curve, psd_uchar 
 {
 	psd_int i, x, y;
 	psd_int p1, p2, p3, p4;
-	
+
 	/*  Initialize boundary curve points */
 	for(i = 0; i < curve->input_value[0]; i ++)
 		table[i] = (psd_uchar)curve->output_value[0];
@@ -326,7 +327,7 @@ psd_bool psd_layer_blend_curves(psd_context * context, psd_layer_record * layer,
 	psd_int i, j;
 	psd_layer_curves * data = NULL;
 	psd_uchar lookup_table[4][256];
-	
+
 	if(context->color_mode != psd_color_mode_rgb && context->color_mode != psd_color_mode_grayscale)
 		return psd_false;
 
@@ -348,7 +349,7 @@ psd_bool psd_layer_blend_curves(psd_context * context, psd_layer_record * layer,
 			for(j = 0; j < 4; j ++)
 				lookup_table[j][i] = i;
 		}
-		
+
 		for(i = 0; i < data->curve_count; i ++)
 		{
 			if(context->color_mode == psd_color_mode_grayscale)
@@ -371,7 +372,7 @@ psd_bool psd_layer_blend_curves(psd_context * context, psd_layer_record * layer,
 			}
 		}
 	}
-	
+
 	psd_adjustment_blend_rgb(context, layer, dst_rect, data->lookup_table[0],
 		data->lookup_table[1], data->lookup_table[2], psd_false);
 

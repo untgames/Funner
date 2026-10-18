@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -52,7 +53,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_gradient_overlay_default(gradient_overlay);
 
 	// Unicode string: name from classID
@@ -96,7 +97,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -116,7 +117,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 				// Actual value (double)
 				gradient_overlay->opacity = (psd_int)(psd_stream_get_double(context) * 2.55 + 0.5);
 				break;
-				
+
 			// gradient color
 			case 'Grad':
 				// Descriptor
@@ -127,7 +128,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 			case 'Angl':	// angle
 				// Unit psd_float
 				psd_assert(type == 'UntF');
-				
+
 				// '#Ang' = angle: base degrees
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Ang');
@@ -169,7 +170,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 				// '#Prc' = percent:
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Prc');
-								
+
 				// Actual value (double)
 				gradient_overlay->scale = (psd_int)psd_stream_get_double(context);
 				break;
@@ -177,7 +178,7 @@ psd_status psd_get_layer_gradient_overlay2(psd_context * context, psd_layer_effe
 			// offset, not documented
 			case 'Ofst':
 				psd_assert(type == 'Objc');
-				psd_stream_get_object_point(&gradient_overlay->horz_offset, 
+				psd_stream_get_object_point(&gradient_overlay->horz_offset,
 					&gradient_overlay->vert_offset, context);
 				break;
 
@@ -277,32 +278,32 @@ psd_status psd_layer_effects_blend_gradient_overlay(psd_context * context, psd_l
 	switch(gradient_overlay->style)
 	{
 		case psd_gradient_style_linear:
-			psd_gradient_fill_linear(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse, 
-				center_x - sign_x * radius_x, center_y + sign_y * radius_y, 
+			psd_gradient_fill_linear(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse,
+				center_x - sign_x * radius_x, center_y + sign_y * radius_y,
 				center_x + sign_x * radius_x, center_y - sign_y * radius_y);
 			break;
 		case psd_gradient_style_radial:
-			psd_gradient_fill_radial(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse, 
+			psd_gradient_fill_radial(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse,
 				center_x, center_y, radius_corner);
 			break;
 		case psd_gradient_style_angle:
-			psd_gradient_fill_angle(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse, 
+			psd_gradient_fill_angle(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse,
 				center_x, center_y, gradient_overlay->angle);
 			break;
 		case psd_gradient_style_reflected:
-			psd_gradient_fill_reflected(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse, 
-				center_x - sign_x * radius_x, center_y + sign_y * radius_y, 
+			psd_gradient_fill_reflected(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse,
+				center_x - sign_x * radius_x, center_y + sign_y * radius_y,
 				center_x + sign_x * radius_x, center_y - sign_y * radius_y);
 			break;
 		case psd_gradient_style_diamond:
-			psd_gradient_fill_diamond(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse, 
+			psd_gradient_fill_diamond(&dst_bmp, &gradient_overlay->gradient_color, gradient_overlay->reverse,
 				center_x, center_y, radius_corner, gradient_overlay->angle);
 			break;
 		default:
 			psd_assert(0);
 			break;
 	}
-	
+
 	psd_bitmap_mix_alpha_channel(&dst_bmp, &src_bmp);
 	memcpy(&layer_mask_info, &layer->layer_mask_info, sizeof(psd_layer_mask_info));
 	if(layer_mask_info.disabled == psd_false && (layer_mask_info.default_color != 255 || layer_mask_info.mask_data != NULL))
@@ -315,7 +316,7 @@ psd_status psd_layer_effects_blend_gradient_overlay(psd_context * context, psd_l
 	}
 
 	data->valid[psd_layer_effects_type_gradient_overlay] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

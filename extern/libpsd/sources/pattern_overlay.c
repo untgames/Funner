@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -50,7 +51,7 @@ psd_status psd_get_layer_pattern_overlay2(psd_context * context, psd_layer_effec
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_pattern_overlay_default(pattern_overlay);
 
 	// Unicode string: name from classID
@@ -88,7 +89,7 @@ psd_status psd_get_layer_pattern_overlay2(psd_context * context, psd_layer_effec
 				if(strcmp(keychar, "phase") == 0)
 				{
 					psd_assert(type == 'Objc');
-					psd_stream_get_object_point(&pattern_overlay->horz_phase, 
+					psd_stream_get_object_point(&pattern_overlay->horz_phase,
 						&pattern_overlay->vert_phase, context);
 					// problem, why ???
 					pattern_overlay->horz_phase = 0;
@@ -100,7 +101,7 @@ psd_status psd_get_layer_pattern_overlay2(psd_context * context, psd_layer_effec
 					psd_stream_get_object_null(type, context);
 				}
 				break;
-				
+
 			// effect enable
 			case 'enab':
 				psd_assert(type == 'bool');
@@ -110,7 +111,7 @@ psd_status psd_get_layer_pattern_overlay2(psd_context * context, psd_layer_effec
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -159,7 +160,7 @@ psd_status psd_get_layer_pattern_overlay2(psd_context * context, psd_layer_effec
 				break;
 		}
 	}
-	
+
 	return psd_status_done;
 }
 
@@ -198,12 +199,12 @@ psd_status psd_layer_effects_blend_pattern_overlay(psd_context * context, psd_la
 	{
 		if(strcmp(context->patterns[i].unique_id, pattern_overlay->pattern_info.identifier) == 0)
 		{
-			psd_pattern_fill(&dst_bmp, &context->patterns[i], pattern_overlay->scale, 
+			psd_pattern_fill(&dst_bmp, &context->patterns[i], pattern_overlay->scale,
 				pattern_overlay->horz_phase, pattern_overlay->vert_phase);
 			break;
 		}
 	}
-	
+
 	psd_bitmap_mix_alpha_channel(&dst_bmp, &src_bmp);
 	memcpy(&layer_mask_info, &layer->layer_mask_info, sizeof(psd_layer_mask_info));
 	if(layer_mask_info.disabled == psd_false && (layer_mask_info.default_color != 255 || layer_mask_info.mask_data != NULL))
@@ -216,7 +217,7 @@ psd_status psd_layer_effects_blend_pattern_overlay(psd_context * context, psd_la
 	}
 
 	data->valid[psd_layer_effects_type_pattern_overlay] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

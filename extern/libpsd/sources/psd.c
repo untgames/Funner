@@ -23,6 +23,7 @@
  * $Id: psd.c, created by Patrick in 2006.05.18, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -74,12 +75,12 @@ static psd_status psd_image_load_tag(psd_context ** dst_context, psd_char * file
 		psd_free(context);
 		return psd_status_invalid_file;
 	}
-	
+
 	context->state = PSD_FILE_HEADER;
 	context->stream.file_length = psd_fsize(context->file);
 	context->load_tag = load_tag;
 	status = psd_main_loop(context);
-	
+
 	if(status != psd_status_done)
 	{
 		psd_image_free(context);
@@ -89,7 +90,7 @@ static psd_status psd_image_load_tag(psd_context ** dst_context, psd_char * file
 	{
 		psd_stream_free(context);
 	}
-	
+
 	*dst_context = context;
 
 	return status;
@@ -133,15 +134,15 @@ psd_status psd_image_free(psd_context * context)
 {
 	if(context == NULL)
 		return psd_status_invalid_context;
-	
+
 	psd_color_mode_data_free(context);
 	psd_image_resource_free(context);
 	psd_layer_and_mask_free(context);
 	psd_image_data_free(context);
-	
+
 	psd_image_blend_free(context);
 	psd_stream_free(context);
-	
+
 	psd_free(context);
 
 	return psd_status_done;
@@ -158,7 +159,7 @@ static psd_status psd_main_loop(psd_context * context)
 			status = psd_status_fread_error;
 			break;
 		}
-		
+
 		switch(context->state)
 		{
 			case PSD_FILE_HEADER:
@@ -173,7 +174,7 @@ static psd_status psd_main_loop(psd_context * context)
 				else if(status == psd_status_unkown_error)
 					status = psd_status_file_header_error;
 				break;
-				
+
 			case PSD_COLOR_MODE_DATA:
 				status = psd_get_color_mode_data(context);
 				if(status == psd_status_done)
@@ -181,7 +182,7 @@ static psd_status psd_main_loop(psd_context * context)
 				else if(status == psd_status_unkown_error)
 					status = psd_status_color_mode_data_error;
 				break;
-				
+
 			case PSD_IMAGE_RESOURCE:
 				status = psd_get_image_resource(context);
 				if(status == psd_status_done)
@@ -189,7 +190,7 @@ static psd_status psd_main_loop(psd_context * context)
 				else if(status == psd_status_unkown_error)
 					status = psd_status_image_resource_error;
 				break;
-				
+
 			case PSD_LAYER_AND_MASK_INFORMATION:
 				status = psd_get_layer_and_mask(context);
 				if(status == psd_status_done)
@@ -197,7 +198,7 @@ static psd_status psd_main_loop(psd_context * context)
 				else if(status == psd_status_unkown_error)
 					status = psd_status_layer_and_mask_error;
 				break;
-				
+
 			case PSD_IMAGE_DATA:
 				status = psd_get_image_data(context);
 				if(status == psd_status_done)

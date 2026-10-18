@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -46,7 +47,7 @@ static psd_float  highlights_sub[256] = { 0 };
 static psd_float  midtones_sub[256]   = { 0 };
 static psd_float  shadows_sub[256]    = { 0 };
 
-extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_uchar * red_lookup_table, psd_uchar * green_lookup_table, psd_uchar * blue_lookup_table,
 	psd_bool preserve_luminosity);
 
@@ -55,7 +56,7 @@ psd_status psd_get_layer_color_balance(psd_context * context, psd_layer_record *
 {
 	psd_layer_color_balance * data;
 	psd_int i;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_color_balance;
 	layer->layer_type = psd_layer_type_color_balance;
 
@@ -72,7 +73,7 @@ psd_status psd_get_layer_color_balance(psd_context * context, psd_layer_record *
 		data->cyan_red[i] = psd_stream_get_short(context);
 		data->magenta_green[i] = psd_stream_get_short(context);
 		data->yellow_blue[i] = psd_stream_get_short(context);
-		// (-100...100). 
+		// (-100...100).
 		psd_assert(data->cyan_red[i] >= -100 && data->cyan_red[i] <= 100);
 		psd_assert(data->magenta_green[i] >= -100 && data->cyan_red[i] <= 100);
 		psd_assert(data->yellow_blue[i] >= -100 && data->cyan_red[i] <= 100);
@@ -93,11 +94,11 @@ static void psd_color_balance_transfer_init(void)
 
 	for (i = 0; i < 256; i++)
 	{
-		highlights_add[i] = shadows_sub[255 - i] = 
+		highlights_add[i] = shadows_sub[255 - i] =
 			(1.075f - 1 / ( i / 16.0f + 1));
-		midtones_add[i] = midtones_sub[i] = 
+		midtones_add[i] = midtones_sub[i] =
 			0.667f * (1 - PSD_SQR((i - 127.0f) / 127.0f));
-		shadows_add[i] = highlights_sub[i] = 
+		shadows_add[i] = highlights_sub[i] =
 			0.667f * (1 - PSD_SQR((i - 127.0f) / 127.0f));
 		//midtones_sub[i] = 0.64f * (1 - PSD_SQR((i - 127.0f) / 127.0f));
 	}
@@ -175,15 +176,15 @@ psd_bool psd_layer_blend_color_balance(psd_context * context, psd_layer_record *
 			psd_color_balance_transfer_init();
 			transfer_initialized = psd_true;
 		}
-		psd_color_balance_calculate_table(data, data->lookup_table[0], 
+		psd_color_balance_calculate_table(data, data->lookup_table[0],
 			data->lookup_table[1], data->lookup_table[2]);
 	}
 
-	psd_adjustment_blend_rgb(context, layer, dst_rect, data->lookup_table[0], 
+	psd_adjustment_blend_rgb(context, layer, dst_rect, data->lookup_table[0],
 		data->lookup_table[1], data->lookup_table[2], data->preserve_luminosity);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

@@ -23,6 +23,7 @@
  * $Id: selective_color.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -32,7 +33,7 @@
 
 
 typedef void psd_adjustment_blend_proc(psd_uint layer_info_data, psd_int * red, psd_int * green, psd_int * blue);
-extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_adjustment_blend_proc * blend_proc, psd_uint layer_info_data);
 
 
@@ -40,7 +41,7 @@ psd_status psd_get_layer_selective_color(psd_context * context, psd_layer_record
 {
 	psd_layer_selective_color * data;
 	psd_int i;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_selective_color;
 	layer->layer_type = psd_layer_type_selective_color;
 
@@ -56,7 +57,7 @@ psd_status psd_get_layer_selective_color(psd_context * context, psd_layer_record
 		return psd_status_selective_color_unsupport_version;
 
 	// Correction method.. 0 = Apply color correction in relative mode; 1 =
-	// Apply color correction in absolute mode.	
+	// Apply color correction in absolute mode.
 	data->correction_method = psd_stream_get_short(context);
 
 	// Ten eight-byte plate correction records.
@@ -93,7 +94,7 @@ static void psd_selective_color_proc(psd_uint layer_info_data, psd_int * red, ps
 	psd_int src_cyan, src_magenta, src_yellow, src_black, dst_cyan, dst_magenta, dst_yellow, dst_black;
 	psd_int opacity, i, range[4];
 
-	psd_rgb_to_intcmyk(*red, *green, *blue, 
+	psd_rgb_to_intcmyk(*red, *green, *blue,
 		&src_cyan, &src_magenta, &src_yellow, &src_black);
 	dst_cyan = src_cyan;
 	dst_magenta = src_magenta;
@@ -115,7 +116,7 @@ static void psd_selective_color_proc(psd_uint layer_info_data, psd_int * red, ps
 				opacity = (hue - range[0]) * 255 / 30;
 			else
 				opacity = (range[3] - hue) * 255 / 30;
-				
+
 			if(data->cyan_correction[i] != 0 || data->magenta_correction[i] != 0 ||
 				data->yellow_correction[i] != 0 || data->black_correction[i] != 0)
 			{
@@ -144,7 +145,7 @@ static void psd_selective_color_proc(psd_uint layer_info_data, psd_int * red, ps
 			}
 		}
 	}
-	
+
 	for(i = 7; i < 10; i ++)
 	{
 		if((i == 7 && src_black == 0) ||
@@ -180,7 +181,7 @@ static void psd_selective_color_proc(psd_uint layer_info_data, psd_int * red, ps
 	dst_magenta = PSD_CONSTRAIN(dst_magenta, 0, 255);
 	dst_yellow = PSD_CONSTRAIN(dst_yellow, 0, 255);
 	dst_black = PSD_CONSTRAIN(dst_black, 0, 255);
-	psd_intcmyk_to_rgb(dst_cyan, dst_magenta, dst_yellow, dst_black, 
+	psd_intcmyk_to_rgb(dst_cyan, dst_magenta, dst_yellow, dst_black,
 		red, green, blue);
 }
 
@@ -205,7 +206,7 @@ psd_bool psd_layer_blend_selective_color(psd_context * context, psd_layer_record
 	psd_adjustment_blend_color(context, layer, dst_rect, psd_selective_color_proc, layer_info_data);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

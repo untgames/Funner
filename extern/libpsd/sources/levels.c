@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -32,7 +33,7 @@
 #include "psd_math.h"
 
 
-extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_rgb(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_uchar * red_lookup_table, psd_uchar * green_lookup_table, psd_uchar * blue_lookup_table,
 	psd_bool preserve_luminosity);
 
@@ -44,7 +45,7 @@ psd_status psd_get_layer_levels(psd_context * context, psd_layer_record * layer,
 	psd_layer_levels * data;
 	psd_int i, prev_stream_pos = context->stream.current_pos;
 	psd_uint tag;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_levels;
 	layer->layer_type = psd_layer_type_levels;
 
@@ -54,7 +55,7 @@ psd_status psd_get_layer_levels(psd_context * context, psd_layer_record * layer,
 	memset(data, 0, sizeof(psd_layer_levels));
 	layer->layer_info_data[layer->layer_info_count] = (psd_uint)data;
 	layer->layer_info_count ++;
-	
+
 	// Version ( = 2)
 	if(psd_stream_get_short(context) != 2)
 		return psd_status_levels_unsupport_version;
@@ -226,7 +227,7 @@ psd_bool psd_layer_blend_levels(psd_context * context, psd_layer_record * layer,
 					{
 						for(j = 0; j < 256; j ++)
 						{
-							data->lookup_table[0][j] = data->lookup_table[1][j] = 
+							data->lookup_table[0][j] = data->lookup_table[1][j] =
 								data->lookup_table[2][j] = output_table[input_table[j]];
 						}
 					}
@@ -237,12 +238,12 @@ psd_bool psd_layer_blend_levels(psd_context * context, psd_layer_record * layer,
 					}
 				}
 			}
-			
+
 			if(context->color_mode == psd_color_mode_grayscale)
 				break;
 		}
 	}
-	
+
 	psd_adjustment_blend_rgb(context, layer, dst_rect, data->lookup_table[0],
 		data->lookup_table[1], data->lookup_table[2], psd_false);
 

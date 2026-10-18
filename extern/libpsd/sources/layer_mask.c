@@ -23,6 +23,7 @@
  * $Id: layer_mask.c, created by Patrick in 2006.05.19, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -148,8 +149,8 @@ static psd_status psd_get_layer_sheet_color(psd_context * context, psd_layer_rec
 {
 	psd_int i;
 	psd_ushort color_component[4];
-	
-	// Color. Only the first color setting is used for Photoshop 6.0; 	
+
+	// Color. Only the first color setting is used for Photoshop 6.0;
 	for(i = 0; i < 4; i ++)
 		color_component[i] = psd_stream_get_char(context);
 	psd_color_space_to_argb(&layer->sheet_color, psd_color_space_rgb, color_component);
@@ -320,7 +321,7 @@ static psd_status psd_get_layer_info(psd_context * context)
 
 	prev_layer_stream_pos = context->stream.current_pos;
 
-	// Layer count. 
+	// Layer count.
 	context->layer_count = psd_stream_get_short(context);
 	// If it is a negative number, its absolute value is the number of
 	// layers and the first alpha channel contains the transparency data for the
@@ -355,7 +356,7 @@ static psd_status psd_get_layer_info(psd_context * context)
 		layer->divider_blend_mode = psd_blend_mode_pass_through;
 		layer->layer_mask_info.default_color = 255;
 		layer->layer_mask_info.disabled = psd_true;
-		
+
 		// Rectangle containing the contents of the layer. Specified as top, left,
 		// bottom, right coordinates
 		layer->top = psd_stream_get_int(context);
@@ -371,7 +372,7 @@ static psd_status psd_get_layer_info(psd_context * context)
 		// Number of channels in the layer
 		layer->number_of_channels = psd_stream_get_short(context);
 		psd_assert(layer->number_of_channels > 0);
-		
+
 		layer->channel_info = (psd_channel_info *)psd_malloc(layer->number_of_channels * sizeof(psd_channel_info));
 		if(layer->channel_info == NULL)
 		{
@@ -510,12 +511,12 @@ static psd_status psd_get_layer_info(psd_context * context)
 			psd_layer_free(layer);
 			return psd_status_invalid_blending_channels;
 		}
-		
+
 		layer->layer_blending_ranges.channel_black_src = (psd_ushort *)psd_malloc(layer->layer_blending_ranges.number_of_blending_channels * 2);
 		layer->layer_blending_ranges.channel_white_src = (psd_ushort *)psd_malloc(layer->layer_blending_ranges.number_of_blending_channels * 2);
 		layer->layer_blending_ranges.channel_black_dst = (psd_ushort *)psd_malloc(layer->layer_blending_ranges.number_of_blending_channels * 2);
 		layer->layer_blending_ranges.channel_white_dst = (psd_ushort *)psd_malloc(layer->layer_blending_ranges.number_of_blending_channels * 2);
-		if(layer->layer_blending_ranges.channel_black_src == NULL || 
+		if(layer->layer_blending_ranges.channel_black_src == NULL ||
 			layer->layer_blending_ranges.channel_white_src == NULL ||
 			layer->layer_blending_ranges.channel_black_dst == NULL ||
 			layer->layer_blending_ranges.channel_white_dst == NULL)
@@ -523,7 +524,7 @@ static psd_status psd_get_layer_info(psd_context * context)
 			psd_layer_free(layer);
 			return psd_status_malloc_failed;
 		}
-		
+
 		for(j = 0; j < layer->layer_blending_ranges.number_of_blending_channels; j ++)
 		{
 			// channel source range
@@ -693,7 +694,7 @@ static psd_status psd_get_layer_info(psd_context * context)
 
 		psd_assert(context->stream.current_pos - extra_stream_pos == extra_length);
 	}
-	
+
 	for(i = 0, layer = context->layer_records; i < context->layer_count; i ++, layer ++)
 	{
 		// Channel image data. Contains one or more image data records for each layer.
@@ -771,10 +772,10 @@ psd_status psd_get_layer_and_mask(psd_context * context)
 	length = psd_stream_get_int(context);
 	if(length <= 0)
 		return psd_status_done;
-	
+
 	prev_stream_pos = context->stream.current_pos;
 
-	if(context->load_tag == psd_load_tag_merged || context->load_tag == psd_load_tag_thumbnail || 
+	if(context->load_tag == psd_load_tag_merged || context->load_tag == psd_load_tag_thumbnail ||
 		context->load_tag == psd_load_tag_exif)
 	{
 		psd_stream_get_null(context, length);
@@ -783,14 +784,14 @@ psd_status psd_get_layer_and_mask(psd_context * context)
 
 	// Layer info
 	status = psd_get_layer_info(context);
-	
+
 	psd_freeif(context->temp_image_data);
 	context->temp_image_data = NULL;
 	context->temp_image_length = 0;
 	psd_freeif(context->temp_channel_data);
 	context->temp_channel_data = NULL;
 	context->temp_channel_length = 0;
-	
+
 	if(status != psd_status_done)
 		return status;
 
@@ -808,9 +809,9 @@ psd_status psd_get_layer_and_mask(psd_context * context)
 				status = psd_get_layer_info(context);
 				continue;
 			}
-			
+
 			size = psd_stream_get_int(context);
-			
+
 			switch(tag)
 			{
 				case 'Patt':
@@ -835,7 +836,7 @@ psd_status psd_get_layer_and_mask(psd_context * context)
 			break;
 		}
 	}
-	
+
 	// Filler: zeros
 	psd_stream_get_null(context, prev_stream_pos + length - context->stream.current_pos);
 
@@ -845,7 +846,7 @@ psd_status psd_get_layer_and_mask(psd_context * context)
 static void psd_layer_free(psd_layer_record * layer)
 {
 	psd_int i;
-	
+
 	for(i = 0; i < layer->layer_info_count; i ++)
 	{
 		if(layer->layer_info_data[i] != 0)
@@ -905,10 +906,10 @@ static void psd_layer_free(psd_layer_record * layer)
 void psd_layer_and_mask_free(psd_context * context)
 {
 	psd_int i;
-	
+
 	for(i = 0; i < context->layer_count; i ++)
 		psd_layer_free(&context->layer_records[i]);
-	
+
 	psd_freeif(context->layer_records);
 	psd_freeif(context->temp_channel_data);
 	psd_pattern_free(context);

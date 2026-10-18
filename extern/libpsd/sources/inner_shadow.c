@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -52,7 +53,7 @@ static void psd_set_layer_inner_shadow_default(psd_layer_effects_inner_shadow * 
 	inner_shadow->distance = 5;
 	inner_shadow->choke = 0;
 	inner_shadow->size = 5;
-	
+
 	for(i = 0; i < 256; i ++)
 		inner_shadow->contour_lookup_table[i] = i;
 	inner_shadow->anti_aliased = psd_false;
@@ -68,7 +69,7 @@ psd_status psd_get_layer_inner_shadow(psd_context * context, psd_layer_effects_i
 
 	// Size of the remaining items: 41 or 51 (depending on version)
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 0 (Photoshop 5.0) or 2 (Photoshop 5.5)
 	version = psd_stream_get_int(context);
 	if(version != 0 && version != 2)
@@ -88,7 +89,7 @@ psd_status psd_get_layer_inner_shadow(psd_context * context, psd_layer_effects_i
 
 	// maybe photoshop is wrong
 	psd_stream_get_short(context);
-	
+
 	// Color
 	inner_shadow->color = psd_stream_get_space_color(context);
 
@@ -97,7 +98,7 @@ psd_status psd_get_layer_inner_shadow(psd_context * context, psd_layer_effects_i
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	inner_shadow->blend_mode = psd_stream_get_blend_mode(context);
 
@@ -125,7 +126,7 @@ psd_status psd_get_layer_inner_shadow2(psd_context * context, psd_layer_effects_
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_inner_shadow_default(inner_shadow);
 
 	// Unicode string: name from classID
@@ -169,7 +170,7 @@ psd_status psd_get_layer_inner_shadow2(psd_context * context, psd_layer_effects_
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -281,14 +282,14 @@ psd_status psd_layer_effects_blend_inner_shadow(psd_context * context, psd_layer
 	psd_bitmap src_bmp, dst_bmp, knock_bmp;
 	psd_layer_mask_info layer_mask_info;
 	psd_int choke_size, blur_size;
-	
+
 	if(inner_shadow->use_global_light == psd_true)
 		angle = context->global_angle;
 	else
 		angle = inner_shadow->angle;
 	distance_x = -(psd_int)(inner_shadow->distance * cos(PSD_PI * angle / 180) + 0.5);
 	distance_y = (psd_int)(inner_shadow->distance * sin(PSD_PI * angle / 180) + 0.5);
-	
+
 	data->left[psd_layer_effects_type_inner_shadow] = -inner_shadow->size + distance_x - PSD_ABS(distance_x);
 	data->top[psd_layer_effects_type_inner_shadow] = -inner_shadow->size + distance_y - PSD_ABS(distance_y);
 	width = layer->width + inner_shadow->size * 2 + PSD_ABS(distance_x) * 2;
@@ -333,11 +334,11 @@ psd_status psd_layer_effects_blend_inner_shadow(psd_context * context, psd_layer
 	}
 	else
 	{
-		psd_inflate_bitmap(&dst_bmp, &src_bmp, inner_shadow->size + PSD_ABS(distance_x), 
+		psd_inflate_bitmap(&dst_bmp, &src_bmp, inner_shadow->size + PSD_ABS(distance_x),
 			inner_shadow->size + PSD_ABS(distance_y));
 		psd_fill_bitmap_without_alpha_channel(&dst_bmp, inner_shadow->color);
 	}
-	
+
 	memcpy(&layer_mask_info, &layer->layer_mask_info, sizeof(psd_layer_mask_info));
 	if(layer_mask_info.disabled == psd_false && (layer_mask_info.default_color != 255 || layer_mask_info.mask_data != NULL))
 	{
@@ -353,7 +354,7 @@ psd_status psd_layer_effects_blend_inner_shadow(psd_context * context, psd_layer
 	psd_create_bitmap(&knock_bmp, width, height);
 	psd_copy_bitmap(&knock_bmp, &dst_bmp);
 	psd_offset_bitmap(&knock_bmp, distance_x, distance_y, inner_shadow->color);
-	
+
 	choke_size = (inner_shadow->choke * inner_shadow->size + 50) / 100;
 	blur_size = inner_shadow->size - choke_size;
 	if(choke_size != 0)
@@ -366,21 +367,21 @@ psd_status psd_layer_effects_blend_inner_shadow(psd_context * context, psd_layer
 		psd_bitmap_gaussian_blur_alpha_channel(&dst_bmp, blur_size);
 	}
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, inner_shadow->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, inner_shadow->contour_lookup_table,
 		inner_shadow->anti_aliased, psd_false);
 
 	if(inner_shadow->noise > 0)
 	{
-		psd_effects_add_noise(&dst_bmp, inner_shadow->noise, 
+		psd_effects_add_noise(&dst_bmp, inner_shadow->noise,
 			data->left[psd_layer_effects_type_inner_shadow] + layer->left,
 			data->top[psd_layer_effects_type_inner_shadow] + layer->top, context);
 	}
 
 	psd_bitmap_knock_out(&dst_bmp, &knock_bmp);
 	psd_free_bitmap(&knock_bmp);
-	
+
 	data->valid[psd_layer_effects_type_inner_shadow] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

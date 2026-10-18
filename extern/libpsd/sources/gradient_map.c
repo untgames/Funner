@@ -23,6 +23,7 @@
  * $Id: gradient_map.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -31,7 +32,7 @@
 
 
 typedef void psd_adjustment_blend_proc(psd_uint layer_info_data, psd_int * red, psd_int * green, psd_int * blue);
-extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_adjustment_blend_proc * blend_proc, psd_uint layer_info_data);
 
 
@@ -43,7 +44,7 @@ psd_status psd_get_layer_gradient_map(psd_context * context, psd_layer_record * 
 	psd_status status;
 	psd_color_space color_model;
 	psd_ushort color_component[4];
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_gradient_map;
 	layer->layer_type = psd_layer_type_gradient_map;
 
@@ -85,13 +86,13 @@ psd_status psd_get_layer_gradient_map(psd_context * context, psd_layer_record * 
 		data->color_stop[i].location = psd_stream_get_int(context);
 		// Midpoint of color stop
 		data->color_stop[i].midpoint = psd_stream_get_int(context);
-		
+
 		// Actual color for the stop
 		data->color_stop[i].actual_color = psd_stream_get_space_color(context);
 
 		// padding, I don't find any information from adobe sdk
 		psd_stream_get_short(context);
-		
+
 		data->color_stop[i].color_stop_type = psd_color_stop_type_user_stop;
 	}
 
@@ -133,26 +134,26 @@ psd_status psd_get_layer_gradient_map(psd_context * context, psd_layer_record * 
 			data->using_vector_color_flag = psd_stream_get_short(context);
 			// Roughness factor
 			data->roughness_factor = psd_stream_get_int(context);
-			
+
 			// Color model
 			color_model = psd_stream_get_short(context);
 			// 4 * 2 Minimum color values
 			for(i = 0; i < 4; i ++)
 				color_component[i] = psd_stream_get_short(context) >> 8;
-			status = psd_color_space_to_argb(&data->min_color, color_model, 
+			status = psd_color_space_to_argb(&data->min_color, color_model,
 				color_component);
 			//if(status != psd_status_done)
 			//	return status;
 			// 4 * 2 Maximum color values
 			for(i = 0; i < 4; i ++)
 				color_component[i] = psd_stream_get_short(context) >> 8;
-			status = psd_color_space_to_argb(&data->max_color, color_model, 
+			status = psd_color_space_to_argb(&data->max_color, color_model,
 				color_component);
 			//if(status != psd_status_done)
 			//	return status;
 		}
 	}
-	
+
 	// Dummy: not used in Photoshop 6.0
 	psd_stream_get_short(context);
 
@@ -177,7 +178,7 @@ static void psd_gradient_map_proc(psd_uint layer_info_data, psd_int * red, psd_i
 	psd_layer_gradient_map * data = (psd_layer_gradient_map *)layer_info_data;
 	psd_int gray;
 	psd_argb_color color;
-	
+
 	gray = PSD_GET_COLOR_INTENSITY(*red, *green, *blue);
 	if(data->reverse == psd_true)
 		color = data->lookup_table[255 - gray];
@@ -194,7 +195,7 @@ psd_bool psd_layer_blend_gradient_map(psd_context * context, psd_layer_record * 
 	psd_uint layer_info_data;
 	psd_layer_gradient_map * data;
 	psd_int i, j, start_pos, end_pos, mid_pos;
-	psd_int start_red, start_green, start_blue, 
+	psd_int start_red, start_green, start_blue,
 		end_red, end_green, end_blue,
 		mid_red, mid_green, mid_blue;
 	psd_int dst_red, dst_green, dst_blue;
@@ -214,7 +215,7 @@ psd_bool psd_layer_blend_gradient_map(psd_context * context, psd_layer_record * 
 	if(layer->adjustment_valid == psd_true)
 	{
 		psd_color_memset(data->lookup_table, data->color_stop[0].actual_color, data->color_stop[0].location / 16);
-		
+
 		for(i = 0; i < data->number_color_stops - 1; i ++)
 		{
 			start_pos = data->color_stop[i].location / 16;
@@ -229,7 +230,7 @@ psd_bool psd_layer_blend_gradient_map(psd_context * context, psd_layer_record * 
 			mid_red = (start_red + end_red) / 2;
 			mid_green = (start_green + end_green) / 2;
 			mid_blue = (start_blue + end_blue) / 2;
-			
+
 			for(j = start_pos; j < mid_pos; j ++)
 			{
 				dst_red = start_red + (mid_red - start_red) * (j - start_pos) / (mid_pos - start_pos);
@@ -247,15 +248,15 @@ psd_bool psd_layer_blend_gradient_map(psd_context * context, psd_layer_record * 
 			}
 		}
 
-		psd_color_memset(data->lookup_table + data->color_stop[data->number_color_stops - 1].location / 16, 
-			data->color_stop[data->number_color_stops - 1].actual_color, 
+		psd_color_memset(data->lookup_table + data->color_stop[data->number_color_stops - 1].location / 16,
+			data->color_stop[data->number_color_stops - 1].actual_color,
 			256 - data->color_stop[data->number_color_stops - 1].location / 16);
 	}
 
 	psd_adjustment_blend_color(context, layer, dst_rect, psd_gradient_map_proc, layer_info_data);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

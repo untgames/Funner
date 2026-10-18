@@ -23,6 +23,7 @@
  * $Id: stream.c, created by Patrick in 2006.05.18, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -60,11 +61,11 @@ psd_int psd_stream_get(psd_context * context, psd_uchar * buffer, psd_int length
 
 	if(buffer == NULL)
 		return 0;
-	
+
 	psd_assert(length >= 0);
-	
+
 	stream = &context->stream;
-	
+
 	if(stream->buffer == NULL)
 	{
 		stream->buffer = (psd_uchar *)psd_malloc(PSD_STREAM_MAX_READ_LENGTH);
@@ -125,7 +126,7 @@ psd_int psd_stream_get_null(psd_context * context, psd_int length)
 		return 0;
 
 	stream = &context->stream;
-	
+
 	if(stream->buffer == NULL)
 	{
 		stream->buffer = (psd_uchar *)psd_malloc(PSD_STREAM_MAX_READ_LENGTH);

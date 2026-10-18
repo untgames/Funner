@@ -23,6 +23,7 @@
  * $Id: gradient_blend.c, created by Patrick in 2006.06.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_color.h"
@@ -48,12 +49,12 @@ psd_float psd_carm_sqrt(psd_float x)
 		psd_int 	intPart;
 		psd_float 	floatPart;
 	} convertor2;
-	
+
 	convertor.floatPart = x;
 	convertor2.floatPart = x;
 	convertor.intPart = 0x1FBCF800 + (convertor.intPart >> 1);
 	convertor2.intPart = 0x5f3759df - (convertor2.intPart >> 1);
-	
+
 	return 0.5f*(convertor.floatPart + (x * convertor2.floatPart));
 }
 
@@ -78,7 +79,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 		psd_color_memset(color_table + location1, gradient_color->color_stop[0].actual_color,
 			location2 - location1);
 	}
-	
+
 	for(i = 0; i < gradient_color->number_color_stops - 1; i ++)
 	{
 		location1 = (gradient_color->color_stop[i].location * table_count + 2048) / 4096;
@@ -89,7 +90,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 				location2 - location1);
 			continue;
 		}
-		
+
 		color = gradient_color->color_stop[i].actual_color;
 		r1 = psd_get_red_component(color);
 		g1 = psd_get_green_component(color);
@@ -98,7 +99,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 		r3 = psd_get_red_component(color);
 		g3 = psd_get_green_component(color);
 		b3 = psd_get_blue_component(color);
-		
+
 		if(gradient_color->color_stop[i + 1].midpoint == 50)
 		{
 			red = PSD_FIXED_16_16_INT(r1);
@@ -109,7 +110,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 			blue_step = PSD_FIXED_16_16_INT(b3 - b1) / (location2 - location1);
 			for(j = location1; j < location2; j ++)
 			{
-				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red), 
+				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red),
 					PSD_FIXED_16_16_ROUND(green), PSD_FIXED_16_16_ROUND(blue));
 				red += red_step;
 				green += green_step;
@@ -118,12 +119,12 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 		}
 		else
 		{
-			midpoint = location1 + (gradient_color->color_stop[i + 1].midpoint * 
+			midpoint = location1 + (gradient_color->color_stop[i + 1].midpoint *
 				(location2 - location1) + 50) / 100;
 			r2 = (r1 + r3) / 2;
 			g2 = (g1 + g3) / 2;
 			b2 = (b1 + b3) / 2;
-			
+
 			red = PSD_FIXED_16_16_INT(r1);
 			green = PSD_FIXED_16_16_INT(g1);
 			blue = PSD_FIXED_16_16_INT(b1);
@@ -132,7 +133,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 			blue_step = PSD_FIXED_16_16_INT(b2 - b1) / (midpoint - location1);
 			for(j = location1; j < midpoint; j ++)
 			{
-				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red), 
+				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red),
 					PSD_FIXED_16_16_ROUND(green), PSD_FIXED_16_16_ROUND(blue));
 				red += red_step;
 				green += green_step;
@@ -147,7 +148,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 			blue_step = PSD_FIXED_16_16_INT(b3 - b2) / (location2 - midpoint);
 			for(j = midpoint; j < location2; j ++)
 			{
-				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red), 
+				color_table[j] = PSD_RGB_TO_COLOR(PSD_FIXED_16_16_ROUND(red),
 					PSD_FIXED_16_16_ROUND(green), PSD_FIXED_16_16_ROUND(blue));
 				red += red_step;
 				green += green_step;
@@ -178,10 +179,10 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 			}
 		}
 	}
-	
+
 	for(i = 0; i < gradient_color->number_transparency_stops - 1; i ++)
 	{
-		if(gradient_color->transparency_stop[i].opacity == 100 && 
+		if(gradient_color->transparency_stop[i].opacity == 100 &&
 			gradient_color->transparency_stop[i + 1].opacity == 100)
 		{
 			continue;
@@ -189,8 +190,8 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 
 		location1 = (gradient_color->transparency_stop[i].location * table_count + 2048) / 4096;
 		location2 = (gradient_color->transparency_stop[i + 1].location * table_count + 2048) / 4096;
-		
-		if(gradient_color->transparency_stop[i].opacity == 
+
+		if(gradient_color->transparency_stop[i].opacity ==
 			gradient_color->transparency_stop[i + 1].opacity)
 		{
 			high_opacity = (gradient_color->transparency_stop[i].opacity * 255 + 50) / 100;
@@ -211,7 +212,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 				opacity_step = PSD_FIXED_16_16_INT(o3 - o1) / (location2 - location1);
 				for(j = location1; j < location2 ; j ++)
 				{
-					color_table[j] = (color_table[j] & 0x00FFFFFF) | 
+					color_table[j] = (color_table[j] & 0x00FFFFFF) |
 						(PSD_FIXED_16_16_ROUND(opacity) << 24);
 					opacity += opacity_step;
 				}
@@ -219,14 +220,14 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 			else
 			{
 				o2 = (o1 + o3) / 2;
-				midpoint = location1 + (gradient_color->transparency_stop[i + 1].midpoint * 
+				midpoint = location1 + (gradient_color->transparency_stop[i + 1].midpoint *
 					(location2 - location1) + 50) / 100;
-				
+
 				opacity = PSD_FIXED_16_16_INT(o1);
 				opacity_step = PSD_FIXED_16_16_INT(o2 - o1) / (midpoint - location1);
 				for(j = location1; j < midpoint; j ++)
 				{
-					color_table[j] = (color_table[j] & 0x00FFFFFF) | 
+					color_table[j] = (color_table[j] & 0x00FFFFFF) |
 						(PSD_FIXED_16_16_ROUND(opacity) << 24);
 					opacity += opacity_step;
 				}
@@ -235,7 +236,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 				opacity_step = PSD_FIXED_16_16_INT(o3 - o2) / (location2 - midpoint);
 				for(j = midpoint; j < location2; j ++)
 				{
-					color_table[j] = (color_table[j] & 0x00FFFFFF) | 
+					color_table[j] = (color_table[j] & 0x00FFFFFF) |
 						(PSD_FIXED_16_16_ROUND(opacity) << 24);
 					opacity += opacity_step;
 				}
@@ -270,7 +271,7 @@ void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_
 	}
 }
 
-psd_status psd_gradient_fill_linear(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse, 
+psd_status psd_gradient_fill_linear(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse,
 	psd_int start_x, psd_int start_y, psd_int end_x, psd_int end_y)
 {
 	psd_int distance, table_count;
@@ -319,7 +320,7 @@ psd_status psd_gradient_fill_linear(psd_bitmap * bitmap, psd_gradient_color * gr
 			dst_data += width;
 		}
 	}
-	
+
 	else if(start_y == end_y)
 	{
 		table_count = PSD_ABS(end_x - start_x);
@@ -363,7 +364,7 @@ psd_status psd_gradient_fill_linear(psd_bitmap * bitmap, psd_gradient_color * gr
 			dst_data += width;
 		}
 	}
-	
+
 	else
 	{
 		distance = (psd_int)psd_carm_sqrt((psd_float)((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y)) + 0.5f);
@@ -399,13 +400,13 @@ psd_status psd_gradient_fill_linear(psd_bitmap * bitmap, psd_gradient_color * gr
 			line_x += delta_y;
 		}
 	}
-	
+
 	psd_free(color_table);
-	
+
 	return psd_status_done;
 }
 
-psd_status psd_gradient_fill_radial(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse, 
+psd_status psd_gradient_fill_radial(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse,
 	psd_int center_x, psd_int center_y, psd_int radius)
 {
 	psd_int width, height, left, top, right, bottom, i, j, ii, i2, j2;
@@ -533,11 +534,11 @@ psd_status psd_gradient_fill_radial(psd_bitmap * bitmap, psd_gradient_color * gr
 	}
 
 	psd_free(color_table);
-	
+
 	return psd_status_done;
 }
 
-psd_status psd_gradient_fill_angle(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse, 
+psd_status psd_gradient_fill_angle(psd_bitmap * bitmap, psd_gradient_color * gradient_color, psd_bool reverse,
 	psd_int center_x, psd_int center_y, psd_int angle)
 {
 	psd_int left, top, width, height, i, j, i2, j2, dx, dy, tan_angle, cur_angle;
@@ -668,7 +669,7 @@ psd_status psd_gradient_fill_angle(psd_bitmap * bitmap, psd_gradient_color * gra
 	}
 
 	psd_free(color_table);
-	
+
 	return psd_status_done;
 }
 
@@ -721,7 +722,7 @@ psd_status psd_gradient_fill_reflected(psd_bitmap * bitmap, psd_gradient_color *
 			dst_data += width;
 		}
 	}
-	
+
 	else if(start_y == end_y)
 	{
 		table_count = PSD_ABS(end_x - start_x);
@@ -765,7 +766,7 @@ psd_status psd_gradient_fill_reflected(psd_bitmap * bitmap, psd_gradient_color *
 			dst_data += width;
 		}
 	}
-	
+
 	else
 	{
 		distance = (psd_int)psd_carm_sqrt((psd_float)((end_x - start_x) * (end_x - start_x) + (end_y - start_y) * (end_y - start_y)) + 0.5f);
@@ -802,9 +803,9 @@ psd_status psd_gradient_fill_reflected(psd_bitmap * bitmap, psd_gradient_color *
 			line_x += delta_y;
 		}
 	}
-	
+
 	psd_free(color_table);
-	
+
 	return psd_status_done;
 }
 
@@ -817,7 +818,7 @@ psd_status psd_gradient_fill_diamond(psd_bitmap * bitmap, psd_gradient_color * g
 	psd_argb_color * color_table;
 	psd_argb_color * dst_data, cur_color;
 	psd_fixed_16_16 angle_sin, angle_cos;
-	
+
 	angle = (angle + 360) % 90;
 	width = bitmap->width;
 	height = bitmap->height;
@@ -882,9 +883,9 @@ psd_status psd_gradient_fill_diamond(psd_bitmap * bitmap, psd_gradient_color * g
 			}
 		}
 	}
-	
+
 	psd_free(color_table);
-	
+
 	return psd_status_done;
 }
 

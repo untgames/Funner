@@ -23,6 +23,7 @@
  * $Id: inner_glow.c, created by Patrick in 2006.06.18, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -36,7 +37,7 @@
 extern void psd_bitmap_gaussian_blur_alpha_channel(psd_bitmap * bitmap, psd_double radius);
 extern void psd_effects_add_noise(psd_bitmap * bitmap, psd_int noise, psd_int left, psd_int top, psd_context * context);
 extern void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_color * color_table, psd_int table_count, psd_bool reverse);
-extern void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden, 
+extern void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden,
 	psd_int jitter, psd_int left, psd_int top, psd_context * context);
 
 
@@ -50,12 +51,12 @@ static void psd_set_layer_inner_glow_default(psd_layer_effects_inner_glow * inne
 	inner_glow->noise = 0;
 	inner_glow->fill_type = psd_fill_solid_color;
 	inner_glow->color = inner_glow->native_color = 0XFFFFFFBE;
-	
+
 	inner_glow->technique = psd_technique_softer;
 	inner_glow->source = psd_glow_edge;
 	inner_glow->choke = 0;
 	inner_glow->size = 5;
-	
+
 	for(i = 0; i < 256; i ++)
 		inner_glow->contour_lookup_table[i] = i;
 	inner_glow->anti_aliased = psd_false;
@@ -73,7 +74,7 @@ psd_status psd_get_layer_inner_glow(psd_context * context, psd_layer_effects_inn
 
 	// Size of the remaining items: 32 for Photoshop 5.0; 43 for 5.5
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 0 for Photoshop 5.0; 2 for 5.5
 	version = psd_stream_get_int(context);
 	if(version != 0 && version != 2)
@@ -87,13 +88,13 @@ psd_status psd_get_layer_inner_glow(psd_context * context, psd_layer_effects_inn
 
 	// Color
 	inner_glow->color = psd_stream_get_space_color(context);
-	
+
 	// Blend mode: 4 bytes for signature and 4 bytes for the key
 	// Blend mode signature: '8BIM'
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	inner_glow->blend_mode = psd_stream_get_blend_mode(context);
 
@@ -110,7 +111,7 @@ psd_status psd_get_layer_inner_glow(psd_context * context, psd_layer_effects_inn
 		invert = psd_stream_get_bool(context);
 		if(invert == psd_true)
 			inner_glow->source = psd_glow_center;
-		
+
 		// Native color
 		inner_glow->native_color = psd_stream_get_space_color(context);
 	}
@@ -123,7 +124,7 @@ psd_status psd_get_layer_inner_glow2(psd_context * context, psd_layer_effects_in
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_inner_glow_default(inner_glow);
 
 	// Unicode string: name from classID
@@ -329,7 +330,7 @@ psd_status psd_layer_effects_blend_inner_glow(psd_context * context, psd_layer_r
 	psd_layer_mask_info layer_mask_info;
 	psd_int choke_size, blur_size;
 	psd_argb_color gradient_table[256];
-	
+
 	data->left[psd_layer_effects_type_inner_glow] = -inner_glow->size;
 	data->top[psd_layer_effects_type_inner_glow] = -inner_glow->size;
 	width = layer->width + inner_glow->size * 2;
@@ -395,7 +396,7 @@ psd_status psd_layer_effects_blend_inner_glow(psd_context * context, psd_layer_r
 
 	if(inner_glow->technique == psd_technique_precise)
 		psd_bitmap_find_edge(&dst_bmp, psd_false);
-	
+
 	choke_size = (inner_glow->choke * inner_glow->size + 50) / 100;
 	blur_size = inner_glow->size - choke_size;
 	if(choke_size != 0)
@@ -413,12 +414,12 @@ psd_status psd_layer_effects_blend_inner_glow(psd_context * context, psd_layer_r
 	if(inner_glow->source == psd_glow_center)
 		psd_bitmap_reverse_alpha_channel(&dst_bmp);
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, inner_glow->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, inner_glow->contour_lookup_table,
 		inner_glow->anti_aliased, psd_false);
 
 	if(inner_glow->noise > 0)
 	{
-		psd_effects_add_noise(&dst_bmp, inner_glow->noise, 
+		psd_effects_add_noise(&dst_bmp, inner_glow->noise,
 			data->left[psd_layer_effects_type_inner_glow] + layer->left,
 			data->top[psd_layer_effects_type_inner_glow] + layer->top, context);
 	}
@@ -426,16 +427,16 @@ psd_status psd_layer_effects_blend_inner_glow(psd_context * context, psd_layer_r
 	if(inner_glow->fill_type == psd_fill_gradient)
 	{
 		psd_gradient_color_get_table(&inner_glow->gradient_color, gradient_table, 256, psd_false);
-		psd_effects_apply_gradient(&dst_bmp, gradient_table, psd_false, inner_glow->jitter, 
+		psd_effects_apply_gradient(&dst_bmp, gradient_table, psd_false, inner_glow->jitter,
 			data->left[psd_layer_effects_type_inner_glow] + layer->left,
 			data->top[psd_layer_effects_type_inner_glow] + layer->top, context);
 	}
 
 	psd_bitmap_knock_out(&dst_bmp, &knock_bmp);
 	psd_free_bitmap(&knock_bmp);
-	
+
 	data->valid[psd_layer_effects_type_inner_glow] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

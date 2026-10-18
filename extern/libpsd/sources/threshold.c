@@ -23,6 +23,7 @@
  * $Id: threshold.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -37,7 +38,7 @@ extern void psd_adjustment_blend_gray(psd_context * context, psd_layer_record * 
 psd_status psd_get_layer_threshold(psd_context * context, psd_layer_record * layer)
 {
 	psd_layer_threshold * data;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_threshold;
 	layer->layer_type = psd_layer_type_threshold;
 
@@ -85,7 +86,7 @@ psd_bool psd_layer_blend_threshold(psd_context * context, psd_layer_record * lay
 	psd_adjustment_blend_gray(context, layer, dst_rect, lookup_table);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

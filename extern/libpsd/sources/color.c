@@ -24,18 +24,19 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_color.h"
 #include "psd_math.h"
 
 
-psd_argb_color psd_argb_to_color(psd_color_component alpha, psd_color_component red, 
+psd_argb_color psd_argb_to_color(psd_color_component alpha, psd_color_component red,
 	psd_color_component green, psd_color_component blue)
 {
 	return (alpha << 24) | (red << 16) | (green << 8) | blue;
 }
 
-psd_argb_color psd_rgb_to_color(psd_color_component red, psd_color_component green, 
+psd_argb_color psd_rgb_to_color(psd_color_component red, psd_color_component green,
 	psd_color_component blue)
 {
 	return (0xFF << 24) | (red << 16) | (green << 8) | blue;
@@ -55,7 +56,7 @@ psd_argb_color psd_cmyk_to_color(psd_double cyan, psd_double magenta, psd_double
 	return PSD_RGB_TO_COLOR(red, green, blue);
 }
 
-psd_argb_color psd_acmyk_to_color(psd_color_component alpha, psd_double cyan, 
+psd_argb_color psd_acmyk_to_color(psd_color_component alpha, psd_double cyan,
 	psd_double magenta, psd_double yellow, psd_double black)
 {
 	psd_int red, green, blue;
@@ -178,7 +179,7 @@ psd_argb_color psd_axyz_to_color(psd_color_component alpha, psd_double x, psd_do
 static psd_int psd_hue_to_color(psd_int hue, psd_double m1, psd_double m2)
 {
 	psd_double v;
-	
+
 	hue %= 360;
 	if(hue < 60)
 		v = m1 + (m2 - m1) * hue / 60;
@@ -247,33 +248,33 @@ psd_status psd_color_space_to_argb(psd_argb_color * dst_color, psd_color_space c
 	{
 		case psd_color_space_rgb:
 			*dst_color = psd_rgb_to_color(
-				(psd_color_component)color_component[0], 
-				(psd_color_component)color_component[1], 
+				(psd_color_component)color_component[0],
+				(psd_color_component)color_component[1],
 				(psd_color_component)color_component[2]);
 			break;
-			
+
 		case psd_color_space_hsb:
 			*dst_color = psd_hsb_to_color(
-				color_component[0], 
-				color_component[1] / 100.0, 
+				color_component[0],
+				color_component[1] / 100.0,
 				color_component[2] / 100.0);
 			break;
-			
+
 		case psd_color_space_cmyk:
 			*dst_color = psd_cmyk_to_color(
-				color_component[0] / 100.0, 
-				color_component[1] / 100.0, 
-				color_component[2] / 100.0, 
+				color_component[0] / 100.0,
+				color_component[1] / 100.0,
+				color_component[2] / 100.0,
 				color_component[3] / 100.0);
 			break;
-			
+
 		case psd_color_space_lab:
 			*dst_color = psd_lab_to_color(
-				color_component[0], 
-				color_component[1], 
+				color_component[0],
+				color_component[1],
 				color_component[2]);
 			break;
-			
+
 		default:
 			*dst_color = psd_color_clear;
 			return psd_status_unsupport_color_space;
@@ -288,12 +289,12 @@ void psd_color_memset(psd_argb_color * bits, psd_argb_color color, psd_int lengt
 
 	if(length <= 0)
 		return;
-	
+
 	*bits = color;
 	length *= 4;
 	length -= 4;
 	bytes = 4;
-	
+
 	while(length > 0)
 	{
 		memcpy((psd_uchar *)bits + bytes, bits, length < bytes ? length : bytes);
@@ -324,7 +325,7 @@ void psd_rgb_to_inthsb(psd_int red, psd_int green, psd_int blue, psd_int * hue, 
 			*saturation = d * 255 / (cmax + cmin);
 		else
 			*saturation = d * 255 / (511 - cmax - cmin);
-		
+
 		if(red == cmax)
 			h = (green - blue) * 60 / d;
 		else if(green == cmax)
@@ -373,18 +374,18 @@ void psd_inthsb_to_rgb(psd_int hue, psd_int saturation, psd_int brightness, psd_
 psd_int psd_rgb_get_brightness(psd_int red, psd_int green, psd_int blue)
 {
 	psd_int cmax, cmin;
-	
+
 	cmax = PSD_MAX(red, PSD_MAX(green, blue));
 	cmin = PSD_MIN(red, PSD_MIN(green, blue));
 
 	return (cmax + cmin + 1) >> 1;
 }
 
-void psd_rgb_to_intcmyk(psd_int red, psd_int green, psd_int blue, 
+void psd_rgb_to_intcmyk(psd_int red, psd_int green, psd_int blue,
 	psd_int * cyan, psd_int * magenta, psd_int * yellow, psd_int * black)
 {
 	psd_int dst_cyan, dst_magenta, dst_yellow, dst_black;
-	
+
 	dst_cyan = 255 - red;
 	dst_magenta = 255 - green;
 	dst_yellow = 255 - blue;
@@ -405,7 +406,7 @@ void psd_rgb_to_intcmyk(psd_int red, psd_int green, psd_int blue,
 	*black = dst_black;
 }
 
-void psd_intcmyk_to_rgb(psd_int cyan, psd_int magenta, psd_int yellow, psd_int black, 
+void psd_intcmyk_to_rgb(psd_int cyan, psd_int magenta, psd_int yellow, psd_int black,
 	psd_int * red, psd_int * green, psd_int * blue)
 {
 	*red = (65535 - (cyan * (255 - black) + (black << 8))) >> 8;

@@ -23,6 +23,7 @@
  * $Id: gradient_fill.c, created by Patrick in 2006.06.11, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -37,7 +38,7 @@ psd_status psd_get_layer_gradient_fill(psd_context * context, psd_layer_record *
 	psd_int number_items;
 	psd_uint type, key, rootkey;
 	psd_uchar keychar[256];
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_gradient_fill;
 	layer->layer_type = psd_layer_type_gradient_fill;
 
@@ -108,11 +109,11 @@ psd_status psd_get_layer_gradient_fill(psd_context * context, psd_layer_record *
 				psd_assert(type == 'bool');
 				data->align_with_layer = psd_stream_get_bool(context);
 				break;
-				
+
 			case 'Angl':	// angle
 				// Unit psd_float
 				psd_assert(type == 'UntF');
-				
+
 				// '#Ang' = angle: base degrees
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Ang');
@@ -128,7 +129,7 @@ psd_status psd_get_layer_gradient_fill(psd_context * context, psd_layer_record *
 				// '#Prc' = percent:
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Prc');
-								
+
 				// Actual value (double)
 				data->scale = (psd_int)psd_stream_get_double(context);
 				break;

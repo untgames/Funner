@@ -23,6 +23,7 @@
  * $Id: outer_glow.c, created by Patrick in 2006.05.23, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -36,7 +37,7 @@
 extern void psd_bitmap_gaussian_blur_alpha_channel(psd_bitmap * bitmap, psd_double radius);
 extern void psd_effects_add_noise(psd_bitmap * bitmap, psd_int noise, psd_int left, psd_int top, psd_context * context);
 extern void psd_gradient_color_get_table(psd_gradient_color * gradient_color, psd_argb_color * color_table, psd_int table_count, psd_bool reverse);
-extern void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden, 
+extern void psd_effects_apply_gradient(psd_bitmap * bitmap, psd_argb_color * gradient_table, psd_bool edge_hidden,
 	psd_int jitter, psd_int left, psd_int top, psd_context * context);
 
 
@@ -50,11 +51,11 @@ static void psd_set_layer_outer_glow_default(psd_layer_effects_outer_glow * oute
 	outer_glow->noise = 0;
 	outer_glow->fill_type = psd_fill_solid_color;
 	outer_glow->color = outer_glow->native_color = 0xFFFFFFBE;
-	
+
 	outer_glow->technique = psd_technique_softer;
 	outer_glow->spread = 0;
 	outer_glow->size = 5;
-	
+
 	for(i = 0; i < 256; i ++)
 		outer_glow->contour_lookup_table[i] = i;
 	outer_glow->anti_aliased = psd_false;
@@ -71,7 +72,7 @@ psd_status psd_get_layer_outer_glow(psd_context * context, psd_layer_effects_out
 
 	// Size of the remaining items: 32 for Photoshop 5.0; 42 for 5.5
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 0 for Photoshop 5.0; 2 for 5.5
 	version = psd_stream_get_int(context);
 	if(version != 0 && version != 2)
@@ -91,7 +92,7 @@ psd_status psd_get_layer_outer_glow(psd_context * context, psd_layer_effects_out
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	outer_glow->blend_mode = psd_stream_get_blend_mode(context);
 
@@ -116,7 +117,7 @@ psd_status psd_get_layer_outer_glow2(psd_context * context, psd_layer_effects_ou
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_outer_glow_default(outer_glow);
 
 	// Unicode string: name from classID
@@ -288,7 +289,7 @@ psd_status psd_layer_effects_blend_outer_glow(psd_context * context, psd_layer_r
 	psd_layer_mask_info layer_mask_info;
 	psd_int spread_size, blur_size;
 	psd_argb_color gradient_table[256];
-	
+
 	data->left[psd_layer_effects_type_outer_glow] = -outer_glow->size;
 	data->top[psd_layer_effects_type_outer_glow] = -outer_glow->size;
 	width = layer->width + outer_glow->size * 2;
@@ -352,7 +353,7 @@ psd_status psd_layer_effects_blend_outer_glow(psd_context * context, psd_layer_r
 
 	if(outer_glow->technique == psd_technique_precise)
 		psd_bitmap_find_edge(&dst_bmp, psd_true);
-	
+
 	spread_size = (outer_glow->spread * outer_glow->size + 50) / 100;
 	blur_size = outer_glow->size - spread_size;
 	if(spread_size != 0)
@@ -367,12 +368,12 @@ psd_status psd_layer_effects_blend_outer_glow(psd_context * context, psd_layer_r
 
 	psd_bitmap_ajust_range(&dst_bmp, outer_glow->range);
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, outer_glow->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, outer_glow->contour_lookup_table,
 		outer_glow->anti_aliased, psd_true);
 
 	if(outer_glow->noise > 0)
 	{
-		psd_effects_add_noise(&dst_bmp, outer_glow->noise, 
+		psd_effects_add_noise(&dst_bmp, outer_glow->noise,
 			data->left[psd_layer_effects_type_outer_glow] + layer->left,
 			data->top[psd_layer_effects_type_outer_glow] + layer->top, context);
 	}
@@ -380,16 +381,16 @@ psd_status psd_layer_effects_blend_outer_glow(psd_context * context, psd_layer_r
 	if(outer_glow->fill_type == psd_fill_gradient)
 	{
 		psd_gradient_color_get_table(&outer_glow->gradient_color, gradient_table, 256, psd_false);
-		psd_effects_apply_gradient(&dst_bmp, gradient_table, psd_true, outer_glow->jitter, 
+		psd_effects_apply_gradient(&dst_bmp, gradient_table, psd_true, outer_glow->jitter,
 			data->left[psd_layer_effects_type_outer_glow] + layer->left,
 			data->top[psd_layer_effects_type_outer_glow] + layer->top, context);
 	}
 
 	psd_bitmap_knock_out(&dst_bmp, &knock_bmp);
 	psd_free_bitmap(&knock_bmp);
-	
+
 	data->valid[psd_layer_effects_type_outer_glow] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

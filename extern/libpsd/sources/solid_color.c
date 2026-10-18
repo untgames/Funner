@@ -23,6 +23,7 @@
  * $Id: solid_color.c, created by Patrick in 2006.05.24, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -36,7 +37,7 @@ psd_status psd_get_layer_solid_color(psd_context * context, psd_layer_record * l
 	psd_layer_solid_color * data;
 	psd_int length, number_items;
 	psd_uint key;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_solid_color;
 	layer->layer_type = psd_layer_type_solid_color;
 

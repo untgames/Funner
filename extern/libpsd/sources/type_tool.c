@@ -23,6 +23,7 @@
  * $Id: type_tool.c, created by Patrick in 2006.05.30, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -34,7 +35,7 @@ psd_status psd_get_layer_type_tool(psd_context * context, psd_layer_record * lay
 {
 	psd_layer_type_tool * data;
 	psd_int i, j, length;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_type_tool;
 
 	data = (psd_layer_type_tool *)psd_malloc(sizeof(psd_layer_type_tool));
@@ -201,7 +202,7 @@ psd_status psd_get_layer_type_tool(psd_context * context, psd_layer_record * lay
 
 	// Anti alias on/off
 	data->anti_alias = psd_stream_get_bool(context);
-	
+
 	return psd_status_done;
 }
 

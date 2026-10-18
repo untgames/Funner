@@ -23,6 +23,7 @@
  * $Id: photo_filter.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -33,7 +34,7 @@
 psd_status psd_get_layer_photo_filter(psd_context * context, psd_layer_record * layer)
 {
 	psd_layer_photo_filter * data;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_photo_filter;
 	layer->layer_type = psd_layer_type_photo_filter;
 

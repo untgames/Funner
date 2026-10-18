@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -48,7 +49,7 @@ static void psd_set_layer_stroke_default(psd_layer_effects_stroke * stroke)
 	stroke->opacity = 255;
 
 	stroke->fill_type = psd_fill_solid_color;
-	
+
 	stroke->fill_color = psd_color_red;
 
 	stroke->gradient_reverse = psd_false;
@@ -66,7 +67,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_stroke_default(stroke);
 
 	// Unicode string: name from classID
@@ -104,7 +105,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 				if(strcmp(keychar, "phase") == 0)
 				{
 					psd_assert(type == 'Objc');
-					psd_stream_get_object_point(&stroke->pattern_horz_phase, 
+					psd_stream_get_object_point(&stroke->pattern_horz_phase,
 						&stroke->pattern_vert_phase, context);
 					stroke->pattern_horz_phase = 0;
 					stroke->pattern_vert_phase = 0;
@@ -115,7 +116,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 					psd_stream_get_object_null(type, context);
 				}
 				break;
-				
+
 			// effect enable
 			case 'enab':
 				psd_assert(type == 'bool');
@@ -125,7 +126,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 			// position
 			case 'Styl':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -133,7 +134,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 				key = psd_stream_get_int(context);
 				// fill style
 				psd_assert(key == 'FStl');
-				
+
 				length = psd_stream_get_int(context);
 				if(length == 0)
 					key = psd_stream_get_int(context);
@@ -163,7 +164,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 			// fill type
 			case 'PntT':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -171,7 +172,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 				key = psd_stream_get_int(context);
 				// fill style
 				psd_assert(key == 'FrFl');
-				
+
 				length = psd_stream_get_int(context);
 				if(length == 0)
 					key = psd_stream_get_int(context);
@@ -201,7 +202,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -248,7 +249,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 			case 'Angl':	// angle
 				// Unit psd_float
 				psd_assert(type == 'UntF');
-				
+
 				// '#Ang' = angle: base degrees
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Ang');
@@ -270,7 +271,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 				psd_assert(key == 'GrdT');
 				stroke->gradient_style = psd_stream_get_object_gradient_style(context);
 				break;
-				
+
 			case 'Rvrs':	// reverse
 				// boolean
 				psd_assert(type == 'bool');
@@ -284,7 +285,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 				// '#Prc' = percent:
 				key = psd_stream_get_int(context);
 				psd_assert(key == '#Prc');
-								
+
 				// Actual value (double)
 				if(stroke->fill_type == psd_fill_gradient)
 					stroke->gradient_scale = (psd_int)psd_stream_get_double(context);
@@ -301,7 +302,7 @@ psd_status psd_get_layer_stroke2(psd_context * context, psd_layer_effects_stroke
 			// offset, not documented
 			case 'Ofst':
 				psd_assert(type == 'Objc');
-				psd_stream_get_object_point(&stroke->gradient_horz_offset, 
+				psd_stream_get_object_point(&stroke->gradient_horz_offset,
 					&stroke->gradient_vert_offset, context);
 				break;
 
@@ -415,7 +416,7 @@ psd_status psd_layer_effects_blend_stroke(psd_context * context, psd_layer_recor
 		case psd_fill_solid_color:
 			psd_fill_bitmap_without_alpha_channel(&dst_bmp, stroke->fill_color);
 			break;
-			
+
 		case psd_fill_gradient:
 			if(stroke->gradient_align == psd_false)
 			{
@@ -487,25 +488,25 @@ psd_status psd_layer_effects_blend_stroke(psd_context * context, psd_layer_recor
 			switch(stroke->gradient_style)
 			{
 				case psd_gradient_style_linear:
-					psd_gradient_fill_linear(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse, 
-						center_x - sign_x * radius_x, center_y + sign_y * radius_y, 
+					psd_gradient_fill_linear(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse,
+						center_x - sign_x * radius_x, center_y + sign_y * radius_y,
 						center_x + sign_x * radius_x, center_y - sign_y * radius_y);
 					break;
 				case psd_gradient_style_radial:
-					psd_gradient_fill_radial(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse, 
+					psd_gradient_fill_radial(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse,
 						center_x, center_y, radius_corner);
 					break;
 				case psd_gradient_style_angle:
-					psd_gradient_fill_angle(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse, 
+					psd_gradient_fill_angle(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse,
 						center_x, center_y, stroke->gradient_angle);
 					break;
 				case psd_gradient_style_reflected:
-					psd_gradient_fill_reflected(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse, 
-						center_x - sign_x * radius_x, center_y + sign_y * radius_y, 
+					psd_gradient_fill_reflected(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse,
+						center_x - sign_x * radius_x, center_y + sign_y * radius_y,
 						center_x + sign_x * radius_x, center_y - sign_y * radius_y);
 					break;
 				case psd_gradient_style_diamond:
-					psd_gradient_fill_diamond(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse, 
+					psd_gradient_fill_diamond(&src_bmp, &stroke->gradient_color, stroke->gradient_reverse,
 						center_x, center_y, radius_corner, stroke->gradient_angle);
 					break;
 				default:
@@ -515,22 +516,22 @@ psd_status psd_layer_effects_blend_stroke(psd_context * context, psd_layer_recor
 
 			psd_bitmap_copy_without_alpha_channel(&dst_bmp, &src_bmp);
 			break;
-			
+
 		case psd_fill_pattern:
 			for(i = 0; i < context->pattern_count; i ++)
 			{
 				if(strcmp(context->patterns[i].unique_id, stroke->pattern_info.identifier) == 0)
 				{
-					psd_pattern_fill(&src_bmp, &context->patterns[i], stroke->pattern_scale, 
-						stroke->pattern_horz_phase + stroke->size, 
+					psd_pattern_fill(&src_bmp, &context->patterns[i], stroke->pattern_scale,
+						stroke->pattern_horz_phase + stroke->size,
 						stroke->pattern_vert_phase + stroke->size);
 					break;
 				}
 			}
-			
+
 			psd_bitmap_copy_without_alpha_channel(&dst_bmp, &src_bmp);
 			break;
-			
+
 		default:
 			psd_assert(0);
 			break;
@@ -539,7 +540,7 @@ psd_status psd_layer_effects_blend_stroke(psd_context * context, psd_layer_recor
 	psd_free_bitmap(&src_bmp);
 
 	data->valid[psd_layer_effects_type_stroke] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

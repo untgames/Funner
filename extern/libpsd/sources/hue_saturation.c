@@ -23,6 +23,7 @@
  * $Id: hue_saturation.c, created by Patrick in 2006.05.22, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -32,7 +33,7 @@
 
 
 typedef void psd_adjustment_blend_proc(psd_uint layer_info_data, psd_int * red, psd_int * green, psd_int * blue);
-extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_adjustment_blend_proc * blend_proc, psd_uint layer_info_data);
 
 
@@ -41,7 +42,7 @@ psd_status psd_get_layer_hue_saturation(psd_context * context, psd_layer_record 
 {
 	psd_layer_hue_saturation * data;
 	psd_int i, j;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_new_hue_saturation;
 	layer->layer_type = psd_layer_type_hue_saturation;
 
@@ -110,7 +111,7 @@ static void psd_hue_saturation_proc(psd_uint layer_info_data, psd_int * red, psd
 	psd_int i, opacity;
 
 	psd_rgb_to_inthsb(*red, *green, *blue, &src_hue, &src_saturation, &src_lightness);
-	
+
 	dst_hue = data->master_hue;
 	dst_saturation = data->master_saturation;
 	dst_lightness = data->master_lightness;
@@ -132,7 +133,7 @@ static void psd_hue_saturation_proc(psd_uint layer_info_data, psd_int * red, psd
 		dst_saturation = PSD_CONSTRAIN(dst_saturation, 0, 255);
 		dst_lightness = src_lightness + src_lightness * PSD_CONSTRAIN(dst_lightness, -100, 100) / 100;
 		dst_lightness = PSD_CONSTRAIN(dst_lightness, 0, 255);
-		
+
 		psd_inthsb_to_rgb(dst_hue, dst_saturation, dst_lightness, red, green, blue);
 	}
 }
@@ -177,7 +178,7 @@ psd_bool psd_layer_blend_hue_saturation(psd_context * context, psd_layer_record 
 					if(data->range_values[i][2] > data->range_values[i][3] && increase == 0)
 						increase = 360;
 					range_value[3] = data->range_values[i][3] + increase;
-					
+
 					for(j = 0; j < 360; j ++)
 					{
 						if(j >= range_value[0] && j < range_value[3])
@@ -240,7 +241,7 @@ psd_bool psd_layer_blend_hue_saturation(psd_context * context, psd_layer_record 
 	psd_adjustment_blend_color(context, layer, dst_rect, psd_hue_saturation_proc, layer_info_data);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

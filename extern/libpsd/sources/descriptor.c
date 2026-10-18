@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_descriptor.h"
@@ -51,7 +52,7 @@ static void psd_stream_get_object_list(psd_context * context);
 static void psd_stream_get_unicode_name(psd_context * context)
 {
 	psd_int length;
-	
+
 	length = psd_stream_get_int(context) * 2;
 	psd_stream_get_null(context, length);
 }
@@ -59,7 +60,7 @@ static void psd_stream_get_unicode_name(psd_context * context)
 static void psd_stream_get_object_id(psd_context * context)
 {
 	psd_int length;
-	
+
 	length = psd_stream_get_int(context);
 	if(length == 0)
 		psd_stream_get_int(context);
@@ -88,28 +89,28 @@ static void psd_stream_get_object_reference(psd_context * context)
 				// Unicode string: name from classID
 				psd_stream_get_unicode_name(context);
 				// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-				// byte classID	
+				// byte classID
 				psd_stream_get_object_id(context);
 				// KeyID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte keyID
 				psd_stream_get_object_id(context);
 				break;
-				
+
 			// 'Clss' = Class
 			case 'Clss':
 				// Unicode string: name from classID
 				psd_stream_get_unicode_name(context);
 				// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-				// byte classID				
+				// byte classID
 				psd_stream_get_object_id(context);
 				break;
-				
+
 			// 'Enmr' = Enumerated Reference
 			case 'Enmr':
 				// Unicode string: name from classID
 				psd_stream_get_unicode_name(context);
 				// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-				// byte classID				
+				// byte classID
 				psd_stream_get_object_id(context);
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
@@ -118,28 +119,28 @@ static void psd_stream_get_object_reference(psd_context * context)
 				// byte enum
 				psd_stream_get_object_id(context);
 				break;
-				
+
 			// 'rele' = Offset
 			case 'rele':
 				// Unicode string: name from classID
 				psd_stream_get_unicode_name(context);
 				// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-				// byte classID				
+				// byte classID
 				psd_stream_get_object_id(context);
 				// Value of the offset
 				psd_stream_get_int(context);
 				break;
-				
+
 			// 'Idnt' = Identifier
 			case 'Idnt':
 				psd_stream_get_int(context);
 				break;
-				
+
 			// 'indx' = Index
 			case 'indx':
 				psd_stream_get_int(context);
 				break;
-			
+
 			// 'name' =Name
 			case 'name':
 				psd_stream_get_unicode_name(context);
@@ -206,7 +207,7 @@ static void psd_stream_get_object_class(psd_context * context)
 	// Unicode string: name from classID
 	psd_stream_get_unicode_name(context);
 	// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-	// byte classID				
+	// byte classID
 	psd_stream_get_object_id(context);
 }
 
@@ -214,7 +215,7 @@ static void psd_stream_get_object_class(psd_context * context)
 static void psd_stream_get_object_alias(psd_context * context)
 {
 	psd_int length;
-	
+
 	// Length of data to follow
 	length = psd_stream_get_int(context);
 
@@ -227,12 +228,12 @@ static void psd_stream_get_object_descriptor(psd_context * context)
 {
 	psd_uint type;
 	psd_int length, number_items;
-	
+
 	// Unicode string: name from classID
 	psd_stream_get_unicode_name(context);
 
 	// classID: 4 bytes (length), followed either by string or (if length is zero) 4-
-	// byte classID				
+	// byte classID
 	psd_stream_get_object_id(context);
 
 	// Number of items in descriptor
@@ -307,7 +308,7 @@ static void psd_stream_get_object_list(psd_context * context)
 	{
 		// OSType key for type to use.
 		type = psd_stream_get_int(context);
-		
+
 		switch(type)
 		{
 			case 'obj ':
@@ -402,7 +403,7 @@ psd_argb_color psd_stream_get_object_color(psd_context * context)
 	psd_uint key;
 	psd_int length, number_colors;
 	psd_int red, green, blue;
-	
+
 	// Unicode string: name from classID
 	length = psd_stream_get_int(context) * 2;
 	psd_stream_get_null(context, length);
@@ -415,7 +416,7 @@ psd_argb_color psd_stream_get_object_color(psd_context * context)
 	key = psd_stream_get_int(context);
 	// rgb color
 	psd_assert(key == 'RGBC');
-	
+
 	// Number of color component
 	number_colors = psd_stream_get_int(context);
 	// must be 3
@@ -466,7 +467,7 @@ psd_argb_color psd_stream_get_object_color(psd_context * context)
 static void psd_contour_compose(psd_matrix a, psd_matrix b, psd_matrix ab)
 {
 	psd_int i, j;
-	
+
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 4; j++)
@@ -479,8 +480,8 @@ static void psd_contour_compose(psd_matrix a, psd_matrix b, psd_matrix ab)
 	}
 }
 
-static void psd_contour_plot(psd_uchar * table, 
-	psd_uchar * input_value, psd_uchar * output_value, psd_bool * corner, 
+static void psd_contour_plot(psd_uchar * table,
+	psd_uchar * input_value, psd_uchar * output_value, psd_bool * corner,
 	psd_int p1, psd_int p2, psd_int p3, psd_int p4)
 {
 	psd_matrix geometry;
@@ -707,7 +708,7 @@ void psd_stream_get_object_contour(psd_uchar * lookup_table, psd_context * conte
 		}
 	}
 
-	psd_contour_calculate_table(lookup_table, number_point, 
+	psd_contour_calculate_table(lookup_table, number_point,
 		input_value, output_value, corner);
 }
 
@@ -838,7 +839,7 @@ psd_gradient_style psd_stream_get_object_gradient_style(psd_context * context)
 	psd_gradient_style style = psd_gradient_style_linear;
 	psd_int length;
 	psd_uint tag;
-	
+
 	// enum: 4 bytes (length), followed either by string or (if length is zero) 4-
 	// byte enum
 	length = psd_stream_get_int(context);
@@ -874,7 +875,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 	psd_int i, length, number_items, number_lists, number_data;
 	psd_uint key, rootkey, type;
 	psd_uchar keychar[256];
-	
+
 	// Unicode string: name from classID
 	length = psd_stream_get_int(context) * 2;
 	psd_stream_get_null(context, length);
@@ -987,7 +988,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					number_data = psd_stream_get_int(context);
 					// maybe be 4, include color, color stop type, location and midpoint
 					psd_assert(number_data == 4);
-					
+
 					length = psd_stream_get_int(context);
 					psd_assert(length == 0);
 					key = psd_stream_get_int(context);
@@ -1008,7 +1009,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// Type
 					psd_assert(key == 'Type');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Enumerated
@@ -1051,7 +1052,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// Location
 					psd_assert(key == 'Lctn');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Integer
@@ -1067,7 +1068,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// midpoint
 					psd_assert(key == 'Mdpn');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Integer
@@ -1088,7 +1089,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					gradient_color->number_transparency_stops * sizeof(psd_gradient_transparency_stop));
 				if(gradient_color->transparency_stop == NULL)
 					return;
-				memset(gradient_color->transparency_stop, 0, gradient_color->number_transparency_stops * 
+				memset(gradient_color->transparency_stop, 0, gradient_color->number_transparency_stops *
 					sizeof(psd_gradient_transparency_stop));
 
 				/***************************************************************************/
@@ -1125,7 +1126,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// opacity
 					psd_assert(key == 'Opct');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Unit psd_float
@@ -1146,7 +1147,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// Location
 					psd_assert(key == 'Lctn');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Integer
@@ -1162,7 +1163,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					key = psd_stream_get_int(context);
 					// midpoint
 					psd_assert(key == 'Mdpn');
-					
+
 					// Type: OSType key
 					type = psd_stream_get_int(context);
 					// Integer
@@ -1171,7 +1172,7 @@ void psd_stream_get_object_gradient_color(psd_gradient_color * gradient_color, p
 					gradient_color->transparency_stop[i].midpoint = psd_stream_get_int(context);
 				}
 				break;
-				
+
 			default:
 				psd_assert(0);
 				psd_stream_get_object_null(type, context);
@@ -1185,7 +1186,7 @@ void psd_stream_get_object_pattern_info(psd_pattern_info * pattern_info, psd_con
 	psd_int i, length, number_items, identifier_length;
 	psd_uint key, rootkey, type;
 	psd_uchar keychar[256];
-	
+
 	// Unicode string: name from classID
 	length = psd_stream_get_int(context) * 2;
 	psd_stream_get_null(context, length);
@@ -1230,7 +1231,7 @@ void psd_stream_get_object_pattern_info(psd_pattern_info * pattern_info, psd_con
 
 				psd_stream_get(context, (psd_uchar *)pattern_info->name, 2 * pattern_info->name_length);
 				break;
-				
+
 			case 'Idnt':
 				// String
 				psd_assert(type == 'TEXT');
@@ -1252,7 +1253,7 @@ void psd_stream_get_object_point(psd_int * horz, psd_int * vert, psd_context * c
 {
 	psd_int length, number_item;
 	psd_uint key, rootkey, type;
-	
+
 	// Unicode string: name from classID
 	length = psd_stream_get_int(context) * 2;
 	psd_stream_get_null(context, length);

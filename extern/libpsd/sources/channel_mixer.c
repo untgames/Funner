@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_system.h"
 #include "psd_stream.h"
@@ -33,7 +34,7 @@
 
 
 typedef void psd_adjustment_blend_proc(psd_uint layer_info_data, psd_int * red, psd_int * green, psd_int * blue);
-extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect, 
+extern void psd_adjustment_blend_color(psd_context * context, psd_layer_record * layer, psd_rect * dst_rect,
 	psd_adjustment_blend_proc * blend_proc, psd_uint layer_info_data);
 
 
@@ -41,7 +42,7 @@ psd_status psd_get_layer_channel_mixer(psd_context * context, psd_layer_record *
 {
 	psd_layer_channel_mixer * data;
 	psd_int i;
-	
+
 	layer->layer_info_type[layer->layer_info_count] = psd_layer_info_type_channel_mixer;
 	layer->layer_type = psd_layer_type_channel_mixer;
 
@@ -79,7 +80,7 @@ static void psd_channel_mixer_proc(psd_uint layer_info_data, psd_int * red, psd_
 {
 	psd_layer_channel_mixer * data = (psd_layer_channel_mixer *)layer_info_data;
 	psd_int dst_red, dst_green, dst_blue, src_red, src_green, src_blue, gray;
-	
+
 	src_red = *red;
 	src_green = *green;
 	src_blue = *blue;
@@ -98,7 +99,7 @@ static void psd_channel_mixer_proc(psd_uint layer_info_data, psd_int * red, psd_
 	}
 	else
 	{
-		if(data->red_cyan[0] != 100 || data->green_magenta[0] != 0 || 
+		if(data->red_cyan[0] != 100 || data->green_magenta[0] != 0 ||
 			data->blue_yellow[0] != 0 || data->constant[0] != 0)
 		{
 			dst_red = 0;
@@ -109,7 +110,7 @@ static void psd_channel_mixer_proc(psd_uint layer_info_data, psd_int * red, psd_
 			*red = PSD_CONSTRAIN(dst_red, 0, 255);
 		}
 
-		if(data->green_magenta[1] != 100 || data->red_cyan[1] != 0 || 
+		if(data->green_magenta[1] != 100 || data->red_cyan[1] != 0 ||
 			data->blue_yellow[1] != 0 || data->constant[1] != 0)
 		{
 			dst_green = 0;
@@ -120,7 +121,7 @@ static void psd_channel_mixer_proc(psd_uint layer_info_data, psd_int * red, psd_
 			*green = PSD_CONSTRAIN(dst_green, 0, 255);
 		}
 
-		if(data->blue_yellow[2] != 100 || data->red_cyan[2] != 0 || 
+		if(data->blue_yellow[2] != 100 || data->red_cyan[2] != 0 ||
 			data->green_magenta[2] != 0 || data->constant[2] != 0)
 		{
 			dst_blue = 0;
@@ -155,7 +156,7 @@ psd_bool psd_layer_blend_channel_mixer(psd_context * context, psd_layer_record *
 	psd_adjustment_blend_color(context, layer, dst_rect, psd_channel_mixer_proc, layer_info_data);
 
 	layer->adjustment_valid = psd_false;
-	
+
 	return psd_true;
 }
 

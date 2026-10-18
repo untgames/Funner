@@ -23,6 +23,7 @@
  * $Id: rect.c, created by Patrick in 2005.06.01, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_rect.h"
 #include "psd_math.h"
@@ -43,7 +44,7 @@ psd_bool psd_incept_rect(psd_rect * r1, psd_rect * r2, psd_rect * dst_rect)
 
 psd_bool psd_equal_rect(psd_rect * r1, psd_rect * r2)
 {
-	if((r1->left == r2->left) && (r1->right == r2->right) 
+	if((r1->left == r2->left) && (r1->right == r2->right)
 		&&(r1->top == r2->top) && (r1->bottom == r2->bottom) )
 		return psd_true;
 
@@ -70,7 +71,7 @@ psd_bool psd_subtract_rect(psd_rect * r1, psd_rect * r2, psd_rect * dst_rect)
 		}
 		else
 			return psd_false;
-		
+
 		return psd_true;
 	}
 	else if(r1->top == r2->top && r1->bottom == r2->bottom)
@@ -91,7 +92,7 @@ psd_bool psd_subtract_rect(psd_rect * r1, psd_rect * r2, psd_rect * dst_rect)
 		}
 		else
 			return psd_false;
-		
+
 		return psd_true;
 	}
 
@@ -135,7 +136,7 @@ void psd_inflate_rect(psd_rect * rc, psd_int dlt_x, psd_int dlt_y)
 		dlt_x = psd_rect_width(rc) / 2;
 	if(rc->top - dlt_y > rc->bottom + dlt_y)
 		dlt_y = psd_rect_height(rc) / 2;
-	
+
 	rc->left -= dlt_x ;
 	rc->right += dlt_x ;
 	rc->top -= dlt_y ;
@@ -146,7 +147,7 @@ psd_bool psd_point_in_rect(psd_rect * rc, psd_int x, psd_int y)
 {
 	if(x >= rc->left && y >= rc->top && x < rc->right && y < rc->bottom)
 		return psd_true;
-	
+
 	return psd_false;
 }
 

@@ -23,6 +23,7 @@
  * $Id: image_resource.c, created by Patrick in 2006.05.18, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -246,12 +247,12 @@ psd_status psd_get_image_resource(psd_context * context)
 #ifdef PSD_INCLUDE_LIBJPEG
 						if(context->thumbnail_resource.format == 0)
 						{
-							status = psd_thumbnail_decode_raw(&context->thumbnail_resource.thumbnail_data, 
+							status = psd_thumbnail_decode_raw(&context->thumbnail_resource.thumbnail_data,
 								context->thumbnail_resource.size_after_compression, context);
 						}
 						else
 						{
-							status = psd_thumbnail_decode_jpeg(&context->thumbnail_resource.thumbnail_data, 
+							status = psd_thumbnail_decode_jpeg(&context->thumbnail_resource.thumbnail_data,
 								context->thumbnail_resource.size_after_compression, context);
 						}
 						if(status != psd_status_done)
@@ -399,7 +400,7 @@ psd_status psd_get_image_resource(psd_context * context)
 						context->border_info.border_width = psd_fixed_16_16_tofloat((psd_fixed_16_16)psd_stream_get_int(context));
 						// 2 bytes for border units (1 = inches, 2 = cm, 3 = points, 4 = picas, 5 = columns).
 						context->border_info.border_units = (psd_units)psd_stream_get_short(context);
-						psd_assert(context->border_info.border_units >= psd_units_inches && 
+						psd_assert(context->border_info.border_units >= psd_units_inches &&
 							context->border_info.border_units <= psd_units_columns);
 						context->fill_border_info = psd_true;
 						break;
@@ -477,7 +478,7 @@ psd_status psd_get_image_resource(psd_context * context)
 						}
 						context->fill_color_samplers = psd_true;
 						break;
-						
+
 					// (Photoshop 6.0) Slices
 					case 1050:
 						// Version ( = 6)
@@ -530,7 +531,7 @@ psd_status psd_get_image_resource(psd_context * context)
 							psd_stream_get_null(context, size);
 							context->slices_resource.slices_resource_block[i].horizontal_alignment = psd_stream_get_int(context);
 							context->slices_resource.slices_resource_block[i].veritcal_alignment = psd_stream_get_int(context);
-							context->slices_resource.slices_resource_block[i].color = psd_argb_to_color(psd_stream_get_char(context), 
+							context->slices_resource.slices_resource_block[i].color = psd_argb_to_color(psd_stream_get_char(context),
 								psd_stream_get_char(context), psd_stream_get_char(context), psd_stream_get_char(context));
 						}
 						context->fill_slices_resource = psd_true;
@@ -559,7 +560,7 @@ psd_status psd_get_image_resource(psd_context * context)
 							context->url_list.items[i].name = (psd_ushort *)psd_malloc(2 * context->url_list.items[i].name_length);
 							if (context->url_list.items[i].name == NULL)
 								return psd_status_malloc_failed;
-							psd_stream_get(context, (psd_uchar *)context->url_list.items[i].name, 
+							psd_stream_get(context, (psd_uchar *)context->url_list.items[i].name,
 								2 * context->url_list.items[i].name_length);
 						}
 						context->fill_url_list = psd_true;
@@ -590,7 +591,7 @@ psd_status psd_get_image_resource(psd_context * context)
 						context->fill_exif_data = psd_true;
 #	endif // ifdef PSD_INCLUDDE_LIBEXIF
 						break;
-						
+
 					// (Photoshop 7.0) XMP metadata
 					// File info as XML description
 					// http://Partners.adobe.com/asn/developer/xmp/main.html
@@ -650,7 +651,7 @@ psd_status psd_get_image_resource(psd_context * context)
 						context->print_flags_info.scale = psd_stream_get_short(context);
 						context->fill_print_flags_info = psd_true;
 						break;
-						
+
 #endif // ifdef PSD_GET_ALL_IMAGE_RESOURCE
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -677,7 +678,7 @@ psd_status psd_get_image_resource(psd_context * context)
 						}
 						break;
 				}
-				
+
 				// Filler
 				psd_stream_get_null(context, prev_stream_pos + sizeofdata - context->stream.current_pos);
 			}
@@ -694,9 +695,9 @@ psd_status psd_get_image_resource(psd_context * context)
 void psd_image_resource_free(psd_context * context)
 {
 	psd_int i;
-	
+
 	psd_alpha_channel_free(context);
-	
+
 	psd_freeif(context->layer_group_id);
 	psd_freeif(context->thumbnail_resource.jfif_data);
 	psd_freeif(context->thumbnail_resource.thumbnail_data);

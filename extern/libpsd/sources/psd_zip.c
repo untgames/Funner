@@ -23,6 +23,7 @@
  * $Id: psd_zip.c, created by Patrick in 2007.02.02, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 
@@ -30,7 +31,7 @@
 #include "zlib.h"
 
 
-psd_status psd_unzip_without_prediction(psd_uchar *src_buf, psd_int src_len, 
+psd_status psd_unzip_without_prediction(psd_uchar *src_buf, psd_int src_len,
 	psd_uchar *dst_buf, psd_int dst_len)
 {
 	z_stream stream;
@@ -46,7 +47,7 @@ psd_status psd_unzip_without_prediction(psd_uchar *src_buf, psd_int src_len,
 
 	if(inflateInit(&stream) != Z_OK)
 		return psd_status_unzip_error;
-	
+
 	do {
 		state = inflate(&stream, Z_PARTIAL_FLUSH);
 		if(state == Z_STREAM_END)
@@ -85,8 +86,8 @@ psd_bool psd_test_big_endian(void)
 	return result;
 }
 
-psd_status psd_unzip_with_prediction(psd_uchar *src_buf, psd_int src_len, 
-	psd_uchar *dst_buf, psd_int dst_len, 
+psd_status psd_unzip_with_prediction(psd_uchar *src_buf, psd_int src_len,
+	psd_uchar *dst_buf, psd_int dst_len,
 	psd_int row_size, psd_int color_depth)
 {
 	psd_status status;
@@ -100,7 +101,7 @@ psd_status psd_unzip_with_prediction(psd_uchar *src_buf, psd_int src_len,
 		return status;
 
 	big_endian = psd_test_big_endian();
-	
+
 	buf = dst_buf;
 	wbuf = (psd_ushort *)dst_buf;
 	do {

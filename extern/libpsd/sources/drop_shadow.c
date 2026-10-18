@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -52,12 +53,12 @@ static void psd_set_layer_drop_shadow_default(psd_layer_effects_drop_shadow * dr
 	drop_shadow->distance = 5;
 	drop_shadow->spread = 0;
 	drop_shadow->size = 5;
-	
+
 	for(i = 0; i < 256; i ++)
 		drop_shadow->contour_lookup_table[i] = i;
 	drop_shadow->anti_aliased = psd_false;
 	drop_shadow->noise = 0;
-	
+
 	drop_shadow->knocks_out = psd_false;
 }
 
@@ -67,10 +68,10 @@ psd_status psd_get_layer_drop_shadow(psd_context * context, psd_layer_effects_dr
 	psd_uint tag;
 
 	psd_set_layer_drop_shadow_default(drop_shadow);
-	
+
 	// Size of the remaining items: 41 or 51 (depending on version)
 	size = psd_stream_get_int(context);
-	
+
 	// Version: 0 (Photoshop 5.0) or 2 (Photoshop 5.5)
 	version = psd_stream_get_int(context);
 	if(version != 0 && version != 2)
@@ -90,7 +91,7 @@ psd_status psd_get_layer_drop_shadow(psd_context * context, psd_layer_effects_dr
 
 	// maybe photoshop is wrong
 	psd_stream_get_short(context);
-	
+
 	// Color
 	drop_shadow->color = psd_stream_get_space_color(context);
 
@@ -99,7 +100,7 @@ psd_status psd_get_layer_drop_shadow(psd_context * context, psd_layer_effects_dr
 	tag = psd_stream_get_int(context);
 	if(tag != '8BIM')
 		return psd_status_blend_mode_signature_error;
-	
+
 	// Blend mode key
 	drop_shadow->blend_mode = psd_stream_get_blend_mode(context);
 
@@ -127,7 +128,7 @@ psd_status psd_get_layer_drop_shadow2(psd_context * context, psd_layer_effects_d
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_drop_shadow_default(drop_shadow);
 
 	// Unicode string: name from classID
@@ -173,7 +174,7 @@ psd_status psd_get_layer_drop_shadow2(psd_context * context, psd_layer_effects_d
 					psd_assert(0);
 				}
 				break;
-				
+
 			// effect enable
 			case 'enab':
 				psd_assert(type == 'bool');
@@ -183,7 +184,7 @@ psd_status psd_get_layer_drop_shadow2(psd_context * context, psd_layer_effects_d
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -327,14 +328,14 @@ psd_status psd_layer_effects_blend_drop_shadow(psd_context * context, psd_layer_
 	psd_bitmap src_bmp, dst_bmp, knock_bmp;
 	psd_layer_mask_info layer_mask_info;
 	psd_int spread_size, blur_size;
-	
+
 	if(drop_shadow->use_global_light == psd_true)
 		angle = context->global_angle;
 	else
 		angle = drop_shadow->angle;
 	distance_x = -(psd_int)(drop_shadow->distance * cos(PSD_PI * angle / 180) + 0.5);
 	distance_y = (psd_int)(drop_shadow->distance * sin(PSD_PI * angle / 180) + 0.5);
-	
+
 	data->left[psd_layer_effects_type_drop_shadow] = -drop_shadow->size + distance_x;
 	data->top[psd_layer_effects_type_drop_shadow] = -drop_shadow->size + distance_y;
 	width = layer->width + drop_shadow->size * 2;
@@ -399,7 +400,7 @@ psd_status psd_layer_effects_blend_drop_shadow(psd_context * context, psd_layer_
 		psd_copy_bitmap(&knock_bmp, &dst_bmp);
 		psd_offset_bitmap(&knock_bmp, distance_x, distance_y, psd_color_clear);
 	}
-	
+
 	spread_size = (drop_shadow->spread * drop_shadow->size + 50) / 100;
 	blur_size = drop_shadow->size - spread_size;
 	if(spread_size != 0)
@@ -412,12 +413,12 @@ psd_status psd_layer_effects_blend_drop_shadow(psd_context * context, psd_layer_
 		psd_bitmap_gaussian_blur_alpha_channel(&dst_bmp, blur_size);
 	}
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, drop_shadow->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, drop_shadow->contour_lookup_table,
 		drop_shadow->anti_aliased, psd_true);
 
 	if(drop_shadow->noise > 0)
 	{
-		psd_effects_add_noise(&dst_bmp, drop_shadow->noise, 
+		psd_effects_add_noise(&dst_bmp, drop_shadow->noise,
 			data->left[psd_layer_effects_type_drop_shadow] + layer->left,
 			data->top[psd_layer_effects_type_drop_shadow] + layer->top, context);
 	}
@@ -427,9 +428,9 @@ psd_status psd_layer_effects_blend_drop_shadow(psd_context * context, psd_layer_
 		psd_bitmap_knock_out(&dst_bmp, &knock_bmp);
 		psd_free_bitmap(&knock_bmp);
 	}
-	
+
 	data->valid[psd_layer_effects_type_drop_shadow] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

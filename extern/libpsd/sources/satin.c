@@ -24,6 +24,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -41,14 +42,14 @@ extern void psd_bitmap_gaussian_blur_alpha_channel(psd_bitmap * bitmap, psd_doub
 static void psd_set_layer_satin_default(psd_layer_effects_satin * satin)
 {
 	psd_int i;
-	
+
 	satin->blend_mode = psd_blend_mode_multiply;
 	satin->color = psd_color_black;
 	satin->opacity = 128;
 	satin->angle = 19;
 	satin->distance = 11;
 	satin->size = 14;
-	
+
 	for(i = 0; i < 256; i ++)
 		satin->contour_lookup_table[i] = i;
 	satin->anti_aliased = psd_false;
@@ -60,7 +61,7 @@ psd_status psd_get_layer_satin2(psd_context * context, psd_layer_effects_satin *
 	psd_int length, number_items;
 	psd_uint rootkey, type, key;
 	psd_uchar keychar[256];
-	
+
 	psd_set_layer_satin_default(satin);
 
 	// Unicode string: name from classID
@@ -103,7 +104,7 @@ psd_status psd_get_layer_satin2(psd_context * context, psd_layer_effects_satin *
 			// blend mode
 			case 'Md  ':
 				psd_assert(type == 'enum');
-				
+
 				// TypeID: 4 bytes (length), followed either by string or (if length is zero) 4-
 				// byte typeID
 				length = psd_stream_get_int(context);
@@ -120,7 +121,7 @@ psd_status psd_get_layer_satin2(psd_context * context, psd_layer_effects_satin *
 				psd_assert(type == 'Objc');
 				satin->color = psd_stream_get_object_color(context);
 				break;
-				
+
 			// anti-aliased
 			case 'AntA':
 				psd_assert(type == 'bool');
@@ -132,7 +133,7 @@ psd_status psd_get_layer_satin2(psd_context * context, psd_layer_effects_satin *
 				psd_assert(type == 'bool');
 				satin->invert = psd_stream_get_bool(context);
 				break;
-				
+
 			// opacity
 			case 'Opct':
 				psd_assert(type == 'UntF');
@@ -186,14 +187,14 @@ psd_status psd_get_layer_satin2(psd_context * context, psd_layer_effects_satin *
 	return psd_status_done;
 }
 
-static void psd_satin_blend_offset(psd_bitmap * dst_bmp, psd_bitmap * src_bmp, psd_bool invert, 
+static void psd_satin_blend_offset(psd_bitmap * dst_bmp, psd_bitmap * src_bmp, psd_bool invert,
 	psd_int offset_x, psd_int offset_y)
 {
 	psd_int i, j, left1, left2, top1, top2, right1, right2, bottom1, bottom2,
 		x1, x2, y1, y2;
 	psd_int alpha1, alpha2, dst_alpha;
 	psd_argb_color * dst_data, * src_data1, * src_data2;
-	
+
 	if(PSD_ABS(offset_x) >= dst_bmp->width || PSD_ABS(offset_y) >= dst_bmp->height)
 		return;
 
@@ -353,7 +354,7 @@ psd_status psd_layer_effects_blend_satin(psd_context * context, psd_layer_record
 
 	psd_bitmap_gaussian_blur_alpha_channel(&dst_bmp, satin->size);
 
-	psd_bitmap_contour_alpha_channel(&dst_bmp, satin->contour_lookup_table, 
+	psd_bitmap_contour_alpha_channel(&dst_bmp, satin->contour_lookup_table,
 		satin->anti_aliased, psd_false);
 
 	distance_x = -(psd_int)(satin->distance * cos(PSD_PI * satin->angle / 180) + 0.5);
@@ -363,9 +364,9 @@ psd_status psd_layer_effects_blend_satin(psd_context * context, psd_layer_record
 	psd_bitmap_knock_out(&satin_bmp, &knock_bmp);
 	psd_free_bitmap(&knock_bmp);
 	psd_free_bitmap(&dst_bmp);
-	
+
 	data->valid[psd_layer_effects_type_satin] = psd_false;
-	
+
 	return psd_status_done;
 }
 #endif

@@ -23,6 +23,7 @@
  * $Id: channel_image.c, created by Patrick in 2006.05.25, libpsd@graphest.com Exp $
  */
 
+#include <string.h>
 #include "libpsd.h"
 #include "psd_config.h"
 #include "psd_system.h"
@@ -35,10 +36,10 @@
 #define PSD_MIN_TEMP_IMAGE_LENGTH		12288
 
 #ifdef PSD_INCLUDE_ZLIB
-extern psd_status psd_unzip_without_prediction(psd_uchar *src_buf, psd_int src_len, 
+extern psd_status psd_unzip_without_prediction(psd_uchar *src_buf, psd_int src_len,
 	psd_uchar *dst_buf, psd_int dst_len);
-extern psd_status psd_unzip_with_prediction(psd_uchar *src_buf, psd_int src_len, 
-	psd_uchar *dst_buf, psd_int dst_len, 
+extern psd_status psd_unzip_with_prediction(psd_uchar *src_buf, psd_int src_len,
+	psd_uchar *dst_buf, psd_int dst_len,
 	psd_int row_size, psd_int color_depth);
 #endif
 
@@ -90,7 +91,7 @@ static psd_status psd_combine_bitmap1_channel(psd_context * context, psd_layer_r
 			}
 		}
 	}
-	
+
 	return psd_status_done;
 }
 
@@ -120,7 +121,7 @@ static psd_status psd_combine_grayscale8_channel(psd_context * context, psd_laye
 	}
 
 	psd_assert(gray != NULL);
-	
+
 	if(alpha == NULL)
 	{
 		for(i = layer->width * layer->height; i --; )
@@ -172,7 +173,7 @@ static psd_status psd_combine_grayscale16_channel(psd_context * context, psd_lay
 	}
 
 	psd_assert(gray != NULL);
-	
+
 	if(alpha == NULL)
 	{
 		for(i = layer->width * layer->height; i --; )
@@ -336,7 +337,7 @@ static psd_status psd_combine_rgb16_channel(psd_context * context, psd_layer_rec
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = PSD_RGB_TO_COLOR(PSD_CHAR_TO_SHORT(red) >> 8, 
+			*dst_color = PSD_RGB_TO_COLOR(PSD_CHAR_TO_SHORT(red) >> 8,
 				PSD_CHAR_TO_SHORT(green) >> 8, PSD_CHAR_TO_SHORT(blue) >> 8);
 			dst_color ++;
 			red += 2;
@@ -348,7 +349,7 @@ static psd_status psd_combine_rgb16_channel(psd_context * context, psd_layer_rec
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = PSD_ARGB_TO_COLOR(PSD_CHAR_TO_SHORT(alpha) >> 8, 
+			*dst_color = PSD_ARGB_TO_COLOR(PSD_CHAR_TO_SHORT(alpha) >> 8,
 				PSD_CHAR_TO_SHORT(red) >> 8, PSD_CHAR_TO_SHORT(green) >> 8, PSD_CHAR_TO_SHORT(blue) >> 8);
 			dst_color ++;
 			alpha += 2;
@@ -469,8 +470,8 @@ static psd_status psd_combine_cmyk16_channel(psd_context * context, psd_layer_re
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = psd_intcmyk_to_color(255 - (PSD_CHAR_TO_SHORT(cyan) >> 8), 
-				255 - (PSD_CHAR_TO_SHORT(magenta) >> 8), 255 - (PSD_CHAR_TO_SHORT(yellow) >> 8), 
+			*dst_color = psd_intcmyk_to_color(255 - (PSD_CHAR_TO_SHORT(cyan) >> 8),
+				255 - (PSD_CHAR_TO_SHORT(magenta) >> 8), 255 - (PSD_CHAR_TO_SHORT(yellow) >> 8),
 				255 - (PSD_CHAR_TO_SHORT(black) >> 8));
 			dst_color ++;
 			cyan += 2;
@@ -483,8 +484,8 @@ static psd_status psd_combine_cmyk16_channel(psd_context * context, psd_layer_re
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = psd_intacmyk_to_color(PSD_CHAR_TO_SHORT(alpha) >> 8, 
-				255 - (PSD_CHAR_TO_SHORT(cyan) >> 8), 255 - (PSD_CHAR_TO_SHORT(magenta) >> 8), 
+			*dst_color = psd_intacmyk_to_color(PSD_CHAR_TO_SHORT(alpha) >> 8,
+				255 - (PSD_CHAR_TO_SHORT(cyan) >> 8), 255 - (PSD_CHAR_TO_SHORT(magenta) >> 8),
 				255 - (PSD_CHAR_TO_SHORT(yellow) >> 8), 255 - (PSD_CHAR_TO_SHORT(black) >> 8));
 			dst_color ++;
 			alpha += 2;
@@ -599,7 +600,7 @@ static psd_status psd_combine_lab16_channel(psd_context * context, psd_layer_rec
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = psd_lab_to_color((PSD_CHAR_TO_SHORT(lightness) >> 8) * 100 >> 8, 
+			*dst_color = psd_lab_to_color((PSD_CHAR_TO_SHORT(lightness) >> 8) * 100 >> 8,
 				(PSD_CHAR_TO_SHORT(a) >> 8) - 128, (PSD_CHAR_TO_SHORT(b) >> 8) - 128);
 			dst_color ++;
 			lightness += 2;
@@ -611,7 +612,7 @@ static psd_status psd_combine_lab16_channel(psd_context * context, psd_layer_rec
 	{
 		for(i = layer->width * layer->height; i --; )
 		{
-			*dst_color = psd_alab_to_color(PSD_CHAR_TO_SHORT(alpha) >> 8, (PSD_CHAR_TO_SHORT(lightness) >> 8) * 100 >> 8, 
+			*dst_color = psd_alab_to_color(PSD_CHAR_TO_SHORT(alpha) >> 8, (PSD_CHAR_TO_SHORT(lightness) >> 8) * 100 >> 8,
 				(PSD_CHAR_TO_SHORT(a) >> 8) - 128, (PSD_CHAR_TO_SHORT(b) >> 8) - 128);
 			dst_color ++;
 			alpha += 2;
@@ -702,7 +703,7 @@ static psd_status psd_get_layer_user_supplied_layer_mask8(psd_context * context,
 			layer->layer_mask_info.mask_data = (psd_color_component *)psd_malloc(layer->layer_mask_info.width * layer->layer_mask_info.height);
 			if(layer->layer_mask_info.mask_data == NULL)
 				return psd_status_malloc_failed;
-			memcpy(layer->layer_mask_info.mask_data, context->temp_image_data + context->max_channel_length * i, 
+			memcpy(layer->layer_mask_info.mask_data, context->temp_image_data + context->max_channel_length * i,
 				layer->layer_mask_info.width * layer->layer_mask_info.height);
 			return psd_status_done;
 		}
@@ -792,7 +793,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 			psd_stream_get_null(context, layer->channel_info[i].data_length);
 		return psd_status_done;
 	}
-	
+
 	context->per_channel_length = per_channel_length;
 	context->max_channel_length = max_channel_length;
 	length = max_channel_length * layer->number_of_channels;
@@ -812,7 +813,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 	for(i = 0; i < layer->number_of_channels; i ++)
 	{
 		psd_assert(layer->channel_info[i].channel_id >= -2);
-		
+
 		length = layer->channel_info[i].data_length - 2;
 		if(length > context->temp_channel_length)
 		{
@@ -833,14 +834,14 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 
 		if(length <= 0)
 			continue;
-	
+
 		if(psd_stream_get(context, context->temp_channel_data, layer->channel_info[i].data_length - 2)
 			!= layer->channel_info[i].data_length - 2)
 			return psd_status_fread_error;
 
 		image_data = context->temp_image_data + i * max_channel_length;
 		// Compression. 0 = Raw Data, 1 = RLE compressed, 2 = ZIP without
-		// prediction, 3 = ZIP with prediction.		
+		// prediction, 3 = ZIP with prediction.
 		switch(compression)
 		{
 			// If the compression code is 0, the image data is just the raw image data,
@@ -867,7 +868,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 					height = layer->layer_mask_info.height;
 				else
 					height = layer->height;
-				
+
 				count_data = context->temp_channel_data;
 				pixel_data = context->temp_channel_data + height * 2;
 				for(j = 0; j < height; j ++)
@@ -906,7 +907,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 					}
 					count_data += 2;
 				}
-				
+
 				if(layer->channel_info[i].channel_id == -2)
 					psd_assert(pixel_count == mask_pixels);
 				else
@@ -927,7 +928,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 			case 3:		// ZIP with prediction
 #ifdef PSD_INCLUDE_ZLIB
 				status = psd_unzip_with_prediction(context->temp_channel_data, layer->channel_info[i].data_length - 2,
-					image_data, layer->channel_info[i].channel_id == -2 ? mask_pixels : pixels, 
+					image_data, layer->channel_info[i].channel_id == -2 ? mask_pixels : pixels,
 					layer->channel_info[i].channel_id == -2 ? layer->layer_mask_info.width : layer->width,
 					context->depth);
 				if (status != psd_status_done)
@@ -980,7 +981,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 				else
 					psd_assert(0);
 				break;
-				
+
 			// 8bit or 16bit
 			case psd_color_mode_rgb:
 				if(context->depth == 8)
@@ -990,7 +991,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 				else
 					psd_assert(0);
 				break;
-				
+
 			// 8bit or 16bit
 			case psd_color_mode_cmyk:
 #ifdef PSD_SUPPORT_CMYK
@@ -1002,7 +1003,7 @@ psd_status psd_get_layer_channel_image_data(psd_context * context, psd_layer_rec
 					psd_assert(0);
 #endif
 				break;
-				
+
 			// 8bit or 16bit
 			case psd_color_mode_lab:
 #ifdef PSD_SUPPORT_LAB
