@@ -38,7 +38,7 @@ template <class T, class Tail> class tuple_element_holder
 
     tuple_element_holder& operator = (const tuple_element_holder& h)
     {
-      value = h.in_value;
+      value = h.value;
       return *this;
     }
 
