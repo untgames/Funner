@@ -9,6 +9,7 @@ using namespace render::low_level;
 
 typedef xtl::signal<void (Window&)> WindowSignal;
 typedef xtl::com_ptr<INativeWindow> INativeWindowPtr;
+typedef xtl::signal<void (WindowImpl*)>  BeforeDestroySignal;
 
 struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 {
@@ -24,16 +25,17 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   unsigned int             width;                     //ширина окна
   unsigned int             height;                    //высота окна
   WindowSignal             signals [WindowEvent_Num]; //сигналы окна
+  BeforeDestroySignal      before_destroy_signal;     //notification before window state is released
   Log                      log;                       //протокол
   SettingsPtr              settings;                  //настройки рендеринга
-  
+
 ///Конструктор
   Impl (WindowImpl* in_owner, const SettingsPtr& in_settings)
     : owner (in_owner)
     , width (0)
     , height (0)
   {
-    memset (&swap_chain_desc, 0, sizeof swap_chain_desc);    
+    memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
   }
 
 ///Деструктор
@@ -48,19 +50,19 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     {
     }
   }
-  
+
 ///Создание цепочки обмена
   void CreateSwapChain (void* handle, const char* adapter_mask)
   {
     try
     {
       swap_chain = 0;
-      
+
       if (!device_manager)
         throw xtl::format_operation_exception ("", "Null device manager");
 
-      swap_chain_desc.window_handle = handle;      
-         
+      swap_chain_desc.window_handle = handle;
+
       swap_chain = low_level::DriverManager::CreateSwapChain (&device_manager->Driver (), adapter_mask, swap_chain_desc);
 
       if (!swap_chain)
@@ -78,14 +80,14 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     try
     {
       swap_chain = 0;
-      
+
       if (!device_manager)
         throw xtl::format_operation_exception ("", "Null device manager");
 
       swap_chain_desc.window_handle = handle;
-      
+
       low_level::IAdapter* adapter_ptr = adapter.get ();
-          
+
       swap_chain = device_manager->Driver ().CreateSwapChain (1, &adapter_ptr, swap_chain_desc);
 
       if (!swap_chain)
@@ -97,7 +99,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       throw;
     }
   }
-  
+
 ///Создание целей рендеринга
   void CreateRenderTargets ()
   {
@@ -105,17 +107,17 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     {
       if (!swap_chain)
         throw xtl::format_operation_exception ("", "Null swap chain");
-        
+
       log.Printf ("Initialize render targets for swap chain");
-      
+
       LowLevelTexturePtr color_texture (device_manager->Device ().CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count - 1), false),
                          depth_stencil_texture (device_manager->Device ().CreateDepthStencilTexture (swap_chain.get ()), false);
- 
+
       if (!color_buffer)
       {
         RenderTargetPtr new_color_buffer (new RenderTargetImpl (device_manager, color_texture.get ()), false),
                         new_depth_stencil_buffer (new RenderTargetImpl (device_manager, depth_stencil_texture.get ()), false);
-        
+
         color_buffer         = new_color_buffer;
         depth_stencil_buffer = new_depth_stencil_buffer;
       }
@@ -134,10 +136,10 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
           throw;
         }
       }
-      
+
       color_buffer->Resize (width, height);
       depth_stencil_buffer->Resize (width, height);
-      
+
       log.Printf ("...render targets for swap chain created");
     }
     catch (xtl::exception& e)
@@ -146,7 +148,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       throw;
     }
   }
-  
+
 ///Обновление размеров окна
   void UpdateSizes (unsigned int in_width, unsigned int in_height)
   {
@@ -161,14 +163,14 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     {
       if (signals [WindowEvent_OnUpdate].empty () || !swap_chain)
         return;
-        
+
       Window window = Wrappers::Wrap<Window> (owner);
-        
+
       signals [WindowEvent_OnUpdate] (window);
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnUpdate", e.what ());      
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnUpdate", e.what ());
     }
     catch (...)
     {
@@ -181,22 +183,22 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   {
     try
     {
-      UpdateSizes (width, height);  
+      UpdateSizes (width, height);
 
       if (swap_chain)
         swap_chain->SetSize (width, height);
 
       if (signals [WindowEvent_OnResize].empty ())
         return;
-      
+
       if (color_buffer)
       {
         color_buffer->Resize (width, height);
         depth_stencil_buffer->Resize (width, height);
       }
-      
+
       Window window = Wrappers::Wrap<Window> (owner);
-        
+
       signals [WindowEvent_OnResize] (window);
     }
     catch (std::exception& e)
@@ -208,32 +210,32 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnResize");
     }
   }
-  
+
 ///Обработка события смены оконного дескриптора
   void OnHandleChanged (void* handle)
   {
     try
     {
       log.Printf ("Swap chain handle changed (handle=%p)", handle);
-      
+
       swap_chain = 0;
-      
+
       if (!handle)
         return;
 
       CreateSwapChain (handle);
-      
+
       try
-      {        
+      {
         CreateRenderTargets ();
       }
       catch (...)
       {
         swap_chain = 0;
-        
+
         if (color_buffer)         color_buffer->SetTarget (0);
         if (depth_stencil_buffer) depth_stencil_buffer->SetTarget (0);
-        
+
         throw;
       }
     }
@@ -246,20 +248,20 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnChangeHandle");
     }
   }
-  
+
 ///Обработчик события изменения области вывода
   void OnViewportChanged (const Rect& viewport)
   {
     try
     {
       log.Printf ("Window viewport changed: x=%d, y=%d, width=%u, height=%u", viewport.x, viewport.y, viewport.width, viewport.height);
-      
+
       if (color_buffer)
       {
         color_buffer->Resize (viewport.width, viewport.height);
         color_buffer->SetViewportOffset (math::vec2ui (viewport.x, viewport.y));
       }
-      
+
       if (depth_stencil_buffer)
       {
         depth_stencil_buffer->Resize (viewport.width, viewport.height);
@@ -268,13 +270,13 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnChangeViewport", e.what ());      
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnChangeViewport", e.what ());
     }
     catch (...)
     {
       log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnChangeViewport");
     }
-  }  
+  }
 };
 
 /*
@@ -288,7 +290,7 @@ unsigned int get_uint_property (const common::PropertyMap& properties, const cha
 {
   if (!properties.IsPresent (name))
     return default_value;
-    
+
   return (unsigned int)properties.GetInteger (name);
 }
 
@@ -296,7 +298,7 @@ const char* get_string_property (const common::PropertyMap& properties, const ch
 {
   if (!properties.IsPresent (name))
     return default_value;
-    
+
   return properties.GetString (name);
 }
 
@@ -307,15 +309,15 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
   try
   {
     Log log;
-    
+
     log.Printf ("Creating render window");
-    
+
       //заполнение параметров цепочки обмена
-      
+
     low_level::SwapChainDesc swap_chain_desc;
-    
+
     memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
-    
+
     swap_chain_desc.frame_buffer.color_bits   = get_uint_property (properties, "ColorBits", 0);
     swap_chain_desc.frame_buffer.alpha_bits   = get_uint_property (properties, "AlphaBits", 0);
     swap_chain_desc.frame_buffer.depth_bits   = get_uint_property (properties, "DepthBits", 0);
@@ -338,40 +340,40 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
         throw xtl::make_argument_exception ("", "properties ['SwapMethod']", swap_method_name);
       }
     }
-    
+
       //создание цепочки обмена
-    
+
     impl = new Impl (this, settings);
-    
+
     impl->native_window   = &window;
     impl->swap_chain_desc = swap_chain_desc;
-    
+
     if (!device_manager)
     {
       const char *driver_mask  = get_string_property (properties, "DriverMask", "*"),
                  *adapter_mask = get_string_property (properties, "AdapterMask", "*"),
                  *init_string  = get_string_property (properties, "InitString", "");
-                 
-      log.Printf ("Create device manager (driver='%s', adapter='%s', init_string='%s')", driver_mask, adapter_mask, init_string);                 
-                 
+
+      log.Printf ("Create device manager (driver='%s', adapter='%s', init_string='%s')", driver_mask, adapter_mask, init_string);
+
       LowLevelDevicePtr device;
       LowLevelDriverPtr driver;
-      
+
       swap_chain_desc.window_handle = window.GetHandle ();
 
       low_level::DriverManager::CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, impl->swap_chain, device, driver);
-      
+
       if (!device)
         throw xtl::format_operation_exception ("", "Null device after render::low_level::DriverManager::CreateSwapChainAndDevice");
-        
+
       if (!driver)
         throw xtl::format_operation_exception ("", "Null driver after render::low_level::DriverManager::CreateSwapChainAndDevice");
-        
+
       if (!impl->swap_chain)
-        throw xtl::format_operation_exception ("", "Null swap chain after render::low_level::DriverManager::CreateSwapChainAndDevice");      
-        
+        throw xtl::format_operation_exception ("", "Null swap chain after render::low_level::DriverManager::CreateSwapChainAndDevice");
+
       LowLevelAdapterPtr adapter = impl->swap_chain->GetAdapter ();
-        
+
       if (!adapter)
         throw xtl::format_operation_exception ("", "Null adapter after render::low_level::DriverManager::CreateSwapChainAndDevice");
 
@@ -383,24 +385,24 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
     else
     {
       const char* adapter_mask = get_string_property (properties, "AdapterMask", "*");
-                                  
+
       impl->device_manager = device_manager;
-      
+
       log.Printf ("Creating swap chain (adapter='%s')", adapter_mask);
-      
+
       impl->CreateSwapChain (window.GetHandle (), adapter_mask);
     }
-    
+
       //обновление размеров
-      
+
     impl->UpdateSizes (window.GetWidth (), window.GetHeight ());
-    
+
       //подписка на события окна
 
     window.AttachListener (impl.get ());
-    
+
       //создание целей рендеринга
-      
+
     impl->CreateRenderTargets ();
   }
   catch (xtl::exception& e)
@@ -412,6 +414,14 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
 
 WindowImpl::~WindowImpl ()
 {
+  try
+  {
+    impl->before_destroy_signal (this);
+  }
+  catch (...)
+  {
+    //Destruction must complete even if a handler throws.
+  }
 }
 
 /*
@@ -431,7 +441,7 @@ void WindowImpl::SetName (const char* name)
 {
   if (!name)
     throw xtl::make_null_argument_exception ("render::manager::WindowImpl::SetName", "name");
-    
+
   impl->name = name;
 }
 
@@ -448,7 +458,7 @@ const RenderTargetPtr& WindowImpl::ColorBuffer ()
 {
   if (!impl->color_buffer)
     throw xtl::format_operation_exception ("render::manager::WindowImpl::ColorBuffer", "No color buffer binded");
-    
+
   return impl->color_buffer;
 }
 
@@ -456,7 +466,7 @@ const RenderTargetPtr& WindowImpl::DepthStencilBuffer ()
 {
   if (!impl->depth_stencil_buffer)
     throw xtl::format_operation_exception ("render::manager::WindowImpl::DepthStencilBuffer", "No depth-stencil buffer binded");
-    
+
   return impl->depth_stencil_buffer;
 }
 
@@ -494,6 +504,11 @@ void WindowImpl::SwapBuffers ()
 /*
     Регистрация обработчиков событий
 */
+
+xtl::connection WindowImpl::RegisterDestroyHandler (const BeforeDestroyHandler& handler) const
+{
+  return impl->before_destroy_signal.connect (handler);
+}
 
 xtl::connection WindowImpl::RegisterEventHandler (WindowEvent event, const EventHandler& handler) const
 {

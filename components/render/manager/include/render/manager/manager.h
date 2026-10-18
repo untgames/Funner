@@ -194,6 +194,7 @@ class RenderManager
     typedef xtl::function<void (RenderManager& manager, manager::Window& window)> WindowEventHandler;
     typedef xtl::function<void (RenderManager& manager)>                         EventHandler;
 
+    //OnRemoved handlers may access the window during the callback, but must not retain it.
     xtl::connection RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const;
     xtl::connection RegisterEventHandler       (RenderManagerEvent event, const EventHandler& handler) const;
 

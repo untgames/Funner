@@ -1,0 +1,13 @@
+Results of window_destroy_test:
+--- Destroy window first ---
+before last reference: 0 removals
+removed 'main' 800x600, remaining windows: 0
+color buffer 800x600
+depth buffer 800x600
+after last reference: 1 removals, 0 windows
+--- Destroy manager first ---
+surviving window 'survivor' 800x600
+after surviving window: 1 removals
+--- Throw from destruction handler ---
+throwing destruction handler
+after throwing handler: 0 windows

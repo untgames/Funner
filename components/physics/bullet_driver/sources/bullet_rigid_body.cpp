@@ -97,7 +97,14 @@ RigidBody::RigidBody (bullet::Shape* shape, float mass)
 
 RigidBody::~RigidBody ()
 {
-  impl->before_destroy_signal (this);
+  try
+  {
+    impl->before_destroy_signal (this);
+  }
+  catch (...)
+  {
+    //Destruction must complete even if a handler throws.
+  }
 }
 
 /*
