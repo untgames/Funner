@@ -17,7 +17,7 @@ Save layers to dir 'test'...
   <Folder Name="Group 1" Id="0" Opacity="255" Visible="1"/>
   <Layer Name="Layer 4" Image="test/image004.png" Left="59" Top="41" Width="0" Height="0" Opacity="255" Visible="1" BlendMode="psd_blend_mode_normal"/>
 </LayerMap>
-413044ec107a57ec3b37ed0e18794eb9 *test/image001.png
+b9a8baffec54e63b271ed68dd4be9884 *test/image001.png
 48ae9d0cc5d1b1a616728cf298643a5b *test/image002.png
-413044ec107a57ec3b37ed0e18794eb9 *test/image003.png
-413044ec107a57ec3b37ed0e18794eb9 *test/image004.png
+b9a8baffec54e63b271ed68dd4be9884 *test/image003.png
+b9a8baffec54e63b271ed68dd4be9884 *test/image004.png
